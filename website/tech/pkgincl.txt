@@ -1,0 +1,17 @@
+Svarog386 is a FreeDOS(tm) distribution that comes with plenty of third-party packages. With time, packages get updated and new packages are being added. However, Svarog386 is not a shareware distribution CD, nor it is a "warez" production of any kind! Every software that is distributed within Svarog386 must comply to a few common sense rules, as listed below.
+
+*** Objective usefulness ***
+
+The distributed software must be useful. There is no point in distributing hundreds of "Hello World" programs for example. The software must be useable as a finished product and provide some features that are proven to be seeked by at least a subset of the user base. Games are considered useful, as long as they fulfill their goal of providing actual distraction.
+
+*** Reasonable quality ***
+
+The packaged program must exhibit traits of reasonable quality. This means that it should have a deterministic behavior, and be free of undesirable side-effects to the user's computer (not crashing, freezing, resulting in unexpected loss of data, etc). It should also provide clear, non-ambiguous instructions to the user about how the program is meant to be used.
+
+*** Free (no cost) ***
+
+The program must be free - that is, available at no financial cost. It doesn't have to comply to an OSI-approved license or be open-source (even if that would be preferred), but at the very least it must be free for personal, non-commercial use.
+
+*** Distribution allowed ***
+
+The program must allow distribution without restrictions, and must not forbid being redistributed in a re-packaged form.

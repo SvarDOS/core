@@ -1,0 +1,53 @@
+@import url(https://fonts.googleapis.com/css?Oxygen+Mono|Open+Sans:400,700,400italic);
+
+p.title {
+  font-size: 1.35em; margin: 3em auto 0 auto; text-align: center;
+}
+
+p.copyr {
+  font-size: 1.00em; margin: 0 auto 4.5em auto; color: #959595; text-align: center;
+}
+
+p.chapt {
+  font-size: 1.05em; font-weight: bold; margin: 1.75em 0 0 0; text-align: left;
+}
+
+p {
+  font-size: 1.00em; margin: 0.5em 0 0 0; text-align: justify;
+}
+
+p.tech {
+  white-space: pre-wrap;
+  font-size: 1.1em;
+  text-align: left;
+  font-family: 'Oxygen Mono', monospace;
+}
+
+html,body {
+  font-size: 1.0em;
+  margin: 0;
+  padding: 0;
+  background-color: #B0B0B0;
+  height: 100%;
+  font-family: "open sans", sans-serif;
+}
+
+a:link { /* unvisited link */
+  color: #000080; text-decoration: none;
+}
+
+a:visited { /* visited link */
+  color: #000080; text-decoration: none;
+}
+
+a:hover { /* mouse over link */
+  color: #0000FF; text-decoration: none;
+}
+
+a:active { /* selected link */
+  color: #000080; text-decoration: none;
+}
+
+a.mateusz {
+  color: inherit; text-decoration: none;
+}
