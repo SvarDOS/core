@@ -1,7 +1,8 @@
 <?php
   $arts = array(
-  'pkgincl'=>'Packages inclusion rules',
-  'pkgformat'=>'Package format'
+  'pkgincl' => 'Packages inclusion rules',
+  'pkgformat' => 'Package format',
+  'onlinerepos' => 'Svarog386 online repositories'
   );
 
   natcasesort($arts);
