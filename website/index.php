@@ -54,15 +54,23 @@
       <p>Svarog386 is <b>not</b> designed for strict 8086 compatibility. Many parts of it might require a 386-class CPU. If you look for a simple 8086 FreeDOS distribution, take a look at <a href="http://svarog86.sourceforge.net">Svarog86</a>.</p>
 
       <p>Need to get in touch, or wish to contribute some packages? Feel free to drop a line to the usenet group <b>alt.os.free-dos</b>. Alternatively, you could also reach me directly via <a href="https://sourceforge.net/u/userid-1220451/">sourceforge</a>.
-
-      <p style="margin: 1.2em auto 0 auto; font-size: 1.2em; text-align: center; font-weight: bold;"><a href="http://svarog386.viste.fr/svarog386.iso">Download the latest Svarog386 ISO</a></p>
-      <p style="margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;">
       ';
 
+      // find the latest ISO file available
+      $files = glob("*.iso", GLOB_NOSORT);
+      $files = array_combine($files, array_map("filemtime", $files));
+      arsort($files);
+      $latest_iso = key($files);
+
       // compute file size and date
-      $fsize = filesize("svarog386.iso") >> 20;
-      $ftime = date("d M Y", filemtime("svarog386.iso"));
-      echo "({$fsize}M, last update: {$ftime}, <a href=\"svarog386.iso.md5\" style=\"color: inherit;\">MD5</a>)";
+      $fsize = filesize($latest_iso) >> 20;
+      $ftime = date("d M Y", $files[$latest_iso]);
+
+      echo "<p style=\"margin: 1.2em auto 0 auto; font-size: 1.2em; text-align: center; font-weight: bold;\"><a href=\"http://svarog386.viste.fr/{$latest_iso}\">Download the latest Svarog386 ISO</a></p>\n";
+      echo '<p style="margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;">
+      ';
+
+      echo "({$fsize}M, last update: {$ftime}, <a href=\"{$latest_iso}.md5\" style=\"color: inherit;\">MD5</a>)";
 
       echo '
       </p>
