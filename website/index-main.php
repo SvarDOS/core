@@ -28,12 +28,17 @@
   $fsize_nosrc = filesize($latest_iso_nosrc) >> 20;
   $ftime_nosrc = date("d M Y", $files[$latest_iso_nosrc]);
 
-  echo "    <p style=\"margin: 1.2em auto 0 auto; font-size: 1.2em; text-align: center; font-weight: bold;\"><a href=\"/{$latest_iso_full}\">Download the latest Svarog386 ISO</a></p>\n";
-  echo '    <p style="margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;">';
+  //echo "    <p style=\"margin: 1.2em auto 0 auto; font-size: 1.2em; text-align: center; font-weight: bold;\">Download the latest Svarog386 ISO</p>\n";
 
-  echo "({$fsize_full}M, last update: {$ftime_full}, <a href=\"/{$latest_iso_full}.md5\" style=\"color: inherit;\">MD5</a>)";
+  echo "    <div style=\"width: 45%; float: left; margin: 1.2em 0 0 5%;\">\n";
+  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"/{$latest_iso_full}\">Download Svarog386 full version</a></p>\n";
+  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">({$fsize_full}M, last update: {$ftime_full}, <a href=\"/{$latest_iso_full}.md5\" style=\"color: inherit;\">MD5</a>)</p>\n";
+  echo "    </div>\n";
 
-  echo "</p>\n";
+  echo "    <div style=\"width: 45%; float: right; margin: 1.2em 5% 0 0;\">\n";
+  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"/{$latest_iso_nosrc}\">Download Svarog386 binary (no sources)</a></p>\n";
+  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">({$fsize_nosrc}M, last update: {$ftime_nosrc}, <a href=\"/{$latest_iso_nosrc}.md5\" style=\"color: inherit;\">MD5</a>)</p>\n";
+  echo "    </div>\n";
 
 ?>
 
