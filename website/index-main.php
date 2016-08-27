@@ -1,5 +1,7 @@
     <p class="title">Svarog386 - a FreeDOS distribution for 386+ computers</p>
     <p class="copyr">brought to you by <a href="http://mateusz.viste.fr/" class="mateusz">Mateusz Viste</a></p>
+
+    <div style="overflow: auto;">
     <img src="svarog386.png" alt="logo" style="height: 10em; float: right; margin: 0 0 0.5em 0.5em;">
 
     <p>Svarog386 is a DOS distribution based on FreeDOS. It's released in the form of a single bootable CD image (ISO) that contains the FreeDOS kernel, a command interpreter and a variety of third-party packages.<br>
@@ -8,6 +10,7 @@
     <p>Svarog386 is <b>not</b> designed for strict 8086 compatibility. Many parts of it might require a 386-class CPU. If you look for a simple 8086 FreeDOS distribution, take a look at <a href="http://svarog86.sourceforge.net">Svarog86</a>.</p>
 
     <p>Need to get in touch, or wish to contribute some packages? Feel free to drop a line to the usenet group <b>alt.os.free-dos</b>. Alternatively, you could also reach me directly via <a href="https://sourceforge.net/u/userid-1220451/">sourceforge</a>.
+    </div>
 
 <?php
   // find the latest 'full' ISO available
