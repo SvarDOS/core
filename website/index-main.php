@@ -42,4 +42,4 @@
 
 ?>
 
-    <p>You might want to know what it is exactly that you are about to download, before fetching the 450M+ ISO file. Feel free to browse the <a href="/repos/listing.txt">listing</a> of all the packages that come with Svarog386.</p>
+    <p>You might want to know what it is exactly that you are about to download, before fetching the 450M+ ISO file. Feel free to browse the <a href="listing.txt">listing</a> of all the packages that come with Svarog386.</p>

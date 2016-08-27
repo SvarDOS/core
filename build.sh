@@ -34,7 +34,8 @@ find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "source/*" ';'
 find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
 
 # refresh all repositories
-rm $REPOROOT/listing.txt
+cd "$REPOROOT"
+rm listing.txt
 $BUILDIDX $REPOROOT/base && $BUILDIDX $REPOROOTNOSRC/base
 if [ $? -ne 0 ] ; then exit 1 ; fi
 $BUILDIDX $REPOROOT/devel && $BUILDIDX $REPOROOTNOSRC/devel
