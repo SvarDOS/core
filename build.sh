@@ -13,6 +13,7 @@ BUILDIDX=/root/fdnpkg-buildidx/buildidx
 CDISODIR='/srv/www/svarog386.viste.fr/'
 CDROOT='/root/svarog386/cdroot'
 CDROOTNOSRC='/root/svarog386/cdrootnosrc'
+CDROOTMICRO='/root/svarog386/cdrootmicro'
 
 ### parameters block ends here ##############################################
 
@@ -24,8 +25,10 @@ echo "cloning $REPOROOT to $REPOROOTNOSRC..."
 rsync -a --delete $REPOROOT $REPOROOTNOSRC
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
-# sync the boot.img file from full version to the nosrc one
+# sync the boot.img file from full version to nosrc and micro
 cp $CDROOT/boot.img $CDROOTNOSRC/
+if [ $? -ne 0 ] ; then exit 1 ; fi
+cp $CDROOT/boot.img $CDROOTMICRO/
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # now strip the sources from the 'no source' clone
@@ -61,12 +64,16 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 DATESTAMP=`date +%Y%m%d-%H%M`
 CDISO="$CDISODIR/svarog386-full-$DATESTAMP.iso"
 CDISONOSRC="$CDISODIR/svarog386-nosrc-$DATESTAMP.iso"
+CDISOMICRO="$CDISODIR/svarog386-micro-$DATESTAMP.iso"
 genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -o $CDISO.tmp $CDROOT
 if [ $? -ne 0 ] ; then exit 1 ; fi
 genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -o $CDISONOSRC.tmp $CDROOTNOSRC
 if [ $? -ne 0 ] ; then exit 1 ; fi
+genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -o $CDISOMICRO.tmp $CDROOTMICRO
+if [ $? -ne 0 ] ; then exit 1 ; fi
 mv $CDISO.tmp $CDISO
 mv $CDISONOSRC.tmp $CDISONOSRC
+mv $CDISOMICRO.tmp $CDISOMICRO
 
 # compute the MD5 of the ISO files, taking care to include only the filename in it
 echo "computing md5 sums..."
@@ -75,6 +82,9 @@ md5sum `basename $CDISO` > $CDISO.md5
 
 cd `dirname $CDISONOSRC`
 md5sum `basename $CDISONOSRC` > $CDISONOSRC.md5
+
+cd `dirname $CDISOMICRO`
+md5sum `basename $CDISOMICRO` > $CDISOMICRO.md5
 
 cd "$origdir"
 
