@@ -11,7 +11,7 @@
 
 <?php
   // find the latest ISO file available
-  $files = glob("*.iso", GLOB_NOSORT);
+  $files = glob("svarog386-full-*.iso", GLOB_NOSORT);
   $files = array_combine($files, array_map("filemtime", $files));
   arsort($files);
   $latest_iso = key($files);
