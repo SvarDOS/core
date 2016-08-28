@@ -97,6 +97,10 @@ md5sum `basename $CDISONOSRC` > $CDISONOSRC.md5
 cd `dirname $CDISOMICRO`
 md5sum `basename $CDISOMICRO` > $CDISOMICRO.md5
 
+# delete all *.iso and *.md5 files, leaving only the 16 most recent
+echo "cleaning up old versions..."
+ls -tp $CDISODIR/svarog386-*-*.iso* | tail -n +17 | xargs -I {} rm -- {}
+
 cd "$origdir"
 
 echo "all done!"
