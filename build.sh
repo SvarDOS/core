@@ -37,8 +37,6 @@ find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "source/*" ';'
 find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
 
 # refresh all repositories
-cd "$REPOROOT"
-rm listing.txt
 $BUILDIDX $REPOROOT/base && $BUILDIDX $REPOROOTNOSRC/base
 if [ $? -ne 0 ] ; then exit 1 ; fi
 $BUILDIDX $REPOROOT/devel && $BUILDIDX $REPOROOTNOSRC/devel
@@ -59,6 +57,19 @@ $BUILDIDX $REPOROOT/sound && $BUILDIDX $REPOROOTNOSRC/sound
 if [ $? -ne 0 ] ; then exit 1 ; fi
 $BUILDIDX $REPOROOT/util && $BUILDIDX $REPOROOTNOSRC/util
 if [ $? -ne 0 ] ; then exit 1 ; fi
+
+# recompute the listing.txt file
+rm $CDISODIR/listing.txt
+cat $REPOROOT/base/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/devel/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/drivers/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/edit/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/emulatrs/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/games/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/net/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/packers/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/sound/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/util/listing.txt >> $CDISODIR/listing.txt
 
 # compute a filename for the ISO files and build it
 DATESTAMP=`date +%Y%m%d-%H%M`
