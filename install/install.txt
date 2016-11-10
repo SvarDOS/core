@@ -1,0 +1,8 @@
+
+                           SVAROG386 INSTALLER
+                     Copyright (C) 2016 Mateusz Viste
+
+This is a simple installer for Svarog386. It installs packages from the CD
+(relying on fdinst), SYS the boot disk and pre-configures default boot files
+(autoexec.bat and config.sys).
+
