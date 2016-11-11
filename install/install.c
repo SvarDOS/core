@@ -162,9 +162,8 @@ static int isdriveremovable(int drv) {
 }
 
 
-/* returns total disk space of drive drv (in MiB, max 2048), or -1 if drive invalid
- * also sets emptyflag to 1 if drive is empty, or to 0 otherwise */
-static int disksize(int drv, int *emptyflag) {
+/* returns total disk space of drive drv (in MiB, max 2048), or -1 if drive invalid */
+static int disksize(int drv) {
   long res;
   union REGS r;
   r.h.ah = 0x36; /* DOS 2+ get free disk space */
@@ -174,12 +173,24 @@ static int disksize(int drv, int *emptyflag) {
   res = r.x.ax;
   res *= r.x.bx;
   res *= r.x.cx;
-  res >>= 20; /* bytes to MiB */
-  if (r.x.dx != r.x.bx) { /* DX is total number of clusters, while BX is only free clusters */
-    *emptyflag = 0;
+  return(res >> 20); /* return result after converting bytes to MiB */
+}
+
+
+/* returns 0 if disk is empty, non-zero otherwise */
+static int diskempty(int drv) {
+  unsigned int rc;
+  int res;
+  char buff[8];
+  struct find_t fileinfo;
+  sprintf(buff, "%c:\\*.*", 'A' + drv - 1);
+  rc = _dos_findfirst(buff, _A_NORMAL | _A_SUBDIR | _A_HIDDEN | _A_SYSTEM, &fileinfo);
+  if (rc == 0) {
+    res = 1; /* call successfull means disk is not empty */
   } else {
-    *emptyflag = 1;
+    res = 0;
   }
+  /* _dos_findclose(&fileinfo); */ /* apparently required only on OS/2 */
   return(res);
 }
 
@@ -187,7 +198,7 @@ static int disksize(int drv, int *emptyflag) {
 static int preparedrive(void) {
   int driveremovable;
   int selecteddrive = 3; /* hardcoded to 'C:' */
-  int ds, emptydriveflag;
+  int ds;
   for (;;) {
     newscreen();
     driveremovable = isdriveremovable(selecteddrive);
@@ -214,13 +225,13 @@ static int preparedrive(void) {
           return(-1);
       }
       newscreen();
-      video_putstring(12, 10, COLOR_BODY[mono], "Your computer will reboot now. Press any key.");
+      video_putstring(11, 10, COLOR_BODY[mono], "Your computer will reboot now. Press any key.");
       input_getkey();
       reboot();
       return(-1);
     } else if (driveremovable > 0) {
-      video_putstring(8, 2, COLOR_BODY[mono], "ERROR: Drive C: appears to be a removable device.");
-      video_putstring(10, 2, COLOR_BODY[mono], "Installation aborted. Press any key.");
+      video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: appears to be a removable device.");
+      video_putstring(11, 2, COLOR_BODY[mono], "Installation aborted. Press any key.");
       return(-1);
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
@@ -236,7 +247,7 @@ static int preparedrive(void) {
     }
     rmdir("C:\\SVWRTEST.123");
     /* check total disk space */
-    ds = disksize(selecteddrive, &emptydriveflag);
+    ds = disksize(selecteddrive);
     if (ds < 16) {
       video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: is not big enough!");
       video_putstring(10, 2, COLOR_BODY[mono], "      Svarog386 requires a disk of at least 16 MiB.");
@@ -245,7 +256,7 @@ static int preparedrive(void) {
       return(-1);
     }
     /* is the disk empty? */
-    if (emptydriveflag != 0) {
+    if (diskempty(selecteddrive) != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
       video_putstring(7, 2, COLOR_BODY[mono], "ERROR: Drive C: is not empty. Svarog386 must be installed on an empty disk.");
       video_putstring(8, 2, COLOR_BODY[mono], "       You can format the disk now, to make it empty. Note however, that");
@@ -253,12 +264,12 @@ static int preparedrive(void) {
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
-      system("FORMAT /Q C:");
+      system("FORMAT C: /Q /U /V:SVAROG");
       continue;
     } else {
       /* final confirmation */
       char *list[] = { "Install Svarog386", "Quit to DOS", NULL};
-      video_putstring(8, 2, COLOR_BODY[mono], "The installation of Svarog386 to your C: disk is about to begin.");
+      video_putstring(7, 2, COLOR_BODY[mono], "The installation of Svarog386 to your C: disk is about to begin.");
       if (menuselect(10, -1, 4, list) != 0) return(-1);
       system("SYS A: C:");
       mkdir("C:\\TEMP");
@@ -379,7 +390,7 @@ static void installpackages(void) {
   /* install packages */
   for (i = 0; pkglist[i] != NULL; i++) {
     char buff[16];
-    sprintf(buff, "Installing package %d/%d: %s", i, pkglistlen, pkglist[i]);
+    sprintf(buff, "Installing package %d/%d: %s", i+1, pkglistlen, pkglist[i]);
     video_putstring(10, 2, COLOR_BODY[mono], buff);
     sprintf(buff, "FDNPKG INSTALL %s > NULL");
     system(buff);
