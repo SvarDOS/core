@@ -71,11 +71,27 @@ static int menuselect(int ypos, int xpos, int height, char **list) {
     if (key == 0x0D) { /* ENTER */
       return(res);
     } else if (key == 0x148) { /* up */
-      if (res > 0) res--;
+      if (res > 0) {
+        res--;
+        if (res < offset) offset = res;
+      }
     } else if (key == 0x150) { /* down */
-      if (res+1 < count) res++;
+      if (res+1 < count) {
+        res++;
+        if (res > offset + height - 3) offset = res - (height - 3);
+      }
+    } else if (key == 0x147) { /* home */
+      res = 0;
+      offset = 0;
+    } else if (key == 0x14F) { /* end */
+      res = count - 1;
+      if (res > offset + height - 3) offset = res - (height - 3);
     } else if (key == 0x1B) {  /* ESC */
       return(-1);
+    } else {
+      char buf[8];
+      sprintf(buf, "0x%02X ", key);
+      video_putstring(1, 0, COLOR_BODY[mono], buf);
     }
   }
 }
@@ -133,17 +149,16 @@ static int welcomescreen(void) {
 }
 
 
-static int testdrive(int drv) {
+/* returns 1 if drive is removable, 0 if not, -1 on error */
+static int isdriveremovable(int drv) {
   union REGS r;
-  /* try to switch to new drive */
-  r.h.ah = 0x0E;
-  r.h.dl = drv;
+  r.x.ax = 0x4408;
+  r.h.bl = drv;
   int86(0x21, &r, &r);
-  /* has it worked? if yes, then the drive is valid */
-  r.h.ah = 0x19;
-  int86(0x21, &r, &r);
-  if (r.h.al == drv) return(0);
-  return(-1);
+  /* CF set on error, AX set to 0 if removable, 1 if fixed */
+  if (r.x.cflag != 0) return(-1);
+  if (r.x.ax == 0) return(1);
+  return(0);
 }
 
 
@@ -170,45 +185,62 @@ static int disksize(int drv, int *emptyflag) {
 
 
 static int preparedrive(void) {
-  int driveexists;
+  int driveremovable;
   int selecteddrive = 3; /* hardcoded to 'C:' */
   int ds, emptydriveflag;
   for (;;) {
     newscreen();
-    driveexists = testdrive(selecteddrive);
-    if (driveexists != 0) {
-      char *list[] = { "Run the FDISK partitionning tool", "Quit to DOS", NULL};
+    driveremovable = isdriveremovable(selecteddrive);
+    if (driveremovable < 0) {
+      char *list[] = { "Create an automatic partition", "Run the FDISK partitionning tool", "Quit to DOS", NULL};
       video_putstring(4, 2, COLOR_BODY[mono], "ERROR: Drive C: could not be found. Perhaps your hard disk needs to be");
       video_putstring(5, 2, COLOR_BODY[mono], "       partitionned first. Please create at least one partition on your");
       video_putstring(6, 2, COLOR_BODY[mono], "       hard disk, so Svarog386 can be installed on it. Note, that");
       video_putstring(7, 2, COLOR_BODY[mono], "       Svarog386 requires at least 16 MiB of available disk space.");
-      video_putstring(9, 2, COLOR_BODY[mono], "You can use the FDISK partitioning tool for creating the required partition,");
-      video_putstring(10, 2, COLOR_BODY[mono], "or abort the installation and use any other partition manager of your choice.");
-      if (menuselect(12, -1, 4, list) != 0) return(-1);
-      video_clear(0x0700, 0);
-      video_movecursor(0, 0);
-      system("fdisk");
+      video_putstring(9, 2, COLOR_BODY[mono], "You can use the FDISK partitioning tool for creating the required partition");
+      video_putstring(10, 2, COLOR_BODY[mono], "manually, or you can let the installer partitioning your disk");
+      video_putstring(11, 2, COLOR_BODY[mono], "automatically. You can also abort the installation to use any other");
+      video_putstring(12, 2, COLOR_BODY[mono], "partition manager of your choice.");
+      switch (menuselect(14, -1, 5, list)) {
+        case 0:
+          system("FDISK /AUTO");
+          break;
+        case 1:
+          video_clear(0x0700, 0);
+          video_movecursor(0, 0);
+          system("FDISK");
+          break;
+        case 2:
+          return(-1);
+      }
       newscreen();
-      video_putstring(13, 10, COLOR_BODY[mono], "Your computer will reboot now. Press any key.");
+      video_putstring(12, 10, COLOR_BODY[mono], "Your computer will reboot now. Press any key.");
+      input_getkey();
       reboot();
       return(-1);
+    } else if (driveremovable > 0) {
+      video_putstring(8, 2, COLOR_BODY[mono], "ERROR: Drive C: appears to be a removable device.");
+      video_putstring(10, 2, COLOR_BODY[mono], "Installation aborted. Press any key.");
+      return(-1);
     }
-    /* if not formatted, propose to format it right away */
-    ds = disksize(selecteddrive, &emptydriveflag);
-    if (ds < 0) {
+    /* if not formatted, propose to format it right away (try to create a directory) */
+    if (mkdir("C:\\SVWRTEST.123") != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
       video_putstring(7, 2, COLOR_BODY[mono], "ERROR: Drive C: seems to be unformated.");
       video_putstring(8, 2, COLOR_BODY[mono], "       Do you wish to format it?");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
-      system("FORMAT /Q C:");
+      system("FORMAT C: /Q /U /V:SVAROG");
       continue;
     }
-    /* check total space */
+    rmdir("C:\\SVWRTEST.123");
+    /* check total disk space */
+    ds = disksize(selecteddrive, &emptydriveflag);
     if (ds < 16) {
-      video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: is not big enough! Svarog386 requires a disk of at least 16 MiB.");
-      video_putstring(11, 2, COLOR_BODY[mono], "Press any key to return to DOS.");
+      video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: is not big enough!");
+      video_putstring(10, 2, COLOR_BODY[mono], "      Svarog386 requires a disk of at least 16 MiB.");
+      video_putstring(12, 2, COLOR_BODY[mono], "Press any key to return to DOS.");
       input_getkey();
       return(-1);
     }
