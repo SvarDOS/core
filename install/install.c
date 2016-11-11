@@ -192,9 +192,9 @@ static int preparedrive(void) {
     newscreen();
     driveremovable = isdriveremovable(selecteddrive);
     if (driveremovable < 0) {
-      char *list[] = { "Create an automatic partition", "Run the FDISK partitionning tool", "Quit to DOS", NULL};
+      char *list[] = { "Create an automatic partition", "Run the FDISK partitioning tool", "Quit to DOS", NULL};
       video_putstring(4, 2, COLOR_BODY[mono], "ERROR: Drive C: could not be found. Perhaps your hard disk needs to be");
-      video_putstring(5, 2, COLOR_BODY[mono], "       partitionned first. Please create at least one partition on your");
+      video_putstring(5, 2, COLOR_BODY[mono], "       partitioned first. Please create at least one partition on your");
       video_putstring(6, 2, COLOR_BODY[mono], "       hard disk, so Svarog386 can be installed on it. Note, that");
       video_putstring(7, 2, COLOR_BODY[mono], "       Svarog386 requires at least 16 MiB of available disk space.");
       video_putstring(9, 2, COLOR_BODY[mono], "You can use the FDISK partitioning tool for creating the required partition");
