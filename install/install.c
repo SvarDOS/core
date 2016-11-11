@@ -11,11 +11,14 @@
 #include "input.h"
 #include "video.h"
 
-#define COLOR_TITLEBAR 0x7000
-#define COLOR_BODY 0x1700
-#define COLOR_SELECT 0x7000
-#define COLOR_SELECTCUR 0x1F00
+/* color scheme (color, mono) */
+static unsigned short COLOR_TITLEBAR[2] = {0x7000,0x7000};
+static unsigned short COLOR_BODY[2] = {0x1700,0x0700};
+static unsigned short COLOR_SELECT[2] = {0x7000,0x7000};
+static unsigned short COLOR_SELECTCUR[2] = {0x1F00,0x0700};
 
+/* mono flag */
+static int mono = 0;
 
 
 /* reboot the computer */
@@ -37,30 +40,30 @@ static int menuselect(int ypos, int xpos, int height, char **list) {
   /* if xpos negative, means 'center out' */
   if (xpos < 0) xpos = 39 - (width >> 1);
 
-  video_putchar(ypos, xpos+width+2, COLOR_SELECT, 0xBF);         /*       \ */
-  video_putchar(ypos, xpos-1, COLOR_SELECT, 0xDA);               /*  /      */
-  video_putchar(ypos+height-1, xpos-1, COLOR_SELECT, 0xC0);      /*  \      */
-  video_putchar(ypos+height-1, xpos+width+2, COLOR_SELECT, 0xD9);/*      /  */
-  video_putcharmulti(ypos, xpos, COLOR_SELECT, 0xC4, width + 2, 1);
-  video_putcharmulti(ypos+height-1, xpos, COLOR_SELECT, 0xC4, width + 2, 1);
-  video_putcharmulti(ypos+1, xpos-1, COLOR_SELECT, 0xB3, height - 2, 80);
-  video_putcharmulti(ypos+1, xpos+width+2, COLOR_SELECT, 0xB3, height - 2, 80);
+  video_putchar(ypos, xpos+width+2, COLOR_SELECT[mono], 0xBF);         /*       \ */
+  video_putchar(ypos, xpos-1, COLOR_SELECT[mono], 0xDA);               /*  /      */
+  video_putchar(ypos+height-1, xpos-1, COLOR_SELECT[mono], 0xC0);      /*  \      */
+  video_putchar(ypos+height-1, xpos+width+2, COLOR_SELECT[mono], 0xD9);/*      /  */
+  video_putcharmulti(ypos, xpos, COLOR_SELECT[mono], 0xC4, width + 2, 1);
+  video_putcharmulti(ypos+height-1, xpos, COLOR_SELECT[mono], 0xC4, width + 2, 1);
+  video_putcharmulti(ypos+1, xpos-1, COLOR_SELECT[mono], 0xB3, height - 2, 80);
+  video_putcharmulti(ypos+1, xpos+width+2, COLOR_SELECT[mono], 0xB3, height - 2, 80);
 
   for (;;) {
     int key;
     /* list of selectable items */
     for (i = 0; i < height - 2; i++) {
       if (i + offset == res) {
-        video_putchar(ypos + 1 + i, xpos, COLOR_SELECTCUR, 16);
-        video_putchar(ypos + 1 + i, xpos+width+1, COLOR_SELECTCUR, 17);
+        video_putchar(ypos + 1 + i, xpos, COLOR_SELECTCUR[mono], 16);
+        video_putchar(ypos + 1 + i, xpos+width+1, COLOR_SELECTCUR[mono], 17);
         video_movecursor(ypos + 1 + i, xpos);
-        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECTCUR, list[i + offset], width);
+        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECTCUR[mono], list[i + offset], width);
       } else if (i + offset < count) {
-        video_putchar(ypos + 1 + i, xpos, COLOR_SELECT, ' ');
-        video_putchar(ypos + 1 + i, xpos+width+1, COLOR_SELECT, ' ');
-        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECT, list[i + offset], width);
+        video_putchar(ypos + 1 + i, xpos, COLOR_SELECT[mono], ' ');
+        video_putchar(ypos + 1 + i, xpos+width+1, COLOR_SELECT[mono], ' ');
+        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECT[mono], list[i + offset], width);
       } else {
-        video_putcharmulti(ypos + 1 + i, xpos, COLOR_SELECT, ' ', width+2, 1);
+        video_putcharmulti(ypos + 1 + i, xpos, COLOR_SELECT[mono], ' ', width+2, 1);
       }
     }
     key = input_getkey();
@@ -78,9 +81,9 @@ static int menuselect(int ypos, int xpos, int height, char **list) {
 
 static void newscreen(void) {
   int x;
-  for (x = 0; x < 80; x++) video_putchar(0, x, COLOR_TITLEBAR, ' ');
-  video_clear(COLOR_BODY, 80);
-  video_putstring(0, 29, COLOR_TITLEBAR, "SVAROG386 INSTALLATION");
+  for (x = 0; x < 80; x++) video_putchar(0, x, COLOR_TITLEBAR[mono], ' ');
+  video_clear(COLOR_BODY[mono], 80);
+  video_putstring(0, 29, COLOR_TITLEBAR[mono], "SVAROG386 INSTALLATION");
 }
 
 
@@ -101,12 +104,12 @@ static int selectlang(char *lang) {
   };
 
   newscreen();
-  video_putstring(3, 30, COLOR_BODY, "Welcome to Svarog386");
-  video_putstring(4, 30, COLOR_BODY, "====================");
-  video_putstring(6, 2, COLOR_BODY, "Svarog386 is an operating system based on the FreeDOS kernel. It targets");
-  video_putstring(7, 2, COLOR_BODY, "386+ computers and comes with a variety of third-party applications. Before");
-  video_putstring(8, 2, COLOR_BODY, "we get to serious business, please select your preferred language from the");
-  video_putstring(9, 2, COLOR_BODY, "list below, and press the ENTER key:");
+  video_putstring(3, 30, COLOR_BODY[mono], "Welcome to Svarog386");
+  video_putstring(4, 30, COLOR_BODY[mono], "====================");
+  video_putstring(6, 2, COLOR_BODY[mono], "Svarog386 is an operating system based on the FreeDOS kernel. It targets");
+  video_putstring(7, 2, COLOR_BODY[mono], "386+ computers and comes with a variety of third-party applications. Before");
+  video_putstring(8, 2, COLOR_BODY[mono], "we get to serious business, please select your preferred language from the");
+  video_putstring(9, 2, COLOR_BODY[mono], "list below, and press the ENTER key:");
   choice = menuselect(11, -1, 12, langlist);
   if (choice < 0) return(-1);
   /* write short language code into lang */
@@ -121,10 +124,10 @@ static int selectlang(char *lang) {
 static int welcomescreen(void) {
   char *choice[] = {"Install Svarog386 to disk", "Quit to DOS", NULL};
   newscreen();
-  video_putstring(4, 1, COLOR_BODY, "You are about to install Svarog386, a free, MSDOS-compatible operating system");
-  video_putstring(5, 1, COLOR_BODY, "based on the FreeDOS kernel.");
-  video_putstring(7, 1, COLOR_BODY, "WARNING: If your PC has another operating system installed, this other system");
-  video_putstring(8, 1, COLOR_BODY, "         might be unable to boot once Svarog386 is installed.");
+  video_putstring(4, 1, COLOR_BODY[mono], "You are about to install Svarog386, a free, MSDOS-compatible operating system");
+  video_putstring(5, 1, COLOR_BODY[mono], "based on the FreeDOS kernel.");
+  video_putstring(7, 1, COLOR_BODY[mono], "WARNING: If your PC has another operating system installed, this other system");
+  video_putstring(8, 1, COLOR_BODY[mono], "         might be unable to boot once Svarog386 is installed.");
   return(menuselect(14, -1, 4, choice));
 }
 
@@ -174,18 +177,18 @@ static int preparedrive(void) {
     driveexists = testdrive(selecteddrive);
     if (driveexists != 0) {
       char *list[] = { "Run the FDISK partitionning tool", "Quit to DOS", NULL};
-      video_putstring(4, 2, COLOR_BODY, "ERROR: Drive C: could not be found. Perhaps your hard disk needs to be");
-      video_putstring(5, 2, COLOR_BODY, "       partitionned first. Please create at least one partition on your");
-      video_putstring(6, 2, COLOR_BODY, "       hard disk, so Svarog386 can be installed on it. Note, that");
-      video_putstring(7, 2, COLOR_BODY, "       Svarog386 requires at least 16 MiB of available disk space.");
-      video_putstring(9, 2, COLOR_BODY, "You can use the FDISK partitioning tool for creating the required partition,");
-      video_putstring(10, 2, COLOR_BODY, "or abort the installation and use any other partition manager of your choice.");
+      video_putstring(4, 2, COLOR_BODY[mono], "ERROR: Drive C: could not be found. Perhaps your hard disk needs to be");
+      video_putstring(5, 2, COLOR_BODY[mono], "       partitionned first. Please create at least one partition on your");
+      video_putstring(6, 2, COLOR_BODY[mono], "       hard disk, so Svarog386 can be installed on it. Note, that");
+      video_putstring(7, 2, COLOR_BODY[mono], "       Svarog386 requires at least 16 MiB of available disk space.");
+      video_putstring(9, 2, COLOR_BODY[mono], "You can use the FDISK partitioning tool for creating the required partition,");
+      video_putstring(10, 2, COLOR_BODY[mono], "or abort the installation and use any other partition manager of your choice.");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
       system("fdisk");
       newscreen();
-      video_putstring(13, 10, COLOR_BODY, "Your computer will reboot now. Press any key.");
+      video_putstring(13, 10, COLOR_BODY[mono], "Your computer will reboot now. Press any key.");
       reboot();
       return(-1);
     }
@@ -193,8 +196,8 @@ static int preparedrive(void) {
     ds = disksize(selecteddrive, &emptydriveflag);
     if (ds < 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
-      video_putstring(7, 2, COLOR_BODY, "ERROR: Drive C: seems to be unformated.");
-      video_putstring(8, 2, COLOR_BODY, "       Do you wish to format it?");
+      video_putstring(7, 2, COLOR_BODY[mono], "ERROR: Drive C: seems to be unformated.");
+      video_putstring(8, 2, COLOR_BODY[mono], "       Do you wish to format it?");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
@@ -203,17 +206,17 @@ static int preparedrive(void) {
     }
     /* check total space */
     if (ds < 16) {
-      video_putstring(9, 2, COLOR_BODY, "ERROR: Drive C: is not big enough! Svarog386 requires a disk of at least 16 MiB.");
-      video_putstring(11, 2, COLOR_BODY, "Press any key to return to DOS.");
+      video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: is not big enough! Svarog386 requires a disk of at least 16 MiB.");
+      video_putstring(11, 2, COLOR_BODY[mono], "Press any key to return to DOS.");
       input_getkey();
       return(-1);
     }
     /* is the disk empty? */
     if (emptydriveflag != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
-      video_putstring(7, 2, COLOR_BODY, "ERROR: Drive C: is not empty. Svarog386 must be installed on an empty disk.");
-      video_putstring(8, 2, COLOR_BODY, "       You can format the disk now, to make it empty. Note however, that");
-      video_putstring(9, 2, COLOR_BODY, "       this will ERASE ALL CURRENT DATA on your disk.");
+      video_putstring(7, 2, COLOR_BODY[mono], "ERROR: Drive C: is not empty. Svarog386 must be installed on an empty disk.");
+      video_putstring(8, 2, COLOR_BODY[mono], "       You can format the disk now, to make it empty. Note however, that");
+      video_putstring(9, 2, COLOR_BODY[mono], "       this will ERASE ALL CURRENT DATA on your disk.");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
@@ -222,7 +225,7 @@ static int preparedrive(void) {
     } else {
       /* final confirmation */
       char *list[] = { "Install Svarog386", "Quit to DOS", NULL};
-      video_putstring(8, 2, COLOR_BODY, "The installation of Svarog386 to your C: disk is about to begin.");
+      video_putstring(8, 2, COLOR_BODY[mono], "The installation of Svarog386 to your C: disk is about to begin.");
       if (menuselect(10, -1, 4, list) != 0) return(-1);
       system("SYS A: C:");
       return(0);
@@ -233,9 +236,9 @@ static int preparedrive(void) {
 
 static void finalreboot(void) {
   newscreen();
-  video_putstring(10, 2, COLOR_BODY, "Svarog386 installation is over. Please remove the");
-  video_putstring(10, 2, COLOR_BODY, "installation diskette and/or CD from the drive.");
-  video_putstring(13, 2, COLOR_BODY, "Press any key to reboot...");
+  video_putstring(10, 2, COLOR_BODY[mono], "Svarog386 installation is over. Please remove the");
+  video_putstring(10, 2, COLOR_BODY[mono], "installation diskette and/or CD from the drive.");
+  video_putstring(13, 2, COLOR_BODY[mono], "Press any key to reboot...");
   input_getkey();
   reboot();
 }
@@ -335,7 +338,7 @@ static void installpackages(void) {
   };
   int i;
   newscreen();
-  video_putstring(10, 2, COLOR_BODY, "Installing packages...");
+  video_putstring(10, 2, COLOR_BODY[mono], "Installing packages...");
   for (i = 0; pkglist[i] != NULL; i++) {
     char buff[32];
     sprintf(buff, "FDINST %s.ZIP > NULL");
@@ -347,6 +350,9 @@ static void installpackages(void) {
 int main(void) {
   char lang[4];
   int targetdrv;
+
+  /* init screen and detect mono status */
+  mono = video_init();
 
   for (;;) { /* fake loop, it's here just to break out easily */
     if (selectlang(lang) < 0) break; /* welcome to svarog, select your language */
