@@ -4,6 +4,7 @@
  */
 
 #include <dos.h>
+#include <direct.h>  /* mkdir() */
 #include <stdio.h>   /* printf() and friends */
 #include <stdlib.h>  /* system() */
 #include <string.h>  /* memcpy() */
@@ -228,6 +229,7 @@ static int preparedrive(void) {
       video_putstring(8, 2, COLOR_BODY[mono], "The installation of Svarog386 to your C: disk is about to begin.");
       if (menuselect(10, -1, 4, list) != 0) return(-1);
       system("SYS A: C:");
+      mkdir("C:\\TEMP");
       return(0);
     }
   }
@@ -262,6 +264,8 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "SET WATTCP.CFG=%c:\\SYSTEM\\CFG\\WATTCP.CFG\r\n");
   fprintf(fd, "PATH %%DOSDIR%%\\BIN;%%DOSDIR%%\\LINKS\r\n");
   fprintf(fd, "PROMPT $P$G\r\n");
+  fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
+  fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
   fprintf(fd, "\r\n\r\n");
   fprintf(fd, "MODE CON CP PREPARE=((991) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA10.CPX\r\n");
   fprintf(fd, "MODE CON CP SELECT=991\r\n");
@@ -336,12 +340,16 @@ static void installpackages(void) {
     "XCOPY",
     NULL
   };
-  int i;
+  int i, pkglistlen;
   newscreen();
-  video_putstring(10, 2, COLOR_BODY[mono], "Installing packages...");
+  /* count how long the pkg list is */
+  for (pkglistlen = 0; pkglist[pkglistlen] != NULL; pkglistlen++);
+  /* install packages */
   for (i = 0; pkglist[i] != NULL; i++) {
-    char buff[32];
-    sprintf(buff, "FDINST %s.ZIP > NULL");
+    char buff[16];
+    sprintf(buff, "Installing package %d/%d: %s", i, pkglistlen, pkglist[i]);
+    video_putstring(10, 2, COLOR_BODY[mono], buff);
+    sprintf(buff, "FDNPKG INSTALL %s > NULL");
     system(buff);
   }
 }
@@ -356,7 +364,7 @@ int main(void) {
 
   for (;;) { /* fake loop, it's here just to break out easily */
     if (selectlang(lang) < 0) break; /* welcome to svarog, select your language */
-    /*selectkeyb();*/ /* if non-english, what keyb layout should we use? */
+    /*selectkeyb();*/ /* what keyb layout should we use? */
     if (welcomescreen() != 0) break; /* what svarog386 is, ask whether to run live dos or install */
     targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
     if (targetdrv < 0) break;
