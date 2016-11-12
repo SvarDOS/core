@@ -1,2 +1,1 @@
-language list should be stored in a separate file (install.dat). it would contain the amount
-of languages, the list of all languages, their short code, codepage, supported keyboard layouts and country.sys preferences.
+language list should be stored in a separate file (install.dat). it would contain the amount of languages, the list of all languages, their short code, codepage, supported keyboard layouts and country.sys preferences.

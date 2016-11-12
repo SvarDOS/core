@@ -101,6 +101,7 @@ static void newscreen(void) {
   for (x = 0; x < 80; x++) video_putchar(0, x, COLOR_TITLEBAR[mono], ' ');
   video_clear(COLOR_BODY[mono], 80);
   video_putstring(0, 29, COLOR_TITLEBAR[mono], "SVAROG386 INSTALLATION");
+  video_movecursor(25,0);
 }
 
 
@@ -121,13 +122,10 @@ static int selectlang(char *lang) {
   };
 
   newscreen();
-  video_putstring(3, 30, COLOR_BODY[mono], "Welcome to Svarog386");
-  video_putstring(4, 30, COLOR_BODY[mono], "====================");
-  video_putstring(6, 2, COLOR_BODY[mono], "Svarog386 is an operating system based on the FreeDOS kernel. It targets");
-  video_putstring(7, 2, COLOR_BODY[mono], "386+ computers and comes with a variety of third-party applications. Before");
-  video_putstring(8, 2, COLOR_BODY[mono], "we get to serious business, please select your preferred language from the");
-  video_putstring(9, 2, COLOR_BODY[mono], "list below, and press the ENTER key:");
-  choice = menuselect(11, -1, 12, langlist);
+  video_putstring(4, 30, COLOR_BODY[mono], "Welcome to Svarog386");
+  video_putstring(5, 30, COLOR_BODY[mono], "====================");
+  video_putstring(8, 2, COLOR_BODY[mono], "Please select your language from the list below:");
+  choice = menuselect(10, -1, 12, langlist);
   if (choice < 0) return(-1);
   /* write short language code into lang */
   for (code = langlist[choice]; *code != 0; code++);
@@ -141,10 +139,11 @@ static int selectlang(char *lang) {
 static int welcomescreen(void) {
   char *choice[] = {"Install Svarog386 to disk", "Quit to DOS", NULL};
   newscreen();
-  video_putstring(4, 1, COLOR_BODY[mono], "You are about to install Svarog386, a free, MSDOS-compatible operating system");
-  video_putstring(5, 1, COLOR_BODY[mono], "based on the FreeDOS kernel.");
-  video_putstring(7, 1, COLOR_BODY[mono], "WARNING: If your PC has another operating system installed, this other system");
-  video_putstring(8, 1, COLOR_BODY[mono], "         might be unable to boot once Svarog386 is installed.");
+  video_putstring(4, 1, COLOR_BODY[mono], "You are about to install Svarog386: a free, MSDOS-compatible operating system");
+  video_putstring(5, 1, COLOR_BODY[mono], "based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a");
+  video_putstring(6, 1, COLOR_BODY[mono], "variety of third-party applications.");
+  video_putstring(8, 1, COLOR_BODY[mono], "WARNING: If your PC has another operating system installed, this other system");
+  video_putstring(9, 1, COLOR_BODY[mono], "         might be unable to boot once Svarog386 is installed.");
   return(menuselect(14, -1, 4, choice));
 }
 
@@ -197,8 +196,11 @@ static int diskempty(int drv) {
 
 static int preparedrive(void) {
   int driveremovable;
-  int selecteddrive = 3; /* hardcoded to 'C:' */
+  int selecteddrive = 3; /* hardcoded to 'C:' for now */
+  int cselecteddrive;
   int ds;
+  char buff[128];
+  cselecteddrive = 'A' + selecteddrive - 1;
   for (;;) {
     newscreen();
     driveremovable = isdriveremovable(selecteddrive);
@@ -230,21 +232,26 @@ static int preparedrive(void) {
       reboot();
       return(-1);
     } else if (driveremovable > 0) {
-      video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: appears to be a removable device.");
+      sprintf(buff, "ERROR: Drive %c: appears to be a removable device.");
+      video_putstring(9, 2, COLOR_BODY[mono], buff);
       video_putstring(11, 2, COLOR_BODY[mono], "Installation aborted. Press any key.");
       return(-1);
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
-    if (mkdir("C:\\SVWRTEST.123") != 0) {
+    sprintf(buff, "%c:\\SVWRTEST.123", cselecteddrive);
+    if (mkdir(buff) != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
-      video_putstring(7, 2, COLOR_BODY[mono], "ERROR: Drive C: seems to be unformated.");
+      sprintf(buff, "ERROR: Drive %c: seems to be unformated.", cselecteddrive);
+      video_putstring(7, 2, COLOR_BODY[mono], buff);
       video_putstring(8, 2, COLOR_BODY[mono], "       Do you wish to format it?");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
-      system("FORMAT C: /Q /U /V:SVAROG");
+      sprintf(buff, "FORMAT %c: /Q /U /V:SVAROG386", cselecteddrive);
+      system(buff);
       continue;
     }
+    sprintf(buff, "%c:\\SVWRTEST.123", cselecteddrive);
     rmdir("C:\\SVWRTEST.123");
     /* check total disk space */
     ds = disksize(selecteddrive);
@@ -264,16 +271,19 @@ static int preparedrive(void) {
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
-      system("FORMAT C: /Q /U /V:SVAROG");
+      system("FORMAT C: /Q /U /V:SVAROG386");
       continue;
     } else {
       /* final confirmation */
       char *list[] = { "Install Svarog386", "Quit to DOS", NULL};
-      video_putstring(7, 2, COLOR_BODY[mono], "The installation of Svarog386 to your C: disk is about to begin.");
+      sprintf(buff, "The installation of Svarog386 to your %c: disk is about to begin.", cselecteddrive);
+      video_putstring(7, 2, COLOR_BODY[mono], buff);
       if (menuselect(10, -1, 4, list) != 0) return(-1);
-      system("SYS A: C:");
-      mkdir("C:\\TEMP");
-      return(0);
+      sprintf(buff, "SYS A: %c:", cselecteddrive);
+      system(buff);
+      sprintf(buff, "%c:\\TEMP", cselecteddrive);
+      mkdir(buff);
+      return(cselecteddrive);
     }
   }
 }
@@ -281,8 +291,8 @@ static int preparedrive(void) {
 
 static void finalreboot(void) {
   newscreen();
-  video_putstring(10, 2, COLOR_BODY[mono], "Svarog386 installation is over. Please remove the");
-  video_putstring(10, 2, COLOR_BODY[mono], "installation diskette and/or CD from the drive.");
+  video_putstring(10, 2, COLOR_BODY[mono], "Svarog386 installation is over. Please remove the installation");
+  video_putstring(11, 2, COLOR_BODY[mono], "diskette and/or CD from the drive.");
   video_putstring(13, 2, COLOR_BODY[mono], "Press any key to reboot...");
   input_getkey();
   reboot();
@@ -290,17 +300,16 @@ static void finalreboot(void) {
 
 
 static void bootfilesgen(int targetdrv, char *lang) {
-  char drv = 'A' + targetdrv - 1;
   char buff[128];
   FILE *fd;
   /*** AUTOEXEC.BAT ***/
-  sprintf(buff, "%c:\\AUTOEXEC.BAT", drv);
+  sprintf(buff, "%c:\\AUTOEXEC.BAT", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "@ECHO OFF\r\n");
-  fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", drv);
-  fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVAROG.386\r\n", drv);
-  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n", drv);
+  fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", targetdrv);
+  fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
+  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n", targetdrv);
   fprintf(fd, "SET LANG=%s\r\n", lang);
   fprintf(fd, "SET DIRCMD=/OGNE/P\r\n");
   fprintf(fd, "SET FDNPKG.CFG=%c:\\SYSTEM\\CFG\\FDNPKG.CFG\r\n");
@@ -316,15 +325,15 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "SHSUCDX /d:FDCD0001\r\n");
   fclose(fd);
   /*** CONFIG.SYS ***/
-  sprintf(buff, "%c:\\CONFIG.SYS", drv);
+  sprintf(buff, "%c:\\CONFIG.SYS", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "DOS=UMB,HIGH\r\n");
   fprintf(fd, "FILES=50\r\n");
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEM.EXE\r\n", drv);
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512", drv);
-  fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\SVAROG.386\r\n", drv);
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\CDROM.SYS /D:FDCD0001\r\n", drv);
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEM.EXE\r\n", targetdrv);
+  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512", targetdrv);
+  fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\CDROM.SYS /D:FDCD0001\r\n", targetdrv);
   fclose(fd);
 }
 
@@ -389,10 +398,11 @@ static void installpackages(void) {
   for (pkglistlen = 0; pkglist[pkglistlen] != NULL; pkglistlen++);
   /* install packages */
   for (i = 0; pkglist[i] != NULL; i++) {
-    char buff[16];
+    char buff[128];
     sprintf(buff, "Installing package %d/%d: %s", i+1, pkglistlen, pkglist[i]);
+    strcat(buff, "       ");
     video_putstring(10, 2, COLOR_BODY[mono], buff);
-    sprintf(buff, "FDNPKG INSTALL %s > NULL");
+    sprintf(buff, "FDNPKG INSTALL %s > NUL");
     system(buff);
   }
 }
