@@ -381,7 +381,7 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "DOS=UMB,HIGH\r\n");
   fprintf(fd, "FILES=50\r\n");
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEM.EXE\r\n", targetdrv);
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512", targetdrv);
+  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512\r\n", targetdrv);
   fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\CDROM.SYS /D:FDCD0001\r\n", targetdrv);
   fclose(fd);
