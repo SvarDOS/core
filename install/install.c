@@ -385,7 +385,7 @@ static void bootfilesgen(int targetdrv, char *lang) {
 }
 
 
-static void installpackages(void) {
+static void installpackages(int targetdrv) {
   char *pkglist[] = {
     "APPEND",
     "ASSIGN",
@@ -440,16 +440,22 @@ static void installpackages(void) {
     NULL
   };
   int i, pkglistlen;
+  char buff[64];
   newscreen();
   /* count how long the pkg list is */
   for (pkglistlen = 0; pkglist[pkglistlen] != NULL; pkglistlen++);
+  /* set DOSDIR and friends */
+  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\SVAROG.386", targetdrv);
+  setenv("DOSDIR", buff, 1);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP", targetdrv);
+  setenv("TEMP", buff, 1);
   /* install packages */
   for (i = 0; pkglist[i] != NULL; i++) {
     char buff[128];
     snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkglist[i]);
     strcat(buff, "       ");
     video_putstring(10, 2, COLOR_BODY[mono], buff);
-    sprintf(buff, "FDNPKG INSTALL %s > NUL");
+    sprintf(buff, "FDINST INSTALL X:\\BASE\\%s.ZIP > NUL", pkglist[i]);
     system(buff);
   }
 }
@@ -508,7 +514,7 @@ int main(void) {
     targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
     if (targetdrv < 0) break;
     /*askaboutsources();*/ /* IF sources are available, ask if installing with them */
-    installpackages();   /* install packages */
+    installpackages(targetdrv);   /* install packages */
     bootfilesgen(targetdrv, lang); /* generate simple boot files */
     /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
     /*netcfg();*/ /* basic networking config */
