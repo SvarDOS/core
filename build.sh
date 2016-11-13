@@ -14,6 +14,7 @@ CDISODIR='/srv/www/svarog386.viste.fr/'
 CDROOT='/root/svarog386/cdroot'
 CDROOTNOSRC='/root/svarog386/cdrootnosrc'
 CDROOTMICRO='/root/svarog386/cdrootmicro'
+CUSTFILES='/root/svarog386/files'
 
 ### parameters block ends here ##############################################
 
@@ -24,6 +25,27 @@ origdir=`pwd`
 echo "cloning $REPOROOT to $REPOROOTNOSRC..."
 rsync -a --delete $REPOROOT $REPOROOTNOSRC
 if [ $? -ne 0 ] ; then exit 1 ; fi
+
+# build the boot floppy image first
+cp $CUSTFILES/bootmini.img $CDROOT/boot.img
+mcopy -i $CDROOT/boot.img $CUSTFILES/install.com ::/INSTALL.COM
+mcopy -i $CDROOT/boot.img $CUSTFILES/autoexec.bat ::/AUTOEXEC.BAT
+mcopy -i $CDROOT/boot.img $CUSTFILES/config.sys ::/CONFIG.SYS
+mcopy -i $CDROOT/boot.img $CUSTFILES/display.exe ::/DISPLAY.EXE
+mcopy -i $CDROOT/boot.img $CUSTFILES/fdnpkg.cfg ::/FDNPKG.CFG
+mcopy -i $CDROOT/boot.img $CUSTFILES/mode.com ::/MODE.COM
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega.cpx ::/EGA.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega2.cpx ::/EGA2.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega3.cpx ::/EGA3.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega4.cpx ::/EGA4.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega5.cpx ::/EGA5.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega6.cpx ::/EGA6.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega7.cpx ::/EGA7.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega8.cpx ::/EGA8.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega9.cpx ::/EGA9.CPX
+mcopy -i $CDROOT/boot.img $CUSTFILES/ega10.cpx ::/EGA10.CPX
+mmd -i $CDROOT/boot.img ::/NLS
+mcopy -i $CDROOT/boot.img $CUSTFILES/nls/*.* ::/NLS/
 
 # sync the boot.img file from full version to nosrc and micro
 cp $CDROOT/boot.img $CDROOTNOSRC/
