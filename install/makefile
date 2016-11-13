@@ -10,7 +10,7 @@
 all: install.com
 
 install.com: install.c input.c video.c
-	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox install.c input.c video.c
+	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox install.c input.c video.c kitten\kitten.c
 	upx --8086 -9 install.com
 
 clean: .SYMBOLIC

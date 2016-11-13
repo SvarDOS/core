@@ -1,6 +1,8 @@
 /*
  * SVAROG386 INSTALL
  * COPYRIGHT (C) 2016 MATEUSZ VISTE
+ *
+ * http://svarog386.sf.net
  */
 
 #include <dos.h>
@@ -9,8 +11,12 @@
 #include <stdlib.h>  /* system() */
 #include <string.h>  /* memcpy() */
 #include <unistd.h>
+
+#include "kitten\kitten.h"
+
 #include "input.h"
 #include "video.h"
+
 
 /* color scheme (color, mono) */
 static unsigned short COLOR_TITLEBAR[2] = {0x7000,0x7000};
@@ -29,6 +35,34 @@ static void reboot(void) {
   *rstaddr = 0x1234; /* 0x1234 = warm boot, 0 = cold boot */
   (*bootroutine)(); /* jump to the BIOS reboot routine at FFFF:0000 */
 }
+
+
+/* an NLS wrapper around video_putstring() */
+static void putstringnls(int y, int x, unsigned short attr, int nlsmaj, int nlsmin, char *s) {
+  s = kittengets(nlsmaj, nlsmin, s);
+  video_putstring(y, x, attr, s);
+}
+
+
+#define LDEC(x,y) (((unsigned short)x << 8) | (unsigned short)y)
+/* provides codepage and country files required by lang */
+static int getnlscp(char *lang, int *egafile) {
+  unsigned short l;
+  l = lang[0];
+  l <<= 8;
+  l |= lang[1];
+  switch (l) {
+    case LDEC('E','N'):
+      *egafile = 0;
+      return(437);
+    case LDEC('P','L'):
+      *egafile = 10;
+      return(991);
+  }
+  *egafile = 0;
+  return(437);
+}
+
 
 static int menuselect(int ypos, int xpos, int height, char **list) {
   int i, offset = 0, res = 0, count, width = 0;
@@ -98,15 +132,18 @@ static int menuselect(int ypos, int xpos, int height, char **list) {
 
 static void newscreen(void) {
   int x;
+  char *title;
+  title = kittengets(0, 0, "SVAROG386 INSTALLATION");
   for (x = 0; x < 80; x++) video_putchar(0, x, COLOR_TITLEBAR[mono], ' ');
+  video_putstring(0, 40 - (strlen(title) >> 1), COLOR_TITLEBAR[mono], title);
   video_clear(COLOR_BODY[mono], 80);
-  video_putstring(0, 29, COLOR_TITLEBAR[mono], "SVAROG386 INSTALLATION");
   video_movecursor(25,0);
 }
 
-
 static int selectlang(char *lang) {
   int choice;
+  int x;
+  char *msg;
   char *code;
   char *langlist[] = {
     "English\0EN",
@@ -122,9 +159,11 @@ static int selectlang(char *lang) {
   };
 
   newscreen();
-  video_putstring(4, 30, COLOR_BODY[mono], "Welcome to Svarog386");
-  video_putstring(5, 30, COLOR_BODY[mono], "====================");
-  video_putstring(8, 2, COLOR_BODY[mono], "Please select your language from the list below:");
+  msg = kittengets(1, 0, "Welcome to Svarog386");
+  x = 40 - (strlen(msg) >> 1);
+  video_putstring(4, x, COLOR_BODY[mono], msg);
+  video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
+  putstringnls(8, 2, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
   choice = menuselect(10, -1, 12, langlist);
   if (choice < 0) return(-1);
   /* write short language code into lang */
@@ -138,13 +177,15 @@ static int selectlang(char *lang) {
 /* returns 0 if installation must proceed, non-zero otherwise */
 static int welcomescreen(void) {
   char *choice[] = {"Install Svarog386 to disk", "Quit to DOS", NULL};
+  choice[0] = kittengets(0, 1, choice[0]);
+  choice[1] = kittengets(0, 2, choice[1]);
   newscreen();
-  video_putstring(4, 1, COLOR_BODY[mono], "You are about to install Svarog386: a free, MSDOS-compatible operating system");
-  video_putstring(5, 1, COLOR_BODY[mono], "based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a");
-  video_putstring(6, 1, COLOR_BODY[mono], "variety of third-party applications.");
-  video_putstring(8, 1, COLOR_BODY[mono], "WARNING: If your PC has another operating system installed, this other system");
-  video_putstring(9, 1, COLOR_BODY[mono], "         might be unable to boot once Svarog386 is installed.");
-  return(menuselect(14, -1, 4, choice));
+  putstringnls(4, 1, COLOR_BODY[mono], 2, 0, "You are about to install Svarog386: a free, MSDOS-compatible operating system");
+  putstringnls(5, 1, COLOR_BODY[mono], 2, 1, "based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a");
+  putstringnls(6, 1, COLOR_BODY[mono], 2, 2, "variety of third-party applications.");
+  putstringnls(8, 1, COLOR_BODY[mono], 2, 3, "WARNING: If your PC has another operating system installed, this other system");
+  putstringnls(9, 1, COLOR_BODY[mono], 2, 4, "         might be unable to boot once Svarog386 is installed.");
+  return(menuselect(13, -1, 4, choice));
 }
 
 
@@ -206,14 +247,19 @@ static int preparedrive(void) {
     driveremovable = isdriveremovable(selecteddrive);
     if (driveremovable < 0) {
       char *list[] = { "Create an automatic partition", "Run the FDISK partitioning tool", "Quit to DOS", NULL};
-      video_putstring(4, 2, COLOR_BODY[mono], "ERROR: Drive C: could not be found. Perhaps your hard disk needs to be");
-      video_putstring(5, 2, COLOR_BODY[mono], "       partitioned first. Please create at least one partition on your");
-      video_putstring(6, 2, COLOR_BODY[mono], "       hard disk, so Svarog386 can be installed on it. Note, that");
-      video_putstring(7, 2, COLOR_BODY[mono], "       Svarog386 requires at least 16 MiB of available disk space.");
-      video_putstring(9, 2, COLOR_BODY[mono], "You can use the FDISK partitioning tool for creating the required partition");
-      video_putstring(10, 2, COLOR_BODY[mono], "manually, or you can let the installer partitioning your disk");
-      video_putstring(11, 2, COLOR_BODY[mono], "automatically. You can also abort the installation to use any other");
-      video_putstring(12, 2, COLOR_BODY[mono], "partition manager of your choice.");
+      list[0] = kittengets(0, 3, list[0]);
+      list[1] = kittengets(0, 4, list[1]);
+      list[2] = kittengets(0, 2, list[2]);
+      sprintf(buff, kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be"), cselecteddrive);
+      video_putstring(4, 2, COLOR_BODY[mono], buff);
+      putstringnls(5, 2, COLOR_BODY[mono], 3, 1, "       partitioned first. Please create at least one partition on your");
+      putstringnls(6, 2, COLOR_BODY[mono], 3, 2, "       hard disk, so Svarog386 can be installed on it. Note, that");
+      sprintf(buff, kittengets(3, 3, "       Svarog386 requires at least %d MiB of available disk space."), 16);
+      video_putstring(7, 2, COLOR_BODY[mono], buff);
+      putstringnls(9, 2, COLOR_BODY[mono], 3, 4, "You can use the FDISK partitioning tool for creating the required partition");
+      putstringnls(10, 2, COLOR_BODY[mono], 3, 5, "manually, or you can let the installer partitioning your disk");
+      putstringnls(11, 2, COLOR_BODY[mono], 3, 6, "automatically. You can also abort the installation to use any other");
+      putstringnls(12, 2, COLOR_BODY[mono], 3, 7, "partition manager of your choice.");
       switch (menuselect(14, -1, 5, list)) {
         case 0:
           system("FDISK /AUTO");
@@ -227,56 +273,67 @@ static int preparedrive(void) {
           return(-1);
       }
       newscreen();
-      video_putstring(11, 10, COLOR_BODY[mono], "Your computer will reboot now. Press any key.");
+      putstringnls(11, 10, COLOR_BODY[mono], 3, 8, "Your computer will reboot now.");
+      putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
       reboot();
       return(-1);
     } else if (driveremovable > 0) {
-      sprintf(buff, "ERROR: Drive %c: appears to be a removable device.");
+      sprintf(buff, kittengets(3, 9, "ERROR: Drive %c: is a removable device. Installation aborted."), cselecteddrive);
       video_putstring(9, 2, COLOR_BODY[mono], buff);
-      video_putstring(11, 2, COLOR_BODY[mono], "Installation aborted. Press any key.");
+      putstringnls(11, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
       return(-1);
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
     sprintf(buff, "%c:\\SVWRTEST.123", cselecteddrive);
     if (mkdir(buff) != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
-      sprintf(buff, "ERROR: Drive %c: seems to be unformated.", cselecteddrive);
+      list[0] = kittengets(0, 6, list[0]);
+      list[1] = kittengets(0, 2, list[1]);
+      sprintf(buff, kittengets(3, 10, "ERROR: Drive %c: seems to be unformated."), cselecteddrive);
       video_putstring(7, 2, COLOR_BODY[mono], buff);
-      video_putstring(8, 2, COLOR_BODY[mono], "       Do you wish to format it?");
+      putstringnls(8, 2, COLOR_BODY[mono], 3, 11, "       Do you wish to format it?");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
-      sprintf(buff, "FORMAT %c: /Q /U /V:SVAROG386", cselecteddrive);
+      sprintf(buff, "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
       system(buff);
       continue;
     }
     sprintf(buff, "%c:\\SVWRTEST.123", cselecteddrive);
-    rmdir("C:\\SVWRTEST.123");
+    rmdir(buff);
     /* check total disk space */
     ds = disksize(selecteddrive);
     if (ds < 16) {
-      video_putstring(9, 2, COLOR_BODY[mono], "ERROR: Drive C: is not big enough!");
-      video_putstring(10, 2, COLOR_BODY[mono], "      Svarog386 requires a disk of at least 16 MiB.");
-      video_putstring(12, 2, COLOR_BODY[mono], "Press any key to return to DOS.");
+      sprintf(buff, kittengets(3, 12, "ERROR: Drive %c: is not big enough!"), cselecteddrive);
+      video_putstring(9, 2, COLOR_BODY[mono], buff);
+      sprintf(buff, kittengets(3, 13, "      Svarog386 requires a disk of at least %d MiB."), 16);
+      video_putstring(10, 2, COLOR_BODY[mono], buff);
+      putstringnls(12, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
       return(-1);
     }
     /* is the disk empty? */
     if (diskempty(selecteddrive) != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
-      video_putstring(7, 2, COLOR_BODY[mono], "ERROR: Drive C: is not empty. Svarog386 must be installed on an empty disk.");
-      video_putstring(8, 2, COLOR_BODY[mono], "       You can format the disk now, to make it empty. Note however, that");
-      video_putstring(9, 2, COLOR_BODY[mono], "       this will ERASE ALL CURRENT DATA on your disk.");
+      list[0] = kittengets(0, 6, list[0]);
+      list[1] = kittengets(0, 2, list[1]);
+      sprintf(buff, kittengets(3, 14, "ERROR: Drive %c: is not empty. Svarog386 must be installed on an empty disk."), cselecteddrive);
+      video_putstring(7, 2, COLOR_BODY[mono], buff);
+      putstringnls(8, 2, COLOR_BODY[mono], 3, 15, "       You can format the disk now, to make it empty. Note however, that");
+      putstringnls(9, 2, COLOR_BODY[mono], 3, 16, "       this will ERASE ALL CURRENT DATA on your disk.");
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
-      system("FORMAT C: /Q /U /V:SVAROG386");
+      sprintf(buff, "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
+      system(buff);
       continue;
     } else {
       /* final confirmation */
       char *list[] = { "Install Svarog386", "Quit to DOS", NULL};
-      sprintf(buff, "The installation of Svarog386 to your %c: disk is about to begin.", cselecteddrive);
+      list[0] = kittengets(0, 1, list[0]);
+      list[1] = kittengets(0, 2, list[1]);
+      sprintf(buff, kittengets(3, 17, "The installation of Svarog386 to %c: is about to begin."), cselecteddrive);
       video_putstring(7, 2, COLOR_BODY[mono], buff);
       if (menuselect(10, -1, 4, list) != 0) return(-1);
       sprintf(buff, "SYS A: %c:", cselecteddrive);
@@ -286,16 +343,6 @@ static int preparedrive(void) {
       return(cselecteddrive);
     }
   }
-}
-
-
-static void finalreboot(void) {
-  newscreen();
-  video_putstring(10, 2, COLOR_BODY[mono], "Svarog386 installation is over. Please remove the installation");
-  video_putstring(11, 2, COLOR_BODY[mono], "diskette and/or CD from the drive.");
-  video_putstring(13, 2, COLOR_BODY[mono], "Press any key to reboot...");
-  input_getkey();
-  reboot();
 }
 
 
@@ -319,7 +366,7 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
   fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
   fprintf(fd, "\r\n\r\n");
-  fprintf(fd, "MODE CON CP PREPARE=((991) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA10.CPX\r\n");
+  fprintf(fd, "MODE CON CP PREPARE=((991) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA10.CPX)\r\n");
   fprintf(fd, "MODE CON CP SELECT=991\r\n");
   fprintf(fd, "\r\n");
   fprintf(fd, "SHSUCDX /d:FDCD0001\r\n");
@@ -399,11 +446,47 @@ static void installpackages(void) {
   /* install packages */
   for (i = 0; pkglist[i] != NULL; i++) {
     char buff[128];
-    sprintf(buff, "Installing package %d/%d: %s", i+1, pkglistlen, pkglist[i]);
+    snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkglist[i]);
     strcat(buff, "       ");
     video_putstring(10, 2, COLOR_BODY[mono], buff);
     sprintf(buff, "FDNPKG INSTALL %s > NUL");
     system(buff);
+  }
+}
+
+
+static void finalreboot(void) {
+  newscreen();
+  putstringnls(10, 2, COLOR_BODY[mono], 5, 0, "Svarog386 installation is over. Your computer will reboot now.");
+  putstringnls(11, 2, COLOR_BODY[mono], 5, 1, "Please remove the installation disk from your drive.");
+  putstringnls(13, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
+  input_getkey();
+  reboot();
+}
+
+
+static void loadcp(char *lang) {
+  int cp, egafile;
+  char buff[64];
+  cp = getnlscp(lang, &egafile);
+  if (cp == 437) return;
+  video_movecursor(1, 0);
+  if (egafile == 1) {
+    sprintf(buff, "MODE CON CP PREP=((%d) A:\\EGA.CPX)", cp);
+  } else {
+    sprintf(buff, "MODE CON CP PREP=((%d) A:\\EGA%d.CPX)", cp, egafile);
+  }
+  system(buff);
+  sprintf(buff, "MODE CON CP SEL=%d", cp);
+  system(buff);
+  /* below I re-init the video controller - apparently this is required if
+   * I want the new glyph symbols to be actually applied */
+  {
+  union REGS r;
+  r.h.ah = 0x0F; /* get current video mode */
+  int86(0x10, &r, &r); /* r.h.al contains the current video mode now */
+  r.h.ah = 0; /* set video mode (to whatever is set in AL) */
+  int86(0x10, &r, &r);
   }
 }
 
@@ -417,6 +500,9 @@ int main(void) {
 
   for (;;) { /* fake loop, it's here just to break out easily */
     if (selectlang(lang) < 0) break; /* welcome to svarog, select your language */
+    setenv("LANG", lang, 1);
+    loadcp(lang);
+    kittenopen("INSTALL"); /* NLS support */
     /*selectkeyb();*/ /* what keyb layout should we use? */
     if (welcomescreen() != 0) break; /* what svarog386 is, ask whether to run live dos or install */
     targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
@@ -425,10 +511,12 @@ int main(void) {
     installpackages();   /* install packages */
     bootfilesgen(targetdrv, lang); /* generate simple boot files */
     /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
-    /*netcfg();*/ /* basic networking config? */
+    /*netcfg();*/ /* basic networking config */
+    /* TODO compute a customized FDNPKG file that looks either to local CD or net */
     finalreboot(); /* remove the CD and reboot */
     break;
   }
+  kittenclose(); /* close NLS support */
   video_clear(0x0700, 0);
   video_movecursor(0, 0);
   return(0);
