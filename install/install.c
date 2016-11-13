@@ -27,6 +27,9 @@ static unsigned short COLOR_SELECTCUR[2] = {0x1F00,0x0700};
 /* mono flag */
 static int mono = 0;
 
+/* how much disk space does Svarog386 require (in MiB) */
+#define SVAROG_DISK_REQ 8
+
 
 /* reboot the computer */
 static void reboot(void) {
@@ -254,7 +257,7 @@ static int preparedrive(void) {
       video_putstring(4, 2, COLOR_BODY[mono], buff);
       putstringnls(5, 2, COLOR_BODY[mono], 3, 1, "       partitioned first. Please create at least one partition on your");
       putstringnls(6, 2, COLOR_BODY[mono], 3, 2, "       hard disk, so Svarog386 can be installed on it. Note, that");
-      sprintf(buff, kittengets(3, 3, "       Svarog386 requires at least %d MiB of available disk space."), 16);
+      sprintf(buff, kittengets(3, 3, "       Svarog386 requires at least %d MiB of available disk space."), SVAROG_DISK_REQ);
       video_putstring(7, 2, COLOR_BODY[mono], buff);
       putstringnls(9, 2, COLOR_BODY[mono], 3, 4, "You can use the FDISK partitioning tool for creating the required partition");
       putstringnls(10, 2, COLOR_BODY[mono], 3, 5, "manually, or you can let the installer partitioning your disk");
@@ -304,10 +307,10 @@ static int preparedrive(void) {
     rmdir(buff);
     /* check total disk space */
     ds = disksize(selecteddrive);
-    if (ds < 16) {
+    if (ds < SVAROG_DISK_REQ) {
       sprintf(buff, kittengets(3, 12, "ERROR: Drive %c: is not big enough!"), cselecteddrive);
       video_putstring(9, 2, COLOR_BODY[mono], buff);
-      sprintf(buff, kittengets(3, 13, "      Svarog386 requires a disk of at least %d MiB."), 16);
+      sprintf(buff, kittengets(3, 13, "      Svarog386 requires a disk of at least %d MiB."), SVAROG_DISK_REQ);
       video_putstring(10, 2, COLOR_BODY[mono], buff);
       putstringnls(12, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
