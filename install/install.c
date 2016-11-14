@@ -166,7 +166,7 @@ static int selectlang(char *lang) {
   x = 40 - (strlen(msg) >> 1);
   video_putstring(4, x, COLOR_BODY[mono], msg);
   video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
-  putstringnls(8, 2, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
+  putstringnls(8, -1, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
   choice = menuselect(10, -1, 12, langlist);
   if (choice < 0) return(-1);
   /* write short language code into lang */
@@ -213,10 +213,11 @@ static int disksize(int drv) {
   r.h.dl = drv;
   int86(0x21, &r, &r);
   if (r.x.ax == 0xffffu) return(-1); /* AX set to FFFFh if drive invalid */
-  res = r.x.ax;
-  res *= r.x.bx;
-  res *= r.x.cx;
-  return(res >> 20); /* return result after converting bytes to MiB */
+  res = r.x.ax;  /* sectors per cluster */
+  res *= r.x.dx; /* dx contains total clusters, bx contains free clusters */
+  res *= r.x.cx; /* bytes per sector */
+  res >>= 20;    /* convert bytes to MiB */
+  return(res);
 }
 
 
@@ -249,7 +250,7 @@ static int preparedrive(void) {
     newscreen();
     driveremovable = isdriveremovable(selecteddrive);
     if (driveremovable < 0) {
-      char *list[] = { "Create an automatic partition", "Run the FDISK partitioning tool", "Quit to DOS", NULL};
+      char *list[] = { "Create a partition automatically", "Run the FDISK partitioning tool", "Quit to DOS", NULL};
       list[0] = kittengets(0, 3, list[0]);
       list[1] = kittengets(0, 4, list[1]);
       list[2] = kittengets(0, 2, list[2]);
@@ -337,7 +338,7 @@ static int preparedrive(void) {
       list[0] = kittengets(0, 1, list[0]);
       list[1] = kittengets(0, 2, list[1]);
       sprintf(buff, kittengets(3, 17, "The installation of Svarog386 to %c: is about to begin."), cselecteddrive);
-      video_putstring(7, 2, COLOR_BODY[mono], buff);
+      video_putstring(7, -1, COLOR_BODY[mono], buff);
       if (menuselect(10, -1, 4, list) != 0) return(-1);
       sprintf(buff, "SYS A: %c:", cselecteddrive);
       system(buff);
@@ -351,7 +352,9 @@ static int preparedrive(void) {
 
 static void bootfilesgen(int targetdrv, char *lang) {
   char buff[128];
+  int cp, egafile;
   FILE *fd;
+  cp = getnlscp(lang, &egafile);
   /*** AUTOEXEC.BAT ***/
   sprintf(buff, "%c:\\AUTOEXEC.BAT", targetdrv);
   fd = fopen(buff, "wb");
@@ -359,7 +362,7 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "@ECHO OFF\r\n");
   fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", targetdrv);
   fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
-  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n", targetdrv);
+  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
   fprintf(fd, "SET LANG=%s\r\n", lang);
   fprintf(fd, "SET DIRCMD=/OGNE/P\r\n");
   fprintf(fd, "SET FDNPKG.CFG=%c:\\SYSTEM\\CFG\\FDNPKG.CFG\r\n");
@@ -368,11 +371,23 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
   fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
-  fprintf(fd, "\r\n\r\n");
-  fprintf(fd, "MODE CON CP PREPARE=((991) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA10.CPX)\r\n");
-  fprintf(fd, "MODE CON CP SELECT=991\r\n");
   fprintf(fd, "\r\n");
-  fprintf(fd, "SHSUCDX /d:FDCD0001\r\n");
+  if (egafile > 0) {
+    if (egafile == 1) {
+      fprintf(fd, "MODE CON CP PREPARE=((%d) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA.CPX)\r\n", cp, targetdrv);
+    } else {
+      fprintf(fd, "MODE CON CP PREPARE=((%d) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA%d.CPX)\r\n", cp, targetdrv, egafile);
+    }
+    fprintf(fd, "MODE CON CP SELECT=%d\r\n", cp);
+    fprintf(fd, "\r\n");
+  }
+  fprintf(fd, "SHSUCDX /d:SVCD0001\r\n");
+  fprintf(fd, "\r\n");
+  fprintf(fd, "REM Uncomment the line below for automatic mouse support\r\n");
+  fprintf(fd, "REM CTMOUSE\r\n");
+  fprintf(fd, "\r\n");
+  fprintf(fd, "ECHO.");
+  fprintf(fd, "ECHO WELCOME TO SVAROG386! TYPE 'HELP' IF YOU NEED HELP.\r\n");
   fclose(fd);
   /*** CONFIG.SYS ***/
   sprintf(buff, "%c:\\CONFIG.SYS", targetdrv);
@@ -380,10 +395,10 @@ static void bootfilesgen(int targetdrv, char *lang) {
   if (fd == NULL) return;
   fprintf(fd, "DOS=UMB,HIGH\r\n");
   fprintf(fd, "FILES=50\r\n");
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEM.EXE\r\n", targetdrv);
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
+  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512 /P\r\n", targetdrv);
   fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\CDROM.SYS /D:FDCD0001\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
   fclose(fd);
 }
 
@@ -458,7 +473,7 @@ static void installpackages(int targetdrv) {
     snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkglist[i]);
     strcat(buff, "       ");
     video_putstring(10, 2, COLOR_BODY[mono], buff);
-    sprintf(buff, "FDINST INSTALL X:\\BASE\\%s.ZIP > NUL", pkglist[i]);
+    sprintf(buff, "FDINST INSTALL X:\\CORE\\%s.ZIP > NUL", pkglist[i]);
     system(buff);
   }
 }
@@ -466,9 +481,9 @@ static void installpackages(int targetdrv) {
 
 static void finalreboot(void) {
   newscreen();
-  putstringnls(10, 2, COLOR_BODY[mono], 5, 0, "Svarog386 installation is over. Your computer will reboot now.");
-  putstringnls(11, 2, COLOR_BODY[mono], 5, 1, "Please remove the installation disk from your drive.");
-  putstringnls(13, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
+  putstringnls(9, 2, COLOR_BODY[mono], 5, 0, "Svarog386 installation is over. Your computer will reboot now.");
+  putstringnls(10, 2, COLOR_BODY[mono], 5, 1, "Please remove the installation disk from your drive.");
+  putstringnls(12, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
   input_getkey();
   reboot();
 }
