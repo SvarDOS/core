@@ -14,6 +14,7 @@
 
 #include "kitten\kitten.h"
 
+#include "cdrom.h"
 #include "input.h"
 #include "video.h"
 
@@ -290,7 +291,9 @@ static int preparedrive(void) {
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
     sprintf(buff, "%c:\\SVWRTEST.123", cselecteddrive);
-    if (mkdir(buff) != 0) {
+    if (mkdir(buff) == 0) {
+      rmdir(buff);
+    } else {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
       list[0] = kittengets(0, 6, list[0]);
       list[1] = kittengets(0, 2, list[1]);
@@ -304,8 +307,6 @@ static int preparedrive(void) {
       system(buff);
       continue;
     }
-    sprintf(buff, "%c:\\SVWRTEST.123", cselecteddrive);
-    rmdir(buff);
     /* check total disk space */
     ds = disksize(selecteddrive);
     if (ds < SVAROG_DISK_REQ) {
@@ -350,11 +351,47 @@ static int preparedrive(void) {
 }
 
 
-static void bootfilesgen(int targetdrv, char *lang) {
+/* copy file src into dst, substituting all characters c1 by c2 */
+static void fcopysub(char *dst, char *src, char c1, char c2) {
+  FILE *fdd, *fds;
+  int buff;
+  fds = fopen(src, "rb");
+  if (fds == NULL) return;
+  fdd = fopen(dst, "wb");
+  if (fdd == NULL) {
+    fclose(fds);
+    return;
+  }
+  /* */
+  for (;;) {
+    buff = fgetc(fds);
+    if (buff == EOF) break;
+    if (buff == c1) buff = c2;
+    fprintf(fdd, "%c", buff);
+  }
+  /* close files and return */
+  fclose(fdd);
+  fclose(fds);
+}
+
+
+static void bootfilesgen(int targetdrv, char *lang, int cdromdrv) {
   char buff[128];
   int cp, egafile;
   FILE *fd;
   cp = getnlscp(lang, &egafile);
+  /*** CONFIG.SYS ***/
+  sprintf(buff, "%c:\\CONFIG.SYS", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return;
+  fprintf(fd, "DOS=UMB,HIGH\r\n");
+  fprintf(fd, "FILES=50\r\n");
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
+  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512 /P\r\n", targetdrv);
+  if (egafile > 0) fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\DISPLAY.SYS\r\n", targetdrv);
+  fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\CONF\\COUNTRY.SYS\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
+  fclose(fd);
   /*** AUTOEXEC.BAT ***/
   sprintf(buff, "%c:\\AUTOEXEC.BAT", targetdrv);
   fd = fopen(buff, "wb");
@@ -364,10 +401,10 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
   fprintf(fd, "SET LANG=%s\r\n", lang);
-  fprintf(fd, "SET DIRCMD=/OGNE/P\r\n");
-  fprintf(fd, "SET FDNPKG.CFG=%c:\\SYSTEM\\CFG\\FDNPKG.CFG\r\n");
-  fprintf(fd, "SET WATTCP.CFG=%c:\\SYSTEM\\CFG\\WATTCP.CFG\r\n");
-  fprintf(fd, "PATH %%DOSDIR%%\\BIN;%%DOSDIR%%\\LINKS\r\n");
+  fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
+  fprintf(fd, "SET FDNPKG.CFG=%c:\\SYSTEM\\CFG\\FDNPKG.CFG\r\n", targetdrv);
+  fprintf(fd, "SET WATTCP.CFG=%c:\\SYSTEM\\CFG\\WATTCP.CFG\r\n", targetdrv);
+  fprintf(fd, "PATH %%DOSDIR%%\\BIN;%c:\\SYSTEM\\LINKS\r\n", targetdrv);
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
   fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
@@ -386,24 +423,22 @@ static void bootfilesgen(int targetdrv, char *lang) {
   fprintf(fd, "REM Uncomment the line below for automatic mouse support\r\n");
   fprintf(fd, "REM CTMOUSE\r\n");
   fprintf(fd, "\r\n");
-  fprintf(fd, "ECHO.");
-  fprintf(fd, "ECHO WELCOME TO SVAROG386! TYPE 'HELP' IF YOU NEED HELP.\r\n");
+  fprintf(fd, "ECHO.\r\n");
+  fprintf(fd, "ECHO Welcome to Svarog386! Type 'HELP' if your need help.\r\n");
   fclose(fd);
-  /*** CONFIG.SYS ***/
-  sprintf(buff, "%c:\\CONFIG.SYS", targetdrv);
-  fd = fopen(buff, "wb");
-  if (fd == NULL) return;
-  fprintf(fd, "DOS=UMB,HIGH\r\n");
-  fprintf(fd, "FILES=50\r\n");
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512 /P\r\n", targetdrv);
-  fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
-  fclose(fd);
+  /*** CREATE DIRECTORY FOR OTHER CONFIGURATION FILES ***/
+  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG", targetdrv);
+  mkdir(buff);
+  /*** FDNPKG.CFG ***/
+  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG\\FDNPKG.CFG", targetdrv);
+  fcopysub(buff, "A:\\DAT\\FDNPKG.CFG", '$', cdromdrv);
+  /*** COUNTRY.SYS ***/
+  /*** PICOTCP ***/
+  /*** WATTCP ***/
 }
 
 
-static void installpackages(int targetdrv) {
+static void installpackages(int targetdrv, int cdromdrv) {
   char *pkglist[] = {
     "APPEND",
     "ASSIGN",
@@ -473,7 +508,7 @@ static void installpackages(int targetdrv) {
     snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkglist[i]);
     strcat(buff, "       ");
     video_putstring(10, 2, COLOR_BODY[mono], buff);
-    sprintf(buff, "FDINST INSTALL X:\\CORE\\%s.ZIP > NUL", pkglist[i]);
+    sprintf(buff, "FDINST INSTALL %c:\\CORE\\%s.ZIP > NUL", cdromdrv, pkglist[i]);
     system(buff);
   }
 }
@@ -518,6 +553,15 @@ static void loadcp(char *lang) {
 int main(void) {
   char lang[4];
   int targetdrv;
+  int cdromdrv;
+
+  /* find where the cdrom drive is */
+  cdromdrv = cdrom_findfirst();
+  if (cdromdrv < 0) {
+    printf("ERROR: CD-ROM DRIVE NOT FOUND\r\n");
+    return(1);
+  }
+  cdromdrv += 'A'; /* convert the cdrom 'id' (A=0) to an actual drive letter */
 
   /* init screen and detect mono status */
   mono = video_init();
@@ -532,11 +576,10 @@ int main(void) {
     targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
     if (targetdrv < 0) break;
     /*askaboutsources();*/ /* IF sources are available, ask if installing with them */
-    installpackages(targetdrv);   /* install packages */
-    bootfilesgen(targetdrv, lang); /* generate simple boot files */
+    installpackages(targetdrv, cdromdrv);    /* install packages */
+    bootfilesgen(targetdrv, lang, cdromdrv); /* generate boot files and other configurations */
     /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
     /*netcfg();*/ /* basic networking config */
-    /* TODO compute a customized FDNPKG file that looks either to local CD or net */
     finalreboot(); /* remove the CD and reboot */
     break;
   }
