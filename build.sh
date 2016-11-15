@@ -28,24 +28,8 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # build the boot floppy image first
 cp $CUSTFILES/bootmini.img $CDROOT/boot.img
-mcopy -i $CDROOT/boot.img $CUSTFILES/install.com ::/INSTALL.COM
-mcopy -i $CDROOT/boot.img $CUSTFILES/autoexec.bat ::/AUTOEXEC.BAT
-mcopy -i $CDROOT/boot.img $CUSTFILES/config.sys ::/CONFIG.SYS
-mcopy -i $CDROOT/boot.img $CUSTFILES/display.exe ::/DISPLAY.EXE
-mcopy -i $CDROOT/boot.img $CUSTFILES/fdnpkg.cfg ::/FDNPKG.CFG
-mcopy -i $CDROOT/boot.img $CUSTFILES/mode.com ::/MODE.COM
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega.cpx ::/EGA.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega2.cpx ::/EGA2.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega3.cpx ::/EGA3.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega4.cpx ::/EGA4.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega5.cpx ::/EGA5.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega6.cpx ::/EGA6.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega7.cpx ::/EGA7.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega8.cpx ::/EGA8.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega9.cpx ::/EGA9.CPX
-mcopy -i $CDROOT/boot.img $CUSTFILES/ega10.cpx ::/EGA10.CPX
-mmd -i $CDROOT/boot.img ::/NLS
-mcopy -i $CDROOT/boot.img $CUSTFILES/nls/*.* ::/NLS/
+export MTOOLS_NO_VFAT=1
+mcopy -sQm -i $CDROOT/boot.img $CUSTFILES/floppy/* ::/
 
 # sync the boot.img file from full version to nosrc and micro
 cp $CDROOT/boot.img $CDROOTNOSRC/
@@ -59,7 +43,7 @@ find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "source/*" ';'
 find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
 
 # refresh all repositories
-$BUILDIDX $REPOROOT/base && $BUILDIDX $REPOROOTNOSRC/base
+$BUILDIDX $REPOROOT/core && $BUILDIDX $REPOROOTNOSRC/core
 if [ $? -ne 0 ] ; then exit 1 ; fi
 $BUILDIDX $REPOROOT/devel && $BUILDIDX $REPOROOTNOSRC/devel
 if [ $? -ne 0 ] ; then exit 1 ; fi
@@ -82,7 +66,7 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # recompute the listing.txt file
 rm $CDISODIR/listing.txt
-cat $REPOROOT/base/listing.txt >> $CDISODIR/listing.txt
+cat $REPOROOT/core/listing.txt >> $CDISODIR/listing.txt
 cat $REPOROOT/devel/listing.txt >> $CDISODIR/listing.txt
 cat $REPOROOT/drivers/listing.txt >> $CDISODIR/listing.txt
 cat $REPOROOT/edit/listing.txt >> $CDISODIR/listing.txt
