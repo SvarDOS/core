@@ -281,7 +281,7 @@ static int preparedrive(void) {
       list[1] = kittengets(0, 4, list[1]);
       list[2] = kittengets(0, 2, list[2]);
       snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so Svarog386 can be installed on it. Note, that Svarog386 requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVAROG_DISK_REQ);
-      video_putstring(4, 2, COLOR_BODY[mono], buff, -1);
+      putstringwrap(4, 2, COLOR_BODY[mono], buff);
       switch (menuselect(14, -1, 5, list)) {
         case 0:
           system("FDISK /AUTO");
@@ -577,7 +577,6 @@ int main(void) {
 
   /* find where the cdrom drive is */
   cdromdrv = cdrom_findfirst();
-  cdromdrv = 3;
   if (cdromdrv < 0) {
     printf("ERROR: CD-ROM DRIVE NOT FOUND\r\n");
     return(1);
