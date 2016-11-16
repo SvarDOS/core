@@ -27,8 +27,7 @@
 3.2:BúèD: Dysk %c: jest noûnikiem wymiennym. Instalacja zatrzymana.
 3.3:BúèD: Dysk %c: zdaje sië nie byç sformatowany. Czy chcesz go sformatowaç?
 3.4:BúèD: Dysk %c: jest za maíy! Svarog386 wymaga co najmniej %d MiB miejsca.
-3.5:BúèD: Dysk %c: nie jest pusty. Svarog386 moße byç zainstalowany wyíÜcznie na pustym dysku.\n\n
-Moßesz sformatowaç dysk teraz, aby go opr¢ßniç. Operacja ta sprawi jednak ße WSZYSTKIE OBECNE DANE ZOSTANè UTRACONE.
+3.5:BúèD: Dysk %c: nie jest pusty. Svarog386 moße byç zainstalowany wyíÜcznie na pustym dysku.\n\nMoßesz sformatowaç dysk teraz, aby go opr¢ßniç. Operacja ta sprawi jednak ße WSZYSTKIE OBECNE DANE ZOSTANè UTRACONE.
 3.6:Za chwilë rozpocznie sië instalacja systemu Svarog386 na dysk %c.
 
 ### PACKAGES INSTALLATION ###
