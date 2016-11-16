@@ -281,7 +281,7 @@ static int preparedrive(void) {
       list[1] = kittengets(0, 4, list[1]);
       list[2] = kittengets(0, 2, list[2]);
       snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so Svarog386 can be installed on it. Note, that Svarog386 requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVAROG_DISK_REQ);
-      putstringwrap(4, 2, COLOR_BODY[mono], buff);
+      putstringwrap(4, 1, COLOR_BODY[mono], buff);
       switch (menuselect(14, -1, 5, list)) {
         case 0:
           system("FDISK /AUTO");
@@ -295,14 +295,14 @@ static int preparedrive(void) {
           return(-1);
       }
       newscreen();
-      putstringnls(11, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
+      putstringnls(10, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
       putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
       reboot();
       return(-1);
     } else if (driveremovable > 0) {
       snprintf(buff, sizeof(buff), kittengets(3, 2, "ERROR: Drive %c: is a removable device. Installation aborted."), cselecteddrive);
-      video_putstring(9, 2, COLOR_BODY[mono], buff, -1);
+      video_putstring(9, 1, COLOR_BODY[mono], buff, -1);
       putstringnls(11, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
       return(-1);
     }
@@ -315,7 +315,7 @@ static int preparedrive(void) {
       list[0] = kittengets(0, 6, list[0]);
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 3, "ERROR: Drive %c: seems to be unformated. Do you wish to format it?"), cselecteddrive);
-      video_putstring(7, 2, COLOR_BODY[mono], buff, -1);
+      video_putstring(7, 1, COLOR_BODY[mono], buff, -1);
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
@@ -328,7 +328,7 @@ static int preparedrive(void) {
     if (ds < SVAROG_DISK_REQ) {
       int y = 9;
       snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! Svarog386 requires a disk of at least %d MiB."), cselecteddrive);
-      y += putstringwrap(y, 2, COLOR_BODY[mono], buff);
+      y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
       putstringnls(++y, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
       return(-1);
@@ -339,7 +339,7 @@ static int preparedrive(void) {
       list[0] = kittengets(0, 6, list[0]);
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. Svarog386 must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
-      putstringwrap(7, 2, COLOR_BODY[mono], buff);
+      putstringwrap(7, 1, COLOR_BODY[mono], buff);
       if (menuselect(12, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
@@ -522,7 +522,7 @@ static void installpackages(int targetdrv, int cdromdrv) {
     char buff[128];
     snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkglist[i]);
     strcat(buff, "       ");
-    video_putstring(10, 2, COLOR_BODY[mono], buff, -1);
+    video_putstring(10, 1, COLOR_BODY[mono], buff, -1);
     if (pkglist[i][1] == ':') {
       snprintf(buff, sizeof(buff), "FDINST INSTALL %s.ZIP > NUL", pkglist[i]);
     } else {
@@ -537,7 +537,7 @@ static void finalreboot(void) {
   int y = 9;
   newscreen();
   y += putstringnls(y, 2, COLOR_BODY[mono], 5, 0, "Svarog386 installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.");
-  putstringnls(++y, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
+  putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
   input_getkey();
   reboot();
 }
@@ -587,9 +587,11 @@ int main(void) {
   mono = video_init();
 
   for (;;) { /* fake loop, it's here just to break out easily */
+    kittenopen("INSTALL"); /* NLS support */
     if (selectlang(lang) < 0) break; /* welcome to svarog, select your language */
     setenv("LANG", lang, 1);
     loadcp(lang);
+    kittenclose(); /* reload NLS with new language */
     kittenopen("INSTALL"); /* NLS support */
     /*selectkeyb();*/ /* what keyb layout should we use? */
     if (welcomescreen() != 0) break; /* what svarog386 is, ask whether to run live dos or install */
