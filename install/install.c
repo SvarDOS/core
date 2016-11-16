@@ -354,7 +354,7 @@ static int preparedrive(void) {
       snprintf(buff, sizeof(buff), kittengets(3, 6, "The installation of Svarog386 to %c: is about to begin."), cselecteddrive);
       video_putstring(7, -1, COLOR_BODY[mono], buff, -1);
       if (menuselect(10, -1, 4, list) != 0) return(-1);
-      snprintf(buff, sizeof(buff), "SYS A: %c:", cselecteddrive);
+      snprintf(buff, sizeof(buff), "SYS A: %c: > NUL", cselecteddrive);
       system(buff);
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
       mkdir(buff);
