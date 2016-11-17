@@ -82,11 +82,11 @@ DATESTAMP=`date +%Y%m%d-%H%M`
 CDISO="$CDISODIR/svarog386-full-$DATESTAMP.iso"
 CDISONOSRC="$CDISODIR/svarog386-nosrc-$DATESTAMP.iso"
 CDISOMICRO="$CDISODIR/svarog386-micro-$DATESTAMP.iso"
-genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -o $CDISO.tmp $CDROOT
+genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o $CDISO.tmp $CDROOT
 if [ $? -ne 0 ] ; then exit 1 ; fi
-genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -o $CDISONOSRC.tmp $CDROOTNOSRC
+genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o $CDISONOSRC.tmp $CDROOTNOSRC
 if [ $? -ne 0 ] ; then exit 1 ; fi
-genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -o $CDISOMICRO.tmp $CDROOTMICRO
+genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o $CDISOMICRO.tmp $CDROOTMICRO
 if [ $? -ne 0 ] ; then exit 1 ; fi
 mv $CDISO.tmp $CDISO
 mv $CDISONOSRC.tmp $CDISONOSRC
