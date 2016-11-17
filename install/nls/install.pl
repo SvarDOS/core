@@ -35,4 +35,4 @@
 4.0:Instalacja pakietu %d/%d: %s
 
 ### END SCREEN ###
-5.0:Instalacja Svarog386 jest zako¤czona. Tw¢j komputer zostanie teraz uruchomiony ponownie.\nWyjmij prosz‘ dysk instalacyjny z nap‘du.
+5.0:Instalacja Svarog386 jest zako¤czona. Tw¢j komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z nap‘du.
