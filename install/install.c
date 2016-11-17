@@ -180,14 +180,9 @@ static int selectlang(char *lang) {
   char *code;
   char *langlist[] = {
     "English\0EN",
-    "French\0FR",
-    "German\0DE",
-    "Italian\0IT",
+/*    "French\0FR",*/
     "Polish\0PL",
-    "Russian\0RU",
-    "Slovenian\0SL",
-    "Spanish\0ES",
-    "Turkish\0TR",
+/*    "Turkish\0TR",*/
     NULL
   };
 
@@ -197,7 +192,7 @@ static int selectlang(char *lang) {
   video_putstring(4, x, COLOR_BODY[mono], msg, -1);
   video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
   putstringnls(8, -1, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
-  choice = menuselect(10, -1, 12, langlist);
+  choice = menuselect(11, -1, 3, langlist);
   if (choice < 0) return(-1);
   /* write short language code into lang */
   for (code = langlist[choice]; *code != 0; code++);
@@ -336,11 +331,12 @@ static int preparedrive(void) {
     /* is the disk empty? */
     if (diskempty(selecteddrive) != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
+      int y = 6;
       list[0] = kittengets(0, 6, list[0]);
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. Svarog386 must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
-      putstringwrap(7, 1, COLOR_BODY[mono], buff);
-      if (menuselect(12, -1, 4, list) != 0) return(-1);
+      y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
+      if (menuselect(++y, -1, 4, list) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
@@ -485,6 +481,7 @@ static void installpackages(int targetdrv, int cdromdrv) {
     "HIMEMX",
     "KERNEL",
     "KEYB",
+    "KEYB_LAY",
     "LABEL",
     "LBACACHE",
     "MEM",
@@ -558,7 +555,8 @@ static void loadcp(char *lang) {
   snprintf(buff, sizeof(buff), "MODE CON CP SEL=%d > NUL", cp);
   system(buff);
   /* below I re-init the video controller - apparently this is required if
-   * I want the new glyph symbols to be actually applied */
+   * I want the new glyph symbols to be actually applied, at least some
+   * (broken?) BIOSes, like VBox, apply glyphs only at next video mode change */
   {
   union REGS r;
   r.h.ah = 0x0F; /* get current video mode */
@@ -567,6 +565,19 @@ static void loadcp(char *lang) {
   r.h.ah = 0; /* re-set video mode (to whatever is set in AL) */
   int86(0x10, &r, &r);
   }
+}
+
+
+/* checks CD drive drv for the presence of the Svarog386 install CD
+ * returns 0 if found, non-zero otherwise */
+static int checkcd(char drv) {
+  FILE *fd;
+  char fname[32];
+  snprintf(fname, sizeof(fname), "%c:\\CORE\\MEM.ZIP", drv);
+  fd = fopen(fname, "rb");
+  if (fd == NULL) return(-1);
+  fclose(fd);
+  return(0);
 }
 
 
@@ -582,6 +593,10 @@ int main(void) {
     return(1);
   }
   cdromdrv += 'A'; /* convert the cdrom 'id' (A=0) to an actual drive letter */
+  if (checkcd(cdromdrv) != 0) {
+    printf("ERROR: SVAROG386 INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
+    return(1);
+  }
 
   /* init screen and detect mono status */
   mono = video_init();
