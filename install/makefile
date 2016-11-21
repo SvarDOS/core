@@ -9,10 +9,17 @@
 
 all: install.com
 
-install.com: install.c cdrom.c input.c video.c
+install.com: keylay.h install.c cdrom.c input.c video.c
 	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox install.c cdrom.c input.c video.c kitten\kitten.c
 	upx --8086 -9 install.com
 
+locales.exe: locales.c
+	wcl -0 -y -cc -wx -ml -lr -we -d0 -ox locales.c
+
+keylay.h: locales.exe
+	locales.exe
+
 clean: .SYMBOLIC
 	del install.com
+	del locales.exe
 	del *.obj

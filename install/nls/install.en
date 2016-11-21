@@ -14,9 +14,10 @@
 0.5:Press any key...
 0.6:Proceed with formatting
 
-### LANGUAGE SELECTION SCREEN ###
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Welcome to Svarog386
 1.1:Please select your language from the list below:
+1.5:Svarog386 supports the keyboard layouts used in different countries. Choose the keyboard layout you want.
 
 ### WELCOME SCREEN ###
 2.0:You are about to install Svarog386: a free, MSDOS-compatible operating system based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.

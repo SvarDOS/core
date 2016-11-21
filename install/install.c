@@ -18,6 +18,9 @@
 #include "input.h"
 #include "video.h"
 
+/* keyboard layouts and locales */
+#include "keylay.h"
+#include "keyoff.h"
 
 /* color scheme (color, mono) */
 static unsigned short COLOR_TITLEBAR[2] = {0x7000,0x7000};
@@ -30,6 +33,19 @@ static int mono = 0;
 
 /* how much disk space does Svarog386 require (in MiB) */
 #define SVAROG_DISK_REQ 8
+
+/* a convenience 'function' used for debugging */
+#define DBG(x) { video_putstringfix(24, 0, 0x4F00u, x, 80); }
+
+struct slocales {
+  char lang[4];
+  char *keybcode;
+  unsigned int codepage;
+  int egafile;
+  int keybfile;
+  int keyboff;
+  int keyblen;
+};
 
 
 /* reboot the computer */
@@ -77,30 +93,10 @@ static int putstringnls(int y, int x, unsigned short attr, int nlsmaj, int nlsmi
 }
 
 
-#define LDEC(x,y) (((unsigned short)x << 8) | (unsigned short)y)
-/* provides codepage and country files required by lang */
-static int getnlscp(char *lang, int *egafile) {
-  unsigned short l;
-  l = lang[0];
-  l <<= 8;
-  l |= lang[1];
-  switch (l) {
-    case LDEC('E','N'):
-      *egafile = 0;
-      return(437);
-    case LDEC('P','L'):
-      *egafile = 10;
-      return(991);
-  }
-  *egafile = 0;
-  return(437);
-}
-
-
-static int menuselect(int ypos, int xpos, int height, char **list) {
+static int menuselect(int ypos, int xpos, int height, char **list, int listlen) {
   int i, offset = 0, res = 0, count, width = 0;
-  /* count how many languages there is */
-  for (count = 0; list[count] != NULL; count++) {
+  /* count how many positions there is, and check their width */
+  for (count = 0; (list[count] != NULL) && (count != listlen); count++) {
     int len = strlen(list[count]);
     if (len > width) width = len;
   }
@@ -173,16 +169,14 @@ static void newscreen(void) {
   video_movecursor(25,0);
 }
 
-static int selectlang(char *lang) {
-  int choice;
-  int x;
+static int selectlang(struct slocales *locales) {
+  int choice, x;
   char *msg;
-  char *code;
   char *langlist[] = {
-    "English\0EN",
-/*    "French\0FR",*/
-    "Polish\0PL",
-/*    "Turkish\0TR",*/
+    "English",
+    "French",
+    "Polish",
+    "Turkish",
     NULL
   };
 
@@ -192,12 +186,77 @@ static int selectlang(char *lang) {
   video_putstring(4, x, COLOR_BODY[mono], msg, -1);
   video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
   putstringnls(8, -1, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
-  choice = menuselect(11, -1, 3, langlist);
+  choice = menuselect(11, -1, 6, langlist, -1);
   if (choice < 0) return(-1);
-  /* write short language code into lang */
-  for (code = langlist[choice]; *code != 0; code++);
-  memcpy(lang, code + 1, 2);
-  lang[2] = 0;
+  /* populate locales with default values */
+  memset(locales, 0, sizeof(struct slocales));
+  switch (choice) {
+    case 1:
+      strcpy(locales->lang, "FR");
+      locales->keyboff = OFFLOC_FR;
+      locales->keyblen = OFFLEN_FR;
+      break;
+    case 2:
+      strcpy(locales->lang, "PL");
+      locales->keyboff = OFFLOC_PL;
+      locales->keyblen = OFFLEN_PL;
+      break;
+    case 3:
+      strcpy(locales->lang, "TR");
+      locales->keyboff = OFFLOC_TR;
+      locales->keyblen = OFFLEN_TR;
+      break;
+    default:
+      strcpy(locales->lang, "EN");
+      locales->keyboff = 0;
+      locales->keyblen = OFFCOUNT;
+      break;
+  }
+  /* populate the slocales struct */
+  for (msg = kblayouts[locales->keyboff]; *msg != 0; msg++); /* skip layout name */
+  msg++;
+  /* skip keyb code and copy it to locales.keybcode */
+  locales->keybcode = msg;
+  for (; *msg != 0; msg++);
+  /* */
+  locales->codepage = ((unsigned short)msg[1] << 8) | msg[2];
+  locales->egafile = msg[3];
+  locales->keybfile = msg[4];
+  /* */
+  return(0);
+}
+
+
+#define LTODEC(x, y) ((unsigned short)(x << 8) | (y))
+static int selectkeyb(struct slocales *locales) {
+  int keyboff, keyblen, menuheight;
+  unsigned short lang;
+  lang = LTODEC(locales->lang[0], locales->lang[1]);
+
+  switch (lang) {
+    case LTODEC('F', 'R'):
+      keyboff = OFFLOC_FR;
+      keyblen = OFFLEN_FR;
+      break;
+    case LTODEC('P', 'L'):
+      keyboff = OFFLOC_PL;
+      keyblen = OFFLEN_PL;
+      break;
+    case LTODEC('T', 'R'):
+      keyboff = OFFLOC_TR;
+      keyblen = OFFLEN_TR;
+      break;
+    default: /* otherwise propose all possible keyoard layouts */
+      keyboff = 0;
+      keyblen = OFFCOUNT;
+      break;
+  }
+  if (keyblen == 1) return(0); /* do not ask for keyboard layout if only one is available for given language */
+  newscreen();
+  putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "Svarog386 supports the keyboard layouts used in different countries. Choose the keyboard layout you want.");
+  menuheight = keyblen + 2;
+  if (menuheight > 13) menuheight = 13;
+  if (menuselect(10, -1, menuheight, &(kblayouts[keyboff]), keyblen) < 0) return(-1);
   return(0);
 }
 
@@ -209,7 +268,7 @@ static int welcomescreen(void) {
   choice[1] = kittengets(0, 2, choice[1]);
   newscreen();
   putstringnls(4, 1, COLOR_BODY[mono], 2, 0, "You are about to install Svarog386: a free, MSDOS-compatible operating system based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.");
-  return(menuselect(13, -1, 4, choice));
+  return(menuselect(13, -1, 4, choice, -1));
 }
 
 
@@ -277,7 +336,7 @@ static int preparedrive(void) {
       list[2] = kittengets(0, 2, list[2]);
       snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so Svarog386 can be installed on it. Note, that Svarog386 requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVAROG_DISK_REQ);
       putstringwrap(4, 1, COLOR_BODY[mono], buff);
-      switch (menuselect(14, -1, 5, list)) {
+      switch (menuselect(14, -1, 5, list, -1)) {
         case 0:
           system("FDISK /AUTO");
           break;
@@ -311,7 +370,7 @@ static int preparedrive(void) {
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 3, "ERROR: Drive %c: seems to be unformated. Do you wish to format it?"), cselecteddrive);
       video_putstring(7, 1, COLOR_BODY[mono], buff, -1);
-      if (menuselect(12, -1, 4, list) != 0) return(-1);
+      if (menuselect(12, -1, 4, list, -1) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
@@ -336,7 +395,7 @@ static int preparedrive(void) {
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. Svarog386 must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
-      if (menuselect(++y, -1, 4, list) != 0) return(-1);
+      if (menuselect(++y, -1, 4, list, -1) != 0) return(-1);
       video_clear(0x0700, 0);
       video_movecursor(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
@@ -349,7 +408,7 @@ static int preparedrive(void) {
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 6, "The installation of Svarog386 to %c: is about to begin."), cselecteddrive);
       video_putstring(7, -1, COLOR_BODY[mono], buff, -1);
-      if (menuselect(10, -1, 4, list) != 0) return(-1);
+      if (menuselect(10, -1, 4, list, -1) != 0) return(-1);
       snprintf(buff, sizeof(buff), "SYS A: %c: > NUL", cselecteddrive);
       system(buff);
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
@@ -384,11 +443,9 @@ static void fcopysub(char *dst, char *src, char c1, char c2) {
 }
 
 
-static void bootfilesgen(int targetdrv, char *lang, int cdromdrv) {
+static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) {
   char buff[128];
-  int cp, egafile;
   FILE *fd;
-  cp = getnlscp(lang, &egafile);
   /*** CONFIG.SYS ***/
   snprintf(buff, sizeof(buff), "%c:\\CONFIG.SYS", targetdrv);
   fd = fopen(buff, "wb");
@@ -408,7 +465,7 @@ static void bootfilesgen(int targetdrv, char *lang, int cdromdrv) {
   fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", targetdrv);
   fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
-  fprintf(fd, "SET LANG=%s\r\n", lang);
+  fprintf(fd, "SET LANG=%s\r\n", locales->lang);
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
   fprintf(fd, "SET FDNPKG.CFG=%c:\\SYSTEM\\CFG\\FDNPKG.CFG\r\n", targetdrv);
   fprintf(fd, "SET WATTCP.CFG=%c:\\SYSTEM\\CFG\\WATTCP.CFG\r\n", targetdrv);
@@ -418,14 +475,19 @@ static void bootfilesgen(int targetdrv, char *lang, int cdromdrv) {
   fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
   fprintf(fd, "FDAPM APMDOS\r\n");
   fprintf(fd, "\r\n");
-  if (egafile > 0) {
+  if (locales->egafile > 0) {
     fprintf(fd, "DISPLAY CON=(EGA,,1)\r\n");
-    if (egafile == 1) {
-      fprintf(fd, "MODE CON CP PREPARE=((%d) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA.CPX)\r\n", cp, targetdrv);
+    if (locales->egafile == 1) {
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA.CPX)\r\n", locales->codepage, targetdrv);
     } else {
-      fprintf(fd, "MODE CON CP PREPARE=((%d) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA%d.CPX)\r\n", cp, targetdrv, egafile);
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
     }
-    fprintf(fd, "MODE CON CP SELECT=%d\r\n", cp);
+    fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
+    if (locales->keybfile == 1) {
+      fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\KEYBOARD.SYS\r\n", locales->keybcode, locales->codepage, targetdrv);
+    } else {
+      fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\KEYBRD%d.SYS\r\n", locales->keybcode, locales->codepage, targetdrv, locales->keybfile);
+    }
     fprintf(fd, "\r\n");
   }
   fprintf(fd, "SHSUCDX /d:SVCD0001\r\n");
@@ -540,19 +602,17 @@ static void finalreboot(void) {
 }
 
 
-static void loadcp(char *lang) {
-  int cp, egafile;
+static void loadcp(struct slocales *locales) {
   char buff[64];
-  cp = getnlscp(lang, &egafile);
-  if (cp == 437) return;
+  if (locales->codepage == 437) return;
   video_movecursor(1, 0);
-  if (egafile == 1) {
-    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%d) A:\\EGA.CPX) > NUL", cp);
+  if (locales->egafile == 1) {
+    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) A:\\EGA.CPX) > NUL", locales->codepage);
   } else {
-    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%d) A:\\EGA%d.CPX) > NUL", cp, egafile);
+    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) A:\\EGA%d.CPX) > NUL", locales->codepage, locales->egafile);
   }
   system(buff);
-  snprintf(buff, sizeof(buff), "MODE CON CP SEL=%d > NUL", cp);
+  snprintf(buff, sizeof(buff), "MODE CON CP SEL=%u > NUL", locales->codepage);
   system(buff);
   /* below I re-init the video controller - apparently this is required if
    * I want the new glyph symbols to be actually applied, at least some
@@ -570,7 +630,7 @@ static void loadcp(char *lang) {
 
 /* checks CD drive drv for the presence of the Svarog386 install CD
  * returns 0 if found, non-zero otherwise */
-static int checkcd(char drv) {
+/*static int checkcd(char drv) {
   FILE *fd;
   char fname[32];
   snprintf(fname, sizeof(fname), "%c:\\CORE\\MEM.ZIP", drv);
@@ -578,11 +638,11 @@ static int checkcd(char drv) {
   if (fd == NULL) return(-1);
   fclose(fd);
   return(0);
-}
+}*/
 
 
 int main(void) {
-  char lang[4];
+  struct slocales locales;
   int targetdrv;
   int cdromdrv;
 
@@ -593,28 +653,28 @@ int main(void) {
     return(1);
   }
   cdromdrv += 'A'; /* convert the cdrom 'id' (A=0) to an actual drive letter */
-  if (checkcd(cdromdrv) != 0) {
+  /*if (checkcd(cdromdrv) != 0) {
     printf("ERROR: SVAROG386 INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
     return(1);
-  }
+  }*/
 
   /* init screen and detect mono status */
   mono = video_init();
 
   for (;;) { /* fake loop, it's here just to break out easily */
     kittenopen("INSTALL"); /* NLS support */
-    if (selectlang(lang) < 0) break; /* welcome to svarog, select your language */
-    setenv("LANG", lang, 1);
-    loadcp(lang);
+    if (selectlang(&locales) < 0) break; /* welcome to svarog, select your language */
+    setenv("LANG", locales.lang, 1);
+    loadcp(&locales);
     kittenclose(); /* reload NLS with new language */
     kittenopen("INSTALL"); /* NLS support */
-    /*selectkeyb();*/ /* what keyb layout should we use? */
+    if (selectkeyb(&locales) != 0) break;  /* what keyb layout should we use? */
     if (welcomescreen() != 0) break; /* what svarog386 is, ask whether to run live dos or install */
     targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
     if (targetdrv < 0) break;
     /*askaboutsources();*/ /* IF sources are available, ask if installing with them */
     installpackages(targetdrv, cdromdrv);    /* install packages */
-    bootfilesgen(targetdrv, lang, cdromdrv); /* generate boot files and other configurations */
+    bootfilesgen(targetdrv, &locales, cdromdrv); /* generate boot files and other configurations */
     /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
     /*netcfg();*/ /* basic networking config */
     finalreboot(); /* remove the CD and reboot */
