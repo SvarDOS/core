@@ -31,10 +31,12 @@ cp $CUSTFILES/bootmini.img $CDROOT/boot.img
 export MTOOLS_NO_VFAT=1
 mcopy -sQm -i $CDROOT/boot.img $CUSTFILES/floppy/* ::/
 
-# sync the boot.img file from full version to nosrc and micro
+# sync the boot.img file from full version to nosrc and micro, and publish it also stand-alone
 cp $CDROOT/boot.img $CDROOTNOSRC/
 if [ $? -ne 0 ] ; then exit 1 ; fi
 cp $CDROOT/boot.img $CDROOTMICRO/
+if [ $? -ne 0 ] ; then exit 1 ; fi
+cp $CDROOT/boot.img $CDISODIR/
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # now strip the sources from the 'no source' clone
