@@ -501,6 +501,8 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
       fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
     }
     fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
+  }
+  if (locales->keybfile > 0) {
     if (locales->keybfile == 1) {
       fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\KEYBOARD.SYS\r\n", locales->keybcode, locales->codepage, targetdrv);
     } else {
@@ -514,7 +516,7 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   fprintf(fd, "REM CTMOUSE\r\n");
   fprintf(fd, "\r\n");
   fprintf(fd, "ECHO.\r\n");
-  fprintf(fd, "ECHO Welcome to Svarog386! Type 'HELP' if you need help.\r\n");
+  fprintf(fd, "ECHO %s\r\n", kittengets(6, 0, "Welcome to Svarog386! Type 'HELP' if you need help."));
   fclose(fd);
   /*** CREATE DIRECTORY FOR OTHER CONFIGURATION FILES ***/
   snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG", targetdrv);
