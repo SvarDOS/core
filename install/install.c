@@ -627,10 +627,9 @@ static void loadcp(struct slocales *locales) {
   }
 }
 
-
 /* checks CD drive drv for the presence of the Svarog386 install CD
  * returns 0 if found, non-zero otherwise */
-/*static int checkcd(char drv) {
+static int checkcd(char drv) {
   FILE *fd;
   char fname[32];
   snprintf(fname, sizeof(fname), "%c:\\CORE\\MEM.ZIP", drv);
@@ -638,7 +637,7 @@ static void loadcp(struct slocales *locales) {
   if (fd == NULL) return(-1);
   fclose(fd);
   return(0);
-}*/
+}
 
 
 int main(void) {
@@ -653,10 +652,10 @@ int main(void) {
     return(1);
   }
   cdromdrv += 'A'; /* convert the cdrom 'id' (A=0) to an actual drive letter */
-  /*if (checkcd(cdromdrv) != 0) {
+  if (checkcd(cdromdrv) != 0) {
     printf("ERROR: SVAROG386 INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
     return(1);
-  }*/
+  }
 
   /* init screen and detect mono status */
   mono = video_init();
