@@ -1,0 +1,42 @@
+#
+# This is a localization file for the Svarog386 INSTALL program
+#
+# Language..: Turkish
+# Translator: anonymous
+#
+
+### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
+0.0:SVAROG386 KURULUMU
+0.1:Svarog386'y kur
+0.2:DOS'a ‡k
+0.3:Disk b”lmn otomatik olarak oluŸtur
+0.4:FDISK disk b”lm oluŸturma aracn ‡alŸtr
+0.5:Herhangi bir tuŸa basn...
+0.6:Bi‡imlendirmeye baŸla
+
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
+1.0:Svarog386'ya hoŸ geldiniz
+1.1:Dilinizi aŸa§daki listeden se‡iniz:
+1.5:Svarog386 de§iŸik lkelerde kullanlan klavye dzenlerini destekler. ˜stedi§iniz klavye dzenini se‡iniz.
+
+### WELCOME SCREEN ###
+2.0:FreeDOS ‡ekirde§ine dayal, cretsiz ve MS-DOS uyumlu bir iŸletim sistemi olan Svarog386'y kurmak zeresiniz. Svarog386, 386+ bilgisayarlar hedefler ve ‡eŸitli ‡nc parti uygulamalar sunar.\n\n˜KAZ: E§er PC'nizde baŸka bir iŸletim sistemi kuruluysa, bu sistem Svarog386 kurulduktan sonra baŸlamayabilir.
+
+### DISK SETUP ###
+3.0:HATA: %c: srcs bulunamad. Belki sabit diskinizde ”nce b”lm oluŸturmanz geremektedir. Ltfen sabit diskinizde en az bir b”lm oluŸturun ki Svarog386 o b”lme kurulabilsin. Svarog386'nn en az %d MiB disk alanna ihtiya‡ duydu§unu unutmayn.\n\nGerekli b”lm elle oluŸturmak i‡in FDISK b”lm oluŸturma aracn kullanabilir ya da kurulumun diskinizde otomatik olarak b”lm oluŸturmasna izin verebilirsiniz. BaŸka bir b”lm y”neticisi kullanmak i‡in kurulumu iptal de edebilirsiniz.
+3.1:Bilgisayarnz Ÿimdi yeniden baŸlayacaktr.
+3.2:HATA: %c: srcs ‡karlabilir bir cihazdr. Kurulum iptal edilmiŸtir.
+3.3:HATA: %c: bi‡imlendirilmemiŸ g”zkmektedir. Bi‡imlendirmek ister misiniz?
+3.4:HATA: %c: srcs yeteri kadar byk de§ildir! Svarog386 en az %d MiB boyutunda bir diske ihtiya‡ duyar.
+3.5:HATA: %c: srcs boŸ de§ildir. Svarog386, boŸ bir diske kurulmaldr.\n\nDiski boŸaltmak i‡in Ÿimdi bi‡imlendirebilirsiniz. Bununla beraber, bunun diskinizdeki TšM GšNCEL VER˜LER˜ S˜LECE¦˜N˜ unutmaynz.
+3.6:Svarog386'nn %c: srcsne kurulumu baŸlamak zeredir.
+
+### PACKAGES INSTALLATION ###
+# example: "Installing package 4/50: FDISK"
+4.0:u paket kuruluyor: %d/%d: %s
+
+### END SCREEN ###
+5.0:Svarog386 kurulumu sona ermiŸtir. Bilgisayarnz Ÿimdi yeniden baŸlayacaktr.\nLtfen kurulum diskini srcnzden ‡karn.
+
+### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
+6.0:Svarog386'ya hoŸ geldiniz! Yardma ihtiyacnz varsa 'HELP' yaznz.
