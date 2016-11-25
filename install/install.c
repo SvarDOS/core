@@ -471,7 +471,12 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   fprintf(fd, "DOS=UMB,HIGH\r\n");
   fprintf(fd, "FILES=50\r\n");
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\COMMAND.COM /E:512 /P\r\n", targetdrv);
+  if (strcmp(locales->lang, "EN") == 0) {
+    strcpy(buff, "command");
+  } else {
+    snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
+  }
+  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\%s.COM /E:512 /P\r\n", targetdrv, buff);
   fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\CONF\\COUNTRY.SYS\r\n", targetdrv);
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
   fclose(fd);
