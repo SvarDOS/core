@@ -15,3 +15,9 @@ The program must be free - that is, available at no financial cost. It doesn't h
 *** Distribution allowed ***
 
 The program must allow distribution without restrictions, and must not forbid being redistributed in a re-packaged form.
+
+  ----------------
+   CORE exception
+  ----------------
+
+Please note that, while the above rules are valid for all third-party repositories that come with Svarog386, it does not apply to the 'core' repository which contains the operating system itself. Svarog386 being a free (as in "libre") operating system, all "core" packages must comply to a libre-like license - be it GPL, BSD, public domain, or anything that allows for unrestricted distribution, provides source code and allows to modify it freely.
