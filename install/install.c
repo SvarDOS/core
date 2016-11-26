@@ -164,13 +164,29 @@ static int menuselect(int ypos, int xpos, int height, char **list, int listlen) 
   }
 }
 
-static void newscreen(void) {
+static void newscreen(int statusbartype) {
   int x;
-  char *title;
-  title = kittengets(0, 0, "SVAROG386 INSTALLATION");
+  char *msg;
+  msg = kittengets(0, 0, "SVAROG386 INSTALLATION");
   for (x = 0; x < 80; x++) video_putchar(0, x, COLOR_TITLEBAR[mono], ' ');
-  video_putstring(0, 40 - (strlen(title) >> 1), COLOR_TITLEBAR[mono], title, -1);
+  video_putstring(0, 40 - (strlen(msg) >> 1), COLOR_TITLEBAR[mono], msg, -1);
   video_clear(COLOR_BODY[mono], 80);
+  switch (statusbartype) {
+    case 1:
+      msg = kittengets(0, 11, "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS");
+      break;
+    case 2:
+      msg = kittengets(0, 5, "Press any key...");
+      break;
+    case 3:
+      msg = "";
+      break;
+    default:
+      msg = kittengets(0, 10, "Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen");
+      break;
+  }
+  video_putchar(24, 0, COLOR_TITLEBAR[mono], ' ');
+  video_putstringfix(24, 1, COLOR_TITLEBAR[mono], msg, 79);
   video_movecursor(25,0);
 }
 
@@ -185,7 +201,7 @@ static int selectlang(struct slocales *locales) {
     NULL
   };
 
-  newscreen();
+  newscreen(1);
   msg = kittengets(1, 0, "Welcome to Svarog386");
   x = 40 - (strlen(msg) >> 1);
   video_putstring(4, x, COLOR_BODY[mono], msg, -1);
@@ -257,7 +273,7 @@ static int selectkeyb(struct slocales *locales) {
       break;
   }
   if (keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
-  newscreen();
+  newscreen(0);
   putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "Svarog386 supports the keyboard layouts used in different countries. Choose the keyboard layout you want.");
   menuheight = keyblen + 2;
   if (menuheight > 13) menuheight = 13;
@@ -272,7 +288,7 @@ static int welcomescreen(void) {
   char *choice[] = {"Install Svarog386 to disk", "Quit to DOS", NULL};
   choice[0] = kittengets(0, 1, choice[0]);
   choice[1] = kittengets(0, 2, choice[1]);
-  newscreen();
+  newscreen(0);
   putstringnls(4, 1, COLOR_BODY[mono], 2, 0, "You are about to install Svarog386: a free, MSDOS-compatible operating system based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.");
   c = menuselect(13, -1, 4, choice, -1);
   if (c < 0) return(MENUPREV);
@@ -337,10 +353,10 @@ static int preparedrive(void) {
   char buff[1024];
   cselecteddrive = 'A' + selecteddrive - 1;
   for (;;) {
-    newscreen();
     driveremovable = isdriveremovable(selecteddrive);
     if (driveremovable < 0) {
       char *list[] = { "Create a partition automatically", "Run the FDISK partitioning tool", "Quit to DOS", NULL};
+      newscreen(0);
       list[0] = kittengets(0, 3, list[0]);
       list[1] = kittengets(0, 4, list[1]);
       list[2] = kittengets(0, 2, list[2]);
@@ -360,13 +376,14 @@ static int preparedrive(void) {
         default:
           return(-1);
       }
-      newscreen();
+      newscreen(2);
       putstringnls(10, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
       putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
       reboot();
       return(MENUQUIT);
     } else if (driveremovable > 0) {
+      newscreen(2);
       snprintf(buff, sizeof(buff), kittengets(3, 2, "ERROR: Drive %c: is a removable device. Installation aborted."), cselecteddrive);
       video_putstring(9, 1, COLOR_BODY[mono], buff, -1);
       putstringnls(11, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
@@ -378,6 +395,7 @@ static int preparedrive(void) {
       rmdir(buff);
     } else {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
+      newscreen(0);
       list[0] = kittengets(0, 6, list[0]);
       list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 3, "ERROR: Drive %c: seems to be unformated. Do you wish to format it?"), cselecteddrive);
@@ -395,6 +413,7 @@ static int preparedrive(void) {
     ds = disksize(selecteddrive);
     if (ds < SVAROG_DISK_REQ) {
       int y = 9;
+      newscreen(2);
       snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! Svarog386 requires a disk of at least %d MiB."), cselecteddrive);
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
       putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
@@ -402,6 +421,7 @@ static int preparedrive(void) {
       return(MENUQUIT);
     }
     /* is the disk empty? */
+    newscreen(0);
     if (diskempty(selecteddrive) != 0) {
       char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
       int y = 6;
@@ -593,7 +613,7 @@ static void installpackages(int targetdrv, int cdromdrv) {
   };
   int i, pkglistlen;
   char buff[64];
-  newscreen();
+  newscreen(3);
   /* count how long the pkg list is */
   for (pkglistlen = 0; pkglist[pkglistlen] != NULL; pkglistlen++);
   /* set DOSDIR and friends */
@@ -619,7 +639,7 @@ static void installpackages(int targetdrv, int cdromdrv) {
 
 static void finalreboot(void) {
   int y = 9;
-  newscreen();
+  newscreen(2);
   y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0, "Svarog386 installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.");
   putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
   input_getkey();

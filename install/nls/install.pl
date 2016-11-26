@@ -13,6 +13,9 @@
 0.4:Uruchom narz‘dzie partycjonowania FDISK
 0.5:Nacižnij dowolny klawisz...
 0.6:Formatuj
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:G¢ra/D¢’ = Wyb¢r pozycji | Enter = Zatwierd¦ wyb¢r | ESC = Poprzedni ekran
+0.11:G¢ra/D¢’ = Wyb¢r pozycji | Enter = Zatwierd¦ wyb¢r | ESC = Wyjd¦ do DOS
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Witaj w systemie Svarog386
