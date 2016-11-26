@@ -13,6 +13,9 @@
 0.4:Run the FDISK partitioning tool
 0.5:Press any key...
 0.6:Proceed with formatting
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen
+0.11:Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Welcome to Svarog386
