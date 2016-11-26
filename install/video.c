@@ -13,11 +13,9 @@
 /* pointer to the VGA/MDA screen */
 static unsigned short far *scr = (unsigned short far *)0xB8000000L;
 
-void video_clear(unsigned short attr, int offset) {
-  int x;
-  for (x = offset; x < 2000; x++) {
-    scr[x] = attr;
-  }
+void video_clear(unsigned short attr, int offset, int offsetend) {
+  offsetend += 2000;
+  while (offset < offsetend) scr[offset++] = attr;
 }
 
 /* inits screen, returns 0 for color mode, 1 for mono */

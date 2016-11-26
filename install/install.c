@@ -165,12 +165,11 @@ static int menuselect(int ypos, int xpos, int height, char **list, int listlen) 
 }
 
 static void newscreen(int statusbartype) {
-  int x;
   char *msg;
   msg = kittengets(0, 0, "SVAROG386 INSTALLATION");
-  for (x = 0; x < 80; x++) video_putchar(0, x, COLOR_TITLEBAR[mono], ' ');
+  video_putcharmulti(0, 0, COLOR_TITLEBAR[mono], ' ', 80, 1);
   video_putstring(0, 40 - (strlen(msg) >> 1), COLOR_TITLEBAR[mono], msg, -1);
-  video_clear(COLOR_BODY[mono], 80);
+  video_clear(COLOR_BODY[mono], 80, -80);
   switch (statusbartype) {
     case 1:
       msg = kittengets(0, 11, "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS");
@@ -367,7 +366,7 @@ static int preparedrive(void) {
           system("FDISK /AUTO");
           break;
         case 1:
-          video_clear(0x0700, 0);
+          video_clear(0x0700, 0, 0);
           video_movecursor(0, 0);
           system("FDISK");
           break;
@@ -403,7 +402,7 @@ static int preparedrive(void) {
       choice = menuselect(12, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
-      video_clear(0x0700, 0);
+      video_clear(0x0700, 0, 0);
       video_movecursor(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
       system(buff);
@@ -432,7 +431,7 @@ static int preparedrive(void) {
       choice = menuselect(++y, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
-      video_clear(0x0700, 0);
+      video_clear(0x0700, 0, 0);
       video_movecursor(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
       system(buff);
@@ -735,7 +734,7 @@ int main(void) {
 
  Quit:
   kittenclose(); /* close NLS support */
-  video_clear(0x0700, 0);
+  video_clear(0x0700, 0, 0);
   video_movecursor(0, 0);
   return(0);
 }
