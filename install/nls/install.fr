@@ -14,8 +14,8 @@
 0.5:Appuyez sur une touche quelconque...
 0.6:Proc‚der au formatage
 # Every string below must be at most 78 characters long! (used in status bar)
-0.10:Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen
-0.11:Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS
+0.10:Haut/Bas = Choisir l'‚l‚ment | Entr‚e = Valider | chap = cran pr‚c‚dent
+0.11:Haut/Bas = Choisir l'‚l‚ment | Entr‚e = Valider | chap = Quitter vers DOS
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Bienvenue sur Svarog386
@@ -26,7 +26,7 @@
 2.0:Vous ˆtes sur le point d'installer Svarog386 : un systŠme d'exploitation libre, compatible avec MS-DOS et bas‚ sur le noyau FreeDOS. Svarog386 vise les ordinateurs 386+ et offre une multitude d'applications tierces.\n\nATTENTION : s'il y a un autre systŠme d'exploitation install‚ sur votre PC, cet autre systŠme pourrait ne plus d‚marrer une fois que Svarog386 sera install‚.
 
 ### DISK SETUP ###
-3.0:ERREUR: le lecteur %c: n'a pu ˆtre trouv‚. Peut-ˆtre que votre disque a d'abord besoin d'ˆtre partitionn‚. Veuillez cr‚er au moins une partition sur votre disque dur pour que Svarog386 puisse y ˆtre install‚. Notez que Svarog386 n‚cessite au moins %d Mio de d'espace disque disponible.\n\nVous pouvez utiliser l'outil de partitionnement FDISK pour cr‚er manuellement la partition n‚cessaire, ou bien vous pouvez laisser l'installeur partitionner votre disque automatiquement. Vous pouvez aussi annuler l'installation pour utiliser un autre outil.
+3.0:ERREUR: le lecteur %c: n'a pu ˆtre trouv‚. Peut-ˆtre que votre disque a d'abord besoin d'ˆtre partitionn‚. Veuillez cr‚er au moins une partition sur votre disque dur pour que Svarog386 puisse y ˆtre install‚. Notez que Svarog386 n‚cessite au moins %d Mio d'espace disque disponible.\n\nVous pouvez utiliser l'outil de partitionnement FDISK pour cr‚er manuellement la partition n‚cessaire, ou bien vous pouvez laisser l'installeur partitionner votre disque automatiquement. Vous pouvez aussi annuler l'installation pour utiliser un autre outil.
 3.1:Votre ordinateur va maintenant red‚marrer.
 3.2:ERREUR: le lecteur %c: est un p‚riph‚rique amovible. Installation annul‚e.
 3.3:ERREUR: le lecteur %c: ne semble pas ˆtre format‚. Voulez-vous le formater ?
