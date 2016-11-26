@@ -156,11 +156,11 @@ static int menuselect(int ypos, int xpos, int height, char **list, int listlen) 
       if (res > offset + height - 3) offset = res - (height - 3);
     } else if (key == 0x1B) {  /* ESC */
       return(-1);
-    } else {
+    }/* else {
       char buf[8];
       snprintf(buf, sizeof(buf), "0x%02X ", key);
       video_putstring(1, 0, COLOR_BODY[mono], buf, -1);
-    }
+    }*/
   }
 }
 
