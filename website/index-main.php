@@ -9,7 +9,7 @@
 
     <p>Svarog386 is <b>not</b> designed for strict 8086 compatibility. Many parts of it might require a 386-class CPU. If you look for a simple 8086 FreeDOS distribution, take a look at <a href="http://svarog86.sourceforge.net">Svarog86</a>.</p>
 
-    <p>Need to get in touch? Wish to contribute some packages, translate Svarog386 to your language, or otherwise contribute? Feel free to drop a line or two to the usenet group <b>alt.os.free-dos</b>.
+    <p>Need to get in touch? Wish to contribute some packages, translate Svarog386 to your language, or otherwise contribute? Feel free to drop a line or two to the usenet group <b><a href="?p=tech&amp;art=support">alt.os.free-dos</a></b>.
     </div>
 
 <?php

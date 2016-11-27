@@ -1,5 +1,6 @@
 <?php
   $arts = array(
+  'support' => 'How do I get in touch with Svarog386\'s people?',
   'pkgincl' => 'Packages inclusion rules',
   'pkgformat' => 'Package format',
   'onlinerepos' => 'Svarog386 online repositories'
