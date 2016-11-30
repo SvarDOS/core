@@ -26,7 +26,7 @@
 2.0:FreeDOS ‡ekirde§ine dayal, cretsiz ve MS-DOS uyumlu bir iŸletim sistemi olan Svarog386'y kurmak zeresiniz. Svarog386, 386+ bilgisayarlar hedefler ve ‡eŸitli ‡nc parti uygulamalar sunar.\n\n˜KAZ: E§er PC'nizde baŸka bir iŸletim sistemi kuruluysa, bu sistem Svarog386 kurulduktan sonra baŸlamayabilir.
 
 ### DISK SETUP ###
-3.0:HATA: %c: srcs bulunamad. Belki sabit diskinizde ”nce b”lm oluŸturmanz geremektedir. Ltfen sabit diskinizde en az bir b”lm oluŸturun ki Svarog386 o b”lme kurulabilsin. Svarog386'nn en az %d MiB disk alanna ihtiya‡ duydu§unu unutmayn.\n\nGerekli b”lm elle oluŸturmak i‡in FDISK b”lm oluŸturma aracn kullanabilir ya da kurulumun diskinizde otomatik olarak b”lm oluŸturmasna izin verebilirsiniz. BaŸka bir b”lm y”neticisi kullanmak i‡in kurulumu iptal de edebilirsiniz.
+3.0:HATA: %c: srcs bulunamad. Belki sabit diskinizde ”nce b”lm oluŸturmanz gerekmektedir. Ltfen sabit diskinizde en az bir b”lm oluŸturun ki Svarog386 o b”lme kurulabilsin. Svarog386'nn en az %d MiB disk alanna ihtiya‡ duydu§unu unutmayn.\n\nGerekli b”lm elle oluŸturmak i‡in FDISK b”lm oluŸturma aracn kullanabilir ya da kurulumun diskinizde otomatik olarak b”lm oluŸturmasna izin verebilirsiniz. BaŸka bir b”lm y”neticisi kullanmak i‡in kurulumu iptal de edebilirsiniz.
 3.1:Bilgisayarnz Ÿimdi yeniden baŸlayacaktr.
 3.2:HATA: %c: srcs ‡karlabilir bir cihazdr. Kurulum iptal edilmiŸtir.
 3.3:HATA: %c: bi‡imlendirilmemiŸ g”zkmektedir. Bi‡imlendirmek ister misiniz?
