@@ -8,7 +8,7 @@
 
 /* the kblayouts list is a NULL-terminated array that contains entries in the
  * following format:
- * human description string <0> layout code string <0> <codepage number as a 16bit value> <ega.sys file number as a single byte> <keyboard.sys file number as a single byte>
+ * human description string <0> layout code string <0> <codepage number as a 16bit value> <ega.sys file number as a single byte> <keyboard.sys file number as a single byte> <sub keyb ID as a 16bit value, zero if none>
 
     char *kblayouts[] = {
     "English (US)\0xxxx",
@@ -37,7 +37,7 @@ static unsigned int dec2oct(int n) {
 }
 
 
-static void addnew(char *countrycode, char *humanlang, char *keybcode, unsigned short cp, unsigned char egafile, unsigned char keybfile) {
+static void addnew(char *countrycode, char *humanlang, char *keybcode, unsigned short cp, unsigned char egafile, unsigned char keybfile, unsigned int subid) {
   static char lastcountry[4] = {0};
   static int curoffset = 0, curcountryoffset = 0;
   /* if new country, declare an offset */
@@ -60,7 +60,7 @@ static void addnew(char *countrycode, char *humanlang, char *keybcode, unsigned 
   }
   /* */
   if (countrycode[0] != 0) {
-    fprintf(fdkeyb, "  \"%s\\0%s\\0\\%d\\%d\\%d\\%d\",\r\n", humanlang, keybcode, dec2oct(cp >> 8), dec2oct(cp & 0xff), dec2oct(egafile), dec2oct(keybfile));
+    fprintf(fdkeyb, "  \"%s\\0%s\\0\\%d\\%d\\%d\\%d\\%d\\%d\",\r\n", humanlang, keybcode, dec2oct(cp >> 8), dec2oct(cp & 0xff), dec2oct(egafile), dec2oct(keybfile), dec2oct(subid >> 8), dec2oct(subid & 0xff));
   } else {
     fprintf(fdkeyb, "  NULL};\r\n");
   }
@@ -77,33 +77,33 @@ int main(void) {
   /******************* LAYOUTS LIST START *******************/
 
   /* English */
-  addnew("EN", "English (US)", "en", 437, 0, 0);
-  addnew("EN", "English (UK)", "uk", 437, 0, 1);
+  addnew("EN", "English (US)", "en", 437, 0, 0, 0);
+  addnew("EN", "English (UK)", "uk", 437, 0, 1, 0);
 
   /* French */
-  addnew("FR", "French (France)", "fr", 858, 1, 1);
-  addnew("FR", "French (Canada, standard)", "cf", 863, 9, 1);
-  addnew("FR", "French (Canada, legacy)", "cf501", 863, 9, 1);
+  addnew("FR", "French (France)", "fr", 858, 1, 1, 0);
+  addnew("FR", "French (Canada, standard)", "cf", 863, 9, 1, 0);
+  addnew("FR", "French (Canada, legacy)", "cf", 863, 9, 1, 501);
 
   /* German */
-  addnew("DE", "German", "de", 858, 1, 1);
+  addnew("DE", "German", "de", 858, 1, 1, 0);
 
   /* Hungarian */
-  addnew("HU", "Hungarian", "hu208", 852, 1, 1);
+  addnew("HU", "Hungarian", "hu", 852, 1, 1, 208);
 
   /* Polish */
-  addnew("PL", "Polish", "pl", 991, 10, 1);
+  addnew("PL", "Polish", "pl", 991, 10, 1, 0);
 
   /* Spanish */
-  addnew("ES", "Spanish", "es", 858, 1, 1);
+  addnew("ES", "Spanish", "es", 858, 1, 1, 0);
 
   /* Turkish */
-  addnew("TR", "Turkish", "tr", 857, 1, 2);
+  addnew("TR", "Turkish", "tr", 857, 1, 2, 0);
 
   /******************* LAYOUTS LIST STOP *******************/
 
   /* end of list - DO NOT REMOVE */
-  addnew("", "", "", 0, 0, 0);
+  addnew("", "", "", 0, 0, 0, 0);
 
   /* close files */
   fclose(fdoff);

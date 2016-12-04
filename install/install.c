@@ -72,6 +72,7 @@ struct slocales {
   int keybfile;
   int keyboff;
   int keyblen;
+  unsigned int keybid;
 };
 
 
@@ -211,6 +212,21 @@ static void newscreen(int statusbartype) {
   video_movecursor(25,0);
 }
 
+/* fills a slocales struct accordingly to the value of its keyboff member */
+static void kblay2slocal(struct slocales *locales) {
+  char *m;
+  for (m = kblayouts[locales->keyboff]; *m != 0; m++); /* skip layout name */
+  m++;
+  /* skip keyb code and copy it to locales.keybcode */
+  locales->keybcode = m;
+  for (; *m != 0; m++);
+  /* */
+  locales->codepage = ((unsigned short)m[1] << 8) | m[2];
+  locales->egafile = m[3];
+  locales->keybfile = m[4];
+  locales->keybid = ((unsigned short)m[5] << 8) | m[6];
+}
+
 static int selectlang(struct slocales *locales) {
   int choice, x;
   char *msg;
@@ -254,51 +270,25 @@ static int selectlang(struct slocales *locales) {
       locales->keyblen = OFFCOUNT;
       break;
   }
-  /* populate the slocales struct */
-  for (msg = kblayouts[locales->keyboff]; *msg != 0; msg++); /* skip layout name */
-  msg++;
-  /* skip keyb code and copy it to locales.keybcode */
-  locales->keybcode = msg;
-  for (; *msg != 0; msg++);
-  /* */
-  locales->codepage = ((unsigned short)msg[1] << 8) | msg[2];
-  locales->egafile = msg[3];
-  locales->keybfile = msg[4];
+  /* populate the slocales struct accordingly to the keyboff member */
+  kblay2slocal(locales);
   /* */
   return(MENUNEXT);
 }
 
 
-#define LTODEC(x, y) ((unsigned short)(x << 8) | (y))
 static int selectkeyb(struct slocales *locales) {
-  int keyboff, keyblen, menuheight;
-  unsigned short lang;
-  lang = LTODEC(locales->lang[0], locales->lang[1]);
-
-  switch (lang) {
-    case LTODEC('F', 'R'):
-      keyboff = OFFLOC_FR;
-      keyblen = OFFLEN_FR;
-      break;
-    case LTODEC('P', 'L'):
-      keyboff = OFFLOC_PL;
-      keyblen = OFFLEN_PL;
-      break;
-    case LTODEC('T', 'R'):
-      keyboff = OFFLOC_TR;
-      keyblen = OFFLEN_TR;
-      break;
-    default: /* otherwise propose all possible keyoard layouts */
-      keyboff = 0;
-      keyblen = OFFCOUNT;
-      break;
-  }
-  if (keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
+  int menuheight, choice;
+  if (locales->keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
   newscreen(0);
   putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "Svarog386 supports the keyboard layouts used in different countries. Choose the keyboard layout you want.");
-  menuheight = keyblen + 2;
+  menuheight = locales->keyblen + 2;
   if (menuheight > 13) menuheight = 13;
-  if (menuselect(10, -1, menuheight, &(kblayouts[keyboff]), keyblen) < 0) return(MENUPREV);
+  choice = menuselect(10, -1, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
+  if (choice < 0) return(MENUPREV);
+  /* (re)load the keyboard layout & codepage setup */
+  locales->keyboff += choice;
+  kblay2slocal(locales);
   return(MENUNEXT);
 }
 
@@ -504,6 +494,8 @@ static void fcopysub(char *dst, char *src, char c1, char c2) {
 
 static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) {
   char buff[128];
+  char buff2[16];
+  char buff3[16];
   FILE *fd;
   /*** CONFIG.SYS ***/
   snprintf(buff, sizeof(buff), "%c:\\CONFIG.SYS", targetdrv);
@@ -550,10 +542,16 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   }
   if (locales->keybfile > 0) {
     if (locales->keybfile == 1) {
-      fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\KEYBOARD.SYS\r\n", locales->keybcode, locales->codepage, targetdrv);
+      snprintf(buff2, sizeof(buff2), "KEYBOARD.SYS");
     } else {
-      fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\KEYBRD%d.SYS\r\n", locales->keybcode, locales->codepage, targetdrv, locales->keybfile);
+      snprintf(buff2, sizeof(buff2), "KEYBRD%d.SYS", locales->keybfile);
     }
+    if (locales->keybid > 0) {
+      buff3[0] = 0;
+    } else {
+      snprintf(buff3, sizeof(buff3), " /ID:%d", locales->keybid);
+    }
+    fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\%s%s\r\n", locales->keybcode, locales->codepage, targetdrv, buff2, buff3);
     fprintf(fd, "\r\n");
   }
   fprintf(fd, "SHSUCDX /d:SVCD0001\r\n");
