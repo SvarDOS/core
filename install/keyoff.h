@@ -4,10 +4,12 @@
 #define OFFLEN_FR 3
 #define OFFLOC_DE 5
 #define OFFLEN_DE 1
-#define OFFLOC_PL 6
+#define OFFLOC_HU 6
+#define OFFLEN_HU 1
+#define OFFLOC_PL 7
 #define OFFLEN_PL 1
-#define OFFLOC_ES 7
+#define OFFLOC_ES 8
 #define OFFLEN_ES 1
-#define OFFLOC_TR 8
+#define OFFLOC_TR 9
 #define OFFLEN_TR 1
-#define OFFCOUNT 9
+#define OFFCOUNT 10

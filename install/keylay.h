@@ -8,6 +8,8 @@ char *kblayouts[] = {
   "French (Canada, legacy)\0cf501\0\3\137\11\1",
   /****** DE ******/
   "German\0de\0\3\132\1\1",
+  /****** HU ******/
+  "Hungarian\0hu208\0\3\124\1\1",
   /****** PL ******/
   "Polish\0pl\0\3\337\12\1",
   /****** ES ******/

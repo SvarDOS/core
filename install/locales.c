@@ -88,6 +88,9 @@ int main(void) {
   /* German */
   addnew("DE", "German", "de", 858, 1, 1);
 
+  /* Hungarian */
+  addnew("HU", "Hungarian", "hu208", 852, 1, 1);
+
   /* Polish */
   addnew("PL", "Polish", "pl", 991, 10, 1);
 
