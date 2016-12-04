@@ -546,7 +546,7 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
     } else {
       snprintf(buff2, sizeof(buff2), "KEYBRD%d.SYS", locales->keybfile);
     }
-    if (locales->keybid > 0) {
+    if (locales->keybid == 0) {
       buff3[0] = 0;
     } else {
       snprintf(buff3, sizeof(buff3), " /ID:%d", locales->keybid);
