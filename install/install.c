@@ -513,7 +513,7 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   fprintf(fd, "FILES=50\r\n");
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
   if (strcmp(locales->lang, "EN") == 0) {
-    strcpy(buff, "command");
+    strcpy(buff, "COMMAND");
   } else {
     snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
   }
