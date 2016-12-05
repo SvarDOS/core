@@ -23,6 +23,13 @@ p.tech {
   font-family: 'Oxygen Mono', monospace;
 }
 
+p.wondering {
+  font-size: 0.95em;
+  margin: 1.3em 0;
+  border: 1px #222 dashed;
+  opacity: 0.8;
+}
+
 html,body {
   font-size: 1.0em;
   margin: 0;

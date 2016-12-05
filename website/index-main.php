@@ -62,3 +62,5 @@
     <p>You might want to know what it is exactly that you are about to download, before fetching the multi-megabytes ISO file. Feel free to browse the <a href="listing.txt">listing</a> of all the packages that come with Svarog386.</p>
 
     <p>If your computer is unable to boot from a CD, you can use Svarog386's <a href="boot.img">boot floppy image</a> to install Svarog386 (you still need to put Svarog386's CD in your drive).</p>
+
+    <p class="wondering">Wondering how Svarog386 is built? You might want to take a look at the <a href="https://sourceforge.net/p/svarog386/code">project's SVN</a>, where all the build-related files are stored.</p>
