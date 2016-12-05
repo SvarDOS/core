@@ -501,8 +501,9 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   snprintf(buff, sizeof(buff), "%c:\\CONFIG.SYS", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
-  fprintf(fd, "DOS=UMB,HIGH\r\n");
-  fprintf(fd, "FILES=50\r\n");
+  fprintf(fd, "DOS=UMB,HIGH\r\n"
+              "LASTDRIVE=Z\r\n"
+              "FILES=50\r\n");
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
   if (strcmp(locales->lang, "EN") == 0) {
     strcpy(buff, "COMMAND");
