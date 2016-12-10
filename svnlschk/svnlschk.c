@@ -82,14 +82,16 @@ static long countnlsstrings(char *file, int filetype) {
     /* skip empty lines and comments */
     if ((line[0] == 0) || (line[0] == '#')) continue;
     /* */
-    if (filetype == 0) {
+    if (filetype == 0) { /* CATS-like */
       res++;
-    } else {
+    } else if (filetype == 1) { /* lng (FreeCOM) */
       if ((line[0] == ':') && (stringongoing == 0)) stringongoing = 1;
       if ((line[0] == '.') && (stringongoing != 0)) {
         res++;
         stringongoing = 0;
       }
+    } else { /* err (FreeCOM) */
+      res++;
     }
   }
   return(res);
@@ -108,14 +110,15 @@ int main(int argc, char **argv) {
   #define FILEALLOC 1024*1024
   FILE *fd;
   /* read arg list */
-  if ((argc != 4) || (argv[1][0] == '-') || (atoi(argv[3]) > 1) || (atoi(argv[3]) < 0)) {
+  if ((argc != 4) || (argv[1][0] == '-') || (argv[3][0] > '2') || (argv[3][0] < '0')) {
     printf("-1\n");
-    fprintf(stderr, "svnlschk - Svarog's NLS checker\n"
-                    "usage: svnlschk pkg.zip lang filetype\n"
+    fprintf(stderr, "svnlschk - Svarog's NLS checker - Copyright (C) 2016 Mateusz Viste\n"
+                    "usage: svnlschk pkg.zip lang nlstype\n"
                     "\n"
-                    "where filetype is:\n"
+                    "where nlstype is:\n"
                     " 0 = standard CATS-like NLS file\n"
-                    " 1 = FreeCOM-style LNG file\n");
+                    " 1 = FreeCOM-style LNG file\n"
+                    " 2 = FreeCOM-style ERR file\n");
     return(1);
   }
   pkgfile = argv[1];
@@ -132,7 +135,13 @@ int main(int argc, char **argv) {
     return(1);
   }
   /* extract wanted file through popen() and read it into memory */
-  snprintf(buff, sizeof(buff), "unzip -pC %s nls/%s.%s", pkgfile, pkgshortname, lang);
+  if (filetype == 0) { /* CATS-like */
+    snprintf(buff, sizeof(buff), "unzip -pC %s nls/%s.%s", pkgfile, pkgshortname, lang);
+  } else if (filetype == 1) { /* lng (FreeCOM) */
+    snprintf(buff, sizeof(buff), "unzip -pC %s source/%s/strings/%s.lng", pkgfile, pkgshortname, lang);
+  } else { /* err (FreeCOM) */
+    snprintf(buff, sizeof(buff), "unzip -pC %s source/%s/strings/%s.err", pkgfile, pkgshortname, lang);
+  }
   /* */
   fd = popen(buff, "r");
   if (fd == NULL) {
