@@ -24,6 +24,8 @@
       readfile('index-why.htm');
     } else if ($p == 'tech') {
       include 'index-tech.php';
+    } else if ($p == 'nls') {
+      readfile('index-nls.htm');
     } else if ($p == 'test') {
       include 'index-test.php';
     } else if ($p == 'pkgincl') { // this one should be removed soon, once the tech version is discovered by search engines -- 26 Aug 2016

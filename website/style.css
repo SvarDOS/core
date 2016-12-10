@@ -58,3 +58,42 @@ a:active { /* selected link */
 a.mateusz {
   color: inherit; text-decoration: none;
 }
+
+table.nls {
+  margin: 1em auto;
+}
+
+table.nls th {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+}
+
+td.pkg {
+  text-align: left;
+  font-size: 1em;
+}
+
+td.err {
+  background-color: #f55;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+td.complete {
+  background-color: #5f5;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+td.incomplete {
+  background-color: #fdd;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+td.unsup {
+  background-color: #bbb;
+  text-align: center;
+  font-size: 0.9em;
+}
