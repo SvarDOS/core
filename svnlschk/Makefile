@@ -9,3 +9,7 @@ all: svnlschk
 
 svnlschk: svnlschk.c
 	$(CC) svnlschk.c -o svnlschk $(CFLAGS)
+
+clean:
+	rm -f *.o svnlschk
+
