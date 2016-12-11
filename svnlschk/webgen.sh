@@ -3,9 +3,10 @@
 SVNLSCHK='./svnlschk'
 COREDIR='/srv/www/svarog386.viste.fr/repos/core'
 HTMLFILE='/srv/www/svarog386.viste.fr/index-nls.htm'
+INSTALLNLS='/root/svarog386/files/floppy/nls'
 
-LANGSLIST="en      de     fr     pl     tr"
-LANGSLONG="default german french polish turkish"
+LANGSLIST="en      fr     pl     tr"
+LANGSLONG="default french polish turkish"
 
 ##############################################################################
 
@@ -65,6 +66,17 @@ do
 done
 
 printf "\n</tr>\n" >> $HTMLFILE
+
+# process INSTALL
+mkdir /tmp/nls
+cp $INSTALLNLS/install.* /tmp/nls/
+CURDIR=`pwd`
+cd /tmp
+zip -qq -r install.zip nls
+cd $CURDIR
+processfile /tmp/install.zip "install" 0
+rm /tmp/install.zip
+rm -rf /tmp/nls
 
 # process COMMAND (special NLS format)
 processfile $COREDIR/command.zip "command (lng)" 1
