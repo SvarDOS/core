@@ -13,7 +13,7 @@
 
     <div style="background-color: #FAFAFA; width: 70%; min-width: 800px; margin: 0 auto; height: auto !important; min-height: 100%; box-shadow: 0 0 2em 0.25em #202020;"><div style="padding: 0.5em 0.5em 2em 0.5em;">
 
-    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=why">Why Svarog386</a> I <a href="?p=tech">Tech</a></p>
+    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=why">Why Svarog386</a> I <a href="?p=tech">Tech</a> I <a href="?p=nls">NLS</a></p>
 
 <?php
 
