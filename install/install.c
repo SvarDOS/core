@@ -460,6 +460,7 @@ static int preparedrive(void) {
       if (choice == 1) return(MENUQUIT);
       snprintf(buff, sizeof(buff), "SYS A: %c: > NUL", cselecteddrive);
       system(buff);
+      system("FDISK /MBR");
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
       mkdir(buff);
       return(cselecteddrive);
