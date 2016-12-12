@@ -7,16 +7,29 @@
 
 ### parameters block starts here ############################################
 
-REPOROOT=/srv/www/svarog386.viste.fr/repos/
-REPOROOTNOSRC=/srv/www/svarog386.viste.fr/repos-nosrc/
-BUILDIDX=/root/fdnpkg-buildidx/buildidx
+REPOROOT='/srv/www/svarog386.viste.fr/repos/'
+REPOROOTNOSRC='/srv/www/svarog386.viste.fr/repos-nosrc/'
+BUILDIDX='/root/fdnpkg-buildidx/buildidx'
 CDISODIR='/srv/www/svarog386.viste.fr/'
+CDISODIRTEST='/srv/www/svarog386.viste.fr/test/'
 CDROOT='/root/svarog386/cdroot'
 CDROOTNOSRC='/root/svarog386/cdrootnosrc'
 CDROOTMICRO='/root/svarog386/cdrootmicro'
 CUSTFILES='/root/svarog386/files'
 
 ### parameters block ends here ##############################################
+
+TESTMODE=0
+if [ "x$1" = "xprod" ]; then
+  TESTMODE=0
+elif [ "x$1" = "xtest" ]; then
+  TESTMODE=1
+  CDISODIR="$CDISODIRTEST"
+  mkdir -p "$CDISODIR"
+else
+  echo "usage: build.sh prod|test"
+  exit 1
+fi
 
 # remember where we are, so we can return there once all is done
 origdir=`pwd`
