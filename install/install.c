@@ -387,6 +387,9 @@ static int preparedrive(void) {
         default:
           return(-1);
       }
+      /* write a temporary MBR which only skips the drive (in case BIOS would
+       * try to boot off the not-yet-ready C: disk) */
+      system("FDISK /AMBR"); /* writes BOOT.MBR into actual MBR */
       newscreen(2);
       putstringnls(10, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
       putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
