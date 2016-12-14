@@ -78,9 +78,17 @@ int main(void) {
 
   /******************* LAYOUTS LIST START *******************/
 
+  /* addnew(countrycode, humanlang, keybcode, cp, egafile, keybfile, subid) */
+
   /* English */
   addnew("EN", "English (US)", "en", 437, 0, 0, 0);
   addnew("EN", "English (UK)", "uk", 437, 0, 1, 0);
+
+  /* Armenian */
+  addnew("HY", "Armenian", "hy", 899, 6, 3, 0);
+
+  /* Bulgarian */
+  addnew("BG", "Bulgarian", "bg", 872, 3, 2, 0);
 
   /* French */
   addnew("FR", "French (France)", "fr", 858, 1, 1, 0);
@@ -93,15 +101,28 @@ int main(void) {
   /* Hungarian */
   addnew("HU", "Hungarian", "hu", 852, 1, 1, 208);
 
+  /* Italian */
+  addnew("IT", "Italian", "it", 858, 1, 1, 0);
+
+  /* Norvegian */
+  addnew("NO", "Norvegian", "no", 858, 9, 1, 0);
+
   /* Polish */
-  addnew("PL", "Polish", "pl", 991, 10, 1, 0);
+  addnew("PL", "Polish (Programmer)", "pl", 991, 10, 1, 0);
+  addnew("PL", "Polish (Typewriter)", "pl", 991, 10, 1, 214);
 
   /* Russian */
   addnew("RU", "Russian (Standard)", "ru", 866, 3, 2, 0);
   addnew("RU", "Russian (Typewriter)", "ru", 866, 3, 2, 443);
 
+  /* Slovenian */
+  addnew("SL", "Slovenian", "si", 852, 1, 1, 0);
+
   /* Spanish */
   addnew("ES", "Spanish", "es", 858, 1, 1, 0);
+
+  /* Swedish */
+  addnew("SV", "Swedish", "sv", 858, 1, 1, 0);
 
   /* Turkish */
   addnew("TR", "Turkish", "tr", 857, 1, 2, 0);
