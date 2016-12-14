@@ -234,6 +234,7 @@ static int selectlang(struct slocales *locales) {
     "English",
     "French",
     "Polish",
+    "Russian",
     "Turkish",
     NULL
   };
@@ -244,7 +245,7 @@ static int selectlang(struct slocales *locales) {
   video_putstring(4, x, COLOR_BODY[mono], msg, -1);
   video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
   putstringnls(8, -1, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
-  choice = menuselect(11, -1, 6, langlist, -1);
+  choice = menuselect(11, -1, 7, langlist, -1);
   if (choice < 0) return(MENUPREV);
   /* populate locales with default values */
   memset(locales, 0, sizeof(struct slocales));
@@ -260,6 +261,11 @@ static int selectlang(struct slocales *locales) {
       locales->keyblen = OFFLEN_PL;
       break;
     case 3:
+      strcpy(locales->lang, "RU");
+      locales->keyboff = OFFLOC_RU;
+      locales->keyblen = OFFLEN_RU;
+      break;
+    case 4:
       strcpy(locales->lang, "TR");
       locales->keyboff = OFFLOC_TR;
       locales->keyblen = OFFLEN_TR;
