@@ -1,0 +1,46 @@
+#
+# This is a localization file for the Svarog386 INSTALL program
+#
+# Language..: Italian
+# Codepage..: 850/858/437
+# Translator: Roberto Mariottini
+#
+
+### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
+0.0:INSTALLAZIONE DI SVAROG386
+0.1:Installa Svarog386
+0.2:Esci al DOS
+0.3:Crea automaticamente una partizione
+0.4:Esegui lo strumento di partizionamento FDISK
+0.5:Premi un tasto...
+0.6:Procedi con la formattazione
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:Su/Giù = Seleziona | Invio = Valida la tua scelta | ESC = Precedente
+0.11:Su/Giù = Seleziona | Invio = Valida la tua scelta | ESC = Esci al DOS
+
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
+1.0:Benvenuto in Svarog386
+1.1:Seleziona la lingua desiderata dalla lista seguente:
+1.5:Svarog386 supporta le tastiere usate in paesi differenti. Scegli la tastiera che stai usando.
+
+### WELCOME SCREEN ###
+2.0:Stai pe rinstallare Svarog386: un sistema operativo libero, compatibile con MSDOS, basato sul kernel di FreeDOS. Svarog386 si rivolge a computer di classe 386+ e include una varietà di applicazioni di terze parti.\n\nATTENZIONE: Se il tuo PC ha già un altro sistema operativo installato, l'altro sistema operativo potrebbe non essere in grado di ripartire dopo aver installato Svarog386.
+
+### DISK SETUP ###
+3.0:ERRORE: L'unità %c: non è stata trovata. Forse perché l'hard disk deve essere prima partizionato. Occorre creare almeno una partizione sull'hard disk per poterci installare Svarog386. Notare che Svarog386 richiede almeno %d MiB di spazio libero su disco.\n\nPuoi usare lo strumento di partizionamento FDISK per creare la partizion manualmente, o lasciare che il programma di installazione partizioni il disco automaticamente. Puoi anche annullare l'installazione per usare lo strumento di partizionamento che prferisci.
+3.1:Il computer sarà ora riavviato.
+3.2:ERRORE: L'unità %c: è un disco rimovibile. Installazione annullata.
+3.3:ERRORE: L'unità %c: non sembra essere formattata. Vuoi formattarla?
+3.4:ERRORE: L'unità %c: non è abbastanza capiente! Svarog386 richiede un disco di almeno %d MiB.
+3.5:ERRORE: L'unità %c: non è vuota. Svarog386 deve essere installato su un disco vuoto.\n\nPuoi formattare il disco adesso, per svuotarlo. Nota che questa operazione CANCELLERA' TUTTI I DATI presenti sul disco.
+3.6:L'installazione di Svarog386 in %c: sta per cominciare.
+
+### PACKAGES INSTALLATION ###
+# example: "Installing package 4/50: FDISK"
+4.0:Installazione del pacchetto %d/%d: %s
+
+### END SCREEN ###
+5.0:L'installazione di Svarog386 è terminata. Il computer sarà riavviato.\nRimuovere il disco di installazione dall'unità.
+
+### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
+6.0:Benvenuto in Svarog386! Scrivi 'HELP' se hai bisogno di aiuto.
