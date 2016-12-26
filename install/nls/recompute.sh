@@ -15,6 +15,11 @@ if [ $? -ne 0 ] ; then
   echo "ERROR! ABORTED!"; exit
 fi
 
+utf8tocp 852 install.si.utf8 > install.si
+if [ $? -ne 0 ] ; then
+  echo "ERROR! ABORTED!"; exit
+fi
+
 utf8tocp 857 install.tr.utf8 > install.tr
 if [ $? -ne 0 ] ; then
   echo "ERROR! ABORTED!"; exit
