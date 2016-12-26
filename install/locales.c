@@ -116,7 +116,7 @@ int main(void) {
   addnew("RU", "Russian (Typewriter)", "ru", 866, 3, 2, 443);
 
   /* Slovenian */
-  addnew("SL", "Slovenian", "si", 852, 1, 1, 0);
+  addnew("SI", "Slovenian", "si", 852, 1, 1, 0);
 
   /* Spanish */
   addnew("ES", "Spanish", "es", 858, 1, 1, 0);

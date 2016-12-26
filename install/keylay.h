@@ -25,7 +25,7 @@ char *kblayouts[] = {
   /****** RU ******/
   "Russian (Standard)\0ru\0\3\142\3\2\0\0",
   "Russian (Typewriter)\0ru\0\3\142\3\2\1\273",
-  /****** SL ******/
+  /****** SI ******/
   "Slovenian\0si\0\3\124\1\1\0\0",
   /****** ES ******/
   "Spanish\0es\0\3\132\1\1\0\0",

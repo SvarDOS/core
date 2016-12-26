@@ -19,8 +19,8 @@
 #define OFFLEN_PL 2
 #define OFFLOC_RU 13
 #define OFFLEN_RU 2
-#define OFFLOC_SL 15
-#define OFFLEN_SL 1
+#define OFFLOC_SI 15
+#define OFFLEN_SI 1
 #define OFFLOC_ES 16
 #define OFFLEN_ES 1
 #define OFFLOC_SV 17

@@ -5,8 +5,8 @@ COREDIR='/srv/www/svarog386.viste.fr/repos/core'
 HTMLFILE='/srv/www/svarog386.viste.fr/index-nls.htm'
 INSTALLNLS='/root/svarog386/files/floppy/nls'
 
-LANGSLIST="en      fr     it      pl     ru      tr"
-LANGSLONG="default french italian polish russian turkish"
+LANGSLIST="en      fr     it      pl     ru      si      tr"
+LANGSLONG="default french italian polish russian slovene turkish"
 
 ##############################################################################
 
