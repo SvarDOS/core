@@ -4,6 +4,8 @@ SVNLSCHK='./svnlschk'
 COREDIR='/srv/www/svarog386.viste.fr/repos/core'
 HTMLFILE='/srv/www/svarog386.viste.fr/index-nls.htm'
 INSTALLNLS='/root/svarog386/files/floppy/nls'
+NLSTEMPDIR='/tmp/sv_nls'
+NLSARCH='/srv/www/svarog386.viste.fr/nls.zip'
 
 LANGSLIST="en      fr     it      pl     ru      si      tr"
 LANGSLONG="default french italian polish russian slovene turkish"
@@ -20,9 +22,15 @@ processfile() {
   if [ $nlstype -eq 0 ] ; then
     LANGS=$LANGSLIST
     ENCOUNT=`$SVNLSCHK $f en $nlstype`
+    unzip -Cj "$f" nls/\* -d "$NLSTEMPDIR/nls/"
   else
     LANGS=$LANGSLONG
     ENCOUNT=`$SVNLSCHK $f default $nlstype`
+    if [ $nlstype -eq 1 ] ; then
+      unzip -Cj "$f" source/command/strings/\*.lng -d "$NLSTEMPDIR/nls/command/"
+    else
+      unzip -Cj "$f" source/command/strings/\*.err -d "$NLSTEMPDIR/nls/command/"
+    fi
   fi
 
   echo "<tr>" >> $HTMLFILE
@@ -67,16 +75,18 @@ done
 
 printf "\n</tr>\n" >> $HTMLFILE
 
+mkdir -p "$NLSTEMPDIR/nls/command"
+
 # process INSTALL
 mkdir /tmp/nls
 cp $INSTALLNLS/install.* /tmp/nls/
 CURDIR=`pwd`
 cd /tmp
 zip -qq -r install.zip nls
+rm -rf /tmp/nls
 cd $CURDIR
 processfile /tmp/install.zip "install" 0
 rm /tmp/install.zip
-rm -rf /tmp/nls
 
 # process COMMAND (special NLS format)
 processfile $COREDIR/command.zip "command (lng)" 1
@@ -96,5 +106,10 @@ do
 done
 
 cat tail.html >> $HTMLFILE
+
+cd "$NLSTEMPDIR"
+zip -9 -k -r "$NLSARCH" nls
+rm -rf "$NLSTEMPDIR"
+cd "$CURDIR"
 
 exit 0
