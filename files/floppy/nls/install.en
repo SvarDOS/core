@@ -39,7 +39,7 @@
 4.0:Installing package %d/%d: %s
 
 ### END SCREEN ###
-5.0:Svarog386 installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.
+5.0:Svarog386 installation is over. Your computer will reboot now.\nPlease make sure to remove the installation media.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Welcome to Svarog386! Type 'HELP' if you need help.
