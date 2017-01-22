@@ -23,7 +23,7 @@
 1.5:Svarog386 supports different keyboard layouts. Choose the keyboard layout that you want.
 
 ### WELCOME SCREEN ###
-2.0:You are about to install Svarog386: a free, MS-DOS compatible operating system based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.
+2.0:You are about to install Svarog386: a free, MS-DOS compatible operating system based on FreeDOS. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.
 
 ### DISK SETUP ###
 3.0:ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one primary partition on your hard disk, so Svarog386 can be installed on it. Note, that Svarog386 requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice.
