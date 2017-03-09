@@ -20,6 +20,11 @@ if [ $? -ne 0 ] ; then
   echo "ERROR! ABORTED!"; exit
 fi
 
+utf8tocp 858 install.sv.utf8 > install.sv
+if [ $? -ne 0 ] ; then
+  echo "ERROR! ABORTED!"; exit
+fi
+
 utf8tocp 857 install.tr.utf8 > install.tr
 if [ $? -ne 0 ] ; then
   echo "ERROR! ABORTED!"; exit
