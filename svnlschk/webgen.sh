@@ -7,8 +7,8 @@ INSTALLNLS='/root/svarog386/files/floppy/nls'
 NLSTEMPDIR='/tmp/sv_nls'
 NLSARCH='/srv/www/svarog386.viste.fr/nls.zip'
 
-LANGSLIST="en      fr     it      pl     ru      si      tr"
-LANGSLONG="default french italian polish russian slovene turkish"
+LANGSLIST="en      fr     it      pl     ru      si      sw      tr"
+LANGSLONG="default french italian polish russian slovene swedish turkish"
 
 ##############################################################################
 
