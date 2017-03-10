@@ -40,8 +40,6 @@
 
 ### WELCOME SCREEN ###
 ### VŽLKOMSTSKŽRM ###
-#2.0:You are about to install Svarog386: a free, MS-DOS compatible operating system based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.
-2.0:Du ska just till att installera Svarog386: ett fritt, MS-DOS-kompatibelt operativsystem baserat p† FreeDOS-k„rnan. Svarog386 „r „mnat f”r 386+-datorer och kommer med en samling olika tredjepartsapplikationer.\n\nVARNING: Om din PC har ett annat operativsystem intstallerat, kanske detta andra system inte kan boota n„r v„l Svarog386 har installerats.
 #2.0:You are about to install Svarog386: a free, MS-DOS compatible operating system based on FreeDOS. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.
 2.0:Du ska just till att installera Svarog386: ett fritt, MS-DOS-kompatibelt operativsystem baserat p† FreeDOS. Svarog386 „r „mnat f”r 386+-datorer och kommer med en samling olika tredjepartsapplikationer.\n\nVARNING: Om din PC har ett annat operativsystem intstallerat, kanske detta andra system inte kan boota n„r v„l Svarog386 har installerats.
 
