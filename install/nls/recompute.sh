@@ -1,5 +1,10 @@
 #!/bin/sh
 
+utf8tocp 858 install.de.utf8 > install.de
+if [ $? -ne 0 ] ; then
+  echo "ERROR! ABORTED!"; exit
+fi
+
 utf8tocp 858 install.it.utf8 > install.it
 if [ $? -ne 0 ] ; then
   echo "ERROR! ABORTED!"; exit
