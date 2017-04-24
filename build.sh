@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This script generates indexes of Svarog386 repositories and builds the ISO
 # CD images. It should be executed each time that a package file have been
@@ -8,6 +8,7 @@
 ### parameters block starts here ############################################
 
 REPOROOT='/srv/www/svarog386.viste.fr/repos/'
+REPOROOTSRC='/srv/www/svarog386.viste.fr/repos-src/'
 REPOROOTNOSRC='/srv/www/svarog386.viste.fr/repos-nosrc/'
 BUILDIDX='/root/fdnpkg-buildidx/buildidx'
 CDISODIR='/srv/www/svarog386.viste.fr/'
@@ -18,6 +19,54 @@ CDROOTMICRO='/root/svarog386/cdrootmicro'
 CUSTFILES='/root/svarog386/files'
 
 ### parameters block ends here ##############################################
+
+# function to be called with the repository (short) name as argument
+function dorepo {
+  repodir=$1
+  # switch to repo's dir
+  cd $REPOROOT/$repodir
+  # duplicate all zip files as zib
+  for f in *.zip
+  do
+  cp -p $f `basename -s .zip $f`.zib
+  done
+  # now strip the sources from the 'zib' versions
+  find $REPOROOT/$repodir -iname '*.zib' -exec zip "{}" -d "SOURCE/*" ';'
+  find $REPOROOT/$repodir -iname '*.zib' -exec zip "{}" -d "source/*" ';'
+  find $REPOROOT/$repodir -iname '*.zib' -exec zip "{}" -d "Source/*" ';'
+
+  # build idx for the full (net) repo
+  $BUILDIDX $REPOROOT/$repodir
+  # copy listing into the global listing
+  cat $REPOROOT/$repodir/listing.txt >> $CDISODIR/listing.txt
+
+  # compute links for the 'no source' version
+  mkdir -p $REPOROOTNOSRC/$repodir
+  cd $REPOROOTNOSRC/$repodir
+  if [ $? -ne 0 ] ; then exit 1 ; fi
+  rm *.zip *.zib
+  for f in $REPOROOT/$repodir/*.zib
+  do
+  ln -s "$f" `basename -s .zib $f`.zip
+  done
+  # build idx for the 'no source' version
+  $BUILDIDX $REPOROOTNOSRC/$repodir
+
+  # compute links for the 'with source' (but no zib) version
+  mkdir -p $REPOROOTSRC/$repodir
+  cd $REPOROOTSRC/$repodir
+  if [ $? -ne 0 ] ; then exit 1 ; fi
+  rm *.zip *.zib
+  for f in $REPOROOT/$repodir/*.zip
+  do
+  ln -s "$f" `basename $f`
+  done
+  # build idx for the 'no source' version
+  $BUILDIDX $REPOROOTSRC/$repodir
+}
+
+### actual code flow starts here ############################################
+
 
 TESTMODE=0
 if [ "x$1" = "xprod" ]; then
@@ -34,11 +83,6 @@ fi
 # remember where we are, so we can return there once all is done
 origdir=`pwd`
 
-# clone the repositories into future 'no source' versions
-echo "cloning $REPOROOT to $REPOROOTNOSRC..."
-rsync -a --delete $REPOROOT $REPOROOTNOSRC
-if [ $? -ne 0 ] ; then exit 1 ; fi
-
 # build the boot floppy image first
 cp $CUSTFILES/bootmini.img $CDROOT/boot.img
 export MTOOLS_NO_VFAT=1
@@ -52,45 +96,21 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 cp $CDROOT/boot.img $CDISODIR/
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
-# now strip the sources from the 'no source' clone
-find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "SOURCE/*" ';'
-find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "source/*" ';'
-find $REPOROOTNOSRC/ -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
-
-# refresh all repositories
-$BUILDIDX $REPOROOT/core && $BUILDIDX $REPOROOTNOSRC/core
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/devel && $BUILDIDX $REPOROOTNOSRC/devel
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/drivers && $BUILDIDX $REPOROOTNOSRC/drivers
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/edit && $BUILDIDX $REPOROOTNOSRC/edit
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/emulatrs && $BUILDIDX $REPOROOTNOSRC/emulatrs
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/games && $BUILDIDX $REPOROOTNOSRC/games
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/net && $BUILDIDX $REPOROOTNOSRC/net
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/packers && $BUILDIDX $REPOROOTNOSRC/packers
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/sound && $BUILDIDX $REPOROOTNOSRC/sound
-if [ $? -ne 0 ] ; then exit 1 ; fi
-$BUILDIDX $REPOROOT/util && $BUILDIDX $REPOROOTNOSRC/util
-if [ $? -ne 0 ] ; then exit 1 ; fi
-
-# recompute the listing.txt file
+# remove the 'human' listing (will be regenerated in a short moment)
 rm $CDISODIR/listing.txt
-cat $REPOROOT/core/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/devel/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/drivers/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/edit/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/emulatrs/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/games/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/net/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/packers/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/sound/listing.txt >> $CDISODIR/listing.txt
-cat $REPOROOT/util/listing.txt >> $CDISODIR/listing.txt
+
+# process all repos (also builds the listing.txt file)
+dorepo core
+dorepo devel
+dorepo drivers
+dorepo edit
+dorepo emulatrs
+dorepo games
+dorepo net
+dorepo packers
+dorepo sound
+dorepo util
+
 
 # compute a filename for the ISO files and build it
 DATESTAMP=`date +%Y%m%d-%H%M`
