@@ -7,7 +7,7 @@
     <p>Svarog386 is a <a href="?p=tech&amp;art=licensing">free</a>, <a href="?p=nls">multilingual</a> DOS distribution based on FreeDOS. It's released in the form of a single bootable CD image (ISO) that contains the FreeDOS kernel, a command interpreter and a variety of third-party packages.<br>
     Svarog386 is a "rolling release", meaning that it doesn't follow the concept of "versions". Svarog386 can be kept up-to-date either via online <a href="?p=tech&amp;art=onlinerepos">update repositories</a> or by using the latest ISO image as your local package repository.</p>
 
-    <p>Svarog386 is <b>not</b> designed for strict 8086 compatibility. Many parts of it might require a 386-class CPU. If you look for a simple 8086 FreeDOS distribution, take a look at <a href="http://svarog86.sourceforge.net">Svarog86</a>.</p>
+    <p>Svarog386 is <b>not</b> designed for strict 8086 compatibility. Many parts of it may require a 386-class CPU. If you look for a simple 8086 FreeDOS distribution, take a look at <a href="http://svarog86.sourceforge.net">Svarog86</a>.</p>
 
     <p>Need to get in touch? Wish to contribute some packages, translate Svarog386 to your language, or otherwise contribute? Feel free to drop a line or two to the usenet group <b><a href="?p=tech&amp;art=support">alt.os.free-dos</a></b>.
     </div>
