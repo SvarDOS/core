@@ -1,10 +1,11 @@
 <?php
   $arts = array(
-  'support' => 'How do I get in touch with Svarog386\'s people?',
-  'pkgincl' => 'Packages inclusion rules',
-  'pkgformat' => 'Package format',
-  'licensing' => 'Svarog386 licensing',
-  'onlinerepos' => 'Svarog386 online repositories'
+  'support'     => 'How do I get in touch with the Svarog386 community?',
+  'pkgincl'     => 'Packages inclusion rules',
+  'pkgformat'   => 'Package format',
+  'licensing'   => 'Svarog386 licensing',
+  'onlinerepos' => 'Svarog386 online repositories',
+  'whatmeans'   => 'What does "Svarog" mean?'
   );
 
   natcasesort($arts);
