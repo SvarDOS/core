@@ -1,4 +1,9 @@
-@import url(https://fonts.googleapis.com/css?Oxygen+Mono|Open+Sans:400,700,400italic);
+@import url(https://fonts.googleapis.com/css?Open+Sans:400,700,400italic);
+
+@font-face {
+  font-family: 'dosega';
+  src: url('dosega.ttf');
+}
 
 p.title {
   font-size: 1.35em; margin: 3em auto 0 auto; text-align: center;
@@ -20,7 +25,7 @@ p.tech {
   white-space: pre-wrap;
   font-size: 1.1em;
   text-align: left;
-  font-family: 'Oxygen Mono', monospace;
+  font-family: 'dosega', monospace;
 }
 
 p.wondering {
@@ -31,7 +36,7 @@ p.wondering {
 }
 
 html,body {
-  font-size: 1.0em;
+  font-size: 1.1em;
   margin: 0;
   padding: 0;
   background-color: #B0B0B0;
