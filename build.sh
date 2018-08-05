@@ -164,6 +164,10 @@ echo "date=`stat --format='%Y' $CDISONOSRC`" >> "$PUBDIR/downloads.ini"
 
 cd "$origdir"
 
+cd svnlschk
+./webgen.sh
+cd ..
+
 echo "all done!"
 
 exit 0

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-SVNLSCHK='./svnlschk'
-COREDIR='/srv/www/svarog386.viste.fr/repos/core'
-HTMLFILE='/srv/www/svarog386.viste.fr/index-nls.htm'
-INSTALLNLS='/root/svarog386/files/floppy/nls'
-NLSTEMPDIR='/tmp/sv_nls'
-NLSARCH='/srv/www/svarog386.viste.fr/nls.zip'
+SVNLSCHK=`realpath ./svnlschk`
+COREDIR=`realpath ../cdroot/core`
+HTMLFILE=`realpath ../website/index-nls.htm`
+INSTALLNLS=`realpath ../files/floppy/nls`
+NLSTEMPDIR=`realpath /tmp/sv_nls`
+NLSARCH=`realpath ../website/nls.zip`
 
 LANGSLIST="en      de     fr     it      pl     ru      si      sv      tr"
 LANGSLONG="default german french italian polish russian slovene swedish turkish"
