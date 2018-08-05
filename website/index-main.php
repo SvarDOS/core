@@ -17,18 +17,18 @@
   $downarr = parse_ini_file('downloads.ini', TRUE);
 
   echo "    <div style=\"width: 45%; float: left; margin: 1.2em 5% 0 0;\">\n";
-  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"/{$downarr['nosrc']['url']}\">Download Svarog386</a></p>\n";
-  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">(" . $downarr['nosrc']['size'] >> 20 . "M, last update: " . date("d M Y", $downarr['nosrc']['date']) . ", <a href=\"/{$downarr['nosrc']['md5']}\" style=\"color: inherit;\">MD5</a>)</p>\n";
+  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"{$downarr['nosrc']['url']}\">Download Svarog386</a></p>\n";
+  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">(" . ($downarr['nosrc']['size'] >> 20) . "M, last update: " . date("d M Y", $downarr['nosrc']['date']) . ", <a href=\"{$downarr['nosrc']['md5']}\" style=\"color: inherit;\">MD5</a>)</p>\n";
   echo "    </div>\n";
 
   echo "    <div style=\"width: 45%; float: right; margin: 1.2em 0 0 5%;\">\n";
-  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"/{$downarr['full']['url']}\">Download Svarog386 (+sources)</a></p>\n";
-  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">(" . $downarr['full']['size'] >> 20 . "M, last update: " . date("d M Y", $downarr['full']['date']) . ", <a href=\"/{$downarr['full']['md5']}\" style=\"color: inherit;\">MD5</a>)</p>\n";
+  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"{$downarr['full']['url']}\">Download Svarog386 (+sources)</a></p>\n";
+  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">(" . ($downarr['full']['size'] >> 20) . "M, last update: " . date("d M Y", $downarr['full']['date']) . ", <a href=\"{$downarr['full']['md5']}\" style=\"color: inherit;\">MD5</a>)</p>\n";
   echo "    </div>\n";
 
   echo "    <div style=\"width: 100%; margin: 1.2em 0 0 0;\">\n";
-  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"/{$downarr['micro']['url']}\">Download Svarog386 micro (core OS only)</a></p>\n";
-  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">(" . $downarr['micro']['size'] >> 20 . "M, last update: " . date("d M Y", $downarr['micro']['date']) . ", <a href=\"/{$downarr['micro']['md5']}\" style=\"color: inherit;\">MD5</a>)</p>\n";
+  echo "      <p style=\"text-align: center; font-weight: bold;\"><a href=\"{$downarr['micro']['url']}\">Download Svarog386 micro (core OS only)</a></p>\n";
+  echo "      <p style=\"margin: 0 auto 1.4em auto; font-size: 1em; text-align: center; color: #333;\">(" . ($downarr['micro']['size'] >> 20) . "M, last update: " . date("d M Y", $downarr['micro']['date']) . ", <a href=\"{$downarr['micro']['md5']}\" style=\"color: inherit;\">MD5</a>)</p>\n";
   echo "    </div>\n";
 
 ?>
