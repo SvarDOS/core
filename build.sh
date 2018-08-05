@@ -12,8 +12,8 @@
 ### parameters block starts here ############################################
 
 REPOROOT=`realpath ./website/repos/`
-REPOROOTSRC=`realpath ./website/repos-src/`
-REPOROOTNOSRC=`realpath ./website/repos-nosrc/`
+REPOROOTSRC=`realpath ./cdroot/`
+REPOROOTNOSRC=`realpath ./cdrootnosrc/`
 BUILDIDX=`realpath ../fdnpkg/trunk/buildidx/buildidx`
 CDISODIR=`realpath ./iso/`
 PUBDIR=`realpath ./website/`
@@ -111,13 +111,17 @@ dorepo util
 
 # delete all (previous) *.iso and *.md5 files
 echo "cleaning up old versions..."
-rm $CDISODIR/svarog386-*-*.iso*
+rm -r $CDISODIR/*
 
 # compute a filename for the ISO files and build it
 DATESTAMP=`date +%Y%m%d-%H%M`
-CDISO="$CDISODIR/svarog386-$DATESTAMP-full.iso"
-CDISONOSRC="$CDISODIR/svarog386-$DATESTAMP-nosrc.iso"
-CDISOMICRO="$CDISODIR/svarog386-$DATESTAMP-micro.iso"
+YEAR=`date +%Y`
+
+mkdir -p "$CDISODIR/$YEAR"
+
+CDISO="$CDISODIR/$YEAR/svarog386-$DATESTAMP-full.iso"
+CDISONOSRC="$CDISODIR/$YEAR/svarog386-$DATESTAMP-nosrc.iso"
+CDISOMICRO="$CDISODIR/$YEAR/svarog386-$DATESTAMP-micro.iso"
 genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISO" "$CDROOT"
 if [ $? -ne 0 ] ; then exit 1 ; fi
 genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISONOSRC" "$CDROOTNOSRC"
@@ -141,20 +145,20 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # compute the ini file with properties of each ISO
 echo "[micro]" > "$PUBDIR/downloads.ini"
-echo "url=\"https://sourceforge.net/projects/svarog386/files/svarog386-$DATESTAMP-micro.iso/download\"" >> "$PUBDIR/downloads.ini"
-echo "md5=\"https://sourceforge.net/projects/svarog386/files/svarog386-$DATESTAMP-micro.md5/download\"" >> "$PUBDIR/downloads.ini"
+echo "url=\"https://sourceforge.net/projects/svarog386/files/$YEAR/svarog386-$DATESTAMP-micro.iso/download\"" >> "$PUBDIR/downloads.ini"
+echo "md5=\"https://sourceforge.net/projects/svarog386/files/$YEAR/svarog386-$DATESTAMP-micro.md5/download\"" >> "$PUBDIR/downloads.ini"
 echo "size=`stat --format='%s' $CDISOMICRO`" >> "$PUBDIR/downloads.ini"
 echo "date=`stat --format='%Y' $CDISOMICRO`" >> "$PUBDIR/downloads.ini"
 echo "" >> "$PUBDIR/downloads.ini"
 echo "[full]" >> "$PUBDIR/downloads.ini"
-echo "url=\"https://sourceforge.net/projects/svarog386/files/svarog386-$DATESTAMP-full.iso/download\"" >> "$PUBDIR/downloads.ini"
-echo "md5=\"https://sourceforge.net/projects/svarog386/files/svarog386-$DATESTAMP-full.md5/download\"" >> "$PUBDIR/downloads.ini"
+echo "url=\"https://sourceforge.net/projects/svarog386/files/$YEAR/svarog386-$DATESTAMP-full.iso/download\"" >> "$PUBDIR/downloads.ini"
+echo "md5=\"https://sourceforge.net/projects/svarog386/files/$YEAR/svarog386-$DATESTAMP-full.md5/download\"" >> "$PUBDIR/downloads.ini"
 echo "size=`stat --format='%s' $CDISO`" >> "$PUBDIR/downloads.ini"
 echo "date=`stat --format='%Y' $CDISO`" >> "$PUBDIR/downloads.ini"
 echo "" >> "$PUBDIR/downloads.ini"
 echo "[nosrc]" >> "$PUBDIR/downloads.ini"
-echo "url=\"https://sourceforge.net/projects/svarog386/files/svarog386-$DATESTAMP-nosrc.iso/download\"" >> "$PUBDIR/downloads.ini"
-echo "md5=\"https://sourceforge.net/projects/svarog386/files/svarog386-$DATESTAMP-nosrc.md5/download\"" >> "$PUBDIR/downloads.ini"
+echo "url=\"https://sourceforge.net/projects/svarog386/files/$YEAR/svarog386-$DATESTAMP-nosrc.iso/download\"" >> "$PUBDIR/downloads.ini"
+echo "md5=\"https://sourceforge.net/projects/svarog386/files/$YEAR/svarog386-$DATESTAMP-nosrc.md5/download\"" >> "$PUBDIR/downloads.ini"
 echo "size=`stat --format='%s' $CDISONOSRC`" >> "$PUBDIR/downloads.ini"
 echo "date=`stat --format='%Y' $CDISONOSRC`" >> "$PUBDIR/downloads.ini"
 
