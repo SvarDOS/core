@@ -5,6 +5,7 @@
   'pkgformat'   => 'Package format',
   'licensing'   => 'Svarog386 licensing',
   'onlinerepos' => 'Svarog386 online repositories',
+  'vboxfonts'   => 'Under VirtualBox the language-specific glyphs appear broken',
   'whatmeans'   => 'What does "Svarog" mean?'
   );
 
