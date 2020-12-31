@@ -22,7 +22,32 @@ CDROOTNOSRC=`realpath ./cdrootnosrc`
 CDROOTMICRO=`realpath ./cdrootmicro`
 CUSTFILES=`realpath ./files`
 
+GENISOIMAGE=''    # can be mkisofs, genisoimage or empty for autodetection
+
 ### parameters block ends here ##############################################
+
+
+# auto-detect whether to use mkisofs or genisoimage
+
+if [ "x$GENISOIMAGE" == "x" ] ; then
+mkisofs --help > /dev/null
+if [ $? -eq 0 ] ; then
+  GENISOIMAGE='mkisofs'
+fi
+fi
+
+if [ "x$GENISOIMAGE" == "x" ] ; then
+genisoimage --help > /dev/null
+if [ $? -eq 0 ] ; then
+  GENISOIMAGE='genisoimage'
+fi
+fi
+
+if [ "x$GENISOIMAGE" == "x" ] ; then
+  echo "ERROR: neither genisoimage nor mkisofs was found on this system"
+  exit 1
+fi
+
 
 # function to be called with the repository (short) name as argument
 function dorepo {
@@ -122,11 +147,11 @@ mkdir -p "$CDISODIR/$YEAR"
 CDISO="$CDISODIR/$YEAR/svarog386-$DATESTAMP-full.iso"
 CDISONOSRC="$CDISODIR/$YEAR/svarog386-$DATESTAMP-nosrc.iso"
 CDISOMICRO="$CDISODIR/$YEAR/svarog386-$DATESTAMP-micro.iso"
-genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISO" "$CDROOT"
+$GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISO" "$CDROOT"
 if [ $? -ne 0 ] ; then exit 1 ; fi
-genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISONOSRC" "$CDROOTNOSRC"
+$GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISONOSRC" "$CDROOTNOSRC"
 if [ $? -ne 0 ] ; then exit 1 ; fi
-genisoimage -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISOMICRO" "$CDROOTMICRO"
+$GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVAROG386 -o "$CDISOMICRO" "$CDROOTMICRO"
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # compute the MD5 of the ISO files, taking care to include only the filename in it
