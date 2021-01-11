@@ -1,4 +1,4 @@
-Package files provide an easy way to manage software on Svarog386.
+Package files provide an easy way to manage software on svarDOS.
 
 
 *** Package filenames ***
@@ -12,7 +12,7 @@ Svarog386 uses ZIP files as its package file format. This format has been chosen
 
 Here below is the RECOMENDED command line that can be used to create a package for a program named EXAMPLE using info-zip:
 
-  ZIP −9 -r -k EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+  ZIP -9 -r -k EXAMPLE.ZIP subdir1 subdir2 ... subdirN
 
 If you are using 7za to create your packages, then use this:
 

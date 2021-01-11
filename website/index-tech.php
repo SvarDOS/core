@@ -1,10 +1,9 @@
 <?php
   $arts = array(
-  'support'     => 'How do I get in touch with the Svarog386 community?',
+  'support'     => 'How do I get in touch with the SvarDOS community?',
   'pkgincl'     => 'Packages inclusion rules',
   'pkgformat'   => 'Package format',
-  'licensing'   => 'Svarog386 licensing',
-  'onlinerepos' => 'Svarog386 online repositories',
+  'licensing'   => 'SvarDOS licensing',
   'vboxfonts'   => 'Under VirtualBox the language-specific glyphs appear broken',
   'whatmeans'   => 'What does "Svarog" mean?'
   );
@@ -18,7 +17,7 @@
       return;
     } else {
       echo "<p class=\"title\">" . htmlentities($arts[$art]) . "</p>\n";
-      echo "<p class=\"copyr\">This is an article from the Svarog386 tech base</p>\n";
+      echo "<p class=\"copyr\">This is an article from the SvarDOS tech base</p>\n";
       echo '<p class="tech">';
       echo htmlentities(file_get_contents('tech/' . $art . '.txt'));
       echo "</p>\n";
@@ -27,7 +26,7 @@
   }
 ?>
 
-<p class="title">Svarog386 technical notes</p>
+<p class="title">SvarDOS technical notes</p>
 <p class="copyr">no documentation is perfect, this one's no exception</p>
 <table style="margin: 0 auto;">
 

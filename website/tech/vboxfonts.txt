@@ -1,5 +1,5 @@
 At least some versions of the VirtualBox hypervisor exhibit a bug in their VGA emulation. It appears that when a new font is loaded into VGA memory, the VirtualBox emulation actually uses it only after a video adapter INT 10h call.
 
-Because of this behaviour, loading a codepage yelds apparently no effect, thus localized string may appear with wrong glyphs.
+Because of this behaviour, loading a codepage yields apparently no effect, thus localized strings may appear with wrong glyphs.s
 
 A simple workaround is to force a VGA reinitialization through "MODE CO80" each time that a new codepage is loaded into memory.

@@ -1,3 +1,5 @@
+The "svar" in svarDOS stands for "Svarog", since svarDOS is the successor of the Svarog386 distribution.
+
 Excerpt from Wikipedia, the free encyclopedia:
 
 Svarog is a Slavic deity (...) identified with Hephaestus, the god of the blacksmith in ancient Greek religion (...), some researchers conclude that Svarog is the Slavic god of celestial fire and of blacksmithing.

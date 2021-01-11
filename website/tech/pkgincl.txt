@@ -1,4 +1,4 @@
-Svarog386 is a FreeDOS(tm) distribution that comes with plenty of third-party packages. With time, packages get updated and new packages are being added. However, Svarog386 is not a shareware distribution CD, nor it is a "warez" production of any kind! Every software that is distributed within Svarog386 must comply to a few common sense rules, as listed below.
+svarDOS is a DOS distribution that comes with plenty of third-party packages. With time, packages get updated and new packages are being added. However, svarDOS is not a shareware distribution CD, nor it is a "warez" production of any kind. Every software that is distributed within svarDOS must comply to a few common sense rules, as listed below.
 
 *** Objective usefulness ***
 
@@ -20,4 +20,4 @@ The program must allow distribution without restrictions, and must not forbid be
    CORE exception
   ----------------
 
-Please note that, while the above rules are valid for all third-party repositories that come with Svarog386, it does not apply to the 'core' repository which contains the operating system itself. Svarog386 being a free (as in "libre") operating system, all "core" packages must comply to a libre-like license - be it GPL, BSD, public domain, or anything that allows for unrestricted distribution, provides source code and allows to modify it freely.
+Please note that, while the above rules are valid for all third-party packages that may be distributed with svarDOS, it does not apply to the 'core' packages that contain the operating system itself. svarDOS being a free (as in "libre") operating system, all "core" packages must comply to a libre-like license - be it GPL, BSD, MIT, public domain, or anything that allows for unrestricted distribution, provides source code and allows to modify it freely.

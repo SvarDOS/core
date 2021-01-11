@@ -1,3 +1,3 @@
-The recommended way to contact the Svarog386 community is through the alt.os.free-dos usenet newsgroup.
+The recommended way to contact the svarDOS community is through its mailing list:
 
-To write on a usenet newsgroup, you either need a usenet (NNTP) reader, or you can rely on a web-based usenet reader. Many web-based usenet readers exist out there. One of the most popular seems to be the one behind Google Groups: https://groups.google.com/forum/#!forum/alt.os.free-dos
+https://lists.osdn.me/mailman/listinfo/svardos-users
