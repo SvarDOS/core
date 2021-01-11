@@ -16,7 +16,7 @@
       echo "<p>invalid article!</p>";
       return;
     } else {
-      echo "<p class=\"title\">" . htmlentities($arts[$art]) . "</p>\n";
+      echo '<h1>' . htmlentities($arts[$art]) . "</h1>\n";
       echo "<p class=\"copyr\">This is an article from the SvarDOS tech base</p>\n";
       echo '<p class="tech">';
       echo htmlentities(file_get_contents('tech/' . $art . '.txt'));
@@ -26,7 +26,7 @@
   }
 ?>
 
-<p class="title">SvarDOS technical notes</p>
+<h1>SvarDOS technical notes</h1>
 <p class="copyr">no documentation is perfect, this one's no exception</p>
 <table style="margin: 0 auto;">
 

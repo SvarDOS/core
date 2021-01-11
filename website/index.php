@@ -6,7 +6,6 @@
     <meta name="author" content="Mateusz Viste">
     <meta name="robots" content="index, follow">
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -25,7 +24,7 @@
     } else if ($p == 'nls') {
       readfile('index-nls.htm');
     } else if ($p == 'test') {
-      include 'index-test.php';
+      include 'index-main.php';
     } else { // else display the front page
       //include 'index-main.php';
       include 'wip.htm';
