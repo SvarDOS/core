@@ -12,5 +12,5 @@
 #if [ $? -ne 0 ] ; then exit 1 ; fi
 
 # sync the website (with repositories)
-rsync -a --delete --progress website/ mateuszviste@shell.osdn.net/home/groups/s/sv/svardos/htdocs/
+rsync -rtDOvz --delete --progress website/ mateuszviste@shell.osdn.net:/home/groups/s/sv/svardos/htdocs/
 
