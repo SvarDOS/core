@@ -35,13 +35,21 @@ p.wondering {
   opacity: 0.8;
 }
 
-html,body {
-  font-size: 1.1em;
+html {
   margin: 0;
   padding: 0;
-  background-color: #B0B0B0;
-  height: 100%;
+  background-color: #ccc;
+}
+
+body {
+  font-size: 1.1em;
+  background-color: #fff;
   font-family: "open sans", sans-serif;
+  margin: 0 auto;
+  padding: 1em 0.5em
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 60em;
 }
 
 a:link { /* unvisited link */
