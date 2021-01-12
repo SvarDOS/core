@@ -9,12 +9,8 @@
 
 set -e
 
-# sync ISO files to osdn storage servers
-rsync -a --progress iso mateuszviste@storage.osdn.net:/storage/groups/s/sv/svardos/
-
-# sync packages (with sources)
+# sync packages (with sources) to the osdn storage server
 rsync -a --progress --delete packages mateuszviste@storage.osdn.net:/storage/groups/s/sv/svardos/
 
-# sync the website (with repositories)
+# sync the website (with repositories and downloads)
 rsync -rtDOvz --delete --progress website/ mateuszviste@shell.osdn.net:/home/groups/s/sv/svardos/htdocs/
-
