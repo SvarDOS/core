@@ -7,9 +7,13 @@
 # Synchronization of ISO files, website and repositories towards sourceforge.
 #
 
-# sync ISO files to sourceforge download servers
-#rsync -a --progress iso/* mateuszviste@storage.osdn.net:/storage/groups/s/sv/svardos/
-#if [ $? -ne 0 ] ; then exit 1 ; fi
+set -e
+
+# sync ISO files to osdn storage servers
+rsync -a --progress iso mateuszviste@storage.osdn.net:/storage/groups/s/sv/svardos/
+
+# sync packages (with sources)
+rsync -a --progress --delete packages mateuszviste@storage.osdn.net:/storage/groups/s/sv/svardos/
 
 # sync the website (with repositories)
 rsync -rtDOvz --delete --progress website/ mateuszviste@shell.osdn.net:/home/groups/s/sv/svardos/htdocs/
