@@ -1,6 +1,11 @@
     <h1>SvarDOS - an open-source DOS distribution</h1>
     <p class="copyr">brought to you by <a href="http://mateusz.viste.fr/" class="mateusz">Mateusz Viste</a></p>
 
+    <div style="margin: 2em auto; width: 20em; border: 1px #777 solid; background-color: #fff; padding: 0.5em;">
+    <p style="text-align: center; font-size: 1.5em; margin: 1.5em auto;">WORK IN PROGRESS</p>
+    <p style="font-size: 1.2em;">This project is in a work-in-progress phase, nothing works yet. Please come back later!</p>
+    </div>
+
     <p>SvarDOS is a <a href="?p=tech&amp;art=licensing">free</a>, <a href="?p=nls">multilingual</a> DOS distribution that uses the FreeDOS kernel. It's released in the form of a bootable CD image (ISO) that contains the "core" operating system, as well as a variety of third-party packages.<br>
     SvarDOS is a "rolling release", meaning that it doesn't follow the concept of "versions". SvarDOS can be kept up-to-date trough its online update tool.</p>
 

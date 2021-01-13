@@ -10,7 +10,7 @@
   </head>
   <body>
 
-    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=why">Why SvarDOS</a> I <a href="?p=tech">Tech</a> I <a href="?p=nls">NLS</a></p>
+    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=why">Why SvarDOS</a> I <a href="?p=repo">Repo</a> I <a href="?p=tech">Tech</a> I <a href="?p=nls">NLS</a></p>
 
 <?php
 
@@ -23,11 +23,12 @@
       include 'index-tech.php';
     } else if ($p == 'nls') {
       readfile('index-nls.htm');
+    } else if ($p == 'repo') {
+      include 'index-repo.php';
     } else if ($p == 'test') {
       include 'index-main.php';
     } else { // else display the front page
-      //include 'index-main.php';
-      include 'wip.htm';
+      include 'index-main.php';
     }
 ?>
   </body>

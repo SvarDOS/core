@@ -28,11 +28,12 @@
 
 <h1>SvarDOS technical notes</h1>
 <p class="copyr">no documentation is perfect, this one's no exception</p>
-<table style="margin: 0 auto;">
+
+<table>
 
 <?php
 foreach ($arts as $file=>$title) {
-  echo "<tr><td><a href=\"?p=tech&art={$file}\">" . htmlentities($title) . "</a></td></tr>";
+  echo "<tr><td><a href=\"?p=tech&art={$file}\">" . htmlentities($title) . "</a></td></tr>\n";
 }
 ?>
 
