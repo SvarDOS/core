@@ -35,7 +35,7 @@
 
 
 /* computes the BSD sum of a file and returns it. returns 0 on error. */
-static uint16_t file2bsum(char *filename) {
+static uint16_t file2bsum(const char *filename) {
   uint16_t result = 0;
   unsigned char buff[1024 * 1024];
   size_t i, buffread;
@@ -99,7 +99,7 @@ static int readline_fromfile(FILE *fd, char *line, int maxlen) {
   }
 }
 
-static int readlsm(char *filename, char *version, char *title, char *description) {
+static int readlsm(const char *filename, char *version, char *title, char *description) {
   char linebuff[1024];
   char *valuestr;
   int x;
@@ -151,7 +151,7 @@ static int cmpstring(const void *p1, const void *p2) {
 }
 
 
-static void GenIndexes(char *repodir) {
+static void GenIndexes(const char *repodir) {
   char *LsmFileList[4096];
   char tmpbuf[64];
   char *LsmFile, LSMpackage[64], LSMtitle[128], LSMversion[128], LSMdescription[1024];
@@ -215,9 +215,9 @@ static void GenIndexes(char *repodir) {
 
 int main(int argc, char **argv) {
   char *repodir;
-  char cmdbuff[1024];
+  char cmdbuff[256];
 
-  puts("FDNPKG server repository generator version " pVer);
+  puts("SvarDOS repository index generator ver " pVer);
 
   if (argc != 2) {
     puts("Usage: buildidx repodir");
@@ -238,7 +238,7 @@ int main(int argc, char **argv) {
   system("mkdir appinfo");
 
   puts("Populating appinfo with LSM files from archives...");
-  sprintf(cmdbuff, "unzip -C -j -L -o '%s/*.zip' 'appinfo/*.lsm' -d appinfo", repodir);
+  snprintf(cmdbuff, sizeof(cmdbuff), "unzip -C -j -L -o '%s/*.zip' 'appinfo/*.lsm' -d appinfo", repodir);
   system(cmdbuff);
 
   puts("Generating the index file...");
