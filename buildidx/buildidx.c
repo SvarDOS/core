@@ -1,12 +1,13 @@
 /*
-  FDNPKG idx builder
-  Copyright (C) Mateusz Viste 2012, 2013, 2014, 2015, 2016, 2017
+  SvarDOS repo index builder
+  Copyright (C) Mateusz Viste 2012-2021
 
-  buildidx computes idx files for FDNPKG-compatible repositories.
-  it must be executed pointing to a directory that stores FreeDOS
-  packages (zip) files. buildidx will generate the index file and
-  save it into the package repository.
+  buildidx computes an index tsv file for the SvarDOS repository.
+  it must be executed pointing to a directory that stores packages (zip)
+  files. buildidx will generate the index file and save it into the package
+  repository.
 
+  13 jan 2021: removed the identification line, changed CRC32 to bsum, not creating the listing.txt file and stopped compressing index
   23 apr 2017: uncompressed index is no longer created, added CRC32 of zib (bin only) files, if present
   28 aug 2016: listing.txt is always written inside the repo dir (instead of inside current dir)
   27 aug 2016: accepting full paths to repos (starting with /...)
@@ -22,6 +23,7 @@
 
 #include <errno.h>
 #include <stdio.h>   /* fopen, fclose... */
+#include <stdint.h>
 #include <stdlib.h>  /* system() */
 #include <string.h>  /* strcasecmp() */
 #include <time.h>    /* time(), ctime() */
@@ -29,27 +31,26 @@
 #include <dirent.h>
 #include <sys/types.h>
 
-#define pVer "2017-04-23"
+#define pVer "2021-01-13"
 
 
-#include "crc32lib.c"
-
-
-/* computes the CRC32 of file and returns it. returns 0 on error. */
-static unsigned long file2crc(char *filename) {
-  unsigned long result;
-  unsigned char buff[16 * 1024];
-  int buffread;
+/* computes the BSD sum of a file and returns it. returns 0 on error. */
+static uint16_t file2bsum(char *filename) {
+  uint16_t result = 0;
+  unsigned char buff[1024 * 1024];
+  size_t i, buffread;
   FILE *fd;
   fd = fopen(filename, "rb");
   if (fd == NULL) return(0);
-  result = crc32_init();
   while ((buffread = fread(buff, 1, sizeof(buff), fd)) > 0) {
-    if (buffread > 0) crc32_feed(&result, buff, buffread);
+    for (i = 0; i < buffread; i++) {
+      /* rotr */
+      result = (result >> 1) | (result << 15);
+      /* */
+      result += buff[i];
+    }
   }
-  crc32_finish(&result);
   fclose(fd);
-  if (buffread < 0) puts("read() error!");
   return(result);
 }
 
@@ -150,22 +151,12 @@ static int cmpstring(const void *p1, const void *p2) {
 }
 
 
-static char *getlastdir(char *s) {
-  char *r = s;
-  for (; *s != 0; s++) {
-    if ((*s == '/') && (s[1] != 0)) r = s+1;
-  }
-  return(r);
-}
-
-
 static void GenIndexes(char *repodir) {
   char *LsmFileList[4096];
   char tmpbuf[64];
   char *LsmFile, LSMpackage[64], LSMtitle[128], LSMversion[128], LSMdescription[1024];
   int LsmCount = 0, x;
-  FILE *idx, *listing;
-  time_t curtime;
+  FILE *idx;
   DIR *dir;
   struct dirent *diritem;
 
@@ -191,35 +182,21 @@ static void GenIndexes(char *repodir) {
   qsort(&LsmFileList[0], LsmCount, sizeof(char *), cmpstring);
 
   /* Create the index file */
-  sprintf(tmpbuf, "%s/index.lst", repodir);
+  sprintf(tmpbuf, "%s/index.tsv", repodir);
   idx = fopen(tmpbuf, "wb");
-  sprintf(tmpbuf, "%s/listing.txt", repodir);
-  listing = fopen(tmpbuf, "wb");
-
-  /* Write out the index header */
-  curtime = time(NULL);
-  fprintf(idx, "FD-REPOv1\t'%s' built at unix time %ld, lists %d packages\n", getlastdir(repodir), curtime, LsmCount);
-  fprintf(listing, "\n");
-  fprintf(listing, "*** Repository '%s' - build time: %s\n", getlastdir(repodir), ctime(&curtime));
 
   /* Read every LSM */
   for (x = 0; x < LsmCount; x++) {
-    unsigned long crc32, crc32zib;
+    uint16_t bsum;
     LsmFile = LsmFileList[x];
     sprintf(LSMpackage, "%s", LsmFile);
     LSMpackage[strlen(LSMpackage) - 4] = 0;
 
-    /* compute the CRC of the zip package, and its zib version, if present */
+    /* compute the BSD sum of the zip package */
     sprintf(tmpbuf, "%s/%s.zip", repodir, LSMpackage);
-    crc32 = file2crc(tmpbuf);
-    sprintf(tmpbuf, "%s/%s.zib", repodir, LSMpackage);
-    crc32zib = file2crc(tmpbuf);
+    bsum = file2bsum(tmpbuf);
 
-    if (crc32zib != 0) {
-      printf("Processing %s... CRC %08lX (zib: %08lX)\n", LsmFile, crc32, crc32zib);
-    } else {
-      printf("Processing %s... CRC %08lX\n", LsmFile, crc32);
-    }
+    printf("Processing %s... BSUM %04X\n", LsmFile, bsum);
 
     sprintf(tmpbuf, "appinfo/%s", LsmFile);
     readlsm(tmpbuf, LSMversion, LSMtitle, LSMdescription);
@@ -228,22 +205,9 @@ static void GenIndexes(char *repodir) {
     if (LSMtitle[0] == 0) printf("Warning: no LSM title for %s.zip\n", LSMpackage);
     if (LSMversion[0] == 0) printf("Warning: no LSM version for %s.zip!\n", LSMpackage);
     if (LSMdescription[0] == 0) printf("Warning: no LSM description for %s.zip!\n", LSMpackage);
-    if (crc32zib != 0) {
-      fprintf(idx, "%s\t%s\t%s\t%08lX\t%08lX\n", LSMpackage, LSMversion, LSMdescription, crc32, crc32zib);
-    } else {
-      fprintf(idx, "%s\t%s\t%s\t%08lX\t\n", LSMpackage, LSMversion, LSMdescription, crc32);
-    }
-    fprintf(listing, "%s %s - %s\n", LSMpackage, LSMversion, LSMdescription);
+    fprintf(idx, "%s\t%s\t%s\t%u\n", LSMpackage, LSMversion, LSMdescription, bsum);
   }
-  fprintf(listing, "\n");
   fclose(idx);
-  fclose(listing);
-  /* create the compressed version of the index file using gzip */
-  sprintf(tmpbuf, "gzip -9 < %s/index.lst > %s/index.gz", repodir, repodir);
-  system(tmpbuf);
-  /* remove the uncompressed version */
-  sprintf(tmpbuf, "%s/index.lst", repodir);
-  unlink(tmpbuf);
   printf("%d packages found.\n", LsmCount);
 }
 

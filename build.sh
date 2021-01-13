@@ -13,7 +13,7 @@
 
 PKGDIR=`realpath ./packages`
 REPOROOT=`realpath ./website/repo`
-BUILDIDX=`realpath ../fdnpkg/trunk/buildidx/buildidx`
+BUILDIDX=`realpath ./buildidx/buildidx`
 PUBDIR=`realpath ./website/download`
 CDROOT=`realpath ./cdroot`
 CUSTFILES=`realpath ./files`
