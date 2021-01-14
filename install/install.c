@@ -1,30 +1,28 @@
 /*
- * SVAROG386 INSTALL
- * COPYRIGHT (C) 2016 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * SVARDOS INSTALL PROGRAM
+ * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * COPYRIGHT (C) 2016-2021 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  *
- * http://svarog386.sf.net
+ * http://svardos.osdn.io
  */
 
 #include <dos.h>
@@ -53,8 +51,8 @@ static unsigned short COLOR_SELECTCUR[2] = {0x1F00,0x0700};
 /* mono flag */
 static int mono = 0;
 
-/* how much disk space does Svarog386 require (in MiB) */
-#define SVAROG_DISK_REQ 8
+/* how much disk space does SvarDOS require (in MiB) */
+#define SVARDOS_DISK_REQ 8
 
 /* menu screens can output only one of these: */
 #define MENUNEXT 0
@@ -189,7 +187,7 @@ static int menuselect(int ypos, int xpos, int height, char **list, int listlen) 
 
 static void newscreen(int statusbartype) {
   char *msg;
-  msg = kittengets(0, 0, "SVAROG386 INSTALLATION");
+  msg = kittengets(0, 0, "SVARDOS INSTALLATION");
   video_putcharmulti(0, 0, COLOR_TITLEBAR[mono], ' ', 80, 1);
   video_putstring(0, 40 - (strlen(msg) >> 1), COLOR_TITLEBAR[mono], msg, -1);
   video_clear(COLOR_BODY[mono], 80, -80);
@@ -244,7 +242,7 @@ static int selectlang(struct slocales *locales) {
   };
 
   newscreen(1);
-  msg = kittengets(1, 0, "Welcome to Svarog386");
+  msg = kittengets(1, 0, "Welcome to SvarDOS");
   x = 40 - (strlen(msg) >> 1);
   video_putstring(4, x, COLOR_BODY[mono], msg, -1);
   video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
@@ -311,7 +309,7 @@ static int selectkeyb(struct slocales *locales) {
   int menuheight, choice;
   if (locales->keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
   newscreen(0);
-  putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "Svarog386 supports the keyboard layouts used in different countries. Choose the keyboard layout you want.");
+  putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "SvarDOS supports the keyboard layouts used in different countries. Choose the keyboard layout you want.");
   menuheight = locales->keyblen + 2;
   if (menuheight > 13) menuheight = 13;
   choice = menuselect(10, -1, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
@@ -326,11 +324,11 @@ static int selectkeyb(struct slocales *locales) {
 /* returns 0 if installation must proceed, non-zero otherwise */
 static int welcomescreen(void) {
   int c;
-  char *choice[] = {"Install Svarog386 to disk", "Quit to DOS", NULL};
+  char *choice[] = {"Install SvarDOS to disk", "Quit to DOS", NULL};
   choice[0] = kittengets(0, 1, choice[0]);
   choice[1] = kittengets(0, 2, choice[1]);
   newscreen(0);
-  putstringnls(4, 1, COLOR_BODY[mono], 2, 0, "You are about to install Svarog386: a free, MSDOS-compatible operating system based on the FreeDOS kernel. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.");
+  putstringnls(4, 1, COLOR_BODY[mono], 2, 0, "You are about to install SvarDOS: a free, MSDOS-compatible operating system based on the FreeDOS kernel. SvarDOS targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once SvarDOS is installed.");
   c = menuselect(13, -1, 4, choice, -1);
   if (c < 0) return(MENUPREV);
   if (c == 0) return(MENUNEXT);
@@ -401,7 +399,7 @@ static int preparedrive(void) {
       list[0] = kittengets(0, 3, list[0]);
       list[1] = kittengets(0, 4, list[1]);
       list[2] = kittengets(0, 2, list[2]);
-      snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so Svarog386 can be installed on it. Note, that Svarog386 requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVAROG_DISK_REQ);
+      snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so SvarDOS can be installed on it. Note, that SvarDOS requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVARDOS_DISK_REQ);
       putstringwrap(4, 1, COLOR_BODY[mono], buff);
       switch (menuselect(14, -1, 5, list, -1)) {
         case 0:
@@ -449,16 +447,16 @@ static int preparedrive(void) {
       if (choice == 1) return(MENUQUIT);
       video_clear(0x0700, 0, 0);
       video_movecursor(0, 0);
-      snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
+      snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
       system(buff);
       continue;
     }
     /* check total disk space */
     ds = disksize(selecteddrive);
-    if (ds < SVAROG_DISK_REQ) {
+    if (ds < SVARDOS_DISK_REQ) {
       int y = 9;
       newscreen(2);
-      snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! Svarog386 requires a disk of at least %d MiB."), cselecteddrive);
+      snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB."), cselecteddrive);
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
       putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
@@ -471,22 +469,22 @@ static int preparedrive(void) {
       int y = 6;
       list[0] = kittengets(0, 6, list[0]);
       list[1] = kittengets(0, 2, list[1]);
-      snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. Svarog386 must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
+      snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. SvarDOS must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
       choice = menuselect(++y, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       video_clear(0x0700, 0, 0);
       video_movecursor(0, 0);
-      snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVAROG386", cselecteddrive);
+      snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
       system(buff);
       continue;
     } else {
       /* final confirmation */
-      char *list[] = { "Install Svarog386", "Quit to DOS", NULL};
+      char *list[] = { "Install SvarDOS", "Quit to DOS", NULL};
       list[0] = kittengets(0, 1, list[0]);
       list[1] = kittengets(0, 2, list[1]);
-      snprintf(buff, sizeof(buff), kittengets(3, 6, "The installation of Svarog386 to %c: is about to begin."), cselecteddrive);
+      snprintf(buff, sizeof(buff), kittengets(3, 6, "The installation of SvarDOS to %c: is about to begin."), cselecteddrive);
       video_putstring(7, -1, COLOR_BODY[mono], buff, -1);
       choice = menuselect(10, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
@@ -538,13 +536,13 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   fprintf(fd, "DOS=UMB,HIGH\r\n"
               "LASTDRIVE=Z\r\n"
               "FILES=50\r\n");
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVAROG.386\\BIN\\HIMEMX.EXE\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVARDOS\\BIN\\HIMEMX.EXE\r\n", targetdrv);
   if (strcmp(locales->lang, "EN") == 0) {
     strcpy(buff, "COMMAND");
   } else {
     snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
   }
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVAROG.386\\BIN\\%s.COM /E:512 /P\r\n", targetdrv, buff);
+  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", targetdrv, buff);
   fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\CONF\\COUNTRY.SYS\r\n", targetdrv);
   fprintf(fd, "DEVICE=%c:\\SYSTEM\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
   fclose(fd);
@@ -554,7 +552,7 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   if (fd == NULL) return;
   fprintf(fd, "@ECHO OFF\r\n");
   fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", targetdrv);
-  fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVAROG.386\r\n", targetdrv);
+  fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVARDOS\r\n", targetdrv);
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
   fprintf(fd, "SET LANG=%s\r\n", locales->lang);
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
@@ -569,9 +567,9 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   if (locales->egafile > 0) {
     fprintf(fd, "DISPLAY CON=(EGA,,1)\r\n");
     if (locales->egafile == 1) {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA.CPX)\r\n", locales->codepage, targetdrv);
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVARDOS\\CPI\\EGA.CPX)\r\n", locales->codepage, targetdrv);
     } else {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVAROG.386\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVARDOS\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
     }
     fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
   }
@@ -586,7 +584,7 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
     } else {
       snprintf(buff3, sizeof(buff3), " /ID:%d", locales->keybid);
     }
-    fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVAROG.386\\BIN\\%s%s\r\n", locales->keybcode, locales->codepage, targetdrv, buff2, buff3);
+    fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVARDOS\\BIN\\%s%s\r\n", locales->keybcode, locales->codepage, targetdrv, buff2, buff3);
     fprintf(fd, "\r\n");
   }
   fprintf(fd, "SHSUCDX /d:SVCD0001\r\n");
@@ -595,7 +593,7 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
   fprintf(fd, "REM CTMOUSE\r\n");
   fprintf(fd, "\r\n");
   fprintf(fd, "ECHO.\r\n");
-  fprintf(fd, "ECHO %s\r\n", kittengets(6, 0, "Welcome to Svarog386! Type 'HELP' if you need help."));
+  fprintf(fd, "ECHO %s\r\n", kittengets(6, 0, "Welcome to SvarDOS! Type 'HELP' if you need help."));
   fclose(fd);
   /*** CREATE DIRECTORY FOR OTHER CONFIGURATION FILES ***/
   snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG", targetdrv);
@@ -671,7 +669,7 @@ static void installpackages(int targetdrv, int cdromdrv) {
   /* count how long the pkg list is */
   for (pkglistlen = 0; pkglist[pkglistlen] != NULL; pkglistlen++);
   /* set DOSDIR and friends */
-  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\SVAROG.386", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\SVARDOS", targetdrv);
   setenv("DOSDIR", buff, 1);
   snprintf(buff, sizeof(buff), "%c:\\TEMP", targetdrv);
   setenv("TEMP", buff, 1);
@@ -694,7 +692,7 @@ static void installpackages(int targetdrv, int cdromdrv) {
 static void finalreboot(void) {
   int y = 9;
   newscreen(2);
-  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0, "Svarog386 installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.");
+  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0, "SvarDOS installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.");
   putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
   input_getkey();
   reboot();
@@ -726,7 +724,7 @@ static void loadcp(struct slocales *locales) {
   }
 }
 
-/* checks CD drive drv for the presence of the Svarog386 install CD
+/* checks CD drive drv for the presence of the SvarDOS install CD
  * returns 0 if found, non-zero otherwise */
 static int checkcd(char drv) {
   FILE *fd;
@@ -753,7 +751,7 @@ int main(void) {
   }
   cdromdrv += 'A'; /* convert the cdrom 'id' (A=0) to an actual drive letter */
   if (checkcd(cdromdrv) != 0) {
-    printf("ERROR: SVAROG386 INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
+    printf("ERROR: SVARDOS INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
     return(1);
   }
 
@@ -763,7 +761,7 @@ int main(void) {
   kittenopen("INSTALL"); /* load initial NLS support */
 
  SelectLang:
-  action = selectlang(&locales); /* welcome to svarog, select your language */
+  action = selectlang(&locales); /* welcome to svardos, select your language */
   if (action != MENUNEXT) goto Quit;
   setenv("LANG", locales.lang, 1);
   loadcp(&locales);
@@ -774,7 +772,7 @@ int main(void) {
   if (action == MENUPREV) goto SelectLang;
 
  WelcomeScreen:
-  action = welcomescreen(); /* what svarog386 is, ask whether to run live dos or install */
+  action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto Quit;
   if (action == MENUPREV) goto SelectLang;
   targetdrv = preparedrive(); /* what drive should we install to? check avail. space */

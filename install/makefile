@@ -1,5 +1,5 @@
 #
-# This is a makefile to build the Svarog386 install program
+# This is a makefile to build the SvarDOS install program
 #
 # You can use following targets:
 #

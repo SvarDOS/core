@@ -1,5 +1,5 @@
 /*
- * input keyboard routines used by the Svarog386 installer.
+ * input keyboard routines used by the SvarDOS installer.
  * Copyright (C) 2016 Mateusz Viste
  */
 

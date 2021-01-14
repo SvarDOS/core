@@ -1,5 +1,5 @@
 /*
- * Video routines used by the Svarog386 installer
+ * Video routines used by the SvarDOS installer
  * Copyright (C) 2016 Mateusz Viste
  */
 

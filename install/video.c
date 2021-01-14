@@ -1,5 +1,5 @@
 /*
- * Video routines used by the Svarog386 installer
+ * Video routines used by the SvarDOS installer
  * Copyright (C) 2016 Mateusz Viste
  *
  * All video routines output data directly to VRAM, and they all do that

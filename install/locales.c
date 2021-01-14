@@ -1,5 +1,5 @@
 /*
- * This program creates a header file for the Svarog386 installer, that
+ * This program creates a header file for the SvarDOS installer, that
  * contains the list of all supported keyboard layouts, along with a way to
  * select sets of keyboard layouts that apply to only a specific region.
  *

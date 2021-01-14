@@ -1,13 +1,13 @@
 #
-# This is a localization file for the Svarog386 INSTALL program
+# This is a localization file for the SvarDOS INSTALL program
 #
 # Language..: English
 # Translator: Mateusz Viste
 #
 
 ### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
-0.0:SVAROG386 INSTALLATION
-0.1:Install Svarog386
+0.0:SVARDOS INSTALLATION
+0.1:Install SvarDOS
 0.2:Quit to DOS
 0.3:Create a partition automatically
 0.4:Run the FDISK partitioning tool
@@ -18,28 +18,28 @@
 0.11:Up/Down = Select entry | Enter = Confirm choice | ESC = Quit to DOS
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
-1.0:Welcome to Svarog386
+1.0:Welcome to SvarDOS
 1.1:Please select your preferred language from the list below:
-1.5:Svarog386 supports different keyboard layouts. Choose the keyboard layout that you want.
+1.5:SvarDOS supports different keyboard layouts. Choose the keyboard layout that you want.
 
 ### WELCOME SCREEN ###
-2.0:You are about to install Svarog386: a free, MS-DOS compatible operating system based on FreeDOS. Svarog386 targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once Svarog386 is installed.
+2.0:You are about to install SvarDOS: a free, MS-DOS compatible operating system based on FreeDOS. SvarDOS comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once SvarDOS is installed.
 
 ### DISK SETUP ###
-3.0:ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one primary partition on your hard disk, so Svarog386 can be installed on it. Note, that Svarog386 requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice.
+3.0:ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one primary partition on your hard disk, so SvarDOS can be installed on it. Note, that SvarDOS requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice.
 3.1:Your computer will reboot now.
 3.2:ERROR: Drive %c: is a removable device. Installation aborted.
 3.3:ERROR: Drive %c: seems to be unformated. Do you wish to format it?
-3.4:ERROR: Drive %c: is not big enough! Svarog386 requires a disk of at least %d MiB.
-3.5:ERROR: Drive %c: is not empty. Svarog386 must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk.
-3.6:The installation of Svarog386 to %c: is about to begin.
+3.4:ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB.
+3.5:ERROR: Drive %c: is not empty. SvarDOS must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk.
+3.6:The installation of SvarDOS to %c: is about to begin.
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Installing package %d/%d: %s
 
 ### END SCREEN ###
-5.0:Svarog386 installation is over. Your computer will reboot now.\nPlease make sure to remove the installation media.
+5.0:SvarDOS installation is over. Your computer will reboot now.\nPlease make sure to remove the installation media.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
-6.0:Welcome to Svarog386! Type 'HELP' if you need help.
+6.0:Welcome to SvarDOS! Type 'HELP' if you need help.
