@@ -57,7 +57,7 @@ void video_putcharmulti(int y, int x, unsigned short attr, int c, int repeat, in
   }
 }
 
-void video_putstring(int y, int x, unsigned short attr, char *s, int maxlen) {
+void video_putstring(int y, int x, unsigned short attr, const char *s, int maxlen) {
   if (x < 0) { /* means 'center out' */
     int slen;
     for (slen = 0; s[slen] != 0; slen++); /* faster than strlen() */
@@ -70,7 +70,7 @@ void video_putstring(int y, int x, unsigned short attr, char *s, int maxlen) {
   }
 }
 
-void video_putstringfix(int y, int x, unsigned short attr, char *s, int w) {
+void video_putstringfix(int y, int x, unsigned short attr, const char *s, int w) {
   x += (y << 6) + (y << 4); /* I use x as an offset now */
   while (w-- > 0) {
     scr[x++] = attr | *s;
