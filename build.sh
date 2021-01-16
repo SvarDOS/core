@@ -78,13 +78,13 @@ function prep_flop {
 
   # now populate the floppies
   curdisk=1
-  for p in $CDROOT/*.zip ; do
+  for p in $COREPKGS ; do
     # if copy fails, then probably the floppy is full - try again after
     # creating an additional floppy image
-    if ! mcopy -mi "$1/$curdisk.img" "$p" ::/ ; then
+    if ! mcopy -mi "$1/$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
       curdisk=$((curdisk+1))
       mformat -C -f $1 -v SVARDOS -i "$1/$curdisk.img"
-      mcopy -mi "$1/$curdisk.img" "$p" ::/
+      mcopy -mi "$1/$curdisk.img" "$CDROOT/$p.zip" ::/
     fi
   done
 
