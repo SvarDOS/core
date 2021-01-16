@@ -707,12 +707,12 @@ static void loadcp(const struct slocales *locales) {
   }
 }
 
-/* checks CD drive drv for the presence of the SvarDOS install CD
+/* checks that drive drv contains SvarDOS packages
  * returns 0 if found, non-zero otherwise */
-static int checkcd(char drv) {
+static int checkinstsrc(char drv) {
   FILE *fd;
-  char fname[32];
-  snprintf(fname, sizeof(fname), "%c:\\MEM.ZIP", drv);
+  char fname[16];
+  snprintf(fname, sizeof(fname), "%c:\\ATTRIB.ZIP", drv);
   fd = fopen(fname, "rb");
   if (fd == NULL) return(-1);
   fclose(fd);
@@ -723,19 +723,23 @@ static int checkcd(char drv) {
 int main(void) {
   struct slocales locales;
   int targetdrv;
-  int cdromdrv;
+  int sourcedrv;
   int action;
 
-  /* find where the cdrom drive is */
-  cdromdrv = cdrom_findfirst();
-  if (cdromdrv < 0) {
-    printf("ERROR: CD-ROM DRIVE NOT FOUND\r\n");
-    return(1);
-  }
-  cdromdrv += 'A'; /* convert the cdrom 'id' (A=0) to an actual drive letter */
-  if (checkcd(cdromdrv) != 0) {
-    printf("ERROR: SVARDOS INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
-    return(1);
+  /* am I running in install-from-floppy mode? */
+  if (checkinstsrc('A') == 0) {
+    sourcedrv = 'A';
+  } else { /* otherwise find where the cdrom drive is */
+    sourcedrv = cdrom_findfirst();
+    if (sourcedrv < 0) {
+      printf("ERROR: CD-ROM DRIVE NOT FOUND\r\n");
+      return(1);
+    }
+    sourcedrv += 'A'; /* convert the source drive 'id' (A=0) to an actual drive letter */
+    if (checkinstsrc(sourcedrv) != 0) {
+      printf("ERROR: SVARDOS INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
+      return(1);
+    }
   }
 
   /* init screen and detect mono status */
@@ -762,8 +766,8 @@ int main(void) {
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
   /*askaboutsources();*/ /* IF sources are available, ask if installing with them */
-  if (installpackages(targetdrv, cdromdrv) != 0) goto Quit;    /* install packages */
-  bootfilesgen(targetdrv, &locales, cdromdrv); /* generate boot files and other configurations */
+  if (installpackages(targetdrv, sourcedrv) != 0) goto Quit;    /* install packages */
+  bootfilesgen(targetdrv, &locales, sourcedrv); /* generate boot files and other configurations */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */
   finalreboot(); /* remove the CD and reboot */
