@@ -16,6 +16,7 @@ REPOROOT=`realpath ./website/repo`
 BUILDIDX=`realpath ./buildidx/buildidx`
 PUBDIR=`realpath ./website/download`
 CDROOT=`realpath ./cdroot`
+FLOPROOT=`realpath ./floproot`
 CUSTFILES=`realpath ./files`
 
 GENISOIMAGE=''    # can be mkisofs, genisoimage or empty for autodetection
@@ -48,6 +49,11 @@ fi
 set -e
 
 
+# list of packages to be part of CORE
+COREPKGS=( "attrib" "chkdsk" "choice" "command" "cpidos" "ctmouse" "deltree" "devload" "diskcopy" "display" "dosfsck" "edit" "fc" "fdapm" "fdisk" "fdnpkg" "format" "himemx" "kernel" "keyb" "keyb_lay" "label" "mem" "mode" "more" "move" "shsucdx" "sort" "tree" "undelete" "xcopy" "udvd2" )
+
+
+
 # function that builds the packages repository
 function dorepo {
   # copy all zip files to the web repo
@@ -73,70 +79,27 @@ fi
 origdir=`pwd`
 
 mkdir "$CDROOT"
-
-# build the boot (install) floppy image first
-cp $CUSTFILES/bootmini.img $CDROOT/boot.img
-export MTOOLS_NO_VFAT=1
-mcopy -sQm -i "$CDROOT/boot.img" $CUSTFILES/floppy/* ::/
-if [ $? -ne 0 ] ; then exit 1 ; fi
-
-# link CORE packages to CDROOT
-mkdir -p "$CDROOT/CORE"
-cp "$REPOROOT/udvd2.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/append.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/assign.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/attrib.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/chkdsk.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/choice.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/command.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/comp.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/cpidos.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/ctmouse.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/debug.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/defrag.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/deltree.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/devload.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/diskcomp.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/diskcopy.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/display.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/dosfsck.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/edit.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/edlin.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/exe2bin.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/fc.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/fdapm.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/fdisk.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/fdnpkg.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/find.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/format.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/help.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/himemx.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/kernel.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/keyb.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/keyb_lay.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/label.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/lbacache.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/mem.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/mirror.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/mode.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/more.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/move.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/nansi.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/nlsfunc.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/print.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/rdisk.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/recover.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/replace.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/share.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/shsucdx.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/sort.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/swsubst.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/tree.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/undelete.zip" "$CDROOT/CORE/"
-cp "$REPOROOT/xcopy.zip" "$CDROOT/CORE/"
+mkdir "$FLOPROOT"
 
 # build the repo (also builds the listing.txt file)
 dorepo
+
+# add CORE packages to CDROOT + create the list of packages on floppy
+for pkg in "${COREPKGS[@]}" ; do
+  cp "$REPOROOT/$pkg.zip" "$CDROOT/"
+  echo "$pkg" >> "$FLOPROOT/install.lst"
+done
+
+# prepare the content of the boot (install) floppy
+cp "install/install.com" "$FLOPROOT/"
+cp "install/nls/"install.?? "$FLOPROOT/"
+cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
+
+# build the boot floppy image
+export MTOOLS_NO_VFAT=1
+truncate -s 1474560 "$CDROOT/boot.img"
+mformat -f 1440 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
+mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
 
 # delete previous (if any) *.iso and *.md5 files
 echo "cleaning up old versions..."
@@ -145,16 +108,14 @@ rm -f "$PUBDIR/svardos.iso" "$PUBDIR/svardos.iso.md5"
 CDISO="$PUBDIR/svardos.iso"
 
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT"
-if [ $? -ne 0 ] ; then exit 1 ; fi
 
-# cleanup CDROOT
-rm -rf "$CDROOT"
+# cleanup temporary things
+rm -rf "$CDROOT" "$FLOPROOT"
 
 # compute the MD5 of the ISO file, taking care to include only the filename in it
 echo "computing md5 sums..."
 cd `dirname "$CDISO"`
 md5sum `basename "$CDISO"` > "$CDISO.md5"
-if [ $? -ne 0 ] ; then exit 1 ; fi
 
 cd "$origdir"
 

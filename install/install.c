@@ -501,7 +501,7 @@ static int preparedrive(void) {
 
 
 /* copy file src into dst, substituting all characters c1 by c2 */
-static void fcopysub(char *dst, char *src, char c1, char c2) {
+static void fcopysub(const char *dst, const char *src, char c1, char c2) {
   FILE *fdd, *fds;
   int buff;
   fds = fopen(src, "rb");
@@ -524,7 +524,7 @@ static void fcopysub(char *dst, char *src, char c1, char c2) {
 }
 
 
-static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) {
+static void bootfilesgen(char targetdrv, const struct slocales *locales, char cdromdrv) {
   char buff[128];
   char buff2[16];
   char buff3[16];
@@ -607,85 +607,68 @@ static void bootfilesgen(int targetdrv, struct slocales *locales, int cdromdrv) 
 }
 
 
-static void installpackages(int targetdrv, int cdromdrv) {
-  char *pkglist[] = {
-    "A:\\UDVD2", /* this one's not part of CORE, hence it's stored right on the floppy */
-    "APPEND",
-    "ASSIGN",
-    "ATTRIB",
-    "CHKDSK",
-    "CHOICE",
-    "COMMAND",
-    "COMP",
-    "CPIDOS",
-    "CTMOUSE",
-    "DEBUG",
-    "DEFRAG",
-    "DELTREE",
-    "DEVLOAD",
-    "DISKCOMP",
-    "DISKCOPY",
-    "DISPLAY",
-    "DOSFSCK",
-    "EDIT",
-    "EDLIN",
-    "EXE2BIN",
-    "FC",
-    "FDAPM",
-    "FDISK",
-    "FDNPKG",
-    "FIND",
-    "FORMAT",
-    "HELP",
-    "HIMEMX",
-    "KERNEL",
-    "KEYB",
-    "KEYB_LAY",
-    "LABEL",
-    "LBACACHE",
-    "MEM",
-    "MIRROR",
-    "MODE",
-    "MORE",
-    "MOVE",
-    "NANSI",
-    "NLSFUNC",
-    "PRINT",
-    "RDISK",
-    "RECOVER",
-    "REPLACE",
-    "SHARE",
-    "SHSUCDX",
-    "SORT",
-    "SWSUBST",
-    "TREE",
-    "UNDELETE",
-    "XCOPY",
-    NULL
-  };
+static int installpackages(char targetdrv, char cdromdrv) {
+  char pkglist[512];
   int i, pkglistlen;
+  size_t pkglistflen;
   char buff[64];
+  FILE *fd;
+  char *pkgptr;
   newscreen(3);
-  /* count how long the pkg list is */
-  for (pkglistlen = 0; pkglist[pkglistlen] != NULL; pkglistlen++);
-  /* set DOSDIR and friends */
+  /* load pkg list */
+  fd = fopen("install.lst", "rb");
+  if (fd == NULL) {
+    video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST NOT FOUND", -1);
+    input_getkey();
+    return(-1);
+  }
+  pkglistflen = fread(pkglist, 1, sizeof(pkglist), fd);
+  fclose(fd);
+  if (pkglistflen == sizeof(pkglist)) {
+    video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST TOO LARGE", -1);
+    input_getkey();
+    return(-1);
+  }
+  pkglist[pkglistflen] = 0xff; /* mark the end of list */
+  /* replace all \r and \n chars by 0 bytes, and count the number of packages */
+  pkglistlen = 0;
+  for (i = 0; i < pkglistflen; i++) {
+    switch (pkglist[i]) {
+      case '\n':
+        pkglistlen++;
+        /* FALLTHRU */
+      case '\r':
+        pkglist[i] = 0;
+        break;
+    }
+  }
+  /* set DOSDIR */
   snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\SVARDOS", targetdrv);
   setenv("DOSDIR", buff, 1);
   snprintf(buff, sizeof(buff), "%c:\\TEMP", targetdrv);
   setenv("TEMP", buff, 1);
   /* install packages */
-  for (i = 0; pkglist[i] != NULL; i++) {
-    char buff[128];
-    snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkglist[i]);
+  pkgptr = pkglist;
+  for (i = 0;; i++) {
+    char buff[64];
+    /* move forward to nearest entry or end of list */
+    while (*pkgptr == 0) pkgptr++;
+    if (*pkgptr == 0xff) break;
+    /* install the package */
+    snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkgptr);
     strcat(buff, "       ");
-    video_putstring(10, 1, COLOR_BODY[mono], buff, -1);
-    if (pkglist[i][1] == ':') {
-      snprintf(buff, sizeof(buff), "FDINST INSTALL %s.ZIP > NUL", pkglist[i]);
-    } else {
-      snprintf(buff, sizeof(buff), "FDINST INSTALL %c:\\CORE\\%s.ZIP > NUL", cdromdrv, pkglist[i]);
+    video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
+    snprintf(buff, sizeof(buff), "FDINST INSTALL %c:\\%s.ZIP > NUL", cdromdrv, pkgptr);
+    if (system(buff) != 0) {
+      video_putstring(10, 30, COLOR_BODY[mono], "ERROR: PKG INSTALL FAILED", -1);
+      input_getkey();
+      return(-1);
     }
-    system(buff);
+    /* jump to next entry or end of list */
+    while ((*pkgptr != 0) && (*pkgptr != 0xff)) pkgptr++;
+    if (*pkgptr == 0xff) break;
   }
+  return(0);
 }
 
 
@@ -699,7 +682,7 @@ static void finalreboot(void) {
 }
 
 
-static void loadcp(struct slocales *locales) {
+static void loadcp(const struct slocales *locales) {
   char buff[64];
   if (locales->codepage == 437) return;
   video_movecursor(1, 0);
@@ -729,7 +712,7 @@ static void loadcp(struct slocales *locales) {
 static int checkcd(char drv) {
   FILE *fd;
   char fname[32];
-  snprintf(fname, sizeof(fname), "%c:\\CORE\\MEM.ZIP", drv);
+  snprintf(fname, sizeof(fname), "%c:\\MEM.ZIP", drv);
   fd = fopen(fname, "rb");
   if (fd == NULL) return(-1);
   fclose(fd);
@@ -779,7 +762,7 @@ int main(void) {
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
   /*askaboutsources();*/ /* IF sources are available, ask if installing with them */
-  installpackages(targetdrv, cdromdrv);    /* install packages */
+  if (installpackages(targetdrv, cdromdrv) != 0) goto Quit;    /* install packages */
   bootfilesgen(targetdrv, &locales, cdromdrv); /* generate boot files and other configurations */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */

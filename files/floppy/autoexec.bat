@@ -1,7 +1,6 @@
 @ECHO OFF
 PATH A:\
-SET NLSPATH=A:\NLS
-SET TEMP=C:\TEMP
+SET NLSPATH=A:\
 PROMPT $P$G
 SET DIRCMD=/P /OGNE /4
 SET FDNPKG.CFG=A:\FDNPKG.CFG
@@ -24,8 +23,12 @@ IF NOT EXIST SVCD0001 DEVLOAD /Q /H A:\ELTORITO.SYS /D:SVCD0001
 REM enable the CD only if driver succeeded
 IF EXIST SVCD0001 SHSUCDX /D:SVCD0001 /Q
 
-A:\FDAPM APMDOS
+FDAPM APMDOS
+
 ECHO.
-ECHO *** Welcome to Svarog386 ***
+ECHO  **************************
+ECHO  *** Welcome to SvarDOS ***
+ECHO  **************************
 ECHO.
+
 INSTALL
