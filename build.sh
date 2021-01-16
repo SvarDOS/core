@@ -8,6 +8,8 @@
 # It should be executed each time that a package has been modified, added or
 # removed.
 #
+# usage: ./build.sh [noclean]
+#
 
 ### parameters block starts here ############################################
 
@@ -67,6 +69,18 @@ function dorepo {
   $BUILDIDX "$REPOROOT/"
 }
 
+
+# prepares image for floppy sets of size $1 and in number of $2 floppies
+function prep_flop {
+  mkdir $1
+  mformat -C -f $1 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$1/1.img"
+  mcopy -sQm -i "$1/1.img" "$FLOPROOT/"* ::/
+  for i in $(seq 2 $2) ; do
+    mformat -C -f $1 -v SVARDOS -i "$1/$i.img"
+  done
+}
+
+
 ### actual code flow starts here ############################################
 
 # check presence of the buildidx tool
@@ -95,11 +109,18 @@ cp "install/install.com" "$FLOPROOT/"
 cp "install/nls/"install.?? "$FLOPROOT/"
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
 
-# build the boot floppy image
+# build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
-truncate -s 1474560 "$CDROOT/boot.img"
-mformat -f 1440 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
+mformat -C -f 1440 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
 mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
+
+# prepare images for floppies in different sizes and numbers
+prep_flop 1440 3
+prep_flop 1200 3
+prep_flop 720 4
+
+# now populate the floppies sets
+#xxxxxxx
 
 # delete previous (if any) *.iso and *.md5 files
 echo "cleaning up old versions..."
@@ -110,7 +131,9 @@ CDISO="$PUBDIR/svardos.iso"
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT"
 
 # cleanup temporary things
-rm -rf "$CDROOT" "$FLOPROOT"
+if [ "x$1" != "xnoclean" ] ; then
+  rm -rf "$CDROOT" "$FLOPROOT"
+fi
 
 # compute the MD5 of the ISO file, taking care to include only the filename in it
 echo "computing md5 sums..."
