@@ -675,8 +675,8 @@ static int installpackages(char targetdrv, char cdromdrv) {
   setenv("COMSPEC", buff, 1);
   snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG\\FDNPKG.CFG", targetdrv);
   setenv("FDNPKG.CFG", buff, 1);
-  /* copy pkginst to the new drive so it is not read from floppy each time I need it */
-  snprintf(buff, sizeof(buff), "COPY %c:\\FDINST.EXE %c:\\ > NUL", cdromdrv, targetdrv);
+  /* copy pkginst to the new drive so it is not read from the floppy each time */
+  snprintf(buff, sizeof(buff), "COPY A:\\FDINST.EXE %c:\\ > NUL", targetdrv);
   system(buff);
   /* change current drive to target so I use the on-hdd fdinst from now on */
   if (set_cur_drive(targetdrv) != 0) {
