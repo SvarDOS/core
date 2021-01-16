@@ -37,6 +37,7 @@
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Instalacja pakietu %d/%d: %s
+4.1:*** Wú£° DYSK ZAWIERAJèCY POTRZEBNY PLIK I NACIòNIJ DOWOLNY KLAWISZ ***
 
 ### END SCREEN ###
 5.0:Instalacja SvarDOS zostaía zako§czona. Tw¢j komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napëdu.

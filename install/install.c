@@ -383,6 +383,28 @@ static int diskempty(int drv) {
 }
 
 
+/* set new DOS "current drive" to drv ('A', 'B', etc). returns 0 on success */
+static int set_cur_drive(char drv) {
+  union REGS r;
+  if ((drv < 'A') || (drv > 'Z')) return(-1);
+  r.h.ah = 0x0E; /* DOS 1+ SELECT DEFAULT DRIVE */
+  r.h.dl = drv - 'A';
+  int86(0x21, &r, &r);
+  if (r.h.al < drv - 'A') return(-1);
+  return(0);
+}
+
+
+/* returns 0 if file exists, non-zero otherwise */
+static int fileexists(const char *fname) {
+  FILE *fd;
+  fd = fopen(fname, "rb");
+  if (fd == NULL) return(-1);
+  fclose(fd);
+  return(0);
+}
+
+
 static int preparedrive(void) {
   int driveremovable;
   int selecteddrive = 3; /* hardcoded to 'C:' for now */
@@ -595,7 +617,9 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
   fprintf(fd, "ECHO.\r\n");
   fprintf(fd, "ECHO %s\r\n", kittengets(6, 0, "Welcome to SvarDOS! Type 'HELP' if you need help."));
   fclose(fd);
-  /*** CREATE DIRECTORY FOR OTHER CONFIGURATION FILES ***/
+  /*** CREATE DIRECTORY FOR CONFIGURATION FILES ***/
+  snprintf(buff, sizeof(buff), "%c:\\SYSTEM", targetdrv);
+  mkdir(buff);
   snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG", targetdrv);
   mkdir(buff);
   /*** FDNPKG.CFG ***/
@@ -642,11 +666,24 @@ static int installpackages(char targetdrv, char cdromdrv) {
         break;
     }
   }
-  /* set DOSDIR */
+  /* set DOSDIR, TEMP, COMSPEC and FDNPKG.CFG */
   snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\SVARDOS", targetdrv);
   setenv("DOSDIR", buff, 1);
   snprintf(buff, sizeof(buff), "%c:\\TEMP", targetdrv);
   setenv("TEMP", buff, 1);
+  snprintf(buff, sizeof(buff), "%c:\\COMMAND.COM", targetdrv);
+  setenv("COMSPEC", buff, 1);
+  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG\\FDNPKG.CFG", targetdrv);
+  setenv("FDNPKG.CFG", buff, 1);
+  /* copy pkginst to the new drive so it is not read from floppy each time I need it */
+  snprintf(buff, sizeof(buff), "COPY %c:\\FDINST.EXE %c:\\ > NUL", cdromdrv, targetdrv);
+  system(buff);
+  /* change current drive to target so I use the on-hdd fdinst from now on */
+  if (set_cur_drive(targetdrv) != 0) {
+    video_putstring(10, 30, COLOR_BODY[mono], "ERROR: CHANGING DRIVE TO TARGET FAILED", -1);
+    input_getkey();
+    return(-1);
+  }
   /* install packages */
   pkgptr = pkglist;
   for (i = 0;; i++) {
@@ -658,9 +695,17 @@ static int installpackages(char targetdrv, char cdromdrv) {
     snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkgptr);
     strcat(buff, "       ");
     video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
+    /* wait for new diskette if package not found */
+    snprintf(buff, sizeof(buff), "%c:\\%s.zip", cdromdrv, pkgptr);
+    while (fileexists(buff) != 0) {
+      putstringnls(12, 1, COLOR_BODY[mono], 4, 1, "*** INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY ***");
+      input_getkey();
+      video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
+    }
+    /* proceed with package install */
     snprintf(buff, sizeof(buff), "FDINST INSTALL %c:\\%s.ZIP > NUL", cdromdrv, pkgptr);
     if (system(buff) != 0) {
-      video_putstring(10, 30, COLOR_BODY[mono], "ERROR: PKG INSTALL FAILED", -1);
+      video_putstring(12, 30, COLOR_BODY[mono], "ERROR: PKG INSTALL FAILED", -1);
       input_getkey();
       return(-1);
     }
@@ -707,16 +752,13 @@ static void loadcp(const struct slocales *locales) {
   }
 }
 
+
 /* checks that drive drv contains SvarDOS packages
  * returns 0 if found, non-zero otherwise */
 static int checkinstsrc(char drv) {
-  FILE *fd;
   char fname[16];
   snprintf(fname, sizeof(fname), "%c:\\ATTRIB.ZIP", drv);
-  fd = fopen(fname, "rb");
-  if (fd == NULL) return(-1);
-  fclose(fd);
-  return(0);
+  return(fileexists(fname));
 }
 
 
@@ -765,9 +807,8 @@ int main(void) {
   targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
-  /*askaboutsources();*/ /* IF sources are available, ask if installing with them */
-  if (installpackages(targetdrv, sourcedrv) != 0) goto Quit;    /* install packages */
   bootfilesgen(targetdrv, &locales, sourcedrv); /* generate boot files and other configurations */
+  if (installpackages(targetdrv, sourcedrv) != 0) goto Quit;    /* install packages */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */
   finalreboot(); /* remove the CD and reboot */
