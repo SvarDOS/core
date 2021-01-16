@@ -52,7 +52,7 @@ set -e
 
 
 # list of packages to be part of CORE
-COREPKGS=( "attrib" "chkdsk" "choice" "command" "cpidos" "ctmouse" "deltree" "devload" "diskcopy" "display" "dosfsck" "edit" "fc" "fdapm" "fdisk" "fdnpkg" "format" "himemx" "kernel" "keyb" "keyb_lay" "label" "mem" "mode" "more" "move" "shsucdx" "sort" "tree" "undelete" "xcopy" "udvd2" )
+COREPKGS="attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk fdnpkg format himemx kernel keyb keyb_lay label mem mode more move shsucdx sort tree undelete xcopy udvd2"
 
 
 
@@ -99,7 +99,7 @@ mkdir "$FLOPROOT"
 dorepo
 
 # add CORE packages to CDROOT + create the list of packages on floppy
-for pkg in "${COREPKGS[@]}" ; do
+for pkg in $COREPKGS ; do
   cp "$REPOROOT/$pkg.zip" "$CDROOT/"
   echo "$pkg" >> "$FLOPROOT/install.lst"
 done
