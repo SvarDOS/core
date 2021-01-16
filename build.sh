@@ -73,20 +73,29 @@ function dorepo {
 # prepares image for floppy sets of size $1
 function prep_flop {
   mkdir $1
-  mformat -C -f $1 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$1/1.img"
-  mcopy -sQm -i "$1/1.img" "$FLOPROOT/"* ::/
+  mformat -C -f $1 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$1/disk1.img"
+  mcopy -sQm -i "$1/disk1.img" "$FLOPROOT/"* ::/
 
   # now populate the floppies
   curdisk=1
   for p in $COREPKGS ; do
     # if copy fails, then probably the floppy is full - try again after
     # creating an additional floppy image
-    if ! mcopy -mi "$1/$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
+    if ! mcopy -mi "$1/disk$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
       curdisk=$((curdisk+1))
-      mformat -C -f $1 -v SVARDOS -i "$1/$curdisk.img"
-      mcopy -mi "$1/$curdisk.img" "$CDROOT/$p.zip" ::/
+      mformat -C -f $1 -v SVARDOS -i "$1/disk$curdisk.img"
+      mcopy -mi "$1/disk$curdisk.img" "$CDROOT/$p.zip" ::/
     fi
   done
+
+  # add a short readme
+  echo "This directory contains a set of $curdisk floppy images of the SvarDOS distribution in the $1 KB floppy format." > "$1/readme.txt"
+  echo "" >> "$1/readme.txt"
+  echo "These images are raw floppy disk dumps. To write them on an actual floppy disk, you have to use a low-level sector copying tool, like dd." >> "$1/readme.txt"
+  echo "" >> "$1/readme.txt"
+  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$1/readme.txt"
+
+  unix2dos "$1/readme.txt"
 
   # zip the images (and remove them at the same time)
   rm -f "$PUBDIR/svardos-floppy-$1k.zip"
