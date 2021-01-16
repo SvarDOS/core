@@ -70,14 +70,30 @@ function dorepo {
 }
 
 
-# prepares image for floppy sets of size $1 and in number of $2 floppies
+# prepares image for floppy sets of size $1
 function prep_flop {
   mkdir $1
   mformat -C -f $1 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$1/1.img"
   mcopy -sQm -i "$1/1.img" "$FLOPROOT/"* ::/
-  for i in $(seq 2 $2) ; do
-    mformat -C -f $1 -v SVARDOS -i "$1/$i.img"
+
+  # now populate the floppies
+  curdisk=1
+  for p in $CDROOT/*.zip ; do
+    # if copy fails, then probably the floppy is full - try again after
+    # creating an additional floppy image
+    if ! mcopy -mi "$1/$curdisk.img" "$p" ::/ ; then
+      curdisk=$((curdisk+1))
+      mformat -C -f $1 -v SVARDOS -i "$1/$curdisk.img"
+      mcopy -mi "$1/$curdisk.img" "$p" ::/
+    fi
   done
+
+  # zip the images (and remove them at the same time)
+  rm -f "$PUBDIR/svardos-floppy-$1k.zip"
+  zip -9 -rmj "$PUBDIR/svardos-floppy-$1k.zip" $1/*
+
+  # clean up
+  rmdir $1
 }
 
 
@@ -115,12 +131,11 @@ mformat -C -f 1440 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
 mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
 
 # prepare images for floppies in different sizes and numbers
-prep_flop 1440 3
-prep_flop 1200 3
-prep_flop 720 4
+prep_flop 2880
+prep_flop 1440
+prep_flop 1200
+prep_flop 720
 
-# now populate the floppies sets
-#xxxxxxx
 
 # delete previous (if any) *.iso and *.md5 files
 echo "cleaning up old versions..."
