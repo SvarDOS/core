@@ -309,7 +309,7 @@ static int selectkeyb(struct slocales *locales) {
   int menuheight, choice;
   if (locales->keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
   newscreen(0);
-  putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "SvarDOS supports the keyboard layouts used in different countries. Choose the keyboard layout you want.");
+  putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "SvarDOS supports different keyboard layouts. Choose the keyboard layout that you want.");
   menuheight = locales->keyblen + 2;
   if (menuheight > 13) menuheight = 13;
   choice = menuselect(10, -1, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);

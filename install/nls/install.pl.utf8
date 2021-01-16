@@ -20,7 +20,7 @@
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Witaj w systemie SvarDOS
 1.1:Wybierz swój język z poniższej listy:
-1.5:SvarDOS wspiera układy klawiatur wspierane w różnych krajach. Wybierz układ klawiatury który ci odpowiada.
+1.5:SvarDOS wspiera różne układy klawiatury. Wybierz układ, który ci odpowiada.
 
 ### WELCOME SCREEN ###
 2.0:Za chwilę rozpocznie się instalacja systemu SvarDOS: bezpłatnego systemu operacyjnego opartego na jądrze FreeDOS, i kompatybilnego z MSDOS. SvarDOS zawiera mnóstwo aplikacji dodatkowych.\n\nUWAGA: Jeśli twój komputer posiada już inny system operacyjny, system ten może nie zdołać uruchomić się po instalacji SvarDOS.

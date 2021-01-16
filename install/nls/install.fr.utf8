@@ -20,7 +20,7 @@
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Bienvenue sur SvarDOS
 1.1:Veuillez choisir votre langue sur la liste ci-dessous :
-1.5:SvarDOS prend en charge différents claviers utilisés dans divers pays. Choisissez le clavier que vous préférez.
+1.5:SvarDOS prend en charge différents claviers. Choisissez le clavier que vous préférez.
 
 ### WELCOME SCREEN ###
 2.0:Vous êtes sur le point d'installer SvarDOS : un système d'exploitation libre, compatible avec MS-DOS et basé sur le noyau FreeDOS. SvarDOS offre une multitude d'applications tierces.\n\nATTENTION : s'il y a un autre système d'exploitation installé sur votre PC, cet autre système pourrait ne plus démarrer une fois que SvarDOS sera installé.
