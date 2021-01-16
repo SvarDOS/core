@@ -11,13 +11,14 @@
 
     <p>Need to get in touch? Wish to contribute some packages, translate SvarDOS to your language, or otherwise contribute? Feel free to drop a line or two to the project's <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a>.</p>
 
-    <h2>Download</h2>
+    <h2>Downloads</h2>
 
     <ul>
-      <li><a href="download/svardos.iso">SvarDOS install CD</a> (<a href="download/svardos.iso.md5">MD5</a>)</li>
-      <li>SvarDOS install on 1.44M floppy disks</li>
-      <li>SvarDOS install on 1.2M floppy disks</li>
-      <li>SvarDOS install on 720K floppy disks</li>
+      <li><a href="download/svardos-cd.zip">SvarDOS install CD (ISO)</a></li>
+      <li><a href="download/svardos-floppy-2880k.zip">SvarDOS install on 2.88M floppy disks</a></li>
+      <li><a href="download/svardos-floppy-1440k.zip">SvarDOS install on 1.44M floppy disks</a></li>
+      <li><a href="download/svardos-floppy-1200k.zip">SvarDOS install on 1.2M floppy disks</a></li>
+      <li><a href="download/svardos-floppy-720k.zip">SvarDOS install on 720K floppy disks</a></li>
     </ul>
 
     <p class="wondering">Wondering how SvarDOS is built? You might want to take a look at the <a href="https://osdn.net/projects/svardos/scm/svn/tree/head/">project's SVN</a>, where all the build-related files are stored.</p>

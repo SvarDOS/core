@@ -136,24 +136,22 @@ prep_flop 1440
 prep_flop 1200
 prep_flop 720
 
+CDISO="$PUBDIR/svardos-cd.iso"
+CDZIP="$PUBDIR/svardos-cd.zip"
 
-# delete previous (if any) *.iso and *.md5 files
+# delete previous (if any) iso
 echo "cleaning up old versions..."
-rm -f "$PUBDIR/svardos.iso" "$PUBDIR/svardos.iso.md5"
-
-CDISO="$PUBDIR/svardos.iso"
+rm -f "$CDISO" "$CDZIP"
 
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT"
+
+# compress the ISO
+zip -mj9 "$CDZIP" "$CDISO"
 
 # cleanup temporary things
 if [ "x$1" != "xnoclean" ] ; then
   rm -rf "$CDROOT" "$FLOPROOT"
 fi
-
-# compute the MD5 of the ISO file, taking care to include only the filename in it
-echo "computing md5 sums..."
-cd `dirname "$CDISO"`
-md5sum `basename "$CDISO"` > "$CDISO.md5"
 
 cd "$origdir"
 
