@@ -87,13 +87,13 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
   *outfname = 0;
   *url = 0;
   if ((argc == 3) && (strcasecmp(argv[1], "search") == 0)) {
-    sprintf(url, "/pkg.php?a=search&p=%s", argv[2]);
+    sprintf(url, "/repo/?a=search&p=%s", argv[2]);
   } else if ((argc == 3) && (strcasecmp(argv[1], "pull") == 0)) {
     if ((strlen(argv[2]) > 8) || (argv[2][0] == 0)) {
       puts("ERROR: package name must be 8 characters maximum");
       return(-1);
     }
-    sprintf(url, "/pkg.php?a=pull&p=%s", argv[2]);
+    sprintf(url, "/repo/?a=pull&p=%s", argv[2]);
     sprintf(outfname, "%s.zip", argv[2]);
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
     puts("NOT SUPPORTED YET");
