@@ -6,10 +6,23 @@
     <p style="font-size: 1.2em;">This project is in a work-in-progress phase, nothing works yet. Please come back later!</p>
     </div>
 
-    <p>SvarDOS is a <a href="?p=tech&amp;art=licensing">free</a>, <a href="?p=nls">multilingual</a> DOS distribution that uses the FreeDOS kernel. It's released in the form of a bootable CD image (ISO) that contains the "core" operating system, as well as a variety of third-party packages.<br>
-    SvarDOS is a "rolling release", meaning that it doesn't follow the concept of "versions". SvarDOS can be kept up-to-date trough its online update tool.</p>
+    <p>SvarDOS is an open-source project that is meant to integrate the best out of the currently available DOS tools, drivers and games. DOS development has been abandoned by commercial players a very long time ago, mostly during early nineties. Nowadays, it survives solely through the efforts of hobbyists and retro-enthusiasts, but this is a highly sparse and unorganized ecosystem. SvarDOS aims to collect available DOS software, package it and make it easy to find and install applications using a network-enabled package manager.</p>
 
-    <p>Need to get in touch? Wish to contribute some packages, translate SvarDOS to your language, or otherwise contribute? Feel free to drop a line or two to the project's <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a>.</p>
+    <h2>SvarDOS is minimalist and 8086-compatibe</h2>
+
+    <p>Once installed, SvarDOS is a minimalistic DOS system that offers only the most basic tools for system administration. It is up to the user to install additional packages. Care is taken so SvarDOS remains 8086-compatible, at least in its most basic (core) configuration.</p>
+
+    <h2>SvarDOS is open-source</h2>
+
+    <p>SvarDOS files are published under the terms of the MIT license. This applies only to SvarDOS-specific files, though - the packages may be subject to different licenses (GPL, BSD, Public Domain, Freeware...).</p>
+
+    <h2>SvarDOS has no "versions"</h2>
+
+    <p>SvarDOS is a "rolling" release, meaning that it doesn't follow the concept of "versions". Once installed, SvarDOS can be kept up-to-date trough its online update tool.</p>
+
+    <h2>The community</h2>
+
+    <p>Need to get in touch? Wish to contribute some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? The project has a <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a> just for that.</p>
 
     <h2>Downloads</h2>
 
