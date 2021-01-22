@@ -71,30 +71,31 @@ static void help(void) {
   puts("");
   puts("usage:  pkgnet search <term>");
   puts("        pkgnet pull <package>");
-  puts("        pkgnet checkup [<package>]");
+  puts("        pkgnet checkup");
   puts("");
   puts("actions:");
   puts(" search   - asks remote repository for the list of matching packages");
   puts(" pull     - downloads package into current directory");
-  puts(" checkup  - lists available updates (for all packages if no argument)");
+  puts(" checkup  - lists updates available for your system");
   puts("");
 }
 
 
 /* parses command line arguments and fills outfname and url accordingly
  * returns 0 on success, non-zero otherwise */
-static int parseargv(int argc, char * const *argv, char **outfname, char *url) {
-  *outfname = NULL;
+static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
+  *outfname = 0;
   *url = 0;
   if ((argc == 3) && (strcasecmp(argv[1], "search") == 0)) {
     sprintf(url, "/pkg.php?a=search&p=%s", argv[2]);
   } else if ((argc == 3) && (strcasecmp(argv[1], "pull") == 0)) {
+    if ((strlen(argv[2]) > 8) || (argv[2][0] == 0)) {
+      puts("ERROR: package name must be 8 characters maximum");
+      return(-1);
+    }
     sprintf(url, "/pkg.php?a=pull&p=%s", argv[2]);
-    *outfname = argv[2];
+    sprintf(outfname, "%s.zip", argv[2]);
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
-    puts("NOT SUPPORTED YET");
-    return(-1);
-  } else if ((argc == 3) && (strcasecmp(argv[1], "checkup") == 0)) {
     puts("NOT SUPPORTED YET");
     return(-1);
   } else {
@@ -105,35 +106,20 @@ static int parseargv(int argc, char * const *argv, char **outfname, char *url) {
 }
 
 
-int main(int argc, char **argv) {
-  unsigned char buffer[4096];
-  char url[64];
+/* fetch http data from ipaddr using url
+ * write result to file outfname if not null, or print to stdout otherwise
+ * fills bsum with the BSD sum of the data
+ * returns the length of data obtained, or neg value on error */
+static long htget(const char *ipaddr, const char *url, const char *outfname, unsigned short *bsum) {
   struct net_tcpsocket *sock;
+  unsigned char buffer[4096];
   time_t lastactivity;
   int headersdone = 0;
   int httpcode = -1;
   long flen = 0;
-  unsigned short bsum = 0;
-  char *outfname = NULL;
   FILE *fd = NULL;
 
-  /* parse command line arguments */
-  if (parseargv(argc, argv, &outfname, url) != 0) return(1);
-
-  /* init network stack */
-  if (net_init() != 0) {
-    puts("ERROR: Network subsystem initialization failed");
-    return(1);
-  }
-
-  puts(""); /* required because watt-32 likes to print out garbage sometimes ("configuring through DHCP...") */
-
-  if (net_dnsresolve((char *)buffer, HOSTADDR) != 0) {
-    puts("ERROR: DNS resolution failed");
-    return(1);
-  }
-
-  sock = net_connect((char *)buffer, 80);
+  sock = net_connect(ipaddr, 80);
   if (sock == NULL) {
     puts("ERROR: failed to connect to " HOSTADDR);
     goto SHITQUIT;
@@ -141,13 +127,13 @@ int main(int argc, char **argv) {
 
   /* wait for net_connect() to actually connect */
   for (;;) {
-    int connstate;
-    connstate = net_isconnected(sock, 1);
+    int connstate = net_isconnected(sock, 1);
     if (connstate > 0) break;
     if (connstate < 0) {
       puts("ERROR: connection error");
       goto SHITQUIT;
     }
+    _asm int 28h;  /* DOS idle */
   }
 
   /* socket is connected - send the http request */
@@ -183,12 +169,12 @@ int main(int argc, char **argv) {
       if (httpcode < 0) {
         httpcode = atoi((char *)buffer);
         /* on error, the answer should be always printed on screen */
-        if ((httpcode == 200) && (outfname != NULL)) {
+        if ((httpcode == 200) && (*outfname != 0)) {
           fd = fopen(outfname, "wb");
           if (fd == NULL) {
             printf("ERROR: failed to create file %s", outfname);
             puts("");
-            break;
+            goto SHITQUIT;
           }
         }
       }
@@ -210,29 +196,73 @@ int main(int argc, char **argv) {
         /* update the bsd sum */
         for (i = 0; i < byteread; i++) {
           /* rotr16 */
-          unsigned short bsumlsb = bsum & 1;
-          bsum >>= 1;
-          bsum |= (bsumlsb << 15);
+          unsigned short bsumlsb = *bsum & 1;
+          *bsum >>= 1;
+          *bsum |= (bsumlsb << 15);
           /* bsum += ch */
-          bsum += buffer[i];
+          *bsum += buffer[i];
         }
       } else { /* otherwise dump to screen */
         printf("%s", buffer);
       }
     }
   }
+  net_close(sock);
+  return(flen);
 
-  if (fd != NULL) {
+  SHITQUIT:
+  net_abort(sock);
+  return(-1);
+}
+
+
+/* checks if file exists, returns 0 if not, non-zero otherwise */
+static int fexists(const char *fname) {
+  FILE *fd = fopen(fname, "rb");
+  if (fd == NULL) return(0);
+  fclose(fd);
+  return(1);
+}
+
+
+int main(int argc, char **argv) {
+  char ipaddr[64];
+  char url[64];
+  unsigned short bsum = 0;
+  char outfname[16];
+  long flen;
+
+  /* parse command line arguments */
+  if (parseargv(argc, argv, outfname, url) != 0) return(1);
+
+  /* if outfname requested, make sure that file does not exist yet */
+  if (fexists(outfname)) {
+    printf("ERROR: file %s already exists", outfname);
+    puts("");
+    return(1);
+  }
+
+  /* init network stack */
+  if (net_init() != 0) {
+    puts("ERROR: Network subsystem initialization failed");
+    return(1);
+  }
+
+  puts(""); /* required because watt-32 likes to print out garbage sometimes ("configuring through DHCP...") */
+
+  if (net_dnsresolve(ipaddr, HOSTADDR) != 0) {
+    puts("ERROR: DNS resolution failed");
+    return(1);
+  }
+
+  flen = htget(ipaddr, url, outfname, &bsum);
+  if (flen < 1) return(1);
+
+  if (*outfname != 0) {
     /* print bsum, size, filename */
     printf("Downloaded %ld KiB into %s (BSUM: %04X)", flen >> 10, outfname, bsum);
     puts("");
-    fclose(fd);
   }
 
-  net_close(sock);
   return(0);
-
-  SHITQUIT:
-  if (sock != NULL) net_abort(sock);
-  return(1);
 }
