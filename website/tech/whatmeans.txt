@@ -1,4 +1,4 @@
-The "svar" in svarDOS stands for "Svarog", since svarDOS is the successor of the Svarog386 distribution.
+The "Svar" in SvarDOS refers to "Svarog". SvarDOS is the successor of the Svarog386 distribution.
 
 Excerpt from Wikipedia, the free encyclopedia:
 

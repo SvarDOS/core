@@ -1,4 +1,4 @@
-Package files provide an easy way to manage software on svarDOS.
+Package files provide an easy way to manage software on SvarDOS.
 
 
 *** Package filenames ***
@@ -8,7 +8,7 @@ Packages names must follow some basic rules. They shall be max. 8 letters long (
 
 *** Package files ***
 
-Svarog386 uses ZIP files as its package file format. This format has been chosen because ZIP files under DOS have become the de facto way to distribute collections of files. Also, the ZIP file format is well documented, well supported, and in the public domain.
+SvarDOS uses ZIP files as its package file format. This format has been chosen because ZIP files under DOS have become the de facto way to distribute collections of files. Also, the ZIP file format is well documented, well supported, and in the public domain.
 
 Here below is the RECOMENDED command line that can be used to create a package for a program named EXAMPLE using info-zip:
 
@@ -17,12 +17,6 @@ Here below is the RECOMENDED command line that can be used to create a package f
 If you are using 7za to create your packages, then use this:
 
   7za a -mm=deflate -mx=9 -tzip EXAMPLE.ZIP subdir1 subdir2 ... subdirN
-
-Note, that 7za allows to use different compression algorithms. The Svarog386 package manager (FDNPKG) supports two compression methods: Deflate and LZMA. Usually LZMA provides better compression than Deflate, however it is not recommended for general use because LZMA decompression requires much more memory than Deflate. LZMA decompression needs about 24MiB of memory, which is more than the total available memory on most DOS systems. LZMA might be used for specific packages that assume high-end systems (for example: 3D games, etc). In any case, it's always safer to stick with Deflate.
-
-Nevertheless, if you wish to create a package using LZMA, use this:
-
-  7za a -mm=lzma -tzip EXAMPLE.ZIP subdir1 subdir2 ... subdirN
 
 
 *** Package directory structure ***
