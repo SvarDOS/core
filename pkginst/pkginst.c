@@ -13,7 +13,6 @@
 
 #include "crc32.h"     /* all CRC32 related stuff */
 #include "fdnpkg.h"    /* PKGINST_NOSOURCE, PKGINST_SKIPLINKS... */
-#include "http.h"
 #include "helpers.h"   /* slash2backslash(), strtolower() */
 #include "fileexst.h"
 #include "kprintf.h"

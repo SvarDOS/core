@@ -6,7 +6,6 @@
 #ifndef pkginst_sentinel
 #define pkginst_sentinel
 
-#include "pkgdb.h"
 #include "loadconf.h" /* required for struct customdirs */
 
 int is_package_installed(char *pkgname, char *dosdir, char *mapdrv);
