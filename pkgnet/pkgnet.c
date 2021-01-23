@@ -168,7 +168,18 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
       lastactivity = time(NULL);
       /* do I know the http code yet? */
       if (httpcode < 0) {
-        httpcode = atoi((char *)buffer);
+        int spc;
+        /* find the first space (HTTP/1.1 200 OK) */
+        for (spc = 0; spc < 16; spc++) {
+          if (buffer[spc] == ' ') break;
+          if (buffer[spc] == 0) break;
+        }
+        if (buffer[spc] == 0) continue; /* not enough data received */
+        if (buffer[spc] != ' ') {
+          puts("ERROR: server answered with invalid HTTP");
+          goto SHITQUIT;
+        }
+        httpcode = atoi((char *)(buffer + spc + 1));
         /* on error, the answer should be always printed on screen */
         if ((httpcode == 200) && (*outfname != 0)) {
           fd = fopen(outfname, "wb");
