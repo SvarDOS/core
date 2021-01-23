@@ -17,9 +17,6 @@
 #include "crc32.h"
 #include "kprintf.h"
 #include "parsecmd.h"
-#ifndef NOLZMA
-  #include "lzmadec.h"   /* LZMA support */
-#endif
 #include "inf.h"   /* DEFLATE support */
 #include "version.h"
 
@@ -52,23 +49,6 @@ static time_t dostime2unix(unsigned char *buff) {
   if (result == (time_t)-1) return(0);
   return(result);
 }
-
-
-#ifndef NOLZMA
-/* this is a wrapper on malloc(), used as a callback by lzmadec */
-static void *SzAlloc(void *p, size_t size) {
-  p = p; /* for gcc to not complain */
-  if (size == 0) return(0);
-  return(malloc(size));
-}
-
-/* this is a wrapper on free(), used as a callback by lzmadec */
-static void SzFree(void *p, void *address) {
-  p = p;  /* for gcc to not complain */
-  free(address);
-}
-#endif
-
 
 
 /* opens a zip file and provides the list of files in the archive.
@@ -198,9 +178,6 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, char *fulldestfilename) {
   switch (curzipnode->compmethod) {
     case 0:  /* stored */
     case 8:  /* deflated */
-#ifndef NOLZMA
-    case 14: /* lzma */
-#endif
       break;
     default: /* unsupported compression method, sorry */
       return(-1);
@@ -242,84 +219,6 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, char *fulldestfilename) {
     }
   } else if (curzipnode->compmethod == 8) {  /* if the file is deflated, inflate it */
     extract_res = inf(zipfd, filefd, buff, &cksum, curzipnode->compressedfilelen);
-#ifndef NOLZMA
-  } else if (curzipnode->compmethod == 14) {  /* LZMA */
-    #define lzmaoutbufflen 32768u
-    long bytesread, bytesreadtotal = 0, byteswritetotal = 0;
-    SizeT buffoutreslen;
-    ISzAlloc g_alloc;
-    ELzmaStatus lzmastatus;
-    SRes lzmaresult;
-    CLzmaDec lzmahandle;
-    unsigned char lzmahdr[LZMA_PROPS_SIZE]; /* 5 bytes of properties */
-    unsigned char *lzmaoutbuff;
-
-    extract_res = -5; /* assume we will fail. if we don't - then we will update this flag */
-    lzmaoutbuff = malloc(lzmaoutbufflen);
-    if (lzmaoutbuff == NULL) {
-      free(buff);
-      fclose(filefd);   /* close the dst file */
-      return(-33);
-    }
-
-    fread(lzmahdr, 4, 1, zipfd); /* load the 4 bytes long 'zip-lzma header */
-    bytesreadtotal = 4; /* remember we read 4 bytes already */
-
-    /* lzma properties should be exactly 5 bytes long. If it's not, it's either not valid lzma, or some version that wasn't existing yet when I wrote these words. Also, check that the lzma content is at least 9 bytes long and that our previous malloc() calls suceeded. */
-    if ((lzmahdr[2] == 5) && (lzmahdr[3] == 0) && (curzipnode->compressedfilelen >= 9)) {
-
-      extract_res = 0;  /* since we got so far, let's assume we will succeed now */
-
-      g_alloc.Alloc = SzAlloc; /* these will be used as callbacks by lzma to manage memory */
-      g_alloc.Free = SzFree;
-
-      fread(lzmahdr, sizeof(lzmahdr), 1, zipfd); /* load the lzma header */
-      bytesreadtotal += sizeof(lzmahdr);
-
-      /* Note, that in a 'normal' lzma stream we would have now 8 bytes with the uncompressed length of the file. Here we don't. ZIP cut this information out, since it stores it already in its own header. */
-
-      memset(&lzmahandle, 0, sizeof(lzmahandle)); /* reset the whole lzmahandle structure - not doing this leads to CRASHES!!! */
-      LzmaDec_Init(&lzmahandle);
-      lzmaresult = LzmaDec_Allocate(&lzmahandle, lzmahdr, LZMA_PROPS_SIZE, &g_alloc); /* forget not to LzmaDec_Free() later! */
-      if (lzmaresult != 0) extract_res = -13;
-
-      while (extract_res == 0) {
-        bytesread = buffsize;
-        if (bytesread > curzipnode->compressedfilelen - bytesreadtotal) bytesread = curzipnode->compressedfilelen - bytesreadtotal;
-        buffoutreslen = lzmaoutbufflen;
-        /* printf("Will read %d bytes from input stream\n", bytesread); */
-        fread(buff, bytesread, 1, zipfd); /* read stuff from input stream */
-        fseek(zipfd, 0 - bytesread, SEEK_CUR); /* get back to the position at the start of our chunk of data */
-        lzmaresult = LzmaDec_DecodeToBuf(&lzmahandle, lzmaoutbuff, &buffoutreslen, buff, (SizeT *)&bytesread, LZMA_FINISH_ANY, &lzmastatus);
-        bytesreadtotal += bytesread;
-        /* printf("expanded %ld bytes into %ld (total read: %ld bytes)\n", (long)bytesread, (long)buffoutreslen, (long)bytesreadtotal); */
-        fseek(zipfd, bytesread, SEEK_CUR); /* go forward to the position next to the input we processed */
-        if (lzmaresult != SZ_OK) {
-          extract_res = -20;
-          if (lzmaresult == SZ_ERROR_DATA) extract_res = -21;        /* DATA ERROR */
-          if (lzmaresult == SZ_ERROR_MEM) extract_res = -22;         /* MEMORY ALLOC ERROR */
-          if (lzmaresult == SZ_ERROR_UNSUPPORTED) extract_res = -23; /* UNSUPPORTED PROPERTY */
-          if (lzmaresult == SZ_ERROR_INPUT_EOF) extract_res = -24;   /* NEED MORE INPUT */
-          break;
-        }
-        /* check that we haven't got TOO MUCH decompressed data, and trim if necessary. It happens that LZMA provides a few bytes more than it should at the end of the stream. */
-        if (byteswritetotal + (long)buffoutreslen > curzipnode->filelen) {
-          buffoutreslen = curzipnode->filelen - byteswritetotal;
-        }
-        byteswritetotal += buffoutreslen;
-        fwrite(lzmaoutbuff, buffoutreslen, 1, filefd); /* write stuff to output file */
-        crc32_feed(&cksum, lzmaoutbuff, buffoutreslen);
-        /* if (lzmastatus == LZMA_STATUS_FINISHED_WITH_MARK) puts("lzma says we are done!"); */
-        if ((lzmastatus == LZMA_STATUS_FINISHED_WITH_MARK) || (bytesreadtotal >= curzipnode->compressedfilelen)) {
-          extract_res = 0; /* looks like we succeeded! */
-          break;
-        }
-      }
-      LzmaDec_Free(&lzmahandle, &g_alloc); /* this will free all the stuff we allocated via LzmaDec_Allocate() */
-      /* printf("Processed %d bytes of input into %d bytes of output. CRC32: %08lX\n", bytesreadtotal, byteswritetotal, crc32); */
-    }
-    free(lzmaoutbuff);
-#endif
   }
 
   /* clean up memory, close the dst file and terminates crc32 */

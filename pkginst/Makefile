@@ -3,7 +3,7 @@
 # Copyright (C) 2021 Mateusz Viste
 #
 
-CFLAGS = -0 -ml -os -wx -we -d0 -i=zlib\ -DNOREPOS -DNOLZMA
+CFLAGS = -0 -ml -os -wx -we -d0 -i=zlib\ -DNOREPOS
 LDFLAGS = -ml -lr -fe=pkginst.exe
 LIBS = zlib\zlib_l.lib
 
