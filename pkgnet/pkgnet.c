@@ -56,8 +56,9 @@ static int detecthttpheadersend(unsigned char *buff, int len) {
       continue;
     }
     /* end of headers! rewind the buffer and return new len */
-    len -= (i + 1);
-    if (len > 0) memmove(buff, buff + i + 1, len);
+    i += 1; /* add 1 to skip the current \n character */
+    len -= i;
+    if (len > 0) memmove(buff, buff + i, len + 1); /* +1 so I catch the string terminator as well */
     return(len);
   }
   return(0);
