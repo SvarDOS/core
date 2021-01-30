@@ -1,6 +1,6 @@
 /*
- * This file is part of FDNPKG
- * Copyright (C) 2013-2017 Mateusz Viste. All rights reserved.
+ * This file is part of PKGINST (SvarDOS)
+ * Copyright (C) 2013-2021 Mateusz Viste. All rights reserved.
  */
 
 #include <stdio.h>
@@ -8,13 +8,7 @@
 #include <stdlib.h>   /* atoi(), qsort() - not using it after all, redefining it manually later */
 #include <string.h>   /* strlen() */
 #include <sys/types.h>
-
-/* opendir() and friends */
-#ifdef __WATCOMC__
-  #include <direct.h>
-#else
-  #include <dirent.h>
-#endif
+#include <direct.h> /* opendir() and friends */
 
 #include "fdnpkg.h"   /* PKGINST_UPDATE */
 #include "fileexst.h"
@@ -36,12 +30,6 @@ static int strcompare(const void *str1, const void *str2) {
   char **s1 = (char **)str1;
   char **s2 = (char **)str2;
   return(strcasecmp(*s1, *s2));
-}
-
-
-/* clears current line */
-static void clrline(void) {
-  printf("\r                                                                            \r");
 }
 
 
@@ -108,93 +96,6 @@ void showinstalledpkgs(char *filterstr, char *dosdir) {
   for (x = 0; x < packagelist_len; x++) {
     /* print the package/version couple on screen */
     printf("%s %s\n", packagelist[x], packagelist_ver[x]);
-  }
-}
-
-
-/* displays the list of available updates for local packages (or a single package if pkg is not NULL). Returns 0 if some updates are found, non zero otherwise. */
-int checkupdates(char *dosdir, struct pkgdb *pkgdb, char **repolist, char *pkg, char *tempdir, int flags, struct customdirs *dirlist, char *proxy, int proxyport, char *downloadingstring, char *mapdrv) {
-  struct pkgdb *curpkg;
-  struct pkgrepo *currepo;
-  char *packagelist[packagelist_maxlen];
-  char *packagelist_ver[packagelist_maxlen];
-  int packagelist_len, x, foundupdate = 0, totalupdatesfound = 0;
-  int packages_updated = 0, packages_updatefailed = 0;
-  packagelist_len = loadinstpkglist(packagelist, packagelist_ver, packagelist_maxlen, NULL, dosdir);
-  for (x = 0; x < packagelist_len; x++) {
-    if (pkg != NULL) {
-      if (strcasecmp(pkg, packagelist[x]) != 0) continue; /* if we got asked for a specific package, skip all other packages. */
-    } else { /* else display a progress so slower PCs don't think we are freezed */
-      long percprogress = x; /* long, just in case we have more than 3'200 packages installed... */
-      percprogress *= 100;
-      percprogress /= packagelist_len;
-      kitten_printf(10, 7, "Looking for updates...");
-      printf(" %ld%% (%s)        \r", percprogress, packagelist[x]); /* empty spaces trailing for flushing the previous content on the line */
-    }
-    for (curpkg = pkgdb; curpkg != NULL; curpkg = curpkg->nextpkg) { /* iterate through packages */
-      if (strcasecmp(curpkg->name, packagelist[x]) == 0) {
-        foundupdate = 0;
-        for (currepo = curpkg->repolist; currepo != NULL; currepo = currepo->nextrepo) { /* check for possible newer version in every repo */
-          if (isversionnewer(packagelist_ver[x], currepo->version) > 0) { /* isversionnewer() returns 1 if version is newer */
-            if (foundupdate == 0) {
-              foundupdate = 1;
-              totalupdatesfound += 1;
-              if (pkg == NULL) {
-                clrline();
-                kitten_printf(10, 0, "%s (local version: %s)", packagelist[x], packagelist_ver[x]);
-                puts("");
-              }
-            }
-            if (pkg == NULL) {
-              clrline();
-              printf("  ");
-              kitten_printf(10, 1, "version %s at %s", currepo->version, repolist[currepo->repo]);
-              puts("");
-            }
-          }
-        }
-        /* actually upgrade the package, if requested so */
-        if (foundupdate != 0) {
-          if (flags & PKGINST_UPDATE) {
-            FILE *zipfilefd;
-            struct ziplist *zipfileidx;
-            char buffmem1k[1024];
-            clrline();
-            kitten_printf(10, 3, "An update of '%s' has been found. Update in progress...", packagelist[x]);
-            puts("");
-            packages_updatefailed += 1; /* increment the updatefailed counter - later we will decrement it if we're okay */
-            zipfileidx = pkginstall_preparepackage(pkgdb, packagelist[x], tempdir, NULL, flags, repolist, &zipfilefd, proxy, proxyport, downloadingstring, dosdir, dirlist, buffmem1k, mapdrv);
-            if (zipfileidx != NULL) {
-              if (pkgrem(packagelist[x], dosdir, mapdrv) != 0) {
-                /* ooops, package removal failed... */
-                zip_freelist(&zipfileidx);
-              } else {  /* pkgrem == 0 */
-                pkginstall_installpackage(packagelist[x], dosdir, dirlist, zipfileidx, zipfilefd, mapdrv);
-                packages_updated += 1;
-                packages_updatefailed -= 1; /* decrement the updatefailed counter to leverage the fact we incremented it without reason earlier */
-              }
-              fclose(zipfilefd);
-            }
-          }
-          puts(""); /* add a line feed to visually separate packages */
-        }
-        break; /* get out of the loop to get over the next local package */
-      }
-    }
-  }
-  if (pkg == NULL) {
-    clrline();
-    kitten_printf(10, 5, "%d package update(s) found.", totalupdatesfound);
-    puts("");
-    if (flags & PKGINST_UPDATE) {
-      kitten_printf(10, 4, "%d package(s) updated, %d package(s) failed.", packages_updated, packages_updatefailed);
-      puts("");
-    }
-  }
-  if (foundupdate != 0) {
-    return(0);
-  } else {
-    return(-1);
   }
 }
 
