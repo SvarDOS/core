@@ -1,6 +1,6 @@
 /*
- * This file is part of fdnpkg
- * Copyright (C) 2012-2017 Mateusz Viste
+ * This file is part of pkginst
+ * Copyright (C) 2012-2021 Mateusz Viste
  *
  * It contains a few helper function...
  */
@@ -189,37 +189,6 @@ void mkpath(char *dirs) {
         dirs[x] = savechar;
       }
     }
-  }
-}
-
-
-/* remap drive, if needed (hack for situations where fdinst is used to
- * install an OS to a drive that will change its letter post-install) */
-void mapdrives(char *s, char *mapdrv) {
-  int i = 0;
-  if (mapdrv == NULL) return;
-  if ((s == NULL) || (s[0] == 0) || (s[1] != ':')) return;
-  while (mapdrv[i] != 0) {
-    if (toupper(mapdrv[i]) == toupper(s[0])) {
-      s[0] = toupper(mapdrv[i + 1]);
-      return;
-    }
-    i += 2;
-  }
-}
-
-
-/* */
-void unmapdrives(char *s, char *mapdrv) {
-  int i = 0;
-  if (mapdrv == NULL) return;
-  if ((s == NULL) || (s[0] == 0) || (s[1] != ':')) return;
-  while (mapdrv[i] != 0) {
-    if (toupper(mapdrv[i + 1]) == toupper(s[0])) {
-      s[0] = toupper(mapdrv[i]);
-      return;
-    }
-    i += 2;
   }
 }
 

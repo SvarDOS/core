@@ -85,7 +85,7 @@ static enum ACTIONTYPES parsearg(int argc, char **argv) {
 }
 
 
-static int pkginst(char *file, int flags, char *dosdir, char *tempdir, struct customdirs *dirlist, char *mapdrv) {
+static int pkginst(char *file, int flags, char *dosdir, char *tempdir, struct customdirs *dirlist) {
   char pkgname[32];
   int t, lastpathdelim = -1, u = 0;
   char *buffmem1k;
@@ -111,11 +111,11 @@ static int pkginst(char *file, int flags, char *dosdir, char *tempdir, struct cu
     return(1);
   }
   /* prepare the zip file and install it */
-  zipfileidx = pkginstall_preparepackage(NULL, pkgname, tempdir, file, flags, NULL, &zipfilefd, NULL, 0, NULL, dosdir, dirlist, buffmem1k, mapdrv);
+  zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist, buffmem1k);
   free(buffmem1k);
   if (zipfileidx != NULL) {
     int res = 0;
-    if (pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd, mapdrv) != 0) res = 1;
+    if (pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd) != 0) res = 1;
     fclose(zipfilefd);
     return(res);
   } else {
@@ -130,7 +130,6 @@ int main(int argc, char **argv) {
   enum ACTIONTYPES action;
   char *dosdir, *tempdir, *cfgfile;
   struct customdirs *dirlist;
-  char *mapdrv = "";
 
   action = parsearg(argc, argv);
   if (action == ACTION_HELP) return(showhelp());
@@ -151,7 +150,7 @@ int main(int argc, char **argv) {
   /* load configuration */
   flags = 0;
   dirlist = NULL;
-  if (loadconf(cfgfile, NULL, 0, NULL, NULL, &dirlist, &flags, NULL, NULL, &mapdrv) < 0) return(5);
+  if (loadconf(cfgfile, &dirlist, &flags) < 0) return(5);
 
   /* free the cfgfile buffer, I won't need the config file's location any more */
   free(cfgfile);
@@ -159,10 +158,10 @@ int main(int argc, char **argv) {
 
   switch (action) {
     case ACTION_INSTALL:
-      res = pkginst(argv[2], flags, dosdir, tempdir, dirlist, mapdrv);
+      res = pkginst(argv[2], flags, dosdir, tempdir, dirlist);
       break;
     case ACTION_REMOVE:
-      res = pkgrem(argv[2], dosdir, mapdrv);
+      res = pkgrem(argv[2], dosdir);
       break;
     default:
       res = showhelp();

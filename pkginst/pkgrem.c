@@ -69,7 +69,7 @@ static struct dirliststruct *rememberpath(struct dirliststruct *dirlist, char *p
 
 
 /* removes a package from the system. Returns 0 on success, non-zero otherwise */
-int pkgrem(char *pkgname, char *dosdir, char *mapdrv) {
+int pkgrem(char *pkgname, char *dosdir) {
   char fpath[512];
   char shellcmd[512];
   char *lineptr;
@@ -83,7 +83,6 @@ int pkgrem(char *pkgname, char *dosdir, char *mapdrv) {
 
   /* Check if the file %DOSDIR%\packages\pkgname.lst exists (if not, the package is not installed) */
   sprintf(fpath, "%s\\packages\\%s.lst", dosdir, pkgname);
-  mapdrives(fpath, mapdrv);
   if (fileexists(fpath) == 0) { /* file does not exist */
     kitten_printf(4, 0, "Package %s is not installed, so not removed.", pkgname);
     puts("");
@@ -114,8 +113,6 @@ int pkgrem(char *pkgname, char *dosdir, char *mapdrv) {
       free(lineptr); /* free the memory occupied by the line */
       continue; /* skip empty lines */
     }
-    /* remap drive */
-    mapdrives(lineptr, mapdrv);
     /* remember the path part for removal later */
     lastdirsep = -1;
     for (x = 1; lineptr[x] != 0; x++) {

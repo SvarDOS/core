@@ -137,10 +137,9 @@ static void processlinkfile(char *linkfile, char *dosdir, struct customdirs *dir
 
 
 /* returns 0 if pkgname is not installed, non-zero otherwise */
-int is_package_installed(char *pkgname, char *dosdir, char *mapdrv) {
+int is_package_installed(char *pkgname, char *dosdir) {
   char fname[512];
   sprintf(fname, "%s\\packages\\%s.lst", dosdir, pkgname);
-  mapdrives(fname, mapdrv);
   if (fileexists(fname) != 0) { /* file exists -> package is installed */
     return(1);
   } else {
@@ -150,8 +149,8 @@ int is_package_installed(char *pkgname, char *dosdir, char *mapdrv) {
 
 
 /* checks that pkgname is NOT installed. return 0 on success, non-zero otherwise. */
-int validate_package_not_installed(char *pkgname, char *dosdir, char *mapdrv) {
-  if (is_package_installed(pkgname, dosdir, mapdrv) != 0) {
+int validate_package_not_installed(char *pkgname, char *dosdir) {
+  if (is_package_installed(pkgname, dosdir) != 0) {
     kitten_printf(3, 18, "Package %s is already installed! You might want to use the 'update' action.", pkgname);
     puts("");
     return(-1);
@@ -172,7 +171,7 @@ static struct flist_t *findfileinlist(struct flist_t *flist, char *fname) {
 
 /* prepare a package for installation. this is mandatory before actually installing it!
  * returns a pointer to the zip file's index on success, NULL on failure. the *zipfile pointer is updated with a file descriptor to the open zip file to install. */
-struct ziplist *pkginstall_preparepackage(struct pkgdb *pkgdb, char *pkgname, char *tempdir, char *localfile, int flags, char **repolist, FILE **zipfd, char *proxy, int proxyport, char *downloadingstring, char *dosdir, struct customdirs *dirlist, char *buffmem1k, char *mapdrv) {
+struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int flags, FILE **zipfd, char *dosdir, struct customdirs *dirlist, char *buffmem1k) {
   char *fname;
   char *zipfile;
   char *appinfofile;
@@ -190,7 +189,7 @@ struct ziplist *pkginstall_preparepackage(struct pkgdb *pkgdb, char *pkgname, ch
 
   /* check if not already installed, if already here, print a message "you might want to use update instead"
    * of course this must not be done if we are in the process of upgrading said package */
-  if (((flags & PKGINST_UPDATE) == 0) && (validate_package_not_installed(pkgname, dosdir, mapdrv) != 0)) {
+  if (((flags & PKGINST_UPDATE) == 0) && (validate_package_not_installed(pkgname, dosdir) != 0)) {
     return(NULL);
   }
 
@@ -271,7 +270,6 @@ struct ziplist *pkginstall_preparepackage(struct pkgdb *pkgdb, char *pkgname, ch
     /* look out for collisions with already existing files (unless we are
      * updating the package and the local file belongs to it */
     shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist);
-    mapdrives(fname, mapdrv);
     strcat(fname, shortfile);
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
       kitten_puts(3, 9, "Error: Package contains a file that already exists locally:");
@@ -317,7 +315,7 @@ struct ziplist *pkginstall_preparepackage(struct pkgdb *pkgdb, char *pkgname, ch
 
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
-int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char *mapdrv) {
+int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
   char *buff;
   char *fulldestfilename;
   char packageslst[64];
@@ -344,7 +342,6 @@ int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *di
 
   /* open the lst file */
   sprintf(buff, "%s\\%s", dosdir, packageslst);
-  mapdrives(buff, mapdrv);
   lstfd = fopen(buff, "wb"); /* opening it in binary mode, because I like to have control over line terminators (CR/LF) */
   if (lstfd == NULL) {
     kitten_printf(3, 10, "Error: Could not create %s!", buff);
@@ -363,8 +360,6 @@ int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *di
     shortfile = computelocalpath(curzipnode->filename, buff, dosdir, dirlist); /* substitute paths to custom dirs */
     /* log the filename to packages\pkg.lst (with original, unmapped drive) */
     fprintf(lstfd, "%s%s\r\n", buff, shortfile);
-    /* remap drive letter, if needed (AFTER writing to lstfd) */
-    mapdrives(buff, mapdrv);
     /* create the path, just in case it doesn't exist yet */
     mkpath(buff);
     sprintf(fulldestfilename, "%s%s", buff, shortfile);
@@ -380,7 +375,6 @@ int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *di
     }
     /* if it's a LINK file, recompute a new content */
     if (islinkfile(curzipnode->filename) != 0) {
-      unmapdrives(buff, mapdrv);
       processlinkfile(fulldestfilename, dosdir, dirlist, buff);
     }
   }

@@ -1,6 +1,6 @@
 /*
- * This file is part of fdnpkg
- * Copyright (C) 2012-2017 Mateusz Viste
+ * This file is part of pkginst
+ * Copyright (C) 2012-2021 Mateusz Viste
  *
  * It contains a few helper function...
  */
@@ -14,8 +14,6 @@ void backslash2slash(char *str);
 void strtolower(char *mystring);
 char *fdnpkg_strcasestr(const char *s, const char *find);
 void mkpath(char *dirs);
-void mapdrives(char *s, char *mapdrv);
-void unmapdrives(char *s, char *mapdrv);
 char *computelocalpath(char *longfilename, char *respath, char *dosdir, struct customdirs *dirlist);
 void removeDoubleBackslashes(char *str);
 int detect_localpath(char *url);
