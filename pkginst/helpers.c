@@ -14,12 +14,8 @@
 
 #include "version.h"
 
-#ifdef __WATCOMC__
-  #include <direct.h>  /* provides the mkdir() prototype */
-  #define MAKEDIR(x) mkdir(x);
-#else
-  #define MAKEDIR(x) mkdir(x, S_IWUSR); /* S_IWUSR is to make the directory READONLY bit NOT set */
-#endif
+#include <direct.h>  /* provides the mkdir() prototype */
+#define MAKEDIR(x) mkdir(x);
 
 #include "helpers.h"
 
@@ -195,7 +191,7 @@ void mkpath(char *dirs) {
 
 /* returns a pointer to the start of the filename, out of a path\to\file string, and
    fills respath with the local folder where the file should be placed. */
-char *computelocalpath(char *longfilename, char *respath, char *dosdir, struct customdirs *dirlist) {
+char *computelocalpath(char *longfilename, char *respath, const char *dosdir, const struct customdirs *dirlist) {
   int x, lastsep = 0, firstsep = -1;
   char savedchar;
   char *shortfilename, *pathstart;

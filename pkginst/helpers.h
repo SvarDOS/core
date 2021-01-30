@@ -14,7 +14,7 @@ void backslash2slash(char *str);
 void strtolower(char *mystring);
 char *fdnpkg_strcasestr(const char *s, const char *find);
 void mkpath(char *dirs);
-char *computelocalpath(char *longfilename, char *respath, char *dosdir, struct customdirs *dirlist);
+char *computelocalpath(char *longfilename, char *respath, const char *dosdir, const struct customdirs *dirlist);
 void removeDoubleBackslashes(char *str);
 int detect_localpath(char *url);
 char *getfext(char *fname);
