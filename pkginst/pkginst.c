@@ -12,7 +12,7 @@
 #include <sys/types.h> /* struct utimbuf */
 
 #include "crc32.h"     /* all CRC32 related stuff */
-#include "fdnpkg.h"    /* PKGINST_NOSOURCE, PKGINST_SKIPLINKS... */
+#include "fdnpkg.h"    /* PKGINST_SKIPLINKS... */
 #include "helpers.h"   /* slash2backslash(), strtolower() */
 #include "fileexst.h"
 #include "kprintf.h"
@@ -228,12 +228,6 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int fl
     /* remove 'directory' ZIP entries to avoid false alerts about directory already existing */
     if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) {
       curzipnode->filename[0] = 0; /* mark it "empty", will be removed in a short moment */
-    }
-    /* if --nosource specified, skip sources */
-    if ((flags & PKGINST_NOSOURCE) != 0) {
-      if (fdnpkg_strcasestr(curzipnode->filename, "source\\") == curzipnode->filename) { /* drop this file */
-        curzipnode->filename[0] = 0; /* in fact, we just mark the file as 'empty' on the filename.. see below */
-      }
     }
     /* is it a "link file"? */
     if (fdnpkg_strcasestr(curzipnode->filename, "links\\") == curzipnode->filename) {

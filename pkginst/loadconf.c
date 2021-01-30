@@ -12,7 +12,7 @@
 #include <stdlib.h> /* malloc(), free() */
 
 #include "crc32.h"  /* crc32() */
-#include "fdnpkg.h" /* PKGINST_NOSOURCE, PKGINST_SKIPLINKS... */
+#include "fdnpkg.h" /* PKGINST_SKIPLINKS... */
 #include "helpers.h" /* slash2backslash(), removeDoubleBackslashes()... */
 #include "kprintf.h"
 #include "loadconf.h"

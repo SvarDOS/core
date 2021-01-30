@@ -7,9 +7,8 @@
 #define FDNPKG_H_SENTINEL
 
 /* flags used by FDNPKG */
-#define PKGINST_NOSOURCE  1
-#define PKGINST_SKIPLINKS 2
-#define PKGINST_UPDATE    4
+#define PKGINST_SKIPLINKS 1
+#define PKGINST_UPDATE    2
 
 struct flist_t {
   struct flist_t *next;
