@@ -1,5 +1,5 @@
 /*
- * This file is part of FDNPKG
+ * This file is part of pkginst (SvarDOS)
  * Copyright (C) 2012-2021 Mateusz Viste
  * Changes by TK Chia
  */
@@ -137,19 +137,15 @@ static void processlinkfile(char *linkfile, char *dosdir, struct customdirs *dir
 
 
 /* returns 0 if pkgname is not installed, non-zero otherwise */
-int is_package_installed(char *pkgname, char *dosdir) {
+int is_package_installed(const char *pkgname, const char *dosdir) {
   char fname[512];
   sprintf(fname, "%s\\packages\\%s.lst", dosdir, pkgname);
-  if (fileexists(fname) != 0) { /* file exists -> package is installed */
-    return(1);
-  } else {
-    return(0);
-  }
+  return(fileexists(fname)); /* file exists -> package is installed */
 }
 
 
 /* checks that pkgname is NOT installed. return 0 on success, non-zero otherwise. */
-int validate_package_not_installed(char *pkgname, char *dosdir) {
+static int validate_package_not_installed(const char *pkgname, const char *dosdir) {
   if (is_package_installed(pkgname, dosdir) != 0) {
     kitten_printf(3, 18, "Package %s is already installed! You might want to use the 'update' action.", pkgname);
     puts("");
@@ -170,15 +166,15 @@ static struct flist_t *findfileinlist(struct flist_t *flist, char *fname) {
 
 
 /* prepare a package for installation. this is mandatory before actually installing it!
- * returns a pointer to the zip file's index on success, NULL on failure. the *zipfile pointer is updated with a file descriptor to the open zip file to install. */
+ * returns a pointer to the zip file's index on success, NULL on failure. the **zipfd pointer is updated with a file descriptor to the open zip file to install. */
 struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int flags, FILE **zipfd, char *dosdir, struct customdirs *dirlist, char *buffmem1k) {
   char *fname;
   char *zipfile;
   char *appinfofile;
   int appinfopresence;
   char *shortfile;
-  struct ziplist *ziplinkedlist, *curzipnode, *prevzipnode;
-  struct flist_t *flist;
+  struct ziplist *ziplinkedlist = NULL, *curzipnode, *prevzipnode;
+  struct flist_t *flist = NULL;
 
   fname = buffmem1k;
   zipfile = buffmem1k + 256;
@@ -204,19 +200,16 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int fl
   *zipfd = fopen(zipfile, "rb");
   if (*zipfd == NULL) {
     kitten_puts(3, 8, "Error: Invalid zip archive! Package not installed.");
-    return(NULL);
+    goto RAII;
   }
   ziplinkedlist = zip_listfiles(*zipfd);
   if (ziplinkedlist == NULL) {
     kitten_puts(3, 8, "Error: Invalid zip archive! Package not installed.");
-    fclose(*zipfd);
-    return(NULL);
+    goto RAII;
   }
   /* if updating, load the list of files belonging to the current package */
   if ((flags & PKGINST_UPDATE) != 0) {
     flist = pkg_loadflist(pkgname, dosdir);
-  } else {
-    flist = NULL;
   }
   /* Verify that there's no collision with existing local files, look for the appinfo presence, get rid of sources if required, and rename BAT links into COM files */
   appinfopresence = 0;
@@ -257,9 +250,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int fl
     if (validfilename(curzipnode->filename) != 0) {
       kitten_puts(3, 23, "Error: Package contains an invalid filename:");
       printf(" %s\n", curzipnode->filename);
-      zip_freelist(&ziplinkedlist);
-      fclose(*zipfd);
-      return(NULL);
+      goto RAII_ERR;
     }
     /* look out for collisions with already existing files (unless we are
      * updating the package and the local file belongs to it */
@@ -268,27 +259,21 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int fl
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
       kitten_puts(3, 9, "Error: Package contains a file that already exists locally:");
       printf(" %s\n", fname);
-      zip_freelist(&ziplinkedlist);
-      fclose(*zipfd);
-      return(NULL);
+      goto RAII_ERR;
     }
     /* abort if any entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
       kitten_printf(3, 20, "Error: Package contains an encrypted file:");
       puts("");
       printf(" %s\n", curzipnode->filename);
-      zip_freelist(&ziplinkedlist);
-      fclose(*zipfd);
-      return(NULL);
+      goto RAII_ERR;
     }
     /* abort if any file is compressed with an unsupported method */
     if ((curzipnode->compmethod != 0/*store*/) && (curzipnode->compmethod != 8/*deflate*/)) { /* unsupported compression method */
       kitten_printf(8, 2, "Error: Package contains a file compressed with an unsupported method (%d):", curzipnode->compmethod);
       puts("");
       printf(" %s\n", curzipnode->filename);
-      zip_freelist(&ziplinkedlist);
-      fclose(*zipfd);
-      return(NULL);
+      goto RAII_ERR;
     }
     if (strcmp(curzipnode->filename, appinfofile) == 0) appinfopresence = 1;
     prevzipnode = curzipnode;
@@ -298,11 +283,21 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int fl
   if (appinfopresence != 1) {
     kitten_printf(3, 12, "Error: Package do not contain the %s file! Not a valid FreeDOS package.", appinfofile);
     puts("");
-    zip_freelist(&ziplinkedlist);
-    fclose(*zipfd);
-    return(NULL);
+    goto RAII_ERR;
   }
 
+  goto RAII;
+
+  RAII_ERR:
+  zip_freelist(&ziplinkedlist);
+  ziplinkedlist = NULL;
+  if ((zipfd != NULL) && (*zipfd != NULL)) {
+    fclose(*zipfd);
+    *zipfd = NULL;
+  }
+
+  RAII:
+  pkg_freeflist(flist);
   return(ziplinkedlist);
 }
 
