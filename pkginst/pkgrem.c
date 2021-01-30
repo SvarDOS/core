@@ -1,6 +1,6 @@
 /*
- * This file is part of the FDNPKG project.
- * Copyright (C) Mateusz Viste 2012-2016. All rights reserved.
+ * This file is part of the pkginst (SvarDOS) project.
+ * Copyright (C) Mateusz Viste 2012-2021. All rights reserved.
  */
 
 #include <ctype.h>    /* toupper() */

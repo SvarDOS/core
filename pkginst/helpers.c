@@ -7,15 +7,11 @@
 
 
 #include <ctype.h>    /* tolower() */
+#include <direct.h>   /* provides the mkdir() prototype */
 #include <string.h>   /* */
 #include <stdio.h>    /* sprintf() */
 #include <stdlib.h>   /* atoi() */
 #include <sys/stat.h> /* mkdir() */
-
-#include "version.h"
-
-#include <direct.h>  /* provides the mkdir() prototype */
-#define MAKEDIR(x) mkdir(x);
 
 #include "helpers.h"
 
@@ -181,7 +177,7 @@ void mkpath(char *dirs) {
         savechar = dirs[x];
         dirs[x] = 0;
         /* make the dir */
-        MAKEDIR(dirs);
+        mkdir(dirs);
         dirs[x] = savechar;
       }
     }
