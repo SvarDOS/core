@@ -29,6 +29,7 @@
 #include <stdlib.h>   /* malloc() and friends */
 #include <string.h>   /* strcasecmp() */
 
+#include "kitten/kitten.h"
 #include "kprintf.h"
 #include "libunzip.h"
 #include "pkginst.h"
@@ -111,26 +112,31 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
 
 
 int main(int argc, char **argv) {
-  int res, flags;
+  int res = 1, flags;
   enum ACTIONTYPES action;
   const char *dosdir;
   struct customdirs *dirlist;
 
+  kittenopen("pkginst"); /* NLS init */
+
   action = parsearg(argc, argv);
-  if (action == ACTION_HELP) return(showhelp());
+  if (action == ACTION_HELP) {
+    showhelp();
+    goto GAMEOVER;
+  }
 
   /* read the DOSDIR environment variable */
   dosdir = getenv("DOSDIR");
   if (dosdir == NULL) {
     kitten_puts(2, 2, "%DOSDIR% not set! You should make it point to the FreeDOS main directory.");
     kitten_puts(2, 3, "Example: SET DOSDIR=C:\\FDOS");
-    return(-1);
+    goto GAMEOVER;
   }
 
   /* load configuration */
   flags = 0;
   dirlist = NULL;
-  if (loadconf(dosdir, &dirlist, &flags) != 0) return(5);
+  if (loadconf(dosdir, &dirlist, &flags) != 0) goto GAMEOVER;
 
   switch (action) {
     case ACTION_INSTALL:
@@ -147,6 +153,8 @@ int main(int argc, char **argv) {
       break;
   }
 
+  GAMEOVER:
+  kittenclose(); /* NLS de-init */
   if (res != 0) return(1);
   return(0);
 }
