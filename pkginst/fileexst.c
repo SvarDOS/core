@@ -5,15 +5,11 @@
 
 #include <stdio.h>
 #include "fileexst.h"
-#include "version.h"
 
-int fileexists(char *filename) {
+int fileexists(const char *filename) {
   FILE *fd;
   fd = fopen(filename, "rb");
-  if (fd != NULL) { /* file exists */
-      fclose(fd);
-      return(1);
-    } else {
-      return(0);
-  }
+  if (fd == NULL) return(0); /* file does not exists */
+  fclose(fd);
+  return(1);
 }
