@@ -32,7 +32,7 @@ static int strcompare(const void *str1, const void *str2) {
 }
 
 
-static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packagelist_maxlen, char *filterstr, const char *dosdir) {
+static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packagelist_maxlen, const char *filterstr, const char *dosdir) {
   DIR *dp;
   int packagelist_len = 0, x;
   struct dirent *ep;
@@ -78,7 +78,7 @@ static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packa
 
 #define packagelist_maxlen 1024
 
-void showinstalledpkgs(char *filterstr, const char *dosdir) {
+void showinstalledpkgs(const char *filterstr, const char *dosdir) {
   char *packagelist[packagelist_maxlen];
   char *packagelist_ver[packagelist_maxlen];
   int packagelist_len, x;

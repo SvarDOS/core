@@ -7,6 +7,6 @@
   #define showinst_h_sentinel
   void pkg_freeflist(struct flist_t *flist);
   struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir);
-  void showinstalledpkgs(char *filterstr, const char *dosdir);
+  void showinstalledpkgs(const char *filterstr, const char *dosdir);
   int listfilesofpkg(const char *pkgname, const char *dosdir);
 #endif
