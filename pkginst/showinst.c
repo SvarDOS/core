@@ -17,7 +17,6 @@
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_freelist()... */
 #include "lsm.h"
-#include "pkgdb.h"
 #include "pkginst.h"
 #include "pkgrem.h"
 #include "rtrim.h"
