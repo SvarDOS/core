@@ -51,8 +51,8 @@ static int showhelp(void) {
          "Usage: PKGINST install package.zip\n"
          "       PKGINST remove package\n"
          "\n"
-         "PKGINST is published under the MIT license. It uses a PKGINST.CFG configuration\n"
-         "file located in the directory pointed by %%PKGCFG%%\n"
+         "PKGINST is published under the MIT license. It uses a configuration file\n"
+         "located at %%DOSDIR%%\\CFG\\PKGINST.CFG\n"
          );
   return(1);
 }

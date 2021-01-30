@@ -101,7 +101,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
   char cfgfile[256];
   int curtok = 0, curval = 0, nline = 1;
 
-  snprintf(cfgfile, sizeof(cfgfile), "%s\\cfg\\pkg.cfg", dosdir);
+  snprintf(cfgfile, sizeof(cfgfile), "%s\\cfg\\pkginst.cfg", dosdir);
   fd = fopen(cfgfile, "r");
   if (fd == NULL) {
     kitten_printf(7, 1, "Error: Could not open config file (%s)!", cfgfile);
