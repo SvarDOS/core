@@ -105,7 +105,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
 int main(int argc, char **argv) {
   int res, flags;
   enum ACTIONTYPES action;
-  char *dosdir;
+  const char *dosdir;
   struct customdirs *dirlist;
 
   action = parsearg(argc, argv);
