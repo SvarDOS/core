@@ -8,10 +8,7 @@
 #include <string.h>    /* strlen() */
 #include <stdlib.h>    /* free() */
 #include <unistd.h>    /* rmdir(), unlink() */
-
-#ifdef __WATCOMC__
 #include <direct.h>  /* watcom needs this for the rmdir() prototype */
-#endif
 
 #include "fileexst.h"
 #include "getdelim.h"
@@ -29,7 +26,7 @@ struct dirliststruct {
 
 
 /* adds a directory to dirlist, if not already present */
-static struct dirliststruct *rememberdir(struct dirliststruct *dirlist, char *path) {
+static struct dirliststruct *rememberdir(struct dirliststruct *dirlist, const char *path) {
   struct dirliststruct *res;
   /* if already present, do nothing */
   for (res = dirlist; res != NULL; res = res->next) {
@@ -69,9 +66,9 @@ static struct dirliststruct *rememberpath(struct dirliststruct *dirlist, char *p
 
 
 /* removes a package from the system. Returns 0 on success, non-zero otherwise */
-int pkgrem(char *pkgname, char *dosdir) {
-  char fpath[512];
-  char shellcmd[512];
+int pkgrem(const char *pkgname, const char *dosdir) {
+  char fpath[256];
+  char shellcmd[256];
   char *lineptr;
   FILE *flist;
   int getdelimlen;
@@ -79,7 +76,7 @@ int pkgrem(char *pkgname, char *dosdir) {
   int x;
   size_t getdelimcount = 0;
   struct dirliststruct *dirlist = NULL; /* used to remember directories to remove */
-  char pkglistfile[512];
+  char pkglistfile[256];
 
   /* Check if the file %DOSDIR%\packages\pkgname.lst exists (if not, the package is not installed) */
   sprintf(fpath, "%s\\packages\\%s.lst", dosdir, pkgname);

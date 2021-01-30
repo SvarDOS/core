@@ -5,5 +5,5 @@
 
 #ifndef pkgrem_sentinel
 #define pkgrem_sentinel
-int pkgrem(char *pkgname, char *dosdir);
+int pkgrem(const char *pkgname, const char *dosdir);
 #endif
