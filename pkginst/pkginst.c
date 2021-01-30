@@ -167,9 +167,8 @@ static struct flist_t *findfileinlist(struct flist_t *flist, char *fname) {
 
 /* prepare a package for installation. this is mandatory before actually installing it!
  * returns a pointer to the zip file's index on success, NULL on failure. the **zipfd pointer is updated with a file descriptor to the open zip file to install. */
-struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int flags, FILE **zipfd, char *dosdir, struct customdirs *dirlist, char *buffmem1k) {
+struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char *buffmem1k) {
   char *fname;
-  char *zipfile;
   char *appinfofile;
   int appinfopresence;
   char *shortfile;
@@ -177,22 +176,14 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, char *localfile, int fl
   struct flist_t *flist = NULL;
 
   fname = buffmem1k;
-  zipfile = buffmem1k + 256;
   appinfofile = buffmem1k + 512;
 
-  strtolower(pkgname); /* convert pkgname to lower case, because the http repo is probably case sensitive */
   sprintf(appinfofile, "appinfo\\%s.lsm", pkgname); /* Prepare the appinfo/xxxx.lsm filename string for later use */
 
   /* check if not already installed, if already here, print a message "you might want to use update instead"
    * of course this must not be done if we are in the process of upgrading said package */
   if (((flags & PKGINST_UPDATE) == 0) && (validate_package_not_installed(pkgname, dosdir) != 0)) {
     return(NULL);
-  }
-
-  if (localfile != NULL) {  /* if it's a local file, then we will have to skip all the network stuff */
-    strcpy(zipfile, localfile);
-  } else {
-    zipfile[0] = 0;
   }
 
   /* Now let's check the content of the zip file */
