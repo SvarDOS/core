@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <direct.h> /* opendir() and friends */
 
-#include "fdnpkg.h"   /* PKGINST_UPDATE */
+#include "fdnpkg.h"
 #include "fileexst.h"
 #include "getdelim.h"
 #include "helpers.h"  /* fdnpkg_strcasestr(), slash2backslash()... */
@@ -33,7 +33,7 @@ static int strcompare(const void *str1, const void *str2) {
 }
 
 
-static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packagelist_maxlen, char *filterstr, char *dosdir) {
+static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packagelist_maxlen, char *filterstr, const char *dosdir) {
   DIR *dp;
   int packagelist_len = 0, x;
   struct dirent *ep;
@@ -79,7 +79,7 @@ static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packa
 
 #define packagelist_maxlen 1024
 
-void showinstalledpkgs(char *filterstr, char *dosdir) {
+void showinstalledpkgs(char *filterstr, const char *dosdir) {
   char *packagelist[packagelist_maxlen];
   char *packagelist_ver[packagelist_maxlen];
   int packagelist_len, x;
@@ -111,7 +111,7 @@ void pkg_freeflist(struct flist_t *flist) {
 
 
 /* returns a linked list of the files that belong to package pkgname */
-struct flist_t *pkg_loadflist(char *pkgname, char *dosdir) {
+struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
   struct flist_t *res = NULL, *newnode;
   FILE *fd;
   char *lineptr;
@@ -163,7 +163,7 @@ struct flist_t *pkg_loadflist(char *pkgname, char *dosdir) {
 
 
 /* Prints files owned by a package */
-void listfilesofpkg(char *pkgname, char *dosdir) {
+void listfilesofpkg(char *pkgname, const char *dosdir) {
   struct flist_t *flist, *flist_ptr;
   /* load the list of files belonging to pkgname */
   flist = pkg_loadflist(pkgname, dosdir);
