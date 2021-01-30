@@ -11,7 +11,6 @@
 #include <string.h> /* strcasecmp() */
 #include <stdlib.h> /* malloc(), free() */
 
-#include "crc32.h"  /* crc32() */
 #include "fdnpkg.h" /* PKGINST_SKIPLINKS... */
 #include "helpers.h" /* slash2backslash(), removeDoubleBackslashes()... */
 #include "kprintf.h"
@@ -107,18 +106,20 @@ static int addnewdir(struct customdirs **dirlist, char *name, char *location) {
 }
 
 
-int loadconf(char *cfgfile, struct customdirs **dirlist, int *flags) {
+int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
   int bytebuff, parserstate = 0;
   FILE *fd;
   #define maxtok 16
   char token[maxtok];
-  #define maxval 1024
+  #define maxval 256
   char value[maxval];
+  char cfgfile[256];
   int curtok = 0, curval = 0, nline = 1;
 
+  snprintf(cfgfile, sizeof(cfgfile), "%s\\cfg\\pkg.cfg", dosdir);
   fd = fopen(cfgfile, "r");
   if (fd == NULL) {
-    kitten_printf(7, 1, "Error: Could not open config file '%s'!", cfgfile);
+    kitten_printf(7, 1, "Error: Could not open config file (%s)!", cfgfile);
     puts("");
     return(-1);
   }

@@ -41,18 +41,15 @@ enum ACTIONTYPES {
 
 
 static int showhelp(void) {
-  printf("FDINST v" PVER " Copyright (C) " PDATE " Mateusz Viste\n"
+  printf("PKGINST ver " PVER " Copyright (C) " PDATE " Mateusz Viste\n"
          "\n"
-         "FDINST is a lightweigth package installer for FreeDOS. It is an alternative\n"
-         "to FDNPKG, when only basic, local install/remove actions are necessary. FDINST\n"
-         "is a 16-bit, 8086-compatible application running in real mode.\n"
+         "PKGINST is the package installer for SvarDOS.\n"
          "\n"
-         "Usage: FDINST install package.zip\n"
-         "       FDINST remove package\n"
+         "Usage: PKGINST install package.zip\n"
+         "       PKGINST remove package\n"
          "\n"
-         "FDINST is published under the MIT license, and shares most of its source code\n"
-         "with FDNPKG to guarantee consistent behaviour of both tools. It also uses\n"
-         "FDNPKG's configuration file.\n"
+         "PKGINST is published under the MIT license. It uses a PKGINST.CFG configuration\n"
+         "file located in the directory pointed by %%PKGCFG%%\n"
          );
   return(1);
 }
@@ -73,7 +70,7 @@ static enum ACTIONTYPES parsearg(int argc, char **argv) {
 }
 
 
-static int pkginst(const char *file, int flags, const char *dosdir, struct customdirs *dirlist) {
+static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist) {
   char pkgname[32];
   int t, lastpathdelim = -1, u = 0;
   struct ziplist *zipfileidx;
@@ -108,33 +105,19 @@ static int pkginst(const char *file, int flags, const char *dosdir, struct custo
 int main(int argc, char **argv) {
   int res, flags;
   enum ACTIONTYPES action;
-  char *dosdir, *cfgfile;
+  char *dosdir;
   struct customdirs *dirlist;
 
   action = parsearg(argc, argv);
   if (action == ACTION_HELP) return(showhelp());
 
-  /* allocate some bits for cfg file's location */
-  cfgfile = malloc(256);
-  if (cfgfile == NULL) {
-    puts("ERROR: Out of memory");
-    return(1);
-  }
-
   /* read all necessary environment variables */
-  if (readenv(&dosdir, cfgfile, 256) != 0) {
-    free(cfgfile);
-    return(1);
-  }
+  if (readenv(&dosdir) != 0) return(1);
 
   /* load configuration */
   flags = 0;
   dirlist = NULL;
-  if (loadconf(cfgfile, &dirlist, &flags) < 0) return(5);
-
-  /* free the cfgfile buffer, I won't need the config file's location any more */
-  free(cfgfile);
-  cfgfile = NULL;
+  if (loadconf(dosdir, &dirlist, &flags) != 0) return(5);
 
   switch (action) {
     case ACTION_INSTALL:

@@ -10,6 +10,6 @@
 #ifndef READENV_H_SENTINEL
 #define READENV_H_SENTINEL
 
-int readenv(char **dosdir, char *cfgfile, int cfgfilemaxlen);
+int readenv(char **dosdir);
 
 #endif
