@@ -59,29 +59,17 @@ static int showhelp(void) {
 
 
 static enum ACTIONTYPES parsearg(int argc, char **argv) {
-  int extpos, i;
-  enum ACTIONTYPES res = ACTION_HELP;
   /* I expect exactly 2 arguments (ie argc == 3) */
   if (argc != 3) return(ACTION_HELP);
+
   /* look for valid actions */
   if (strcasecmp(argv[1], "install") == 0) {
-    res = ACTION_INSTALL;
+    return(ACTION_INSTALL);
   } else if (strcasecmp(argv[1], "remove") == 0) {
-    res = ACTION_REMOVE;
+    return(ACTION_REMOVE);
+  } else {
+    return(ACTION_HELP);
   }
-  /* the argument should never be empty */
-  if (argv[2][0] == 0) return(ACTION_INSTALL);
-  /* for 'install', validate that the extension is '.zip' */
-  if (res == ACTION_INSTALL) {
-    /* find where the file's extension starts */
-    extpos = 0;
-    for (i = 0; argv[2][i] != 0; i++) {
-      if (argv[2][i] == '.') extpos = i + 1;
-    }
-    if (extpos == 0) return(ACTION_HELP);
-  }
-  /* return the result */
-  return(res);
 }
 
 
