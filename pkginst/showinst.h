@@ -8,5 +8,5 @@
   void pkg_freeflist(struct flist_t *flist);
   struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir);
   void showinstalledpkgs(char *filterstr, const char *dosdir);
-  void listfilesofpkg(char *pkgname, const char *dosdir);
+  int listfilesofpkg(const char *pkgname, const char *dosdir);
 #endif

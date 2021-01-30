@@ -162,14 +162,16 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
 
 
 /* Prints files owned by a package */
-void listfilesofpkg(char *pkgname, const char *dosdir) {
+int listfilesofpkg(const char *pkgname, const char *dosdir) {
   struct flist_t *flist, *flist_ptr;
   /* load the list of files belonging to pkgname */
   flist = pkg_loadflist(pkgname, dosdir);
+  if (flist == NULL) return(-1);
   /* display each filename on screen */
   for (flist_ptr = flist; flist_ptr != NULL; flist_ptr = flist_ptr->next) {
-    printf("%s\n", flist_ptr->fname);
+    puts(flist_ptr->fname);
   }
   /* free the list of files */
   pkg_freeflist(flist);
+  return(0);
 }

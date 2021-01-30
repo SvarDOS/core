@@ -33,12 +33,14 @@
 #include "libunzip.h"
 #include "pkginst.h"
 #include "pkgrem.h"
+#include "showinst.h"
 #include "version.h"
 
 
 enum ACTIONTYPES {
   ACTION_INSTALL,
   ACTION_REMOVE,
+  ACTION_LISTFILES,
   ACTION_HELP
 };
 
@@ -50,6 +52,7 @@ static int showhelp(void) {
          "\n"
          "Usage: PKGINST install package.zip\n"
          "       PKGINST remove package\n"
+         "       PKGINST listfiles package\n"
          "\n"
          "PKGINST is published under the MIT license. It uses a configuration file\n"
          "located at %%DOSDIR%%\\CFG\\PKGINST.CFG\n"
@@ -67,6 +70,8 @@ static enum ACTIONTYPES parsearg(int argc, char **argv) {
     return(ACTION_INSTALL);
   } else if (strcasecmp(argv[1], "remove") == 0) {
     return(ACTION_REMOVE);
+  } else if (strcasecmp(argv[1], "listfiles") == 0) {
+    return(ACTION_LISTFILES);
   } else {
     return(ACTION_HELP);
   }
@@ -133,6 +138,9 @@ int main(int argc, char **argv) {
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);
+      break;
+    case ACTION_LISTFILES:
+      res = listfilesofpkg(argv[2], dosdir);
       break;
     default:
       res = showhelp();
