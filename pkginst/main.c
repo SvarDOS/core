@@ -1,6 +1,6 @@
 /*
- * FDINST - lightweigth FreeDOS package installer
- * Copyright (C) 2015-2017 Mateusz Viste
+ * PKGINST - lightweigth SvarDOS package installer
+ * Copyright (C) 2015-2021 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -73,10 +73,9 @@ static enum ACTIONTYPES parsearg(int argc, char **argv) {
 }
 
 
-static int pkginst(char *file, int flags, char *dosdir, char *tempdir, struct customdirs *dirlist) {
+static int pkginst(const char *file, int flags, const char *dosdir, struct customdirs *dirlist) {
   char pkgname[32];
   int t, lastpathdelim = -1, u = 0;
-  char *buffmem1k;
   struct ziplist *zipfileidx;
   FILE *zipfilefd;
   for (t = 0; file[t] != 0; t++) {
@@ -92,15 +91,8 @@ static int pkginst(char *file, int flags, char *dosdir, char *tempdir, struct cu
       break;
     }
   }
-  /* allocate some memory for pkginst_preparepackage() to do its job */
-  buffmem1k = malloc(1024);
-  if (buffmem1k == NULL) {
-    puts("ERROR: Out of memory");
-    return(1);
-  }
   /* prepare the zip file and install it */
-  zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist, buffmem1k);
-  free(buffmem1k);
+  zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
   if (zipfileidx != NULL) {
     int res = 0;
     if (pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd) != 0) res = 1;
@@ -116,7 +108,7 @@ static int pkginst(char *file, int flags, char *dosdir, char *tempdir, struct cu
 int main(int argc, char **argv) {
   int res, flags;
   enum ACTIONTYPES action;
-  char *dosdir, *tempdir, *cfgfile;
+  char *dosdir, *cfgfile;
   struct customdirs *dirlist;
 
   action = parsearg(argc, argv);
@@ -130,7 +122,7 @@ int main(int argc, char **argv) {
   }
 
   /* read all necessary environment variables */
-  if (readenv(&dosdir, &tempdir, cfgfile, 256) != 0) {
+  if (readenv(&dosdir, cfgfile, 256) != 0) {
     free(cfgfile);
     return(1);
   }
@@ -146,7 +138,7 @@ int main(int argc, char **argv) {
 
   switch (action) {
     case ACTION_INSTALL:
-      res = pkginst(argv[2], flags, dosdir, tempdir, dirlist);
+      res = pkginst(argv[2], flags, dosdir, dirlist);
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);

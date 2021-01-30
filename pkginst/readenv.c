@@ -1,10 +1,10 @@
 /*
- * This file is part of FDNPKG.
+ * This file is part of pkginst (SvarDOS).
  *
- * Reads environment variables that will be used by FDNPKG and FDINST.
+ * Reads environment variables that will be used by pkginst.
  * Returns 0 on success, non-zero otherwise.
  *
- * Copyright (C) 2012-2016 Mateusz Viste
+ * Copyright (C) 2012-2021 Mateusz Viste
  */
 
 #include <stdio.h>    /* snprintf() */
@@ -14,7 +14,7 @@
 #include "readenv.h"
 
 
-int readenv(char **dosdir, char **tempdir, char *cfgfile, int cfgfilemaxlen) {
+int readenv(char **dosdir, char *cfgfile, int cfgfilemaxlen) {
   char *cfg;
 
   /* check if %DOSDIR% is set, and retrieve it */
@@ -23,14 +23,6 @@ int readenv(char **dosdir, char **tempdir, char *cfgfile, int cfgfilemaxlen) {
     kitten_puts(2, 2, "%DOSDIR% not set! You should make it point to the FreeDOS main directory.");
     kitten_puts(2, 3, "Example: SET DOSDIR=C:\\FDOS");
     return(-1);
-  }
-
-  /* check if %TEMP% is set, and retrieve it */
-  *tempdir = getenv("TEMP");
-  if (*tempdir == NULL) {
-    kitten_puts(2, 0, "%TEMP% not set! You should make it point to a writeable directory.");
-    kitten_puts(2, 1, "Example: SET TEMP=C:\\TEMP");
-    return(-2);
   }
 
   /* look for the FDNPKG.CFG env. variable */

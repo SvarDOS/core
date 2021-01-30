@@ -9,7 +9,7 @@
 #include "loadconf.h" /* required for struct customdirs */
 
 int is_package_installed(const char *pkgname, const char *dosdir);
-struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *localfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char *buffmem1k);
-int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd);
+struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *localfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist);
+int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd);
 
 #endif

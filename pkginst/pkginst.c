@@ -23,7 +23,7 @@
 
 
 /* return 1 if fname looks like a link filename, 0 otherwise */
-static int islinkfile(char *fname) {
+static int islinkfile(const char *fname) {
   char *link1 = "LINKS\\";
   char *link2 = "links\\";
   int x;
@@ -36,7 +36,7 @@ static int islinkfile(char *fname) {
 
 /* validate a filename (8+3, no weird characters, etc). returns 0 on success,
  * nonzero otherwise. */
-static int validfilename(char *fname) {
+static int validfilename(const char *fname) {
   int i, i2;
   char *validchars = "!#$%&'()-@^_`{}~";
   int elemlen = 0;
@@ -81,7 +81,7 @@ static int validfilename(char *fname) {
 
 /* processes a link file - that is, reads the target inside, and overwrite
  * the file with new content */
-static void processlinkfile(char *linkfile, char *dosdir, struct customdirs *dirlist, char *buff) {
+static void processlinkfile(const char *linkfile, const char *dosdir, const struct customdirs *dirlist, char *buff) {
   char origtarget[512];
   int x;
   char *shortfile;
@@ -156,7 +156,7 @@ static int validate_package_not_installed(const char *pkgname, const char *dosdi
 
 
 /* find a filename in a flist linked list, and returns a pointer to it */
-static struct flist_t *findfileinlist(struct flist_t *flist, char *fname) {
+static struct flist_t *findfileinlist(struct flist_t *flist, const char *fname) {
   while (flist != NULL) {
     if (strcmp(flist->fname, fname) == 0) return(flist);
     flist = flist->next;
@@ -167,16 +167,13 @@ static struct flist_t *findfileinlist(struct flist_t *flist, char *fname) {
 
 /* prepare a package for installation. this is mandatory before actually installing it!
  * returns a pointer to the zip file's index on success, NULL on failure. the **zipfd pointer is updated with a file descriptor to the open zip file to install. */
-struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char *buffmem1k) {
-  char *fname;
-  char *appinfofile;
+struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist) {
+  char fname[256];
+  char appinfofile[256];
   int appinfopresence;
   char *shortfile;
   struct ziplist *ziplinkedlist = NULL, *curzipnode, *prevzipnode;
   struct flist_t *flist = NULL;
-
-  fname = buffmem1k;
-  appinfofile = buffmem1k + 512;
 
   sprintf(appinfofile, "appinfo\\%s.lsm", pkgname); /* Prepare the appinfo/xxxx.lsm filename string for later use */
 
@@ -295,7 +292,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
 
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
-int pkginstall_installpackage(char *pkgname, char *dosdir, struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
+int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
   char *buff;
   char *fulldestfilename;
   char packageslst[64];
