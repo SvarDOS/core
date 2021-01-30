@@ -1,10 +1,9 @@
 /*
- * This file is part of FDNPKG.
+ * This file is part of pkginst (SvarDOS).
  *
- * Loads the list of repositories from the config file specified in %FDNPKG%.
- * Returns the amount of repositories found (and loaded) on success, or -1 on failure.
+ * Loads the list of repositories from a config file.
  *
- * Copyright (C) 2012-2016 Mateusz Viste
+ * Copyright (C) 2012-2021 Mateusz Viste
  */
 
 #include <stdio.h>  /* printf(), fclose(), fopen()... */
@@ -16,7 +15,6 @@
 #include "kprintf.h"
 #include "loadconf.h"
 #include "parsecmd.h"
-#include "version.h"
 
 
 void freeconf(struct customdirs **dirlist) {
@@ -24,16 +22,13 @@ void freeconf(struct customdirs **dirlist) {
   /* free the linked list of custom dirs */
   while (*dirlist != NULL) {
     curpos = *dirlist;
-    if (curpos->name != NULL) free(curpos->name);
-    if (curpos->location != NULL) free(curpos->location);
     *dirlist = (*dirlist)->next;
     free(curpos);
   }
-  *dirlist = NULL;
 }
 
 
-static int checkfordoubledirlist(struct customdirs *dirlist) {
+static int checkfordoubledirlist(const struct customdirs *dirlist) {
   struct customdirs *curpos;
   for (; dirlist != NULL; dirlist = dirlist->next) {
     for (curpos = dirlist->next; curpos != NULL; curpos = curpos->next) {
@@ -49,7 +44,7 @@ static int checkfordoubledirlist(struct customdirs *dirlist) {
 
 
 /* validates dirlist entries: check that they are absolute paths and are not using restricted names */
-static int validatedirlist(struct customdirs *dirlist) {
+static int validatedirlist(const struct customdirs *dirlist) {
   for (; dirlist != NULL; dirlist = dirlist->next) {
     /* the location must be at least 3 characters long to be a valid absolute path (like 'c:\')*/
     if (strlen(dirlist->location) < 3) {
@@ -83,21 +78,11 @@ static int validatedirlist(struct customdirs *dirlist) {
 
 /* add (and allocates) a new custom dir entry to dirlist. Returns 0 on success,
    or non-zero on failure (failures happen on out of memory events). */
-static int addnewdir(struct customdirs **dirlist, char *name, char *location) {
+static int addnewdir(struct customdirs **dirlist, const char *name, const char *location) {
   struct customdirs *newentry;
-  newentry = malloc(sizeof(struct customdirs));
+  if (strlen(name) >= sizeof(newentry->name)) return(-2);
+  newentry = malloc(sizeof(struct customdirs) + strlen(location) + 1);
   if (newentry == NULL) return(-1);
-  newentry->name = malloc(strlen(name) + 1);
-  if (newentry->name == NULL) {
-    free(newentry);
-    return(-1);
-  }
-  newentry->location = malloc(strlen(location) + 1);
-  if (newentry->location == NULL) {
-    free(newentry->name);
-    free(newentry);
-    return(-1);
-  }
   strcpy(newentry->name, name);
   strcpy(newentry->location, location);
   newentry->next = *dirlist;

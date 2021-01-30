@@ -9,7 +9,7 @@ LIBS = zlib\zlib_l.lib
 
 all: pkginst.exe
 
-pkginst.exe: main.obj crc32.obj fileexst.obj getdelim.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj parsecmd.obj pkginst.obj pkgrem.obj readenv.obj rtrim.obj showinst.obj
+pkginst.exe: main.obj crc32.obj fileexst.obj getdelim.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj parsecmd.obj pkginst.obj pkgrem.obj rtrim.obj showinst.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
 
 main.obj: main.c
@@ -50,9 +50,6 @@ pkginst.obj: pkginst.c
 
 pkgrem.obj: pkgrem.c
 	wcc $(CFLAGS) pkgrem.c
-
-readenv.obj: readenv.c
-	wcc $(CFLAGS) readenv.c
 
 rtrim.obj: rtrim.c
 	wcc $(CFLAGS) rtrim.c

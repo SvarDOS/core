@@ -1,5 +1,5 @@
 /*
- * PKGINST - lightweigth SvarDOS package installer
+ * PKGINST - SvarDOS package installer
  * Copyright (C) 2015-2021 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,10 +26,10 @@
 #include <stdlib.h>   /* malloc() and friends */
 #include <string.h>   /* strcasecmp() */
 
+#include "kprintf.h"
 #include "libunzip.h"
 #include "pkginst.h"
 #include "pkgrem.h"
-#include "readenv.h"
 #include "version.h"
 
 
@@ -111,8 +111,13 @@ int main(int argc, char **argv) {
   action = parsearg(argc, argv);
   if (action == ACTION_HELP) return(showhelp());
 
-  /* read all necessary environment variables */
-  if (readenv(&dosdir) != 0) return(1);
+  /* read the DOSDIR environment variable */
+  dosdir = getenv("DOSDIR");
+  if (dosdir == NULL) {
+    kitten_puts(2, 2, "%DOSDIR% not set! You should make it point to the FreeDOS main directory.");
+    kitten_puts(2, 3, "Example: SET DOSDIR=C:\\FDOS");
+    return(-1);
+  }
 
   /* load configuration */
   flags = 0;

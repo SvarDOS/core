@@ -8,9 +8,9 @@
 #define loadrepolist_sentinel
 
 struct customdirs {
-  char *name;
-  char *location;
   struct customdirs *next;
+  char name[9];
+  char location[1]; /* extended at alloc time */
 };
 
 /* Loads the list of custom directories from the config file
