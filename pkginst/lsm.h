@@ -6,5 +6,5 @@
 #ifndef readlsm_h_sentinel
   #define readlsm_h_sentinel
   /* Loads metadata from an LSM file. Returns 0 on success, non-zero on error. */
-  int readlsm(char *filename, char *version, int version_maxlen);
+  int readlsm(const char *filename, char *version, int version_maxlen);
 #endif

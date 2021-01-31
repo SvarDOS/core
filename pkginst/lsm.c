@@ -32,7 +32,7 @@ static int readline_fromfile(FILE *fd, char *line, int maxlen) {
 
 
 /* Loads metadata from an LSM file. Returns 0 on success, non-zero on error. */
-int readlsm(char *filename, char *version, int version_maxlen) {
+int readlsm(const char *filename, char *version, int version_maxlen) {
   char linebuff[128];
   char *valuestr;
   int x;
@@ -42,17 +42,8 @@ int readlsm(char *filename, char *version, int version_maxlen) {
   /* open the file */
   fd = fopen(filename, "rb");
   if (fd == NULL) return(-1);
-  /* check the file's header */
-  if (readline_fromfile(fd, linebuff, 64) < 0) {
-    fclose(fd);
-    return(-1);
-  }
-  if (strcasecmp(linebuff, "begin3") != 0) {
-    fclose(fd);
-    return(-1);
-  }
   /* read the LSM file line by line */
-  while (readline_fromfile(fd, linebuff, 127) >= 0) {
+  while (readline_fromfile(fd, linebuff, sizeof(linebuff) - 1) >= 0) {
     for (x = 0;; x++) {
       if (linebuff[x] == 0) {
         x = -1;
@@ -66,10 +57,7 @@ int readlsm(char *filename, char *version, int version_maxlen) {
       valuestr = linebuff + x + 1;
       trim(linebuff);
       trim(valuestr);
-      if (strcasecmp(linebuff, "version") == 0) {
-        snprintf(version, version_maxlen, "%s", valuestr);
-        version[version_maxlen] = 0; /* snprintf is supposed to terminate string itself, but the DJGPP doesn't */
-      }
+      if (strcasecmp(linebuff, "version") == 0) snprintf(version, version_maxlen, "%s", valuestr);
     }
   }
   fclose(fd);
