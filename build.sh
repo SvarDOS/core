@@ -70,39 +70,43 @@ function dorepo {
 }
 
 
-# prepares image for floppy sets of size $1
+# prepares image for floppy sets of:
+# $1 cylinders
+# $2 heads (sides)
+# $3 sectors per track
+# $4 size
 function prep_flop {
-  mkdir $1
-  mformat -C -f $1 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$1/disk1.img"
-  mcopy -sQm -i "$1/disk1.img" "$FLOPROOT/"* ::/
+  mkdir $4
+  mformat -C -t $1 -h $2 -s $3 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$4/disk1.img"
+  mcopy -sQm -i "$4/disk1.img" "$FLOPROOT/"* ::/
 
   # now populate the floppies
   curdisk=1
   for p in $COREPKGS ; do
     # if copy fails, then probably the floppy is full - try again after
     # creating an additional floppy image
-    if ! mcopy -mi "$1/disk$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
+    if ! mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
       curdisk=$((curdisk+1))
-      mformat -C -f $1 -v SVARDOS -i "$1/disk$curdisk.img"
-      mcopy -mi "$1/disk$curdisk.img" "$CDROOT/$p.zip" ::/
+      mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$4/disk$curdisk.img"
+      mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.zip" ::/
     fi
   done
 
   # add a short readme
-  echo "This directory contains a set of $curdisk floppy images of the SvarDOS distribution in the $1 KB floppy format." > "$1/readme.txt"
-  echo "" >> "$1/readme.txt"
-  echo "These images are raw floppy disk dumps. To write them on an actual floppy disk, you have to use a low-level sector copying tool, like dd." >> "$1/readme.txt"
-  echo "" >> "$1/readme.txt"
-  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$1/readme.txt"
+  echo "This directory contains a set of $curdisk floppy images of the SvarDOS distribution in the $4 KB floppy format." > "$4/readme.txt"
+  echo "" >> "$4/readme.txt"
+  echo "These images are raw floppy disk dumps. To write them on an actual floppy disk, you have to use a low-level sector copying tool, like dd." >> "$4/readme.txt"
+  echo "" >> "$4/readme.txt"
+  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$4/readme.txt"
 
-  unix2dos "$1/readme.txt"
+  unix2dos "$4/readme.txt"
 
   # zip the images (and remove them at the same time)
-  rm -f "$PUBDIR/svardos-floppy-$1k.zip"
-  zip -9 -rmj "$PUBDIR/svardos-floppy-$1k.zip" $1/*
+  rm -f "$PUBDIR/svardos-floppy-$4k.zip"
+  zip -9 -rmj "$PUBDIR/svardos-floppy-$4k.zip" $4/*
 
   # clean up
-  rmdir $1
+  rmdir $4
 }
 
 
@@ -139,11 +143,11 @@ export MTOOLS_NO_VFAT=1
 mformat -C -f 1440 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
 mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
 
-# prepare images for floppies in different sizes and numbers
-prep_flop 2880
-prep_flop 1440
-prep_flop 1200
-prep_flop 720
+# prepare images for floppies in different sizes (args are C H S SIZE)
+prep_flop 80 2 36 2880
+prep_flop 80 2 18 1440
+prep_flop 80 2 15 1200
+prep_flop 80 2  9  720
 
 CDISO="$PUBDIR/svardos-cd.iso"
 CDZIP="$PUBDIR/svardos-cd.zip"
