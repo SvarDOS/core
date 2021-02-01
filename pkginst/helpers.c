@@ -13,6 +13,7 @@
 #include <stdlib.h>   /* atoi() */
 #include <sys/stat.h> /* mkdir() */
 
+#include "rtrim.h"
 #include "helpers.h"
 
 
@@ -245,4 +246,34 @@ char *getfext(char *fname) {
   /* if no dot found, then point to the string's null terminator */
   if (res == NULL) return(fname);
   return(res);
+}
+
+
+/* reads a line from a "token = value" file, returns 0 on success
+ * val (if not NULL) is updated with a pointer to the "value" part
+ * delim is the delimiter char (typically ':' or '=' but can be anything) */
+int freadtokval(FILE *fd, char *line, size_t maxlen, char **val, char delim) {
+  int bytebuff, linelen = 0;
+  if (val != NULL) *val = NULL;
+  for (;;) {
+    bytebuff = fgetc(fd);
+    if (bytebuff == EOF) {
+      if (linelen == 0) return(-1);
+      break;
+    }
+    if (bytebuff < 0) return(-1);
+    if ((*val == NULL) && (bytebuff == delim)) {
+      line[linelen++] = 0;
+      *val = line + linelen;
+      continue;
+    }
+    if (bytebuff == '\r') continue; /* ignore CR */
+    if (bytebuff == '\n') break;
+    if (linelen < maxlen - 1) line[linelen++] = bytebuff;
+  }
+  /* terminate line and trim token and value (if any) */
+  line[linelen] = 0;
+  trim(line);
+  if ((val != NULL) && (*val != NULL)) trim(*val);
+  return(0);
 }

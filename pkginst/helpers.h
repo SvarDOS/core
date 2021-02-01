@@ -18,4 +18,5 @@ char *computelocalpath(char *longfilename, char *respath, const char *dosdir, co
 void removeDoubleBackslashes(char *str);
 int detect_localpath(char *url);
 char *getfext(char *fname);
+int freadtokval(FILE *fd, char *line, size_t maxlen, char **val, char delim);
 #endif

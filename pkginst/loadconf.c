@@ -92,205 +92,73 @@ static int addnewdir(struct customdirs **dirlist, const char *name, const char *
 
 
 int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
-  int bytebuff, parserstate = 0;
   FILE *fd;
-  #define maxtok 16
-  char token[maxtok];
-  #define maxval 256
-  char value[maxval];
-  char cfgfile[256];
-  int curtok = 0, curval = 0, nline = 1;
+  char *value = NULL;
+  char token[512];
+  int nline = 0;
 
-  snprintf(cfgfile, sizeof(cfgfile), "%s\\cfg\\pkginst.cfg", dosdir);
-  fd = fopen(cfgfile, "r");
+  snprintf(token, sizeof(token), "%s\\cfg\\pkginst.cfg", dosdir);
+  fd = fopen(token, "r");
   if (fd == NULL) {
-    kitten_printf(7, 1, "Error: Could not open config file (%s)!", cfgfile);
+    kitten_printf(7, 1, "Error: Could not open config file (%s)!", token);
     puts("");
     return(-1);
   }
 
   /* read the config file line by line */
-  do {
-    bytebuff = fgetc(fd);
-    if (bytebuff != '\r') {
-      switch (parserstate) {
-        case 0: /* Looking for start of line */
-          if ((bytebuff == EOF) || (bytebuff == ' ') || (bytebuff == '\t')) break;
-          if (bytebuff == '\n') {
-            nline += 1;
-            break;
-          }
-          if (bytebuff == '#') {
-              parserstate = 9;
-            } else {
-              token[0] = bytebuff;
-              curtok = 1;
-              parserstate = 1;
-          }
-          break;
-        case 1: /* Looking for token end */
-          if ((bytebuff == EOF) || (bytebuff == '\n')) {
-            kitten_printf(7, 2, "Warning: token without value on line #%d", nline);
-            puts("");
-            if (bytebuff == '\n') nline += 1;
-            parserstate = 0;
-            break;
-          }
-          if ((bytebuff == ' ') || (bytebuff == '\t')) {
-              token[curtok] = 0;
-              parserstate = 2;
-            } else {
-              token[curtok] = bytebuff;
-              curtok += 1;
-              if (curtok >= maxtok) {
-                parserstate = 9; /* ignore the line */
-                kitten_printf(7, 3, "Warning: Config file token overflow on line #%d", nline);
-                puts("");
-              }
-          }
-          break;
-        case 2: /* Looking for value start */
-          if ((bytebuff == EOF) || (bytebuff == '\n')) {
-            kitten_printf(7, 4, "Warning: token with empty value on line #%d", nline);
-            puts("");
-            if (bytebuff == '\n') nline += 1;
-            parserstate = 0;
-            break;
-          }
-          if ((bytebuff != ' ') && (bytebuff != '\t')) {
-            value[0] = bytebuff;
-            curval = 1;
-            parserstate = 3;
-          }
-          break;
-        case 3: /* Looking for value end */
-          if ((bytebuff == EOF) || (bytebuff == '\n')) {
-              parserstate = 0;
-              value[curval] = 0;
-              if ((value[curval - 1] == ' ') || (value[curval - 1] == '\t')) {
-                kitten_printf(7, 5, "Warning: trailing white-space(s) after value on line #%d", nline);
-                puts("");
-                while ((value[curval - 1] == ' ') || (value[curval - 1] == '\t')) value[--curval] = 0;
-              }
-              /* Interpret the token/value pair now! */
-              /* printf("token='%s' ; value = '%s'\n", token, value); */
-              if (strcasecmp(token, "SKIPLINKS") == 0) {
-                  int tmpint = atoi(value); /* must be 0/1 */
-                  if (tmpint == 0) {
-                    /* do nothing */
-                  } else if (tmpint == 1) {
-                    *flags |= PKGINST_SKIPLINKS;
-                  } else {
-                    kitten_printf(7, 10, "Warning: Ignored an illegal '%s' value at line #%d", "skiplinks", nline);
-                    puts("");
-                  }
-                } else if (strcasecmp(token, "DIR") == 0) { /* custom repository entry */
-                  char *argv[2], *evar, *evar_content, *realLocation;
-                  #define realLocation_len 512
-                  int x, y;
-                  if (parsecmd(value, argv, 2) != 2) {
-                    kitten_printf(7, 11, "Warning: Invalid 'DIR' directive found at line #%d", nline);
-                    puts("");
-                  }
-                  realLocation = malloc(realLocation_len);
-                  if (realLocation == NULL) {
-                    kitten_printf(2, 14, "Out of memory! (%s)", "malloc realLocation");
-                    puts("");
-                    freeconf(dirlist);
-                    fclose(fd);
-                    return(-1);
-                  }
-                  realLocation[0] = 0; /* force it to be empty, since we might use strcat() on this later! */
-                  /* resolve possible env variables */
-                  evar = NULL;
-                  y = 0;
-                  for (x = 0; argv[1][x] != 0; x++) {
-                    if (evar == NULL) { /* searching for % and copying */
-                        if (argv[1][x] == '%') {
-                            evar = &argv[1][x+1];
-                          } else {
-                            if (y + 1 > realLocation_len) {
-                              kitten_printf(7, 12, "Error: DIR path too long at line #%d", nline);
-                              puts("");
-                              freeconf(dirlist);
-                              free(realLocation);
-                              fclose(fd);
-                              return(-1);
-                            }
-                            realLocation[y] = argv[1][x]; /* copy over */
-                            y++;
-                            realLocation[y] = 0; /* make sure to terminate the string at any time */
-                        }
-                      } else { /* reading a % variable */
-                        if (argv[1][x] == '%') {
-                          argv[1][x] = 0;
-                          evar_content = getenv(evar);
-                          if (evar_content == NULL) {
-                            kitten_printf(7, 13, "Error: Found inexisting environnement variable '%s' at line #%d", evar, nline);
-                            puts("");
-                            freeconf(dirlist);
-                            free(realLocation);
-                            fclose(fd);
-                            return(-1);
-                          }
-                          if (strlen(evar_content) + y + 1 > realLocation_len) {
-                            kitten_printf(7, 12, "Error: DIR path too long at line #%d", nline);
-                            puts("");
-                            freeconf(dirlist);
-                            free(realLocation);
-                            fclose(fd);
-                            return(-1);
-                          }
-                          strcat(realLocation, evar_content);
-                          y += strlen(evar_content);
-                          evar = NULL;
-                        }
-                    }
-                  }
-                  /* add the entry to the list */
-                  slash2backslash(realLocation);
-                  removeDoubleBackslashes(realLocation);
-                  if (realLocation[strlen(realLocation) - 1] != '\\') strcat(realLocation, "\\"); /* make sure to end dirs with a backslash */
-                  if (addnewdir(dirlist, argv[0], realLocation) != 0) {
-                    kitten_printf(2, 14, "Out of memory! (%s)", "addnewdir");
-                    puts("");
-                    freeconf(dirlist);
-                    free(realLocation);
-                    fclose(fd);
-                    return(-1);
-                  }
-                  free(realLocation);
-                } else { /* unknown token */
-                  kitten_printf(7, 8, "Warning: Unknown token '%s' at line #%d", token, nline);
-                  puts("");
-              }
-              /* interpretation done */
-              if (bytebuff == '\n') nline += 1;
-            } else {
-              value[curval] = bytebuff;
-              curval += 1;
-              if ((curval + 1) >= maxval) {
-                parserstate = 9; /* ignore the line */
-                kitten_printf(7, 9, "Warning: Config file value overflow on line #%d", nline);
-                puts("");
-              }
-          }
-          break;
-        case 9: /* Got comment, ignoring the rest of line */
-          if (bytebuff == EOF) break;
-          if (bytebuff == '\n') {
-            nline += 1;
-            parserstate = 0;
-          }
-          break;
-      }
+  while (freadtokval(fd, token, sizeof(token), &value, ' ') == 0) {
+    nline++;
+
+    /* skip comments and empty lines */
+    if ((token[0] == '#') || (token[0] == 0)) continue;
+
+    if ((value == NULL) || (value[0] == 0)) {
+      kitten_printf(7, 4, "Warning: token with empty value on line #%d", nline);
+      puts("");
+      continue;
     }
-  } while (bytebuff != EOF);
+
+    /* printf("token='%s' ; value = '%s'\n", token, value); */
+    if (strcasecmp(token, "SKIPLINKS") == 0) {
+      int tmpint = atoi(value); /* must be 0/1 */
+      if (tmpint == 0) {
+        /* do nothing */
+      } else if (tmpint == 1) {
+        *flags |= PKGINST_SKIPLINKS;
+      } else {
+        kitten_printf(7, 10, "Warning: Ignored an illegal '%s' value at line #%d", "skiplinks", nline);
+        puts("");
+      }
+    } else if (strcasecmp(token, "DIR") == 0) { /* custom directory entry */
+      char *argv[2];
+      #define realLocation_len 512
+      if (parsecmd(value, argv, 2) != 2) {
+        kitten_printf(7, 11, "Warning: Invalid 'DIR' directive found at line #%d", nline);
+        puts("");
+      }
+      /* add the entry to the list */
+      slash2backslash(argv[1]);
+      removeDoubleBackslashes(argv[1]);
+      if (argv[1][strlen(argv[1]) - 1] != '\\') strcat(argv[1], "\\"); /* make sure to end dirs with a backslash */
+      if (addnewdir(dirlist, argv[0], argv[1]) != 0) {
+        kitten_printf(2, 14, "Out of memory! (%s)", "addnewdir");
+        puts("");
+        freeconf(dirlist);
+        fclose(fd);
+        return(-1);
+      }
+    } else { /* unknown token */
+      kitten_printf(7, 8, "Warning: Unknown token '%s' at line #%d", token, nline);
+      puts("");
+    }
+  }
   fclose(fd);
 
   /* perform some validations */
-  if (checkfordoubledirlist(*dirlist) != 0) return(-1);
-  if (validatedirlist(*dirlist) != 0) return(-1);
+  if ((checkfordoubledirlist(*dirlist) != 0) || (validatedirlist(*dirlist) != 0)) {
+    freeconf(dirlist);
+    return(-1);
+  }
 
   return(0);
 }
