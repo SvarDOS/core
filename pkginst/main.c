@@ -42,6 +42,7 @@ enum ACTIONTYPES {
   ACTION_INSTALL,
   ACTION_REMOVE,
   ACTION_LISTFILES,
+  ACTION_LISTLOCAL,
   ACTION_HELP
 };
 
@@ -54,6 +55,7 @@ static int showhelp(void) {
          "Usage: PKGINST install package.zip\n"
          "       PKGINST remove package\n"
          "       PKGINST listfiles package\n"
+         "       PKGINST listlocal [filter]\n"
          "\n"
          "PKGINST is published under the MIT license. It uses a configuration file\n"
          "located at %%DOSDIR%%\\CFG\\PKGINST.CFG\n"
@@ -62,17 +64,16 @@ static int showhelp(void) {
 }
 
 
-static enum ACTIONTYPES parsearg(int argc, char **argv) {
-  /* I expect exactly 2 arguments (ie argc == 3) */
-  if (argc != 3) return(ACTION_HELP);
-
+static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
   /* look for valid actions */
-  if (strcasecmp(argv[1], "install") == 0) {
+  if ((argc == 3) && (strcasecmp(argv[1], "install") == 0)) {
     return(ACTION_INSTALL);
-  } else if (strcasecmp(argv[1], "remove") == 0) {
+  } else if ((argc == 3) && (strcasecmp(argv[1], "remove") == 0)) {
     return(ACTION_REMOVE);
-  } else if (strcasecmp(argv[1], "listfiles") == 0) {
+  } else if ((argc == 3) && (strcasecmp(argv[1], "listfiles") == 0)) {
     return(ACTION_LISTFILES);
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "listlocal") == 0)) {
+    return(ACTION_LISTLOCAL);
   } else {
     return(ACTION_HELP);
   }
@@ -147,6 +148,9 @@ int main(int argc, char **argv) {
       break;
     case ACTION_LISTFILES:
       res = listfilesofpkg(argv[2], dosdir);
+      break;
+    case ACTION_LISTLOCAL:
+      res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
       break;
     default:
       res = showhelp();

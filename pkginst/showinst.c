@@ -11,91 +11,54 @@
 #include <direct.h> /* opendir() and friends */
 
 #include "fdnpkg.h"
-#include "fileexst.h"
 #include "getdelim.h"
 #include "helpers.h"  /* fdnpkg_strcasestr(), slash2backslash()... */
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_freelist()... */
 #include "lsm.h"
-#include "pkginst.h"
-#include "pkgrem.h"
 #include "rtrim.h"
+
 #include "showinst.h"  /* include self for control */
-#include "version.h"
 
 
-/* this is a wrapper around strcasecmp(), to be used by qsort() */
-static int strcompare(const void *str1, const void *str2) {
-  char **s1 = (char **)str1;
-  char **s2 = (char **)str2;
-  return(strcasecmp(*s1, *s2));
-}
-
-
-static int loadinstpkglist(char **packagelist, char **packagelist_ver, int packagelist_maxlen, const char *filterstr, const char *dosdir) {
+int showinstalledpkgs(const char *filterstr, const char *dosdir) {
   DIR *dp;
-  int packagelist_len = 0, x;
   struct dirent *ep;
-  #define verstr_maxlen 64
-  char pkgdir[512], lsmfilename[1024], verstr[verstr_maxlen];
-  sprintf(pkgdir, "%s\\packages", dosdir);
-  dp = opendir(pkgdir);
-  if (dp != NULL) {
-    while ((ep = readdir(dp)) != NULL) {
-      if (ep->d_name[0] != '.') { /* ignore '.', '..', and hidden directories */
-        if (strlen(ep->d_name) > 4) {
-          int tlen = strlen(ep->d_name);
-          if ((ep->d_name[tlen - 4] != '.') || (tolower(ep->d_name[tlen - 3]) != 'l') || (tolower(ep->d_name[tlen - 2]) != 's') || (tolower(ep->d_name[tlen - 1]) != 't')) continue;  /* if it's not an .lst file, skip it silently */
+  char buff[256];
+  char ver[16];
+  int matchfound = 0;
 
-          if (filterstr != NULL) {
-            if (fdnpkg_strcasestr(ep->d_name, filterstr) == NULL) continue; /* if it's not matching the non-NULL filter, skip it */
-          }
-          if (packagelist_len >= packagelist_maxlen) {
-            closedir(dp);
-            return(-1); /* if not enough place in the list - return an error */
-          }
-          packagelist[packagelist_len] = strdup(ep->d_name);
-          packagelist[packagelist_len][strlen(packagelist[packagelist_len]) - 4] = 0; /* cut out the .lst extension */
-          packagelist_len += 1;
-        }
-      }
-    }
-    closedir(dp);
-    qsort(packagelist, packagelist_len, sizeof (char **), strcompare); /* sort the package list */
-    for (x = 0; x < packagelist_len; x++) {
-      /* for each package, load the metadata from %DOSDIR\APPINFO\*.lsm */
-      sprintf(lsmfilename, "%s\\appinfo\\%s.lsm", dosdir, packagelist[x]);
-      if (readlsm(lsmfilename, verstr, verstr_maxlen) != 0) sprintf(verstr, "(unknown version)");
-      packagelist_ver[x] = strdup(verstr);
-    }
-    return(packagelist_len);
-  } else {
-    kitten_printf(9, 0, "Error: Could not access the %s directory.", pkgdir);
+  sprintf(buff, "%s\\packages", dosdir);
+  dp = opendir(buff);
+  if (dp == NULL) {
+    kitten_printf(9, 0, "Error: Could not access directory %s", buff);
     puts("");
     return(-1);
   }
-}
 
-#define packagelist_maxlen 1024
+  while ((ep = readdir(dp)) != NULL) { /* readdir() result must never be freed (statically allocated) */
+    int tlen = strlen(ep->d_name);
+    if (ep->d_name[0] == '.') continue; /* ignore '.', '..', and hidden directories */
+    if (tlen < 4) continue; /* files must be at least 5 bytes long ("x.lst") */
+    if (strcasecmp(ep->d_name + tlen - 4, ".lst") != 0) continue;  /* if not an .lst file, skip it silently */
+    ep->d_name[tlen - 4] = 0; /* trim out the ".lst" suffix */
 
-void showinstalledpkgs(const char *filterstr, const char *dosdir) {
-  char *packagelist[packagelist_maxlen];
-  char *packagelist_ver[packagelist_maxlen];
-  int packagelist_len, x;
+    if (filterstr != NULL) {
+      if (fdnpkg_strcasestr(ep->d_name, filterstr) == NULL) continue; /* if it's not matching the non-NULL filter, skip it */
+    }
 
-  /* load the list of packages */
-  packagelist_len = loadinstpkglist(packagelist, packagelist_ver, packagelist_maxlen, filterstr, dosdir);   /* Populate the packages list */
-  if (packagelist_len < 0) return;
-  if (packagelist_len == 0) {
-    kitten_puts(5, 0, "No package matched the search.");
-    return;
+    /* load the metadata from %DOSDIR\APPINFO\*.lsm */
+    sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
+    readlsm(buff, ver, sizeof(ver));
+
+    printf("%s %s", ep->d_name, ver);
+    puts("");
+    matchfound = 1;
   }
+  if (matchfound == 0) kitten_puts(5, 0, "No package matched the search.");
 
-  /* iterate through all packages */
-  for (x = 0; x < packagelist_len; x++) {
-    /* print the package/version couple on screen */
-    printf("%s %s\n", packagelist[x], packagelist_ver[x]);
-  }
+  closedir(dp);
+  return(0);
 }
 
 
@@ -114,18 +77,14 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
   struct flist_t *res = NULL, *newnode;
   FILE *fd;
   char *lineptr;
-  char buff[512];
+  char buff[256];
   int getdelimlen, fnamelen;
   size_t getdelimcount = 0;
   sprintf(buff, "%s\\packages\\%s.lst", dosdir, pkgname);
-  if (fileexists(buff) == 0) { /* file does not exist */
-    kitten_printf(9, 1, "Error: Local package %s not found.", pkgname);
-    puts("");
-    return(NULL);
-  }
   fd = fopen(buff, "rb");
   if (fd == NULL) {
-    kitten_puts(4, 1, "Error opening lst file!");
+    kitten_printf(9, 1, "Error: Local package %s not found.", pkgname);
+    puts("");
     return(NULL);
   }
   /* iterate through all lines of the file */
