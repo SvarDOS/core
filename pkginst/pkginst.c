@@ -12,7 +12,6 @@
 #include <sys/types.h> /* struct utimbuf */
 
 #include "crc32.h"     /* all CRC32 related stuff */
-#include "fdnpkg.h"    /* PKGINST_SKIPLINKS... */
 #include "helpers.h"   /* slash2backslash(), strtolower() */
 #include "fileexst.h"
 #include "kprintf.h"

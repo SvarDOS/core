@@ -10,7 +10,6 @@
 #include <sys/types.h>
 #include <direct.h> /* opendir() and friends */
 
-#include "fdnpkg.h"
 #include "helpers.h"  /* fdnpkg_strcasestr(), slash2backslash()... */
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_freelist()... */

@@ -10,7 +10,7 @@
 #include <string.h> /* strcasecmp() */
 #include <stdlib.h> /* malloc(), free() */
 
-#include "fdnpkg.h" /* PKGINST_SKIPLINKS... */
+#include "pkginst.h" /* PKGINST_SKIPLINKS... */
 #include "helpers.h" /* slash2backslash(), removeDoubleBackslashes()... */
 #include "kprintf.h"
 #include "loadconf.h"
