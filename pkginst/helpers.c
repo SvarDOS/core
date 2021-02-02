@@ -133,7 +133,7 @@ void removeDoubleBackslashes(char *str) {
   char *curpos;
   int x;
   for (;;) {
-    curpos = fdnpkg_strcasestr(str, "\\\\");
+    curpos = strstr(str, "\\\\");
     if (curpos == NULL) return; /* job done */
     for (x = 1; curpos[x] != 0; x++) {
       curpos[x - 1] = curpos[x];
