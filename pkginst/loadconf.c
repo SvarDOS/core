@@ -131,7 +131,6 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
       }
     } else if (strcasecmp(token, "DIR") == 0) { /* custom directory entry */
       char *argv[2];
-      #define realLocation_len 512
       if (parsecmd(value, argv, 2) != 2) {
         kitten_printf(7, 11, "Warning: Invalid 'DIR' directive found at line #%d", nline);
         puts("");
