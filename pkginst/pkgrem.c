@@ -10,13 +10,10 @@
 #include <unistd.h>    /* rmdir(), unlink() */
 #include <direct.h>  /* watcom needs this for the rmdir() prototype */
 
-#include "fileexst.h"
-#include "getdelim.h"
 #include "helpers.h"   /* slash2backslash() */
 #include "kprintf.h"
+
 #include "pkgrem.h"
-#include "rtrim.h"
-#include "version.h"
 
 
 struct dirliststruct {
@@ -68,81 +65,53 @@ static struct dirliststruct *rememberpath(struct dirliststruct *dirlist, char *p
 /* removes a package from the system. Returns 0 on success, non-zero otherwise */
 int pkgrem(const char *pkgname, const char *dosdir) {
   char fpath[256];
-  char shellcmd[256];
-  char *lineptr;
+  char buff[256];
   FILE *flist;
-  int getdelimlen;
   int lastdirsep;
-  int x;
-  size_t getdelimcount = 0;
   struct dirliststruct *dirlist = NULL; /* used to remember directories to remove */
-  char pkglistfile[256];
 
-  /* Check if the file %DOSDIR%\packages\pkgname.lst exists (if not, the package is not installed) */
+  /* open the file %DOSDIR%\packages\pkgname.lst */
   sprintf(fpath, "%s\\packages\\%s.lst", dosdir, pkgname);
-  if (fileexists(fpath) == 0) { /* file does not exist */
+  flist = fopen(fpath, "rb");
+  if (flist == NULL) {
     kitten_printf(4, 0, "Package %s is not installed, so not removed.", pkgname);
     puts("");
     return(-1);
   }
 
-  /* open the file %DOSDIR%\packages\pkgname.lst */
-  flist = fopen(fpath, "r");
-  if (flist == NULL) {
-    kitten_puts(4, 1, "Error opening lst file!");
-    return(-2);
-  }
-
-  sprintf(pkglistfile, "packages\\%s.lst", pkgname);
-
   /* remove all files/folders listed in pkgname.lst but NOT pkgname.lst */
-  for (;;) {
-    /* read line from file */
-    lineptr = NULL;
-    getdelimlen = getdelim(&lineptr, &getdelimcount, '\n', flist);
-    if (getdelimlen < 0) {
-      free(lineptr);
-      break;
-    }
-    rtrim(lineptr);  /* right-trim the filename */
-    slash2backslash(lineptr); /* change all / to \ */
-    if ((lineptr[0] == 0) || (lineptr[0] == '\r') || (lineptr[0] == '\n')) {
-      free(lineptr); /* free the memory occupied by the line */
-      continue; /* skip empty lines */
-    }
+  while (freadtokval(flist, buff, sizeof(buff), NULL, 0) == 0) {
+    int x;
+    slash2backslash(buff); /* change all slash to backslash */
+    if (buff[0] == 0) continue; /* skip empty lines */
+
     /* remember the path part for removal later */
     lastdirsep = -1;
-    for (x = 1; lineptr[x] != 0; x++) {
-      if ((lineptr[x] == '\\') && (lineptr[x - 1] != ':')) lastdirsep = x;
+    for (x = 1; buff[x] != 0; x++) {
+      if ((buff[x] == '\\') && (buff[x - 1] != ':')) lastdirsep = x;
     }
     if (lastdirsep > 0) {
-      lineptr[lastdirsep] = 0;
-      dirlist = rememberpath(dirlist, lineptr);
-      lineptr[lastdirsep] = '\\';
+      buff[lastdirsep] = 0;
+      dirlist = rememberpath(dirlist, buff);
+      buff[lastdirsep] = '\\';
     }
+
     /* if it's a directory, skip it */
-    if (lineptr[strlen(lineptr) - 1] == '\\') {
-      free(lineptr); /* free the memory occupied by the line */
-      continue;
-    }
-    /* it's a file - remove it */
-    if (strcasecmp(pkglistfile, lineptr) != 0) { /* never delete pkgname.lst at this point - it will be deleted later */
-      if ((lineptr[0] == '\\') || (lineptr[1] == ':')) { /* this is an absolute path */
-        sprintf(shellcmd, "%s", lineptr);
-      } else { /* else it's a relative path starting at %dosdir% */
-        sprintf(shellcmd, "%s\\%s", dosdir, lineptr);
-      }
-      kitten_printf(4, 4, "removing %s", shellcmd);
-      puts("");
-      unlink(shellcmd);
-    }
-    free(lineptr); /* free the memory occupied by the line */
+    if (buff[strlen(buff) - 1] == '\\') continue;
+
+    /* do not delete pkgname.lst at this point - I am using it (will be deleted later) */
+    if (strcasecmp(buff, fpath) == 0) continue;
+
+    /* remove it */
+    kitten_printf(4, 4, "removing %s", buff);
+    puts("");
+    unlink(buff);
   }
 
-  /* close the file */
+  /* close the lst file */
   fclose(flist);
 
-  /* iterate through dirlist and remove directories if empty, from longest to shortest */
+  /* iterate over dirlist and remove directories if empty, from longest to shortest */
   while (dirlist != NULL) {
     struct dirliststruct *dirlistpos, *previousdir;
     /* find the longest path, and put it on top */
@@ -157,20 +126,15 @@ int pkgrem(const char *pkgname, const char *dosdir) {
         previousdir = dirlistpos;
       }
     }
-    if ((dirlist->dirname[0] == '\\') || (dirlist->dirname[1] == ':')) { /* this is an absolute path */
-      sprintf(shellcmd, "%s", dirlist->dirname);
-    } else { /* else it's a relative path starting at %dosdir% */
-      sprintf(shellcmd, "%s\\%s", dosdir, dirlist->dirname);
-    }
-    /* printf("RMDIR %s\n", shellcmd); */
-    rmdir(shellcmd);
+    /* printf("RMDIR %s\n", dirlist->dirname); */
+    rmdir(dirlist->dirname);
     /* free the allocated memory for this entry */
     dirlistpos = dirlist;
     dirlist = dirlistpos->next;
     free(dirlistpos);
   }
 
-  /* remove %DOSDIR%\packages\pkgname.lst */
+  /* remove the lst file */
   unlink(fpath);
   kitten_printf(4, 5, "Package %s has been removed.", pkgname);
   puts("");
