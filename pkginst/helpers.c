@@ -13,7 +13,7 @@
 #include <stdlib.h>   /* atoi() */
 #include <sys/stat.h> /* mkdir() */
 
-#include "rtrim.h"
+#include "trim.h"
 #include "helpers.h"
 
 
