@@ -120,15 +120,6 @@ void slash2backslash(char *str) {
 }
 
 
-/* change all \ to / in a string */
-void backslash2slash(char *str) {
-  int x;
-  for (x = 0; str[x] != 0; x++) {
-    if (str[x] == '\\') str[x] = '/';
-  }
-}
-
-
 void removeDoubleBackslashes(char *str) {
   char *curpos;
   int x;
