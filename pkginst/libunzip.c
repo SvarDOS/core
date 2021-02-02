@@ -16,9 +16,7 @@
 
 #include "crc32.h"
 #include "kprintf.h"
-#include "parsecmd.h"
 #include "inf.h"   /* DEFLATE support */
-#include "version.h"
 
 #include "libunzip.h"  /* include self for control */
 
