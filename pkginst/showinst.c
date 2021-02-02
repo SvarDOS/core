@@ -11,12 +11,10 @@
 #include <direct.h> /* opendir() and friends */
 
 #include "fdnpkg.h"
-#include "getdelim.h"
 #include "helpers.h"  /* fdnpkg_strcasestr(), slash2backslash()... */
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_freelist()... */
 #include "lsm.h"
-#include "rtrim.h"
 
 #include "showinst.h"  /* include self for control */
 
@@ -76,10 +74,8 @@ void pkg_freeflist(struct flist_t *flist) {
 struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
   struct flist_t *res = NULL, *newnode;
   FILE *fd;
-  char *lineptr;
   char buff[256];
-  int getdelimlen, fnamelen;
-  size_t getdelimcount = 0;
+
   sprintf(buff, "%s\\packages\\%s.lst", dosdir, pkgname);
   fd = fopen(buff, "rb");
   if (fd == NULL) {
@@ -88,25 +84,12 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
     return(NULL);
   }
   /* iterate through all lines of the file */
-  for (;;) {
-    lineptr = NULL;
-    getdelimlen = getdelim(&lineptr, &getdelimcount, '\n', fd);
-    if (getdelimlen < 0) { /* EOF */
-      free(lineptr);
-      break;
-    }
-    rtrim(lineptr);  /* right-trim the filename */
-    slash2backslash(lineptr); /* change all / to \ */
-    if ((lineptr[0] == 0) || (lineptr[0] == '\r') || (lineptr[0] == '\n')) continue; /* skip empty lines */
-    if (lineptr[strlen(lineptr) - 1] == '\\') continue; /* skip directories */
-    if ((lineptr[0] == '\\') || (lineptr[1] == ':')) { /* this is an absolute path */
-      fnamelen = snprintf(buff, sizeof(buff), "%s", lineptr);
-    } else { /* else it's a relative path starting at %dosdir% */
-      fnamelen = snprintf(buff, sizeof(buff), "%s\\%s\n", dosdir, lineptr);
-    }
-    free(lineptr); /* free the memory occupied by the line */
+  while (freadtokval(fd, buff, sizeof(buff), NULL, 0) == 0) {
+    slash2backslash(buff); /* change all / to \ */
+    if (buff[0] == 0) continue; /* skip empty lines */
+    if (buff[strlen(buff) - 1] == '\\') continue; /* skip directories */
     /* add the new node to the result */
-    newnode = malloc(sizeof(struct flist_t) + fnamelen);
+    newnode = malloc(sizeof(struct flist_t) + strlen(buff));
     if (newnode == NULL) {
       kitten_printf(2, 14, "Out of memory! (%s)", "malloc failure");
       continue;

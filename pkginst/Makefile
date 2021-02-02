@@ -9,7 +9,7 @@ LIBS = zlib\zlib_l.lib
 
 all: pkginst.exe
 
-pkginst.exe: kitten.obj main.obj crc32.obj fileexst.obj getdelim.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj parsecmd.obj pkginst.obj pkgrem.obj rtrim.obj showinst.obj
+pkginst.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj parsecmd.obj pkginst.obj pkgrem.obj rtrim.obj showinst.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
 
 kitten.obj: kitten\kitten.c
@@ -23,9 +23,6 @@ crc32.obj: crc32.c
 
 fileexst.obj: fileexst.c
 	wcc $(CFLAGS) fileexst.c
-
-getdelim.obj: getdelim.c
-	wcc $(CFLAGS) getdelim.c
 
 helpers.obj: helpers.c
 	wcc $(CFLAGS) helpers.c
