@@ -10,11 +10,10 @@
 #include <string.h> /* strcasecmp() */
 #include <stdlib.h> /* malloc(), free() */
 
-#include "pkginst.h" /* PKGINST_SKIPLINKS... */
 #include "helpers.h" /* slash2backslash(), removeDoubleBackslashes()... */
 #include "kprintf.h"
+
 #include "loadconf.h"
-#include "parsecmd.h"
 
 
 void freeconf(struct customdirs **dirlist) {
@@ -122,16 +121,23 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
 
     /* printf("token='%s' ; value = '%s'\n", token, value); */
     if (strcasecmp(token, "DIR") == 0) { /* custom directory entry */
-      char *argv[2];
-      if (parsecmd(value, argv, 2) != 2) {
+      char *location = NULL;
+      int i;
+      /* find nearer space */
+      for (i = 0; (value[i] != ' ') && (value[i] != 0); i++);
+      if (value[i] == 0) {
         kitten_printf(7, 11, "Warning: Invalid 'DIR' directive found at line #%d", nline);
         puts("");
+        continue;
       }
+      value[i] = 0;
+      location = value + i + 1;
+
       /* add the entry to the list */
-      slash2backslash(argv[1]);
-      removeDoubleBackslashes(argv[1]);
-      if (argv[1][strlen(argv[1]) - 1] != '\\') strcat(argv[1], "\\"); /* make sure to end dirs with a backslash */
-      if (addnewdir(dirlist, argv[0], argv[1]) != 0) {
+      slash2backslash(location);
+      removeDoubleBackslashes(location);
+      if (location[strlen(location) - 1] != '\\') strcat(location, "\\"); /* make sure to end dirs with a backslash */
+      if (addnewdir(dirlist, value, location) != 0) {
         kitten_printf(2, 14, "Out of memory! (%s)", "addnewdir");
         puts("");
         freeconf(dirlist);
