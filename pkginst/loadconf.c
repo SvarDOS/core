@@ -91,7 +91,7 @@ static int addnewdir(struct customdirs **dirlist, const char *name, const char *
 }
 
 
-int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
+int loadconf(const char *dosdir, struct customdirs **dirlist) {
   FILE *fd;
   char *value = NULL;
   char token[512];
@@ -104,6 +104,8 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
     puts("");
     return(-1);
   }
+
+  *dirlist = NULL;
 
   /* read the config file line by line */
   while (freadtokval(fd, token, sizeof(token), &value, ' ') == 0) {
@@ -119,17 +121,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, int *flags) {
     }
 
     /* printf("token='%s' ; value = '%s'\n", token, value); */
-    if (strcasecmp(token, "SKIPLINKS") == 0) {
-      int tmpint = atoi(value); /* must be 0/1 */
-      if (tmpint == 0) {
-        /* do nothing */
-      } else if (tmpint == 1) {
-        *flags |= PKGINST_SKIPLINKS;
-      } else {
-        kitten_printf(7, 10, "Warning: Ignored an illegal '%s' value at line #%d", "skiplinks", nline);
-        puts("");
-      }
-    } else if (strcasecmp(token, "DIR") == 0) { /* custom directory entry */
+    if (strcasecmp(token, "DIR") == 0) { /* custom directory entry */
       char *argv[2];
       if (parsecmd(value, argv, 2) != 2) {
         kitten_printf(7, 11, "Warning: Invalid 'DIR' directive found at line #%d", nline);

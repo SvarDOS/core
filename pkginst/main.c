@@ -113,7 +113,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
 
 
 int main(int argc, char **argv) {
-  int res = 1, flags;
+  int res = 1;
   enum ACTIONTYPES action;
   const char *dosdir;
   struct customdirs *dirlist;
@@ -135,13 +135,11 @@ int main(int argc, char **argv) {
   }
 
   /* load configuration */
-  flags = 0;
-  dirlist = NULL;
-  if (loadconf(dosdir, &dirlist, &flags) != 0) goto GAMEOVER;
+  if (loadconf(dosdir, &dirlist) != 0) goto GAMEOVER;
 
   switch (action) {
     case ACTION_INSTALL:
-      res = pkginst(argv[2], flags, dosdir, dirlist);
+      res = pkginst(argv[2], 0, dosdir, dirlist);
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);

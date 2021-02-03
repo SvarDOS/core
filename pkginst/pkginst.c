@@ -21,18 +21,6 @@
 #include "version.h"
 
 
-/* return 1 if fname looks like a link filename, 0 otherwise */
-static int islinkfile(const char *fname) {
-  char *link1 = "LINKS\\";
-  char *link2 = "links\\";
-  int x;
-  for (x = 0; ; x++) {
-    if (link1[x] == 0) return(1);
-    if ((fname[x] != link1[x]) && (fname[x] != link2[x])) return(0);
-  }
-}
-
-
 /* validate a filename (8+3, no weird characters, etc). returns 0 on success,
  * nonzero otherwise. */
 static int validfilename(const char *fname) {
@@ -78,63 +66,6 @@ static int validfilename(const char *fname) {
 }
 
 
-/* processes a link file - that is, reads the target inside, and overwrite
- * the file with new content */
-static void processlinkfile(const char *linkfile, const char *dosdir, const struct customdirs *dirlist, char *buff) {
-  char origtarget[512];
-  int x;
-  char *shortfile;
-  unsigned char comstub[] = { /* machine code of a COM stub launcher */
-    0xBC,0x00,0x00,0xBB,0x00,0x10,0xB4,0x4A,0xCD,0x21,0xBB,0x2A,0x01,0x8C,0x5F,0x04,
-    0x8C,0x5F,0x08,0x8C,0x5F,0x0C,0xB8,0x00,0x4B,0xBA,0x38,0x01,0xCD,0x21,0xB0,0x7F,
-    0x72,0x04,0xB4,0x4D,0xCD,0x21,0xB4,0x4C,0xCD,0x21,0x00,0x00,0x80,0x00,0x00,0x00,
-    0x5C,0x00,0x00,0x00,0x6C,0x00,0x00,0x00}; /* read comlink.asm for details */
-  const unsigned stack_paras = 12;
-  unsigned alloc_paras, alloc_bytes;
-  FILE *fd;
-  /* open the link file and read the original target */
-  fd = fopen(linkfile, "r");
-  if (fd == NULL) {
-    kitten_printf(3, 21, "Error: Failed to open link file '%s' for read access.", linkfile);
-    puts("");
-    return;
-  }
-  x = fread(origtarget, 1, sizeof(origtarget) - 1, fd);
-  origtarget[x] = 0;
-  fclose(fd);
-  /* validate the original target (ltrim to first \r or \n) */
-  for (x = 0; origtarget[x] != 0; x++) {
-    if ((origtarget[x] == '\r') || (origtarget[x] == '\n')) {
-      origtarget[x] = 0;
-      break;
-    }
-  }
-  /* translate the original target to a local path */
-  shortfile = computelocalpath(origtarget, buff, dosdir, dirlist);
-  /* compute the amount of memory the stub should leave for itself:
-	- 16 paragraphs needed for the PSP
-	- sizeof(comstub) bytes needed for code and data
-	- strlen(shortfile) + 1 for the command line
-	- stack_paras paragraphs for the stack */
-  alloc_paras = 16 + (sizeof(comstub) + strlen(shortfile) + 16) / 16 + stack_paras;
-  alloc_bytes = 16 * alloc_paras;
-  comstub[1] = alloc_bytes & 0xff;
-  comstub[2] = alloc_bytes >> 8;
-  comstub[4] = alloc_paras & 0xff;
-  comstub[5] = alloc_paras >> 8;
-  /* write new content into the link file */
-  fd = fopen(linkfile, "wb");
-  if (fd == NULL) {
-    kitten_printf(3, 22, "Error: Failed to open link file '%s' for write access.", linkfile);
-    puts("");
-    return;
-  }
-  fwrite(comstub, 1, sizeof(comstub), fd);
-  fprintf(fd, "%s%s%c", buff, shortfile, 0);
-  fclose(fd);
-}
-
-
 /* returns 0 if pkgname is not installed, non-zero otherwise */
 int is_package_installed(const char *pkgname, const char *dosdir) {
   char fname[512];
@@ -157,7 +88,7 @@ static int validate_package_not_installed(const char *pkgname, const char *dosdi
 /* find a filename in a flist linked list, and returns a pointer to it */
 static struct flist_t *findfileinlist(struct flist_t *flist, const char *fname) {
   while (flist != NULL) {
-    if (strcmp(flist->fname, fname) == 0) return(flist);
+    if (strcasecmp(flist->fname, fname) == 0) return(flist);
     flist = flist->next;
   }
   return(NULL);
@@ -198,7 +129,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
   if ((flags & PKGINST_UPDATE) != 0) {
     flist = pkg_loadflist(pkgname, dosdir);
   }
-  /* Verify that there's no collision with existing local files, look for the appinfo presence, get rid of sources if required, and rename BAT links into COM files */
+  /* Verify that there's no collision with existing local files, look for the appinfo presence */
   appinfopresence = 0;
   prevzipnode = NULL;
   for (curzipnode = ziplinkedlist; curzipnode != NULL;) {
@@ -209,16 +140,9 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) {
       curzipnode->filename[0] = 0; /* mark it "empty", will be removed in a short moment */
     }
-    /* is it a "link file"? */
+    /* is it a "link file"? skip it - link files are no longer supported */
     if (fdnpkg_strcasestr(curzipnode->filename, "links\\") == curzipnode->filename) {
-      /* skip links, if that's what the user wants */
-      if ((flags & PKGINST_SKIPLINKS) != 0) {
-        curzipnode->filename[0] = 0; /* in fact, we just mark the file as 'empty' on the filename.. see later below */
-      } else {
-        /* if it's a *.BAT link, then rename it to *.COM */
-        char *ext = getfext(curzipnode->filename);
-        if (strcasecmp(ext, "bat") == 0) sprintf(ext, "com");
-      }
+      curzipnode->filename[0] = 0; /* in fact, I just mark the file as 'empty' on the filename - see later below */
     }
 
     if (curzipnode->filename[0] == 0) { /* ignore empty filenames (maybe it was empty originally, or has been emptied because it's a dropped source or link) */
@@ -348,10 +272,6 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     } else {
       printf(" %s -> %s\n", curzipnode->filename, buff);
       filesextractedsuccess += 1;
-    }
-    /* if it's a LINK file, recompute a new content */
-    if (islinkfile(curzipnode->filename) != 0) {
-      processlinkfile(fulldestfilename, dosdir, dirlist, buff);
     }
   }
   fclose(lstfd);
