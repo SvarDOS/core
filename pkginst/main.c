@@ -97,7 +97,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
         break;
     }
   }
-  if (lastdot < lastpathdelim) lastdot = t; /* a dot before last path delimiters is not an extension prefix */
+  if (lastdot <= lastpathdelim) lastdot = t; /* a dot before last path delimiters is not an extension prefix */
   t = lastdot - (lastpathdelim + 1);
   if (t + 1 > sizeof(pkgname)) {
     kitten_puts(3, 24, "ERROR: package name too long");
