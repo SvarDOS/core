@@ -74,6 +74,7 @@
 3.21:Error: Failed to open link file '%s' for read access.
 3.22:Error: Failed to open link file '%s' for write access.
 3.23:Error: Package contains an invalid filename:
+3.24:ERROR: package name too long
 
 
 #### Removing package ####

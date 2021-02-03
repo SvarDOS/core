@@ -81,34 +81,40 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
 
 
 static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist) {
-  char pkgname[32];
-  int t, lastpathdelim = -1, u = 0;
+  char pkgname[9];
+  int t, lastpathdelim = -1, lastdot = -1;
   struct ziplist *zipfileidx;
   FILE *zipfilefd;
+  /* copy the filename into pkgname (without path elements and without extension) */
   for (t = 0; file[t] != 0; t++) {
-    if ((file[t] == '/') || (file[t] == '\\')) lastpathdelim = t;
-  }
-  /* copy the filename into pkgname (without path elements) */
-  for (t = lastpathdelim + 1; file[t] != 0; t++) pkgname[u++] = file[t];
-  pkgname[u] = 0; /* terminate the string */
-  /* truncate the file's extension (.zip) */
-  for (t = u; t > 0; t--) {
-    if (pkgname[t] == '.') {
-      pkgname[t] = 0;
-      break;
+    switch (file[t]) {
+      case '/':
+      case '\\':
+        lastpathdelim = t;
+        break;
+      case '.':
+        lastdot = t;
+        break;
     }
   }
+  if (lastdot < lastpathdelim) lastdot = t; /* a dot before last path delimiters is not an extension prefix */
+  t = lastdot - (lastpathdelim + 1);
+  if (t + 1 > sizeof(pkgname)) {
+    kitten_puts(3, 24, "ERROR: package name too long");
+    return(1);
+  }
+  memcpy(pkgname, file + lastpathdelim + 1, t);
+  pkgname[t] = 0;
   /* prepare the zip file and install it */
   zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
   if (zipfileidx != NULL) {
-    int res = 0;
-    if (pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd) != 0) res = 1;
+    t = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
     fclose(zipfilefd);
-    return(res);
-  } else {
-    fclose(zipfilefd);
-    return(1);
+    return(t);
   }
+
+  fclose(zipfilefd);
+  return(1);
 }
 
 
