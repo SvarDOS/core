@@ -115,12 +115,12 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
 
   *zipfd = fopen(zipfile, "rb");
   if (*zipfd == NULL) {
-    kitten_puts(3, 8, "Error: Invalid zip archive! Package not installed.");
+    kitten_puts(3, 8, "ERROR: Invalid zip archive! Package not installed.");
     goto RAII;
   }
   ziplinkedlist = zip_listfiles(*zipfd);
   if (ziplinkedlist == NULL) {
-    kitten_puts(3, 8, "Error: Invalid zip archive! Package not installed.");
+    kitten_puts(3, 8, "ERROR: Invalid zip archive! Package not installed.");
     goto RAII;
   }
   /* if updating, load the list of files belonging to the current package */
@@ -157,7 +157,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     }
     /* validate that the file has a valid filename (8+3, no shady chars...) */
     if (validfilename(curzipnode->filename) != 0) {
-      kitten_puts(3, 23, "Error: Package contains an invalid filename:");
+      kitten_puts(3, 23, "ERROR: Package contains an invalid filename:");
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
@@ -166,20 +166,20 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist);
     strcat(fname, shortfile);
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
-      kitten_puts(3, 9, "Error: Package contains a file that already exists locally:");
+      kitten_puts(3, 9, "ERROR: Package contains a file that already exists locally:");
       printf(" %s\n", fname);
       goto RAII_ERR;
     }
     /* abort if any entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
-      kitten_printf(3, 20, "Error: Package contains an encrypted file:");
+      kitten_printf(3, 20, "ERROR: Package contains an encrypted file:");
       puts("");
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
     /* abort if any file is compressed with an unsupported method */
     if ((curzipnode->compmethod != 0/*store*/) && (curzipnode->compmethod != 8/*deflate*/)) { /* unsupported compression method */
-      kitten_printf(8, 2, "Error: Package contains a file compressed with an unsupported method (%d):", curzipnode->compmethod);
+      kitten_printf(8, 2, "ERROR: Package contains a file compressed with an unsupported method (%d):", curzipnode->compmethod);
       puts("");
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
@@ -190,7 +190,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
   }
   /* if appinfo file not found, this is not a real FreeDOS package */
   if (appinfopresence != 1) {
-    kitten_printf(3, 12, "Error: Package do not contain the %s file! Not a valid FreeDOS package.", appinfofile);
+    kitten_printf(3, 12, "ERROR: Package do not contain the %s file! Not a valid FreeDOS package.", appinfofile);
     puts("");
     goto RAII_ERR;
   }
@@ -227,7 +227,8 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   buff = malloc(512);
   fulldestfilename = malloc(1024);
   if ((buff == NULL) || (fulldestfilename == NULL)) {
-    kitten_puts(8, 0, "Out of memory!");
+    kitten_printf(2, 14, "Out of memory! (%s)", "fulldestfilename");
+    puts("");
     zip_freelist(&ziplinkedlist);
     free(buff);
     free(fulldestfilename);
@@ -242,7 +243,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   sprintf(buff, "%s\\%s", dosdir, packageslst);
   lstfd = fopen(buff, "wb"); /* opening it in binary mode, because I like to have control over line terminators (CR/LF) */
   if (lstfd == NULL) {
-    kitten_printf(3, 10, "Error: Could not create %s!", buff);
+    kitten_printf(3, 10, "ERROR: Could not create %s!", buff);
     puts("");
     zip_freelist(&ziplinkedlist);
     free(buff);
@@ -264,7 +265,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     /* Now unzip the file */
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
     if (unzip_result != 0) {
-      kitten_printf(8, 3, "Error while extracting '%s' to '%s'!", curzipnode->filename, fulldestfilename);
+      kitten_printf(8, 3, "ERROR: failed extracting '%s' to '%s'!", curzipnode->filename, fulldestfilename);
       printf(" [%d]\n", unzip_result);
       filesextractedfailure += 1;
     } else {

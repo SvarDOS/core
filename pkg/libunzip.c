@@ -88,7 +88,8 @@ struct ziplist *zip_listfiles(FILE *fd) {
       /* create new entry and link it into the list */
       newentry = calloc(sizeof(struct ziplist) + filenamelen, 1);
       if (newentry == NULL) {
-        kitten_puts(8, 0, "Out of memory!");
+        kitten_printf(2, 14, "Out of memory! (%s)", "libunzip");
+        puts("");
         zip_freelist(&reslist);
         break;
       }

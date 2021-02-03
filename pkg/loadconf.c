@@ -29,7 +29,7 @@ static int checkfordoubledirlist(const struct customdirs *dirlist) {
   for (; dirlist != NULL; dirlist = dirlist->next) {
     for (curpos = dirlist->next; curpos != NULL; curpos = curpos->next) {
       if (strcasecmp(curpos->name, dirlist->name) == 0) {
-        kitten_printf(7, 0, "Error: custom dir '%s' is listed twice!", curpos->name);
+        kitten_printf(7, 0, "ERROR: custom dir '%s' is listed twice!", curpos->name);
         puts("");
         return(-1);
       }
@@ -44,7 +44,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
   for (; dirlist != NULL; dirlist = dirlist->next) {
     /* the location must be at least 3 characters long to be a valid absolute path (like 'c:\')*/
     if (strlen(dirlist->location) < 3) {
-      kitten_printf(7, 15, "Error: custom dir '%s' is not a valid absolute path!", dirlist->name);
+      kitten_printf(7, 15, "ERROR: custom dir '%s' is not a valid absolute path!", dirlist->name);
       puts("");
       return(-1);
     }
@@ -52,7 +52,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
     if ((dirlist->location[1] != ':') ||
        ((dirlist->location[2] != '/') && (dirlist->location[2] != '\\')) ||
        (((dirlist->location[0] < 'a') || (dirlist->location[0] > 'z')) && ((dirlist->location[0] < 'A') || (dirlist->location[0] > 'Z')))) {
-      kitten_printf(7, 15, "Error: custom dir '%s' is not a valid absolute path!", dirlist->name);
+      kitten_printf(7, 15, "ERROR: custom dir '%s' is not a valid absolute path!", dirlist->name);
       puts("");
       return(-1);
     }
@@ -63,7 +63,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
         (strcasecmp(dirlist->name, "help") == 0) ||
         (strcasecmp(dirlist->name, "nls") == 0) ||
         (strcasecmp(dirlist->name, "packages") == 0)) {
-      kitten_printf(7, 16, "Error: custom dir '%s' is a reserved name!", dirlist->name);
+      kitten_printf(7, 16, "ERROR: custom dir '%s' is a reserved name!", dirlist->name);
       puts("");
       return(-1);
     }
@@ -96,7 +96,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
   snprintf(token, sizeof(token), "%s\\cfg\\pkg.cfg", dosdir);
   fd = fopen(token, "r");
   if (fd == NULL) {
-    kitten_printf(7, 1, "Error: Could not open config file (%s)!", token);
+    kitten_printf(7, 1, "ERROR: Could not open config file (%s)!", token);
     puts("");
     return(-1);
   }

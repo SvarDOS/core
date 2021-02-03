@@ -28,7 +28,7 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
   sprintf(buff, "%s\\packages", dosdir);
   dp = opendir(buff);
   if (dp == NULL) {
-    kitten_printf(9, 0, "Error: Could not access directory %s", buff);
+    kitten_printf(9, 0, "ERROR: Could not access directory %s", buff);
     puts("");
     return(-1);
   }
@@ -78,7 +78,7 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
   sprintf(buff, "%s\\packages\\%s.lst", dosdir, pkgname);
   fd = fopen(buff, "rb");
   if (fd == NULL) {
-    kitten_printf(9, 1, "Error: Local package %s not found.", pkgname);
+    kitten_printf(9, 1, "ERROR: Local package '%s' not found.", pkgname);
     puts("");
     return(NULL);
   }

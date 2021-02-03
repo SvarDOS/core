@@ -49,19 +49,18 @@ enum ACTIONTYPES {
 
 
 static int showhelp(void) {
-  printf("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste\n"
-         "\n"
-         "PKG is the package installer for SvarDOS.\n"
-         "\n"
-         "Usage: pkg install package.zip\n"
-         "       pkg update package.zip\n"
-         "       pkg remove package\n"
-         "       pkg listfiles package\n"
-         "       pkg listlocal [filter]\n"
-         "\n"
-         "PKG is published under the MIT license. It uses a configuration file\n"
-         "located at %%DOSDIR%%\\CFG\\PKG.CFG\n"
-         );
+  puts("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
+  puts("");
+  kitten_puts(1, 0, "PKG is the package installer for SvarDOS.");
+  puts("");
+  kitten_puts(1, 20, "Usage: pkg install package.zip");
+  kitten_puts(1, 21, "       pkg update package.zip");
+  kitten_puts(1, 22, "       pkg remove package");
+  kitten_puts(1, 23, "       pkg listfiles package");
+  kitten_puts(1, 24, "       pkg listlocal [filter]");
+  puts("");
+  kitten_puts(1, 25, "PKG is published under the MIT license.");
+  kitten_puts(1, 26, "It is configured through %DOSDIR%\\CFG\\PKG.CFG");
   return(1);
 }
 

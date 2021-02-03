@@ -24,7 +24,7 @@ struct ziplist {
   struct ziplist *nextfile;
   time_t timestamp;     /* the timestamp of the file */
   short compmethod;
-  unsigned char flags;  /* zero for files, non-zero for directories */
+  unsigned char flags;  /* see ZIP_FLAG_xxx above */
   char filename[1];     /* must be last element (gets expanded at runtime) */
 };
 
