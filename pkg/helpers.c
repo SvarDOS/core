@@ -122,17 +122,6 @@ char *computelocalpath(char *longfilename, char *respath, const char *dosdir, co
 }
 
 
-/* detect local paths (eg. C:\REPO). Returns 1 if the url looks like a local path, zero otherwise. */
-int detect_localpath(char *url) {
-  if (url[0] != 0) {
-    if (url[1] != 0) {
-      if ((url[1] == ':') && ((url[2] == '\\') || (url[2] == '/'))) return(1);
-    }
-  }
-  return(0);
-}
-
-
 /* analyzes a filename string and returns the pointer to the file's extension
  * (which can be empty) */
 char *getfext(char *fname) {

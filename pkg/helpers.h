@@ -14,7 +14,6 @@ char *fdnpkg_strcasestr(const char *s, const char *find);
 void mkpath(char *dirs);
 char *computelocalpath(char *longfilename, char *respath, const char *dosdir, const struct customdirs *dirlist);
 void removeDoubleBackslashes(char *str);
-int detect_localpath(char *url);
 char *getfext(char *fname);
 int freadtokval(FILE *fd, char *line, size_t maxlen, char **val, char delim);
 #endif
