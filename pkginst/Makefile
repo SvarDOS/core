@@ -1,15 +1,15 @@
 #
-# pkginst Makefile -- requires OpenWatcom (wmake)
+# pkg Makefile -- requires OpenWatcom (wmake)
 # Copyright (C) 2021 Mateusz Viste
 #
 
 CFLAGS = -0 -mc -os -wx -we -d0 -i=zlib
-LDFLAGS = -ml -lr -fe=pkginst.exe
+LDFLAGS = -lr -fe=pkg.exe
 LIBS = zlib\zlib_c.lib
 
-all: pkginst.exe
+all: pkg.exe
 
-pkginst.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj
+pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
 
 kitten.obj: kitten\kitten.c
@@ -56,4 +56,4 @@ showinst.obj: showinst.c
 
 clean: .symbolic
 	del *.obj
-	del pkginst.exe
+	del pkg.exe

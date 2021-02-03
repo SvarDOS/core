@@ -8,7 +8,6 @@
 
 #include "loadconf.h" /* required for struct customdirs */
 
-#define PKGINST_SKIPLINKS 1
 #define PKGINST_UPDATE    2
 
 int is_package_installed(const char *pkgname, const char *dosdir);

@@ -1,5 +1,5 @@
 /*
- * PKGINST - SvarDOS package installer
+ * PKG - SvarDOS package installer
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
@@ -49,18 +49,18 @@ enum ACTIONTYPES {
 
 
 static int showhelp(void) {
-  printf("PKGINST ver " PVER " Copyright (C) " PDATE " Mateusz Viste\n"
+  printf("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste\n"
          "\n"
-         "PKGINST is the package installer for SvarDOS.\n"
+         "PKG is the package installer for SvarDOS.\n"
          "\n"
-         "Usage: PKGINST install package.zip\n"
-         "       PKGINST update package.zip\n"
-         "       PKGINST remove package\n"
-         "       PKGINST listfiles package\n"
-         "       PKGINST listlocal [filter]\n"
+         "Usage: pkg install package.zip\n"
+         "       pkg update package.zip\n"
+         "       pkg remove package\n"
+         "       pkg listfiles package\n"
+         "       pkg listlocal [filter]\n"
          "\n"
-         "PKGINST is published under the MIT license. It uses a configuration file\n"
-         "located at %%DOSDIR%%\\CFG\\PKGINST.CFG\n"
+         "PKG is published under the MIT license. It uses a configuration file\n"
+         "located at %%DOSDIR%%\\CFG\\PKG.CFG\n"
          );
   return(1);
 }
@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
   const char *dosdir;
   struct customdirs *dirlist;
 
-  kittenopen("pkginst"); /* NLS init */
+  kittenopen("pkg"); /* NLS init */
 
   action = parsearg(argc, argv);
   if (action == ACTION_HELP) {

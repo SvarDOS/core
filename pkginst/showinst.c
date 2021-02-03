@@ -1,6 +1,6 @@
 /*
- * This file is part of PKGINST (SvarDOS)
- * Copyright (C) 2013-2021 Mateusz Viste. All rights reserved.
+ * This file is part of PKG (SvarDOS)
+ * Copyright (C) 2013-2021 Mateusz Viste
  */
 
 #include <stdio.h>

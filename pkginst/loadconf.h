@@ -1,5 +1,5 @@
 /*
- * This file is part of pkginst.
+ * This file is part of pkg.
  *
  * Copyright (C) 2012-2021 Mateusz Viste
  */

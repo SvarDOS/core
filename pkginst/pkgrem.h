@@ -1,6 +1,6 @@
 /*
  * This file is part of the SvarDOS project.
- * Copyright (C) Mateusz Viste 2012-2021. All rights reserved.
+ * Copyright (C) Mateusz Viste 2012-2021
  */
 
 #ifndef pkgrem_sentinel

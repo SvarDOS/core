@@ -1,5 +1,5 @@
 /*
- * This file is part of pkginst (SvarDOS)
+ * This file is part of pkg (SvarDOS)
  * Copyright (C) 2012-2021 Mateusz Viste
  */
 
@@ -15,8 +15,8 @@
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_listfiles()... */
 #include "showinst.h"  /* pkg_loadflist() */
+
 #include "pkginst.h"   /* include self for control */
-#include "version.h"
 
 
 /* validate a filename (8+3, no weird characters, etc). returns 0 on success,

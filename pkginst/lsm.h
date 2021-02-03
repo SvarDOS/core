@@ -1,6 +1,6 @@
 /*
- * This file is part of pkginst
- * Copyright (C) 2013-2021 Mateusz Viste, All rights reserved.
+ * This file is part of pkg (SvarDOS)
+ * Copyright (C) 2013-2021 Mateusz Viste
  */
 
 #ifndef readlsm_h_sentinel

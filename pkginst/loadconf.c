@@ -1,8 +1,5 @@
 /*
- * This file is part of pkginst (SvarDOS).
- *
- * Loads the list of repositories from a config file.
- *
+ * This file is part of pkg (SvarDOS).
  * Copyright (C) 2012-2021 Mateusz Viste
  */
 
@@ -96,7 +93,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
   char token[512];
   int nline = 0;
 
-  snprintf(token, sizeof(token), "%s\\cfg\\pkginst.cfg", dosdir);
+  snprintf(token, sizeof(token), "%s\\cfg\\pkg.cfg", dosdir);
   fd = fopen(token, "r");
   if (fd == NULL) {
     kitten_printf(7, 1, "Error: Could not open config file (%s)!", token);

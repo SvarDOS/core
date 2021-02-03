@@ -1,8 +1,6 @@
 /*
- * This file is part of the FDNPKG project
- * http://fdnpkg.sourceforge.net
- *
- * Copyright (C) 2012-2016 Mateusz Viste. All rights reserved.
+ * This file is part of pkg (SvarDOS)
+ * Copyright (C) 2012-2021 Mateusz Viste.
  *
  * Simple library providing functions to unzip files from zip archives.
  */
@@ -16,7 +14,7 @@
 
 #include "crc32.h"
 #include "kprintf.h"
-#include "inf.h"   /* DEFLATE support */
+#include "inf.h"   /* INFLATE support */
 
 #include "libunzip.h"  /* include self for control */
 
@@ -30,7 +28,7 @@
  * seconds are actually not 0-59 but rather 0-29 as there are only 32 possible values – to get actual seconds multiply this field by 2;
  * minutes are always within 0-59 range;
  * hours are always within 0-23 range.     */
-static time_t dostime2unix(unsigned char *buff) {
+static time_t dostime2unix(const unsigned char *buff) {
   struct tm curtime;
   time_t result;
   memset(&curtime, 0, sizeof(curtime)); /* make sure to set everything in curtime to 0's */
@@ -164,7 +162,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
 
 
 /* unzips a file. zipfd points to the open zip file, curzipnode to the entry to extract, and fulldestfilename is the destination file where to unzip it. returns 0 on success, non-zero otherwise. */
-int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, char *fulldestfilename) {
+int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilename) {
   #define buffsize 32 * 1024l /* MUST be at least 32K */
   FILE *filefd;
   unsigned long cksum;

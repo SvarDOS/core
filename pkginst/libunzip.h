@@ -29,7 +29,7 @@ struct ziplist {
 };
 
 struct ziplist *zip_listfiles(FILE *fd);
-int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, char *fulldestfilename);
+int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilename);
 void zip_freelist(struct ziplist **ziplist);
 
 #endif

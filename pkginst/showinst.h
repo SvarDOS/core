@@ -1,5 +1,5 @@
 /*
- * This file is part of pkginst (SvarDOS)
+ * This file is part of pkg (SvarDOS)
  * Copyright (C) 2013-2021 Mateusz Viste
  */
 
