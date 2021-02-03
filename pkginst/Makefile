@@ -3,9 +3,9 @@
 # Copyright (C) 2021 Mateusz Viste
 #
 
-CFLAGS = -0 -ml -os -wx -we -d0 -i=zlib
+CFLAGS = -0 -mc -os -wx -we -d0 -i=zlib
 LDFLAGS = -ml -lr -fe=pkginst.exe
-LIBS = zlib\zlib_l.lib
+LIBS = zlib\zlib_c.lib
 
 all: pkginst.exe
 
