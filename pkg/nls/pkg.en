@@ -6,7 +6,6 @@
 # Translator: Mateusz Viste
 #
 
-
 #### Help ####
 
 1.0:PKG is the package installer for SvarDOS.
@@ -18,13 +17,11 @@
 1.25:PKG is published under the MIT license.
 1.26:It is configured through %DOSDIR%\\CFG\\PKG.CFG
 
-
 ### General stuff ####
 
-2.2:%DOSDIR% not set! You should make it point to the FreeDOS main directory.
-2.3:Example: SET DOSDIR=C:\\FDOS
+2.2:%DOSDIR% not set! You should make it point to the SvarDOS main directory.
+2.3:Example: SET DOSDIR=C:\\SVARDOS
 2.14:Out of memory! (%s)
-
 
 #### Installing package ####
 
@@ -38,7 +35,6 @@
 3.23:ERROR: Package contains an invalid filename:
 3.24:ERROR: package name too long
 
-
 #### Removing package ####
 
 4.0:Package %s is not installed, so not removed.
@@ -46,11 +42,9 @@
 4.4:removing %s
 4.5:Package %s has been removed.
 
-
 #### Searching package ####
 
 5.0:No package matched the search.
-
 
 #### Loading configuration ####
 
@@ -62,13 +56,11 @@
 7.15:ERROR: custom dir '%s' is not a valid absolute path!
 7.16:ERROR: custom dir '%s' is a reserved name!
 
-
 #### Unziping package ####
 
 8.1:unknown zip sig: 0x%08lx
 8.2:ERROR: Package contains a file compressed with an unsupported method (%d):
 8.3:ERROR: failed extracting '%s' to '%s'!
-
 
 #### Handling the local list of installed packages ####
 
