@@ -1,7 +1,6 @@
 /*
  * This file is part of pkginst (SvarDOS)
  * Copyright (C) 2012-2021 Mateusz Viste
- * Changes by TK Chia
  */
 
 #include <ctype.h>     /* toupper() */
@@ -11,7 +10,6 @@
 #include <unistd.h>    /* read() */
 #include <sys/types.h> /* struct utimbuf */
 
-#include "crc32.h"     /* all CRC32 related stuff */
 #include "helpers.h"   /* slash2backslash(), strtolower() */
 #include "fileexst.h"
 #include "kprintf.h"
