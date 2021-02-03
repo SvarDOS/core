@@ -40,6 +40,7 @@
 
 enum ACTIONTYPES {
   ACTION_INSTALL,
+  ACTION_UPDATE,
   ACTION_REMOVE,
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
@@ -53,6 +54,7 @@ static int showhelp(void) {
          "PKGINST is the package installer for SvarDOS.\n"
          "\n"
          "Usage: PKGINST install package.zip\n"
+         "       PKGINST update package.zip\n"
          "       PKGINST remove package\n"
          "       PKGINST listfiles package\n"
          "       PKGINST listlocal [filter]\n"
@@ -68,6 +70,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
   /* look for valid actions */
   if ((argc == 3) && (strcasecmp(argv[1], "install") == 0)) {
     return(ACTION_INSTALL);
+  } else if ((argc == 3) && (strcasecmp(argv[1], "update") == 0)) {
+    return(ACTION_UPDATE);
   } else if ((argc == 3) && (strcasecmp(argv[1], "remove") == 0)) {
     return(ACTION_REMOVE);
   } else if ((argc == 3) && (strcasecmp(argv[1], "listfiles") == 0)) {
@@ -144,8 +148,9 @@ int main(int argc, char **argv) {
   if (loadconf(dosdir, &dirlist) != 0) goto GAMEOVER;
 
   switch (action) {
+    case ACTION_UPDATE:
     case ACTION_INSTALL:
-      res = pkginst(argv[2], 0, dosdir, dirlist);
+      res = pkginst(argv[2], (action == ACTION_UPDATE)?PKGINST_UPDATE:0, dosdir, dirlist);
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);
