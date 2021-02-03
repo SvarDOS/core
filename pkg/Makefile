@@ -11,6 +11,7 @@ all: pkg.exe
 
 pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
+	upx --8086 -9 pkg.exe
 
 kitten.obj: kitten\kitten.c
 	wcc $(CFLAGS) kitten\kitten.c
