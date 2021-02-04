@@ -524,30 +524,6 @@ static int preparedrive(void) {
 }
 
 
-/* copy file src into dst, substituting all characters c1 by c2 */
-static void fcopysub(const char *dst, const char *src, char c1, char c2) {
-  FILE *fdd, *fds;
-  int buff;
-  fds = fopen(src, "rb");
-  if (fds == NULL) return;
-  fdd = fopen(dst, "wb");
-  if (fdd == NULL) {
-    fclose(fds);
-    return;
-  }
-  /* */
-  for (;;) {
-    buff = fgetc(fds);
-    if (buff == EOF) break;
-    if (buff == c1) buff = c2;
-    fprintf(fdd, "%c", buff);
-  }
-  /* close files and return */
-  fclose(fdd);
-  fclose(fds);
-}
-
-
 static void bootfilesgen(char targetdrv, const struct slocales *locales, char cdromdrv) {
   char buff[128];
   char buff2[16];
@@ -560,15 +536,15 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
   fprintf(fd, "DOS=UMB,HIGH\r\n"
               "LASTDRIVE=Z\r\n"
               "FILES=50\r\n");
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\SVARDOS\\BIN\\HIMEMX.EXE\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\SVARDOS\\BIN\\HIMEMX.EXE\r\n", targetdrv);
   if (strcmp(locales->lang, "EN") == 0) {
     strcpy(buff, "COMMAND");
   } else {
     snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
   }
-  fprintf(fd, "SHELLHIGH=%c:\\SYSTEM\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", targetdrv, buff);
-  fprintf(fd, "REM COUNTRY=001,437,%c:\\SYSTEM\\CONF\\COUNTRY.SYS\r\n", targetdrv);
-  fprintf(fd, "DEVICE=%c:\\SYSTEM\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
+  fprintf(fd, "SHELLHIGH=%c:\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", targetdrv, buff);
+  fprintf(fd, "REM COUNTRY=001,437,%c:\\SVARDOS\\CONF\\COUNTRY.SYS\r\n", targetdrv);
+  fprintf(fd, "DEVICE=%c:\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
   fclose(fd);
   /*** AUTOEXEC.BAT ***/
   snprintf(buff, sizeof(buff), "%c:\\AUTOEXEC.BAT", targetdrv);
@@ -576,13 +552,12 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
   if (fd == NULL) return;
   fprintf(fd, "@ECHO OFF\r\n");
   fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", targetdrv);
-  fprintf(fd, "SET DOSDIR=%c:\\SYSTEM\\SVARDOS\r\n", targetdrv);
+  fprintf(fd, "SET DOSDIR=%c:\\SVARDOS\r\n", targetdrv);
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
   fprintf(fd, "SET LANG=%s\r\n", locales->lang);
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
-  fprintf(fd, "SET FDNPKG.CFG=%c:\\SYSTEM\\CFG\\FDNPKG.CFG\r\n", targetdrv);
-  fprintf(fd, "SET WATTCP.CFG=%c:\\SYSTEM\\CFG\\WATTCP.CFG\r\n", targetdrv);
-  fprintf(fd, "PATH %%DOSDIR%%\\BIN;%c:\\SYSTEM\\LINKS\r\n", targetdrv);
+  fprintf(fd, "SET WATTCP.CFG=%c:\\SVARDOS\\CFG\\WATTCP.CFG\r\n", targetdrv);
+  fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n", targetdrv);
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
   fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
@@ -591,9 +566,9 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
   if (locales->egafile > 0) {
     fprintf(fd, "DISPLAY CON=(EGA,,1)\r\n");
     if (locales->egafile == 1) {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVARDOS\\CPI\\EGA.CPX)\r\n", locales->codepage, targetdrv);
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SVARDOS\\CPI\\EGA.CPX)\r\n", locales->codepage, targetdrv);
     } else {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SYSTEM\\SVARDOS\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SVARDOS\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
     }
     fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
   }
@@ -608,7 +583,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
     } else {
       snprintf(buff3, sizeof(buff3), " /ID:%d", locales->keybid);
     }
-    fprintf(fd, "KEYB %s,%d,%c:\\SYSTEM\\SVARDOS\\BIN\\%s%s\r\n", locales->keybcode, locales->codepage, targetdrv, buff2, buff3);
+    fprintf(fd, "KEYB %s,%d,%c:\\SVARDOS\\BIN\\%s%s\r\n", locales->keybcode, locales->codepage, targetdrv, buff2, buff3);
     fprintf(fd, "\r\n");
   }
   fprintf(fd, "SHSUCDX /d:SVCD0001\r\n");
@@ -620,13 +595,28 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
   fprintf(fd, "ECHO %s\r\n", kittengets(6, 0, "Welcome to SvarDOS! Type 'HELP' if you need help."));
   fclose(fd);
   /*** CREATE DIRECTORY FOR CONFIGURATION FILES ***/
-  snprintf(buff, sizeof(buff), "%c:\\SYSTEM", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS", targetdrv);
   mkdir(buff);
-  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG", targetdrv);
   mkdir(buff);
-  /*** FDNPKG.CFG ***/
-  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG\\FDNPKG.CFG", targetdrv);
-  fcopysub(buff, "A:\\DAT\\FDNPKG.CFG", '$', cdromdrv);
+  /*** PKG.CFG ***/
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\PKG.CFG", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return;
+  fprintf(fd, "# pkg config file - specifies locations where packages should be installed\r\n"
+              "\r\n"
+              "# Programs\r\n"
+              "DIR PROGS C:\\\r\n"
+              "\r\n"
+              "# Games \r\n"
+              "DIR GAMES C:\\\r\n"
+              "\r\n"
+              "# Drivers\r\n"
+              "DIR DRIVERS C:\\DRIVERS\r\n"
+              "\r\n"
+              "# Development tools\r\n"
+              "DIR DEVEL C:\\DEVEL\r\n");
+  fclose(fd);
   /*** COUNTRY.SYS ***/
   /*** PICOTCP ***/
   /*** WATTCP ***/
@@ -668,17 +658,13 @@ static int installpackages(char targetdrv, char cdromdrv) {
         break;
     }
   }
-  /* set DOSDIR, TEMP, COMSPEC and FDNPKG.CFG */
-  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\SVARDOS", targetdrv);
+  /* set DOSDIR and COMSPEC */
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS", targetdrv);
   setenv("DOSDIR", buff, 1);
-  snprintf(buff, sizeof(buff), "%c:\\TEMP", targetdrv);
-  setenv("TEMP", buff, 1);
   snprintf(buff, sizeof(buff), "%c:\\COMMAND.COM", targetdrv);
   setenv("COMSPEC", buff, 1);
-  snprintf(buff, sizeof(buff), "%c:\\SYSTEM\\CFG\\FDNPKG.CFG", targetdrv);
-  setenv("FDNPKG.CFG", buff, 1);
   /* copy pkginst to the new drive so it is not read from the floppy each time */
-  snprintf(buff, sizeof(buff), "COPY A:\\FDINST.EXE %c:\\ > NUL", targetdrv);
+  snprintf(buff, sizeof(buff), "COPY A:\\PKG.EXE %c:\\ > NUL", targetdrv);
   system(buff);
   /* change current drive to target so I use the on-hdd fdinst from now on */
   if (set_cur_drive(targetdrv) != 0) {
@@ -705,7 +691,7 @@ static int installpackages(char targetdrv, char cdromdrv) {
       video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
     }
     /* proceed with package install */
-    snprintf(buff, sizeof(buff), "FDINST INSTALL %c:\\%s.ZIP > NUL", cdromdrv, pkgptr);
+    snprintf(buff, sizeof(buff), "PKG INSTALL %c:\\%s.ZIP > NUL", cdromdrv, pkgptr);
     if (system(buff) != 0) {
       video_putstring(12, 30, COLOR_BODY[mono], "ERROR: PKG INSTALL FAILED", -1);
       input_getkey();
