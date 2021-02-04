@@ -19,7 +19,7 @@
 
 ### General stuff ####
 
-2.2:%DOSDIR% ikke sat! DOSDIR skal pege pÜ SvarDOS hoved biblioteket.
+2.2:%DOSDIR% ikke sat! DOSDIR skal pege p√• SvarDOS hoved biblioteket.
 2.3:Eksempel: SET DOSDIR=C:\\SVARDOS
 2.14:Hukommelse opbrugt! (%s)
 
@@ -44,25 +44,25 @@
 
 #### Searching package ####
 
-5.0:Ingen pakke passer med sõgningen.
+5.0:Ingen pakke passer med s√∏gningen.
 
 #### Loading configuration ####
 
 7.0:Fejl: opbevaringsstedet '%s' er oplistet to gange!
-7.1:Fejl: Kan ikke Übne opsëtningsfilen '%s'!
+7.1:Fejl: Kan ikke √•bne ops√¶tningsfilen '%s'!
 7.4:Advarsel: tomt udtryk i linje #%d
 7.8:Advarsel: Ukendt udtryk '%s' i linje #%d
 7.11:Advarsel: Ugyldigt 'DIR' direktiv fundet i linje #%d
-7.15:Fejl: tilpasset bib '%s' er ikke en gyldig og fuldstëndig sti!
+7.15:Fejl: tilpasset bib '%s' er ikke en gyldig og fuldst√¶ndig sti!
 7.16:Fejl: tilpasset bib '%s' er et reserveret navn!
 
 #### Unziping package ####
 
 8.1:ukendt zip signatur: 0x%08x
-8.2:Fejl: Pakkeindhold komprimeret med en ikke understõttet metode (%d):
+8.2:Fejl: Pakkeindhold komprimeret med en ikke underst√∏ttet metode (%d):
 8.3:Fejl under udpakning af '%s' til '%s'!
 
 #### Handling the local list of installed packages ####
 
-9.0:Fejl: Kan ikke fÜ adgang til %s biblioteket.
+9.0:Fejl: Kan ikke f√• adgang til %s biblioteket.
 9.1:Fejl: Lokal pakke %s ikke fundet.

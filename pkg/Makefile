@@ -9,9 +9,23 @@ LIBS = zlib\zlib_c.lib
 
 all: pkg.exe
 
+release: pkg.exe .symbolic
+	mkdir appinfo
+	mkdir bin
+	mkdir nls
+	copy nls_utf8\pkg_en.txt nls\pkg.en
+	utf8tocp 850 nls_utf8\pkg_de.txt > nls\pkg.de
+	utf8tocp 850 nls_utf8\pkg_fr.txt > nls\pkg.fr
+	utf8tocp 850 nls_utf8\pkg_dk.txt > nls\pkg.dk
+	utf8tocp 852 nls_utf8\pkg_si.txt > nls\pkg.si
+	utf8tocp 857 nls_utf8\pkg_tr.txt > nls\pkg.tr
+	utf8tocp maz nls_utf8\pkg_pl.txt > nls\pkg.pl
+	upx --8086 -9 pkg.exe -o bin\pkg.exe
+	copy pkg.lsm appinfo
+	zip -9 -m -o -r pkg.zip appinfo bin nls
+
 pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
-	upx --8086 -9 pkg.exe
 
 kitten.obj: kitten\kitten.c
 	wcc $(CFLAGS) kitten\kitten.c

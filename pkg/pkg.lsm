@@ -1,0 +1,3 @@
+version: 20210204
+description: SvarDOS package manager - installs, removes and updates packages
+license: MIT
