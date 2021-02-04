@@ -7,6 +7,13 @@ LIB = watt32\lib\wattcpwl.lib
 
 all: pkgnet.exe
 
+release: pkgnet.exe .symbolic
+	mkdir bin
+	mkdir appinfo
+	copy pkgnet.exe bin
+	copy pkgnet.lsm appinfo
+	zip -9 -r -m pkgnet.zip bin appinfo
+
 pkgnet.exe: pkgnet.obj net.obj
 	wcl -lr -k8192 $(LIB) *.obj -fe=pkgnet.exe
 

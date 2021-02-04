@@ -1,0 +1,3 @@
+version: 20210121
+description: pulls packages from the internet SvarDOS repository
+license: MIT
