@@ -52,7 +52,7 @@ set -e
 
 
 # list of packages to be part of CORE
-COREPKGS="attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk fdnpkg format himemx kernel keyb keyb_lay label mem mode more move shsucdx sort tree undelete xcopy udvd2"
+COREPKGS="attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk format himemx kernel keyb keyb_lay label mem mode more move pkg pkgnet shsucdx sort tree undelete xcopy udvd2"
 
 
 
@@ -75,6 +75,7 @@ function dorepo {
 # $2 heads (sides)
 # $3 sectors per track
 # $4 size
+# $5 where to put a copy of the image (optional)
 function prep_flop {
   mkdir $4
   mformat -C -t $1 -h $2 -s $3 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$4/disk1.img"
@@ -100,6 +101,11 @@ function prep_flop {
   echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$4/readme.txt"
 
   unix2dos "$4/readme.txt"
+
+  # make a copy of the image, if requested
+  if [ "x$5" != "x" ] ; then
+    cp "$4/disk1.img" $5
+  fi
 
   # zip the images (and remove them at the same time)
   rm -f "$PUBDIR/svardos-floppy-$4k.zip"
@@ -137,14 +143,15 @@ done
 cp "install/install.com" "$FLOPROOT/"
 cp "install/nls/"install.?? "$FLOPROOT/"
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
+unzip -j packages/pkg.zip bin/pkg.exe -d "$FLOPROOT/"
 
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
-mformat -C -f 1440 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
-mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
+#mformat -C -f 2880 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
+#mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
 
 # prepare images for floppies in different sizes (args are C H S SIZE)
-prep_flop 80 2 36 2880
+prep_flop 80 2 36 2880 "$CDROOT/boot.img"
 prep_flop 80 2 18 1440
 prep_flop 80 2 15 1200
 prep_flop 80 2  9  720
@@ -156,7 +163,7 @@ CDZIP="$PUBDIR/svardos-cd.zip"
 echo "cleaning up old versions..."
 rm -f "$CDISO" "$CDZIP"
 
-$GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT"
+$GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/boot.img"
 
 # compress the ISO
 zip -mj9 "$CDZIP" "$CDISO"
