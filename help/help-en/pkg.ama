@@ -1,8 +1,7 @@
 
 %hSvarDOS packages management
 
-To install or remove software on your SvarDOS system, use the "pkg" commands.
-
+To install or remove software on your SvarDOS system, use the "pkg" command.
 pkg is a package manager to allow installing new software from SvarDOS
 packages and removing exising software from the system. To learn about exact
 pkg usage, type pkg /? in the SvarDOS command line shell.
