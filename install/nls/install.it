@@ -41,7 +41,8 @@
 4.0:Installazione del pacchetto %d/%d: %s
 
 ### END SCREEN ###
-5.0:L'installazione di SvarDOS Š terminata. Il computer sar… riavviato.\nRimuovere il disco di installazione dall'unit….
+5.0:Il computer sar… riavviato.\nRimuovere il disco di installazione dall'unit….
+5.1:L'installazione di SvarDOS Š terminata. Please restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Benvenuto in SvarDOS! Scrivi 'HELP' se hai bisogno di aiuto.

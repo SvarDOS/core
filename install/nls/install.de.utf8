@@ -40,7 +40,8 @@
 4.0:Installiere Paket %d/%d: %s
 
 ### END SCREEN ###
-5.0:SvarDOS Installation beendet. Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie das Installationsmedium.
+5.0:Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie das Installationsmedium.
+5.1:SvarDOS Installation beendet. Please restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 # assuming that FreeDOS html help excutable is called

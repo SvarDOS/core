@@ -70,8 +70,10 @@
 ### END SCREEN ###
 ### AVSLUTNINGSSKÃ„RM ###
 #(5.0:SvarDOS installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.)
-#5.0:SvarDOS installation is over. Your computer will reboot now.\nPlease make sure to remove the installation media.
-5.0:SvarDOS-installationen „r klar. Din dator kommer att reboota nu.\nV„nligen se till att ta bort installationsmediet.
+#5.0:Your computer will reboot now.\nPlease make sure to remove the installation media.
+5.0:Din dator kommer att reboota nu.\nV„nligen se till att ta bort installationsmediet.
+#5.1:SvarDOS installation is over. Please restart your computer now.
+5.1:SvarDOS-installationen „r klar. Please restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 ### LOGINVŽLKOMSTTEXT NŽR SYSTEMET ŽR INSTALLERAT ###

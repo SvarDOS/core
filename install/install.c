@@ -121,6 +121,37 @@ static int putstringnls(int y, int x, unsigned short attr, int nlsmaj, int nlsmi
 }
 
 
+/* copy file f1 to f2 using buff as a buffer of buffsz bytes. f2 will be overwritten if it
+ * exists already! returns 0 on success. */
+static int fcopy(const char *f2, const char *f1, void *buff, size_t buffsz) {
+  FILE *fd1, *fd2;
+  size_t sz;
+  int res = -1; /* assume failure */
+
+  /* open files */
+  fd1 = fopen(f1, "rb");
+  fd2 = fopen(f2, "wb");
+  if ((fd1 == NULL) || (fd2 == NULL)) goto QUIT;
+
+  /* copy data */
+  for (;;) {
+    sz = fread(buff, 1, buffsz, fd1);
+    if (sz == 0) {
+      if (feof(fd1) != 0) break;
+      goto QUIT;
+    }
+    if (fwrite(buff, 1, sz, fd2) != sz) goto QUIT;
+  }
+
+  res = 0; /* success */
+
+  QUIT:
+  if (fd1 != NULL) fclose(fd1);
+  if (fd2 != NULL) fclose(fd2);
+  return(res);
+}
+
+
 static int menuselect(int ypos, int xpos, int height, char **list, int listlen) {
   int i, offset = 0, res = 0, count, width = 0;
   /* count how many positions there is, and check their width */
@@ -384,7 +415,7 @@ static int diskempty(int drv) {
   return(res);
 }
 
-
+#ifdef DEADCODE
 /* set new DOS "current drive" to drv ('A', 'B', etc). returns 0 on success */
 static int set_cur_drive(char drv) {
   union REGS r;
@@ -395,7 +426,7 @@ static int set_cur_drive(char drv) {
   if (r.h.al < drv - 'A') return(-1);
   return(0);
 }
-
+#endif
 
 /* returns 0 if file exists, non-zero otherwise */
 static int fileexists(const char *fname) {
@@ -524,13 +555,41 @@ static int preparedrive(void) {
 }
 
 
-static void bootfilesgen(char targetdrv, const struct slocales *locales, char cdromdrv) {
+/* generates locales-related configurations and writes them to file (this
+ * is used to compute autoexec.bat content) */
+static void genlocalesconf(FILE *fd, const struct slocales *locales) {
+  if (locales == NULL) return;
+
+  fprintf(fd, "SET LANG=%s\r\n", locales->lang);
+
+  if (locales->egafile > 0) {
+    fprintf(fd, "DISPLAY CON=(EGA,,1)\r\n");
+    if (locales->egafile == 1) {
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %%DOSDIR%%\\CPI\\EGA.CPX)\r\n", locales->codepage);
+    } else {
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %%DOSDIR%%\\CPI\\EGA%d.CPX)\r\n", locales->codepage, locales->egafile);
+    }
+    fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
+  }
+
+  if (locales->keybfile > 0) {
+    fprintf(fd, "KEYB %s,%d,%%DOSDIR%%\\BIN\\", locales->keybcode, locales->codepage);
+    if (locales->keybfile == 1) {
+      fprintf(fd, "KEYBOARD.SYS");
+    } else {
+      fprintf(fd, "KEYBRD%d.SYS", locales->keybfile);
+    }
+    if (locales->keybid != 0) fprintf(fd, " /ID:%d", locales->keybid);
+    fprintf(fd, "\r\n");
+  }
+}
+
+
+static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   char buff[128];
-  char buff2[16];
-  char buff3[16];
   FILE *fd;
   /*** CONFIG.SYS ***/
-  snprintf(buff, sizeof(buff), "%c:\\CONFIG.SYS", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\CONFIG.SYS", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "DOS=UMB,HIGH\r\n"
@@ -542,51 +601,30 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
   } else {
     snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
   }
-  fprintf(fd, "SHELLHIGH=%c:\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", targetdrv, buff);
-  fprintf(fd, "REM COUNTRY=001,437,%c:\\SVARDOS\\CONF\\COUNTRY.SYS\r\n", targetdrv);
-  fprintf(fd, "DEVICE=%c:\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n", targetdrv);
+  fprintf(fd, "SHELLHIGH=C:\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", buff);
+  fprintf(fd, "REM COUNTRY=001,437,C:\\SVARDOS\\CONF\\COUNTRY.SYS\r\n");
+  fprintf(fd, "REM DEVICE=C:\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n");
   fclose(fd);
   /*** AUTOEXEC.BAT ***/
-  snprintf(buff, sizeof(buff), "%c:\\AUTOEXEC.BAT", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\AUTOEXEC.BAT", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "@ECHO OFF\r\n");
-  fprintf(fd, "SET TEMP=%c:\\TEMP\r\n", targetdrv);
-  fprintf(fd, "SET DOSDIR=%c:\\SVARDOS\r\n", targetdrv);
+  fprintf(fd, "SET TEMP=C:\\TEMP\r\n");
+  fprintf(fd, "SET DOSDIR=C:\\SVARDOS\r\n");
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
-  fprintf(fd, "SET LANG=%s\r\n", locales->lang);
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
-  fprintf(fd, "SET WATTCP.CFG=%c:\\SVARDOS\\CFG\\WATTCP.CFG\r\n", targetdrv);
-  fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n", targetdrv);
+  fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\\WATTCP.CFG\r\n");
+  fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n");
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
   fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
   fprintf(fd, "FDAPM APMDOS\r\n");
   fprintf(fd, "\r\n");
-  if (locales->egafile > 0) {
-    fprintf(fd, "DISPLAY CON=(EGA,,1)\r\n");
-    if (locales->egafile == 1) {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SVARDOS\\CPI\\EGA.CPX)\r\n", locales->codepage, targetdrv);
-    } else {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %c:\\SVARDOS\\CPI\\EGA%d.CPX)\r\n", locales->codepage, targetdrv, locales->egafile);
-    }
-    fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
-  }
-  if (locales->keybfile > 0) {
-    if (locales->keybfile == 1) {
-      snprintf(buff2, sizeof(buff2), "KEYBOARD.SYS");
-    } else {
-      snprintf(buff2, sizeof(buff2), "KEYBRD%d.SYS", locales->keybfile);
-    }
-    if (locales->keybid == 0) {
-      buff3[0] = 0;
-    } else {
-      snprintf(buff3, sizeof(buff3), " /ID:%d", locales->keybid);
-    }
-    fprintf(fd, "KEYB %s,%d,%c:\\SVARDOS\\BIN\\%s%s\r\n", locales->keybcode, locales->codepage, targetdrv, buff2, buff3);
-    fprintf(fd, "\r\n");
-  }
-  fprintf(fd, "SHSUCDX /d:SVCD0001\r\n");
+  genlocalesconf(fd, locales);
+  fprintf(fd, "\r\n");
+  fprintf(fd, "REM Uncomment the line below for CDROM support\r\n");
+  fprintf(fd, "REM SHSUCDX /d:SVCD0001\r\n");
   fprintf(fd, "\r\n");
   fprintf(fd, "REM Uncomment the line below for automatic mouse support\r\n");
   fprintf(fd, "REM CTMOUSE\r\n");
@@ -623,12 +661,12 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales, char cd
 }
 
 
-static int installpackages(char targetdrv, char cdromdrv) {
+static int installpackages(char targetdrv, char srcdrv, const struct slocales *locales) {
   char pkglist[512];
   int i, pkglistlen;
   size_t pkglistflen;
-  char buff[64];
-  FILE *fd;
+  char buff[1024]; /* must be *at least* 1 sector big for efficient file copying */
+  FILE *fd = NULL;
   char *pkgptr;
   newscreen(3);
   /* load pkg list */
@@ -658,24 +696,20 @@ static int installpackages(char targetdrv, char cdromdrv) {
         break;
     }
   }
-  /* set DOSDIR and COMSPEC */
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS", targetdrv);
-  setenv("DOSDIR", buff, 1);
-  snprintf(buff, sizeof(buff), "%c:\\COMMAND.COM", targetdrv);
-  setenv("COMSPEC", buff, 1);
-  /* copy pkginst to the new drive so it is not read from the floppy each time */
-  snprintf(buff, sizeof(buff), "COPY A:\\PKG.EXE %c:\\ > NUL", targetdrv);
-  system(buff);
-  /* change current drive to target so I use the on-hdd fdinst from now on */
-  if (set_cur_drive(targetdrv) != 0) {
-    video_putstring(10, 30, COLOR_BODY[mono], "ERROR: CHANGING DRIVE TO TARGET FAILED", -1);
-    input_getkey();
-    return(-1);
-  }
-  /* install packages */
+  /* copy pkg.exe to the new drive, along with all packages */
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\pkg.exe", targetdrv);
+  snprintf(buff + 64, sizeof(buff) - 64, "%c:\\pkg.exe", srcdrv);
+  fcopy(buff, buff + 64, buff, sizeof(buff));
+
+  /* open the post-install autoexec.bat and prepare initial instructions */
+  snprintf(buff, sizeof(buff), "%c:\\temp\\postinst.bat", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return(-1);
+  fprintf(fd, "@ECHO OFF\r\n");
+
+  /* copy packages */
   pkgptr = pkglist;
   for (i = 0;; i++) {
-    char buff[64];
     /* move forward to nearest entry or end of list */
     while (*pkgptr == 0) pkgptr++;
     if (*pkgptr == 0xff) break;
@@ -684,23 +718,53 @@ static int installpackages(char targetdrv, char cdromdrv) {
     strcat(buff, "       ");
     video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
     /* wait for new diskette if package not found */
-    snprintf(buff, sizeof(buff), "%c:\\%s.zip", cdromdrv, pkgptr);
+    snprintf(buff, sizeof(buff), "%c:\\%s.zip", srcdrv, pkgptr);
     while (fileexists(buff) != 0) {
       putstringnls(12, 1, COLOR_BODY[mono], 4, 1, "*** INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY ***");
       input_getkey();
       video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
     }
-    /* proceed with package install */
-    snprintf(buff, sizeof(buff), "PKG INSTALL %c:\\%s.ZIP > NUL", cdromdrv, pkgptr);
-    if (system(buff) != 0) {
-      video_putstring(12, 30, COLOR_BODY[mono], "ERROR: PKG INSTALL FAILED", -1);
+    /* proceed with package copy (buff contains the src filename already) */
+    snprintf(buff + 32, sizeof(buff) - 32, "%c:\\temp\\%s.zip", targetdrv, pkgptr);
+    if (fcopy(buff + 32, buff, buff, sizeof(buff)) != 0) {
+      video_putstring(10, 30, COLOR_BODY[mono], "READ ERROR", -1);
       input_getkey();
+      fclose(fd);
       return(-1);
     }
+    /* write install instruction to post-install script */
+    fprintf(fd, "pkg install %s.zip\r\ndel %s.zip\r\n", pkgptr, pkgptr);
     /* jump to next entry or end of list */
     while ((*pkgptr != 0) && (*pkgptr != 0xff)) pkgptr++;
     if (*pkgptr == 0xff) break;
   }
+  /* set up locales so the "installation over" message is nicely displayed */
+  genlocalesconf(fd, locales);
+  /* replace autoexec.bat and config.sys now and write some nice message on screen */
+  fprintf(fd, "DEL pkg.exe\r\n"
+              "COPY CONFIG.SYS C:\\\r\n"
+              "DEL CONFIG.SYS\r\n"
+              "DEL C:\\AUTOEXEC.BAT\r\n"
+              "COPY AUTOEXEC.BAT C:\\\r\n"
+              "DEL AUTOEXEC.BAT\r\n");
+  /* print out the "installation over" message */
+  fprintf(fd, "ECHO.\r\n"
+              "ECHO %s\r\n"
+              "ECHO.\r\n", kittengets(5, 1, "SvarDOS installation is over. Please restart your computer now."));
+  fclose(fd);
+
+  /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
+  snprintf(buff, sizeof(buff), "%c:\\autoexec.bat", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return(-1);
+  fprintf(fd, "@ECHO OFF\r\n"
+              "SET DOSDIR=C:\\SVARDOS\r\n"
+              "SET NLSPATH=%%DOSDIR%%\\NLS\r\n"
+              "PATH %%DOSDIR%%\\BIN\r\n");
+  fprintf(fd, "CD TEMP\r\n"
+              "postinst.bat\r\n");
+  fclose(fd);
+
   return(0);
 }
 
@@ -708,7 +772,7 @@ static int installpackages(char targetdrv, char cdromdrv) {
 static void finalreboot(void) {
   int y = 9;
   newscreen(2);
-  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0, "SvarDOS installation is over. Your computer will reboot now.\nPlease remove the installation disk from your drive.");
+  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0, "Your computer will reboot now.\nPlease remove the installation disk from your drive.");
   putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
   input_getkey();
   reboot();
@@ -795,8 +859,8 @@ int main(void) {
   targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
-  bootfilesgen(targetdrv, &locales, sourcedrv); /* generate boot files and other configurations */
-  if (installpackages(targetdrv, sourcedrv) != 0) goto Quit;    /* install packages */
+  bootfilesgen(targetdrv, &locales); /* generate boot files and other configurations */
+  if (installpackages(targetdrv, sourcedrv, &locales) != 0) goto Quit;    /* install packages */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */
   finalreboot(); /* remove the CD and reboot */

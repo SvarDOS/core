@@ -39,7 +39,8 @@
 4.0:NameçŸanje paketa %d/%d: %s
 
 ### END SCREEN ###
-5.0:SvarDOS je nameçŸen. RaŸunalnik se bo zdaj ponovno zagnal.\nProsimo, odstranite namestitveni medij.
+5.0:RaŸunalnik se bo zdaj ponovno zagnal.\nProsimo, odstranite namestitveni medij.
+5.1:SvarDOS je nameçŸen. Please restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Dobrodoçli v SvarDOS! ¬e potrebujete pomoŸ, vtipkajte HELP.

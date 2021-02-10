@@ -40,7 +40,8 @@
 4.1:*** Wú£° DYSK ZAWIERAJèCY POTRZEBNY PLIK I NACIòNIJ DOWOLNY KLAWISZ ***
 
 ### END SCREEN ###
-5.0:Instalacja SvarDOS zostaía zako§czona. Tw¢j komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napëdu.
+5.0:Tw¢j komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napëdu.
+5.1:Instalacja SvarDOS jest zako§czona. Proszë zrestartowaç teraz komputer.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Witaj w systemie SvarDOS! Wpisz 'HELP' jeûli potrzebujesz pomocy.

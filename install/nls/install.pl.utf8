@@ -40,7 +40,8 @@
 4.1:*** WŁÓŻ DYSK ZAWIERAJĄCY POTRZEBNY PLIK I NACIŚNIJ DOWOLNY KLAWISZ ***
 
 ### END SCREEN ###
-5.0:Instalacja SvarDOS została zakończona. Twój komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napędu.
+5.0:Twój komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napędu.
+5.1:Instalacja SvarDOS jest zakończona. Proszę zrestartować teraz komputer.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Witaj w systemie SvarDOS! Wpisz 'HELP' jeśli potrzebujesz pomocy.

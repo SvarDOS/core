@@ -39,7 +39,8 @@
 4.0:Installation du paquet %d/%d: %s
 
 ### END SCREEN ###
-5.0:L'installation de SvarDOS est termin‚e. Votre ordinateur va maintenant red‚marrer.\nVeuillez enlever le disque d'installation de votre lecteur.
+5.0:Votre ordinateur va maintenant red‚marrer.\nVeuillez enlever le disque d'installation de votre lecteur.
+5.1:L'installation de SvarDOS est termin‚e. Veuillez svp red‚marrer votre ordinateur.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Bienvenue sur SvarDOS ! Tapez 'HELP' si vous avez besoin d'aide.

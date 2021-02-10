@@ -39,7 +39,8 @@
 4.0:u paket kuruluyor: %d/%d: %s
 
 ### END SCREEN ###
-5.0:SvarDOS kurulumu sona ermiŸtir. Bilgisayarnz Ÿimdi yeniden baŸlayacaktr.\nLtfen kurulum diskini srcnzden ‡karn.
+5.0:Bilgisayarnz Ÿimdi yeniden baŸlayacaktr.\nLtfen kurulum diskini srcnzden ‡karn.
+5.1:SvarDOS kurulumu sona ermiŸtir. Please restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:SvarDOS'ya hoŸ geldiniz! Yardma ihtiyacnz varsa 'HELP' yaznz.

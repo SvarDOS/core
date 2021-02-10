@@ -40,7 +40,8 @@
 4.1:*** INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY ***
 
 ### END SCREEN ###
-5.0:SvarDOS installation is over. Your computer will reboot now.\nPlease make sure to remove the installation media.
+5.0:Your computer will reboot now.\nPlease remove the installation disk from your drive.
+5.1:SvarDOS installation is over. Please restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Welcome to SvarDOS! Type 'HELP' if you need help.
