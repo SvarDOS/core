@@ -52,7 +52,7 @@ set -e
 
 
 # list of packages to be part of CORE
-COREPKGS="attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk format himemx kernel keyb keyb_lay label mem mode more move pkg pkgnet shsucdx sort tree undelete xcopy udvd2"
+COREPKGS="amb attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk format himemx kernel keyb keyb_lay label mem mode more move pkg pkgnet shsucdx sort tree undelete xcopy udvd2"
 
 
 
