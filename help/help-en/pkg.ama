@@ -12,3 +12,7 @@ you may also use the SvarDOS "pkgnet" command. pkgnet is a network tool that
 makes it easy to search for SvarDOS packages in the SvarDOS repository and
 download them right away. Type pkgnet /? in the SvarDOS command line shell to
 learn about exact pkgnet usage.
+
+See also:
+ * %lpkgfmt.ama:The technical format of a SvarDOS package
+ * %lpkgrules.ama:Packages inclusion rules

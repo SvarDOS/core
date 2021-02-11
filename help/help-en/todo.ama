@@ -1,0 +1,40 @@
+
+%hSvarDOS: The project's TODO list
+
+* Replace the default (FreeDOS) edit with a smaller alternative (?)
+  -> must be TINY
+  -> no need for advanced text editing features, just enough to comfortably
+     edit small (<64K) configuration files
+  -> must be 8086-compatible and have modest memory requirements
+  -> must be NLS-aware (multi-language)
+
+* validate that CORE is 100% 8086-compatible
+
+* build process: the install floppy should be built as much as possible using
+  existing packages (ie. remove the custom "files" directory from svn)
+
+* Networking setup at install time -> should crynwr be part of the install
+  set? Or only selected drivers? Or maybe this could be provided as a
+  "supplemental" floppy disk?
+
+* bootable USB install image
+
+* add a "link" tool so users can easily create "links" to their favorite
+  programs (esp. things like zip/unzip, etc)
+
+* pkg.exe: add an 'unzip' option so pkg.exe can be used as a poor man's unzip
+
+* install.com - MBR changes could be done by the installer itself instead of
+  system()-calling fdisk
+
+* help - write more useful content!
+
+* further NLS support, improvements of existing translations and adding new
+  languages -> would be nice to have some kind of web interface for submitting
+  and reviewing translations
+
+* pkgnet.exe: implement the 'checkup' action for easy update checking
+
+                        =============================
+                          %hWanna help? %lcontact.ama:Get in touch!
+                        =============================
