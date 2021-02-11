@@ -1,5 +1,5 @@
 <h1>SvarDOS repository</h1>
-<p class="copyr">or the world of packages</p>
+<p class="copyr">"the world of packages"</p>
 
 <p>This page lists all packages that are available in the SvarDOS repository. These packages can be downloaded from within SvarDOS using the pkgnet tool, or you can download them from here.</p>
 

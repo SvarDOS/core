@@ -1,3 +1,0 @@
-The recommended way to contact the SvarDOS community is through its mailing list:
-
-https://lists.osdn.me/mailman/listinfo/svardos-users

@@ -10,18 +10,14 @@
   </head>
   <body>
 
-    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=why">Why SvarDOS</a> I <a href="?p=repo">Repo</a> I <a href="?p=tech">Tech</a> I <a href="?p=nls">NLS</a></p>
+    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=repo">Repo</a> I <a href="phpamb.php?fname=help/help-en.amb">Help</a><!-- I <a href="?p=nls">NLS</a>--></p>
 
 <?php
 
     $p = '';
     if (! empty($_GET['p'])) $p = $_GET['p'];
 
-    if ($p == 'why') {
-      readfile('index-why.htm');
-    } else if ($p == 'tech') {
-      include 'index-tech.php';
-    } else if ($p == 'nls') {
+    f ($p == 'nls') {
       readfile('index-nls.htm');
     } else if ($p == 'repo') {
       include 'index-repo.php';
