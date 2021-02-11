@@ -85,7 +85,7 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
 
 static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist) {
   char pkgname[9];
-  int t, lastpathdelim = -1, lastdot = -1;
+  int t, lastpathdelim = -1, lastdot = -1, res = 1;
   struct ziplist *zipfileidx;
   FILE *zipfilefd;
   /* copy the filename into pkgname (without path elements and without extension) */
@@ -111,13 +111,12 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
   /* prepare the zip file and install it */
   zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
   if (zipfileidx != NULL) {
-    t = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
-    fclose(zipfilefd);
-    return(t);
+    res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
+    zip_freelist(&zipfileidx);
   }
 
   fclose(zipfilefd);
-  return(1);
+  return(res);
 }
 
 

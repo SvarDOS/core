@@ -214,26 +214,15 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
 int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
-  char *buff;
-  char *fulldestfilename;
-  char packageslst[64];
+  char buff[256];
+  char fulldestfilename[256];
+  char packageslst[32];
   char *shortfile;
   long filesextractedsuccess = 0, filesextractedfailure = 0;
   struct ziplist *curzipnode;
   FILE *lstfd;
 
   sprintf(packageslst, "packages\\%s.lst", pkgname); /* Prepare the packages/xxxx.lst filename string for later use */
-
-  buff = malloc(512);
-  fulldestfilename = malloc(1024);
-  if ((buff == NULL) || (fulldestfilename == NULL)) {
-    kitten_printf(2, 14, "Out of memory! (%s)", "fulldestfilename");
-    puts("");
-    zip_freelist(&ziplinkedlist);
-    free(buff);
-    free(fulldestfilename);
-    return(-1);
-  }
 
   /* create the %DOSDIR%/packages directory, just in case it doesn't exist yet */
   sprintf(buff, "%s\\packages\\", dosdir);
@@ -245,9 +234,6 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   if (lstfd == NULL) {
     kitten_printf(3, 10, "ERROR: Could not create %s!", buff);
     puts("");
-    zip_freelist(&ziplinkedlist);
-    free(buff);
-    free(fulldestfilename);
     return(-2);
   }
 
@@ -255,9 +241,8 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   for (curzipnode = ziplinkedlist; curzipnode != NULL; curzipnode = curzipnode->nextfile) {
     int unzip_result;
     if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) continue; /* skip directories */
-    if (strcasecmp(curzipnode->filename, packageslst) == 0) continue; /* skip silently the package.lst file, if found */
     shortfile = computelocalpath(curzipnode->filename, buff, dosdir, dirlist); /* substitute paths to custom dirs */
-    /* log the filename to packages\pkg.lst (with original, unmapped drive) */
+    /* log the filename to packages\pkg.lst */
     fprintf(lstfd, "%s%s\r\n", buff, shortfile);
     /* create the path, just in case it doesn't exist yet */
     mkpath(buff);
@@ -274,11 +259,6 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     }
   }
   fclose(lstfd);
-
-  /* free the ziplist and close file descriptor */
-  zip_freelist(&ziplinkedlist);
-  free(buff);
-  free(fulldestfilename);
 
   kitten_printf(3, 19, "Package %s installed: %ld files extracted, %ld errors.", pkgname, filesextractedsuccess, filesextractedfailure);
   puts("");
