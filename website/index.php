@@ -17,7 +17,7 @@
     $p = '';
     if (! empty($_GET['p'])) $p = $_GET['p'];
 
-    f ($p == 'nls') {
+    if ($p == 'nls') {
       readfile('index-nls.htm');
     } else if ($p == 'repo') {
       include 'index-repo.php';

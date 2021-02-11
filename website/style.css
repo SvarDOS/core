@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&family=Source+Sans+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap');
 
 h1 {
   font-size: 1.35em;
@@ -27,12 +27,6 @@ p {
   text-align: justify;
 }
 
-p.tech {
-  white-space: pre-wrap;
-  font-size: 1.1em;
-  text-align: left;
-}
-
 p.wondering {
   font-size: 0.95em;
   margin: 1.3em 0 0 0;
@@ -48,9 +42,9 @@ html {
 }
 
 body {
-  font-size: 1.1em;
+  font-size: 1.15em;
   background-color: #fff;
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   margin: 0 auto;
   padding: 0 0.5em 0.5em 0.5em;
   box-sizing: border-box;
