@@ -7,6 +7,7 @@
   files. buildidx will generate the index file and save it into the package
   repository.
 
+  11 feb 2021: lsm headers are no longer checked, so it is compatible with the simpler lsm format used by SvarDOS
   13 jan 2021: removed the identification line, changed CRC32 to bsum, not creating the listing.txt file and stopped compressing index
   23 apr 2017: uncompressed index is no longer created, added CRC32 of zib (bin only) files, if present
   28 aug 2016: listing.txt is always written inside the repo dir (instead of inside current dir)
@@ -31,7 +32,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 
-#define pVer "2021-01-13"
+#define pVer "2021-02-11"
 
 
 /* computes the BSD sum of a file and returns it. returns 0 on error. */
@@ -111,9 +112,6 @@ static int readlsm(const char *filename, char *version, char *title, char *descr
   /* open the file */
   fd = fopen(filename, "rb");
   if (fd == NULL) return(-1);
-  /* check the file's header */
-  if (readline_fromfile(fd, linebuff, 64) < 0) return(-1);
-  if (strcasecmp(linebuff, "begin3") != 0) return(-1);
   /* read the LSM file line by line */
   while (readline_fromfile(fd, linebuff, 127) >= 0) {
     for (x = 0;; x++) {
