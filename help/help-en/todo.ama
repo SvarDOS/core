@@ -8,7 +8,7 @@
   -> must be 8086-compatible and have modest memory requirements
   -> must be NLS-aware (multi-language)
 
-* validate that CORE is 100% 8086-compatible
+* validate that CORE is 100%% 8086-compatible
 
 * build process: the install floppy should be built as much as possible using
   existing packages (ie. remove the custom "files" directory from svn)

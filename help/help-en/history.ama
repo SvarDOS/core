@@ -1,0 +1,32 @@
+
+%hSvarDOS origins (history from the point of view of its creator)
+
+Mateusz Viste, the SvarDOS author, says:
+
+In the years 2005-2015, I used to perform packaging work for the FreeDOS
+project. I wasn't pleased with the packaging tool that FreeDOS used back then
+(FDPKG), so in 2012 I started working on a new package manager, with network
+support, automatic updates, etc - I named it FDNPKG. Later I also devised a
+scripted way of generating an "always up to date" FreeDOS CD that I
+unimaginatively called "all_cd.iso". This CD included FDNPKG and all the
+FreeDOS packages available at the given moment.
+
+I still wasn't satisfied with how FreeDOS clings to its notion of "releases"
+and that it cannot include some software because of licensing issues, so in
+2016 I decided to create my own distribution, that I called Svarog386 (there
+was also a Svarog86 project that I had created a couple of months earlier,
+dedicated to 8086 machines). Svarog386 naturally relied on the FreeDOS kernel
+and used the FDNPKG package manager.
+
+Then, in 2021, I started to be tired of having two separate distributions to
+care about. Over time, FDNPKG also became a huge piece of protected mode code,
+and although it was magnificent code, I was no longer happy with it: too many
+features, too complex data processing, too high memory requirements... In a
+word: too much fluff. I longed for something simpler, that would do perhaps
+less, but with more transparency towards the user - and something that would
+work in real mode with not much RAM, so it could be useful even on ancient
+8086 machines.
+
+The result of these thoughts was SvarDOS: a distribution that replaced both
+Svarog86 and Svarog386, and that came with its own package manager - a much
+simpler (and in my opinion much more elegant) tool than FDNPKG.
