@@ -14,6 +14,7 @@
 1.22:            pkg remove package
 1.23:            pkg listfiles package
 1.24:            pkg listlocal [filter]
+1.27:            pkg unzip file.zip
 1.25:PKG is published under the MIT license.
 1.26:It is configured through %DOSDIR%\\CFG\\PKG.CFG
 
