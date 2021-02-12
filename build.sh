@@ -51,9 +51,14 @@ fi
 set -e
 
 
-# list of packages to be part of CORE
-COREPKGS="amb attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk format help himemx kernel keyb keyb_lay label mem mode more move pkg pkgnet shsucdx sort tree undelete xcopy udvd2"
+# list of packages to be part of CORE (always installed)
+COREPKGS="amb attrib chkdsk choice command cpidos ctmouse deltree devload diskcopy display dosfsck edit fc fdapm fdisk format help himemx kernel keyb keyb_lay label mem mode more move pkg pkgnet shsucdx sort tree"
 
+# list of packages to be part of EXTRA (only sometimes installed, typically drivers)
+EXTRAPKGS="pcntpk udvd2"
+
+# all packages
+ALLPKGS="$COREPKGS $EXTRAPKGS"
 
 
 # function that builds the packages repository
@@ -83,7 +88,7 @@ function prep_flop {
 
   # now populate the floppies
   curdisk=1
-  for p in $COREPKGS ; do
+  for p in $ALLPKGS ; do
     # if copy fails, then probably the floppy is full - try again after
     # creating an additional floppy image
     if ! mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
@@ -138,6 +143,12 @@ for pkg in $COREPKGS ; do
   cp "$REPOROOT/$pkg.zip" "$CDROOT/"
   echo "$pkg" >> "$FLOPROOT/install.lst"
 done
+
+# add EXTRA packages to CDROOT (but not in the list of packages so instal won't install them by default)
+for pkg in $EXTRAPKGS ; do
+  cp "$REPOROOT/$pkg.zip" "$CDROOT/"
+done
+
 
 # prepare the content of the boot (install) floppy
 cp "install/install.com" "$FLOPROOT/"
