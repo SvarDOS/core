@@ -24,7 +24,7 @@ supported, and in the public domain.
 Here below is the recommended command line that can be used to create a
 package for a program named EXAMPLE using info-zip:
 
-  zip -9rk EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+  zip -9rkD EXAMPLE.ZIP subdir1 subdir2 ... subdirN
 
 If you are using 7za to create your packages, then use this:
 
