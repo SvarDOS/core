@@ -22,7 +22,10 @@ release: pkg.exe .symbolic
 	utf8tocp maz nls_utf8\pkg_pl.txt > nls\pkg.pl
 	upx --8086 -9 pkg.exe -o bin\pkg.exe
 	copy pkg.lsm appinfo
-	zip -9 -m -o -r pkg.zip appinfo bin nls
+	zip -9moDkr pkg.zip appinfo bin nls
+	rmdir appinfo
+	rmdir bin
+	rmdir nls
 
 pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
