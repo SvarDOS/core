@@ -614,7 +614,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "SET DOSDIR=C:\\SVARDOS\r\n");
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
-  fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\\WATTCP.CFG\r\n");
+  fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
   fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n");
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
@@ -658,6 +658,16 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   /*** COUNTRY.SYS ***/
   /*** PICOTCP ***/
   /*** WATTCP ***/
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\WATTCP.CFG", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return;
+  fprintf(fd, "my_ip = dhcp\r\n"
+              "#my_ip = 192.168.0.7\r\n"
+              "#netmask = 255.255.255.0\r\n"
+              "#nameserver = 192.168.0.1\r\n"
+              "#nameserver = 192.168.0.2\r\n"
+              "#gateway = 192.168.1.1\r\n");
+  fclose(fd);
 }
 
 
