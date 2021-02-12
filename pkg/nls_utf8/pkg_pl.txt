@@ -66,3 +66,11 @@
 
 9.0:BŁĄD: Dostęp do katalogu %s nie powiódł się.
 9.1:BŁĄD: Nie znaleziono lokalnego pakietu %s.
+
+#### unzip ####
+
+10.0:OK
+10.1:BŁĄD: Otwarcie pliku archiwum nie powiodło się
+10.2:BŁĄD: Nieprawidłowe archiwum ZIP
+10.3:BŁĄD: Plik już istnieje
+10.4:BŁĄD: błąd unzip (%d)

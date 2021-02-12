@@ -24,7 +24,7 @@ release: pkg.exe .symbolic
 	copy pkg.lsm appinfo
 	zip -9 -m -o -r pkg.zip appinfo bin nls
 
-pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj
+pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
 
 kitten.obj: kitten\kitten.c
@@ -68,6 +68,9 @@ trim.obj: trim.c
 
 showinst.obj: showinst.c
 	wcc $(CFLAGS) showinst.c
+
+unzip.obj: unzip.c
+	wcc $(CFLAGS) unzip.c
 
 clean: .symbolic
 	del *.obj

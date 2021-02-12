@@ -35,6 +35,7 @@
 #include "pkginst.h"
 #include "pkgrem.h"
 #include "showinst.h"
+#include "unzip.h"
 #include "version.h"
 
 
@@ -44,6 +45,7 @@ enum ACTIONTYPES {
   ACTION_REMOVE,
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
+  ACTION_UNZIP,
   ACTION_HELP
 };
 
@@ -58,6 +60,7 @@ static int showhelp(void) {
   kitten_puts(1, 22, "       pkg remove package");
   kitten_puts(1, 23, "       pkg listfiles package");
   kitten_puts(1, 24, "       pkg listlocal [filter]");
+  kitten_puts(1, 27, "       pkg unzip file.zip");
   puts("");
   kitten_puts(1, 25, "PKG is published under the MIT license.");
   kitten_puts(1, 26, "It is configured through %DOSDIR%\\CFG\\PKG.CFG");
@@ -77,6 +80,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_LISTFILES);
   } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "listlocal") == 0)) {
     return(ACTION_LISTLOCAL);
+  } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
+    return(ACTION_UNZIP);
   } else {
     return(ACTION_HELP);
   }
@@ -158,6 +163,9 @@ int main(int argc, char **argv) {
       break;
     case ACTION_LISTLOCAL:
       res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
+      break;
+    case ACTION_UNZIP:
+      res = unzip(argv[2]);
       break;
     default:
       res = showhelp();
