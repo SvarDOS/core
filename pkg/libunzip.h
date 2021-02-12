@@ -16,6 +16,9 @@
 #define ZIP_FLAG_ISADIR    1
 #define ZIP_FLAG_ENCRYPTED 2
 
+#define ZIP_METH_STORE 0
+#define ZIP_METH_DEFLATE 8
+
 struct ziplist {
   long filelen;
   long compressedfilelen;
@@ -23,7 +26,7 @@ struct ziplist {
   long dataoffset;      /* offset in the file where compressed data starts */
   struct ziplist *nextfile;
   time_t timestamp;     /* the timestamp of the file */
-  short compmethod;
+  short compmethod;     /* compression method (ZIP_METH_xxx) */
   unsigned char flags;  /* see ZIP_FLAG_xxx above */
   char filename[1];     /* must be last element (gets expanded at runtime) */
 };

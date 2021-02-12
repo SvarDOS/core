@@ -173,8 +173,8 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilen
 
   /* first of all, check we support the compression method */
   switch (curzipnode->compmethod) {
-    case 0:  /* stored */
-    case 8:  /* deflated */
+    case ZIP_METH_STORE:
+    case ZIP_METH_DEFLATE:
       break;
     default: /* unsupported compression method, sorry */
       return(-1);

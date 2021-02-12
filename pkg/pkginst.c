@@ -178,7 +178,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       goto RAII_ERR;
     }
     /* abort if any file is compressed with an unsupported method */
-    if ((curzipnode->compmethod != 0/*store*/) && (curzipnode->compmethod != 8/*deflate*/)) { /* unsupported compression method */
+    if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
       kitten_printf(8, 2, "ERROR: Package contains a file compressed with an unsupported method (%d):", curzipnode->compmethod);
       puts("");
       printf(" %s\n", curzipnode->filename);
