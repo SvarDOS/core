@@ -13,6 +13,10 @@
 
     <p>SvarDOS files are published under the terms of the MIT license. This applies only to SvarDOS-specific files, though - the packages supplied with SvarDOS may be subject to different licenses (GPL, BSD, Public Domain, Freeware...).</p>
 
+    <h2>Multilingual</h2>
+
+    <p>Many languages are supported: English, German, French, Polish, Russian, Italian and more.</p>
+
     <h2>No "versions"</h2>
 
     <p>SvarDOS is a "rolling" release, meaning that it doesn't follow the concept of "versions". Once the system is installed, its packages can be kept up-to-date using the SvarDOS online update tools (pkg &amp; pkgnet).</p>
