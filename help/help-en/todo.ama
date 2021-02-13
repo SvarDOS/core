@@ -1,12 +1,13 @@
 
 %hSvarDOS: The project's TODO list
 
-* Replace the default (FreeDOS) edit with a smaller alternative (?)
-  -> must be TINY
-  -> no need for advanced text editing features, just enough to comfortably
-     edit small (<64K) configuration files
-  -> must be 8086-compatible and have modest memory requirements
-  -> must be NLS-aware (multi-language)
+* Replace the default (FreeDOS) edit with a smaller alternative (?) that is:
+  - TINY (a dozen of KiBs or so)
+  - relatively simple: no need for advanced text editing features, just enough
+    to comfortably edit small (<64K) configuration files
+  - 8086-compatible and have modest memory requirements
+  - multi-lang (kitten library)
+  - capable of (limited) copy/pasting between two files
 
 * validate that CORE is 100%% 8086-compatible
 
@@ -22,18 +23,27 @@
 * add a "link" tool so users can easily create "links" to their favorite
   programs (esp. things like zip/unzip, etc)
 
-* pkg.exe: add an 'unzip' option so pkg.exe can be used as a poor man's unzip
-
 * install.com - MBR changes could be done by the installer itself instead of
   system()-calling fdisk
 
 * help - write more useful content!
+  -> basic DOS commands (directories, copy/rename/delete files, etc)
+  -> common configuration files (autoexec, config.sys, pkg.cfg, wattcp.cfg..)
+  -> networking guide
+  -> memory management basics
+  -> ...
+
+* test new versions of software and update packages accordingly. special care
+  must be taken for core things: kernel, freecom, fdisk, himemx...
 
 * further NLS support, improvements of existing translations and adding new
   languages -> would be nice to have some kind of web interface for submitting
   and reviewing translations
 
-* pkgnet.exe: implement the 'checkup' action for easy update checking
+* pkgnet.exe: implement the 'checkup' action for easy update checks
+
+* possibly plenty of other things
+
 
                         =============================
                           %hWanna help? %lcontact.ama:Get in touch!
