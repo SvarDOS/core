@@ -154,7 +154,18 @@ done
 cp "install/install.com" "$FLOPROOT/"
 cp "install/nls/"install.?? "$FLOPROOT/"
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
-unzip -j packages/pkg.zip bin/pkg.exe -d "$FLOPROOT/"
+unzip -Cj packages/cpidos.zip 'cpi/ega*.cpx' -d "$FLOPROOT/"
+unzip -Cj packages/command.zip bin/command.com -d "$FLOPROOT/"
+unzip -Cj packages/display.zip bin/display.exe -d "$FLOPROOT/"
+unzip -Cj packages/edit.zip bin/edit.exe -d "$FLOPROOT/"
+unzip -Cj packages/fdapm.zip bin/fdapm.com -d "$FLOPROOT/"
+unzip -Cj packages/fdisk.zip bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
+unzip -Cj packages/format.zip bin/format.exe -d "$FLOPROOT/"
+unzip -Cj packages/kernel.zip bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
+unzip -Cj packages/mem.zip bin/mem.exe -d "$FLOPROOT/"
+unzip -Cj packages/mode.zip bin/mode.com -d "$FLOPROOT/"
+unzip -Cj packages/more.zip bin/more.exe -d "$FLOPROOT/"
+unzip -Cj packages/pkg.zip bin/pkg.exe -d "$FLOPROOT/"
 
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
