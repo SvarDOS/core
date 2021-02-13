@@ -11,14 +11,16 @@
 
 * validate that CORE is 100%% 8086-compatible
 
-* build process: the install floppy should be built as much as possible using
-  existing packages (ie. remove the custom "files" directory from svn)
-
 * Networking setup at install time -> should crynwr be part of the install
   set? Or only selected drivers? Or maybe this could be provided as a
   "supplemental" floppy disk?
 
 * bootable USB install image
+
+* make the COMMAND package smaller so there is no need for multiple
+  lang-dependant copies of the binary
+
+* improve installer so user can choose the target disk
 
 * add a "link" tool so users can easily create "links" to their favorite
   programs (esp. things like zip/unzip, etc)
