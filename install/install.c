@@ -36,7 +36,6 @@
 
 #include "kitten\kitten.h"
 
-#include "cdrom.h"
 #include "input.h"
 #include "video.h"
 
@@ -428,6 +427,16 @@ static int set_cur_drive(char drv) {
 }
 #endif
 
+
+/* get the DOS "current drive" (0=A:, 1=B:, etc) */
+static int get_cur_drive(void) {
+  union REGS r;
+  r.h.ah = 0x19; /* DOS 1+ GET CURRENT DEFAULT DRIVE */
+  int86(0x21, &r, &r);
+  return(r.h.al);
+}
+
+
 /* returns 0 if file exists, non-zero otherwise */
 static int fileexists(const char *fname) {
   FILE *fd;
@@ -438,13 +447,14 @@ static int fileexists(const char *fname) {
 }
 
 
-static int preparedrive(void) {
+static int preparedrive(char sourcedrv) {
   int driveremovable;
-  int selecteddrive = 3; /* hardcoded to 'C:' for now */
+  int selecteddrive = 3; /* default to 'C:' */
   int cselecteddrive;
   int ds;
   int choice;
   char buff[1024];
+  if (selecteddrive == get_cur_drive()) selecteddrive = 4; /* use D: if install is run from C: (typically because it was booted from USB?) */
   cselecteddrive = 'A' + selecteddrive - 1;
   for (;;) {
     driveremovable = isdriveremovable(selecteddrive);
@@ -458,12 +468,12 @@ static int preparedrive(void) {
       putstringwrap(4, 1, COLOR_BODY[mono], buff);
       switch (menuselect(14, -1, 5, list, -1)) {
         case 0:
-          system("FDISK /AUTO");
+          system("FDISK /AUTO"); /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
           break;
         case 1:
           video_clear(0x0700, 0, 0);
           video_movecursor(0, 0);
-          system("FDISK");
+          system("FDISK");  /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
           break;
         case 2:
           return(MENUQUIT);
@@ -472,7 +482,7 @@ static int preparedrive(void) {
       }
       /* write a temporary MBR which only skips the drive (in case BIOS would
        * try to boot off the not-yet-ready C: disk) */
-      system("FDISK /AMBR"); /* writes BOOT.MBR into actual MBR */
+      system("FDISK /AMBR"); /* writes BOOT.MBR into actual MBR */  /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
       newscreen(2);
       putstringnls(10, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
       putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
@@ -544,9 +554,9 @@ static int preparedrive(void) {
       choice = menuselect(10, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
-      snprintf(buff, sizeof(buff), "SYS A: %c: > NUL", cselecteddrive);
+      snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
       system(buff);
-      system("FDISK /MBR");
+      system("FDISK /MBR"); /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
       mkdir(buff);
       return(cselecteddrive);
@@ -794,9 +804,9 @@ static void loadcp(const struct slocales *locales) {
   if (locales->codepage == 437) return;
   video_movecursor(1, 0);
   if (locales->egafile == 1) {
-    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) A:\\EGA.CPX) > NUL", locales->codepage);
+    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) EGA.CPX) > NUL", locales->codepage);
   } else {
-    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) A:\\EGA%d.CPX) > NUL", locales->codepage, locales->egafile);
+    snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) EGA%d.CPX) > NUL", locales->codepage, locales->egafile);
   }
   system(buff);
   snprintf(buff, sizeof(buff), "MODE CON CP SEL=%u > NUL", locales->codepage);
@@ -815,6 +825,7 @@ static void loadcp(const struct slocales *locales) {
 }
 
 
+#ifdef DEADCODE
 /* checks that drive drv contains SvarDOS packages
  * returns 0 if found, non-zero otherwise */
 static int checkinstsrc(char drv) {
@@ -822,6 +833,7 @@ static int checkinstsrc(char drv) {
   snprintf(fname, sizeof(fname), "%c:\\ATTRIB.ZIP", drv);
   return(fileexists(fname));
 }
+#endif
 
 
 int main(void) {
@@ -830,21 +842,7 @@ int main(void) {
   int sourcedrv;
   int action;
 
-  /* am I running in install-from-floppy mode? */
-  if (checkinstsrc('A') == 0) {
-    sourcedrv = 'A';
-  } else { /* otherwise find where the cdrom drive is */
-    sourcedrv = cdrom_findfirst();
-    if (sourcedrv < 0) {
-      printf("ERROR: CD-ROM DRIVE NOT FOUND\r\n");
-      return(1);
-    }
-    sourcedrv += 'A'; /* convert the source drive 'id' (A=0) to an actual drive letter */
-    if (checkinstsrc(sourcedrv) != 0) {
-      printf("ERROR: SVARDOS INSTALLATION CD NOT FOUND IN THE DRIVE.\r\n");
-      return(1);
-    }
-  }
+  sourcedrv = get_cur_drive() + 'A';
 
   /* init screen and detect mono status */
   mono = video_init();
@@ -866,7 +864,7 @@ int main(void) {
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto Quit;
   if (action == MENUPREV) goto SelectLang;
-  targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
+  targetdrv = preparedrive(sourcedrv); /* what drive should we install to? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
   bootfilesgen(targetdrv, &locales); /* generate boot files and other configurations */
