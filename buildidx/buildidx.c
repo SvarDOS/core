@@ -7,6 +7,7 @@
   files. buildidx will generate the index file and save it into the package
   repository.
 
+  13 feb 2021: 'title' LSM field is no longer looked after
   11 feb 2021: lsm headers are no longer checked, so it is compatible with the simpler lsm format used by SvarDOS
   13 jan 2021: removed the identification line, changed CRC32 to bsum, not creating the listing.txt file and stopped compressing index
   23 apr 2017: uncompressed index is no longer created, added CRC32 of zib (bin only) files, if present
@@ -100,7 +101,7 @@ static int readline_fromfile(FILE *fd, char *line, int maxlen) {
   }
 }
 
-static int readlsm(const char *filename, char *version, char *title, char *description) {
+static int readlsm(const char *filename, char *version, char *description) {
   char linebuff[1024];
   char *valuestr;
   int x;
@@ -108,7 +109,6 @@ static int readlsm(const char *filename, char *version, char *title, char *descr
   /* reset fields to be read to empty values */
   version[0] = 0;
   description[0] = 0;
-  title[0] = 0;
   /* open the file */
   fd = fopen(filename, "rb");
   if (fd == NULL) return(-1);
@@ -128,11 +128,9 @@ static int readlsm(const char *filename, char *version, char *title, char *descr
       trim(linebuff);
       trim(valuestr);
       if (strcasecmp(linebuff, "version") == 0) {
-          sprintf(version, "%s", valuestr);
-        } else if (strcasecmp(linebuff, "title") == 0) {
-          sprintf(title, "%s", valuestr);
-        } else if (strcasecmp(linebuff, "description") == 0) {
-          sprintf(description, "%s", valuestr);
+        sprintf(version, "%s", valuestr);
+      } else if (strcasecmp(linebuff, "description") == 0) {
+        sprintf(description, "%s", valuestr);
       }
     }
   }
@@ -150,9 +148,9 @@ static int cmpstring(const void *p1, const void *p2) {
 
 
 static void GenIndexes(const char *repodir) {
-  char *LsmFileList[4096];
+  char *LsmFileList[4096]; /* TODO dynamic sizing, otherwise will crash if there are 4096+ packages */
   char tmpbuf[64];
-  char *LsmFile, LSMpackage[64], LSMtitle[128], LSMversion[128], LSMdescription[1024];
+  char *LsmFile, LSMpackage[64], LSMversion[128], LSMdescription[1024];
   int LsmCount = 0, x;
   FILE *idx;
   DIR *dir;
@@ -197,10 +195,9 @@ static void GenIndexes(const char *repodir) {
     printf("Processing %s... BSUM %04X\n", LsmFile, bsum);
 
     sprintf(tmpbuf, "appinfo/%s", LsmFile);
-    readlsm(tmpbuf, LSMversion, LSMtitle, LSMdescription);
+    readlsm(tmpbuf, LSMversion, LSMdescription);
 
     if (strlen(LSMpackage) > 8) printf("Warning: %s.zip is not in 8.3 format!\n", LSMpackage);
-    if (LSMtitle[0] == 0) printf("Warning: no LSM title for %s.zip\n", LSMpackage);
     if (LSMversion[0] == 0) printf("Warning: no LSM version for %s.zip!\n", LSMpackage);
     if (LSMdescription[0] == 0) printf("Warning: no LSM description for %s.zip!\n", LSMpackage);
     fprintf(idx, "%s\t%s\t%s\t%u\n", LSMpackage, LSMversion, LSMdescription, bsum);
