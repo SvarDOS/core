@@ -386,7 +386,7 @@ static int disksize(int drv) {
   long res;
   union REGS r;
   r.h.ah = 0x36; /* DOS 2+ get free disk space */
-  r.h.dl = drv;
+  r.h.dl = drv;  /* A=1, B=2, etc */
   int86(0x21, &r, &r);
   if (r.x.ax == 0xffffu) return(-1); /* AX set to FFFFh if drive invalid */
   res = r.x.ax;  /* sectors per cluster */
@@ -454,7 +454,11 @@ static int preparedrive(char sourcedrv) {
   int ds;
   int choice;
   char buff[1024];
-  if (selecteddrive == get_cur_drive()) selecteddrive = 4; /* use D: if install is run from C: (typically because it was booted from USB?) */
+  int driveid = 1; /* fdisk runs on first drive (unless USB boot) */
+  if (selecteddrive == get_cur_drive() + 1) { /* get_cur_drive() returns 0-based values (A=0) while selecteddrive is 1-based (A=1) */
+    selecteddrive = 4; /* use D: if install is run from C: (typically because it was booted from USB?) */
+    driveid = 2; /* primary drive is the emulated USB storage */
+  }
   cselecteddrive = 'A' + selecteddrive - 1;
   for (;;) {
     driveremovable = isdriveremovable(selecteddrive);
@@ -468,12 +472,14 @@ static int preparedrive(char sourcedrv) {
       putstringwrap(4, 1, COLOR_BODY[mono], buff);
       switch (menuselect(14, -1, 5, list, -1)) {
         case 0:
-          system("FDISK /AUTO"); /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
+          sprintf(buff, "FDISK /AUTO %d", driveid);
+          system(buff);
           break;
         case 1:
           video_clear(0x0700, 0, 0);
           video_movecursor(0, 0);
-          system("FDISK");  /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
+          sprintf(buff, "FDISK %d", driveid);
+          system(buff);
           break;
         case 2:
           return(MENUQUIT);
@@ -482,7 +488,8 @@ static int preparedrive(char sourcedrv) {
       }
       /* write a temporary MBR which only skips the drive (in case BIOS would
        * try to boot off the not-yet-ready C: disk) */
-      system("FDISK /AMBR"); /* writes BOOT.MBR into actual MBR */  /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
+      sprintf(buff, "FDISK /AMBR %d", driveid);
+      system(buff); /* writes BOOT.MBR into actual MBR */
       newscreen(2);
       putstringnls(10, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
       putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
@@ -521,7 +528,7 @@ static int preparedrive(char sourcedrv) {
     if (ds < SVARDOS_DISK_REQ) {
       int y = 9;
       newscreen(2);
-      snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB."), cselecteddrive);
+      snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB."), cselecteddrive, SVARDOS_DISK_REQ);
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
       putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
       input_getkey();
@@ -555,9 +562,13 @@ static int preparedrive(char sourcedrv) {
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
+      puts(buff);
       system(buff);
-      system("FDISK /MBR"); /* TODO DRIVE SHOULD BE SPECIFIED FOR MULTI-DRIVE SYSTEMS ! */
+      sprintf(buff, "FDISK /MBR %d", driveid);
+      puts(buff);
+      system(buff);
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
+      puts(buff);
       mkdir(buff);
       return(cselecteddrive);
     }
@@ -605,7 +616,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "DOS=UMB,HIGH\r\n"
               "LASTDRIVE=Z\r\n"
               "FILES=50\r\n");
-  fprintf(fd, "DEVICE=%c:\\SVARDOS\\BIN\\HIMEMX.EXE\r\n", targetdrv);
+  fprintf(fd, "DEVICE=C:\\SVARDOS\\BIN\\HIMEMX.EXE\r\n");
   if (strcmp(locales->lang, "EN") == 0) {
     strcpy(buff, "COMMAND");
   } else {
@@ -864,7 +875,7 @@ int main(void) {
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto Quit;
   if (action == MENUPREV) goto SelectLang;
-  targetdrv = preparedrive(sourcedrv); /* what drive should we install to? check avail. space */
+  targetdrv = preparedrive(sourcedrv); /* what drive should we install from? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
   bootfilesgen(targetdrv, &locales); /* generate boot files and other configurations */
