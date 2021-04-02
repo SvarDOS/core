@@ -562,13 +562,10 @@ static int preparedrive(char sourcedrv) {
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
-      puts(buff);
       system(buff);
       sprintf(buff, "FDISK /MBR %d", driveid);
-      puts(buff);
       system(buff);
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
-      puts(buff);
       mkdir(buff);
       return(cselecteddrive);
     }
