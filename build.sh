@@ -177,6 +177,22 @@ prep_flop 80 2 36 2880 "$CDROOT/boot.img"
 prep_flop 80 2 18 1440
 prep_flop 80 2 15 1200
 prep_flop 80 2  9  720
+#prep_flop 96 64 32 98304 "$PUBDIR/svardos-zip100.img" # ZIP 100M (for USB boot in "USB-ZIP mode")
+
+# prepare the USB bootable image
+USBIMG=$PUBDIR/svardos-usb.img
+cp files/boot-svardos.img $USBIMG
+mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
+for p in $ALLPKGS ; do
+  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.zip" ::/
+done
+
+# compress the USB image
+zip -mj9 "$PUBDIR/svardos-usb.zip" "$USBIMG"
+
+# prepare the USB-ZIP bootable image
+#USBZIPIMG=$PUBDIR/svardos-usbzip.img
+#cat files/usb-zip.mbr "$PUBDIR/svardos-zip100.img" > $USBZIPIMG
 
 CDISO="$PUBDIR/svardos-cd.iso"
 CDZIP="$PUBDIR/svardos-cd.zip"
