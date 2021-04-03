@@ -1,7 +1,7 @@
     <h1>SvarDOS - an open-source DOS distribution</h1>
     <p class="copyr">for PCs of the 1980-2000 era</p>
 
-    <div style="margin: -1em auto 2em auto; width: 21em; border: 1px #777 solid; background-color: #fff; padding: 0.1em 0.5em; color: #a00; font-size: 1.1em; border-radius: 0.3em;">This project is very much "work-in-progress", not everything works yet! Wanna help? Get in touch through the project's mailing list!</div>
+    <!--<div style="margin: -1em auto 2em auto; width: 21em; border: 1px #777 solid; background-color: #fff; padding: 0.1em 0.5em; color: #a00; font-size: 1.1em; border-radius: 0.3em;">This project is very much "work-in-progress", not everything works yet! Wanna help? Get in touch through the project's mailing list!</div>-->
 
     <p>SvarDOS is an open-source project that is meant to integrate the best out of the currently available DOS tools, drivers and games. DOS development has been abandoned by commercial players a very long time ago, mostly during early nineties. Nowadays, it survives solely through the efforts of hobbyists and retro-enthusiasts, but this is a highly sparse and unorganized ecosystem. SvarDOS aims to collect available DOS software, package it and make it easy to find and install applications using a network-enabled package manager (like apt-get, but for DOS and able to run even on a 8086 PC).</p>
 
@@ -33,6 +33,7 @@
       <li><a href="download/svardos-floppy-1440k.zip">SvarDOS install on 1.44M floppy disks</a></li>
       <li><a href="download/svardos-floppy-1200k.zip">SvarDOS install on 1.2M floppy disks</a></li>
       <li><a href="download/svardos-floppy-720k.zip">SvarDOS install on 720K floppy disks</a></li>
+      <li><a href="download/svardos-usb.zip">SvarDOS install on a bootable USB image</a></li>
     </ul>
 
     <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="https://osdn.net/projects/svardos/scm/svn/tree/head/">project's SVN</a>, where all the build-related files are stored.</p>
