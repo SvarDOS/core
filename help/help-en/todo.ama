@@ -15,8 +15,6 @@
   set? Or only selected drivers? Or maybe this could be provided as a
   "supplemental" floppy disk?
 
-* bootable USB install image
-
 * make the COMMAND package smaller so there is no need for multiple
   lang-dependant copies of the binary
 
@@ -37,6 +35,8 @@
 
 * test new versions of software and update packages accordingly. special care
   must be taken for core things: kernel, freecom, fdisk, himemx...
+
+* add new, useful software to the SvarDOS repository (see the %lpkgrules.ama:rules%t)
 
 * further NLS support, improvements of existing translations and adding new
   languages -> would be nice to have some kind of web interface for submitting
