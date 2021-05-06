@@ -179,6 +179,48 @@ prep_flop 80 2 15 1200
 prep_flop 80 2  9  720
 #prep_flop 96 64 32 98304 "$PUBDIR/svardos-zip100.img" # ZIP 100M (for USB boot in "USB-ZIP mode")
 
+# prepare the DOSEMU boot zip
+DOSEMUDIR='dosemu-prep-files'
+mkdir "$DOSEMUDIR"
+echo "mkdir %DOSDIR%" >> "$DOSEMUDIR/install.bat"
+echo "mkdir %DOSDIR%\\cfg" >> "$DOSEMUDIR/install.bat"
+echo "ECHO # pkg config file - specifies locations where packages should be installed >> %DOSDIR%\\cfg\\pkg.cfg" >> "$DOSEMUDIR/install.bat"
+echo "ECHO DIR PROGS C:\\ >> %DOSDIR%\\cfg\\pkg.cfg" >> "$DOSEMUDIR/install.bat"
+echo "ECHO DIR GAMES C:\\ >> %DOSDIR%\\cfg\\pkg.cfg" >> "$DOSEMUDIR/install.bat"
+echo "ECHO DIR DRIVERS C:\\DRIVERS\\ >> %DOSDIR%\\cfg\\pkg.cfg" >> "$DOSEMUDIR/install.bat"
+echo "ECHO DIR DEVEL C:\\DEVEL\\ >> %DOSDIR%\\cfg\\pkg.cfg" >> "$DOSEMUDIR/install.bat"
+for p in $COREPKGS ; do
+  cp "$CDROOT/$p.zip" "$DOSEMUDIR/"
+  echo "pkg install $p.zip" >> "$DOSEMUDIR/install.bat"
+  echo "del $p.zip" >> "$DOSEMUDIR/install.bat"
+done
+echo "del pkg.exe" >> "$DOSEMUDIR/install.bat"
+unzip -Cj packages/kernel.zip bin/kernel.sys -d "$DOSEMUDIR/"
+unzip -Cj packages/command.zip bin/command.com -d "$DOSEMUDIR/"
+unzip -Cj packages/pkg.zip bin/pkg.exe -d "$DOSEMUDIR/"
+echo "FILES=50" >> "$DOSEMUDIR/config.sys"
+echo "@ECHO OFF" >> "$DOSEMUDIR/autoexec.bat"
+echo "SET DOSDIR=C:\\SVARDOS" >> "$DOSEMUDIR/autoexec.bat"
+echo "PATH %DOSDIR%\\BIN" >> "$DOSEMUDIR/autoexec.bat"
+echo "IF EXIST INSTALL.BAT GOTO SETUP" >> "$DOSEMUDIR/autoexec.bat"
+echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
+echo "ECHO Welcome to SvarDOS (powered by DOSEMU)! Type HELP if you are lost." >> "$DOSEMUDIR/autoexec.bat"
+echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
+echo "GOTO DONE" >> "$DOSEMUDIR/autoexec.bat"
+echo "" >> "$DOSEMUDIR/autoexec.bat"
+echo "REM *** this is a one-time setup script used only during first initialization ***" >> "$DOSEMUDIR/autoexec.bat"
+echo ":SETUP" >> "$DOSEMUDIR/autoexec.bat"
+echo "CALL INSTALL.BAT" >> "$DOSEMUDIR/autoexec.bat"
+echo "DEL INSTALL.BAT" >> "$DOSEMUDIR/autoexec.bat"
+echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
+echo "ECHO -----------------------------------------------------" >> "$DOSEMUDIR/autoexec.bat"
+echo "ECHO  SVARDOS SETUP COMPLETED. PLEASE RESTART DOSEMU NOW." >> "$DOSEMUDIR/autoexec.bat"
+echo "PAUSE -----------------------------------------------------" >> "$DOSEMUDIR/autoexec.bat"
+echo ":DONE" >> "$DOSEMUDIR/autoexec.bat"
+rm -f "$PUBDIR/svardos-dosemu.zip"
+zip -rm9jk "$PUBDIR/svardos-dosemu.zip" "$DOSEMUDIR"
+rmdir "$DOSEMUDIR"
+
 # prepare the USB bootable image
 USBIMG=$PUBDIR/svardos-usb.img
 cp files/boot-svardos.img $USBIMG
@@ -188,6 +230,7 @@ for p in $ALLPKGS ; do
 done
 
 # compress the USB image
+rm -f "$PUBDIR/svardos-usb.zip"
 zip -mj9 "$PUBDIR/svardos-usb.zip" "$USBIMG"
 
 # prepare the USB-ZIP bootable image
