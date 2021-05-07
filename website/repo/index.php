@@ -69,7 +69,7 @@ if ($a === 'search') {
   $matches = 0;
   while (($pkg = fgetcsv($handle, 1024, "\t")) !== FALSE) {
     if ((stristr($pkg[0], $p)) || (stristr($pkg[2], $p))) {
-      echo str_pad(strtoupper($pkg[0]), 12) . str_pad("ver: {$pkg[1]}", 13) . str_pad("size: " . nicesize(filesize($pkg[0] . '.zip')), 13) . "BSUM: {$pkg[3]}\r\n";
+      echo str_pad(strtoupper($pkg[0]), 12) . str_pad("ver: {$pkg[1]}", 13) . str_pad("size: " . nicesize(filesize($pkg[0] . '.zip')), 13) . "BSUM: " . sprintf("%04X", $pkg[3]) . "\r\n";
       echo wordwrap($pkg[2], 79, "\r\n", true);
       echo "\r\n\r\n";
       $matches++;
