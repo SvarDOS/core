@@ -209,9 +209,9 @@ unzip -Cj packages/pkg.zip bin/pkg.exe -d "$DOSEMUDIR/"
 # CONFIG.SYS
 echo 'FILES=50' >> "$DOSEMUDIR/config.sys"
 echo 'DOS=HIGH,UMB' >> "$DOSEMUDIR/config.sys"
-echo 'DEVICE=D:\dosemu\umb.sys' >> "$DOSEMUDIR/config.sys"
-echo 'DEVICE=D:\dosemu\ems.sys' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICE=D:\dosemu\emufs.sys' >> "$DOSEMUDIR/config.sys"
+echo 'DEVICE=D:\dosemu\umb.sys' >> "$DOSEMUDIR/config.sys"
+echo 'DEVICEHIGH=D:\dosemu\ems.sys' >> "$DOSEMUDIR/config.sys"
 echo 'INSTALL=D:\dosemu\emufs.com' >> "$DOSEMUDIR/config.sys"
 # AUTOEXEC.BAT
 echo "@ECHO OFF" >> "$DOSEMUDIR/autoexec.bat"
