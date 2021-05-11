@@ -34,6 +34,7 @@
       <li><a href="download/svardos-floppy-1200k.zip">SvarDOS install on 1.2M floppy disks</a></li>
       <li><a href="download/svardos-floppy-720k.zip">SvarDOS install on 720K floppy disks</a></li>
       <li><a href="download/svardos-usb.zip">SvarDOS install on a bootable USB image</a></li>
+      <li><a href="download/svardos-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
     </ul>
 
     <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="https://osdn.net/projects/svardos/scm/svn/tree/head/">project's SVN</a>, where all the build-related files are stored.</p>

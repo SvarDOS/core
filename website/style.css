@@ -139,3 +139,13 @@ td.unsup {
   text-align: center;
   font-size: 0.9em;
 }
+
+span.helpmsg {
+  font-size: 0.7em;
+  color: #44e;
+  font-weight: bold;
+  border-radius: 1em;
+  background: #f7f700;
+  vertical-align: super;
+  padding: 0 0.3em;
+}
