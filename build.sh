@@ -198,6 +198,7 @@ for p in $COREPKGS ; do
 done
 echo 'ECHO my_ip = dhcp >> %DOSDIR%\CFG\WATTCP.CFG' >> "$DOSEMUDIR/install.bat"
 echo 'del pkg.exe' >> "$DOSEMUDIR/install.bat"
+echo 'ECHO SHELLHIGH=C:\SVARDOS\BIN\COMMAND.COM /P >> C:\CONFIG.SYS' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO.' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO  SVARDOS SETUP COMPLETED ' >> "$DOSEMUDIR/install.bat"
@@ -209,6 +210,7 @@ unzip -Cj packages/pkg.zip bin/pkg.exe -d "$DOSEMUDIR/"
 # CONFIG.SYS
 echo 'FILES=50' >> "$DOSEMUDIR/config.sys"
 echo 'DOS=HIGH,UMB' >> "$DOSEMUDIR/config.sys"
+echo 'DOSDATA=UMB' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICE=D:\dosemu\emufs.sys' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICE=D:\dosemu\umb.sys' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICEHIGH=D:\dosemu\ems.sys' >> "$DOSEMUDIR/config.sys"
