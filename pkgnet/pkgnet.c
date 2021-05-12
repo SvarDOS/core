@@ -34,7 +34,7 @@
 
 #include "net.h"
 
-#define PVER "20210121"
+#define PVER "20210512"
 #define PDATE "2021"
 
 #define HOSTADDR "svardos.osdn.io"
