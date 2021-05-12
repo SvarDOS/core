@@ -114,7 +114,7 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
 static long htget(const char *ipaddr, const char *url, const char *outfname, unsigned short *bsum) {
   struct net_tcpsocket *sock;
   unsigned char buffer[4096];
-  time_t lastactivity;
+  time_t lastactivity, lastprogressoutput = 0;
   int headersdone = 0;
   int httpcode = -1;
   long flen = 0;
@@ -205,6 +205,11 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
           break;
         }
         flen += byteread;
+        /* update progress once a sec */
+        if (lastprogressoutput != lastactivity) {
+          lastprogressoutput = lastactivity;
+          printf("%ld KiB\r", flen >> 10);
+        }
         /* update the bsd sum */
         for (i = 0; i < byteread; i++) {
           /* rotr16 */
