@@ -34,7 +34,7 @@
 
 #include "net.h"
 
-#define PVER "20210512"
+#define PVER "20210513"
 #define PDATE "2021"
 
 #define HOSTADDR "svardos.osdn.io"
@@ -137,8 +137,8 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     _asm int 28h;  /* DOS idle */
   }
 
-  /* socket is connected - send the http request */
-  snprintf((char *)buffer, sizeof(buffer), "GET %s HTTP/1.1\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet\r\nConnection: close\r\n\r\n", url);
+  /* socket is connected - send the http request (MUST be HTTP/1.0 because I do not support chunked transfers!) */
+  snprintf((char *)buffer, sizeof(buffer), "GET %s HTTP/1.0\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet\r\nConnection: close\r\n\r\n", url);
 
   if (net_send(sock, buffer, strlen((char *)buffer)) != (int)strlen((char *)buffer)) {
     puts("ERROR: failed to send HTTP query to remote server");
