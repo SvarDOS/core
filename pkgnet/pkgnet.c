@@ -216,7 +216,6 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
           unsigned short bsumlsb = *bsum & 1;
           *bsum >>= 1;
           *bsum |= (bsumlsb << 15);
-          /* bsum += ch */
           *bsum += buffer[i];
         }
       } else { /* otherwise dump to screen */
