@@ -128,7 +128,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
 
   /* wait for net_connect() to actually connect */
   for (;;) {
-    int connstate = net_isconnected(sock, 1);
+    int connstate = net_isconnected(sock);
     if (connstate > 0) break;
     if (connstate < 0) {
       puts("ERROR: connection error");
@@ -140,14 +140,14 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   /* socket is connected - send the http request */
   snprintf((char *)buffer, sizeof(buffer), "GET %s HTTP/1.1\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet\r\nConnection: close\r\n\r\n", url);
 
-  if (net_send(sock, (char *)buffer, strlen((char *)buffer)) != (int)strlen((char *)buffer)) {
+  if (net_send(sock, buffer, strlen((char *)buffer)) != (int)strlen((char *)buffer)) {
     puts("ERROR: failed to send HTTP query to remote server");
     goto SHITQUIT;
   }
 
   lastactivity = time(NULL);
   for (;;) {
-    int byteread = net_recv(sock, (char *)buffer, sizeof(buffer) - 1); /* -1 because I will append a NULL terminator */
+    int byteread = net_recv(sock, buffer, sizeof(buffer) - 1); /* -1 because I will append a NULL terminator */
 
     if (byteread < 0) break; /* end of connection */
 

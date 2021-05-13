@@ -68,8 +68,7 @@ struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port) {
 }
 
 
-int net_isconnected(struct net_tcpsocket *s, int waitstate) {
-  waitstate = waitstate; /* gcc warning shut */
+int net_isconnected(struct net_tcpsocket *s) {
   if (tcp_tick(s->sock) == 0) return(-1);
   if (sock_established(s->sock) == 0) return(0);
   return(1);
@@ -78,24 +77,20 @@ int net_isconnected(struct net_tcpsocket *s, int waitstate) {
 
 /* Sends data on socket 'socket'.
    Returns the number of bytes sent on success, and < 0 otherwise */
-int net_send(struct net_tcpsocket *socket, const char *line, long len) {
-  int res;
+int net_send(struct net_tcpsocket *socket, const void *line, long len) {
   /* call this to let Watt-32 handle its internal stuff */
   if (tcp_tick(socket->sock) == 0) return(-1);
   /* send bytes */
-  res = sock_write(socket->sock, (void *)line, len);
-  return(res);
+  return(sock_write(socket->sock, line, len));
 }
 
 
 /* Reads data from socket 'sock' and write it into buffer 'buff', until end of connection. Will fall into error if the amount of data is bigger than 'maxlen' bytes.
 Returns the amount of data read (in bytes) on success, or a negative value otherwise. The error code can be translated into a human error message via libtcp_strerr(). */
-int net_recv(struct net_tcpsocket *socket, char *buff, long maxlen) {
-  int i;
+int net_recv(struct net_tcpsocket *socket, void *buff, long maxlen) {
   /* call this to let WatTCP handle its internal stuff */
   if (tcp_tick(socket->sock) == 0) return(-1);
-  i = sock_fastread(socket->sock, (void *)buff, maxlen);
-  return(i);
+  return(sock_fastread(socket->sock, buff, maxlen));
 }
 
 
