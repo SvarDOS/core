@@ -166,34 +166,34 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     if (byteread > 0) {
       buffer[byteread] = 0;
       lastactivity = time(NULL);
-      /* do I know the http code yet? */
-      if (httpcode < 0) {
-        int spc;
-        /* find the first space (HTTP/1.1 200 OK) */
-        for (spc = 0; spc < 16; spc++) {
-          if (buffer[spc] == ' ') break;
-          if (buffer[spc] == 0) break;
-        }
-        if (buffer[spc] == 0) continue; /* not enough data received */
-        if (buffer[spc] != ' ') {
-          puts("ERROR: server answered with invalid HTTP");
-          goto SHITQUIT;
-        }
-        httpcode = atoi((char *)(buffer + spc + 1));
-        /* on error, the answer should be always printed on screen */
-        if ((httpcode == 200) && (*outfname != 0)) {
-          fd = fopen(outfname, "wb");
-          if (fd == NULL) {
-            printf("ERROR: failed to create file %s", outfname);
-            puts("");
+      /* are headers done already? */
+      if (headersdone == 0) {
+        if (httpcode < 0) { /* do I know the http code yet? */
+          int spc;
+          /* find the first space (HTTP/1.1 200 OK) */
+          for (spc = 0; spc < 16; spc++) {
+            if (buffer[spc] == ' ') break;
+            if (buffer[spc] == 0) break;
+          }
+          if (buffer[spc] == 0) continue; /* not enough data received */
+          if (buffer[spc] != ' ') {
+            puts("ERROR: server answered with invalid HTTP");
             goto SHITQUIT;
           }
+          httpcode = atoi((char *)(buffer + spc + 1));
+          /* on error, the answer should be always printed on screen */
+          if ((httpcode == 200) && (*outfname != 0)) {
+            fd = fopen(outfname, "wb");
+            if (fd == NULL) {
+              printf("ERROR: failed to create file %s", outfname);
+              puts("");
+              goto SHITQUIT;
+            }
+          }
         }
-      }
-      /* skip headers: look for \r\n\r\n or \n\n within the stream */
-      if (headersdone == 0) {
+        /* skip headers: look for \r\n\r\n or \n\n within the stream */
         byteread = detecthttpheadersend(buffer, byteread);
-        headersdone = 1;
+        headersdone = 1; /* assumes ALL headers are contained in the first packet TODO FIXME */
         if (byteread == 0) continue;
       }
       /* if downloading to file, write stuff to disk */
