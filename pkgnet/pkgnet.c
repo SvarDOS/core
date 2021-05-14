@@ -208,7 +208,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
         /* update progress once a sec */
         if (lastprogressoutput != lastactivity) {
           lastprogressoutput = lastactivity;
-          printf("%ld KiB (%ld KiB/s)\r", flen >> 10, (flen >> 10) - (lastflen >> 10));
+          printf("%ld KiB (%ld KiB/s)     \r", flen >> 10, (flen >> 10) - (lastflen >> 10)); /* trailing spaces are meant to avoid leaving garbage on screen if speed goes from, say, 1000 KiB/s to 9 KiB/s */
           lastflen = flen;
           fflush(stdout); /* avoid console buffering */
         }
@@ -229,7 +229,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   return(flen);
 
   SHITQUIT:
-  net_abort(sock);
+  net_close(sock);
   return(-1);
 }
 

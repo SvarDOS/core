@@ -7,11 +7,7 @@
 #ifndef libtcp_hdr
 #define libtcp_hdr
 
-struct net_tcpsocket {
-  int s;       /* used by platforms with BSD-style sockets */
-  void *sock;  /* used by other exotic things (like Watt-32) */
-  char buffer[1];
-};
+struct net_tcpsocket; /* opaque struct, exact implementation in net.c */
 
 /* resolves name and fills resovled addr into ip. returns 0 on success. */
 int net_dnsresolve(char *ip, const char *name);
@@ -40,9 +36,6 @@ int net_recv(struct net_tcpsocket *socket, void *buff, long maxlen);
 
 /* Close the 'sock' socket. */
 void net_close(struct net_tcpsocket *socket);
-
-/* Close the 'sock' socket immediately (to be used when the peer is behaving wrongly) - this is much faster than net_close(). */
-void net_abort(struct net_tcpsocket *socket);
 
 /* Returns an info string about the networking engine being used */
 const char *net_engine(void);

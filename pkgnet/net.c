@@ -14,6 +14,12 @@
 #include "net.h" /* include self for control */
 
 
+struct net_tcpsocket {
+  tcp_Socket *sock;
+  tcp_Socket _sock; /* watt32 socket */
+};
+
+
 int net_dnsresolve(char *ip, const char *name) {
   unsigned long ipnum;
   ipnum = resolve(name); /* I could use WatTCP's lookup_host() here to do all
@@ -47,13 +53,9 @@ struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port) {
   ipaddr = _inet_addr(ipstr);
   if (ipaddr == 0) return(NULL);
 
-  resultsock = calloc(sizeof(struct net_tcpsocket) + sizeof(tcp_Socket), 1);
+  resultsock = calloc(sizeof(struct net_tcpsocket), 1);
   if (resultsock == NULL) return(NULL);
-  resultsock->sock = resultsock->buffer;
-  if (resultsock->sock == NULL) {
-    free(resultsock);
-    return(NULL);
-  }
+  resultsock->sock = &(resultsock->_sock);
 
   /* explicitely set user-managed buffer to none (watt32 will use its own internal buffer) */
   sock_setbuf(resultsock->sock, NULL, 0);
@@ -99,12 +101,6 @@ void net_close(struct net_tcpsocket *socket) {
   /* I could use sock_close() and sock_wait_closed() if I'd want to be
    * friendly, but it's much easier on the tcp stack to send a single RST and
    * forget about the connection (esp. if the peer is misbehaving) */
-  net_abort(socket);
-}
-
-
-/* Close the 'sock' socket immediately (to be used when the peer is behaving wrongly) - this is much faster than net_close(). */
-void net_abort(struct net_tcpsocket *socket) {
   sock_abort(socket->sock);
   free(socket);
 }
