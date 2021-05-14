@@ -34,7 +34,7 @@
 
 #include "net.h"
 
-#define PVER "20210513"
+#define PVER "20210514"
 #define PDATE "2021"
 
 #define HOSTADDR "svardos.osdn.io"
@@ -117,7 +117,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   time_t lastactivity, lastprogressoutput = 0;
   int headersdone = 0;
   int httpcode = -1;
-  long flen = 0;
+  long flen = 0, lastflen = 0;
   FILE *fd = NULL;
 
   sock = net_connect(ipaddr, 80);
@@ -208,7 +208,9 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
         /* update progress once a sec */
         if (lastprogressoutput != lastactivity) {
           lastprogressoutput = lastactivity;
-          printf("%ld KiB\r", flen >> 10);
+          printf("%ld KiB (%ld KiB/s)\r", flen >> 10, (flen >> 10) - (lastflen >> 10));
+          lastflen = flen;
+          fflush(stdout); /* avoid console buffering */
         }
         /* update the bsd sum */
         for (i = 0; i < byteread; i++) {
