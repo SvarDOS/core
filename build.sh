@@ -63,8 +63,9 @@ ALLPKGS="$COREPKGS $EXTRAPKGS"
 
 # function that builds the packages repository
 function dorepo {
-  # copy all zip files to the web repo
-  cp "$PKGDIR"/* $REPOROOT/
+  # clear out the web repo and copy all zip files to it
+  rm "$REPOROOT"/*
+  cp "$PKGDIR"/* "$REPOROOT/"
   # now strip the sources from repo versions
   find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "SOURCE/*" ';'
   find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "source/*" ';'
