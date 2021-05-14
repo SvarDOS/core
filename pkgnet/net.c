@@ -14,9 +14,26 @@
 #include "net.h" /* include self for control */
 
 
+/* if there is enough memory, net_connect() will try setting up a tcp window
+ * larger than the WATT32's default of only 2K
+ * on my system's DOSEMU install the relation between tcp buffer and download
+ * speed were measured as follows (this is on a 4 Mbps ADSL link):
+ *  2K = 20 KiB/s
+ *  4K = 51 KiB/s
+ *  8K = 67 KiB/s
+ *  9K = 98 KiB/s
+ * 10K = 98 KiB/s
+ * 16K = 96 KiB/s
+ * 32K = 98 KiB/s
+ * 60K = 98 KiB/s
+ */
+#define TCPBUFF_SIZE (16 * 1024)
+
+
 struct net_tcpsocket {
   tcp_Socket *sock;
   tcp_Socket _sock; /* watt32 socket */
+  char tcpbuff[1];
 };
 
 
@@ -46,7 +63,7 @@ int net_init(void) {
 
 
 struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port) {
-  struct net_tcpsocket *resultsock;
+  struct net_tcpsocket *resultsock, *resizsock;
   unsigned long ipaddr;
 
   /* convert ip to value */
@@ -57,13 +74,19 @@ struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port) {
   if (resultsock == NULL) return(NULL);
   resultsock->sock = &(resultsock->_sock);
 
-  /* explicitely set user-managed buffer to none (watt32 will use its own internal buffer) */
-  sock_setbuf(resultsock->sock, NULL, 0);
-
   if (!tcp_open(resultsock->sock, 0, ipaddr, port, NULL)) {
     sock_abort(resultsock->sock);
     free(resultsock);
     return(NULL);
+  }
+
+  /* set user-managed buffer if possible (watt32's default is only 2K)
+   * this must be set AFTER tcp_open(), since the latter rewrites the tcp
+   * rx buffer */
+  resizsock = realloc(resultsock, sizeof(struct net_tcpsocket) + TCPBUFF_SIZE);
+  if (resizsock != NULL) {
+    resultsock = resizsock;
+    sock_setbuf(resultsock->sock, resultsock->tcpbuff, TCPBUFF_SIZE);
   }
 
   return(resultsock);
