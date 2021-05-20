@@ -34,17 +34,17 @@
 
 #include "net.h"
 
-#define PVER "20210514"
+#define PVER "20210520"
 #define PDATE "2021"
 
 #define HOSTADDR "svardos.osdn.io"
 
 
-/* strips http headers and returns new buff len */
-static int detecthttpheadersend(unsigned char *buff, int len) {
-  static char lastbyteislf = 0; /* static because I must potentially remember it for next packet/call */
-  int i;
-  for (i = 0; i < len; i++) {
+/* returns length of all http headers, or 0 if uncomplete yet */
+static unsigned short detecthttpheadersend(const unsigned char *buff) {
+  char lastbyteislf = 0;
+  unsigned short i;
+  for (i = 0; buff[i] != 0; i++) {
     if (buff[i] == '\r') continue; /* ignore CR characters */
     if (buff[i] != '\n') {
       lastbyteislf = 0;
@@ -55,11 +55,8 @@ static int detecthttpheadersend(unsigned char *buff, int len) {
       lastbyteislf = 1;
       continue;
     }
-    /* end of headers! rewind the buffer and return new len */
-    i += 1; /* add 1 to skip the current \n character */
-    len -= i;
-    if (len > 0) memmove(buff, buff + i, len + 1); /* +1 so I catch the string terminator as well */
-    return(len);
+    /* end of headers! return length of headers */
+    return(i + 1); /* add 1 to skip the current \n character */
   }
   return(0);
 }
@@ -107,6 +104,46 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
 }
 
 
+static int htget_headers(unsigned char *buffer, size_t buffersz, struct net_tcpsocket *sock, int *httpcode)  {
+  unsigned char *buffptr = buffer;
+  unsigned short bufflen = 0;
+  int byteread;
+  time_t starttime = time(NULL);
+  for (;;) {
+    byteread = net_recv(sock, buffptr, buffersz - (bufflen + 1)); /* -1 because I will append a NULL terminator */
+
+    if (byteread > 0) { /* got data */
+      int hdlen;
+      bufflen += byteread;
+      buffptr += byteread;
+      buffer[bufflen] = 0;
+      hdlen = detecthttpheadersend(buffer);
+      if (hdlen > 0) { /* full headers - parse http code and continue processing */
+        int spc;
+        /* find the first space (HTTP/1.1 200 OK) */
+        for (spc = 0; spc < 16; spc++) {
+          if (buffer[spc] == ' ') break;
+          if (buffer[spc] == 0) break;
+        }
+        if (buffer[spc] != ' ') return(-1);
+        *httpcode = atoi((char *)(buffer + spc + 1));
+        /* rewind the buffer */
+        bufflen -= hdlen;
+        memmove(buffer, buffer + hdlen, bufflen);
+        return(bufflen); /* move to body processing now */
+      }
+
+    } else if (byteread < 0) { /* abort on error */
+      return(-2); /* unexpected end of connection (while waiting for all http headers) */
+
+    } else { /* else no data received - look for timeout and release a cpu cycle */
+      if (time(NULL) - starttime > 20) return(-3); /* TIMEOUT! */
+      _asm int 28h; /* release a CPU cycle */
+    }
+  }
+}
+
+
 /* fetch http data from ipaddr using url
  * write result to file outfname if not null, or print to stdout otherwise
  * fills bsum with the BSD sum of the data
@@ -115,8 +152,8 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   struct net_tcpsocket *sock;
   unsigned char buffer[4096];
   time_t lastactivity, lastprogressoutput = 0;
-  int headersdone = 0;
   int httpcode = -1;
+  int byteread;
   long flen = 0, lastflen = 0;
   FILE *fd = NULL;
 
@@ -145,57 +182,33 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     goto SHITQUIT;
   }
 
-  lastactivity = time(NULL);
-  for (;;) {
-    int byteread = net_recv(sock, buffer, sizeof(buffer) - 1); /* -1 because I will append a NULL terminator */
+  /* receive and process HTTP headers */
+  byteread = htget_headers(buffer, sizeof(buffer), sock, &httpcode);
 
-    if (byteread < 0) break; /* end of connection */
+  /* transmission error? */
+  if (byteread < 0) {
+    printf("ERROR: communication error (%d)", byteread);
+    puts("");
+    goto SHITQUIT;
+  }
 
-    /*  */
-    if (byteread == 0) {
-      if (time(NULL) - lastactivity > 20) { /* TIMEOUT! */
-        puts("ERROR: Timeout while waiting for data");
-        goto SHITQUIT;
-      }
-      /* waiting for packets - release a CPU cycle in the meantime */
-      _asm int 28h;
-      /* */
-      continue;
+  /* open destination file if required and if no server-side error occured */
+  if ((httpcode == 200) && (*outfname != 0)) {
+    fd = fopen(outfname, "wb");
+    if (fd == NULL) {
+      printf("ERROR: failed to create file %s", outfname);
+      puts("");
+      goto SHITQUIT;
     }
+  }
 
-    if (byteread > 0) {
+  /* read body of the answer */
+  lastactivity = time(NULL);
+  for (;; byteread = net_recv(sock, buffer, sizeof(buffer) - 1)) { /* read 1 byte less because I need to append a NULL terminator */
+
+    if (byteread > 0) { /* got data */
       buffer[byteread] = 0;
       lastactivity = time(NULL);
-      /* are headers done already? */
-      if (headersdone == 0) {
-        if (httpcode < 0) { /* do I know the http code yet? */
-          int spc;
-          /* find the first space (HTTP/1.1 200 OK) */
-          for (spc = 0; spc < 16; spc++) {
-            if (buffer[spc] == ' ') break;
-            if (buffer[spc] == 0) break;
-          }
-          if (buffer[spc] == 0) continue; /* not enough data received */
-          if (buffer[spc] != ' ') {
-            puts("ERROR: server answered with invalid HTTP");
-            goto SHITQUIT;
-          }
-          httpcode = atoi((char *)(buffer + spc + 1));
-          /* on error, the answer should be always printed on screen */
-          if ((httpcode == 200) && (*outfname != 0)) {
-            fd = fopen(outfname, "wb");
-            if (fd == NULL) {
-              printf("ERROR: failed to create file %s", outfname);
-              puts("");
-              goto SHITQUIT;
-            }
-          }
-        }
-        /* skip headers: look for \r\n\r\n or \n\n within the stream */
-        byteread = detecthttpheadersend(buffer, byteread);
-        headersdone = 1; /* assumes ALL headers are contained in the first packet TODO FIXME */
-        if (byteread == 0) continue;
-      }
       /* if downloading to file, write stuff to disk */
       if (fd != NULL) {
         int i;
@@ -223,14 +236,29 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
       } else { /* otherwise dump to screen */
         printf("%s", buffer);
       }
+
+    } else if (byteread < 0) { /* end of connection */
+      break;
+
+    } else { /* check for timeout (byteread == 0) */
+      if (time(NULL) - lastactivity > 20) { /* TIMEOUT! */
+        puts("ERROR: Timeout while waiting for data");
+        goto SHITQUIT;
+      }
+      /* waiting for packets - release a CPU cycle in the meantime */
+      _asm int 28h;
     }
   }
-  net_close(sock);
-  return(flen);
+
+  goto ALLGOOD;
 
   SHITQUIT:
+  flen = -1;
+
+  ALLGOOD:
+  if (fd != NULL) fclose(fd);
   net_close(sock);
-  return(-1);
+  return(flen);
 }
 
 
