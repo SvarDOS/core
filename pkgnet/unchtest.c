@@ -17,7 +17,7 @@ static size_t randchunkdata(void *file_chunked, const void *file_raw, size_t fil
   size_t file_chunked_len = 0;
 
   for (;;) {
-    size_t chunklen = (rand() % maxchunksz) + 1;
+    int chunklen = (rand() % maxchunksz) + 1;
     if (file_raw_read + chunklen > file_raw_len) chunklen = file_raw_len - file_raw_read;
 
     file_chunked_len += sprintf((char *)file_chunked + file_chunked_len, "%x\r\n", chunklen);
@@ -40,16 +40,26 @@ static void dumpfile(const char *fname, const void *buff, size_t fsize) {
 
 
 int main(int argc, char **argv) {
-  static unsigned char file_raw[30000u];     /* original file */
-  static unsigned char file_chunked[60000u]; /* chunked version */
-  static unsigned char file_decoded[60000u]; /* after being un-chunked */
+  unsigned char *file_raw;        /* original file */
+  unsigned char *file_chunked;    /* chunked version */
+  unsigned char *file_decoded;    /* after being un-chunked */
   size_t file_raw_len;
   size_t file_chunked_len;
   FILE *fd;
-  int trycount;
+  unsigned int trycount;
 
   if ((argc != 2) || (argv[1][0] == '/')) {
     puts("Usage: unchtest <file>");
+    return(1);
+  }
+
+  #define FILESZ_MAX 20000u
+
+  file_raw = malloc(FILESZ_MAX);
+  file_chunked = malloc(65000u);
+  file_decoded = malloc(65000u);
+  if ((file_raw == NULL) || (file_chunked == NULL) || (file_decoded == NULL)) {
+    puts("ERROR: out of memory");
     return(1);
   }
 
@@ -58,29 +68,30 @@ int main(int argc, char **argv) {
     puts("ERROR: failed to open file");
     return(1);
   }
-  file_raw_len = fread(file_raw, 1, sizeof(file_raw), fd);
+  file_raw_len = fread(file_raw, 1, FILESZ_MAX, fd);
   fclose(fd);
 
   printf("Loaded '%s' (%zu bytes)\r\n", argv[1], file_raw_len);
   srand(time(NULL));
 
-  for (trycount = 0; trycount < 1000; trycount++) {
+  for (trycount = 0; trycount < 30000; trycount++) {
     size_t bytesprocessed = 0;
     size_t file_decoded_len = 0;
     int maxchunksz;
 
     /* segment file into chunks of random size */
-    maxchunksz = (rand() % 1024) + 1;
+    maxchunksz = (rand() % 256) + 8;
     file_chunked_len = randchunkdata(file_chunked, file_raw, file_raw_len, maxchunksz);
 
-    printf("=== TRY %d (CHUNKS: %d BYTES MAX) ======================\r\n", trycount + 1, maxchunksz);
+    printf("=== TRY %d (CHUNKS: %u BYTES MAX) ======================\r\n", trycount + 1, maxchunksz);
 
     for (;;) {
       size_t bytes;
       int decodedbytes;
-      unsigned char buffer[4096];
+      static unsigned char buffer[4096];
 
-      bytes = min((rand() % 256) + 1, file_chunked_len - bytesprocessed);
+      bytes = (rand() % 256) + 1;
+      if (bytes > file_chunked_len - bytesprocessed) bytes = file_chunked_len - bytesprocessed;
       printf("processing %4zu bytes of chunked data", bytes);
       memcpy(buffer, file_chunked + bytesprocessed, bytes);
 
@@ -103,7 +114,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  printf("OK\r\n");
+  printf("OK (%u tests)\r\n", trycount);
 
   return(0);
 }
