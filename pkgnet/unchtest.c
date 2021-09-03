@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
     size_t bytesprocessed = 0;
     size_t file_decoded_len = 0;
     int maxchunksz;
+    struct unchunk_state unchstate = {0};
 
     /* segment file into chunks of random size */
     maxchunksz = (rand() % 256) + 8;
@@ -96,7 +97,7 @@ int main(int argc, char **argv) {
       memcpy(buffer, file_chunked + bytesprocessed, bytes);
 
       /* decode the chunked version reading random amounts of data and build a decoded version */
-      decodedbytes = unchunk(buffer, bytes);
+      decodedbytes = unchunk(buffer, bytes, &unchstate);
       printf(" -> decoded into %4d raw bytes\r\n", decodedbytes);
       memcpy(file_decoded + file_decoded_len, buffer, decodedbytes);
       file_decoded_len += decodedbytes;
