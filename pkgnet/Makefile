@@ -15,7 +15,7 @@ release: pkgnet.exe .symbolic
 	zip -9 -r -m pkgnet.zip bin appinfo
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj
-	wcl -lr -k8192 $(LIB) pkgnet.obj net.obj unchunk.obj -fe=pkgnet.exe
+	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj -fe=pkgnet.exe
 
 pkgnet.obj: pkgnet.c
 	*wcc $(CFLAGS) pkgnet.c
