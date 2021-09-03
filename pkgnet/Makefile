@@ -14,11 +14,20 @@ release: pkgnet.exe .symbolic
 	copy pkgnet.lsm appinfo
 	zip -9 -r -m pkgnet.zip bin appinfo
 
-pkgnet.exe: pkgnet.obj net.obj unchunk.obj
-	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj -fe=pkgnet.exe
+pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
+	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
 
 pkgnet.obj: pkgnet.c
 	*wcc $(CFLAGS) pkgnet.c
+
+trim.obj: ..\pkg\trim.c
+	*wcc $(CFLAGS) ..\pkg\trim.c
+
+lsm.obj: ..\pkg\lsm.c
+	*wcc $(CFLAGS) ..\pkg\lsm.c
+
+helpers.obj: ..\pkg\helpers.c
+	*wcc $(CFLAGS) ..\pkg\helpers.c
 
 net.obj: net.c
 	*wcc $(CFLAGS) net.c

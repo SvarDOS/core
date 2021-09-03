@@ -27,6 +27,7 @@
  * http://svardos.osdn.io
  */
 
+#include <direct.h> /* opendir() and friends */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +35,9 @@
 
 #include "net.h"
 #include "unchunk.h"
+
+#include "../pkg/lsm.h"
+
 
 #define PVER "20210903"
 #define PDATE "2021"
@@ -171,8 +175,49 @@ static int htget_headers(unsigned char *buffer, size_t buffersz, struct net_tcps
    fills buff with data and returns data length.
    must be called repeateadly until zero-lengh is returned */
 static unsigned short checkupdata(char *buff) {
-  buff[0] = 0;
-  return(0);
+  static char *dosdir = NULL;
+  static DIR *dp;
+  static struct dirent *ep;
+
+  /* make sure I know %DOSDIR% */
+  if (dosdir == NULL) {
+    dosdir = getenv("DOSDIR");
+    if ((dosdir == NULL) || (dosdir[0] == 0)) {
+      puts("ERROR: %DOSDIR% not set");
+      return(0);
+    }
+  }
+
+  /* if first call, open the package directory */
+  if (dp == NULL) {
+    sprintf(buff, "%s\\packages", dosdir);
+    dp = opendir(buff);
+    if (dp == NULL) {
+      puts("ERROR: Could not access %DOSDIR%\\packages directory");
+      return(0);
+    }
+  }
+
+  for (;;) {
+    int tlen;
+    char ver[16];
+    ep = readdir(dp);   /* readdir() result must never be freed (statically allocated) */
+    if (ep == NULL) {   /* no more entries */
+      closedir(dp);
+      return(0);
+    }
+
+    tlen = strlen(ep->d_name);
+    if (tlen < 4) continue; /* files must be at least 5 bytes long ("x.lst") */
+    if (strcasecmp(ep->d_name + tlen - 4, ".lst") != 0) continue;  /* if not an .lst file, skip it silently */
+    ep->d_name[tlen - 4] = 0; /* trim out the ".lst" suffix */
+
+    /* load the metadata from %DOSDIR\APPINFO\*.lsm */
+    sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
+    readlsm(buff, ver, sizeof(ver));
+
+    return(sprintf(buff, "%s %s\n", ep->d_name, ver));
+  }
 }
 
 
@@ -230,10 +275,10 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     unsigned short blen;
     int hlen;
     char *hbuf = (char *)buffer + buffersz - 16;
-    for (;;) {
+    do {
       blen = checkupdata((char *)buffer);
       if (blen == 0) { /* last item contains the message trailer */
-        hlen = sprintf(hbuf, "0\r\n\r\n");
+        hlen = sprintf(hbuf, "0\r\n");
       } else {
         hlen = sprintf(hbuf, "%X\r\n", blen);
       }
@@ -241,12 +286,14 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
         puts("ERROR: failed to send POST data to remote server");
         goto SHITQUIT;
       }
-      if (blen == 0) break;
+      /* add trailing CR/LF to buffer as required by chunked mode */
+      buffer[blen++] = '\r';
+      buffer[blen++] = '\n';
       if (net_send(sock, buffer, blen) != blen) {
         puts("ERROR: failed to send POST data to remote server");
         goto SHITQUIT;
       }
-    }
+    } while (blen != 2);
   }
 
   /* receive and process HTTP headers */
