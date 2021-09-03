@@ -33,8 +33,9 @@
 #include <time.h>
 
 #include "net.h"
+#include "unchunk.h"
 
-#define PVER "20210520"
+#define PVER "20210903"
 #define PDATE "2021"
 
 #define HOSTADDR "svardos.osdn.io"
@@ -76,14 +77,18 @@ static void help(void) {
   puts(" pull     - downloads package into current directory");
   puts(" checkup  - lists updates available for your system");
   puts("");
+  printf("Watt32 kernel: %s", net_engine());
+  puts("");
+  puts("");
 }
 
 
 /* parses command line arguments and fills outfname and url accordingly
  * returns 0 on success, non-zero otherwise */
-static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
+static int parseargv(int argc, char * const *argv, char *outfname, char *url, int *ispost) {
   *outfname = 0;
   *url = 0;
+  *ispost = 0;
   if ((argc == 3) && (strcasecmp(argv[1], "search") == 0)) {
     sprintf(url, "/repo/?a=search&p=%s", argv[2]);
   } else if ((argc == 3) && (strcasecmp(argv[1], "pull") == 0)) {
@@ -94,8 +99,8 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
     sprintf(url, "/repo/?a=pull&p=%s", argv[2]);
     sprintf(outfname, "%s.zip", argv[2]);
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
-    puts("NOT SUPPORTED YET");
-    return(-1);
+    sprintf(url, "/repo/?a=checkup");
+    *ispost = 1;
   } else {
     help();
     return(-1);
@@ -104,7 +109,7 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url) {
 }
 
 
-static int htget_headers(unsigned char *buffer, size_t buffersz, struct net_tcpsocket *sock, int *httpcode)  {
+static int htget_headers(unsigned char *buffer, size_t buffersz, struct net_tcpsocket *sock, int *httpcode, int *ischunked)  {
   unsigned char *buffptr = buffer;
   unsigned short bufflen = 0;
   int byteread;
@@ -119,14 +124,32 @@ static int htget_headers(unsigned char *buffer, size_t buffersz, struct net_tcps
       buffer[bufflen] = 0;
       hdlen = detecthttpheadersend(buffer);
       if (hdlen > 0) { /* full headers - parse http code and continue processing */
-        int spc;
+        int i;
+        buffer[hdlen - 1] = 0;
         /* find the first space (HTTP/1.1 200 OK) */
-        for (spc = 0; spc < 16; spc++) {
-          if (buffer[spc] == ' ') break;
-          if (buffer[spc] == 0) break;
+        for (i = 0; i < 16; i++) {
+          if ((buffer[i] == ' ') || (buffer[i] == 0)) break;
         }
-        if (buffer[spc] != ' ') return(-1);
-        *httpcode = atoi((char *)(buffer + spc + 1));
+        if (buffer[i] != ' ') return(-1);
+        *httpcode = atoi((char *)(buffer + i + 1));
+        /* switch all headers to low-case so it is easier to parse them */
+        for (i = 0; i < hdlen; i++) if ((buffer[i] >= 'A') && (buffer[i] <= 'Z')) buffer[i] += ('a' - 'A');
+        /* look out for chunked transfer encoding */
+        {
+        char *lineptr = strstr((char *)buffer, "\ntransfer-encoding:");
+        if (lineptr != NULL) {
+          lineptr += 19;
+          /* replace nearest \r, \n or 0 by 0 */
+          for (i = 0; ; i++) {
+            if ((lineptr[i] == '\r') || (lineptr[i] == '\n') || (lineptr[i] == 0)) {
+              lineptr[i] = 0;
+              break;
+            }
+          }
+          /* do I see the 'chunked' word? */
+          if (strstr((char *)lineptr, "chunked") != NULL) *ischunked = 1;
+        }
+        }
         /* rewind the buffer */
         bufflen -= hdlen;
         memmove(buffer, buffer + hdlen, bufflen);
@@ -144,18 +167,34 @@ static int htget_headers(unsigned char *buffer, size_t buffersz, struct net_tcps
 }
 
 
+/* provides body data of the POST query for checkup actions
+   fills buff with data and returns data length.
+   must be called repeateadly until zero-lengh is returned */
+static unsigned short checkupdata(char *buff) {
+  buff[0] = 0;
+  return(0);
+}
+
+
 /* fetch http data from ipaddr using url
  * write result to file outfname if not null, or print to stdout otherwise
  * fills bsum with the BSD sum of the data
+ * is ispost is non-zero, then the request is a POST and its body data is
+ * obtained through repeated calls to checkupdata()
  * returns the length of data obtained, or neg value on error */
-static long htget(const char *ipaddr, const char *url, const char *outfname, unsigned short *bsum) {
+static long htget(const char *ipaddr, const char *url, const char *outfname, unsigned short *bsum, int ispost, unsigned char *buffer, size_t buffersz) {
   struct net_tcpsocket *sock;
-  unsigned char buffer[4096];
   time_t lastactivity, lastprogressoutput = 0;
-  int httpcode = -1;
+  int httpcode = -1, ischunked = 0;
   int byteread;
   long flen = 0, lastflen = 0;
   FILE *fd = NULL;
+
+  /* unchunk state variable is using a little part of the supplied buffer */
+  struct unchunk_state *unchstate = (void *)buffer;
+  buffer += sizeof(*unchstate);
+  buffersz -= sizeof(*unchstate);
+  memset(unchstate, 0, sizeof(*unchstate));
 
   sock = net_connect(ipaddr, 80);
   if (sock == NULL) {
@@ -175,15 +214,43 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   }
 
   /* socket is connected - send the http request (MUST be HTTP/1.0 because I do not support chunked transfers!) */
-  snprintf((char *)buffer, sizeof(buffer), "GET %s HTTP/1.0\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet\r\nConnection: close\r\n\r\n", url);
+  if (ispost) {
+    snprintf((char *)buffer, buffersz, "POST %s HTTP/1.1\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet/" PVER "\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n", url);
+  } else {
+    snprintf((char *)buffer, buffersz, "GET %s HTTP/1.1\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet/" PVER "\r\nConnection: close\r\n\r\n", url);
+  }
 
   if (net_send(sock, buffer, strlen((char *)buffer)) != (int)strlen((char *)buffer)) {
     puts("ERROR: failed to send HTTP query to remote server");
     goto SHITQUIT;
   }
 
+  /* send chunked data for POST queries */
+  if (ispost) {
+    unsigned short blen;
+    int hlen;
+    char *hbuf = (char *)buffer + buffersz - 16;
+    for (;;) {
+      blen = checkupdata((char *)buffer);
+      if (blen == 0) { /* last item contains the message trailer */
+        hlen = sprintf(hbuf, "0\r\n\r\n");
+      } else {
+        hlen = sprintf(hbuf, "%X\r\n", blen);
+      }
+      if (net_send(sock, hbuf, hlen) != hlen) {
+        puts("ERROR: failed to send POST data to remote server");
+        goto SHITQUIT;
+      }
+      if (blen == 0) break;
+      if (net_send(sock, buffer, blen) != blen) {
+        puts("ERROR: failed to send POST data to remote server");
+        goto SHITQUIT;
+      }
+    }
+  }
+
   /* receive and process HTTP headers */
-  byteread = htget_headers(buffer, sizeof(buffer), sock, &httpcode);
+  byteread = htget_headers(buffer, buffersz, sock, &httpcode, &ischunked);
 
   /* transmission error? */
   if (byteread < 0) {
@@ -193,7 +260,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   }
 
   /* open destination file if required and if no server-side error occured */
-  if ((httpcode == 200) && (*outfname != 0)) {
+  if ((httpcode >= 200) && (httpcode <= 299) && (*outfname != 0)) {
     fd = fopen(outfname, "wb");
     if (fd == NULL) {
       printf("ERROR: failed to create file %s", outfname);
@@ -202,13 +269,16 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     }
   }
 
-  /* read body of the answer */
+  /* read body of the answer (and chunk-decode it if needed) */
   lastactivity = time(NULL);
-  for (;; byteread = net_recv(sock, buffer, sizeof(buffer) - 1)) { /* read 1 byte less because I need to append a NULL terminator */
+  for (;; byteread = net_recv(sock, buffer, buffersz - 1)) { /* read 1 byte less because I need to append a NULL terminator when printf'ing the content */
 
     if (byteread > 0) { /* got data */
-      buffer[byteread] = 0;
       lastactivity = time(NULL);
+
+      /* unpack data if server transmits in chunked mode */
+      if (ischunked) byteread = unchunk(buffer, byteread, unchstate);
+
       /* if downloading to file, write stuff to disk */
       if (fd != NULL) {
         int i;
@@ -234,6 +304,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
           *bsum += buffer[i];
         }
       } else { /* otherwise dump to screen */
+        buffer[byteread] = 0;
         printf("%s", buffer);
       }
 
@@ -272,18 +343,30 @@ static int fexists(const char *fname) {
 
 
 int main(int argc, char **argv) {
-  char ipaddr[64];
-  char url[64];
   unsigned short bsum = 0;
-  char outfname[16];
   long flen;
+  int ispost; /* is the request a POST? */
+
+  struct {
+    unsigned char buffer[5000];
+    char ipaddr[64];
+    char url[64];
+    char outfname[16];
+  } *mem;
+
+  /* allocate memory */
+  mem = malloc(sizeof(*mem));
+  if (mem == NULL) {
+    puts("ERROR: out of memory");
+    return(1);
+  }
 
   /* parse command line arguments */
-  if (parseargv(argc, argv, outfname, url) != 0) return(1);
+  if (parseargv(argc, argv, mem->outfname, mem->url, &ispost) != 0) return(1);
 
   /* if outfname requested, make sure that file does not exist yet */
-  if (fexists(outfname)) {
-    printf("ERROR: file %s already exists", outfname);
+  if ((mem->outfname[0] != 0) && (fexists(mem->outfname))) {
+    printf("ERROR: file %s already exists", mem->outfname);
     puts("");
     return(1);
   }
@@ -296,17 +379,17 @@ int main(int argc, char **argv) {
 
   puts(""); /* required because watt-32 likes to print out garbage sometimes ("configuring through DHCP...") */
 
-  if (net_dnsresolve(ipaddr, HOSTADDR) != 0) {
+  if (net_dnsresolve(mem->ipaddr, HOSTADDR) != 0) {
     puts("ERROR: DNS resolution failed");
     return(1);
   }
 
-  flen = htget(ipaddr, url, outfname, &bsum);
+  flen = htget(mem->ipaddr, mem->url, mem->outfname, &bsum, ispost, mem->buffer, sizeof(mem->buffer));
   if (flen < 1) return(1);
 
-  if (*outfname != 0) {
+  if (mem->outfname[0] != 0) {
     /* print bsum, size, filename */
-    printf("Downloaded %ld KiB into %s (BSUM: %04X)", flen >> 10, outfname, bsum);
+    printf("Downloaded %ld KiB into %s (BSUM: %04X)", flen >> 10, mem->outfname, bsum);
     puts("");
   }
 
