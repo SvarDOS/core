@@ -216,7 +216,7 @@ static unsigned short checkupdata(char *buff) {
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
     readlsm(buff, ver, sizeof(ver));
 
-    return(sprintf(buff, "%s %s\n", ep->d_name, ver));
+    return(sprintf(buff, "%s\t%s\n", ep->d_name, ver));
   }
 }
 
