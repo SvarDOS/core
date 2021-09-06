@@ -200,7 +200,7 @@ static unsigned short checkupdata(char *buff) {
 
   for (;;) {
     int tlen;
-    char ver[16];
+    char ver[20];
     ep = readdir(dp);   /* readdir() result must never be freed (statically allocated) */
     if (ep == NULL) {   /* no more entries */
       closedir(dp);
