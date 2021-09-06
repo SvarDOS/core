@@ -1,3 +1,3 @@
-version: 20210520
-description: pulls packages from the internet SvarDOS repository
+version: 20210906
+description: pulls packages and updates from the internet SvarDOS repository
 license: MIT

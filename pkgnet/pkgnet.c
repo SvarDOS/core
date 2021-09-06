@@ -39,7 +39,7 @@
 #include "../pkg/lsm.h"
 
 
-#define PVER "20210903"
+#define PVER "20210906"
 #define PDATE "2021"
 
 #define HOSTADDR "svardos.osdn.io"
