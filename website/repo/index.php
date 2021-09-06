@@ -7,7 +7,7 @@
  === API ===
   ?a=pull&p=PACKAGE           downloads the zip archive containing PACKAGE
   ?a=search&p=PHRASE          list packages that match PHRASE
-  ?a=checkup&p=PACKAGE&v=ver  check if package available in version > v
+  ?a=checkup                  list of packages+versions in $_POST
 */
 
 
@@ -18,20 +18,61 @@ function nicesize($bytes) {
 }
 
 
+function csv_to_array($filename = '', $delimiter = "\t") {
+  //if (! file_exists($filename) || ! is_readable($filename)) return FALSE;
+  $handle = fopen($filename, 'r');
+  if ($handle === false) return(false);
+
+  $rez = array();
+
+  while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
+    $rez[] = $row;
+  }
+  fclose($handle);
+
+  return $rez;
+}
+
+
+function tabulprint($ar_data, $ar_width, $margin = true) {
+  $count = 0;
+  foreach ($ar_data as $item) {
+    if ($count == 0) {
+      echo '|';
+      if ($margin) echo ' ';
+    }
+    echo substr(str_pad($item, $ar_width[$count]), 0, $ar_width[$count]);
+    if ($margin) {
+      echo ' | ';
+    } else {
+      echo '|';
+    }
+    $count++;
+  }
+  echo "\r\n";
+}
+
+
+// *** MAIN START ************************************************************
+
+
 if (empty($_GET['a'])) {
   http_response_code(404);
   echo "ERROR: no action specified\r\n";
   exit(0);
 }
 
-if (empty($_GET['p'])) {
-  http_response_code(404);
-  echo "ERROR: no package specified\r\n";
-  exit(0);
-}
-
 $a = strtolower($_GET['a']);
-$p = strtolower($_GET['p']);
+
+$p = '';
+if ($a != 'checkup') {
+  if (empty($_GET['p'])) {
+    http_response_code(404);
+    echo "ERROR: no package specified\r\n";
+    exit(0);
+  }
+  $p = strtolower($_GET['p']);
+}
 
 $v = '';
 if (!empty($_GET['v'])) $v = $_GET['v'];
@@ -79,11 +120,28 @@ if ($a === 'search') {
 }
 
 if ($a === 'checkup') {
+  $found = 0;
+  $remote_pkgs = csv_to_array("php://input", "\t"); // [0] = pkgname ; [1] = version
   while (($pkg = fgetcsv($handle, 1024, "\t")) !== FALSE) {
-    if (strcasecmp($pkg[0], $p)) {
-      echo "found package {$pkg[0]} ver {$pkg[1]} -> is it newer than '{$v}' ?\r\n";
+    // is $pkg part of remote packages?
+    foreach ($remote_pkgs as $rpkg) {
+      if (strcasecmp($pkg[0], $rpkg[0]) != 0) continue;
+      if ($pkg[1] === $rpkg[1]) continue; // skip same version
+      if ($found == 0) {
+        echo str_pad('', 58, '-') . "\r\n";
+        tabulprint(array('PACKAGE', 'INSTALLED (LOCAL)', 'AVAILABLE (REMOTE)'), array(8, 20, 20));
+        tabulprint(array('----------', '----------------------', '----------------------'), array(10, 22, 22), false);
+      }
+      $found++;
+      tabulprint(array('' . $pkg[0], $rpkg[1], $pkg[1]), array(8, 20, 20));
       break;
     }
+  }
+  if ($found == 0) {
+    echo "no available updates\r\n";
+  } else {
+    echo str_pad('', 58, '-') . "\r\n";
+    echo "found {$found} differing packages\r\n";
   }
 }
 fclose($handle);
