@@ -239,7 +239,7 @@ int main(int argc, char **argv) {
   }
 
   for (;;) {
-    int i, argcount;
+    int i, n, argcount;
     char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
     char buff[256];
     char const *argvlist[256];
@@ -292,12 +292,18 @@ int main(int argc, char **argv) {
     /* if nothing entered, loop again */
     if (cmdline[-1] == 0) continue;
 
-    /* copy buffer to a near var (incl. trailing CR) */
-    _fmemcpy(buff, cmdline, cmdline[-1] + 1);
+    /* copy buffer to a near var (incl. trailing CR), insert a space before
+       every slash to make sure arguments are well separated */
+    n = 0;
+    for (i = 0; i < cmdline[-1] + 1; i++) {
+      if (cmdline[i] == '/') buff[n++] = ' ';
+      buff[n++] = cmdline[i];
+    }
+    buff[n] = 0;
 
     argcount = explode_progparams(buff, argvlist);
 
-    /* if nothing args found (eg. all-spaces), loop again */
+    /* if no args found (eg. all-spaces), loop again */
     if (argcount == 0) continue;
 
     printf("got %u bytes of cmdline (%d args)\r\n", cmdline[-1], argcount);
