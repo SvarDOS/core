@@ -53,6 +53,8 @@
 
 #include <process.h>
 
+#include "cmd.h"
+#include "helpers.h"
 #include "rmodinit.h"
 
 struct config {
@@ -60,17 +62,6 @@ struct config {
   int install;
   int envsiz;
 } cfg;
-
-
-/* returns zero if s1 starts with s2 */
-static int strstartswith(const char *s1, const char *s2) {
-  while (*s2 != 0) {
-    if (*s1 != *s2) return(-1);
-    s1++;
-    s2++;
-  }
-  return(0);
-}
 
 
 static void parse_argv(struct config *cfg, int argc, char **argv) {
@@ -114,26 +105,13 @@ static int explode_progparams(char *s, char const **argvlist) {
 }
 
 
-static void cmd_set(int argc, char const **argv, unsigned short env_seg) {
-  char far *env = MK_FP(env_seg, 0);
-  char buff[256];
-  int i;
-  while (*env != 0) {
-    /* copy string to local buff for display */
-    for (i = 0;; i++) {
-      buff[i] = *env;
-      env++;
-      if (buff[i] == 0) break;
-    }
-    puts(buff);
-  }
-}
 
 
 int main(int argc, char **argv) {
   struct config cfg;
   unsigned short rmod_seg;
   unsigned short far *rmod_envseg;
+  int ecode = 0;
 
   parse_argv(&cfg, argc, argv);
 
@@ -220,13 +198,14 @@ int main(int argc, char **argv) {
       printf("arg #%d = '%s'\r\n", i, argvlist[i]);
     }
 
-    /* TODO is it an internal command? */
-    if (strcmp(argvlist[0], "set") == 0) {
-      cmd_set(argcount, argvlist, *rmod_envseg);
-      continue;
-    }
-    if (strcmp(argvlist[0], "exit") == 0) break;
+    /* is it about quitting? */
+    if (imatch(argvlist[0], "exit")) break;
 
+    /* try running it as an internal command */
+    ecode = cmd_process(argcount, argvlist, *rmod_envseg);
+    if (ecode >= 0) continue;
+
+    /* must be an external command then */
     execvp(argvlist[0], argvlist);
 
     /* execvp() replaces the current process by the new one
