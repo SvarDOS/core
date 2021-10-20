@@ -105,6 +105,105 @@ static int explode_progparams(char *s, char const **argvlist) {
 }
 
 
+static void buildprompt(char *s, const char *fmt) {
+  for (; *fmt != 0; fmt++) {
+    if (*fmt != '$') {
+      *s = *fmt;
+      s++;
+      continue;
+    }
+    /* escape code ($P, etc) */
+    fmt++;
+    switch (*fmt) {
+      case 'Q':  /* $Q = = (equal sign) */
+      case 'q':
+        *s = '=';
+        s++;
+        break;
+      case '$':  /* $$ = $ (dollar sign) */
+        *s = '$';
+        s++;
+        break;
+      case 'T':  /* $t = current time */
+      case 't':
+        s += sprintf(s, "00:00"); /* TODO */
+        break;
+      case 'D':  /* $D = current date */
+      case 'd':
+        s += sprintf(s, "1985-07-29"); /* TODO */
+        break;
+      case 'P':  /* $P = current drive and path */
+      case 'p':
+        _asm {
+          mov ah, 0x19    /* DOS 1+ - GET CURRENT DRIVE */
+          int 0x21
+          mov bx, s
+          mov [bx], al  /* AL = drive (00 = A:, 01 = B:, etc */
+        }
+        *s += 'A';
+        s++;
+        *s = ':';
+        s++;
+        *s = '\\';
+        s++;
+        _asm {
+          mov ah, 0x47    /* DOS 2+ - CWD - GET CURRENT DIRECTORY */
+          xor dl,dl       /* DL = drive number (00h = default, 01h = A:, etc) */
+          mov si, s       /* DS:SI -> 64-byte buffer for ASCIZ pathname */
+          int 0x21
+        }
+        while (*s != 0) s++; /* move ptr forward to end of pathname */
+        break;
+      case 'V':  /* $V = DOS version number */
+      case 'v':
+        s += sprintf(s, "VER"); /* TODO */
+        break;
+      case 'N':  /* $N = current drive */
+      case 'n':
+        _asm {
+          mov ah, 0x19    /* DOS 1+ - GET CURRENT DRIVE */
+          int 0x21
+          mov bx, s
+          mov [bx], al  /* AL = drive (00 = A:, 01 = B:, etc */
+        }
+        *s += 'A';
+        s++;
+        break;
+      case 'G':  /* $G = > (greater-than sign) */
+      case 'g':
+        *s = '>';
+        s++;
+        break;
+      case 'L':  /* $L = < (less-than sign) */
+      case 'l':
+        *s = '<';
+        s++;
+        break;
+      case 'B':  /* $B = | (pipe) */
+      case 'b':
+        *s = '|';
+        s++;
+        break;
+      case 'H':  /* $H = backspace (erases previous character) */
+      case 'h':
+        *s = '\b';
+        s++;
+        break;
+      case 'E':  /* $E = Escape code (ASCII 27) */
+      case 'e':
+        *s = 27;
+        s++;
+        break;
+      case '_':  /* $_ = CR+LF */
+        *s = '\r';
+        s++;
+        *s = '\n';
+        s++;
+        break;
+    }
+  }
+  *s = '$';
+}
 
 
 int main(int argc, char **argv) {
@@ -142,14 +241,21 @@ int main(int argc, char **argv) {
   for (;;) {
     int i, argcount;
     char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
-    char path[256] = "C:\\>$";
+    char buff[256];
     char const *argvlist[256];
-    union REGS r;
 
-    /* print shell prompt */
-    r.h.ah = 0x09;
-    r.x.dx = FP_OFF(path);
-    intdos(&r, &r);
+    {
+      /* print shell prompt */
+      char *promptptr = buff;
+      buildprompt(promptptr, "$p$g"); /* TODO: prompt should be configurable via environment */
+      _asm {
+        push dx
+        mov ah, 0x09
+        mov dx, promptptr
+        int 0x21
+        pop dx
+      }
+    }
 
     /* wait for user input */
     _asm {
@@ -187,9 +293,9 @@ int main(int argc, char **argv) {
     if (cmdline[-1] == 0) continue;
 
     /* copy buffer to a near var (incl. trailing CR) */
-    _fmemcpy(path, cmdline, cmdline[-1] + 1);
+    _fmemcpy(buff, cmdline, cmdline[-1] + 1);
 
-    argcount = explode_progparams(path, argvlist);
+    argcount = explode_progparams(buff, argvlist);
 
     /* if nothing args found (eg. all-spaces), loop again */
     if (argcount == 0) continue;
