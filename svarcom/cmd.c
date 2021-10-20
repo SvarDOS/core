@@ -12,9 +12,9 @@
 
 #include "cmd.h"
 
-int cmd_process(int argc, const char **argv, unsigned short env_seg) {
+int cmd_process(int argc, const char **argv, unsigned short env_seg, const char far *cmdline) {
 
-  if (imatch(argv[0], "set")) return(cmd_set(argc, argv, env_seg));
+  if (imatch(argv[0], "set")) return(cmd_set(argc, argv, env_seg, cmdline));
 
   return(-2); /* command is not recognized as internal */
 }

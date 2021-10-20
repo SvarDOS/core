@@ -316,7 +316,7 @@ int main(int argc, char **argv) {
 
     /* try running it as an internal command */
     {
-      int ecode = cmd_process(argcount, argvlist, *rmod_envseg);
+      int ecode = cmd_process(argcount, argvlist, *rmod_envseg, cmdline);
       if (ecode >= 0) *lastexitcode = ecode;
       if (ecode >= -1) continue; /* command is internal but did not set an exit code */
     }
