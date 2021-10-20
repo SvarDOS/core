@@ -22,13 +22,16 @@ SIG4 dw 0x2019   ;  +6
 ; environment segment - this is updated by SvarCOM at init time
 ENVSEG   dw 0    ;  +8
 
+; exit code of last application
+LEXCODE  dw 0    ; +0Ah
+
 ; input buffer used for the "previous command" history
-BUF000 db 128, 0 ; +0Ah
+BUF000 db 128, 0 ; +0Ch
 BUF064 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 BUF128 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 
 
-skipsig:         ; +8Ch
+skipsig:         ; +8Eh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -36,6 +39,12 @@ mov ds, ax
 mov es, ax
 mov ss, ax
 mov sp, STACKPTR
+
+; collect the exit code of previous application
+mov ah, 0x4D
+int 0x21
+xor ah, ah          ; clear out termination status, I only want the exit code
+mov [LEXCODE], ax
 
 ; prepare the exec param block
 mov ax, [ENVSEG]

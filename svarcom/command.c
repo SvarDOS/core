@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
   struct config cfg;
   unsigned short rmod_seg;
   unsigned short far *rmod_envseg;
-  int ecode = 0;
+  unsigned short far *lastexitcode;
 
   parse_argv(&cfg, argc, argv);
 
@@ -129,6 +129,7 @@ int main(int argc, char **argv) {
   }
 
   rmod_envseg = MK_FP(rmod_seg, RMOD_OFFSET_ENVSEG);
+  lastexitcode = MK_FP(rmod_seg, RMOD_OFFSET_LEXITCODE);
 
   {
     unsigned short envsiz;
@@ -202,8 +203,11 @@ int main(int argc, char **argv) {
     if (imatch(argvlist[0], "exit")) break;
 
     /* try running it as an internal command */
-    ecode = cmd_process(argcount, argvlist, *rmod_envseg);
-    if (ecode >= 0) continue;
+    {
+      int ecode = cmd_process(argcount, argvlist, *rmod_envseg);
+      if (ecode >= 0) *lastexitcode = ecode;
+      if (ecode >= -1) continue; /* command is internal but did not set an exit code */
+    }
 
     /* must be an external command then */
     execvp(argvlist[0], argvlist);
