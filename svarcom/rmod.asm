@@ -13,22 +13,22 @@ org 0h           ; this is meant to be executed without a PSP
 
 section .text    ; all goes into code segment
 
-jmp short skipsig
+                 ; offset
+SIG1 dw 0x1983   ;  +0
+SIG2 dw 0x1985   ;  +2
+SIG3 dw 0x2017   ;  +4
+SIG4 dw 0x2019   ;  +6
 
-SIG1 dw 0x1983
-SIG2 dw 0x1985
-SIG3 dw 0x2017
-SIG4 dw 0x2019
+; environment segment - this is updated by SvarCOM at init time
+ENVSEG   dw 0    ;  +8
 
-; service routine: used by the transient part of svarcom, returns:
-; AX = offset of input buffer history block
-; BX = offset where environment's segment is stored (patched at install time)
-inputroutine:
-mov ax, BUF000
-mov bx, ENVSEG
-retf
+; input buffer used for the "previous command" history
+BUF000 db 128, 0 ; +0Ah
+BUF064 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+BUF128 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 
-skipsig:
+
+skipsig:         ; +8Ch
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -38,7 +38,8 @@ mov ss, ax
 mov sp, STACKPTR
 
 ; prepare the exec param block
-;mov [EXEC_PARAM_REC], word 0
+mov ax, [ENVSEG]
+mov [EXEC_PARAM_REC], ax
 mov ax, COMSPEC
 mov [EXEC_PARAM_REC+2], ax
 mov [EXEC_PARAM_REC+4], ds
@@ -83,15 +84,7 @@ ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM FROM:", 13, 10
 COMSPEC db "C:\SVN\SVARDOS\SVARCOM\COMMAND.COM"
 COMSPCZ db 0
 
-; input buffer used for the "previous command" history
-BUF000 db 128, 0
-BUF064 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
-BUF128 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
-
 ; FreeDOS int 21h functions that I use require at least 32 bytes of stack,
 ; here I allocate 64 bytes to be sure
 STACKBUF db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 STACKPTR db "xx"
-
-; environment segment - this is updated by SvarCOM at init time
-ENVSEG   dw 0
