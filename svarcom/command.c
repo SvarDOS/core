@@ -306,10 +306,7 @@ int main(int argc, char **argv) {
     /* if no args found (eg. all-spaces), loop again */
     if (argcount == 0) continue;
 
-    printf("got %u bytes of cmdline (%d args)\r\n", cmdline[-1], argcount);
-    for (i = 0; i < argcount; i++) {
-      printf("arg #%d = '%s'\r\n", i, argvlist[i]);
-    }
+    /* for (i = 0; i < argcount; i++) printf("arg #%d = '%s'\r\n", i, argvlist[i]); */
 
     /* is it about quitting? */
     if (imatch(argvlist[0], "exit")) break;
