@@ -20,8 +20,8 @@ CFLAGS = -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=command.map
 
 all: command.com
 
-command.com: rmod.h command.c cmd.c rmodinit.c helpers.c cmd\*.c
-	wcl $(CFLAGS) command.c cmd.c rmodinit.c helpers.c
+command.com: rmod.h command.c cmd.c env.c rmodinit.c helpers.c cmd\*.c
+	wcl $(CFLAGS) command.c cmd.c env.c rmodinit.c helpers.c
 
 rmod.h: file2c.com rmod.com
 	file2c rmod.com rmod.h rmod
