@@ -122,15 +122,23 @@ unsigned short rmod_install(unsigned short envsize) {
 /* scan memory for rmod, returns its segment if found, 0xffff otherwise */
 unsigned short rmod_find(void) {
   unsigned short i;
-  unsigned short far *pattern;
+  unsigned short far *ptrword;
+  unsigned char far *ptrbyte;
 
   /* iterate over all paragraphs, looking for my signature */
-  for (i = 0; i != 65535; i++) {
-    pattern = MK_FP(i, 0);
-    if (pattern[0] != 0x1983) continue;
-    if (pattern[1] != 0x1985) continue;
-    if (pattern[2] != 0x2017) continue;
-    if (pattern[3] != 0x2019) continue;
+  for (i = 1; i != 65535; i++) {
+    ptrword = MK_FP(i, 0);
+    if (ptrword[0] != 0x1983) continue;
+    if (ptrword[1] != 0x1985) continue;
+    if (ptrword[2] != 0x2017) continue;
+    if (ptrword[3] != 0x2019) continue;
+    /* extra check: make sure the paragraph before is an MCB block and that it
+     * belongs to itself. otherwise I could find the rmod code embedded inside
+     * the command.com binary... */
+    ptrbyte = MK_FP(i - 1, 0);
+    if ((*ptrbyte != 'M') && (*ptrbyte != 'Z')) continue; /* not an MCB */
+    ptrword = MK_FP(i - 1, 1);
+    if (*ptrword != i) continue; /* not belonging to self */
     return(i);
   }
   return(0xffff);
