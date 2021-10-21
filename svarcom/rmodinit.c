@@ -93,14 +93,11 @@ unsigned short rmod_install(unsigned short envsize) {
   *owner = rmodseg;
   _fmemcpy(mcb + 8, "SVARCOM", 8);
 
-  /* mark env memory as "self owned" (only if allocated by me) */
-  if (envsize != 0) {
-    printf("envseg allocated at %04X:0000 with %u paragraphs\r\n", envseg, envsize);
-    mcb = MK_FP(envseg - 1, 0);
-    owner = (void far *)(mcb + 1);
-    *owner = rmodseg;
-    _fmemcpy(mcb + 8, "SVARENV", 8);
-  }
+  /* mark env memory as "self owned" */
+  mcb = MK_FP(envseg - 1, 0);
+  owner = (void far *)(mcb + 1);
+  *owner = rmodseg;
+  _fmemcpy(mcb + 8, "SVARENV", 8);
 
   /* write env segment to rmod buffer */
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
