@@ -104,6 +104,34 @@ int cmd_process(unsigned short env_seg, const char far *cmdline) {
   unsigned short argoffset;
   char cmdbuff[256];
 
+  /* special case: is this a drive change? (like "E:") */
+  if ((cmdline[0] != 0) && (cmdline[1] == ':') && ((cmdline[2] == ' ') || (cmdline[2] == 0))) {
+    if (((cmdline[0] >= 'a') && (cmdline[0] <= 'z')) || ((cmdline[0] >= 'A') && (cmdline[0] <= 'Z'))) {
+      unsigned char drive = cmdline[0];
+      unsigned char curdrive = 0;
+      if (drive >= 'a') {
+        drive -= 'a';
+      } else {
+        drive -= 'A';
+      }
+      _asm {
+        push ax
+        push dx
+        mov ah, 0x0e     /* DOS 1+ - SELECT DEFAULT DRIVE */
+        mov dl, drive    /* DL = new default drive (00h = A:, 01h = B:, etc) */
+        int 0x21
+        mov ah, 0x19     /* DOS 1+ - GET CURRENT DRIVE */
+        int 0x21
+        mov curdrive, al /* cur drive (0=A, 1=B, etc) */
+        pop dx
+        pop ax
+      }
+      if (curdrive != drive) puts(doserr(0x0f));
+      return(-1);
+    }
+  }
+
+  /* try matching an internal command */
   cmdptr = cmd_match(cmdline, &argoffset);
   if (cmdptr == NULL) return(-2); /* command is not recognized as internal */
 
