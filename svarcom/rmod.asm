@@ -30,8 +30,15 @@ BUF000 db 128, 0 ; +0Ch
 BUF064 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 BUF128 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 
+; offset of the COMSPEC variable in the environment block, 0 means "use
+; boot drive". this value is patched by the transient part of COMMAND.COM
+COMSPECPTR dw 0  ; +8Eh
 
-skipsig:         ; +8Eh
+; fallback COMSPEC string used if no COMPSEC is present in the environment
+; drive. drive is patched by the transient part of COMMAND.COM
+COMSPECBOOT db "@:\COMMAND.COM", 0 ; +90h
+
+skipsig:         ; +9Fh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -46,32 +53,48 @@ int 0x21
 xor ah, ah          ; clear out termination status, I only want the exit code
 mov [LEXCODE], ax
 
+; preset the default COMSPEC pointer to ES:DX (ES is already set to DS)
+mov dx, COMSPECBOOT
+
+; do I have a valid COMSPEC?
+or [COMSPECPTR], word 0
+jz USEDEFAULTCOMSPEC
+; set ES:DX to actual COMSPEC
+mov es, [ENVSEG]
+mov dx, [COMSPECPTR]
+USEDEFAULTCOMSPEC:
+
 ; prepare the exec param block
 mov ax, [ENVSEG]
 mov [EXEC_PARAM_REC], ax
-mov ax, COMSPEC
-mov [EXEC_PARAM_REC+2], ax
-mov [EXEC_PARAM_REC+4], ds
+mov [EXEC_PARAM_REC+2], dx
+mov [EXEC_PARAM_REC+4], es
 
 ; execute command.com
 mov ax, 0x4B00         ; DOS 2+ - load & execute program
-mov dx, COMSPEC        ; DS:DX  - ASCIZ program name TODO: use real COMSPEC...
+push es                ;
+pop ds                 ;
+;mov dx, COMSPEC       ; DS:DX  - ASCIZ program name (preset already)
+push cs
+pop es
 mov bx, EXEC_PARAM_REC ; ES:BX  - parameter block pointer
 int 0x21
 
 ; if all went well, jump back to start
 jnc skipsig
 
+; restore DS=CS
+mov bx, cs
+mov ds, bx
+
 ; update error string so it contains the error number
 add al, '0'
 mov [ERRLOAD + 4], al
 
-; display error message (with trailing COMSPEC)
+; display error message
 mov ah, 0x09
 mov dx, ERRLOAD
-mov [COMSPCZ], byte '$' ; patch comspec terminator to be $
 int 0x21
-mov [COMSPCZ], byte 0   ; restore initial (NULL) compsec terminator
 
 ; wait for keypress
 mov ah, 0x08
@@ -88,12 +111,9 @@ jmp skipsig
 ;    +0Ah    4   address of an FCB to be placed at PSP:006c
 EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM FROM:", 13, 10
+ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM", 13, 10, '$'
 
-COMSPEC db "C:\SVN\SVARDOS\SVARCOM\COMMAND.COM"
-COMSPCZ db 0
-
-; FreeDOS int 21h functions that I use require at least 32 bytes of stack,
-; here I allocate 64 bytes to be sure
+; DOS int 21h functions that I use require at least 32 bytes of stack, here I
+; allocate 64 bytes to be sure
 STACKBUF db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 STACKPTR db "xx"

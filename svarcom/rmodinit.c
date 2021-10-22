@@ -103,13 +103,38 @@ unsigned short rmod_install(unsigned short envsize) {
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
   *owner = envseg;
 
+  /* write boot drive to rmod bootdrive field */
+  _asm {
+    push ax
+    push bx
+    push dx
+    push ds
+    mov ax, 0x3305 /* DOS 4.0+ - GET BOOT DRIVE */
+    int 0x21 /* boot drive is in DL now (1=A:, 2=B:, etc) */
+    add dl, 'A'-1 /* convert to a proper ASCII letter */
+    /* set DS to rmodseg */
+    mov ax, rmodseg
+    mov ds, ax
+    /* write boot drive to rmod bootdrive field */
+    mov bx, RMOD_OFFSET_BOOTDRIVE
+    mov [bx], dl
+    pop ds
+    pop dx
+    pop bx
+    pop ax
+  }
+
   /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I terminate */
   _asm {
+    push ax
+    push bx
     mov bx, 0x0a                   /* int22 handler is at 0x0A of the PSP */
     mov ax, RMOD_OFFSET_ROUTINE
     mov [bx], ax                   /* int handler offset */
     mov ax, rmodseg
     mov [bx+2], ax                 /* int handler segment */
+    pop bx
+    pop ax
   }
 
   return(rmodseg);

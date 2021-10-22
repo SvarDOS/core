@@ -54,6 +54,7 @@
 #include <process.h>
 
 #include "cmd.h"
+#include "env.h"
 #include "helpers.h"
 #include "rmodinit.h"
 
@@ -314,6 +315,16 @@ int main(int argc, char **argv) {
     {
       int ecode = cmd_process(*rmod_envseg, cmdline);
       if (ecode >= 0) *lastexitcode = ecode;
+      /* update rmod's ptr to COMPSPEC, in case it changed */
+      {
+        unsigned short far *comspecptr = MK_FP(rmod_seg, RMOD_OFFSET_COMSPECPTR);
+        char far *comspecfp = env_lookup(*rmod_envseg, "COMSPEC");
+        if (comspecfp != NULL) {
+          *comspecptr = FP_OFF(comspecfp) + 8; /* +8 to skip the "COMSPEC=" prefix */
+        } else {
+          *comspecptr = 0;
+        }
+      }
       if (ecode >= -1) continue; /* internal command executed */
     }
 
