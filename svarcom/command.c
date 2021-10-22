@@ -80,31 +80,6 @@ static void parse_argv(struct config *cfg, int argc, char **argv) {
 }
 
 
-static int explode_progparams(char *s, char const **argvlist) {
-  int si = 0, argc = 0;
-  for (;;) {
-    /* skip to next non-space character */
-    while (s[si] == ' ') si++;
-    /* end of string? */
-    if (s[si] == '\r') break;
-    /* set argv ptr */
-    argvlist[argc++] = s + si;
-    /* find next space */
-    while (s[si] != ' ' && s[si] != '\r') si++;
-    /* is this end of string? */
-    if (s[si] == '\r') {
-      s[si] = 0;
-      break;
-    }
-    /* not end: terminate arg and look for next one */
-    s[si++] = 0;
-  }
-  /* terminate argvlist with a NULL value */
-  argvlist[argc] = NULL;
-  return(argc);
-}
-
-
 static void buildprompt(char *s, const char *fmt) {
   for (; *fmt != 0; fmt++) {
     if (*fmt != '$') {
@@ -206,6 +181,30 @@ static void buildprompt(char *s, const char *fmt) {
 }
 
 
+static void run_as_external(const char far *cmdline) {
+  char buff[256];
+  char const *argvlist[256];
+  int i, n;
+  /* copy buffer to a near var (incl. trailing CR), insert a space before
+     every slash to make sure arguments are well separated */
+  n = 0;
+  i = 0;
+  for (;;) {
+    if (cmdline[i] == '/') buff[n++] = ' ';
+    buff[n++] = cmdline[i++];
+    if (buff[n] == 0) break;
+  }
+
+  cmd_explode(buff, cmdline, argvlist);
+
+  /* for (i = 0; argvlist[i] != NULL; i++) printf("arg #%d = '%s'\r\n", i, argvlist[i]); */
+
+  /* must be an external command then. this call should never return, unless
+   * the other program failed to be executed. */
+  execvp(argvlist[0], argvlist);
+}
+
+
 int main(int argc, char **argv) {
   struct config cfg;
   unsigned short rmod_seg;
@@ -239,26 +238,35 @@ int main(int argc, char **argv) {
   }
 
   for (;;) {
-    int i, n, argcount;
     char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
-    char buff[256];
-    char const *argvlist[256];
+
+    /* revert input history terminator to \r */
+    if (cmdline[-1] != 0) {
+      cmdline[(unsigned short)(cmdline[-1])] = '\r';
+    }
 
     {
       /* print shell prompt */
+      char buff[256];
       char *promptptr = buff;
       buildprompt(promptptr, "$p$g"); /* TODO: prompt should be configurable via environment */
       _asm {
+        push ax
         push dx
         mov ah, 0x09
         mov dx, promptptr
         int 0x21
         pop dx
+        pop ax
       }
     }
 
     /* wait for user input */
     _asm {
+      push ax
+      push bx
+      push cx
+      push dx
       push ds
 
       /* is DOSKEY support present? (INT 2Fh, AX=4800h, returns non-zero in AL if present) */
@@ -286,40 +294,31 @@ int main(int argc, char **argv) {
 
       DONE:
       pop ds
+      pop dx
+      pop cx
+      pop bx
+      pop ax
     }
     printf("\r\n");
 
     /* if nothing entered, loop again */
     if (cmdline[-1] == 0) continue;
 
-    /* copy buffer to a near var (incl. trailing CR), insert a space before
-       every slash to make sure arguments are well separated */
-    n = 0;
-    for (i = 0; i < cmdline[-1] + 1; i++) {
-      if (cmdline[i] == '/') buff[n++] = ' ';
-      buff[n++] = cmdline[i];
-    }
-    buff[n] = 0;
+    /* replace \r by a zero terminator */
+    cmdline[(unsigned char)(cmdline[-1])] = 0;
 
-    argcount = explode_progparams(buff, argvlist);
+    /* move pointer forward to skip over any leading spaces */
+    while (*cmdline == ' ') cmdline++;
 
-    /* if no args found (eg. all-spaces), loop again */
-    if (argcount == 0) continue;
-
-    /* for (i = 0; i < argcount; i++) printf("arg #%d = '%s'\r\n", i, argvlist[i]); */
-
-    /* is it about quitting? */
-    if (imatch(argvlist[0], "exit")) break;
-
-    /* try running it as an internal command */
+    /* try matching (and executing) an internal command */
     {
-      int ecode = cmd_process(argcount, argvlist, *rmod_envseg, cmdline);
+      int ecode = cmd_process(*rmod_envseg, cmdline);
       if (ecode >= 0) *lastexitcode = ecode;
-      if (ecode >= -1) continue; /* command is internal but did not set an exit code */
+      if (ecode >= -1) continue; /* internal command executed */
     }
 
-    /* must be an external command then */
-    execvp(argvlist[0], argvlist);
+    /* if here, then this was not an internal command */
+    run_as_external(cmdline);
 
     /* execvp() replaces the current process by the new one
     if I am still alive then external command failed to execute */

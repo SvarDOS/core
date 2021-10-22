@@ -7,13 +7,12 @@
 
 #include "env.h"
 
-
-static int cmd_set(int argc, char const **argv, unsigned short env_seg, const char far *cmdline) {
-  char far *env = MK_FP(env_seg, 0);
+static int cmd_set(const struct cmd_funcparam *p) {
+  char far *env = MK_FP(p->env_seg, 0);
   char buff[256];
   int i;
   /* no arguments - display content */
-  if (argc == 1) {
+  if (p->argc == 0) {
     while (*env != 0) {
       /* copy string to local buff for display */
       for (i = 0;; i++) {
@@ -23,14 +22,14 @@ static int cmd_set(int argc, char const **argv, unsigned short env_seg, const ch
       }
       puts(buff);
     }
-  } else if ((argc == 2) && (imatch(argv[1], "/?"))) {
+  } else if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
     puts("TODO: help screen"); /* TODO */
   } else { /* set variable (do not rely on argv, SET has its own rules...) */
     const char far *ptr;
     char buff[256];
     unsigned short i;
     /* locate the first space */
-    for (ptr = cmdline; *ptr != ' '; ptr++);
+    for (ptr = p->cmdline; *ptr != ' '; ptr++);
     /* now locate the first non-space: that's where the variable name begins */
     for (; *ptr == ' '; ptr++);
     /* copy variable to buff and switch it upercase */
@@ -52,7 +51,7 @@ static int cmd_set(int argc, char const **argv, unsigned short env_seg, const ch
     buff[i] = 0;
 
     /* commit variable to environment */
-    i = env_setvar(env_seg, buff);
+    i = env_setvar(p->env_seg, buff);
     if (i == ENV_INVSYNT) goto syntax_err;
     if (i == ENV_NOTENOM) puts("Not enough available space within the environment block");
   }

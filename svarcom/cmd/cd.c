@@ -10,14 +10,14 @@
  * Type CD without parameters to display the current drive and directory.
  */
 
-static int cmd_cd(int argc, char const **argv) {
+static int cmd_cd(const struct cmd_funcparam *p) {
   /* two arguments max */
-  if (argc > 2) {
+  if (p->argc > 1) {
     puts("Too many parameters");
   }
 
   /* no argument? display current drive and dir ("CWD") */
-  if (argc == 1) {
+  if (p->argc == 0) {
     char buff[64];
     char *buffptr = buff;
     _asm {
@@ -40,21 +40,22 @@ static int cmd_cd(int argc, char const **argv) {
       xor dl, dl       /* select drive (0 = current drive) */
       mov si, buffptr  /* 64-byte buffer for ASCIZ pathname */
       int 0x21
-      pop ax
-      pop dx
       pop si
+      pop dx
+      pop ax
     }
     puts(buff);
   }
 
   /* argument can be either a drive (D:) or a path */
-  if (argc == 2) {
+  if (p->argc == 1) {
+    const char *arg = p->argv[0];
+    unsigned short err = 0;
     /* drive (CD B:) */
-    if ((argv[1][0] != '\\') && (argv[1][1] == ':') && (argv[1][2] == 0)) {
+    if ((arg[0] != '\\') && (arg[1] == ':') && (arg[2] == 0)) {
       char buff[64];
       char *buffptr = buff;
-      unsigned char drive = argv[1][0];
-      unsigned short err = 0;
+      unsigned char drive = arg[0];
       if (drive >= 'a') {
         drive -= 'a';
       } else {
@@ -76,19 +77,13 @@ static int cmd_cd(int argc, char const **argv) {
         pop ax
         pop si
       }
-      if (err != 0) {
-        if (err != 0) puts(doserr(err));
-      } else {
-        printf("%c:\\%s\r\n", drive + 'A' - 1, buff);
-      }
+      if (err == 0) printf("%c:\\%s\r\n", drive + 'A' - 1, buff);
     } else { /* path */
-      char const *dir = argv[1];
-      unsigned short err = 0;
       _asm {
         push dx
         push ax
         mov ah, 0x3B  /* CHDIR (set current directory) */
-        mov dx, dir
+        mov dx, arg
         int 0x21
         jnc DONE
         mov [err], ax
@@ -96,8 +91,8 @@ static int cmd_cd(int argc, char const **argv) {
         pop ax
         pop dx
       }
-      if (err != 0) puts(doserr(err));
     }
+    if (err != 0) puts(doserr(err));
   }
 
   return(-1);
