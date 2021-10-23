@@ -206,6 +206,37 @@ static void run_as_external(const char far *cmdline) {
 }
 
 
+static void set_comspec_to_self(unsigned short envseg) {
+  unsigned short *psp_envseg = (void *)(0x2c); /* pointer to my env segment field in the PSP */
+  char far *myenv = MK_FP(*psp_envseg, 0);
+  unsigned short varcount;
+  char buff[256] = "COMSPEC=";
+  char *buffptr = buff + 8;
+  /* who am i? look into my own environment, at the end of it should be my EXEPATH string */
+  while (*myenv != 0) {
+    /* consume a NULL-terminated string */
+    while (*myenv != 0) myenv++;
+    /* move to next string */
+    myenv++;
+  }
+  /* get next word, if 1 then EXEPATH follows */
+  myenv++;
+  varcount = *myenv;
+  myenv++;
+  varcount |= (*myenv << 8);
+  myenv++;
+  if (varcount != 1) return; /* NO EXEPATH FOUND */
+  while (*myenv != 0) {
+    *buffptr = *myenv;
+    buffptr++;
+    myenv++;
+  }
+  *buffptr = 0;
+  /* printf("EXEPATH: '%s'\r\n", buff); */
+  env_setvar(envseg, buff);
+}
+
+
 int main(int argc, char **argv) {
   struct config cfg;
   unsigned short rmod_seg;
@@ -220,15 +251,17 @@ int main(int argc, char **argv) {
     if (rmod_seg == 0xffff) {
       puts("ERROR: rmod_install() failed");
       return(1);
-    } else {
-      printf("rmod installed at seg 0x%04X\r\n", rmod_seg);
     }
+    printf("rmod installed at seg 0x%04X\r\n", rmod_seg);
   } else {
     printf("rmod found at seg 0x%04x\r\n", rmod_seg);
   }
 
   rmod_envseg = MK_FP(rmod_seg, RMOD_OFFSET_ENVSEG);
   lastexitcode = MK_FP(rmod_seg, RMOD_OFFSET_LEXITCODE);
+
+  /* make COMPSEC point to myself */
+  set_comspec_to_self(*rmod_envseg);
 
   {
     unsigned short envsiz;
@@ -311,20 +344,13 @@ int main(int argc, char **argv) {
     /* move pointer forward to skip over any leading spaces */
     while (*cmdline == ' ') cmdline++;
 
+    /* update rmod's ptr to COMPSPEC so it is always up to date */
+    rmod_updatecomspecptr(rmod_seg, *rmod_envseg);
+
     /* try matching (and executing) an internal command */
     {
       int ecode = cmd_process(*rmod_envseg, cmdline);
       if (ecode >= 0) *lastexitcode = ecode;
-      /* update rmod's ptr to COMPSPEC, in case it changed */
-      {
-        unsigned short far *comspecptr = MK_FP(rmod_seg, RMOD_OFFSET_COMSPECPTR);
-        char far *comspecfp = env_lookup(*rmod_envseg, "COMSPEC");
-        if (comspecfp != NULL) {
-          *comspecptr = FP_OFF(comspecfp) + 8; /* +8 to skip the "COMSPEC=" prefix */
-        } else {
-          *comspecptr = 0;
-        }
-      }
       if (ecode >= -1) continue; /* internal command executed */
     }
 

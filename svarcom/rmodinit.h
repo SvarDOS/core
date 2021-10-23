@@ -10,5 +10,6 @@
 
 unsigned short rmod_install(unsigned short envsize);
 unsigned short rmod_find(void);
+void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
 
 #endif

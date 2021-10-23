@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "env.h"
+
 #include "rmod.h"
 
 #include "rmodinit.h"
@@ -164,4 +166,16 @@ unsigned short rmod_find(void) {
     return(i);
   }
   return(0xffff);
+}
+
+
+/* update rmod's pointer to comspec */
+void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg) {
+  unsigned short far *comspecptr = MK_FP(rmod_seg, RMOD_OFFSET_COMSPECPTR);
+  char far *comspecfp = env_lookup(env_seg, "COMSPEC");
+  if (comspecfp != NULL) {
+    *comspecptr = FP_OFF(comspecfp) + 8; /* +8 to skip the "COMSPEC=" prefix */
+  } else {
+    *comspecptr = 0;
+  }
 }
