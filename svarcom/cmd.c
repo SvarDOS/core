@@ -18,6 +18,7 @@ struct cmd_funcparam {
 };
 
 #include "cmd/cd.c"
+#include "cmd/dir.c"
 #include "cmd/exit.c"
 #include "cmd/set.c"
 
@@ -32,6 +33,7 @@ struct CMD_ID {
 const struct CMD_ID INTERNAL_CMDS[] = {
   {"CD",      cmd_cd},
   {"CHDIR",   cmd_cd},
+  {"DIR",     cmd_dir},
   {"EXIT",    cmd_exit},
   {"SET",     cmd_set},
   {NULL,      NULL}
