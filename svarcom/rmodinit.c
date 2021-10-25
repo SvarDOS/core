@@ -1,9 +1,9 @@
 
 #include <i86.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "env.h"
+#include "helpers.h"
 
 #include "rmod.h"
 
@@ -28,7 +28,7 @@ unsigned short rmod_install(unsigned short envsize) {
     pop ax
   }
 
-  printf("original (PSP) env buffer at %04X\r\n", envseg);
+  /* printf("original (PSP) env buffer at %04X\r\n", envseg); */
   /* if custom envsize requested, convert it to number of paragraphs */
   if (envsize != 0) {
     envsize += 15;
@@ -81,7 +81,7 @@ unsigned short rmod_install(unsigned short envsize) {
   }
 
   if (rmodseg == 0xffff) {
-    puts("malloc error");
+    outputnl("malloc error");
     return(0xffff);
   }
 

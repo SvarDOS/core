@@ -23,7 +23,7 @@ static int cmd_set(const struct cmd_funcparam *p) {
       puts(buff);
     }
   } else if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    puts("TODO: help screen"); /* TODO */
+    outputnl("TODO: help screen"); /* TODO */
   } else { /* set variable (do not rely on argv, SET has its own rules...) */
     const char far *ptr;
     char buff[256];
@@ -53,12 +53,12 @@ static int cmd_set(const struct cmd_funcparam *p) {
     /* commit variable to environment */
     i = env_setvar(p->env_seg, buff);
     if (i == ENV_INVSYNT) goto syntax_err;
-    if (i == ENV_NOTENOM) puts("Not enough available space within the environment block");
+    if (i == ENV_NOTENOM) outputnl("Not enough available space within the environment block");
   }
   return(-1);
 
   syntax_err:
 
-  puts("Syntax error");
+  outputnl("Syntax error");
   return(-1);
 }

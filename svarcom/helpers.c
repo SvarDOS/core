@@ -31,3 +31,29 @@ int strstartswith(const char *s1, const char *s2) {
   }
   return(0);
 }
+
+
+/* outputs a NULL-terminated string to stdout */
+void output_internal(const char *s, unsigned short nl) {
+  _asm {
+    mov ah, 0x02 /* AH=9 - write character in DL to stdout */
+    mov si, s
+    cld          /* clear DF so lodsb increments SI */
+    NEXTBYTE:
+    lodsb /* load byte from DS:SI into AL, SI++ */
+    mov dl, al
+    or al, 0  /* is al == 0? */
+    jz DONE
+    int 0x21
+    jmp NEXTBYTE
+    DONE:
+    or nl, 0
+    jz FINITO
+    /* print out a CR/LF trailer if nl set */
+    mov dl, 0x0D /* CR */
+    int 0x21
+    mov dl, 0x0A /* LF */
+    int 0x21
+    FINITO:
+  }
+}

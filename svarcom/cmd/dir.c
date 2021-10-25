@@ -79,7 +79,7 @@ static int cmd_dir(const struct cmd_funcparam *p) {
   }
   if (errcode != 0) return(-1);
 
-  puts(dta->fname);
+  outputnl(dta->fname);
 
   NEXTFILE:
 
@@ -98,7 +98,7 @@ static int cmd_dir(const struct cmd_funcparam *p) {
     pop ax
   }
 
-  puts(dta->fname);
+  outputnl(dta->fname);
 
   if (errcode == 0) goto NEXTFILE;
 

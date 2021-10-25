@@ -249,12 +249,12 @@ int main(int argc, char **argv) {
   if (rmod_seg == 0xffff) {
     rmod_seg = rmod_install(cfg.envsiz);
     if (rmod_seg == 0xffff) {
-      puts("ERROR: rmod_install() failed");
+      outputnl("ERROR: rmod_install() failed");
       return(1);
     }
-    printf("rmod installed at seg 0x%04X\r\n", rmod_seg);
+/*    printf("rmod installed at seg 0x%04X\r\n", rmod_seg); */
   } else {
-    printf("rmod found at seg 0x%04x\r\n", rmod_seg);
+/*    printf("rmod found at seg 0x%04x\r\n", rmod_seg); */
   }
 
   rmod_envseg = MK_FP(rmod_seg, RMOD_OFFSET_ENVSEG);
@@ -263,13 +263,13 @@ int main(int argc, char **argv) {
   /* make COMPSEC point to myself */
   set_comspec_to_self(*rmod_envseg);
 
-  {
+/*  {
     unsigned short envsiz;
     unsigned short far *sizptr = MK_FP(*rmod_envseg - 1, 3);
     envsiz = *sizptr;
     envsiz *= 16;
     printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod_seg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
-  }
+  }*/
 
   for (;;) {
     char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
@@ -333,7 +333,7 @@ int main(int argc, char **argv) {
       pop bx
       pop ax
     }
-    printf("\r\n");
+    outputnl("");
 
     /* if nothing entered, loop again */
     if (cmdline[-1] == 0) continue;
@@ -359,7 +359,7 @@ int main(int argc, char **argv) {
 
     /* execvp() replaces the current process by the new one
     if I am still alive then external command failed to execute */
-    puts("Bad command or file name");
+    outputnl("Bad command or file name");
 
   }
 

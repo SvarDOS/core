@@ -13,7 +13,7 @@
 static int cmd_cd(const struct cmd_funcparam *p) {
   /* two arguments max */
   if (p->argc > 1) {
-    puts("Too many parameters");
+    outputnl("Too many parameters");
   }
 
   /* no argument? display current drive and dir ("CWD") */
@@ -92,7 +92,9 @@ static int cmd_cd(const struct cmd_funcparam *p) {
         pop dx
       }
     }
-    if (err != 0) puts(doserr(err));
+    if (err != 0) {
+      outputnl(doserr(err));
+    }
   }
 
   return(-1);
