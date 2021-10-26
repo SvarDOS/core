@@ -8,18 +8,21 @@
 #include <stdlib.h>
 
 #include "doserr.h"
+#include "env.h"
 #include "helpers.h"
 
 struct cmd_funcparam {
-  int argc;
-  const char *argv[256];
-  unsigned short env_seg;
-  const char far *cmdline;
+  int argc;                 /* number of arguments */
+  const char *argv[256];    /* pointers to each argument */
+  unsigned short env_seg;   /* segment of environment block */
+  unsigned short argoffset; /* offset of cmdline where first argument starts */
+  const char far *cmdline;  /* original cmdline (terminated by \r) */
 };
 
 #include "cmd/cd.c"
 #include "cmd/dir.c"
 #include "cmd/exit.c"
+#include "cmd/prompt.c"
 #include "cmd/set.c"
 
 #include "cmd.h"
@@ -35,6 +38,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"CHDIR",   cmd_cd},
   {"DIR",     cmd_dir},
   {"EXIT",    cmd_exit},
+  {"PROMPT",  cmd_prompt},
   {"SET",     cmd_set},
   {NULL,      NULL}
 };
@@ -142,6 +146,7 @@ int cmd_process(unsigned short env_seg, const char far *cmdline) {
   /* prepare function parameters and feed it to the cmd handling function */
   p.argc = cmd_explode(cmdbuff, cmdline + argoffset, p.argv);
   p.env_seg = env_seg;
+  p.argoffset = argoffset;
   p.cmdline = cmdline;
 
   return((cmdptr->func_ptr)(&p));

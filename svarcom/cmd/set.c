@@ -5,7 +5,6 @@
  * varname can also contain spaces
  */
 
-#include "env.h"
 
 static int cmd_set(const struct cmd_funcparam *p) {
   char far *env = MK_FP(p->env_seg, 0);
