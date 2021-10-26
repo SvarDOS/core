@@ -81,7 +81,15 @@ static void parse_argv(struct config *cfg, int argc, char **argv) {
 }
 
 
-static void buildprompt(char *s, const char *fmt) {
+static void buildprompt(char *s, unsigned short envseg) {
+  /* locate the prompt variable or use the default pattern */
+  const char far *fmt = env_lookup(envseg, "PROMPT");
+  while ((fmt != NULL) && (*fmt != 0)) {
+    fmt++;
+    if (fmt[-1] == '=') break;
+  }
+  if ((fmt == NULL) || (*fmt == 0)) fmt = "$p$g"; /* fallback to default if empty */
+  /* build the prompt string based on pattern */
   for (; *fmt != 0; fmt++) {
     if (*fmt != '$') {
       *s = *fmt;
@@ -283,7 +291,7 @@ int main(int argc, char **argv) {
       /* print shell prompt */
       char buff[256];
       char *promptptr = buff;
-      buildprompt(promptptr, "$p$g"); /* TODO: prompt should be configurable via environment */
+      buildprompt(promptptr, *rmod_envseg);
       _asm {
         push ax
         push dx
