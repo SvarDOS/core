@@ -10,7 +10,9 @@ static int cmd_path(struct cmd_funcparam *p) {
   /* no parameter - display current path */
   if (p->argc == 0) {
     char far *curpath = env_lookup(p->env_seg, "PATH");
-    if (curpath != NULL) {
+    if (curpath == NULL) {
+      outputnl("No Path");
+    } else {
       unsigned short i;
       for (i = 0;; i++) {
         buff[i] = curpath[i];
@@ -58,9 +60,6 @@ static int cmd_path(struct cmd_funcparam *p) {
       if (buff[i + 5] == '\r') break;
     }
     buff[i + 5] = 0;
-    outputnl("---");
-    outputnl(buff);
-    outputnl("---");
     env_setvar(p->env_seg, buff);
   }
 
