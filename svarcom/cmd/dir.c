@@ -29,7 +29,7 @@
 #define cmd_dir_attr_arc 32
 
 
-static int cmd_dir(const struct cmd_funcparam *p) {
+static int cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = "*.*";
   unsigned short errcode;
   _Packed struct DTA {

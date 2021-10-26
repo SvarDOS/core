@@ -5,7 +5,7 @@
  *
  */
 
-static int cmd_prompt(const struct cmd_funcparam *p) {
+static int cmd_prompt(struct cmd_funcparam *p) {
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
     output("Changes the DOS command prompt.\r\n"
            "\r\n"
@@ -22,8 +22,9 @@ static int cmd_prompt(const struct cmd_funcparam *p) {
 
   /* otherwise set PROMPT to whatever is passed on command-line */
   {
-    char buff[256] = "PROMPT=";
     unsigned short i;
+    char *buff = p->BUFFER;
+    strcpy(buff, "PROMPT=");
     for (i = 0;; i++) {
       buff[i + 7] = p->cmdline[p->argoffset + i];
       if (buff[i + 7] == '\r') break;

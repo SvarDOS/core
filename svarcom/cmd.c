@@ -6,6 +6,7 @@
 #include <i86.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "doserr.h"
 #include "env.h"
@@ -17,11 +18,13 @@ struct cmd_funcparam {
   unsigned short env_seg;   /* segment of environment block */
   unsigned short argoffset; /* offset of cmdline where first argument starts */
   const char far *cmdline;  /* original cmdline (terminated by \r) */
+  char BUFFER[1024];        /* a buffer for whatever is needed */
 };
 
 #include "cmd/cd.c"
 #include "cmd/dir.c"
 #include "cmd/exit.c"
+#include "cmd/path.c"
 #include "cmd/prompt.c"
 #include "cmd/set.c"
 
@@ -30,7 +33,7 @@ struct cmd_funcparam {
 
 struct CMD_ID {
   const char *cmd;
-  int (*func_ptr)(const struct cmd_funcparam *); /* pointer to handling function */
+  int (*func_ptr)(struct cmd_funcparam *); /* pointer to handling function */
 };
 
 const struct CMD_ID INTERNAL_CMDS[] = {
@@ -38,6 +41,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"CHDIR",   cmd_cd},
   {"DIR",     cmd_dir},
   {"EXIT",    cmd_exit},
+  {"PATH",    cmd_path},
   {"PROMPT",  cmd_prompt},
   {"SET",     cmd_set},
   {NULL,      NULL}
@@ -104,11 +108,10 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-int cmd_process(unsigned short env_seg, const char far *cmdline) {
+int cmd_process(unsigned short env_seg, const char far *cmdline, char *BUFFER) {
   const struct CMD_ID *cmdptr;
-  struct cmd_funcparam p;
   unsigned short argoffset;
-  char cmdbuff[256];
+  struct cmd_funcparam *p = (void *)BUFFER;
 
   /* special case: is this a drive change? (like "E:") */
   if ((cmdline[0] != 0) && (cmdline[1] == ':') && ((cmdline[2] == ' ') || (cmdline[2] == 0))) {
@@ -144,10 +147,10 @@ int cmd_process(unsigned short env_seg, const char far *cmdline) {
   /* printf("recognized internal command: '%s', tail of command at offset %u\r\n", cmdptr->cmd, argoffset); */
 
   /* prepare function parameters and feed it to the cmd handling function */
-  p.argc = cmd_explode(cmdbuff, cmdline + argoffset, p.argv);
-  p.env_seg = env_seg;
-  p.argoffset = argoffset;
-  p.cmdline = cmdline;
+  p->argc = cmd_explode(BUFFER + sizeof(*p), cmdline + argoffset, p->argv);
+  p->env_seg = env_seg;
+  p->argoffset = argoffset;
+  p->cmdline = cmdline;
 
-  return((cmdptr->func_ptr)(&p));
+  return((cmdptr->func_ptr)(p));
 }

@@ -246,10 +246,11 @@ static void set_comspec_to_self(unsigned short envseg) {
 
 
 int main(int argc, char **argv) {
-  struct config cfg;
-  unsigned short rmod_seg;
-  unsigned short far *rmod_envseg;
-  unsigned short far *lastexitcode;
+  static struct config cfg;
+  static unsigned short rmod_seg;
+  static unsigned short far *rmod_envseg;
+  static unsigned short far *lastexitcode;
+  static unsigned char BUFFER[4096];
 
   parse_argv(&cfg, argc, argv);
 
@@ -289,8 +290,7 @@ int main(int argc, char **argv) {
 
     {
       /* print shell prompt */
-      char buff[256];
-      char *promptptr = buff;
+      char *promptptr = BUFFER;
       buildprompt(promptptr, *rmod_envseg);
       _asm {
         push ax
@@ -357,7 +357,7 @@ int main(int argc, char **argv) {
 
     /* try matching (and executing) an internal command */
     {
-      int ecode = cmd_process(*rmod_envseg, cmdline);
+      int ecode = cmd_process(*rmod_envseg, cmdline, BUFFER);
       if (ecode >= 0) *lastexitcode = ecode;
       if (ecode >= -1) continue; /* internal command executed */
     }

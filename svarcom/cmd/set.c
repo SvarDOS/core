@@ -6,26 +6,25 @@
  */
 
 
-static int cmd_set(const struct cmd_funcparam *p) {
+static int cmd_set(struct cmd_funcparam *p) {
   char far *env = MK_FP(p->env_seg, 0);
-  char buff[256];
-  int i;
+  char *buff = p->BUFFER;
   /* no arguments - display content */
   if (p->argc == 0) {
     while (*env != 0) {
+      unsigned short i;
       /* copy string to local buff for display */
       for (i = 0;; i++) {
         buff[i] = *env;
         env++;
         if (buff[i] == 0) break;
       }
-      puts(buff);
+      outputnl(buff);
     }
   } else if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
     outputnl("TODO: help screen"); /* TODO */
   } else { /* set variable (do not rely on argv, SET has its own rules...) */
     const char far *ptr;
-    char buff[256];
     unsigned short i;
     /* locate the first space */
     for (ptr = p->cmdline; *ptr != ' '; ptr++);

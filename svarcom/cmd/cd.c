@@ -10,7 +10,7 @@
  * Type CD without parameters to display the current drive and directory.
  */
 
-static int cmd_cd(const struct cmd_funcparam *p) {
+static int cmd_cd(struct cmd_funcparam *p) {
   /* two arguments max */
   if (p->argc > 1) {
     outputnl("Too many parameters");
