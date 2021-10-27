@@ -9,8 +9,7 @@ static int cmd_prompt(struct cmd_funcparam *p) {
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
     output("Changes the DOS command prompt.\r\n"
            "\r\n"
-           "PROMPT [new command prompt specification]\r\n"
-           "\r\n");
+           "PROMPT [new command prompt specification]\r\n");
     return(-1);
   }
 

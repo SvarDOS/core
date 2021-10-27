@@ -7,10 +7,8 @@
 
 static int cmd_exit(struct cmd_funcparam *p) {
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    output("EXIT\r\n"
-           "\r\n"
-           "Quits the COMMAND.COM program (command interpreter)\r\n"
-           "\r\n");
+    outputnl("EXIT\r\n");
+    outputnl("Quits the COMMAND.COM program (command interpreter)");
   } else {
     exit(0);
   }
