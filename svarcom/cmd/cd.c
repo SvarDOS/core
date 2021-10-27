@@ -11,15 +11,32 @@
  */
 
 static int cmd_cd(struct cmd_funcparam *p) {
+  char *buffptr = p->BUFFER;
+
   /* two arguments max */
   if (p->argc > 1) {
     outputnl("Too many parameters");
+    return(-1);
+  }
+
+  /* CD /? */
+  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
+    outputnl("Displays the name of or changes the current directory.");
+    outputnl("");
+    outputnl("CHDIR [drive:][path]");
+    outputnl("CHDIR[..]");
+    outputnl("CD [drive:][path]");
+    outputnl("CD[..]");
+    outputnl("");
+    outputnl(".. Specifies that you want to change to the parent directory.");
+    outputnl("");
+    outputnl("Type CD drive: to display the current directory in the specified drive.");
+    outputnl("Type CD without parameters to display the current drive and directory.");
+    return(-1);
   }
 
   /* no argument? display current drive and dir ("CWD") */
   if (p->argc == 0) {
-    char buff[64];
-    char *buffptr = buff;
     _asm {
       push ax
       push dx
@@ -44,7 +61,8 @@ static int cmd_cd(struct cmd_funcparam *p) {
       pop dx
       pop ax
     }
-    puts(buff);
+    outputnl(buffptr);
+    return(-1);
   }
 
   /* argument can be either a drive (D:) or a path */
@@ -53,8 +71,6 @@ static int cmd_cd(struct cmd_funcparam *p) {
     unsigned short err = 0;
     /* drive (CD B:) */
     if ((arg[0] != '\\') && (arg[1] == ':') && (arg[2] == 0)) {
-      char buff[64];
-      char *buffptr = buff;
       unsigned char drive = arg[0];
       if (drive >= 'a') {
         drive -= 'a';
@@ -77,7 +93,7 @@ static int cmd_cd(struct cmd_funcparam *p) {
         pop ax
         pop si
       }
-      if (err == 0) printf("%c:\\%s\r\n", drive + 'A' - 1, buff);
+      if (err == 0) printf("%c:\\%s\r\n", drive + 'A' - 1, buffptr);
     } else { /* path */
       _asm {
         push dx
