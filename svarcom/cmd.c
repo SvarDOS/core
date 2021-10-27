@@ -21,6 +21,7 @@ struct cmd_funcparam {
   char BUFFER[1024];        /* a buffer for whatever is needed */
 };
 
+#include "cmd/_notimpl.c"
 #include "cmd/cd.c"
 #include "cmd/dir.c"
 #include "cmd/exit.c"
@@ -38,14 +39,36 @@ struct CMD_ID {
 };
 
 const struct CMD_ID INTERNAL_CMDS[] = {
+  {"BREAK",   cmd_notimpl},
   {"CD",      cmd_cd},
+  {"CHCP",    cmd_notimpl},
   {"CHDIR",   cmd_cd},
+  {"CLS",     cmd_notimpl},
+  {"COPY",    cmd_notimpl},
+  {"CTTY",    cmd_notimpl},
+  {"DATE",    cmd_notimpl},
+  {"DEL",     cmd_notimpl},
   {"DIR",     cmd_dir},
+  {"ECHO",    cmd_notimpl},
+  {"ERASE",   cmd_notimpl},
   {"EXIT",    cmd_exit},
+  {"LH",      cmd_notimpl},
+  {"LOADHIGH",cmd_notimpl},
+  {"MD",      cmd_notimpl},
+  {"MKDIR",   cmd_notimpl},
+  {"PAUSE",   cmd_notimpl},
   {"PATH",    cmd_path},
   {"PROMPT",  cmd_prompt},
+  {"RD",      cmd_notimpl},
+  {"REN",     cmd_notimpl},
+  {"RENAME",  cmd_notimpl},
+  {"RMDIR",   cmd_notimpl},
   {"SET",     cmd_set},
+  {"TIME",    cmd_notimpl},
+  {"TYPE",    cmd_notimpl},
   {"VER",     cmd_ver},
+  {"VERIFY",  cmd_notimpl},
+  {"VOL",     cmd_notimpl},
   {NULL,      NULL}
 };
 
