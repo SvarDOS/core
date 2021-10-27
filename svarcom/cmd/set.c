@@ -22,7 +22,14 @@ static int cmd_set(struct cmd_funcparam *p) {
       outputnl(buff);
     }
   } else if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    outputnl("TODO: help screen"); /* TODO */
+    outputnl("Displays, sets, or removes DOS environment variables");
+    outputnl("");
+    outputnl("SET [variable=[string]]");
+    outputnl("");
+    outputnl("variable  Specifies the environment-variable name");
+    outputnl("string    Specifies a series of characters to assign to the variable");
+    outputnl("");
+    outputnl("Type SET without parameters to display the current environment variables.");
   } else { /* set variable (do not rely on argv, SET has its own rules...) */
     const char far *ptr;
     unsigned short i;
