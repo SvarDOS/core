@@ -27,6 +27,7 @@ struct cmd_funcparam {
 #include "cmd/path.c"
 #include "cmd/prompt.c"
 #include "cmd/set.c"
+#include "cmd/ver.c"
 
 #include "cmd.h"
 
@@ -44,6 +45,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"PATH",    cmd_path},
   {"PROMPT",  cmd_prompt},
   {"SET",     cmd_set},
+  {"VER",     cmd_ver},
   {NULL,      NULL}
 };
 
