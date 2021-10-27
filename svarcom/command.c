@@ -359,7 +359,10 @@ int main(int argc, char **argv) {
     {
       int ecode = cmd_process(*rmod_envseg, cmdline, BUFFER);
       if (ecode >= 0) *lastexitcode = ecode;
-      if (ecode >= -1) continue; /* internal command executed */
+      if (ecode >= -1) { /* internal command executed */
+        outputnl("");
+        continue;
+      }
     }
 
     /* if here, then this was not an internal command */
