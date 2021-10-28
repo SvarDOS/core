@@ -31,6 +31,7 @@ struct cmd_funcparam {
 #include "cmd/rmdir.c"
 #include "cmd/set.c"
 #include "cmd/ver.c"
+#include "cmd/verify.c"
 #include "cmd/type.c"
 
 #include "cmd.h"
@@ -70,7 +71,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"TIME",    cmd_notimpl},
   {"TYPE",    cmd_type},
   {"VER",     cmd_ver},
-  {"VERIFY",  cmd_notimpl},
+  {"VERIFY",  cmd_verify},
   {"VOL",     cmd_notimpl},
   {NULL,      NULL}
 };
