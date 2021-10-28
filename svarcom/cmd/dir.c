@@ -98,9 +98,10 @@ static int cmd_dir(struct cmd_funcparam *p) {
     pop ax
   }
 
-  outputnl(dta->fname);
-
-  if (errcode == 0) goto NEXTFILE;
+  if (errcode == 0) {
+    outputnl(dta->fname);
+    goto NEXTFILE;
+  }
 
   return(-1);
 }
