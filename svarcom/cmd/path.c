@@ -7,6 +7,20 @@
 static int cmd_path(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
 
+  /* help screen (/?) */
+  if (cmd_ishlp(p)) {
+    output("Displays or sets a search path for executable files.\r\n"
+           "\r\n"
+           "PATH [[drive:]path[;...]]\r\n"
+           "PATH ;\r\n"
+           "\r\n"
+           "Type PATH ; to clear all search-path settings and direct DOS to search\r\n"
+           "only in the current directory.\r\n"
+           "\r\n"
+           "Type PATH without parameters to display the current path.\r\n");
+    return(-1);
+  }
+
   /* no parameter - display current path */
   if (p->argc == 0) {
     char far *curpath = env_lookup(p->env_seg, "PATH");
@@ -30,20 +44,6 @@ static int cmd_path(struct cmd_funcparam *p) {
   }
 
   /* IF HERE: THERE IS EXACTLY 1 ARGUMENT (argc == 1) */
-
-  /* help screen (/?) */
-  if (imatch(p->argv[0], "/?")) {
-    output("Displays or sets a search path for executable files.\r\n"
-           "\r\n"
-           "PATH [[drive:]path[;...]]\r\n"
-           "PATH ;\r\n"
-           "\r\n"
-           "Type PATH ; to clear all search-path settings and direct DOS to search\r\n"
-           "only in the current directory.\r\n"
-           "\r\n"
-           "Type PATH without parameters to display the current path.\r\n");
-    return(-1);
-  }
 
   /* reset the PATH string (PATH ;) */
   if (imatch(p->argv[0], ";")) {

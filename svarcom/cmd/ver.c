@@ -9,7 +9,7 @@ static int cmd_ver(struct cmd_funcparam *p) {
   unsigned char maj = 0, min = 0;
 
   /* help screen */
-  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
+  if (cmd_ishlp(p)) {
     outputnl("Displays the DOS version.");
     return(-1);
   }

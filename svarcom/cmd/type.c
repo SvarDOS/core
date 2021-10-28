@@ -7,15 +7,15 @@ static int cmd_type(struct cmd_funcparam *p) {
   const char *fname = p->argv[0];
   unsigned short err = 0;
 
-  if (p->argc == 0) {
-    outputnl("Required parameter missing");
-    return(-1);
-  }
-
-  if ((p->argc > 0) && (imatch(p->argv[0], "/?"))) {
+  if (cmd_ishlp(p)) {
     outputnl("Displays the contents of a text file.");
     outputnl("");
     outputnl("TYPE [drive:][path]filename");
+    return(-1);
+  }
+
+  if (p->argc == 0) {
+    outputnl("Required parameter missing");
     return(-1);
   }
 

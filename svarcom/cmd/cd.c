@@ -44,14 +44,8 @@ static unsigned short cmd_cd_curpathfordrv(char *buff, unsigned char d) {
 static int cmd_cd(struct cmd_funcparam *p) {
   char *buffptr = p->BUFFER;
 
-  /* two arguments max */
-  if (p->argc > 1) {
-    outputnl("Too many parameters");
-    return(-1);
-  }
-
   /* CD /? */
-  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
+  if (cmd_ishlp(p)) {
     outputnl("Displays the name of or changes the current directory.");
     outputnl("");
     outputnl("CHDIR [drive:][path]");
@@ -63,6 +57,12 @@ static int cmd_cd(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("Type CD drive: to display the current directory in the specified drive.");
     outputnl("Type CD without parameters to display the current drive and directory.");
+    return(-1);
+  }
+
+  /* one argument max */
+  if (p->argc > 1) {
+    outputnl("Too many parameters");
     return(-1);
   }
 

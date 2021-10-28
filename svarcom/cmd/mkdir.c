@@ -6,7 +6,7 @@ static int cmd_mkdir(struct cmd_funcparam *p) {
   const char *dname = p->argv[0];
   unsigned short err = 0;
 
-  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
+  if (cmd_ishlp(p)) {
     outputnl("Creates a directory");
     outputnl("");
     outputnl("MKDIR [drive:]path");

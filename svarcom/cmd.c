@@ -21,6 +21,15 @@ struct cmd_funcparam {
   char BUFFER[1024];        /* a buffer for whatever is needed */
 };
 
+/* scans argv for the presence of a "/?" parameter. returns 1 if found, 0 otherwise */
+static int cmd_ishlp(const struct cmd_funcparam *p) {
+  int i;
+  for (i = 0; i < p->argc; i++) {
+    if ((p->argv[i][0] == '/') && (p->argv[i][1] == '?')) return(1);
+  }
+  return(0);
+}
+
 #include "cmd/_notimpl.c"
 #include "cmd/cd.c"
 #include "cmd/dir.c"

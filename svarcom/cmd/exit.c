@@ -6,7 +6,7 @@
  */
 
 static int cmd_exit(struct cmd_funcparam *p) {
-  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
+  if (cmd_ishlp(p)) {
     outputnl("EXIT\r\n");
     outputnl("Quits the COMMAND.COM program (command interpreter)");
   } else {

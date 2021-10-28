@@ -6,10 +6,11 @@
  */
 
 static int cmd_prompt(struct cmd_funcparam *p) {
-  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    output("Changes the DOS command prompt.\r\n"
-           "\r\n"
-           "PROMPT [new command prompt specification]\r\n");
+
+  if (cmd_ishlp(p)) {
+    outputnl("Changes the DOS command prompt.");
+    outputnl("");
+    outputnl("PROMPT [new command prompt specification]");
     return(-1);
   }
 

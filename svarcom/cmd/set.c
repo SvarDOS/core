@@ -9,6 +9,18 @@
 static int cmd_set(struct cmd_funcparam *p) {
   char far *env = MK_FP(p->env_seg, 0);
   char *buff = p->BUFFER;
+
+  if (cmd_ishlp(p)) {
+    outputnl("Displays, sets, or removes DOS environment variables");
+    outputnl("");
+    outputnl("SET [variable=[string]]");
+    outputnl("");
+    outputnl("variable  Specifies the environment-variable name");
+    outputnl("string    Specifies a series of characters to assign to the variable");
+    outputnl("");
+    outputnl("Type SET without parameters to display the current environment variables.");
+  }
+
   /* no arguments - display content */
   if (p->argc == 0) {
     while (*env != 0) {
@@ -21,15 +33,6 @@ static int cmd_set(struct cmd_funcparam *p) {
       }
       outputnl(buff);
     }
-  } else if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    outputnl("Displays, sets, or removes DOS environment variables");
-    outputnl("");
-    outputnl("SET [variable=[string]]");
-    outputnl("");
-    outputnl("variable  Specifies the environment-variable name");
-    outputnl("string    Specifies a series of characters to assign to the variable");
-    outputnl("");
-    outputnl("Type SET without parameters to display the current environment variables.");
   } else { /* set variable (do not rely on argv, SET has its own rules...) */
     const char far *ptr;
     unsigned short i;

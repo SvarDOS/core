@@ -4,7 +4,7 @@
 
 static int cmd_verify(struct cmd_funcparam *p) {
 
-  if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
+  if (cmd_ishlp(p)) {
     outputnl("Tells DOS whether to verify that files are written correctly to disk.");
     outputnl("\r\nVERIFY [ON | OFF]\r\n");
     outputnl("Type VERIFY without a parameter to display its current setting.");
