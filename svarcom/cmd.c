@@ -25,8 +25,10 @@ struct cmd_funcparam {
 #include "cmd/cd.c"
 #include "cmd/dir.c"
 #include "cmd/exit.c"
+#include "cmd/mkdir.c"
 #include "cmd/path.c"
 #include "cmd/prompt.c"
+#include "cmd/rmdir.c"
 #include "cmd/set.c"
 #include "cmd/ver.c"
 #include "cmd/type.c"
@@ -55,15 +57,15 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"EXIT",    cmd_exit},
   {"LH",      cmd_notimpl},
   {"LOADHIGH",cmd_notimpl},
-  {"MD",      cmd_notimpl},
-  {"MKDIR",   cmd_notimpl},
+  {"MD",      cmd_mkdir},
+  {"MKDIR",   cmd_mkdir},
   {"PAUSE",   cmd_notimpl},
   {"PATH",    cmd_path},
   {"PROMPT",  cmd_prompt},
-  {"RD",      cmd_notimpl},
+  {"RD",      cmd_rmdir},
   {"REN",     cmd_notimpl},
   {"RENAME",  cmd_notimpl},
-  {"RMDIR",   cmd_notimpl},
+  {"RMDIR",   cmd_rmdir},
   {"SET",     cmd_set},
   {"TIME",    cmd_notimpl},
   {"TYPE",    cmd_type},
