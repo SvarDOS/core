@@ -6,8 +6,8 @@ SvarCOM is the SvarDOS command line interpreter, known usually under the name
 "COMMAND.COM". It is designed and maintained by Mateusz Viste, and distributed
 under the terms of the MIT license.
 
-For the time being, it is an incomplete, experimental project. The goal would
-is to eventually make SvarCOM the default SvarDOS shell, replacing FreeCOM.
+For the time being, it is an incomplete, "work in progress" project. The goal
+is to make SvarCOM the default SvarDOS shell, replacing FreeCOM.
 
 
 *** Why replacing FreeCOM, the FreeDOS COMMAND.COM? ***
@@ -18,13 +18,16 @@ do not like about it. SvarCOM is my attempt at addressing these things.
 - FreeCOM is not suitable for low-memory machines. It takes about 55K of
   conventional memory when XMS is unavailable. XMS being a 386+ thing, FreeCOM
   is a poor fit for pre-386 machines. There is the KSSF hack, but it is a
-  kludg with many limitations.
+  kludge with many limitations. As pointed out by one of the FreeCOM authors,
+  FreeCOM is designed with 21'st century machines in mind and not IBM PC
+  compatibles (or "museum computers", as they refer to them).
+ https://www.mail-archive.com/freedos-user@lists.sourceforge.net/msg23472.html
 
-  SvarDOS will not rely on XMS, and will perform swapping that works on any
-  machine (similar to what MS-DOS did).
+  SvarDOS will not rely on XMS, and performs runtime swapping that works on
+  any IBM PC compatible machine.
 
 - FreeCOM requires custom NLS files. While the vast majority of FreeDOS
-  programs use a single "standard" (CATS/Kitten), FreeCOM is using a different
+  programs use a single "standard" (CATS/Kitten), FreeCOM uses a different
   approach with pre-compiled NLS strings, which makes it necessary to
   distribute as many binary blobs as there are supported languages. It also
   makes the translation process much more difficult.
@@ -32,10 +35,17 @@ do not like about it. SvarCOM is my attempt at addressing these things.
   SvarDOS will use Kitten-style translations, like other applications.
 
 - FreeCOM is a complex beast: it aims for compatibility with multiple
-  compilers and supports many features. This makes the code uneasy to follow
-  and changes require careful testing on all supported compilers and all
-  possible build variants.
+  compilers and supports many embedded features. This makes the code uneasy to
+  follow and changes require careful testing on all supported compilers and
+  all possible build variants.
 
-  SvarDOS is meant to be simple and universal. It is meant to be compiled with
-  OpenWatcom and nothing else. It also won't integrate features that can be
-  implemented as third-party tools (typically: DOSKEY).
+  SvarDOS, on the other hand, is meant to be simple and universal. It is meant
+  to be compiled with OpenWatcom only, which makes a ton of IFDEF's go away.
+  It also won't integrate features that can be reasonably implemented as
+  third-party tools (typically: DOSKEY).
+
+- FreeCOM code is released under the terms of a toxic (GPL) license that
+  restrain the freedom of its users due to its virality.
+
+  SvarCOM is released under the terms of a liberal and permissive license that
+  does not impose limitations on how users may or may not use it.
