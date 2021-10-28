@@ -42,10 +42,11 @@ do not like about it. SvarCOM is my attempt at addressing these things.
   SvarDOS, on the other hand, is meant to be simple and universal. It is meant
   to be compiled with OpenWatcom only, which makes a ton of IFDEF's go away.
   It also won't integrate features that can be reasonably implemented as
-  third-party tools (typically: DOSKEY).
+  third-party tools (typically: DOSKEY). It strives to reimplement the
+  functionalities of MS-DOS 5.0.
 
 - FreeCOM code is released under the terms of a toxic (GPL) license that
   restrain the freedom of its users due to its virality.
 
-  SvarCOM is released under the terms of a liberal and permissive license that
-  does not impose limitations on how users may or may not use it.
+  SvarCOM is released under the terms of a liberal and permissive (MIT)
+  license that does not impose limitations on how users may or may not use it.
