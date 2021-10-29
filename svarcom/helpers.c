@@ -57,3 +57,40 @@ void output_internal(const char *s, unsigned short nl) {
     FINITO:
   }
 }
+
+
+/* find first matching files using a FindFirst DOS call
+ * returns 0 on success or a DOS err code on failure */
+unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short attr) {
+  unsigned short res = 0;
+  _asm {
+    /* set DTA location */
+    mov ah, 0x1a
+    mov dx, dta
+    int 0x21
+    /* */
+    mov ah, 0x4e    /* FindFirst */
+    mov dx, pattern
+    mov cx, attr
+    int 0x21        /* CF set on error + err code in AX, DTA filled with FileInfoRec on success */
+    jnc DONE
+    mov [res], ax
+    DONE:
+  }
+  return(res);
+}
+
+
+/* find next matching, ie. continues an action intiated by findfirst() */
+unsigned short findnext(struct DTA *dta) {
+  unsigned short res = 0;
+  _asm {
+    mov ah, 0x4f    /* FindNext */
+    mov dx, dta
+    int 0x21        /* CF set on error + err code in AX, DTA filled with FileInfoRec on success */
+    jnc DONE
+    mov [res], ax
+    DONE:
+  }
+  return(res);
+}

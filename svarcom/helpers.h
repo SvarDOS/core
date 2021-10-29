@@ -13,4 +13,30 @@ void output_internal(const char *s, unsigned short nl);
 #define output(x) output_internal(x, 0)
 #define outputnl(x) output_internal(x, 1)
 
+/*
+ * FileInfoRec (DTA) format:
+ * offset size desc
+ *    +0   21  reserved
+ *  +15h    1  file attr (1=RO 2=Hidden 4=System 8=VOL 16=DIR 32=Archive
+ *  +16h    2  time: bits 0-4=bi-seconds (0-30), bits 5-10=minutes (0-59), bits 11-15=hour (0-23)
+ *  +18h    2  date: bits 0-4=day(0-31), bits 5-8=month (1-12), bits 9-15=years since 1980
+ *  +1ah    4  DWORD file size, in bytes
+ *  +1eh   13  13-bytes max ASCIIZ filename
+ */
+_Packed struct DTA {
+  char reserved[21];
+  unsigned char attr;
+  unsigned short time;
+  unsigned short date;
+  unsigned long size;
+  char fname[13];
+};
+
+/* find first matching files using a FindFirst DOS call
+ * returns 0 on success or a DOS err code on failure */
+unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short attr);
+
+/* find next matching, ie. continues an action intiated by findfirst() */
+unsigned short findnext(struct DTA *dta);
+
 #endif
