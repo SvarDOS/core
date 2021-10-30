@@ -43,7 +43,7 @@ do not like about it. SvarCOM is my attempt at addressing these things.
   to be compiled with OpenWatcom only, which makes a ton of IFDEF's go away.
   It also won't integrate features that can be reasonably implemented as
   third-party tools (typically: DOSKEY). It strives to reimplement the
-  functionalities of MS-DOS 5.0.
+  functionalities of MS-DOS 5/6.
 
 - FreeCOM code is released under the terms of a toxic (GPL) license that
   restrain the freedom of its users due to its virality.
