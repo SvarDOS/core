@@ -21,19 +21,11 @@
  * /L Uses lowercases
  */
 
-#define cmd_dir_attr_ro   1
-#define cmd_dir_attr_hid  2
-#define cmd_dir_attr_sys  4
-#define cmd_dir_attr_vol  8
-#define cmd_dir_attr_dir 16
-#define cmd_dir_attr_arc 32
-
-
 static int cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = "*.*";
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
 
-  if (findfirst(dta, filespecptr, cmd_dir_attr_ro | cmd_dir_attr_hid | cmd_dir_attr_sys | cmd_dir_attr_dir | cmd_dir_attr_arc) != 0) return(-1);
+  if (findfirst(dta, filespecptr, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC) != 0) return(-1);
 
   outputnl(dta->fname);
 

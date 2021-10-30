@@ -32,6 +32,13 @@ _Packed struct DTA {
   char fname[13];
 };
 
+#define DOS_ATTR_RO   1
+#define DOS_ATTR_HID  2
+#define DOS_ATTR_SYS  4
+#define DOS_ATTR_VOL  8
+#define DOS_ATTR_DIR 16
+#define DOS_ATTR_ARC 32
+
 /* find first matching files using a FindFirst DOS call
  * returns 0 on success or a DOS err code on failure */
 unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short attr);
