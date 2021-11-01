@@ -46,4 +46,15 @@ unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short at
 /* find next matching, ie. continues an action intiated by findfirst() */
 unsigned short findnext(struct DTA *dta);
 
+/* print s string and wait for a single key press from stdin. accepts only
+ * key presses defined in the c ASCIIZ string. returns offset of pressed key
+ * in string. keys in c MUST BE UPPERCASE! */
+unsigned short askchoice(const char *s, const char *c);
+
+/* converts a path to its canonic representation */
+void file_truename(const char *src, char *dst);
+
+/* returns DOS attributes of file, or -1 on error */
+int file_getattr(const char *fname);
+
 #endif

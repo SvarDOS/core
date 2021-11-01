@@ -32,6 +32,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 
 #include "cmd/_notimpl.c"
 #include "cmd/cd.c"
+#include "cmd/del.c"
 #include "cmd/dir.c"
 #include "cmd/exit.c"
 #include "cmd/mkdir.c"
@@ -60,10 +61,10 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"COPY",    cmd_notimpl},
   {"CTTY",    cmd_notimpl},
   {"DATE",    cmd_notimpl},
-  {"DEL",     cmd_notimpl},
+  {"DEL",     cmd_del},
   {"DIR",     cmd_dir},
   {"ECHO",    cmd_notimpl},
-  {"ERASE",   cmd_notimpl},
+  {"ERASE",   cmd_del},
   {"EXIT",    cmd_exit},
   {"LH",      cmd_notimpl},
   {"LOADHIGH",cmd_notimpl},

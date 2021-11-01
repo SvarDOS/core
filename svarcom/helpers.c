@@ -94,3 +94,78 @@ unsigned short findnext(struct DTA *dta) {
   }
   return(res);
 }
+
+
+/* print s string and wait for a single key press from stdin. accepts only
+ * key presses defined in the c ASCIIZ string. returns offset of pressed key
+ * in string. keys in c MUST BE UPPERCASE! */
+unsigned short askchoice(const char *s, const char *c) {
+  unsigned short res;
+  char key = 0;
+
+  AGAIN:
+  output(s);
+  output(" ");
+
+  _asm {
+    push ax
+    push dx
+
+    mov ax, 0x0c01 /* clear input buffer and execute getchar (INT 21h,AH=1) */
+    int 0x21
+    /* if AL == 0 then this is an extended character */
+    test al, al
+    jnz GOTCHAR
+    mov ah, 0x08   /* read again to flush extended char from input buffer */
+    int 0x21
+    xor al, al     /* all extended chars are ignored */
+    GOTCHAR:       /* received key is in AL now */
+    mov [key], al  /* save key */
+
+    /* print a cr/lf */
+    mov ah, 0x02
+    mov dl, 0x0D
+    int 0x21
+    mov dl, 0x0A
+    int 0x21
+
+    pop dx
+    pop ax
+  }
+
+  /* ucase() result */
+  if ((key >= 'a') && (key <= 'z')) key -= ('a' - 'A');
+
+  /* is there a match? */
+  for (res = 0; c[res] != 0; res++) if (c[res] == key) return(res);
+
+  goto AGAIN;
+}
+
+
+/* converts a path to its canonic representation */
+void file_truename(const char *src, char *dst) {
+  _asm {
+    mov ah, 0x60  /* query truename, DS:SI=src, ES:DI=dst */
+    push ds
+    pop es
+    mov si, src
+    mov di, dst
+    int 0x21
+  }
+}
+
+
+/* returns DOS attributes of file, or -1 on error */
+int file_getattr(const char *fname) {
+  int res = -1;
+  _asm {
+    mov ax, 0x4300  /* query file attributes, fname at DS:DX */
+    mov dx, fname
+    int 0x21        /* CX=attributes if CF=0, otherwise AX=errno */
+    jc DONE
+    mov [res], cx
+    DONE:
+  }
+  return(res);
+}
