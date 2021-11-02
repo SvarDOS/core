@@ -145,16 +145,24 @@ unsigned short askchoice(const char *s, const char *c) {
 }
 
 
-/* converts a path to its canonic representation */
-void file_truename(const char *src, char *dst) {
+/* converts a path to its canonic representation, returns 0 on success
+ * or DOS err on failure (invalid drive) */
+unsigned short file_truename(const char *src, char *dst) {
+  unsigned short res = 0;
   _asm {
+    push es
     mov ah, 0x60  /* query truename, DS:SI=src, ES:DI=dst */
     push ds
     pop es
     mov si, src
     mov di, dst
     int 0x21
+    jnc DONE
+    mov [res], ax
+    DONE:
+    pop es
   }
+  return(res);
 }
 
 
@@ -207,4 +215,33 @@ void press_any_key(void) {
     mov dl, 0x0A
     int 0x21
   }
+}
+
+
+/* validate a drive (A=0, B=1, etc). returns 1 if valid, 0 otherwise */
+int isdrivevalid(unsigned char drv) {
+  _asm {
+    mov ah, 0x19  /* query default (current) disk */
+    int 0x21      /* drive in AL (0=A, 1=B, etc) */
+    mov ch, al    /* save current drive to ch */
+    /* try setting up the drive as current */
+    mov ah, 0x0E   /* select default drive */
+    mov dl, [drv]  /* 0=A, 1=B, etc */
+    int 0x21
+    /* this call does not set CF on error, I must check cur drive to look for success */
+    mov ah, 0x19  /* query default (current) disk */
+    int 0x21      /* drive in AL (0=A, 1=B, etc) */
+    mov [drv], 1  /* preset result as success */
+    cmp al, dl    /* is eq? */
+    je DONE
+    mov [drv], 0  /* fail */
+    jmp FAILED
+    DONE:
+    /* set current drive back to what it was initially */
+    mov ah, 0x0E
+    mov dl, ch
+    int 0x21
+    FAILED:
+  }
+  return(drv);
 }

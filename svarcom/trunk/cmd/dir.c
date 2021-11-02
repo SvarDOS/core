@@ -85,6 +85,10 @@ static int cmd_dir(struct cmd_funcparam *p) {
           outputnl("/A NOT IMPLEMENTED YET");
           return(-1);
           break;
+        case 'b':
+        case 'B':
+          flags |= DIR_FLAG_BARE;
+          break;
         case 'p':
         case 'P':
           flags |= DIR_FLAG_PAUSE;
@@ -105,7 +109,28 @@ static int cmd_dir(struct cmd_funcparam *p) {
 
   if (filespecptr == NULL) filespecptr = ".";
 
-  file_truename(filespecptr, p->BUFFER);
+  {
+    unsigned short r = file_truename(filespecptr, p->BUFFER);
+    if (r != 0) {
+      outputnl(doserr(r));
+      return(-1);
+    }
+  }
+
+  if ((flags & DIR_FLAG_BARE) == 0) {
+    unsigned char drv = p->BUFFER[0];
+    if (drv >= 'a') {
+      drv -= 'a';
+    } else {
+      drv -= 'A';
+    }
+    cmd_vol_internal(drv, p->BUFFER + 1024);
+    sprintf(p->BUFFER + 1024, "Directory of %s", p->BUFFER);
+    /* trim at first '?', if any */
+    for (i = 0; p->BUFFER[i + 1024] != 0; i++) if (p->BUFFER[i + 1024] == '?') p->BUFFER[i + 1024] = 0;
+    outputnl(p->BUFFER + 1024);
+    outputnl("");
+  }
 
   /* if dir then append \????????.??? */
   i = file_getattr(p->BUFFER);

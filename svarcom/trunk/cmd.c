@@ -33,6 +33,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/_notimpl.c"
 #include "cmd/cd.c"
 #include "cmd/del.c"
+#include "cmd/vol.c"     /* must be included before dir.c due to dependency */
 #include "cmd/dir.c"
 #include "cmd/exit.c"
 #include "cmd/mkdir.c"
@@ -40,9 +41,9 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/prompt.c"
 #include "cmd/rmdir.c"
 #include "cmd/set.c"
+#include "cmd/type.c"
 #include "cmd/ver.c"
 #include "cmd/verify.c"
-#include "cmd/type.c"
 
 #include "cmd.h"
 
@@ -82,7 +83,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"TYPE",    cmd_type},
   {"VER",     cmd_ver},
   {"VERIFY",  cmd_verify},
-  {"VOL",     cmd_notimpl},
+  {"VOL",     cmd_vol},
   {NULL,      NULL}
 };
 

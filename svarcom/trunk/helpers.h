@@ -51,8 +51,9 @@ unsigned short findnext(struct DTA *dta);
  * in string. keys in c MUST BE UPPERCASE! */
 unsigned short askchoice(const char *s, const char *c);
 
-/* converts a path to its canonic representation */
-void file_truename(const char *src, char *dst);
+/* converts a path to its canonic representation, returns 0 on success
+ * or DOS err on failure (invalid drive) */
+unsigned short file_truename(const char *src, char *dst);
 
 /* returns DOS attributes of file, or -1 on error */
 int file_getattr(const char *fname);
@@ -65,5 +66,8 @@ unsigned short screen_getheight(void);
 
 /* displays the "Press any key to continue" msg and waits for a keypress */
 void press_any_key(void);
+
+/* validate a drive (A=0, B=1, etc). returns 1 if valid, 0 otherwise */
+int isdrivevalid(unsigned char drv);
 
 #endif
