@@ -9,44 +9,62 @@ under the terms of the MIT license.
 For the time being, it is an incomplete, "work in progress" project. The goal
 is to make SvarCOM the default SvarDOS shell, replacing FreeCOM.
 
+Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 
-*** Why replacing FreeCOM, the FreeDOS COMMAND.COM? ***
 
-FreeCOM is an impressive piece of software, but there are a few things that I
-do not like about it. SvarCOM is my attempt at addressing these things.
+Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
-- FreeCOM is not suitable for low-memory machines. It takes about 55K of
-  conventional memory when XMS is unavailable. XMS being a 386+ thing, FreeCOM
-  is a poor fit for pre-386 machines. There is the KSSF hack, but it is a
-  kludge with many limitations. As pointed out by one of the FreeCOM authors,
-  FreeCOM is designed with 21'st century machines in mind and not IBM PC
-  compatibles (or "museum computers", as they refer to them).
- https://www.mail-archive.com/freedos-user@lists.sourceforge.net/msg23472.html
+- no support for redirections or pipes (eg. file.exe | more > out.txt)
+- no batch file support
+- few internal commands missing: BREAK, CHCP, CLS, CTTY, LH, REN, COPY, DATE,
+  TIME, VOL, PAUSE, ECHO, IF, REM, SHIFT
 
-  SvarDOS will not rely on XMS, and performs runtime swapping that works on
-  any IBM PC compatible machine.
 
-- FreeCOM requires custom NLS files. While the vast majority of FreeDOS
-  programs use a single "standard" (CATS/Kitten), FreeCOM uses a different
-  approach with pre-compiled NLS strings, which makes it necessary to
-  distribute as many binary blobs as there are supported languages. It also
-  makes the translation process much more difficult.
+Latest version available here: http://svardos.osdn.io/svarcom
 
-  SvarDOS will use Kitten-style translations, like other applications.
 
-- FreeCOM is a complex beast: it aims for compatibility with multiple
-  compilers and supports many embedded features. This makes the code uneasy to
-  follow and changes require careful testing on all supported compilers and
-  all possible build variants.
+=== INTERNAL COMMANDS ========================================================
 
-  SvarDOS, on the other hand, is meant to be simple and universal. It is meant
-  to be compiled with OpenWatcom only, which makes a ton of IFDEF's go away.
-  It also won't integrate features that can be reasonably implemented as
-  third-party tools (typically: DOSKEY). It strives to reimplement the
-  functionalities of MS-DOS 5/6.
+SvarCOM implements the following internal commands. For help on each command,
+run it with a "/?" argument.
 
-- FreeCOM code is released under the terms of a toxic (GPL) license that
-  restrain the freedom of its users due to its virality.
+CD/CHDIR    - displays the name of or changes the current directory
+DEL/ERASE   - deletes one or more files
+DIR         - displays a list of files and subdirectories in a directory
+EXIT        - quits the command.com program (command interpreter)
+MD/MKDIR    - creates a directory
+PATH        - displays or sets a search path for executable files
+PROMPT      - changes the DOS command prompt
+RMDIR       - removes (deletes) a directory
+SET         - displays, sets or removes DOS environment variables
+TYPE        - displays the contents of a text file
+VER         - displays the DOS version
+VERIFY      - tells DOS whether to verify that files are written correctly
 
-  SvarCOM is released under the terms of a liberal and permissive (MIT)
-  license that does not impose limitations on how users may or may not use it.
+
+=== LICENSE ==================================================================
+
+SvarCOM is published under the terms of the MIT license.
+
+Copyright (C) 2021 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+==================================================================== [EOF] ===

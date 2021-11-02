@@ -1,0 +1,56 @@
+
+                         *** SVARCOM VS FREECOM ***
+
+
+The FreeCOM project is an impressive piece of software, but there are a few
+things that I do not like about it. SvarCOM is my attempt at addressing these
+things.
+
+
+*** MEMORY FOOTPRINT *********************************************************
+
+FreeCOM is not suitable for low-memory machines. It takes about 55K of
+conventional memory when XMS is unavailable. XMS being a 386+ thing, FreeCOM
+is a poor fit for pre-386 machines. There is the KSSF hack, but it is a kludge
+with many limitations. As pointed out by one of the FreeCOM authors, FreeCOM
+is designed with 21'st century machines in mind and not IBM PC compatibles.
+
+SvarDOS does not rely on XMS and performs runtime swapping that works on any
+IBM PC compatible machine.
+
+
+*** NLS RESSOURCES ***********************************************************
+
+FreeCOM requires custom NLS files. While the vast majority of FreeDOS programs
+use a single "standard" (CATS/Kitten), FreeCOM uses a different approach with
+pre-compiled NLS strings, which makes it necessary to distribute as many
+binary blobs as there are supported languages. It also makes the translation
+process much more difficult.
+
+SvarDOS will use Kitten-style translations, like other applications.
+
+
+*** CODE COMPLEXITY **********************************************************
+
+FreeCOM is a complex beast: it aims for compatibility with multiple compilers
+and supports many embedded features. This makes the code uneasy to follow and
+changes require careful testing on all supported compilers and all possible
+build variants.
+
+SvarDOS, on the other hand, is meant to be simple and universal. It is meant
+to be compiled with OpenWatcom only, which makes a ton of IFDEF's go away. It
+also won't integrate features that can be reasonably implemented as external
+tools (typically: DOSKEY). It strives to reimplement the functionality of
+MS-DOS 5/6.
+
+
+*** NON-FREE LICENSE *********************************************************
+
+FreeCOM code is released under the terms of a license that restrains the
+freedom of its users due to its virality (GPL).
+
+SvarCOM is released under the terms of a liberal and permissive (MIT) license
+that does not impose limitations on how users may or may not use it.
+
+
+********************************************************************** EOF ***
