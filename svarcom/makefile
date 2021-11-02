@@ -35,3 +35,8 @@ rmod.com: rmod.asm
 clean: .SYMBOLIC
 	del *.com
 	del *.obj
+
+pkg: svarcom.zip
+
+svarcom.zip: command.com
+	zip -9 svarcom.zip command.com *.txt
