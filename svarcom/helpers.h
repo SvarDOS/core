@@ -57,4 +57,13 @@ void file_truename(const char *src, char *dst);
 /* returns DOS attributes of file, or -1 on error */
 int file_getattr(const char *fname);
 
+/* returns screen's width (in columns) */
+unsigned short screen_getwidth(void);
+
+/* returns screen's height (in rows) */
+unsigned short screen_getheight(void);
+
+/* displays the "Press any key to continue" msg and waits for a keypress */
+void press_any_key(void);
+
 #endif

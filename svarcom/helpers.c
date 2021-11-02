@@ -3,6 +3,8 @@
  * Copyright (C) 2021 Mateusz Viste
  */
 
+#include <i86.h>    /* MK_FP() */
+
 #include "helpers.h"
 
 /* case-insensitive comparison of strings, returns non-zero on equality */
@@ -168,4 +170,41 @@ int file_getattr(const char *fname) {
     DONE:
   }
   return(res);
+}
+
+
+/* returns screen's width (in columns) */
+unsigned short screen_getwidth(void) {
+  /* BIOS 0040:004A = word containing screen width in text columns */
+  unsigned short far *scrw = MK_FP(0x40, 0x4a);
+  return(*scrw);
+}
+
+
+/* returns screen's height (in rows) */
+unsigned short screen_getheight(void) {
+  /* BIOS 0040:0084 = byte containing maximum valid row value (EGA ONLY) */
+  unsigned char far *scrh = MK_FP(0x40, 0x84);
+  if (*scrh == 0) return(25);  /* pre-EGA adapter */
+  return(*scrh + 1);
+}
+
+
+/* displays the "Press any key to continue" msg and waits for a keypress */
+void press_any_key(void) {
+  output("Press any key to continue...");
+  _asm {
+    mov ah, 0x08  /* no echo console input */
+    int 0x21      /* pressed key in AL now (0 for extended keys) */
+    test al, al
+    jnz DONE
+    int 0x21      /* executed ah=8 again to read the rest of extended key */
+    DONE:
+    /* output CR/LF */
+    mov ah, 0x02
+    mov dl, 0x0D
+    int 0x21
+    mov dl, 0x0A
+    int 0x21
+  }
 }
