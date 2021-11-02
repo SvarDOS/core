@@ -22,8 +22,9 @@
  */
 
 static int cmd_dir(struct cmd_funcparam *p) {
-  const char *filespecptr = "*.*";
+  const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
+  int i;
 
   if (cmd_ishlp(p)) {
     outputnl("Displays a list of files and subdirectories in a directory.");
@@ -31,7 +32,32 @@ static int cmd_dir(struct cmd_funcparam *p) {
     return(-1);
   }
 
-  if (findfirst(dta, filespecptr, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC) != 0) return(-1);
+  /* parse command line */
+  for (i = 0; i < p->argc; i++) {
+    if (p->argv[i][0] == '/') {
+      switch (p->argv[i][1]) {
+        default:
+          outputnl("Invalid switch");
+          return(-1);
+      }
+    } else {  /* filespec */
+      if (filespecptr != NULL) {
+        outputnl("Too many parameters");
+        return(-1);
+      }
+      filespecptr = p->argv[i];
+    }
+  }
+
+  if (filespecptr == NULL) filespecptr = ".";
+
+  file_truename(filespecptr, p->BUFFER);
+
+  /* if dir then append \????????.??? */
+  i = file_getattr(p->BUFFER);
+  if ((i > 0) && (i & DOS_ATTR_DIR)) strcat(p->BUFFER, "\\????????.???");
+
+  if (findfirst(dta, p->BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC) != 0) return(-1);
 
   outputnl(dta->fname);
 
