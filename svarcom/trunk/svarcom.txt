@@ -14,7 +14,7 @@ Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 
 Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
-- no support for redirections or pipes (eg. file.exe | more > out.txt)
+- no support for pipes (eg. file.exe | more)
 - no batch file support
 - few internal commands missing: BREAK, CHCP, CLS, CTTY, LH, REN, COPY, DATE,
   TIME, ECHO, IF, SHIFT

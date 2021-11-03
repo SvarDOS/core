@@ -56,6 +56,7 @@
 #include "cmd.h"
 #include "env.h"
 #include "helpers.h"
+#include "redir.h"
 #include "rmodinit.h"
 
 struct config {
@@ -355,11 +356,18 @@ int main(int argc, char **argv) {
     /* update rmod's ptr to COMPSPEC so it is always up to date */
     rmod_updatecomspecptr(rmod_seg, *rmod_envseg);
 
+    /* handle redirections (if any) */
+    if (redir_parsecmd(cmdline, BUFFER) != 0) {
+      outputnl("");
+      continue;
+    }
+
     /* try matching (and executing) an internal command */
     {
       int ecode = cmd_process(*rmod_envseg, cmdline, BUFFER);
       if (ecode >= 0) *lastexitcode = ecode;
       if (ecode >= -1) { /* internal command executed */
+        redir_revert(); /* revert stdout (in case it was redirected) */
         outputnl("");
         continue;
       }
@@ -367,6 +375,9 @@ int main(int argc, char **argv) {
 
     /* if here, then this was not an internal command */
     run_as_external(cmdline);
+
+    /* revert stdout (in case it was redirected) */
+    redir_revert();
 
     /* execvp() replaces the current process by the new one
     if I am still alive then external command failed to execute */
