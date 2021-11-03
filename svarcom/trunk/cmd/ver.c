@@ -2,7 +2,7 @@
  * ver
  */
 
-#define PVER "20211027"
+#define PVER "2021.0"
 
 static int cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
