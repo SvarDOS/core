@@ -17,7 +17,7 @@ Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 - no support for redirections or pipes (eg. file.exe | more > out.txt)
 - no batch file support
 - few internal commands missing: BREAK, CHCP, CLS, CTTY, LH, REN, COPY, DATE,
-  TIME, VOL, PAUSE, ECHO, IF, REM, SHIFT
+  TIME, ECHO, IF, SHIFT
 
 
 Latest version available here: http://svardos.osdn.io/svarcom
@@ -34,12 +34,15 @@ DIR         - displays a list of files and subdirectories in a directory
 EXIT        - quits the command.com program (command interpreter)
 MD/MKDIR    - creates a directory
 PATH        - displays or sets a search path for executable files
+PAUSE       - suspends processing of a batch program
 PROMPT      - changes the DOS command prompt
+REM         - records comments (remarks) in a batch file or CONFIG.SYS
 RMDIR       - removes (deletes) a directory
 SET         - displays, sets or removes DOS environment variables
 TYPE        - displays the contents of a text file
 VER         - displays the DOS version
 VERIFY      - tells DOS whether to verify that files are written correctly
+VOL         - displays the disk volume label and serial number
 
 
 === LICENSE ==================================================================

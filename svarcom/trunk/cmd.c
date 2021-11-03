@@ -38,7 +38,9 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/exit.c"
 #include "cmd/mkdir.c"
 #include "cmd/path.c"
+#include "cmd/pause.c"
 #include "cmd/prompt.c"
+#include "cmd/rem.c"
 #include "cmd/rmdir.c"
 #include "cmd/set.c"
 #include "cmd/type.c"
@@ -71,10 +73,11 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"LOADHIGH",cmd_notimpl},
   {"MD",      cmd_mkdir},
   {"MKDIR",   cmd_mkdir},
-  {"PAUSE",   cmd_notimpl},
+  {"PAUSE",   cmd_pause},
   {"PATH",    cmd_path},
   {"PROMPT",  cmd_prompt},
   {"RD",      cmd_rmdir},
+  {"REM",     cmd_rem},
   {"REN",     cmd_notimpl},
   {"RENAME",  cmd_notimpl},
   {"RMDIR",   cmd_rmdir},
