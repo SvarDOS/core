@@ -119,16 +119,17 @@ static int cmd_dir(struct cmd_funcparam *p) {
 
   if ((flags & DIR_FLAG_BARE) == 0) {
     unsigned char drv = p->BUFFER[0];
+    char *buff2 = p->BUFFER + (BUFFER_SIZE / 2);
     if (drv >= 'a') {
       drv -= 'a';
     } else {
       drv -= 'A';
     }
-    cmd_vol_internal(drv, p->BUFFER + 1024);
-    sprintf(p->BUFFER + 1024, "Directory of %s", p->BUFFER);
+    cmd_vol_internal(drv, buff2);
+    sprintf(buff2, "Directory of %s", p->BUFFER);
     /* trim at first '?', if any */
-    for (i = 0; p->BUFFER[i + 1024] != 0; i++) if (p->BUFFER[i + 1024] == '?') p->BUFFER[i + 1024] = 0;
-    outputnl(p->BUFFER + 1024);
+    for (i = 0; buff2[i] != 0; i++) if (buff2[i] == '?') buff2[i] = 0;
+    outputnl(buff2);
     outputnl("");
   }
 

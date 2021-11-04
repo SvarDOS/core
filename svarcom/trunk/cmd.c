@@ -12,13 +12,15 @@
 #include "env.h"
 #include "helpers.h"
 
+#define BUFFER_SIZE 2048    /* make sure this is not bigger than the static buffer in command.c */
+
 struct cmd_funcparam {
   int argc;                 /* number of arguments */
   const char *argv[256];    /* pointers to each argument */
   unsigned short env_seg;   /* segment of environment block */
   unsigned short argoffset; /* offset of cmdline where first argument starts */
   const char far *cmdline;  /* original cmdline (terminated by \r) */
-  char BUFFER[1024];        /* a buffer for whatever is needed */
+  char BUFFER[BUFFER_SIZE]; /* a buffer for whatever is needed */
 };
 
 /* scans argv for the presence of a "/?" parameter. returns 1 if found, 0 otherwise */
@@ -32,6 +34,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 
 #include "cmd/_notimpl.c"
 #include "cmd/cd.c"
+#include "cmd/copy.c"
 #include "cmd/del.c"
 #include "cmd/vol.c"     /* must be included before dir.c due to dependency */
 #include "cmd/dir.c"
@@ -61,7 +64,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"CHCP",    cmd_notimpl},
   {"CHDIR",   cmd_cd},
   {"CLS",     cmd_notimpl},
-  {"COPY",    cmd_notimpl},
+  {"COPY",    cmd_copy},
   {"CTTY",    cmd_notimpl},
   {"DATE",    cmd_notimpl},
   {"DEL",     cmd_del},
@@ -138,10 +141,10 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
     if (s[si] == 0) break;
     /* set argv ptr */
     argvlist[argc++] = buff + i;
-    /* find next space while copying arg to local buffer */
+    /* find next arg delimiter (spc, null, slash or plus) while copying arg to local buffer */
     do {
       buff[i++] = s[si++];
-    } while (s[si] != ' ' && s[si] != 0 && s[si] != '/');
+    } while (s[si] != ' ' && s[si] != 0 && s[si] != '/' && s[si] != '+');
     buff[i++] = 0;
     /* is this end of string? */
     if (s[si] == 0) break;
