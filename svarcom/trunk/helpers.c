@@ -245,3 +245,59 @@ int isdrivevalid(unsigned char drv) {
   }
   return(drv);
 }
+
+
+/* converts a 8+3 filename into 11-bytes FCB format (MYFILE  EXT) */
+void file_fname2fcb(char *dst, const char *src) {
+  unsigned short i;
+
+  /* fill dst with 11 spaces and a NULL terminator */
+  for (i = 0; i < 12; i++) dst[i] = ' ';
+  dst[12] = 0;
+
+  /* copy fname until dot (.) or 8 characters */
+  for (i = 0; i < 8; i++) {
+    if ((src[i] == '.') || (src[i] == 0)) break;
+    dst[i] = src[i];
+  }
+
+  /* advance src until extension or end of string */
+  src += i;
+  for (;;) {
+    if (*src == '.') {
+      src++; /* next character is extension */
+      break;
+    }
+    if (*src == 0) break;
+  }
+
+  /* copy extension to dst (3 chars max) */
+  dst += 8;
+  for (i = 0; i < 3; i++) {
+    if (src[i] == 0) break;
+    dst[i] = src[i];
+  }
+}
+
+
+/* converts a 11-bytes FCB filename (MYFILE  EXT) into 8+3 format (MYFILE.EXT) */
+void file_fcb2fname(char *dst, const char *src) {
+  unsigned short i, end = 0;
+
+  for (i = 0; i < 8; i++) {
+    dst[i] = src[i];
+    if (dst[i] != ' ') end = i + 1;
+  }
+
+  /* is there an extension? */
+  if (src[8] == ' ') {
+    dst[end] = 0;
+  } else { /* found extension: copy it until first space */
+    dst[end++] = '.';
+    for (i = 8; i < 11; i++) {
+      if (src[i] == ' ') break;
+      dst[end++] = src[i];
+    }
+    dst[end] = 0;
+  }
+}

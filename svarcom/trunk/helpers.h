@@ -40,6 +40,8 @@ _Packed struct DTA {
 #define DOS_ATTR_ARC 32
 
 /* find first matching files using a FindFirst DOS call
+ * attr contains DOS attributes that files MUST have (ie attr=0 will match all
+ * files)
  * returns 0 on success or a DOS err code on failure */
 unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short attr);
 
@@ -69,5 +71,11 @@ void press_any_key(void);
 
 /* validate a drive (A=0, B=1, etc). returns 1 if valid, 0 otherwise */
 int isdrivevalid(unsigned char drv);
+
+/* converts a filename into FCB format (FILENAMEEXT) */
+void file_fname2fcb(char *dst, const char *src);
+
+/* converts a FCB filename (FILENAMEEXT) into normal format (FILENAME.EXT) */
+void file_fcb2fname(char *dst, const char *src);
 
 #endif

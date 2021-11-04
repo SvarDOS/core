@@ -15,8 +15,8 @@ Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
 - no support for pipes (eg. file.exe | more)
-- no batch file support
-- few internal commands missing: BREAK, CHCP, CTTY, LH, REN, DATE, TIME, IF, SHIFT
+- no support for batch (and associated commands: CALL, GOTO, IF, SHIFT...)
+- a few internal commands missing: BREAK, CHCP, CTTY, LH, DATE, TIME
 
 
 Latest version available here: http://svardos.osdn.io/svarcom
@@ -39,6 +39,7 @@ PATH        - displays or sets a search path for executable files
 PAUSE       - suspends processing of a batch program
 PROMPT      - changes the DOS command prompt
 REM         - records comments (remarks) in a batch file or CONFIG.SYS
+REN/RENAME  - renames a file or files
 RMDIR       - removes (deletes) a directory
 SET         - displays, sets or removes DOS environment variables
 TYPE        - displays the contents of a text file

@@ -48,6 +48,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/pause.c"
 #include "cmd/prompt.c"
 #include "cmd/rem.c"
+#include "cmd/rename.c"
 #include "cmd/rmdir.c"
 #include "cmd/set.c"
 #include "cmd/type.c"
@@ -85,8 +86,8 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"PROMPT",  cmd_prompt},
   {"RD",      cmd_rmdir},
   {"REM",     cmd_rem},
-  {"REN",     cmd_notimpl},
-  {"RENAME",  cmd_notimpl},
+  {"REN",     cmd_rename},
+  {"RENAME",  cmd_rename},
   {"RMDIR",   cmd_rmdir},
   {"SET",     cmd_set},
   {"TIME",    cmd_notimpl},
