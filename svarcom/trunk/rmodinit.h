@@ -6,7 +6,8 @@
 #define RMOD_OFFSET_INPBUFF    0x0C
 #define RMOD_OFFSET_COMSPECPTR 0x8E
 #define RMOD_OFFSET_BOOTDRIVE  0x90
-#define RMOD_OFFSET_ROUTINE    0x9F
+#define RMOD_OFFSET_ECHOFLAG   0x9F
+#define RMOD_OFFSET_ROUTINE    0xA0
 
 unsigned short rmod_install(unsigned short envsize);
 unsigned short rmod_find(void);

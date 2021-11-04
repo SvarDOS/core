@@ -16,7 +16,7 @@ Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
 - no support for pipes (eg. file.exe | more)
 - no batch file support
-- few internal commands missing: BREAK, CHCP, CTTY, LH, REN, DATE, TIME, ECHO, IF, SHIFT
+- few internal commands missing: BREAK, CHCP, CTTY, LH, REN, DATE, TIME, IF, SHIFT
 
 
 Latest version available here: http://svardos.osdn.io/svarcom
@@ -32,6 +32,7 @@ CLS         - clears the screen
 COPY        - copies one or more files to another location
 DEL/ERASE   - deletes one or more files
 DIR         - displays a list of files and subdirectories in a directory
+ECHO        - displays messages, or turns command-echoing on or off
 EXIT        - quits the command.com program (command interpreter)
 MD/MKDIR    - creates a directory
 PATH        - displays or sets a search path for executable files

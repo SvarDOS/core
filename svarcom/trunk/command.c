@@ -15,11 +15,6 @@
  *   installs it by creating a new PSP, set int 22 vector to the routine, set my "parent PSP" to the routine
  *   and quit.
  *
- *
- *
- * good lecture about PSP and allocating memory
- * https://retrocomputing.stackexchange.com/questions/20001/how-much-of-the-program-segment-prefix-area-can-be-reused-by-programs-with-impun/20006#20006
- *
  * PSP structure
  * http://www.piclist.com/techref/dos/psps.htm
  *
@@ -283,14 +278,14 @@ int main(int argc, char **argv) {
 
   for (;;) {
     char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
+    unsigned char far *echostatus = MK_FP(rmod_seg, RMOD_OFFSET_ECHOFLAG);
 
-    /* revert input history terminator to \r */
-    if (cmdline[-1] != 0) {
-      cmdline[(unsigned short)(cmdline[-1])] = '\r';
-    }
+    if (*echostatus != 0) outputnl(""); /* terminate the previous command with a CR/LF */
 
-    {
-      /* print shell prompt */
+    SKIP_NEWLINE:
+
+    /* print shell prompt (only if ECHO is enabled) */
+    if (*echostatus != 0) {
       char *promptptr = BUFFER;
       buildprompt(promptptr, *rmod_envseg);
       _asm {
@@ -302,6 +297,11 @@ int main(int argc, char **argv) {
         pop dx
         pop ax
       }
+    }
+
+    /* revert input history terminator to \r */
+    if (cmdline[-1] != 0) {
+      cmdline[(unsigned short)(cmdline[-1])] = '\r';
     }
 
     /* wait for user input */
@@ -336,16 +336,22 @@ int main(int argc, char **argv) {
       int 0x2f
 
       DONE:
+      /* terminate command with a CR/LF */
+      mov ah, 0x02 /* display character in dl */
+      mov dl, 0x0d
+      int 0x21
+      mov dl, 0x0a
+      int 0x21
+
       pop ds
       pop dx
       pop cx
       pop bx
       pop ax
     }
-    outputnl("");
 
-    /* if nothing entered, loop again */
-    if (cmdline[-1] == 0) continue;
+    /* if nothing entered, loop again (but without appending an extra CR/LF) */
+    if (cmdline[-1] == 0) goto SKIP_NEWLINE;
 
     /* replace \r by a zero terminator */
     cmdline[(unsigned char)(cmdline[-1])] = 0;
@@ -364,11 +370,10 @@ int main(int argc, char **argv) {
 
     /* try matching (and executing) an internal command */
     {
-      int ecode = cmd_process(*rmod_envseg, cmdline, BUFFER);
+      int ecode = cmd_process(rmod_seg, *rmod_envseg, cmdline, BUFFER);
       if (ecode >= 0) *lastexitcode = ecode;
       if (ecode >= -1) { /* internal command executed */
         redir_revert(); /* revert stdout (in case it was redirected) */
-        outputnl("");
         continue;
       }
     }

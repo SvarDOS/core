@@ -38,7 +38,10 @@ COMSPECPTR dw 0  ; +8Eh
 ; drive. drive is patched by the transient part of COMMAND.COM
 COMSPECBOOT db "@:\COMMAND.COM", 0 ; +90h
 
-skipsig:         ; +9Fh
+; ECHO status used by COMMAND.COM. 0 = ECHO OFF, 1 = ECHO ON
+CMDECHO db 1     ; +9Fh
+
+skipsig:         ; +A0h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
