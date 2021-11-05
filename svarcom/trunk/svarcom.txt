@@ -15,8 +15,8 @@ Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
 - no support for pipes (eg. file.exe | more)
-- no support for batch (and associated commands: CALL, GOTO, IF, SHIFT...)
-- a few internal commands missing: CTTY, LH, DATE, TIME
+- no support for batch (*.BAT) files
+- a few internal commands missing: CALL, CTTY, DATE, GOTO, IF, LH, SHIFT, TIME
 
 
 Latest version available here: http://svardos.osdn.io/svarcom
