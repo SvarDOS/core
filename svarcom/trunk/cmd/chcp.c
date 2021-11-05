@@ -3,7 +3,7 @@
  */
 
 static int cmd_chcp(struct cmd_funcparam *p) {
-  short nnn = 0;
+  unsigned short nnn = 0;
   unsigned short errcode = 0;
 
   if (cmd_ishlp(p)) {
@@ -25,8 +25,7 @@ static int cmd_chcp(struct cmd_funcparam *p) {
 
   /* one param? must be numeric in range 1+ */
   if (p->argc == 1) {
-    nnn = atoi(p->argv[0]);
-    if (nnn < 1) {
+    if (atouns(&nnn, p->argv[0]) != 0) {
       outputnl("Invalid code page number");
       return(-1);
     }

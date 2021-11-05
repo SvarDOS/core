@@ -78,4 +78,7 @@ void file_fname2fcb(char *dst, const char *src);
 /* converts a FCB filename (FILENAMEEXT) into normal format (FILENAME.EXT) */
 void file_fcb2fname(char *dst, const char *src);
 
+/* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
+int atouns(unsigned short *r, const char *s);
+
 #endif

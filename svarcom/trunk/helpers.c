@@ -301,3 +301,44 @@ void file_fcb2fname(char *dst, const char *src) {
     dst[end] = 0;
   }
 }
+
+
+/* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
+int atouns(unsigned short *r, const char *s) {
+  int err = 0;
+
+  _asm {
+    mov si, s
+    xor ax, ax  /* general purpose register */
+    xor cx, cx  /* contains the result */
+    mov bx, 10  /* used as a multiplicative step */
+
+    NEXTBYTE:
+    xchg cx, ax /* move result into cx temporarily */
+    lodsb  /* AL = DS:[SI++] */
+    /* is AL 0? if so we're done */
+    test al, al
+    jz DONE
+    /* validate that AL is in range '0'-'9' */
+    sub al, '0'
+    jc FAIL   /* neg result */
+    cmp al, 9
+    jg FAIL
+    /* restore result into AX (CX contains the new digit) */
+    xchg cx, ax
+    /* multiply result by 10 and add cl */
+    mul bx    /* DX AX = AX * BX(10) */
+    jc FAIL   /* overflow */
+    add ax, cx
+    /* if CF then overflow occured (overflow part lands in DX) */
+    jnc NEXTBYTE
+
+    FAIL:
+    inc [err]
+
+    DONE: /* save result (CX) into indirect memory address r */
+    mov bx, [r]
+    mov [bx], cx
+  }
+  return(err);
+}

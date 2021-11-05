@@ -57,7 +57,7 @@
 struct config {
   int locate;
   int install;
-  int envsiz;
+  unsigned short envsiz;
 } cfg;
 
 
@@ -70,8 +70,9 @@ static void parse_argv(struct config *cfg, int argc, char **argv) {
       cfg->locate = 1;
     }
     if (strstartswith(argv[i], "/e:") == 0) {
-      cfg->envsiz = atoi(argv[i]+3);
-      if (cfg->envsiz < 64) cfg->envsiz = 0;
+      if ((atouns(&(cfg->envsiz), argv[i] + 3) != 0) || (cfg->envsiz < 64)) {
+        cfg->envsiz = 0;
+      }
     }
   }
 }
