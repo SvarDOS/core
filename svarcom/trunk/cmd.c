@@ -36,6 +36,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 
 #include "cmd/_notimpl.c"
 #include "cmd/cd.c"
+#include "cmd/chcp.c"
 #include "cmd/cls.c"
 #include "cmd/copy.c"
 #include "cmd/del.c"
@@ -66,7 +67,7 @@ struct CMD_ID {
 const struct CMD_ID INTERNAL_CMDS[] = {
   {"BREAK",   cmd_notimpl},
   {"CD",      cmd_cd},
-  {"CHCP",    cmd_notimpl},
+  {"CHCP",    cmd_chcp},
   {"CHDIR",   cmd_cd},
   {"CLS",     cmd_cls},
   {"COPY",    cmd_copy},
