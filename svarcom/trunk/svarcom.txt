@@ -16,7 +16,7 @@ Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
 - no support for pipes (eg. file.exe | more)
 - no support for batch (and associated commands: CALL, GOTO, IF, SHIFT...)
-- a few internal commands missing: BREAK, CTTY, LH, DATE, TIME
+- a few internal commands missing: CTTY, LH, DATE, TIME
 
 
 Latest version available here: http://svardos.osdn.io/svarcom
@@ -27,6 +27,7 @@ Latest version available here: http://svardos.osdn.io/svarcom
 SvarCOM implements the following internal commands. For help on each command,
 run it with a "/?" argument.
 
+BREAK       - sets or clears extended CTRL+C checking
 CD/CHDIR    - displays the name of or changes the current directory
 CHCP        - displays or sets the active code page number
 CLS         - clears the screen

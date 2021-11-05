@@ -16,23 +16,48 @@
  * /V - Checks after the copy to assure that a file was copied correctly. If
  * the copy cannot be verified, the program will display an error message.
  * Using this option will result in a slower copying process.
+ *
+ * special case: "COPY A+B+C+D" means "append B, C and D files to the A file"
+ * if A does not exist, then "append C and D to B", etc.
  */
 
 struct copy_setup {
   const char *src[64];
   unsigned short src_count; /* how many sources are declared */
-  const char *dst;
+  char dst[256];
+  unsigned short dstlen;
   char src_asciimode[64];
   char dst_asciimode;
   char last_asciimode; /* /A or /B impacts the file preceding it and becomes the new default for all files that follow */
   char verifyflag;
   char lastitemwasplus;
-  char databuf[BUFFER_SIZE - 512];
+  char databuf[BUFFER_SIZE - 1024];
 };
+
+
+/* appends a backslash if path is a directory
+ * returns the (possibly updated) length of path */
+static unsigned short cmd_copy_addbkslash_if_dir(char *path) {
+  unsigned short len;
+  int attr;
+  for (len = 0; path[len] != 0; len++);
+  if (len == 0) return(0);
+  if (path[len - 1] == '\\') return(len);
+  /* */
+  attr = file_getattr(path);
+  if ((attr > 0) && (attr & DOS_ATTR_DIR)) {
+    path[len++] = '\\';
+    path[len] = 0;
+  }
+  return(len);
+}
+
 
 static int cmd_copy(struct cmd_funcparam *p) {
   struct copy_setup *setup = (void *)(p->BUFFER);
   unsigned short i;
+  unsigned short copiedcount_in = 0, copiedcount_out = 0; /* number of input/output copied files */
+  struct DTA *dta = (void *)0x80; /* use DTA at default location in PSP */
 
   if (cmd_ishlp(p)) {
     outputnl("Copies one or more files to another location.");
@@ -62,7 +87,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
         setup->last_asciimode = 'b';
         if (imatch(p->argv[i], "/a")) setup->last_asciimode = 'a';
         /* */
-        if (setup->dst != NULL) {
+        if (setup->dst[0] != 0) {
           setup->dst_asciimode = setup->last_asciimode;
         } else if (setup->src_count != 0) {
           setup->src_asciimode[setup->src_count - 1] = setup->last_asciimode;
@@ -79,7 +104,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
     /* not a switch - must be either a source, a destination or a + */
     if (p->argv[i][0] == '+') {
       /* a plus cannot appear after destination or before first source */
-      if ((setup->dst != NULL) || (setup->src_count == 0)) {
+      if ((setup->dst[0] != 0) || (setup->src_count == 0)) {
         outputnl("Invalid syntax");
         return(-1);
       }
@@ -103,12 +128,17 @@ static int cmd_copy(struct cmd_funcparam *p) {
     }
 
     /* must be a dst then */
-    if (setup->dst != NULL) {
+    if (setup->dst[0] != 0) {
       outputnl("Invalid syntax");
       return(-1);
     }
-    setup->dst = p->argv[i];
+    if (file_truename(p->argv[i], setup->dst) != 0) {
+      outputnl("Invalid destination");
+      return(-1);
+    }
     setup->dst_asciimode = setup->last_asciimode;
+    /* if dst is a directory then append a backslash */
+    setup->dstlen = cmd_copy_addbkslash_if_dir(setup->dst);
   }
 
   /* DEBUG: output setup content ("if 1" to enable) */
@@ -123,7 +153,91 @@ static int cmd_copy(struct cmd_funcparam *p) {
   printf("verify: %s\r\n", (setup->verifyflag)?"ON":"OFF");
   #endif
 
-  /* TODO perform the operation based on setup directives */
+  /* must have at least one source */
+  if (setup->src_count == 0) {
+    outputnl("Required parameter missing");
+    return(-1);
+  }
+
+  /* perform the operation based on setup directives:
+   * iterate over every source and copy it to dest */
+
+  for (i = 0; i < setup->src_count; i++) {
+    unsigned short t;
+    unsigned short databuflen;
+    unsigned short pathendoffset;
+
+    /* resolve truename of src and write it to buffer */
+    t = file_truename(setup->src[i], setup->databuf);
+    if (t != 0) {
+      output(setup->src[i]);
+      output(" - ");
+      outputnl(doserr(t));
+      continue;
+    }
+    databuflen = strlen(setup->databuf); /* remember databuf length */
+
+    /* if length zero, skip (not sure why this would be possible, though) */
+    if (databuflen == 0) continue;
+
+    /* if src does not end with a backslash AND it is a directory then append a backslash */
+    databuflen = cmd_copy_addbkslash_if_dir(setup->databuf);
+
+    /* if src ends with a '\' then append *.* */
+    if (setup->databuf[databuflen - 1] == '\\') {
+      strcat(setup->databuf, "*.*");
+    }
+
+    /* remember where the path in databuf ends */
+    for (t = 0; setup->databuf[t] != 0; t++) {
+      if (setup->databuf[t] == '\\') pathendoffset = t + 1;
+    }
+
+    /* */
+    if (findfirst(dta, setup->databuf, 0) != 0) {
+      continue;
+    }
+
+    do {
+      if (dta->attr & DOS_ATTR_DIR) continue; /* skip directories */
+
+      /* compute full path/name of the file */
+      strcpy(setup->databuf + pathendoffset, dta->fname);
+
+      /* if there was no destination, then YOU are the destination now!
+       * this handles situations like COPY a.txt+b.txt+c.txt */
+      if (setup->dst[0] == NULL) {
+        strcpy(setup->dst, setup->databuf);
+        setup->dstlen = strlen(setup->dst);
+        copiedcount_in++;
+        copiedcount_out++;
+        continue;
+      }
+
+      /* is dst ending with a backslash? then append fname to it */
+      if (setup->dst[setup->dstlen - 1] == '\\') strcpy(setup->dst + setup->dstlen, dta->fname);
+
+      /* now databuf contains the full source and dst contains the full dest... COPY TIME! */
+
+      /* if dst file exists already -> overwrite it or append?
+          - if dst is a dir (dstlen-1 points at a \\) -> overwrite
+          - otherwise: if copiedcount_in==0 overwrite, else append */
+      output(setup->databuf);
+      if ((setup->dst[setup->dstlen - 1] == '\\') || (copiedcount_in == 0)) {
+        output(" > ");
+        copiedcount_out++;
+      } else {
+        output(" >> ");
+      }
+      outputnl(setup->dst);
+
+      copiedcount_in++;
+    } while (findnext(dta) == 0);
+
+  }
+
+  sprintf(setup->databuf, "%u file(s) copied", copiedcount_out);
+  outputnl(setup->databuf);
 
   return(-1);
 }
