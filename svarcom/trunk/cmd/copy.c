@@ -109,8 +109,8 @@ unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src
     int 0x21       /* CF set on error, bytes read in AX (0=EOF) */
     jc FAIL        /* abort on error */
     /* EOF? (ax == 0) */
-    cmp ax, 0
-    je ENDOFFILE
+    test ax, ax
+    jz ENDOFFILE
     /* write block of AX bytes to dst */
     mov cx, ax     /* block length */
     mov ah, 0x40   /* DOS 2+ -- write to file (CX bytes from DS:DX) */
@@ -123,9 +123,8 @@ unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src
     jne FAIL
     jmp COPY
 
-    /* if dst ascii mode -> add an EOF */
     ENDOFFILE:
-    /* TODO */
+    /* if dst ascii mode -> add an EOF (ASCII mode not supported for the time being) */
 
     jmp CLOSESRC
 
@@ -172,6 +171,8 @@ static int cmd_copy(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("To append files, specify a single file for destination, but multiple files");
     outputnl("for source (using wildcards or file1+file2+file3 format).");
+    outputnl("");
+    outputnl("NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.");
     return(-1);
   }
 
