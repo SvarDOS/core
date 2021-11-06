@@ -53,6 +53,106 @@ static unsigned short cmd_copy_addbkslash_if_dir(char *path) {
 }
 
 
+/* copies src to dst, overwriting or appending to the destination.
+ * - copy is performed in ASCII mode if asciiflag set (stop at first EOF in src
+ *   and append an EOF in dst).
+ * - returns zero on success, DOS error code on error */
+unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src, char srcascii, unsigned char appendflag, void *buff, unsigned short buffsz) {
+  unsigned short errcode = 0;
+  unsigned short srch = 0xffff, dsth = 0xffff;
+  _asm {
+
+    /* open src */
+    OPENSRC:
+    mov ax, 0x3d00 /* DOS 2+ -- open an existing file, read access mode */
+    mov dx, src    /* ASCIIZ fname */
+    int 0x21       /* CF clear on success, handle in AX */
+    mov [srch], ax /* store src handle in memory */
+
+    /* check appendflag so I know if I have to try opening dst for append */
+    xor al, al
+    or al, [appendflag]
+    jz CREATEDST
+
+    /* try opening dst first if appendflag set */
+    mov ax, 0x3d01 /* DOS 2+ -- open an existing file, write access mode */
+    mov dx, dst    /* ASCIIZ fname */
+    int 0x21       /* CF clear on success, handle in AX */
+    jc CREATEDST   /* failed to open file (file does not exist) */
+    mov [dsth], ax /* store dst handle in memory */
+
+    /* got file open, LSEEK to end of it now so future data is appended */
+    mov bx, ax     /* file handle in BX (was still in AX) */
+    mov ax, 0x4202 /* DOS 2+ -- set file pointer to end of file + CX:DX */
+    xor cx, cx     /* offset zero */
+    xor dx, dx     /* offset zero */
+    int 0x21       /* CF set on error */
+    jc FAIL
+    jmp COPY
+
+    /* create dst */
+    CREATEDST:
+    mov ah, 0x3c   /* DOS 2+ -- create a file */
+    mov dx, dst
+    xor cx, cx     /* zero out attributes */
+    int 0x21       /* handle in AX on success, CF set on error */
+    jc FAIL
+    mov [dsth], ax /* store dst handle in memory */
+
+    /* perform actual copy */
+    COPY:
+    /* read a block from src */
+    mov ah, 0x3f   /* DOS 2+ -- read from file */
+    mov bx, [srch]
+    mov cx, [buffsz]
+    mov dx, [buff] /* DX points to buffer */
+    int 0x21       /* CF set on error, bytes read in AX (0=EOF) */
+    jc FAIL        /* abort on error */
+    /* EOF? (ax == 0) */
+    cmp ax, 0
+    je ENDOFFILE
+    /* write block of AX bytes to dst */
+    mov cx, ax     /* block length */
+    mov ah, 0x40   /* DOS 2+ -- write to file (CX bytes from DS:DX) */
+    mov bx, [dsth] /* file handle */
+    /* mov dx, [buff] */ /* DX points to buffer already */
+    int 0x21       /* CF clear and AX=CX on success */
+    jc FAIL
+    cmp ax, cx     /* sould be equal, otherwise failed */
+    mov ax, 0x08   /* preset to DOS error "Insufficient memory" */
+    jne FAIL
+    jmp COPY
+
+    /* if dst ascii mode -> add an EOF */
+    ENDOFFILE:
+    /* TODO */
+
+    jmp CLOSESRC
+
+    FAIL:
+    mov [errcode], ax
+
+    CLOSESRC:
+    /* close src and dst */
+    mov bx, [srch]
+    cmp bx, 0xffff
+    je CLOSEDST
+    mov ah, 0x3e   /* DOS 2+ -- close a file handle */
+    int 0x21
+
+    CLOSEDST:
+    mov bx, [dsth]
+    cmp bx, 0xffff
+    je DONE
+    mov ah, 0x3e   /* DOS 2+ -- close a file handle */
+    int 0x21
+
+    DONE:
+  }
+  return(errcode);
+}
+
+
 static int cmd_copy(struct cmd_funcparam *p) {
   struct copy_setup *setup = (void *)(p->BUFFER);
   unsigned short i;
@@ -199,6 +299,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
     }
 
     do {
+      char appendflag;
       if (dta->attr & DOS_ATTR_DIR) continue; /* skip directories */
 
       /* compute full path/name of the file */
@@ -224,12 +325,20 @@ static int cmd_copy(struct cmd_funcparam *p) {
           - otherwise: if copiedcount_in==0 overwrite, else append */
       output(setup->databuf);
       if ((setup->dst[setup->dstlen - 1] == '\\') || (copiedcount_in == 0)) {
+        appendflag = 0;
         output(" > ");
         copiedcount_out++;
       } else {
+        appendflag = 1;
         output(" >> ");
       }
       outputnl(setup->dst);
+
+      t = cmd_copy_internal(setup->dst, 0, setup->databuf, 0, appendflag, setup->databuf, sizeof(setup->databuf));
+      if (t != 0) {
+        outputnl(doserr(t));
+        return(-1);
+      }
 
       copiedcount_in++;
     } while (findnext(dta) == 0);
