@@ -11,36 +11,6 @@
  */
 
 
-/* display current path drive d (A=1, B=2, etc)
- * returns 0 on success, doserr otherwise */
-static unsigned short cmd_cd_curpathfordrv(char *buff, unsigned char d) {
-  unsigned short r = 0;
-
-  buff[0] = d + 'A' - 1;
-  buff[1] = ':';
-  buff[2] = '\\';
-
-  _asm {
-    push si
-    push ax
-    push dx
-    mov ah, 0x47      /* get current directory */
-    mov dl, [d]       /* A: = 1, B: = 2, etc */
-    mov si, buff      /* append cur dir to buffer */
-    add si, 3         /* skip the present drive:\ prefix */
-    int 0x21
-    jnc DONE
-    mov [r], ax       /* copy result from ax */
-    DONE:
-    pop dx
-    pop ax
-    pop si
-  }
-
-  return(r);
-}
-
-
 static int cmd_cd(struct cmd_funcparam *p) {
   char *buffptr = p->BUFFER;
 
@@ -68,21 +38,8 @@ static int cmd_cd(struct cmd_funcparam *p) {
 
   /* no argument? display current drive and dir ("CWD") */
   if (p->argc == 0) {
-    unsigned char drv = 0;
-
-    _asm {
-      push ax
-      push dx
-      push si
-      mov ah, 0x19  /* get current default drive */
-      int 0x21      /* al = drive (00h = A:, 01h = B:, etc) */
-      inc al        /* convert to 1=A, 2=B, etc */
-      mov [drv], al
-    }
-
-    cmd_cd_curpathfordrv(buffptr, drv);
+    curpathfordrv(buffptr, 0);
     outputnl(buffptr);
-
     return(-1);
   }
 
@@ -99,7 +56,7 @@ static int cmd_cd(struct cmd_funcparam *p) {
         drive -= ('A' - 1);
       }
 
-      err = cmd_cd_curpathfordrv(buffptr, drive);
+      err = curpathfordrv(buffptr, drive);
       if (err == 0) outputnl(buffptr);
     } else { /* path */
       _asm {

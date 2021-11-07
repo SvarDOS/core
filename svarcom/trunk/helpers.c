@@ -360,3 +360,42 @@ unsigned short path_appendbkslash_if_dir(char *path) {
   }
   return(len);
 }
+
+
+/* get current path drive d (A=1, B=2, etc - 0 is "current drive")
+ * returns 0 on success, doserr otherwise */
+unsigned short curpathfordrv(char *buff, unsigned char d) {
+  unsigned short r = 0;
+
+  _asm {
+    /* is d == 0? then I need to resolve current drive */
+    cmp byte ptr [d], 0
+    jne GETCWD
+    /* resolve cur drive */
+    mov ah, 0x19  /* get current default drive */
+    int 0x21      /* al = drive (00h = A:, 01h = B:, etc) */
+    inc al        /* convert to 1=A, 2=B, etc */
+    mov [d], al
+
+    GETCWD:
+    /* prepend buff with drive:\ */
+    mov si, buff
+    mov dl, [d]
+    mov [si], dl
+    add byte ptr [si], 'A' - 1
+    inc si
+    mov [si], ':'
+    inc si
+    mov [si], '\\'
+    inc si
+
+    mov ah, 0x47      /* get current directory of drv DL into DS:SI */
+    int 0x21
+    jnc DONE
+    mov [r], ax       /* copy result from ax */
+
+    DONE:
+  }
+
+  return(r);
+}

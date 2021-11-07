@@ -85,4 +85,8 @@ int atouns(unsigned short *r, const char *s);
  * returns the (possibly updated) length of path */
 unsigned short path_appendbkslash_if_dir(char *path);
 
+/* get current path drive d (A=1, B=2, etc - 0 is "current drive")
+ * returns 0 on success, doserr otherwise */
+unsigned short curpathfordrv(char *buff, unsigned char d);
+
 #endif
