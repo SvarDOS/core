@@ -35,24 +35,6 @@ struct copy_setup {
 };
 
 
-/* appends a backslash if path is a directory
- * returns the (possibly updated) length of path */
-static unsigned short cmd_copy_addbkslash_if_dir(char *path) {
-  unsigned short len;
-  int attr;
-  for (len = 0; path[len] != 0; len++);
-  if (len == 0) return(0);
-  if (path[len - 1] == '\\') return(len);
-  /* */
-  attr = file_getattr(path);
-  if ((attr > 0) && (attr & DOS_ATTR_DIR)) {
-    path[len++] = '\\';
-    path[len] = 0;
-  }
-  return(len);
-}
-
-
 /* copies src to dst, overwriting or appending to the destination.
  * - copy is performed in ASCII mode if asciiflag set (stop at first EOF in src
  *   and append an EOF in dst).
@@ -239,7 +221,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
     }
     setup->dst_asciimode = setup->last_asciimode;
     /* if dst is a directory then append a backslash */
-    setup->dstlen = cmd_copy_addbkslash_if_dir(setup->dst);
+    setup->dstlen = path_appendbkslash_if_dir(setup->dst);
   }
 
   /* DEBUG: output setup content ("if 1" to enable) */
@@ -282,7 +264,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
     if (databuflen == 0) continue;
 
     /* if src does not end with a backslash AND it is a directory then append a backslash */
-    databuflen = cmd_copy_addbkslash_if_dir(setup->databuf);
+    databuflen = path_appendbkslash_if_dir(setup->databuf);
 
     /* if src ends with a '\' then append *.* */
     if (setup->databuf[databuflen - 1] == '\\') {

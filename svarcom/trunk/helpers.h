@@ -81,4 +81,8 @@ void file_fcb2fname(char *dst, const char *src);
 /* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
 int atouns(unsigned short *r, const char *s);
 
+/* appends a backslash if path is a directory
+ * returns the (possibly updated) length of path */
+unsigned short path_appendbkslash_if_dir(char *path);
+
 #endif

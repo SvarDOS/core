@@ -342,3 +342,21 @@ int atouns(unsigned short *r, const char *s) {
   }
   return(err);
 }
+
+
+/* appends a backslash if path is a directory
+ * returns the (possibly updated) length of path */
+unsigned short path_appendbkslash_if_dir(char *path) {
+  unsigned short len;
+  int attr;
+  for (len = 0; path[len] != 0; len++);
+  if (len == 0) return(0);
+  if (path[len - 1] == '\\') return(len);
+  /* */
+  attr = file_getattr(path);
+  if ((attr > 0) && (attr & DOS_ATTR_DIR)) {
+    path[len++] = '\\';
+    path[len] = 0;
+  }
+  return(len);
+}
