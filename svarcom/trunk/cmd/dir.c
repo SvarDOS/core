@@ -32,7 +32,7 @@
 static int cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
-  int i;
+  unsigned short i;
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
   #define DIR_FLAG_PAUSE  1
   #define DIR_FLAG_WIDE   2
@@ -109,12 +109,20 @@ static int cmd_dir(struct cmd_funcparam *p) {
 
   if (filespecptr == NULL) filespecptr = ".";
 
-  {
-    unsigned short r = file_truename(filespecptr, p->BUFFER);
-    if (r != 0) {
-      outputnl(doserr(r));
-      return(-1);
+  /* special case: "DIR drive:" (truename() fails on "C:" under MS-DOS 6.0) */
+  if ((filespecptr[0] != 0) && (filespecptr[1] == ':') && (filespecptr[2] == 0)) {
+    if ((filespecptr[0] >= 'a') && (filespecptr[0] <= 'z')) {
+      p->BUFFER[0] = filespecptr[0] - ('a' - 1);
+    } else {
+      p->BUFFER[0] = filespecptr[0] - ('A' - 1);
     }
+    i = curpathfordrv(p->BUFFER, p->BUFFER[0]);
+  } else {
+    i = file_truename(filespecptr, p->BUFFER);
+  }
+  if (i != 0) {
+    outputnl(doserr(i));
+    return(-1);
   }
 
   if ((flags & DIR_FLAG_BARE) == 0) {
@@ -133,11 +141,17 @@ static int cmd_dir(struct cmd_funcparam *p) {
     outputnl("");
   }
 
-  /* if dir then append \????????.??? */
-  i = file_getattr(p->BUFFER);
-  if ((i > 0) && (i & DOS_ATTR_DIR)) strcat(p->BUFFER, "\\????????.???");
+  /* if dir: append a backslash (also get its len) */
+  i = path_appendbkslash_if_dir(p->BUFFER);
 
-  if (findfirst(dta, p->BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC) != 0) return(-1);
+  /* if ends with a \ then append ????????.??? */
+  if (p->BUFFER[i - 1] == '\\') strcat(p->BUFFER, "????????.???");
+
+  i = findfirst(dta, p->BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC);
+  if (i != 0) {
+    outputnl(doserr(i));
+    return(-1);
+  }
 
   availrows = screen_getheight();
 
