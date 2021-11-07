@@ -25,14 +25,23 @@ static int cmd_chcp(struct cmd_funcparam *p) {
 
   /* one param? must be numeric in range 1+ */
   if (p->argc == 1) {
+    unsigned char nlsfuncflag = 0;
     if (atouns(&nnn, p->argv[0]) != 0) {
       outputnl("Invalid code page number");
       return(-1);
     }
-    /* set code page to nnn */
     _asm {
+      /* verify that NLSFUNC is installed */
       push ax
       push bx
+
+      mov ax, 0x1400    /* DOS 3+ -- is NLSFUNC.EXE installed? */
+      int 0x2f          /* AL = 0xff -> installed */
+      cmp al, 0xff
+      jne DONE
+      mov [nlsfuncflag], 1
+
+      /* set code page to nnn */
 
       mov ax, 0x6602    /* DOS 3.3+ -- Activate Code Page */
       mov bx, [nnn]
@@ -44,7 +53,7 @@ static int cmd_chcp(struct cmd_funcparam *p) {
       pop bx
       pop ax
     }
-    if (errcode == 1) {   /* DOS ERR 1 means "Function number invalid" (ie. no NLS) */
+    if (nlsfuncflag == 0) {
       outputnl("NLSFUNC not installed");
     } else if (errcode != 0) {
       outputnl("Failed to change code page");
