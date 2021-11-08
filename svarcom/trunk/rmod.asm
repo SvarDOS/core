@@ -41,7 +41,11 @@ COMSPECBOOT db "@:\COMMAND.COM", 0 ; +90h
 ; ECHO status used by COMMAND.COM. 0 = ECHO OFF, 1 = ECHO ON
 CMDECHO db 1     ; +9Fh
 
-skipsig:         ; +A0h
+; segment of the first batch in batch chain. this is used by transient
+; COMMAND.COM to chain multiple batch files (through CALL). 0 means "none".
+BATCHCHAIN dw 0  ; +A0h
+
+skipsig:         ; +A2h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
