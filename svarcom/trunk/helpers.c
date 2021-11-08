@@ -4,8 +4,10 @@
  */
 
 #include <i86.h>    /* MK_FP() */
+#include <stdio.h>  /* sprintf() */
 
 #include "helpers.h"
+
 
 /* case-insensitive comparison of strings, returns non-zero on equality */
 int imatch(const char *s1, const char *s2) {
@@ -252,8 +254,8 @@ void file_fname2fcb(char *dst, const char *src) {
   unsigned short i;
 
   /* fill dst with 11 spaces and a NULL terminator */
-  for (i = 0; i < 12; i++) dst[i] = ' ';
-  dst[12] = 0;
+  for (i = 0; i < 11; i++) dst[i] = ' ';
+  dst[11] = 0;
 
   /* copy fname until dot (.) or 8 characters */
   for (i = 0; i < 8; i++) {
@@ -398,4 +400,112 @@ unsigned short curpathfordrv(char *buff, unsigned char d) {
   }
 
   return(r);
+}
+
+
+/* fills a nls_patterns struct with current NLS patterns, returns 0 on success, DOS errcode otherwise */
+unsigned short nls_getpatterns(struct nls_patterns *p) {
+  unsigned short r = 0;
+
+  _asm {
+    mov ax, 0x3800  /* DOS 2+ -- Get Country Info for current country */
+    mov dx, p       /* DS:DX points to the CountryInfoRec buffer */
+    int 0x21
+    jnc DONE
+    mov [r], ax     /* copy DOS err code to r */
+    DONE:
+  }
+
+  return(r);
+}
+
+
+/* computes a formatted date based on NLS patterns found in p
+ * returns length of result */
+unsigned short nls_format_date(char *s, unsigned short yr, unsigned char mo, unsigned char dy, const struct nls_patterns *p) {
+  unsigned short items[3];
+  /* preset date/month/year in proper order depending on date format */
+  switch (p->dateformat) {
+    case 0:  /* USA style: m d y */
+      items[0] = mo;
+      items[1] = dy;
+      items[2] = yr;
+      break;
+    case 1:  /* EU style: d m y */
+      items[0] = dy;
+      items[1] = mo;
+      items[2] = yr;
+      break;
+    case 2:  /* Japan-style: y m d */
+    default:
+      items[0] = yr;
+      items[1] = mo;
+      items[2] = dy;
+      break;
+  }
+  /* compute the string */
+  return(sprintf(s, "%02u%s%02u%s%02u", items[0], p->datesep, items[1], p->datesep, items[2]));
+}
+
+
+/* computes a formatted time based on NLS patterns found in p
+ * returns length of result */
+unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, const struct nls_patterns *p) {
+  char ampm[2] = {0, 0};
+  const char *fmt = "%02u%s%02u%s";
+  if (p->timefmt == 0) {
+    if (ho == 12) {
+      ampm[0] = 'p';
+    } else if (ho > 12) {
+      ho -= 12;
+      ampm[0] = 'p';
+    } else { /* ho < 12 */
+      if (ho == 0) ho = 12;
+      ampm[0] = 'a';
+    }
+    fmt = "%2u%s%02u%s";
+  }
+  return(sprintf(s, fmt, ho, p->timesep, mn, ampm));
+}
+
+
+/* computes a formatted integer number based on NLS patterns found in p
+ * returns length of result */
+unsigned short nls_format_number(char *s, long num, const struct nls_patterns *p) {
+  unsigned short sl = 0, res, i;
+  unsigned char thcount = 0;
+
+  /* handle negative values */
+  if (num < 0) {
+    s[sl++] = '-';
+    num = 0 - num;
+  }
+
+  /* write the absolute value now */
+  do {
+    if ((thcount == 3) && (p->thousep[0] != 0)) {
+      s[sl++] = p->thousep[0];
+      thcount = 0;
+    }
+    s[sl++] = '0' + num % 10;
+    num /= 10;
+    thcount++;
+  } while (num > 0);
+
+  /* terminate the string and remember its size */
+  s[sl] = 0;
+  res = sl;
+
+  /* reverse the string now (it has been build in reverse) */
+  if (s[0] == '-') {
+    sl--;
+    s++;
+  }
+  for (i = 0; i <= (sl / 2); i++) {
+    thcount = s[i];
+    s[i] = s[sl - (i + 1)];
+    s[sl - (i + 1)] = thcount;
+  }
+
+  return(res);
 }

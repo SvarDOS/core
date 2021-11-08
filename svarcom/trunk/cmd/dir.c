@@ -29,19 +29,27 @@
  * NOTE: Multiple /A are not supported - only the last one is significant.
  */
 
+#define WCOLWIDTH 15  /* width of a column in wide mode output */
+
 static int cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
   unsigned short i;
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
+  unsigned short wcols = screen_getwidth() / WCOLWIDTH; /* number of columns in wide mode */
+  unsigned char wcolcount;
+  struct nls_patterns *nls = (void *)(p->BUFFER + (BUFFER_SIZE / 3));
+  char *buff2 = p->BUFFER + (BUFFER_SIZE / 3 * 2);
+
   #define DIR_FLAG_PAUSE  1
-  #define DIR_FLAG_WIDE   2
   #define DIR_FLAG_RECUR  4
-  #define DIR_FLAG_BARE   8
-  #define DIR_FLAG_LCASE 16
+  #define DIR_FLAG_LCASE  8
   unsigned char flags = 0;
-//  unsigned char attribs_show = 0; /* show only files with ALL these attribs */
-//  unsigned char attribs_hide = 0; /* hide files with ANY of these attribs */
+
+  #define DIR_OUTPUT_NORM 1
+  #define DIR_OUTPUT_WIDE 2
+  #define DIR_OUTPUT_BARE 3
+  unsigned char format = DIR_OUTPUT_NORM;
 
   if (cmd_ishlp(p)) {
     outputnl("Displays a list of files and subdirectories in a directory");
@@ -69,6 +77,9 @@ static int cmd_dir(struct cmd_funcparam *p) {
     return(-1);
   }
 
+  i = nls_getpatterns(nls);
+  if (i != 0) outputnl(doserr(i));
+
   /* parse command line */
   for (i = 0; i < p->argc; i++) {
     if (p->argv[i][0] == '/') {
@@ -87,12 +98,20 @@ static int cmd_dir(struct cmd_funcparam *p) {
           break;
         case 'b':
         case 'B':
-          flags |= DIR_FLAG_BARE;
+          format = DIR_OUTPUT_BARE;
+          break;
+        case 'w':
+        case 'W':
+          format = DIR_OUTPUT_WIDE;
           break;
         case 'p':
         case 'P':
           flags |= DIR_FLAG_PAUSE;
           if (neg) flags &= (0xff ^ DIR_FLAG_PAUSE);
+          break;
+        case 'l':
+        case 'L':
+          flags |= DIR_FLAG_LCASE;
           break;
         default:
           outputnl("Invalid switch");
@@ -125,9 +144,8 @@ static int cmd_dir(struct cmd_funcparam *p) {
     return(-1);
   }
 
-  if ((flags & DIR_FLAG_BARE) == 0) {
+  if (format != DIR_OUTPUT_BARE) {
     unsigned char drv = p->BUFFER[0];
-    char *buff2 = p->BUFFER + (BUFFER_SIZE / 2);
     if (drv >= 'a') {
       drv -= 'a';
     } else {
@@ -154,20 +172,74 @@ static int cmd_dir(struct cmd_funcparam *p) {
   }
 
   availrows = screen_getheight();
+  wcolcount = 0; /* may be used for columns counting with wide mode */
 
-  outputnl(dta->fname);
-  availrows--;
+  do {
+    if (flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
 
-  while (findnext(dta) == 0) {
-    outputnl(dta->fname);
-    if (flags & DIR_FLAG_PAUSE) {
-      availrows--;
-      if (availrows < 2) {
-        press_any_key();
-        availrows = screen_getheight();
-      }
+    switch (format) {
+      case DIR_OUTPUT_NORM:
+        /* print fname-space-extension (unless it's "." or "..", then print as-is) */
+        if (dta->fname[0] == '.') {
+          output(dta->fname);
+          i = strlen(dta->fname);
+          while (i++ < 12) output(" ");
+        } else {
+          file_fname2fcb(buff2, dta->fname);
+          memmove(buff2 + 9, buff2 + 8, 4);
+          buff2[8] = ' ';
+          output(buff2);
+        }
+        output(" ");
+        /* either <DIR> or right aligned 10-chars byte size */
+        memset(buff2, ' ', 10);
+        if (dta->attr & DOS_ATTR_DIR) {
+          strcpy(buff2 + 10, "<DIR>");
+        } else {
+          _ultoa(dta->size, buff2 + 10, 10); /* OpenWatcom extension */
+        }
+        output(buff2 + strlen(buff2) - 10);
+        /* two spaces and NLS DATE */
+        buff2[0] = ' ';
+        buff2[1] = ' ';
+        nls_format_date(buff2 + 2, dta->date_yr + 1980, dta->date_mo, dta->date_dy, nls);
+        output(buff2);
+
+        /* one space and NLS TIME */
+        nls_format_time(buff2 + 1, dta->time_hour, dta->time_min, nls);
+        outputnl(buff2);
+        break;
+
+      case DIR_OUTPUT_WIDE: /* display in columns of 12 chars per item */
+        i = strlen(dta->fname);
+        if (dta->attr & DOS_ATTR_DIR) {
+          i += 2;
+          output("[");
+          output(dta->fname);
+          output("]");
+        } else {
+          output(dta->fname);
+        }
+        while (i++ < WCOLWIDTH) output(" ");
+        if (++wcolcount == wcols) {
+          wcolcount = 0;
+          outputnl("");
+        }
+        break;
+
+      case DIR_OUTPUT_BARE:
+        outputnl(dta->fname);
+        break;
     }
-  }
+
+    if ((flags & DIR_FLAG_PAUSE) && (--availrows < 2)) {
+      press_any_key();
+      availrows = screen_getheight();
+    }
+
+  } while (findnext(dta) == 0);
+
+  if (wcolcount != 0) outputnl("");
 
   return(-1);
 }

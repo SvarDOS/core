@@ -26,11 +26,48 @@ void output_internal(const char *s, unsigned short nl);
 _Packed struct DTA {
   char reserved[21];
   unsigned char attr;
-  unsigned short time;
-  unsigned short date;
+  unsigned short time_sec2:5;
+  unsigned short time_min:6;
+  unsigned short time_hour:5;
+  unsigned short date_dy:5;
+  unsigned short date_mo:4;
+  unsigned short date_yr:7;
   unsigned long size;
   char fname[13];
 };
+
+
+/* this is also known as the "Country Info Block" or "CountryInfoRec":
+ * offset size desc
+ *   +0      2   wDateFormat  0=USA (m d y), 1=Europe (d m y), 2=Japan (y m d)
+ *   +2      5  szCrncySymb  currency symbol (ASCIIZ)
+ *   +7      2  szThouSep    thousands separator (ASCIIZ)
+ *   +9      2  szDecSep     decimal separator (ASCIIZ)
+ * +0bH      2  szDateSep    date separator (ASCIIZ)
+ * +0dH      2  szTimeSep    time separator (ASCIIZ)
+ * +0fH      1  bCrncyFlags  currency format flags
+ * +10H      1  bCrncyDigits decimals digits in currency
+ * +11H      1  bTimeFormat  time format 0=12h 1=24h
+ * +12H      4  pfCasemap    Casemap FAR call address
+ * +16H      2  szDataSep    data list separator (ASCIIZ)
+ * +18H     10  res          reserved zeros
+ *          34               total length
+ */
+_Packed struct nls_patterns {
+  unsigned short dateformat;
+  char currency[5];
+  char thousep[2];
+  char decsep[2];
+  char datesep[2];
+  char timesep[2];
+  unsigned char currflags;
+  unsigned char currdigits;
+  unsigned char timefmt;
+  void far *casemapfn;
+  char datalistsep[2];
+  char reserved[10];
+};
+
 
 #define DOS_ATTR_RO   1
 #define DOS_ATTR_HID  2
@@ -88,5 +125,20 @@ unsigned short path_appendbkslash_if_dir(char *path);
 /* get current path drive d (A=1, B=2, etc - 0 is "current drive")
  * returns 0 on success, doserr otherwise */
 unsigned short curpathfordrv(char *buff, unsigned char d);
+
+/* fills a nls_patterns struct with current NLS patterns, returns 0 on success, DOS errcode otherwise */
+unsigned short nls_getpatterns(struct nls_patterns *p);
+
+/* computes a formatted date based on NLS patterns found in p
+ * returns length of result */
+unsigned short nls_format_date(char *s, unsigned short yr, unsigned char mo, unsigned char dy, const struct nls_patterns *p);
+
+/* computes a formatted time based on NLS patterns found in p
+ * returns length of result */
+unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, const struct nls_patterns *p);
+
+/* computes a formatted integer number based on NLS patterns found in p
+ * returns length of result */
+unsigned short nls_format_number(char *s, long num, const struct nls_patterns *p);
 
 #endif
