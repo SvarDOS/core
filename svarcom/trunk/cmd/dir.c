@@ -1,3 +1,27 @@
+/* This file is part of the SvarCOM project and is published under the terms
+ * of the MIT license.
+ *
+ * Copyright (C) 2021 Mateusz Viste
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
 /*
  * dir
  *
@@ -70,10 +94,6 @@ static int cmd_dir(struct cmd_funcparam *p) {
     outputnl("/S Displays files in specified directory and all subdirectories");
     outputnl("/B Uses bare format (no heading information or summary)");
     outputnl("/L Uses lowercases");
-
-    /* TODO FIXME REMOVE THIS ONCE ALL IMPLEMENTED */
-    outputnl("\r\n*** THIS COMMAND IS NOT FULLY IMPLEMENTED YET ***");
-
     return(-1);
   }
 
@@ -100,18 +120,30 @@ static int cmd_dir(struct cmd_funcparam *p) {
         case 'B':
           format = DIR_OUTPUT_BARE;
           break;
-        case 'w':
-        case 'W':
-          format = DIR_OUTPUT_WIDE;
+        case 'l':
+        case 'L':
+          flags |= DIR_FLAG_LCASE;
+          break;
+        case 'o':
+        case 'O':
+          /* TODO */
+          outputnl("/O NOT IMPLEMENTED YET");
+          return(-1);
           break;
         case 'p':
         case 'P':
           flags |= DIR_FLAG_PAUSE;
           if (neg) flags &= (0xff ^ DIR_FLAG_PAUSE);
           break;
-        case 'l':
-        case 'L':
-          flags |= DIR_FLAG_LCASE;
+        case 's':
+        case 'S':
+          /* TODO */
+          outputnl("/S NOT IMPLEMENTED YET");
+          return(-1);
+          break;
+        case 'w':
+        case 'W':
+          format = DIR_OUTPUT_WIDE;
           break;
         default:
           outputnl("Invalid switch");

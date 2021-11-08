@@ -1,5 +1,6 @@
 #
 # This is a makefile to build the SVARCOM command interpreter (COMMAND.COM)
+# using OpenWatcom and nasm.
 #
 # You can use following targets:
 #

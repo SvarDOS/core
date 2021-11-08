@@ -1,0 +1,59 @@
+
+                           =======================
+                           |  SVARCOM TODO LIST  |
+                           =======================
+
+
+stdin redirection: command < file.txt
+
+pipes redirections
+
+stdout redirection should not create the output file if command fails
+
+DIR:
+ - display number of files, tot size in dir and available space on disk
+ - %DIRCMD% support
+ - /A
+ - /O
+ - /S (must use multiple DTAs)
+
+COPY /V
+
+command-line variables resolution (cd %MYDIR%)
+
+ctrl+break handler:
+http://www.techhelpmanual.com/563-int_23h__ctrl_break_exit_address.html
+
+"notify pending command" int support:
+http://www.techhelpmanual.com/741-int_2fh_ae00h__notify_pending_command.html
+
+when execing an external command make sure to sync local environment
+(or run the program with a custom environment pointer?)
+
+when execing a program, make sure I use the correct PATH...
+ -> actually I need to parse PATH and look for matches myself for BAT support
+
+dynamic resizing of environment space
+
+command line arguments to command.com (/e /E /k /p etc)
+
+single-stepping AUTOEXEC with F8 at boot time (/P /Y)
+
+skipping AUTOEXEC with F5 at boot time (/P /D)
+
+CTTY
+
+LOADHIGH/LH
+
+DATE
+
+TIME
+
+batch files support:
+ - CALL
+ - :labels
+ - FOR
+ - GOTO
+ - IF EXIST
+ - IF ERRORLEVEL
+ - SHIFT
