@@ -225,7 +225,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
   }
 
   /* DEBUG: output setup content ("if 1" to enable) */
-  #if 1
+  #if 0
   printf("src: ");
   for (i = 0; i < setup->src_count; i++) {
     if (i != 0) printf(", ");
