@@ -15,8 +15,8 @@ Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 Since SvarCOM is a work-in-progress effort, it still lacks a few things:
 
 - no support for pipes (eg. file.exe | more)
-- no support for batch (*.BAT) files
-- a few internal commands missing: CALL, CTTY, DATE, GOTO, IF, LH, SHIFT
+- no support for batch (*.BAT) files (hence no AUTOEXEC.BAT execution)
+- a few internal commands missing: CALL, CTTY, GOTO, IF, LH, SHIFT
 
 
 Latest version available here: http://svardos.osdn.io/svarcom
@@ -32,6 +32,7 @@ CD/CHDIR    - displays the name of or changes the current directory
 CHCP        - displays or sets the active code page number
 CLS         - clears the screen
 COPY        - copies one or more files to another location
+DATE        - displays or sets the system date
 DEL/ERASE   - deletes one or more files
 DIR         - displays a list of files and subdirectories in a directory
 ECHO        - displays messages, or turns command-echoing on or off

@@ -11,24 +11,24 @@ Below is a loose list of things that I'd like to implement within SvarCOM.
 BEFORE NEXT RELEASE:
 
 pipes redirections
-stdout redirection should not create the output file if command fails
 support for translations (single binary file in %NLSPATH%)
-DATE
 
 
-IN SOME LATER FUTURE:
+AT SOME LATER TIME:
 
 stdin redirection: command < file.txt
 DIR: /A
 DIR: %DIRCMD% support
 DIR: /O
-DIR: /S (must use multiple DTAs)
+DIR: /S (must use multiple DTAs recursively)
 COPY: /V
 command-line variables resolution (cd %MYDIR%)
 storing rmod in a buffer that can be usefully reused once rmod is installed.
 ctrl+break handler: http://www.techhelpmanual.com/563-int_23h__ctrl_break_exit_address.html
 
 "notify pending command" int support: http://www.techhelpmanual.com/741-int_2fh_ae00h__notify_pending_command.html
+
+stdout redirection should not create the output file if command fails
 
 when execing an external command make sure to sync local environment (or run the program with a custom environment pointer?)
 

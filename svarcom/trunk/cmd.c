@@ -65,6 +65,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/chcp.c"
 #include "cmd/cls.c"
 #include "cmd/copy.c"
+#include "cmd/date.c"
 #include "cmd/del.c"
 #include "cmd/vol.c"     /* must be included before dir.c due to dependency */
 #include "cmd/dir.c"
@@ -99,7 +100,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"CLS",     cmd_cls},
   {"COPY",    cmd_copy},
   {"CTTY",    cmd_notimpl},
-  {"DATE",    cmd_notimpl},
+  {"DATE",    cmd_date},
   {"DEL",     cmd_del},
   {"DIR",     cmd_dir},
   {"ECHO",    cmd_echo},

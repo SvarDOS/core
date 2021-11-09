@@ -27,6 +27,7 @@
  */
 
 #define PVER "2021.0"
+#define COPYRDATE "2021"
 
 static int cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
@@ -35,6 +36,20 @@ static int cmd_ver(struct cmd_funcparam *p) {
   /* help screen */
   if (cmd_ishlp(p)) {
     outputnl("Displays the DOS version.");
+    outputnl("");
+    outputnl("ver [/about]");
+    return(-1);
+  }
+
+  if ((p->argc == 1) && (imatch(p->argv[0], "/about"))) {
+    outputnl("SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.");
+    outputnl("");
+    outputnl("This software is distributed under the terms of the MIT license.");
+    outputnl("Copyright (C) " COPYRDATE " Mateusz Viste");
+    outputnl("");
+    outputnl("Prace te dedykuje Milenie i Mojmirowi. Zycze wam, abyscie w dalszym zyciu");
+    outputnl("potrafili wlasciwie docenic wartosc czasow minionych i czerpali radosc z");
+    outputnl("prostych przyjemnosci dnia codziennego.  Lair, jesien 2021.");
     return(-1);
   }
 
