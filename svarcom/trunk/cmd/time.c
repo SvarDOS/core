@@ -222,6 +222,7 @@ static int cmd_time(struct cmd_funcparam *p) {
       pop bx
       pop ax
     }
+    if (buff[1] == 0) break; /* empty string = do not change time */
     if (cmd_time_parse(buff + 2, &ho, &mi, &se, nls) == 0) break;
     outputnl("Invalid time");
   }
