@@ -12,13 +12,14 @@ BEFORE NEXT RELEASE:
 
 pipes redirections
 stdout redirection should not create the output file if command fails
-DIR: /A
 support for translations (single binary file in %NLSPATH%)
+DATE
 
 
 IN SOME LATER FUTURE:
 
 stdin redirection: command < file.txt
+DIR: /A
 DIR: %DIRCMD% support
 DIR: /O
 DIR: /S (must use multiple DTAs)
@@ -39,8 +40,6 @@ single-stepping AUTOEXEC with F8 at boot time (/P /Y)
 skipping AUTOEXEC with F5 at boot time (/P /D)
 CTTY
 LOADHIGH/LH
-DATE
-TIME
 
 batch files support:
  - CALL
