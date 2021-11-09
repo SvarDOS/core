@@ -12,7 +12,6 @@ BEFORE NEXT RELEASE:
 
 pipes redirections
 stdout redirection should not create the output file if command fails
-DIR: display number of files, tot size in dir and available space on disk
 DIR: /A
 support for translations (single binary file in %NLSPATH%)
 

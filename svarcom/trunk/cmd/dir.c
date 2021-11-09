@@ -55,6 +55,50 @@
 
 #define WCOLWIDTH 15  /* width of a column in wide mode output */
 
+
+/* fills freebytes with free bytes for drv (A=0, B=1, etc)
+ * returns DOS ERR code on failure */
+static unsigned short cmd_dir_df(unsigned long *freebytes, unsigned char drv) {
+  unsigned short res = 0;
+  unsigned short sects_per_clust = 0, avail_clusts = 0, bytes_per_sect = 0;
+
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+
+    mov ah, 0x36  /* DOS 2+ -- Get Disk Free Space */
+    mov dl, [drv] /* A=1, B=2, etc (0 = DEFAULT DRIVE) */
+    inc dl
+    int 0x21      /* AX=sects_per_clust, BX=avail_clusts, CX=bytes_per_sect, DX=tot_clusters */
+    cmp ax, 0xffff /* AX=0xffff on error (invalid drive) */
+    jne COMPUTEDF
+    mov [res], 0x0f /* fill res with DOS error code 15 ("invalid drive") */
+    jmp DONE
+
+    COMPUTEDF:
+    /* freebytes = AX * BX * CX */
+    mov [sects_per_clust], ax
+    mov [avail_clusts], bx
+    mov [bytes_per_sect], cx
+
+    DONE:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+
+  /* multiple steps to avoid uint16 overflow */
+  *freebytes = sects_per_clust;
+  *freebytes *= avail_clusts;
+  *freebytes *= bytes_per_sect;
+
+  return(res);
+}
+
+
 static int cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
@@ -64,6 +108,9 @@ static int cmd_dir(struct cmd_funcparam *p) {
   unsigned char wcolcount;
   struct nls_patterns *nls = (void *)(p->BUFFER + (BUFFER_SIZE / 3));
   char *buff2 = p->BUFFER + (BUFFER_SIZE / 3 * 2);
+  unsigned long summary_fcount = 0;
+  unsigned long summary_totsz = 0;
+  unsigned char drv = 0;
 
   #define DIR_FLAG_PAUSE  1
   #define DIR_FLAG_RECUR  4
@@ -177,7 +224,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
   }
 
   if (format != DIR_OUTPUT_BARE) {
-    unsigned char drv = p->BUFFER[0];
+    drv = p->BUFFER[0];
     if (drv >= 'a') {
       drv -= 'a';
     } else {
@@ -208,6 +255,9 @@ static int cmd_dir(struct cmd_funcparam *p) {
 
   do {
     if (flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
+
+    summary_fcount++;
+    if ((dta->attr & DOS_ATTR_DIR) == 0) summary_totsz += dta->size;
 
     switch (format) {
       case DIR_OUTPUT_NORM:
@@ -271,7 +321,32 @@ static int cmd_dir(struct cmd_funcparam *p) {
 
   } while (findnext(dta) == 0);
 
-  if (wcolcount != 0) outputnl("");
+  if (wcolcount != 0) outputnl(""); /* in wide mode make sure to end on a clear row */
+
+  /* print out summary (unless bare output mode) */
+  if (format != DIR_OUTPUT_BARE) {
+    unsigned short alignpos;
+    /* x file(s) */
+    memset(buff2, ' ', 13); /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
+    i = nls_format_number(buff2 + 13, summary_fcount, nls);
+    alignpos = sprintf(buff2 + 13 + i, " %s ", "file(s)");
+    output(buff2 + i);
+    /* xxxx bytes */
+    i = nls_format_number(buff2 + 13, summary_totsz, nls);
+    output(buff2 + i);
+    output(" ");
+    outputnl("bytes");
+    /* xxxx bytes free */
+    printf("totsz = %lu\r\n", summary_totsz);
+    i = cmd_dir_df(&summary_totsz, drv);
+    if (i != 0) outputnl(doserr(i));
+    alignpos += 13 + 13;
+    memset(buff2, ' ', alignpos); /* align the freebytes value to same column as totbytes */
+    i = nls_format_number(buff2 + alignpos, summary_totsz, nls);
+    output(buff2 + i);
+    output(" ");
+    outputnl("bytes free");
+  }
 
   return(-1);
 }
