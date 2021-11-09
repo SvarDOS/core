@@ -106,7 +106,7 @@ static int cmd_time_parse(const char *s, signed char *ho, signed char *mi, signe
     *mi = i;
   }
 
-  /* if minutes provided, read them */
+  /* if seconds provided, read them */
   if (ptrs[1] != NULL) {
     if (cmd_time_get_item(buff, ptrs[1]) != 0) goto FAIL;
     if (atous(&i, buff) != 0) goto FAIL;
