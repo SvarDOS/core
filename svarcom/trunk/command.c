@@ -94,7 +94,7 @@ static void parse_argv(struct config *cfg, int argc, char **argv) {
       cfg->locate = 1;
     }
     if (strstartswith(argv[i], "/e:") == 0) {
-      if ((atouns(&(cfg->envsiz), argv[i] + 3) != 0) || (cfg->envsiz < 64)) {
+      if ((atous(&(cfg->envsiz), argv[i] + 3) != 0) || (cfg->envsiz < 64)) {
         cfg->envsiz = 0;
       }
     }

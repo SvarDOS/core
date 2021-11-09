@@ -288,7 +288,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
         output(buff2);
 
         /* one space and NLS TIME */
-        nls_format_time(buff2 + 1, dta->time_hour, dta->time_min, nls);
+        nls_format_time(buff2 + 1, dta->time_hour, dta->time_min, 0xff, nls);
         outputnl(buff2);
         break;
 

@@ -50,7 +50,7 @@ static int cmd_chcp(struct cmd_funcparam *p) {
   /* one param? must be numeric in range 1+ */
   if (p->argc == 1) {
     unsigned char nlsfuncflag = 0;
-    if (atouns(&nnn, p->argv[0]) != 0) {
+    if (atous(&nnn, p->argv[0]) != 0) {
       outputnl("Invalid code page number");
       return(-1);
     }

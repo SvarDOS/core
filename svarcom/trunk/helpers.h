@@ -140,7 +140,7 @@ void file_fname2fcb(char *dst, const char *src);
 void file_fcb2fname(char *dst, const char *src);
 
 /* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
-int atouns(unsigned short *r, const char *s);
+int atous(unsigned short *r, const char *s);
 
 /* appends a backslash if path is a directory
  * returns the (possibly updated) length of path */
@@ -157,9 +157,9 @@ unsigned short nls_getpatterns(struct nls_patterns *p);
  * returns length of result */
 unsigned short nls_format_date(char *s, unsigned short yr, unsigned char mo, unsigned char dy, const struct nls_patterns *p);
 
-/* computes a formatted time based on NLS patterns found in p
+/* computes a formatted time based on NLS patterns found in p, sc are ignored if set 0xff
  * returns length of result */
-unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, const struct nls_patterns *p);
+unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, unsigned char sc, const struct nls_patterns *p);
 
 /* computes a formatted integer number based on NLS patterns found in p
  * returns length of result */

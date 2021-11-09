@@ -330,7 +330,7 @@ void file_fcb2fname(char *dst, const char *src) {
 
 
 /* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
-int atouns(unsigned short *r, const char *s) {
+int atous(unsigned short *r, const char *s) {
   int err = 0;
 
   _asm {
@@ -472,24 +472,38 @@ unsigned short nls_format_date(char *s, unsigned short yr, unsigned char mo, uns
 }
 
 
-/* computes a formatted time based on NLS patterns found in p
+/* computes a formatted time based on NLS patterns found in p, sc are ignored if set 0xff
  * returns length of result */
-unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, const struct nls_patterns *p) {
-  char ampm[2] = {0, 0};
-  const char *fmt = "%02u%s%02u%s";
+unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, unsigned char sc, const struct nls_patterns *p) {
+  char ampm = 0;
+  unsigned short res;
+
   if (p->timefmt == 0) {
     if (ho == 12) {
-      ampm[0] = 'p';
+      ampm = 'p';
     } else if (ho > 12) {
       ho -= 12;
-      ampm[0] = 'p';
+      ampm = 'p';
     } else { /* ho < 12 */
       if (ho == 0) ho = 12;
-      ampm[0] = 'a';
+      ampm = 'a';
     }
-    fmt = "%2u%s%02u%s";
+    res = sprintf(s, "%2u", ho);
+  } else {
+    res = sprintf(s, "%02u", ho);
   }
-  return(sprintf(s, fmt, ho, p->timesep, mn, ampm));
+
+  /* append separator and minutes */
+  res += sprintf(s + res, "%s%02u", p->timesep, mn);
+
+  /* if seconds provided, append them, too */
+  if (sc != 0xff) res += sprintf(s + res, "%s%02u", p->timesep, sc);
+
+  /* finally append AM/PM char */
+  if (ampm != 0) s[res++] = ampm;
+  s[res] = 0;
+
+  return(res);
 }
 
 
