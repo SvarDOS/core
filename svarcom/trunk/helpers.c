@@ -329,7 +329,9 @@ void file_fcb2fname(char *dst, const char *src) {
 }
 
 
-/* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
+/* converts an ASCIIZ string into an unsigned short. returns 0 on success.
+ * on error, result will contain all valid digits that were read until
+ * error occurred (0 on overflow or if parsing failed immediately) */
 int atous(unsigned short *r, const char *s) {
   int err = 0;
 
@@ -347,17 +349,20 @@ int atous(unsigned short *r, const char *s) {
     jz DONE
     /* validate that AL is in range '0'-'9' */
     sub al, '0'
-    jc FAIL   /* neg result */
+    jc FAIL   /* invalid character detected */
     cmp al, 9
-    jg FAIL
+    jg FAIL   /* invalid character detected */
     /* restore result into AX (CX contains the new digit) */
     xchg cx, ax
     /* multiply result by 10 and add cl */
     mul bx    /* DX AX = AX * BX(10) */
-    jc FAIL   /* overflow */
+    jc OVERFLOW  /* overflow */
     add ax, cx
-    /* if CF then overflow occured (overflow part lands in DX) */
+    /* if CF is set then overflow occurred (overflow part lands in DX) */
     jnc NEXTBYTE
+
+    OVERFLOW:
+    xor cx, cx  /* make sure result is zeroed in case overflow occured */
 
     FAIL:
     inc [err]

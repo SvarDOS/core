@@ -139,7 +139,9 @@ void file_fname2fcb(char *dst, const char *src);
 /* converts a FCB filename (FILENAMEEXT) into normal format (FILENAME.EXT) */
 void file_fcb2fname(char *dst, const char *src);
 
-/* converts an ASCIIZ string into an unsigned short. returns 0 on success. */
+/* converts an ASCIIZ string into an unsigned short. returns 0 on success.
+ * on error, result will contain all valid digits that were read until
+ * error occurred (0 on overflow or if parsing failed immediately) */
 int atous(unsigned short *r, const char *s);
 
 /* appends a backslash if path is a directory
