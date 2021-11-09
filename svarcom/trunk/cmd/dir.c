@@ -337,7 +337,6 @@ static int cmd_dir(struct cmd_funcparam *p) {
     output(" ");
     outputnl("bytes");
     /* xxxx bytes free */
-    printf("totsz = %lu\r\n", summary_totsz);
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) outputnl(doserr(i));
     alignpos += 13 + 13;
