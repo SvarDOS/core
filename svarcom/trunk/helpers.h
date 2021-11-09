@@ -163,6 +163,6 @@ unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, cons
 
 /* computes a formatted integer number based on NLS patterns found in p
  * returns length of result */
-unsigned short nls_format_number(char *s, long num, const struct nls_patterns *p);
+unsigned short nls_format_number(char *s, unsigned long num, const struct nls_patterns *p);
 
 #endif

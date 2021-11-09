@@ -495,17 +495,11 @@ unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, cons
 
 /* computes a formatted integer number based on NLS patterns found in p
  * returns length of result */
-unsigned short nls_format_number(char *s, long num, const struct nls_patterns *p) {
-  unsigned short sl = 0, res, i;
+unsigned short nls_format_number(char *s, unsigned long num, const struct nls_patterns *p) {
+  unsigned short sl = 0, i;
   unsigned char thcount = 0;
 
-  /* handle negative values */
-  if (num < 0) {
-    s[sl++] = '-';
-    num = 0 - num;
-  }
-
-  /* write the absolute value now */
+  /* write the value (reverse) with thousand separators (if any defined) */
   do {
     if ((thcount == 3) && (p->thousep[0] != 0)) {
       s[sl++] = p->thousep[0];
@@ -516,20 +510,15 @@ unsigned short nls_format_number(char *s, long num, const struct nls_patterns *p
     thcount++;
   } while (num > 0);
 
-  /* terminate the string and remember its size */
+  /* terminate the string */
   s[sl] = 0;
-  res = sl;
 
-  /* reverse the string now (it has been build in reverse) */
-  if (s[0] == '-') {
-    sl--;
-    s++;
-  }
-  for (i = 0; i <= (sl / 2); i++) {
+  /* reverse the string now (has been built in reverse) */
+  for (i = sl / 2 + (sl & 1); i < sl; i++) {
     thcount = s[i];
-    s[i] = s[sl - (i + 1)];
+    s[i] = s[sl - (i + 1)];   /* abc'de  if i=3 then ' <-> c */
     s[sl - (i + 1)] = thcount;
   }
 
-  return(res);
+  return(sl);
 }
