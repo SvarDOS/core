@@ -25,7 +25,7 @@ command.com: rmod.h command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c 
 	wcl $(CFLAGS) command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c
 
 rmod.h: file2c.com rmod.com
-	file2c rmod.com rmod.h rmod
+	file2c /c rmod.com rmod.h rmod
 
 file2c.com: file2c.c
 	wcl $(CFLAGS) file2c.c
