@@ -21,11 +21,14 @@ CFLAGS = -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=command.map
 
 all: command.com
 
-command.com: rmod.h command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c cmd\*.c
+command.com: deflang.h rmod.h command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c cmd\*.c
 	wcl $(CFLAGS) command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c
 
 rmod.h: file2c.com rmod.com
 	file2c /c rmod.com rmod.h rmod
+
+deflang.h: file2c.com tlumacz\default.lng
+	file2c /l4096 tlumacz\default.lng deflang.h langblock
 
 file2c.com: file2c.c
 	wcl $(CFLAGS) file2c.c

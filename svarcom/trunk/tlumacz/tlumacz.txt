@@ -1,0 +1,9 @@
+tlumacz is a "compiler" that builds the SvarCOM multi-lang ressource file out
+of a collection of CATS/Kitten text files.
+
+ usage: tlumacz files
+
+where "files" is the directory where all CATS/Kitten files are present.
+tlumacz generates a SVARCOM.DAT file that contains all language ressources.
+This file must be then placed in the %NLSPATH% directory so SvarCOM can find it.
+SvarCOM's language is controlled by the LANG variable (eg. "SET LANG=PL").
