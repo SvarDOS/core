@@ -12,6 +12,8 @@ BEFORE NEXT RELEASE:
 
 pipes redirections
 support for translations (single binary file in %NLSPATH%)
+basic BAT support (without workflow controls, FOR loops etc)
+wmake clean does not work under SvarCOM
 
 
 AT SOME LATER TIME:
@@ -41,7 +43,7 @@ skipping AUTOEXEC with F5 at boot time (/P /D)
 CTTY
 LOADHIGH/LH
 
-batch files support:
+advanced batch files support:
  - CALL
  - :labels
  - FOR
