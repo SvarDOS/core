@@ -1,5 +1,5 @@
 
-                         *** SVARCOM VS FREECOM ***
+                         *** SVARCOM vs FREECOM ***
 
 
 The FreeCOM project is an impressive piece of software, but there are a few
@@ -21,13 +21,16 @@ IBM PC compatible machine.
 
 *** NLS RESSOURCES ***********************************************************
 
-FreeCOM requires custom NLS files. While the vast majority of FreeDOS programs
-use a single "standard" (CATS/Kitten), FreeCOM uses a different approach with
-pre-compiled NLS strings, which makes it necessary to distribute as many
-binary blobs as there are supported languages. It also makes the translation
-process much more difficult.
+FreeCOM requires custom NLS ressources. While the vast majority of FreeDOS
+programs use a single "standard" (CATS), FreeCOM uses a different approach
+with NLS strings built into the binary. This makes it necessary to distribute
+as many binary blobs as there are supported languages. Another consequence is
+that FreeCOM is unable to switch its language dynamically (ie. following
+changes made to the LANG environment variable). It also makes the translation
+more difficult.
 
-SvarDOS will use Kitten-style translations, like other applications.
+SvarDOS uses CATS-style translations in a precompiled form and loads the
+strings that match the LANG variable.
 
 
 *** CODE COMPLEXITY **********************************************************
@@ -37,11 +40,11 @@ and supports many embedded features. This makes the code uneasy to follow and
 changes require careful testing on all supported compilers and all possible
 build variants.
 
-SvarDOS, on the other hand, is meant to be simple and universal. It is meant
-to be compiled with OpenWatcom only, which makes a ton of IFDEF's go away. It
-also won't integrate features that can be reasonably implemented as external
-tools (typically: DOSKEY). It strives to reimplement the functionality of
-MS-DOS 5/6.
+SvarDOS, on the other hand, is meant to be simple and universal. It is
+compiled with OpenWatcom only, which makes a ton of IFDEF's go away. It also
+does not integrate extra features that can be reasonably implemented through
+external tools (typically: DOSKEY). It strives to reimplement the baseline
+functionality of MS-DOS 5/6.
 
 
 *** NON-FREE LICENSE *********************************************************
