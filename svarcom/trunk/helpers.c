@@ -67,32 +67,43 @@ int strstartswith(const char *s1, const char *s2) {
 
 
 /* outputs a NULL-terminated string to stdout */
-void output_internal(const char *s, unsigned short nl) {
+void output_internal(const char *s, unsigned char nl) {
+  const static unsigned char *crlf = "\r\n$";
   _asm {
-    mov ah, 0x02 /* AH=9 - write character in DL to stdout */
-    mov si, s
-    cld          /* clear DF so lodsb increments SI */
-    NEXTBYTE:
-    lodsb /* load byte from DS:SI into AL, SI++ */
-    mov dl, al
-    or al, 0  /* is al == 0? */
-    jz DONE
+    push ds
+    pop es         /* make sure es=ds (scasb uses es) */
+    /* get length of s into CX */
+    mov ax, 0x4000 /* ah=DOS "write to file" and AL=0 for NULL matching */
+    mov dx, s      /* set dx to string (required for later) */
+    mov di, dx     /* set di to string (for NULL matching) */
+    mov cx, 0xffff /* preset cx to 65535 (-1) */
+    cld            /* clear DF so scasb increments DI */
+    repne scasb    /* cmp al, es:[di], inc di, dec cx until match found */
+    /* CX contains (65535 - strlen(s)) now */
+    not cx         /* reverse all bits so I get (strlen(s) + 1) */
+    dec cx         /* this is CX length */
+    jz WRITEDONE   /* do nothing for empty strings */
+
+    /* output by writing to stdout */
+    /* mov ah, 0x40 */  /* DOS 2+ -- write to file via handle */
+    mov bx, 1      /* handle 1 is always stdout */
+    /* mov cx, xxx */ /* write CX bytes */
+    /* mov dx, s   */ /* DS:DX is the source of bytes to "write" */
     int 0x21
-    jmp NEXTBYTE
-    DONE:
-    or nl, 0
-    jz FINITO
+    WRITEDONE:
+
     /* print out a CR/LF trailer if nl set */
-    mov dl, 0x0D /* CR */
-    int 0x21
-    mov dl, 0x0A /* LF */
+    or byte ptr [nl], 0
+    jz FINITO
+    mov ah, 0x09
+    mov dx, crlf
     int 0x21
     FINITO:
   }
 }
 
 
-void nls_output_internal(unsigned short id, unsigned short nl) {
+void nls_output_internal(unsigned short id, unsigned char nl) {
   const char *ptr = langblock + 4; /* first 4 bytes are lang id and lang len */
   const char *NOTFOUND = "NLS_STRING_NOT_FOUND";
   /* find the string id in langblock memory */
