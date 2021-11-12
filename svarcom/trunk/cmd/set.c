@@ -43,6 +43,7 @@ static int cmd_set(struct cmd_funcparam *p) {
     outputnl("string    Specifies a series of characters to assign to the variable");
     outputnl("");
     outputnl("Type SET without parameters to display the current environment variables.");
+    return(-1);
   }
 
   /* no arguments - display content */
