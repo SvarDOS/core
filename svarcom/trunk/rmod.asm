@@ -74,8 +74,9 @@ USEDEFAULTCOMSPEC:
 ; prepare the exec param block
 mov ax, [ENVSEG]
 mov [EXEC_PARAM_REC], ax
-mov [EXEC_PARAM_REC+2], dx
-mov [EXEC_PARAM_REC+4], es
+mov ax, CMDTAIL
+mov [EXEC_PARAM_REC+2], ax
+mov [EXEC_PARAM_REC+4], cs
 
 ; execute command.com
 mov ax, 0x4B00         ; DOS 2+ - load & execute program
@@ -109,6 +110,9 @@ int 0x21
 
 ; back to program start
 jmp skipsig
+
+; command.com tail arguments, in PSP format (length byte followed by arg)
+CMDTAIL db 0
 
 ; ExecParamRec used by INT 21h, AX=4b00 (load and execute program), 14 bytes:
 ;  offset  size  content
