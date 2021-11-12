@@ -35,6 +35,11 @@
  * by either a = sign or a NULL terminator */
 char far *env_lookup(unsigned short env_seg, const char *varname);
 
+/* almost identical to env_lookup(), but instead of returning a pointer
+ * to the 'NAME=value' string, it returns a pointer to value (or NULL if
+ * var not found) */
+char far *env_lookup_val(unsigned short env_seg, const char *varname);
+
 /* returns the size, in bytes, of the allocated environment block */
 unsigned short env_allocsz(unsigned short env_seg);
 

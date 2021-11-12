@@ -55,6 +55,21 @@ char far *env_lookup(unsigned short env_seg, const char *varname) {
 }
 
 
+/* almost identical to env_lookup(), but instead of returning a pointer
+ * to the 'NAME=value' string, it returns a pointer to value (or NULL if
+ * var not found) */
+char far *env_lookup_val(unsigned short env_seg, const char *varname) {
+  char far *r = env_lookup(env_seg, varname);
+  if (r == NULL) return(NULL);
+  /* find '=' or end of string */
+  for (;;) {
+    if (*r == '=') return(r + 1);
+    if (*r == 0) return(r);
+    r++;
+  }
+}
+
+
 /* returns the size, in bytes, of the allocated environment block */
 unsigned short env_allocsz(unsigned short env_seg) {
   unsigned short far *mcbsz = MK_FP(env_seg - 1, 3); /* block size is a word at offset +3 in the MCB */
