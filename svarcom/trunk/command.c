@@ -130,6 +130,17 @@ static void parse_argv(struct config *cfg) {
           if (cfg->envsiz < 64) cfg->envsiz = 0;
           break;
 
+        case '?':
+          outputnl("Starts the SvarCOM command interpreter");
+          outputnl("");
+          outputnl("COMMAND /E:nnn [/[C|K] command]");
+          outputnl("");
+          outputnl("/E:nnn     Sets the environment size to nnn bytes");
+          outputnl("/C         Executes the specified command and returns");
+          outputnl("/K         Executes the specified command and continues running");
+          exit(1);
+          break;
+
         default:
           output("Invalid switch:");
           output(" ");
