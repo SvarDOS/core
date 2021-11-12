@@ -78,26 +78,70 @@
 #include "redir.h"
 #include "rmodinit.h"
 
+#define FLAG_EXEC_AND_QUIT 1
+
 struct config {
-  int locate;
-  int install;
+  unsigned char flags;
+  char *execcmd;
   unsigned short envsiz;
-} cfg;
+};
 
 
-static void parse_argv(struct config *cfg, int argc, char **argv) {
-  int i;
+/* parses command line the hard way (directly from PSP) */
+static void parse_argv(struct config *cfg) {
+  unsigned short i;
+  const unsigned char *cmdlinelen = (unsigned char *)0x80;
+  char *cmdline = (char *)0x81;
+
   memset(cfg, 0, sizeof(*cfg));
 
-  for (i = 1; i < argc; i++) {
-    if (strcmp(argv[i], "/locate") == 0) {
-      cfg->locate = 1;
+  /* set a NULL terminator on cmdline */
+  cmdline[*cmdlinelen] = 0;
+
+  for (i = 0;;) {
+
+    /* skip over any leading spaces */
+    for (;; i++) {
+      if (cmdline[i] == 0) return;
+      if (cmdline[i] != ' ') break;
     }
-    if (strstartswith(argv[i], "/e:") == 0) {
-      if ((atous(&(cfg->envsiz), argv[i] + 3) != 0) || (cfg->envsiz < 64)) {
-        cfg->envsiz = 0;
+
+    if (cmdline[i] != '/') {
+      output("Invalid parameter: ");
+      outputnl(cmdline + i);
+      /* exit(1); */
+    } else {
+      i++;        /* skip the slash */
+      switch (cmdline[i]) {
+        case 'c': /* /C = execute command and quit */
+        case 'C':
+          cfg->flags |= FLAG_EXEC_AND_QUIT;
+          /* FALLTHRU */
+        case 'k': /* /K = execute command and keep running */
+        case 'K':
+          cfg->execcmd = cmdline + i + 1;
+          return;
+
+        case 'e': /* preset the initial size of the environment block */
+        case 'E':
+          i++;
+          if (cmdline[i] == ':') i++; /* could be /E:size */
+          atous(&(cfg->envsiz), cmdline + i);
+          if (cfg->envsiz < 64) cfg->envsiz = 0;
+          break;
+
+        default:
+          output("Invalid switch:");
+          output(" ");
+          outputnl(cmdline + i);
+          exit(1);
+          break;
       }
     }
+
+    /* move to next argument or quit processing if end of cmdline */
+    for (i++; (cmdline[i] != 0) && (cmdline[i] != ' ') && (cmdline[i] != '/'); i++);
+
   }
 }
 
@@ -262,14 +306,14 @@ static void set_comspec_to_self(unsigned short envseg) {
 }
 
 
-int main(int argc, char **argv) {
+int main(void) {
   static struct config cfg;
   static unsigned short rmod_seg;
   static unsigned short far *rmod_envseg;
   static unsigned short far *lastexitcode;
   static unsigned char BUFFER[4096];
 
-  parse_argv(&cfg, argc, argv);
+  parse_argv(&cfg);
 
   rmod_seg = rmod_find();
   if (rmod_seg == 0xffff) {
@@ -297,14 +341,21 @@ int main(int argc, char **argv) {
     printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod_seg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
   }*/
 
-  for (;;) {
+  do {
     char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
     unsigned char far *echostatus = MK_FP(rmod_seg, RMOD_OFFSET_ECHOFLAG);
 
-    if (*echostatus != 0) outputnl(""); /* terminate the previous command with a CR/LF */
-
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
+
+    /* skip user input if I have a command to exec (/C or /K) */
+    if (cfg.execcmd != NULL) {
+      cmdline = cfg.execcmd;
+      cfg.execcmd = NULL;
+      goto EXEC_CMDLINE;
+    }
+
+    if (*echostatus != 0) outputnl(""); /* terminate the previous command with a CR/LF */
 
     SKIP_NEWLINE:
 
@@ -380,6 +431,9 @@ int main(int argc, char **argv) {
     /* replace \r by a zero terminator */
     cmdline[(unsigned char)(cmdline[-1])] = 0;
 
+    /* I jump here when I need to exec an initial command (/C or /K) */
+    EXEC_CMDLINE:
+
     /* move pointer forward to skip over any leading spaces */
     while (*cmdline == ' ') cmdline++;
 
@@ -393,13 +447,10 @@ int main(int argc, char **argv) {
     }
 
     /* try matching (and executing) an internal command */
-    {
-      int ecode = cmd_process(rmod_seg, *rmod_envseg, cmdline, BUFFER);
-      if (ecode >= 0) *lastexitcode = ecode;
-      if (ecode >= -1) { /* internal command executed */
-        redir_revert(); /* revert stdout (in case it was redirected) */
-        continue;
-      }
+    if (cmd_process(rmod_seg, *rmod_envseg, cmdline, BUFFER) >= -1) {
+      /* internal command executed */
+      redir_revert(); /* revert stdout (in case it was redirected) */
+      continue;
     }
 
     /* if here, then this was not an internal command */
@@ -412,7 +463,7 @@ int main(int argc, char **argv) {
     if I am still alive then external command failed to execute */
     outputnl("Bad command or file name");
 
-  }
+  } while ((cfg.flags & FLAG_EXEC_AND_QUIT) == 0);
 
   return(0);
 }

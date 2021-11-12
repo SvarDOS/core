@@ -12,7 +12,6 @@ BEFORE NEXT RELEASE:
 
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
-wmake clean does not work under SvarCOM
 
 
 AT SOME LATER TIME:
@@ -38,7 +37,7 @@ when execing an external command make sure to sync local environment (or run the
 when execing a program, make sure I use the correct PATH.. -> actually I need to parse PATH and look for matches myself for BAT support
 
 dynamic resizing of environment space
-command line arguments to command.com (/e /E /k /p etc)
+command line arguments to command.com (/p etc)
 single-stepping AUTOEXEC with F8 at boot time (/P /Y)
 skipping AUTOEXEC with F5 at boot time (/P /D)
 CTTY
