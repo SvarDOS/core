@@ -34,8 +34,13 @@ int strstartswith(const char *s1, const char *s2);
 /* outputs a NULL-terminated string to stdout */
 void output_internal(const char *s, unsigned short nl);
 
+/* outputs a NULL-terminated NLS string to stdout */
+void nls_output_internal(unsigned short id, unsigned short nl);
+
 #define output(x) output_internal(x, 0)
 #define outputnl(x) output_internal(x, 1)
+#define nls_output(x,y) nls_output_internal((x << 8) | y, 0)
+#define nls_outputnl(x,y) nls_output_internal((x << 8) | y, 1)
 
 /*
  * FileInfoRec (DTA) format:
@@ -166,5 +171,8 @@ unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, unsi
 /* computes a formatted integer number based on NLS patterns found in p
  * returns length of result */
 unsigned short nls_format_number(char *s, unsigned long num, const struct nls_patterns *p);
+
+/* reload nls ressources from svarcom.lng into langblock */
+void nls_langreload(char *buff, unsigned short env);
 
 #endif

@@ -29,8 +29,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "msgid.h"
-
 
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
@@ -201,7 +199,9 @@ int main(int argc, char **argv) {
         puts("ERROR: FAILED TO OPEN OR CREATE DEFAULT.LNG");
         break;
       }
-      fwrite(buff, 1, sz, fd2);
+      fwrite(id, 1, 2, fd2);    /* lang block id */
+      fwrite(&sz, 1, 2, fd2);   /* lang block size */
+      fwrite(buff, 1, sz, fd2); /* langblock content (strings) */
       fclose(fd2);
     }
   }

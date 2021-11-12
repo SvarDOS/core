@@ -307,6 +307,9 @@ int main(int argc, char **argv) {
 
     if (*echostatus != 0) outputnl(""); /* terminate the previous command with a CR/LF */
 
+    /* (re)load translation strings if needed */
+    nls_langreload(BUFFER, *rmod_envseg);
+
     SKIP_NEWLINE:
 
     /* print shell prompt (only if ECHO is enabled) */

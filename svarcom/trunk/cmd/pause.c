@@ -29,7 +29,7 @@
 
 static int cmd_pause(struct cmd_funcparam *p) {
   if (cmd_ishlp(p)) {
-    outputnl("Suspends processing of a batch program");
+    nls_outputnl(15, 0);
     outputnl("\r\nPAUSE");
     return(-1);
   }
