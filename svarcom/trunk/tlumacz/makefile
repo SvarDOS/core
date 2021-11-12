@@ -7,3 +7,8 @@ tlumacz.exe: tlumacz.c
 
 svarcom.lng: tlumacz.exe nls\svarcom.??
 	tlumacz en fr pl
+
+clean: .symbolic
+	del *.exe
+	del *.obj
+	del *.lng
