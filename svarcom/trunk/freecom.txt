@@ -1,5 +1,5 @@
 
-                         *** SVARCOM vs FREECOM ***
+                         === SVARCOM vs FREECOM ===
 
 
 The FreeCOM project is an impressive piece of software, but there are a few
@@ -7,7 +7,7 @@ things that I do not like about it. SvarCOM is my attempt at addressing these
 things.
 
 
-*** MEMORY FOOTPRINT *********************************************************
+=== MEMORY FOOTPRINT =========================================================
 
 FreeCOM is not suitable for low-memory machines. It takes about 55K of
 conventional memory when XMS is unavailable. XMS being a 386+ thing, FreeCOM
@@ -19,7 +19,7 @@ SvarDOS does not rely on XMS and performs runtime swapping that works on any
 IBM PC compatible machine.
 
 
-*** NLS RESSOURCES ***********************************************************
+=== NLS RESSOURCES ===========================================================
 
 FreeCOM requires custom NLS ressources. While the vast majority of FreeDOS
 programs use a single "standard" (CATS), FreeCOM uses a different approach
@@ -33,7 +33,7 @@ SvarDOS uses CATS-style translations in a precompiled form and loads the
 strings that match the LANG variable.
 
 
-*** CODE COMPLEXITY **********************************************************
+=== CODE COMPLEXITY ==========================================================
 
 FreeCOM is a complex beast: it aims for compatibility with multiple compilers
 and supports many embedded features. This makes the code uneasy to follow and
@@ -47,7 +47,7 @@ external tools (typically: DOSKEY). It strives to reimplement the baseline
 functionality of MS-DOS 5/6.
 
 
-*** NON-FREE LICENSE *********************************************************
+=== NON-FREE LICENSE =========================================================
 
 FreeCOM code is released under the terms of a license that restrains the
 freedom of its users due to its virality (GPL).
@@ -56,4 +56,4 @@ SvarCOM is released under the terms of a liberal and permissive (MIT) license
 that does not impose limitations on how users may or may not use it.
 
 
-********************************************************************** EOF ***
+====================================================================== EOF ===
