@@ -1,0 +1,23 @@
+
+                    === SvarCOM implementation notes ===
+
+
+=== Batch files support ======================================================
+
+When SvarCOM executes a command, it checks first if it has a *.BAT extension.
+If so, it switches into 'batch-mode':
+ - allocates a batch 'node', which is a memory area that contains the
+   path and filename of the batch file, as well as the number of the "next
+   line to be executed".
+ - the batch node is attached to the batch chain (a pointer owned by rmod) if
+   the batch file was CALLed from within another batch file, and replaced the
+   current batch if it was simply executed from another batch file.
+
+When the rmod batch pointer is non-NULL, SvarCOM does not ask the user for a
+command. Instead, it opens the batch file, jumps to the "line line to be
+executed" and loads the command from there, incrementing "next line" in the
+process. The maximum length of a batch file is of 65535 lines (any lines after
+this limit will be ignored).
+
+
+====================================================================== EOF ===
