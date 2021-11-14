@@ -45,7 +45,10 @@ CMDECHO db 1     ; +9Fh
 ; COMMAND.COM to chain multiple batch files (through CALL). 0 means "none".
 BATCHCHAIN dw 0  ; +A0h
 
-skipsig:         ; +A2h
+; original parent (segment of)
+ORIGPARENT dd 0  ; +A2h
+
+skipsig:         ; +A6h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs

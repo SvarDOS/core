@@ -22,21 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef RMODINIT_H
-#define RMODINIT_H
+#ifndef SAYONARA_H
+#define SAYONARA_H
 
-#define RMOD_OFFSET_ENVSEG     0x08
-#define RMOD_OFFSET_LEXITCODE  0x0A
-#define RMOD_OFFSET_INPBUFF    0x0C
-#define RMOD_OFFSET_COMSPECPTR 0x8E
-#define RMOD_OFFSET_BOOTDRIVE  0x90
-#define RMOD_OFFSET_ECHOFLAG   0x9F
-#define RMOD_OFFSET_BATCHCHAIN 0xA0
-#define RMOD_OFFSET_ORIGPARENT 0xA2
-#define RMOD_OFFSET_ROUTINE    0xA6
-
-unsigned short rmod_install(unsigned short envsize);
-unsigned short rmod_find(void);
-void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
+/* rewires my parent pointer, uninstalls rmod let DOS terminate me, UNLESS
+ * my parent is unknown */
+void sayonara(unsigned short rmodseg);
 
 #endif

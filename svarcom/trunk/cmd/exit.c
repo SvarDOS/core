@@ -34,7 +34,7 @@ static int cmd_exit(struct cmd_funcparam *p) {
     outputnl("EXIT\r\n");
     outputnl("Quits the COMMAND.COM program (command interpreter)");
   } else {
-    exit(0);
+    sayonara(p->rmod_seg);
   }
   return(-1);
 }

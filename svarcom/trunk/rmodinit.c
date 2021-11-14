@@ -118,7 +118,7 @@ unsigned short rmod_install(unsigned short envsize) {
   *owner = rmodseg;
   _fmemcpy(mcb + 8, "SVARCOM", 8);
 
-  /* mark env memory as "self owned" */
+  /* mark env memory as "owned by rmod" */
   mcb = MK_FP(envseg - 1, 0);
   owner = (void far *)(mcb + 1);
   *owner = rmodseg;
@@ -149,15 +149,32 @@ unsigned short rmod_install(unsigned short envsize) {
     pop ax
   }
 
-  /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I terminate */
+  /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I
+   * terminate and save the original handler in rmod's memory */
   _asm {
     push ax
     push bx
+    push si
+    push di
+    push es
+
+    /* save my original parent in rmod's memory */
+    mov es, [rmodseg]
+    mov si, 0x0a
+    mov di, RMOD_OFFSET_ORIGPARENT
+    cld
+    movsw  /* mov ES:[DI], DS:[SI] and SI += 2 and DI += 2 */
+    movsw
+
     mov bx, 0x0a                   /* int22 handler is at 0x0A of the PSP */
     mov ax, RMOD_OFFSET_ROUTINE
     mov [bx], ax                   /* int handler offset */
     mov ax, rmodseg
     mov [bx+2], ax                 /* int handler segment */
+
+    pop es
+    pop di
+    pop si
     pop bx
     pop ax
   }
@@ -166,29 +183,18 @@ unsigned short rmod_install(unsigned short envsize) {
 }
 
 
-/* scan memory for rmod, returns its segment if found, 0xffff otherwise */
+/* look up my parent: if it's rmod then return its segment,
+ * otherwise return 0xffff */
 unsigned short rmod_find(void) {
-  unsigned short i;
-  unsigned short far *ptrword;
-  unsigned char far *ptrbyte;
-
-  /* iterate over all paragraphs, looking for my signature */
-  for (i = 1; i != 65535; i++) {
-    ptrword = MK_FP(i, 0);
-    if (ptrword[0] != 0x1983) continue;
-    if (ptrword[1] != 0x1985) continue;
-    if (ptrword[2] != 0x2017) continue;
-    if (ptrword[3] != 0x2019) continue;
-    /* extra check: make sure the paragraph before is an MCB block and that it
-     * belongs to itself. otherwise I could find the rmod code embedded inside
-     * the command.com binary... */
-    ptrbyte = MK_FP(i - 1, 0);
-    if ((*ptrbyte != 'M') && (*ptrbyte != 'Z')) continue; /* not an MCB */
-    ptrword = MK_FP(i - 1, 1);
-    if (*ptrword != i) continue; /* not belonging to self */
-    return(i);
-  }
-  return(0xffff);
+  unsigned short *parent = (void *)0x0C; /* parent's seg in PSP[Ch] ("prev. int22 handler") */
+  unsigned short far *ptr;
+  const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
+  unsigned char i;
+  /* is it rmod? */
+  ptr = MK_FP(*parent, 0);
+  for (i = 0; i < 4; i++) if (ptr[i] != sig[i]) return(0xffff);
+  /* match successfull (rmod is my parent) */
+  return(*parent);
 }
 
 

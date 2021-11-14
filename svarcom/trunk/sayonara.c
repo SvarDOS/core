@@ -22,21 +22,38 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef RMODINIT_H
-#define RMODINIT_H
+#include <i86.h>
 
-#define RMOD_OFFSET_ENVSEG     0x08
-#define RMOD_OFFSET_LEXITCODE  0x0A
-#define RMOD_OFFSET_INPBUFF    0x0C
-#define RMOD_OFFSET_COMSPECPTR 0x8E
-#define RMOD_OFFSET_BOOTDRIVE  0x90
-#define RMOD_OFFSET_ECHOFLAG   0x9F
-#define RMOD_OFFSET_BATCHCHAIN 0xA0
-#define RMOD_OFFSET_ORIGPARENT 0xA2
-#define RMOD_OFFSET_ROUTINE    0xA6
+#include "rmodinit.h"
 
-unsigned short rmod_install(unsigned short envsize);
-unsigned short rmod_find(void);
-void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
+#include "sayonara.h"
 
-#endif
+
+/* rewires my parent pointer, uninstalls rmod let DOS terminate me, UNLESS
+ * my parent is unknown */
+void sayonara(unsigned short rmodseg) {
+  unsigned long far *orgparent = MK_FP(rmodseg, RMOD_OFFSET_ORIGPARENT);
+  unsigned long *myparent = (void *)0x0A;
+  unsigned short far *rmodenv_ptr = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
+  unsigned short rmodenv = *rmodenv_ptr;
+
+  /* set my parent back to original value (if 0 = shell is permanent) */
+  if (*orgparent == 0) return;
+  *myparent = *orgparent;
+
+  _asm {
+    /* free RMOD's code segment and env segment */
+    mov ah, 0x49   /* DOS 2+ -- Free Memory Block */
+    mov es, [rmodseg]
+    int 0x21
+
+    /* free RMOD's env segment */
+    mov ah, 0x49   /* DOS 2+ -- Free Memory Block */
+    mov es, [rmodenv]
+    int 0x21
+
+    /* gameover */
+    mov ax, 0x4C00 /* DOS 2+ -- Terminate with exit code 0 */
+    int 0x21
+  }
+}

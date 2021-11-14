@@ -37,6 +37,7 @@
 #include "env.h"
 #include "helpers.h"
 #include "rmodinit.h"
+#include "sayonara.h"
 
 #define BUFFER_SIZE 2048    /* make sure this is not bigger than the static buffer in command.c */
 

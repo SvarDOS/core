@@ -77,6 +77,7 @@
 #include "helpers.h"
 #include "redir.h"
 #include "rmodinit.h"
+#include "sayonara.h"
 
 #define FLAG_EXEC_AND_QUIT 1
 
@@ -476,5 +477,6 @@ int main(void) {
 
   } while ((cfg.flags & FLAG_EXEC_AND_QUIT) == 0);
 
+  sayonara(rmod_seg);
   return(0);
 }

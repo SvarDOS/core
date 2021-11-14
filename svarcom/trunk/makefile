@@ -21,8 +21,8 @@ CFLAGS = -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=command.map
 
 all: command.com
 
-command.com: deflang.h rmod.h command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c cmd\*.c
-	wcl $(CFLAGS) command.c cmd.c doserr.c env.c redir.c rmodinit.c helpers.c
+command.com: deflang.h rmod.h command.c cmd.c doserr.c env.c redir.c rmodinit.c sayonara.c helpers.c cmd\*.c
+	wcl $(CFLAGS) command.c cmd.c doserr.c env.c redir.c rmodinit.c sayonara.c helpers.c
 
 rmod.h: file2c.com rmod.com
 	file2c /c rmod.com rmod.h rmod
