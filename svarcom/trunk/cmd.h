@@ -25,8 +25,10 @@
 #ifndef CMD_H
 #define CMD_H
 
+#include "rmodinit.h"
+
 /* process internal commands */
-int cmd_process(unsigned short env_rmod, unsigned short env_seg, const char far *cmdline, char *BUFFER);
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char far *cmdline, char *BUFFER);
 
 /* explodes a command into an array of arguments where last arg is NULL
  * returns number of args */

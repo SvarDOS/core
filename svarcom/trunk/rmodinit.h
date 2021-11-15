@@ -25,6 +25,14 @@
 #ifndef RMODINIT_H
 #define RMODINIT_H
 
+#define FLAG_EXEC_AND_QUIT 1
+#define FLAG_PERMANENT 2
+
+struct rmod_props {
+  unsigned short rmodseg;
+  unsigned char flags;
+};
+
 #define RMOD_OFFSET_ENVSEG     0x08
 #define RMOD_OFFSET_LEXITCODE  0x0A
 #define RMOD_OFFSET_INPBUFF    0x0C
@@ -35,8 +43,8 @@
 #define RMOD_OFFSET_ORIGPARENT 0xA2
 #define RMOD_OFFSET_ROUTINE    0xA6
 
-unsigned short rmod_install(unsigned short envsize);
-unsigned short rmod_find(void);
+struct rmod_props far *rmod_install(unsigned short envsize);
+struct rmod_props far *rmod_find(void);
 void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
 
 #endif

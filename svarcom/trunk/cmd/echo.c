@@ -29,7 +29,7 @@
 static int cmd_echo(struct cmd_funcparam *p) {
   unsigned short offs = FP_OFF(p->cmdline) + 5;
   unsigned short segm = FP_SEG(p->cmdline);
-  unsigned char far *echostatus = MK_FP(p->rmod_seg, RMOD_OFFSET_ECHOFLAG);
+  unsigned char far *echostatus = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_ECHOFLAG);
 
   /* display help only if /? is the only argument */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {

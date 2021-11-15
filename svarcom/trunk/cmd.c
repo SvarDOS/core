@@ -45,7 +45,7 @@ struct cmd_funcparam {
   int argc;                 /* number of arguments */
   const char *argv[256];    /* pointers to each argument */
   unsigned short env_seg;   /* segment of environment block */
-  unsigned short rmod_seg;  /* segment of the resident module */
+  struct rmod_props far *rmod; /* rmod settings */
   unsigned short argoffset; /* offset of cmdline where first argument starts */
   const char far *cmdline;  /* original cmdline (terminated by a NULL) */
   char BUFFER[BUFFER_SIZE]; /* a buffer for whatever is needed */
@@ -189,7 +189,7 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-int cmd_process(unsigned short rmod_seg, unsigned short env_seg, const char far *cmdline, char *BUFFER) {
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char far *cmdline, char *BUFFER) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
   struct cmd_funcparam *p = (void *)BUFFER;
@@ -230,7 +230,7 @@ int cmd_process(unsigned short rmod_seg, unsigned short env_seg, const char far 
   /* prepare function parameters and feed it to the cmd handling function */
   p->argc = cmd_explode(BUFFER + sizeof(*p), cmdline + argoffset, p->argv);
   p->env_seg = env_seg;
-  p->rmod_seg = rmod_seg;
+  p->rmod = rmod;
   p->argoffset = argoffset;
   p->cmdline = cmdline;
 

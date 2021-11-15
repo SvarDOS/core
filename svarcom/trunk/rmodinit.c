@@ -33,12 +33,14 @@
 #include "rmodinit.h"
 
 
-/* returns segment where rmod is installed */
-unsigned short rmod_install(unsigned short envsize) {
+/* returns far pointer to rmod's settings block on success */
+struct rmod_props far *rmod_install(unsigned short envsize) {
   char far *myptr, far *mcb;
   unsigned short far *owner;
+  const unsigned short sizeof_rmodandprops_paras = rmod_len + sizeof(struct rmod_props) + 15 / 16;
   unsigned int rmodseg = 0xffff;
   unsigned int envseg = 0;
+  struct rmod_props far *res = NULL;
 
   /* read my current env segment from PSP */
   _asm {
@@ -52,6 +54,10 @@ unsigned short rmod_install(unsigned short envsize) {
   }
 
   /* printf("original (PSP) env buffer at %04X\r\n", envseg); */
+
+  /* if envseg is zero, then enforce our own one (MSDOS 5 does not provide a default env) */
+  if ((envseg == 0) && (envsize == 0)) envsize = 256;
+
   /* if custom envsize requested, convert it to number of paragraphs */
   if (envsize != 0) {
     envsize += 15;
@@ -79,7 +85,7 @@ unsigned short rmod_install(unsigned short envsize) {
     int 0x21
     /* ask for a memory block and save the given segment to rmodseg */
     mov ah, 0x48
-    mov bx, (rmod_len + 15) / 16
+    mov bx, sizeof_rmodandprops_paras
     int 0x21
     jc ALLOC_FAIL
     mov rmodseg, ax
@@ -105,7 +111,7 @@ unsigned short rmod_install(unsigned short envsize) {
 
   if (rmodseg == 0xffff) {
     outputnl("malloc error");
-    return(0xffff);
+    return(NULL);
   }
 
   /* copy rmod to its destination */
@@ -123,6 +129,18 @@ unsigned short rmod_install(unsigned short envsize) {
   owner = (void far *)(mcb + 1);
   *owner = rmodseg;
   _fmemcpy(mcb + 8, "SVARENV", 8);
+
+  /* if env block is newly allocated, fill it with a few NULLs */
+  if (envsize != 0) {
+    owner = MK_FP(envseg, 0);
+    owner[0] = 0;
+    owner[1] = 0;
+  }
+
+  /* prepare result (rmod props) */
+  res = MK_FP(rmodseg, rmod_len);
+  _fmemset(res, 0, sizeof(*res));
+  res->rmodseg = rmodseg;
 
   /* write env segment to rmod buffer */
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
@@ -179,22 +197,22 @@ unsigned short rmod_install(unsigned short envsize) {
     pop ax
   }
 
-  return(rmodseg);
+  return(res);
 }
 
 
-/* look up my parent: if it's rmod then return its segment,
- * otherwise return 0xffff */
-unsigned short rmod_find(void) {
+/* look up my parent: if it's rmod then return a ptr to its props struct,
+ * otherwise return NULL */
+struct rmod_props far *rmod_find(void) {
   unsigned short *parent = (void *)0x0C; /* parent's seg in PSP[Ch] ("prev. int22 handler") */
   unsigned short far *ptr;
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
   unsigned char i;
   /* is it rmod? */
   ptr = MK_FP(*parent, 0);
-  for (i = 0; i < 4; i++) if (ptr[i] != sig[i]) return(0xffff);
+  for (i = 0; i < 4; i++) if (ptr[i] != sig[i]) return(NULL);
   /* match successfull (rmod is my parent) */
-  return(*parent);
+  return(MK_FP(*parent, rmod_len));
 }
 
 

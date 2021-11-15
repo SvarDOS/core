@@ -13,7 +13,7 @@ BEFORE NEXT RELEASE:
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
 merge adjacent assembly blocks in rmod_install()
-/P switch for permanent copy
+investigate why COMSPEC is not set properly
 
 
 AT SOME LATER TIME:

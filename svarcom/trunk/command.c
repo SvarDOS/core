@@ -79,10 +79,9 @@
 #include "rmodinit.h"
 #include "sayonara.h"
 
-#define FLAG_EXEC_AND_QUIT 1
 
 struct config {
-  unsigned char flags;
+  unsigned char flags; /* command.com flags, as defined in rmodinit.h */
   char *execcmd;
   unsigned short envsiz;
 };
@@ -131,12 +130,18 @@ static void parse_argv(struct config *cfg) {
           if (cfg->envsiz < 64) cfg->envsiz = 0;
           break;
 
+        case 'p': /* permanent shell (can't exit) */
+        case 'P':
+          cfg->flags |= FLAG_PERMANENT;
+          break;
+
         case '?':
           outputnl("Starts the SvarCOM command interpreter");
           outputnl("");
           outputnl("COMMAND /E:nnn [/[C|K] command]");
           outputnl("");
           outputnl("/E:nnn     Sets the environment size to nnn bytes");
+          outputnl("/P         Makes the new command interpreter permanent (can't exit)");
           outputnl("/C         Executes the specified command and returns");
           outputnl("/K         Executes the specified command and continues running");
           exit(1);
@@ -324,21 +329,25 @@ int main(void) {
   static unsigned short far *rmod_envseg;
   static unsigned short far *lastexitcode;
   static unsigned char BUFFER[4096];
+  static struct rmod_props far *rmod;
 
   parse_argv(&cfg);
 
-  rmod_seg = rmod_find();
-  if (rmod_seg == 0xffff) {
-    rmod_seg = rmod_install(cfg.envsiz);
-    if (rmod_seg == 0xffff) {
+  rmod = rmod_find();
+  if (rmod == NULL) {
+    rmod = rmod_install(cfg.envsiz);
+    if (rmod == NULL) {
       outputnl("ERROR: rmod_install() failed");
       return(1);
     }
+    /* copy flags to rmod's storage */
+    rmod->flags = cfg.flags;
 /*    printf("rmod installed at seg 0x%04X\r\n", rmod_seg); */
   } else {
 /*    printf("rmod found at seg 0x%04x\r\n", rmod_seg); */
   }
 
+  rmod_seg = rmod->rmodseg;
   rmod_envseg = MK_FP(rmod_seg, RMOD_OFFSET_ENVSEG);
   lastexitcode = MK_FP(rmod_seg, RMOD_OFFSET_LEXITCODE);
 
@@ -459,7 +468,7 @@ int main(void) {
     }
 
     /* try matching (and executing) an internal command */
-    if (cmd_process(rmod_seg, *rmod_envseg, cmdline, BUFFER) >= -1) {
+    if (cmd_process(rmod, *rmod_envseg, cmdline, BUFFER) >= -1) {
       /* internal command executed */
       redir_revert(); /* revert stdout (in case it was redirected) */
       continue;
@@ -475,8 +484,8 @@ int main(void) {
     if I am still alive then external command failed to execute */
     outputnl("Bad command or file name");
 
-  } while ((cfg.flags & FLAG_EXEC_AND_QUIT) == 0);
+  } while ((rmod->flags & FLAG_EXEC_AND_QUIT) == 0);
 
-  sayonara(rmod_seg);
+  sayonara(rmod);
   return(0);
 }

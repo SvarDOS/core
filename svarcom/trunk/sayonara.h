@@ -25,8 +25,10 @@
 #ifndef SAYONARA_H
 #define SAYONARA_H
 
+#include "rmodinit.h"
+
 /* rewires my parent pointer, uninstalls rmod let DOS terminate me, UNLESS
  * my parent is unknown */
-void sayonara(unsigned short rmodseg);
+void sayonara(struct rmod_props far *rmod);
 
 #endif
