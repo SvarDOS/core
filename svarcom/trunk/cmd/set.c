@@ -68,14 +68,14 @@ static int cmd_set(struct cmd_funcparam *p) {
     /* copy variable to buff and switch it upercase */
     i = 0;
     for (; *ptr != '='; ptr++) {
-      if (*ptr == '\r') goto syntax_err;
+      if (*ptr == 0) goto syntax_err;
       buff[i] = *ptr;
       if ((buff[i] >= 'a') && (buff[i] <= 'z')) buff[i] -= ('a' - 'A');
       i++;
     }
 
     /* copy value now */
-    while (*ptr != '\r') {
+    while (*ptr != 0) {
       buff[i++] = *ptr;
       ptr++;
     }
