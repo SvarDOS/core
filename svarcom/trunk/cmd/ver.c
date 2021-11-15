@@ -41,6 +41,33 @@ static int cmd_ver(struct cmd_funcparam *p) {
     return(-1);
   }
 
+#if 1
+  if ((p->argc == 1) && (imatch(p->argv[0], "/dbg"))) {
+    unsigned short far *rmod_envseg = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_ENVSEG);
+    unsigned char far *rmod_exitcode = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
+    unsigned short far *rmod_comspecptr = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_COMSPECPTR);
+    char far *fptr;
+    unsigned short i;
+    printf("rmod->rmodseg = 0x%04X\r\n", p->rmod->rmodseg);
+    printf("rmod->origparent = %04X:%04X\r\n", p->rmod->origparent >> 16, p->rmod->origparent & 0xffff);
+    printf("rmod->flags = 0x%02X\r\n", p->rmod->flags);
+    printf("rmod->echoflag = %u\r\n", p->rmod->echoflag);
+    printf("[rmod:RMOD_OFFSET_ENVSEG] = 0x%04X\r\n", *rmod_envseg);
+    for (fptr = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_BOOTDRIVE), i = 0; *fptr != 0; fptr++) buff[i++] = *fptr;
+    buff[i] = 0;
+    printf("[rmod:RMOD_OFFSET_BOOTCOMSPEC] = '%s'\r\n", buff);
+    if (*rmod_comspecptr == 0) {
+      sprintf(buff, "NULL");
+    } else {
+      for (fptr = MK_FP(*rmod_envseg, *rmod_comspecptr), i = 0; *fptr != 0; fptr++) buff[i++] = *fptr;
+      buff[i] = 0;
+    }
+    printf("[rmod:RMOD_OFFSET_COMSPECPTR] = '%s'\r\n", buff);
+    printf("[rmod:RMOD_OFFSET_LEXITCODE] = %u\r\n", *rmod_exitcode);
+    return(-1);
+  }
+#endif
+
   if ((p->argc == 1) && (imatch(p->argv[0], "/about"))) {
     outputnl("SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.");
     outputnl("");
