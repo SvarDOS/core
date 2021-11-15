@@ -139,8 +139,10 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
 
   /* prepare result (rmod props) */
   res = MK_FP(rmodseg, rmod_len);
-  _fmemset(res, 0, sizeof(*res));
-  res->rmodseg = rmodseg;
+  _fmemset(res, 0, sizeof(*res));  /* zero out */
+  res->rmodseg = rmodseg;          /* rmod segment */
+  res->inputbuf[0] = 128;          /* input buffer for INT 0x21, AH=0Ah*/
+  res->echoflag = 1;               /* ECHO ON */
 
   /* write env segment to rmod buffer */
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
@@ -167,6 +169,9 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
     pop ax
   }
 
+  /* save my original parent in rmod's memory */
+  res->origparent = *((unsigned long *)0x0a); /* original parent seg:off is at 0x0a of my PSP */
+
   /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I
    * terminate and save the original handler in rmod's memory */
   _asm {
@@ -175,14 +180,6 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
     push si
     push di
     push es
-
-    /* save my original parent in rmod's memory */
-    mov es, [rmodseg]
-    mov si, 0x0a
-    mov di, RMOD_OFFSET_ORIGPARENT
-    cld
-    movsw  /* mov ES:[DI], DS:[SI] and SI += 2 and DI += 2 */
-    movsw
 
     mov bx, 0x0a                   /* int22 handler is at 0x0A of the PSP */
     mov ax, RMOD_OFFSET_ROUTINE

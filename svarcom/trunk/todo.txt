@@ -13,7 +13,9 @@ BEFORE NEXT RELEASE:
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
 merge adjacent assembly blocks in rmod_install()
-investigate why COMSPEC is not set properly
+COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
+SET COMSPEC=something freezes under MS-DOS 5
+DEBUG-ONLY "rmod" internal command for displaying internal stuff
 
 
 AT SOME LATER TIME:
@@ -39,9 +41,8 @@ when execing an external command make sure to sync local environment (or run the
 when execing a program, make sure I use the correct PATH.. -> actually I need to parse PATH and look for matches myself for BAT support
 
 dynamic resizing of environment space
-command line arguments to command.com (/p etc)
-single-stepping AUTOEXEC with F8 at boot time (/P /Y)
-skipping AUTOEXEC with F5 at boot time (/P /D)
+single-stepping AUTOEXEC with F8 at boot time (/Y)
+skipping AUTOEXEC with F5 at boot time (/D)
 CTTY
 LOADHIGH/LH
 

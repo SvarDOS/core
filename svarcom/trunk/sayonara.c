@@ -33,17 +33,16 @@
  * my parent is unknown */
 void sayonara(struct rmod_props far *rmod) {
   unsigned short rmodseg = rmod->rmodseg;
-  unsigned long far *orgparent = MK_FP(rmodseg, RMOD_OFFSET_ORIGPARENT);
   unsigned long *myparent = (void *)0x0A;
   unsigned short far *rmodenv_ptr = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
   unsigned short rmodenv = *rmodenv_ptr;
 
   /* detect "I am the origin shell" situations */
-  if (*orgparent == 0xffff) return; /* original parent set to 0xffff (DOS-C / FreeDOS) */
+  if (rmod->origparent == 0xffff) return; /* original parent set to 0xffff (DOS-C / FreeDOS) */
   if (rmod->flags & FLAG_PERMANENT) return; /* COMMAND.COM /P */
 
   /* set my parent back to original value */
-  *myparent = *orgparent;
+  *myparent = rmod->origparent;
 
   _asm {
     /* free RMOD's code segment and env segment */

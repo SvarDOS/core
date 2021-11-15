@@ -29,19 +29,18 @@
 #define FLAG_PERMANENT 2
 
 struct rmod_props {
-  unsigned short rmodseg;
-  unsigned char flags;
+  char inputbuf[130];         /* input buffer for INT 21, AH=0x0A */
+  unsigned short rmodseg;     /* segment where rmod is loaded */
+  unsigned long origparent;   /* original parent (far ptr) of the shell */
+  unsigned char flags;        /* command line parameters */
+  unsigned char echoflag;     /* ECHO ON / ECHO OFF */
 };
 
 #define RMOD_OFFSET_ENVSEG     0x08
 #define RMOD_OFFSET_LEXITCODE  0x0A
-#define RMOD_OFFSET_INPBUFF    0x0C
-#define RMOD_OFFSET_COMSPECPTR 0x8E
-#define RMOD_OFFSET_BOOTDRIVE  0x90
-#define RMOD_OFFSET_ECHOFLAG   0x9F
-#define RMOD_OFFSET_BATCHCHAIN 0xA0
-#define RMOD_OFFSET_ORIGPARENT 0xA2
-#define RMOD_OFFSET_ROUTINE    0xA6
+#define RMOD_OFFSET_COMSPECPTR 0x0C
+#define RMOD_OFFSET_BOOTDRIVE  0x0E
+#define RMOD_OFFSET_ROUTINE    0x1D
 
 struct rmod_props far *rmod_install(unsigned short envsize);
 struct rmod_props far *rmod_find(void);

@@ -29,7 +29,6 @@
 static int cmd_echo(struct cmd_funcparam *p) {
   unsigned short offs = FP_OFF(p->cmdline) + 5;
   unsigned short segm = FP_SEG(p->cmdline);
-  unsigned char far *echostatus = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_ECHOFLAG);
 
   /* display help only if /? is the only argument */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
@@ -44,7 +43,7 @@ static int cmd_echo(struct cmd_funcparam *p) {
 
   /* ECHO without any parameter: display current state */
   if (p->argc == 0) {
-    if (*echostatus) {
+    if (p->rmod->echoflag) {
       outputnl("ECHO is on");
     } else {
       outputnl("ECHO is off");
@@ -54,13 +53,13 @@ static int cmd_echo(struct cmd_funcparam *p) {
 
   /* ECHO ON */
   if ((p->argc == 1) && (imatch(p->argv[0], "on"))) {
-    *echostatus = 1;
+    p->rmod->echoflag = 1;
     return(-1);
   }
 
   /* ECHO OFF */
   if ((p->argc == 1) && (imatch(p->argv[0], "off"))) {
-    *echostatus = 0;
+    p->rmod->echoflag = 0;
     return(-1);
   }
 

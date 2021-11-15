@@ -25,30 +25,15 @@ ENVSEG   dw 0    ;  +8
 ; exit code of last application
 LEXCODE  dw 0    ; +0Ah
 
-; input buffer used for the "previous command" history
-BUF000 db 128, 0 ; +0Ch
-BUF064 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
-BUF128 db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
-
 ; offset of the COMSPEC variable in the environment block, 0 means "use
 ; boot drive". this value is patched by the transient part of COMMAND.COM
-COMSPECPTR dw 0  ; +8Eh
+COMSPECPTR dw 0  ; +0Ch
 
 ; fallback COMSPEC string used if no COMPSEC is present in the environment
 ; drive. drive is patched by the transient part of COMMAND.COM
-COMSPECBOOT db "@:\COMMAND.COM", 0 ; +90h
+COMSPECBOOT db "@:\COMMAND.COM", 0 ; +0Eh
 
-; ECHO status used by COMMAND.COM. 0 = ECHO OFF, 1 = ECHO ON
-CMDECHO db 1     ; +9Fh
-
-; segment of the first batch in batch chain. this is used by transient
-; COMMAND.COM to chain multiple batch files (through CALL). 0 means "none".
-BATCHCHAIN dw 0  ; +A0h
-
-; original parent (segment of)
-ORIGPARENT dd 0  ; +A2h
-
-skipsig:         ; +A6h
+skipsig:         ; +1Dh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs

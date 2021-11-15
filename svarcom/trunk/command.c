@@ -323,6 +323,55 @@ static void set_comspec_to_self(unsigned short envseg) {
 }
 
 
+/* wait for user input */
+static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+
+    /* is DOSKEY support present? (INT 2Fh, AX=4800h, returns non-zero in AL if present) */
+    mov ax, 0x4800
+    int 0x2f
+    mov bl, al /* save doskey status in BL */
+
+    /* set up buffered input to inpseg:inpoff */
+    mov ax, inpseg
+    push ax
+    pop ds
+    mov dx, inpoff
+
+    /* execute either DOS input or DOSKEY */
+    test bl, bl /* zf set if no DOSKEY present */
+    jnz DOSKEY
+
+    mov ah, 0x0a
+    int 0x21
+    jmp short DONE
+
+    DOSKEY:
+    mov ax, 0x4810
+    int 0x2f
+
+    DONE:
+    /* terminate command with a CR/LF */
+    mov ah, 0x02 /* display character in dl */
+    mov dl, 0x0d
+    int 0x21
+    mov dl, 0x0a
+    int 0x21
+
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+}
+
+
 int main(void) {
   static struct config cfg;
   static unsigned short rmod_seg;
@@ -363,8 +412,7 @@ int main(void) {
   }*/
 
   do {
-    char far *cmdline = MK_FP(rmod_seg, RMOD_OFFSET_INPBUFF + 2);
-    unsigned char far *echostatus = MK_FP(rmod_seg, RMOD_OFFSET_ECHOFLAG);
+    char far *cmdline = rmod->inputbuf + 2;
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
@@ -376,12 +424,12 @@ int main(void) {
       goto EXEC_CMDLINE;
     }
 
-    if (*echostatus != 0) outputnl(""); /* terminate the previous command with a CR/LF */
+    if (rmod->echoflag != 0) outputnl(""); /* terminate the previous command with a CR/LF */
 
     SKIP_NEWLINE:
 
     /* print shell prompt (only if ECHO is enabled) */
-    if (*echostatus != 0) {
+    if (rmod->echoflag != 0) {
       char *promptptr = BUFFER;
       buildprompt(promptptr, *rmod_envseg);
       _asm {
@@ -400,51 +448,8 @@ int main(void) {
       cmdline[(unsigned short)(cmdline[-1])] = '\r';
     }
 
-    /* wait for user input */
-    _asm {
-      push ax
-      push bx
-      push cx
-      push dx
-      push ds
-
-      /* is DOSKEY support present? (INT 2Fh, AX=4800h, returns non-zero in AL if present) */
-      mov ax, 0x4800
-      int 0x2f
-      mov bl, al /* save doskey status in BL */
-
-      /* set up buffered input */
-      mov ax, rmod_seg
-      push ax
-      pop ds
-      mov dx, RMOD_OFFSET_INPBUFF
-
-      /* execute either DOS input or DOSKEY */
-      test bl, bl /* zf set if no DOSKEY present */
-      jnz DOSKEY
-
-      mov ah, 0x0a
-      int 0x21
-      jmp short DONE
-
-      DOSKEY:
-      mov ax, 0x4810
-      int 0x2f
-
-      DONE:
-      /* terminate command with a CR/LF */
-      mov ah, 0x02 /* display character in dl */
-      mov dl, 0x0d
-      int 0x21
-      mov dl, 0x0a
-      int 0x21
-
-      pop ds
-      pop dx
-      pop cx
-      pop bx
-      pop ax
-    }
+    /* wait for user command line */
+    cmdline_getinput(FP_SEG(rmod->inputbuf), FP_OFF(rmod->inputbuf));
 
     /* if nothing entered, loop again (but without appending an extra CR/LF) */
     if (cmdline[-1] == 0) goto SKIP_NEWLINE;
