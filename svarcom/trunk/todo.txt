@@ -12,7 +12,6 @@ BEFORE NEXT RELEASE:
 
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
-merge adjacent assembly blocks in rmod_install()
 COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
 
 

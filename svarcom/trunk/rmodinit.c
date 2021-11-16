@@ -39,20 +39,12 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   unsigned short far *owner;
   const unsigned short sizeof_rmodandprops_paras = rmod_len + sizeof(struct rmod_props) + 15 / 16;
   unsigned short rmodseg = 0xffff;
-  unsigned short envseg = 0, origenvseg = 0;
+  unsigned short envseg, origenvseg;
   struct rmod_props far *res = NULL;
 
   /* read my current env segment from PSP and save it */
-  _asm {
-    push ax
-    push bx
-    mov bx, 0x2c
-    mov ax, [bx]
-    mov envseg, ax
-    mov origenvseg, ax
-    pop bx
-    pop ax
-  }
+  envseg = *((unsigned short *)0x2c);
+  origenvseg = envseg;
 
   /* printf("original (PSP) env buffer at %04X\r\n", envseg); */
 
@@ -64,7 +56,6 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
     envsize += 15;
     envsize /= 16;
   }
-
 
   _asm {
     /* link in the UMB memory chain for enabling high-memory allocation (and save initial status on stack) */
@@ -176,24 +167,10 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
 
   /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I
    * terminate and save the original handler in rmod's memory */
-  _asm {
-    push ax
-    push bx
-    push si
-    push di
-    push es
-
-    mov bx, 0x0a                   /* int22 handler is at 0x0A of the PSP */
-    mov ax, RMOD_OFFSET_ROUTINE
-    mov [bx], ax                   /* int handler offset */
-    mov ax, rmodseg
-    mov [bx+2], ax                 /* int handler segment */
-
-    pop es
-    pop di
-    pop si
-    pop bx
-    pop ax
+  {
+    unsigned short *ptr = (void *)0x0a; /* int22 handler is at 0x0A of the PSP */
+    ptr[0] = RMOD_OFFSET_ROUTINE;
+    ptr[1] = rmodseg;
   }
 
   return(res);
