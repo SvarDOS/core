@@ -21,8 +21,10 @@ SIG2 dw 0x1985   ;  +2
 SIG3 dw 0x2017   ;  +4
 SIG4 dw 0x2019   ;  +6
 
-; environment segment - this is updated by SvarCOM at init time
-ENVSEG   dw 0    ;  +8
+; offset where a program name to be executed is awaiting (0=none)
+; this is set by SvarCOM, after it presets the ExecParamRec struct and
+; stores the command to be executed somewhere within rmod's segment.
+EXECPROG dw 0    ;  +8
 
 ; exit code of last application
 LEXCODE  dw 0    ; +0Ah
@@ -35,7 +37,15 @@ COMSPECPTR dw 0  ; +0Ch
 ; drive. drive is patched by the transient part of COMMAND.COM
 COMSPECBOOT db "@:\COMMAND.COM", 0 ; +0Eh
 
-skipsig:         ; +1Dh
+; ExecParamRec used by INT 21h, AX=4b00 (load and execute program), 14 bytes:
+;  offset  size  content
+;     +0     2   segment of environment for child (0 = current)
+;     +2     4   address of command line to place at PSP:0080
+;     +6     4   address of an FCB to be placed at PSP:005c
+;    +0Ah    4   address of an FCB to be placed at PSP:006c
+EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +1Dh
+
+skipsig:         ; +2Bh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -44,11 +54,33 @@ mov es, ax
 mov ss, ax
 mov sp, STACKPTR
 
+; should I executed command.com or a pre-set application?
+or [EXECPROG], byte 0
+jz EXEC_COMMAND_COM
+
+; TODO: most probably I should call the DOS SetPSP function here
+
+; exec an application preset (by SvarCOM) in the ExecParamRec
+mov [EXECPROG], byte 0 ; make sure to spawn command.com after app exits
+mov ax, 0x4B00         ; DOS 2+ - load & execute program
+mov dx, [EXECPROG]     ; DS:DX  - ASCIZ program name (preset at PSP[already)
+mov bx, EXEC_PARAM_REC ; ES:BX  - parameter block pointer
+int 0x21
+
+EXEC_COMMAND_COM:
+
 ; collect the exit code of previous application
 mov ah, 0x4D
 int 0x21
 xor ah, ah          ; clear out termination status, I only want the exit code
 mov [LEXCODE], ax
+
+; zero out the exec param block (14 bytes)
+mov al, 0              ; byte to write
+mov cx, 14             ; how many times
+mov di, EXEC_PARAM_REC ; ES:DI = destination
+cld                    ; stosb must move forward
+rep stosb              ; repeat cx times
 
 ; preset the default COMSPEC pointer to ES:DX (ES is already set to DS)
 mov dx, COMSPECBOOT
@@ -101,16 +133,9 @@ int 0x21
 ; back to program start
 jmp skipsig
 
-; command.com tail arguments, in PSP format (length byte followed by arg)
-CMDTAIL db 0
-
-; ExecParamRec used by INT 21h, AX=4b00 (load and execute program), 14 bytes:
-;  offset  size  content
-;     +0     2   segment of environment for child (0 = current)
-;     +2     4   address of command line to place at PSP:0080
-;     +6     4   address of an FCB to be placed at PSP:005c
-;    +0Ah    4   address of an FCB to be placed at PSP:006c
-EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+; command.com tail arguments, in PSP format: length byte followed by args and
+; terminated with \r)
+CMDTAIL db 0x00, 0x0D
 
 ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM", 13, 10, '$'
 
