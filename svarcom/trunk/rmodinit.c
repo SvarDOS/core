@@ -38,17 +38,18 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   char far *myptr, far *mcb;
   unsigned short far *owner;
   const unsigned short sizeof_rmodandprops_paras = rmod_len + sizeof(struct rmod_props) + 15 / 16;
-  unsigned int rmodseg = 0xffff;
-  unsigned int envseg = 0;
+  unsigned short rmodseg = 0xffff;
+  unsigned short envseg = 0, origenvseg = 0;
   struct rmod_props far *res = NULL;
 
-  /* read my current env segment from PSP */
+  /* read my current env segment from PSP and save it */
   _asm {
     push ax
     push bx
     mov bx, 0x2c
     mov ax, [bx]
     mov envseg, ax
+    mov origenvseg, ax
     pop bx
     pop ax
   }
@@ -143,6 +144,7 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   res->rmodseg = rmodseg;          /* rmod segment */
   res->inputbuf[0] = 128;          /* input buffer for INT 0x21, AH=0Ah*/
   res->echoflag = 1;               /* ECHO ON */
+  res->origenvseg = origenvseg;    /* original environment segment */
 
   /* write env segment to rmod buffer */
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);

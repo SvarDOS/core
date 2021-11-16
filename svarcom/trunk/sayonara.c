@@ -38,8 +38,9 @@ void sayonara(struct rmod_props far *rmod) {
   unsigned short rmodenv = *rmodenv_ptr;
 
   /* detect "I am the origin shell" situations */
-  if (rmod->origparent == 0xffff) return; /* original parent set to 0xffff (DOS-C / FreeDOS) */
   if (rmod->flags & FLAG_PERMANENT) return; /* COMMAND.COM /P */
+  if (rmod->origparent == 0xffff) return; /* original parent set to 0xffff (DOS-C / FreeDOS) */
+  if (rmod->origenvseg == 0) return; /* no original environment (MSDOS 5/6) */
 
   /* set my parent back to original value */
   *myparent = rmod->origparent;

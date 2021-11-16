@@ -32,6 +32,8 @@ ctrl+break handler: http://www.techhelpmanual.com/563-int_23h__ctrl_break_exit_a
 
 "notify pending command" int support: http://www.techhelpmanual.com/741-int_2fh_ae00h__notify_pending_command.html
 
+INT 2F,AX=5500 support
+
 stdout redirection should not create the output file if command fails
 
 when execing an external command make sure to sync local environment (or run the program with a custom environment pointer?)

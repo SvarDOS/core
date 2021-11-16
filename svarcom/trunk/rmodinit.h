@@ -32,6 +32,7 @@ struct rmod_props {
   char inputbuf[130];         /* input buffer for INT 21, AH=0x0A */
   unsigned short rmodseg;     /* segment where rmod is loaded */
   unsigned long origparent;   /* original parent (far ptr) of the shell */
+  unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
   unsigned char echoflag;     /* ECHO ON / ECHO OFF */
 };
