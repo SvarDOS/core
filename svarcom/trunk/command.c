@@ -268,26 +268,14 @@ static void buildprompt(char *s, unsigned short envseg) {
 }
 
 
-static void run_as_external(const char far *cmdline) {
-  char buff[256];
-  char const *argvlist[256];
-  int i, n;
-  /* copy buffer to a near var (incl. trailing CR), insert a space before
-     every slash to make sure arguments are well separated */
-  n = 0;
-  i = 0;
-  for (;;) {
-    if (cmdline[i] == '/') buff[n++] = ' ';
-    buff[n++] = cmdline[i++];
-    if (buff[n] == 0) break;
-  }
+static void run_as_external(char *buff, const char far *cmdline) {
+  char const **argvlist = (void *)(buff + 512);
 
   cmd_explode(buff, cmdline, argvlist);
 
   /* for (i = 0; argvlist[i] != NULL; i++) printf("arg #%d = '%s'\r\n", i, argvlist[i]); */
 
-  /* must be an external command then. this call should never return, unless
-   * the other program failed to be executed. */
+  /* this call should never return, unless the program failed to be executed */
   execvp(argvlist[0], argvlist);
 }
 
@@ -480,7 +468,7 @@ int main(void) {
     }
 
     /* if here, then this was not an internal command */
-    run_as_external(cmdline);
+    run_as_external(BUFFER, cmdline);
 
     /* revert stdout (in case it was redirected) */
     redir_revert();

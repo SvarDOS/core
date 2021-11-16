@@ -12,7 +12,6 @@ BEFORE NEXT RELEASE:
 
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
-COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
 
 
 AT SOME LATER TIME:
@@ -34,6 +33,7 @@ ctrl+break handler: http://www.techhelpmanual.com/563-int_23h__ctrl_break_exit_a
 INT 2F,AX=5500 support
 
 stdout redirection should not create the output file if command fails
+COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
 
 when execing an external command make sure to sync local environment (or run the program with a custom environment pointer?)
 
