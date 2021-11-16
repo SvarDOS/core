@@ -9,7 +9,9 @@
 ; and respawning COMMAND.COM whenever necessary.
 
 CPU 8086
-org 0h           ; this is meant to be executed without a PSP
+org 0x100
+
+PSP_ENVSEG equ 0x2C
 
 section .text    ; all goes into code segment
 
@@ -54,13 +56,13 @@ mov dx, COMSPECBOOT
 ; do I have a valid COMSPEC?
 or [COMSPECPTR], word 0
 jz USEDEFAULTCOMSPEC
-; set ES:DX to actual COMSPEC
-mov es, [ENVSEG]
+; set ES:DX to actual COMSPEC (in env segment)
+mov es, [PSP_ENVSEG]
 mov dx, [COMSPECPTR]
 USEDEFAULTCOMSPEC:
 
 ; prepare the exec param block
-mov ax, [ENVSEG]
+mov ax, [PSP_ENVSEG]
 mov [EXEC_PARAM_REC], ax
 mov ax, CMDTAIL
 mov [EXEC_PARAM_REC+2], ax

@@ -37,11 +37,11 @@ struct rmod_props {
   unsigned char echoflag;     /* ECHO ON / ECHO OFF */
 };
 
-#define RMOD_OFFSET_ENVSEG     0x08
-#define RMOD_OFFSET_LEXITCODE  0x0A
-#define RMOD_OFFSET_COMSPECPTR 0x0C
-#define RMOD_OFFSET_BOOTDRIVE  0x0E
-#define RMOD_OFFSET_ROUTINE    0x1D
+#define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
+#define RMOD_OFFSET_LEXITCODE  0x10A
+#define RMOD_OFFSET_COMSPECPTR 0x10C
+#define RMOD_OFFSET_BOOTDRIVE  0x10E
+#define RMOD_OFFSET_ROUTINE    0x11D
 
 struct rmod_props far *rmod_install(unsigned short envsize);
 struct rmod_props far *rmod_find(void);

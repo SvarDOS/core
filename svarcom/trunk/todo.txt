@@ -13,6 +13,10 @@ BEFORE NEXT RELEASE:
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
 
+rmod: should have a proper PSP (copied from transient COMMAND.COM), then
+      call setPSP to let DOS know the new process ID.
+      instead of calling "terminate", rmod should free COMMAND.COM's PSP and
+      its environment block. No need to fiddle with int22 handlers then.
 
 AT SOME LATER TIME:
 

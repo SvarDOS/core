@@ -37,7 +37,7 @@
 struct rmod_props far *rmod_install(unsigned short envsize) {
   char far *myptr, far *mcb;
   unsigned short far *owner;
-  const unsigned short sizeof_rmodandprops_paras = rmod_len + sizeof(struct rmod_props) + 15 / 16;
+  const unsigned short sizeof_rmodandprops_paras = (0x100 + rmod_len + sizeof(struct rmod_props) + 15) / 16;
   unsigned short rmodseg = 0xffff;
   unsigned short envseg, origenvseg;
   struct rmod_props far *res = NULL;
@@ -106,8 +106,14 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
     return(NULL);
   }
 
-  /* copy rmod to its destination */
+  /* copy rmod to its destination, prefixed with a copy of my own PSP */
   myptr = MK_FP(rmodseg, 0);
+  {
+    unsigned short i;
+    char *mypsp = (void *)0;
+    for (i = 0; i < 0x100; i++) myptr[i] = mypsp[i];
+  }
+  myptr = MK_FP(rmodseg, 0x100);
   _fmemcpy(myptr, rmod, rmod_len);
 
   /* mark rmod memory as "self owned" */
@@ -130,14 +136,14 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   }
 
   /* prepare result (rmod props) */
-  res = MK_FP(rmodseg, rmod_len);
+  res = MK_FP(rmodseg, 0x100 + rmod_len);
   _fmemset(res, 0, sizeof(*res));  /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
   res->inputbuf[0] = 128;          /* input buffer for INT 0x21, AH=0Ah*/
   res->echoflag = 1;               /* ECHO ON */
   res->origenvseg = origenvseg;    /* original environment segment */
 
-  /* write env segment to rmod buffer */
+  /* write env segment to rmod's PSP */
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
   *owner = envseg;
 
@@ -185,10 +191,10 @@ struct rmod_props far *rmod_find(void) {
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
   unsigned char i;
   /* is it rmod? */
-  ptr = MK_FP(*parent, 0);
+  ptr = MK_FP(*parent, 0x100);
   for (i = 0; i < 4; i++) if (ptr[i] != sig[i]) return(NULL);
   /* match successfull (rmod is my parent) */
-  return(MK_FP(*parent, rmod_len));
+  return(MK_FP(*parent, 0x100 + rmod_len));
 }
 
 
