@@ -37,8 +37,6 @@ COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
 
 when execing an external command make sure to sync local environment (or run the program with a custom environment pointer?)
 
-when execing a program, make sure I use the correct PATH.. -> actually I need to parse PATH and look for matches myself for BAT support
-
 dynamic resizing of environment space
 single-stepping AUTOEXEC with F8 at boot time (/Y)
 skipping AUTOEXEC with F5 at boot time (/D)

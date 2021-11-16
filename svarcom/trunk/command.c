@@ -268,15 +268,141 @@ static void buildprompt(char *s, unsigned short envseg) {
 }
 
 
-static void run_as_external(char *buff, const char far *cmdline) {
-  char const **argvlist = (void *)(buff + 512);
+/* tries locating executable fname in path and fille res with result. returns 0 on success,
+ * -1 on failed match and -2 on failed match + "don't even try with other paths"
+ * format is filled the offset where extension starts in fname (-1 if not found) */
+int lookup_cmd(char *res, const char *fname, const char *path, const char **extptr) {
+  unsigned short lastbslash = 0xffff;
+  unsigned short i, len;
+  unsigned char explicitpath = 0;
 
-  cmd_explode(buff, cmdline, argvlist);
+  /* does the original fname had an explicit path prefix or explicit ext? */
+  *extptr = NULL;
+  for (i = 0; fname[i] != 0; i++) {
+    switch (fname[i]) {
+      case ':':
+      case '\\':
+        explicitpath = 1;
+        *extptr = NULL; /* extension is the last dot AFTER all path delimiters */
+        break;
+      case '.':
+        *extptr = fname + i + 1;
+        break;
+    }
+  }
+
+  /* normalize filename */
+  if (file_truename(fname, res) != 0) return(-2);
+
+  /* printf("truename: %s\r\n", res); */
+
+  /* figure out where the command starts and if it has an explicit extension */
+  for (len = 0; res[len] != 0; len++) {
+    switch (res[len]) {
+      case '?':   /* abort on any wildcard character */
+      case '*':
+        return(-2);
+      case '\\':
+        lastbslash = len;
+        break;
+    }
+  }
+
+  /* printf("lastbslash=%u\r\n", lastbslash); */
+
+  /* if no path prefix in fname (':' or backslash), then assemble path+filename */
+  if (!explicitpath) {
+    if (path != NULL) {
+      i = strlen(path);
+    } else {
+      i = 0;
+    }
+    if ((i != 0) && (path[i - 1] != '\\')) i++; /* add a byte for inserting a bkslash after path */
+    memmove(res + i, res + lastbslash + 1, len - lastbslash);
+    if (i != 0) {
+      memmove(res, path, i);
+      res[i - 1] = '\\';
+    }
+  }
+
+  /* if no extension was initially provided, try matching COM, EXE, BAT */
+  if (*extptr == NULL) {
+    const char *ext[] = {".COM", ".EXE", ".BAT", NULL};
+    len = strlen(res);
+    for (i = 0; ext[i] != NULL; i++) {
+      strcpy(res + len, ext[i]);
+      /* printf("? '%s'\r\n", res); */
+      *extptr = ext[i] + 1;
+      if (file_getattr(res) >= 0) return(0);
+    }
+  } else { /* try finding it as-is */
+    /* printf("? '%s'\r\n", res); */
+    if (file_getattr(res) >= 0) return(0);
+  }
+
+  /* not found */
+  if (explicitpath) return(-2); /* don't bother trying other paths, the caller had its own path preset anyway */
+  return(-1);
+}
+
+
+static void run_as_external(char *buff, const char far *cmdline, unsigned short envseg) {
+  char const **argvlist = (void *)(buff + 512);
+  char *cmdfile = buff + 1024;
+  const char far *pathptr;
+  int lookup;
+  unsigned short i;
+  const char *ext;
+
+  cmd_explode(buff + 2048, cmdline, argvlist);
 
   /* for (i = 0; argvlist[i] != NULL; i++) printf("arg #%d = '%s'\r\n", i, argvlist[i]); */
 
+  /* is this a command in curdir? */
+  lookup = lookup_cmd(cmdfile, argvlist[0], NULL, &ext);
+  if (lookup == 0) {
+    /* printf("FOUND LOCAL EXEC FILE: '%s'\r\n", cmdfile); */
+    goto RUNCMDFILE;
+  } else if (lookup == -2) {
+    /* puts("NOT FOUND"); */
+    return;
+  }
+
+  /* try matching something in PATH */
+  pathptr = env_lookup_val(envseg, "PATH");
+  if (pathptr == NULL) return;
+
+  /* try each path in %PATH% */
+  for (;;) {
+    for (i = 0;; i++) {
+      buff[i] = *pathptr;
+      if ((buff[i] == 0) || (buff[i] == ';')) break;
+      pathptr++;
+    }
+    buff[i] = 0;
+    lookup = lookup_cmd(cmdfile, argvlist[0], buff, &ext);
+    if (lookup == 0) break;
+    if (lookup == -2) return;
+    if (*pathptr == ';') {
+      pathptr++;
+    } else {
+      return;
+    }
+  }
+
+  RUNCMDFILE:
+  /* TODO run command through INT 0x21 */
+  /* TODO copy environment and append full exec path */
+  /* TODO special handling of batch files */
+  if ((ext != NULL) && (imatch(ext, "bat"))) {
+    outputnl("batch processing not supported yet");
+    return;
+  }
+
+  /* printf("Exec: '%s'\r\n", cmdfile); */
+
   /* this call should never return, unless the program failed to be executed */
-  execvp(argvlist[0], argvlist);
+  execvp(cmdfile, argvlist);
 }
 
 
@@ -468,7 +594,7 @@ int main(void) {
     }
 
     /* if here, then this was not an internal command */
-    run_as_external(BUFFER, cmdline);
+    run_as_external(BUFFER, cmdline, *rmod_envseg);
 
     /* revert stdout (in case it was redirected) */
     redir_revert();
