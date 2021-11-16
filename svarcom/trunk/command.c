@@ -346,13 +346,22 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
 }
 
 
-static void run_as_external(char *buff, const char far *cmdline, unsigned short envseg) {
+static void run_as_external(char *buff, const char far *cmdline, unsigned short envseg, struct rmod_props far *rmod) {
   char const **argvlist = (void *)(buff + 512);
   char *cmdfile = buff + 1024;
   const char far *pathptr;
   int lookup;
   unsigned short i;
   const char *ext;
+  const char far *cmdtail;
+  char far *rmod_execprog = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXECPROG);
+  char far *rmod_cmdtail = MK_FP(rmod->rmodseg, 0x81);
+  _Packed struct {
+    unsigned short envseg;
+    unsigned long cmdtail;
+    unsigned long fcb1;
+    unsigned long fcb2;
+  } far *ExecParam = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXECPARAM);
 
   cmd_explode(buff + 2048, cmdline, argvlist);
 
@@ -401,8 +410,35 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
 
   /* printf("Exec: '%s'\r\n", cmdfile); */
 
-  /* this call should never return, unless the program failed to be executed */
-  execvp(cmdfile, argvlist);
+  /* find cmdtail */
+  cmdtail = cmdline;
+  while (*cmdtail == ' ') cmdtail++;
+  while ((*cmdtail != ' ') && (*cmdtail != '/') && (*cmdtail != '+') && (*cmdtail != 0)) {
+    cmdtail++;
+  }
+
+  /* copy full filename to execute */
+  for (i = 0; cmdfile[i] != 0; i++) rmod_execprog[i] = cmdfile[i];
+  rmod_execprog[i] = 0;
+
+  /* copy cmdtail to rmod's PSP and compute its len */
+  for (i = 0; cmdtail[i] != 0; i++) rmod_cmdtail[i] = cmdtail[i];
+  rmod_cmdtail[i] = '\r';
+  rmod_cmdtail[-1] = i;
+
+  printf("Exec: '");
+  for (i = 0; rmod_execprog[i] != 0; i++) {
+    printf("%c", rmod_execprog[i]);
+  }
+  printf("'\r\n");
+
+  /* set up rmod to execute the command */
+
+  ExecParam->envseg = 0; /* 0 = use parent's env segment */
+  ExecParam->cmdtail = (unsigned long)MK_FP(rmod->rmodseg, 0x80); /* farptr, must be in PSP format (lenbyte args \r) */
+  ExecParam->fcb1 = 0; /* TODO farptr */
+  ExecParam->fcb2 = 0; /* TODO farptr */
+  exit(0); /* let rmod do the job now */
 }
 
 
@@ -594,7 +630,7 @@ int main(void) {
     }
 
     /* if here, then this was not an internal command */
-    run_as_external(BUFFER, cmdline, *rmod_envseg);
+    run_as_external(BUFFER, cmdline, *rmod_envseg, rmod);
 
     /* revert stdout (in case it was redirected) */
     redir_revert();

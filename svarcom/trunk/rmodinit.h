@@ -42,7 +42,8 @@ struct rmod_props {
 #define RMOD_OFFSET_COMSPECPTR 0x10C
 #define RMOD_OFFSET_BOOTDRIVE  0x10E
 #define RMOD_OFFSET_EXECPARAM  0x11D
-#define RMOD_OFFSET_ROUTINE    0x12B
+#define RMOD_OFFSET_EXECPROG   0x12B
+#define RMOD_OFFSET_ROUTINE    0x1AB
 
 struct rmod_props far *rmod_install(unsigned short envsize);
 struct rmod_props far *rmod_find(void);

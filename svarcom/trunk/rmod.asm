@@ -21,10 +21,7 @@ SIG2 dw 0x1985   ;  +2
 SIG3 dw 0x2017   ;  +4
 SIG4 dw 0x2019   ;  +6
 
-; offset where a program name to be executed is awaiting (0=none)
-; this is set by SvarCOM, after it presets the ExecParamRec struct and
-; stores the command to be executed somewhere within rmod's segment.
-EXECPROG dw 0    ;  +8
+FFU_UNUSED dw 0  ;  +8
 
 ; exit code of last application
 LEXCODE  dw 0    ; +0Ah
@@ -45,7 +42,10 @@ COMSPECBOOT db "@:\COMMAND.COM", 0 ; +0Eh
 ;    +0Ah    4   address of an FCB to be placed at PSP:006c
 EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +1Dh
 
-skipsig:         ; +2Bh
+; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +2Bh
+EXECPROG dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+skipsig:         ; +ABh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -58,14 +58,18 @@ mov sp, STACKPTR
 or [EXECPROG], byte 0
 jz EXEC_COMMAND_COM
 
-; TODO: most probably I should call the DOS SetPSP function here
+; TODO: perhaps I should call the DOS SetPSP function here? But if I do, the
+;       int 21h, ah=50h call freezes...
+;mov ah, 0x50           ; DOS 2+ -- Set PSP
+;mov bx, cs
+;int 0x21
 
 ; exec an application preset (by SvarCOM) in the ExecParamRec
-mov [EXECPROG], byte 0 ; make sure to spawn command.com after app exits
 mov ax, 0x4B00         ; DOS 2+ - load & execute program
-mov dx, [EXECPROG]     ; DS:DX  - ASCIZ program name (preset at PSP[already)
+mov dx, EXECPROG       ; DS:DX  - ASCIZ program name (preset at PSP[already)
 mov bx, EXEC_PARAM_REC ; ES:BX  - parameter block pointer
 int 0x21
+mov [EXECPROG], byte 0 ; make sure to spawn command.com after app exits
 
 EXEC_COMMAND_COM:
 
