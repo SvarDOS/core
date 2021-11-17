@@ -400,17 +400,24 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
   }
 
   RUNCMDFILE:
-  /* TODO special handling of batch files */
-  if ((ext != NULL) && (imatch(ext, "bat"))) {
-    outputnl("batch processing not supported yet");
-    return;
-  }
 
   /* find cmdtail */
   cmdtail = cmdline;
   while (*cmdtail == ' ') cmdtail++;
   while ((*cmdtail != ' ') && (*cmdtail != '/') && (*cmdtail != '+') && (*cmdtail != 0)) {
     cmdtail++;
+  }
+
+  /* special handling of batch files */
+  if ((ext != NULL) && (imatch(ext, "bat"))) {
+    /* copy truename of the bat file to rmod buff */
+    for (i = 0; cmdfile[i] != 0; i++) rmod->batfile[i] = cmdfile[i];
+    rmod->batfile[i] = 0;
+    /* copy args of the bat file to rmod buff */
+    for (i = 0; cmdtail[i] != 0; i++) rmod->batargs[i] = cmdtail[i];
+    /* reset the 'next line to execute' counter */
+    rmod->batnextline = 0;
+    return;
   }
 
   /* copy full filename to execute */
@@ -512,6 +519,34 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
 }
 
 
+/* fetches a line from batch file and write it to buff, increments
+ * rmod counter on success. returns NULL on failure.
+ * buff must start with a length byte but the returned pointer must
+ * skip it. */
+char far *getbatcmd(char far *buff, struct rmod_props far *rmod) {
+  unsigned short i;
+  buff++; /* make room for the len byte */
+  /* TODO temporary hack to display a dummy message */
+  if (rmod->batnextline == 0) {
+    char *msg = "ECHO batch files not supported yet";
+    for (i = 0; msg[i] != 0; i++) buff[i] = msg[i];
+    buff[i] = 0;
+    buff[-1] = i;
+  } else {
+    rmod->batfile[0] = 0;
+    return(NULL);
+  }
+  /* open file */
+  /* read until awaiting line */
+  /* copy line to buff */
+  /* close file */
+  /* */
+  rmod->batnextline++;
+  if (rmod->batnextline == 0) rmod->batfile[0] = 0; /* max line count reached */
+  return(buff);
+}
+
+
 int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
@@ -536,10 +571,7 @@ int main(void) {
     /* if I was spawned by rmod and FLAG_EXEC_AND_QUIT is set, then I should
      * die asap, because the command has been executed already, so I no longer
      * have a purpose in life */
-    if (rmod->flags & FLAG_EXEC_AND_QUIT) {
-      printf("rmod + FLAG_EXEC_AND_QUIT\r\n");
-      sayonara(rmod);
-    }
+    if (rmod->flags & FLAG_EXEC_AND_QUIT) sayonara(rmod);
   }
 
   rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
@@ -593,8 +625,14 @@ int main(void) {
       cmdline[(unsigned short)(cmdline[-1])] = '\r';
     }
 
-    /* wait for user command line */
-    cmdline_getinput(FP_SEG(rmod->inputbuf), FP_OFF(rmod->inputbuf));
+    /* if batch file is being executed -> fetch next line */
+    if (rmod->batfile[0] != 0) {
+      cmdline = getbatcmd(BUFFER + sizeof(BUFFER) - 130, rmod);
+      if (cmdline == NULL) continue;
+    } else {
+      /* interactive mode: wait for user command line */
+      cmdline_getinput(FP_SEG(rmod->inputbuf), FP_OFF(rmod->inputbuf));
+    }
 
     /* if nothing entered, loop again (but without appending an extra CR/LF) */
     if (cmdline[-1] == 0) goto SKIP_NEWLINE;
@@ -626,6 +664,8 @@ int main(void) {
 
     /* if here, then this was not an internal command */
     run_as_external(BUFFER, cmdline, *rmod_envseg, rmod);
+    /* perhaps this is a newly launched BAT file */
+    if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
 
     /* revert stdout (in case it was redirected) */
     redir_revert();

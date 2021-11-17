@@ -35,6 +35,9 @@ struct rmod_props {
   unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
   unsigned char echoflag;     /* ECHO ON / ECHO OFF */
+  char batfile[130];          /* truename of batch file being processed */
+  char batargs[130];          /* arguments of the processed batch files */
+  unsigned short batnextline; /* next line of bat file to be executed */
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
