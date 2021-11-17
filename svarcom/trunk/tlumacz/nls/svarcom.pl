@@ -5,5 +5,5 @@
 # Translator: Mateusz Viste
 #
 
-15.0:Wstrzymuje wykonywanie skryptu
-15.1:Nacisnij dowolny klawisz aby kontynuowac...
+15.0:Wstrzymuje przetwarzanie pliku wsadowego
+15.1:Naciûnij dowolny klawisz aby kontynuowaç...

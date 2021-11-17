@@ -5,5 +5,5 @@
 # Translator: Mateusz Viste
 #
 
-15.0:Suspends l'execution d'un script batch
-15.1:Appuyez sur une touche afin de continuer...
+15.0:Suspends l'ex‚cution d'un programme batch
+15.1:Appuyez sur une touche pour continuer...
