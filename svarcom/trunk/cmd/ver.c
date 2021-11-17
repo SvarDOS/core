@@ -76,8 +76,8 @@ static int cmd_ver(struct cmd_funcparam *p) {
     outputnl("This software is distributed under the terms of the MIT license.");
     outputnl("Copyright (C) " COPYRDATE " Mateusz Viste");
     outputnl("");
-    outputnl("Prace te dedykuje Milenie i Mojmirowi. Zycze wam, abyscie w dalszym zyciu");
-    outputnl("potrafili wlasciwie docenic wartosc czasow minionych i czerpali radosc z");
+    outputnl("Prace te dedykuje Milenie i Mojmirowi. Zycze wam, abyscie w swoim zyciu");
+    outputnl("potrafili docenic wartosc czasow minionych, jednoczesnie czerpiac radosc z");
     outputnl("prostych przyjemnosci dnia codziennego.  Lair, jesien 2021.");
     return(-1);
   }
