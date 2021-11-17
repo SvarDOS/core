@@ -523,7 +523,7 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
  * rmod counter on success. returns NULL on failure.
  * buff must start with a length byte but the returned pointer must
  * skip it. */
-char far *getbatcmd(char far *buff, struct rmod_props far *rmod) {
+static char far *getbatcmd(char *buff, struct rmod_props far *rmod) {
   unsigned short i;
   buff++; /* make room for the len byte */
   /* TODO temporary hack to display a dummy message */
@@ -543,6 +543,10 @@ char far *getbatcmd(char far *buff, struct rmod_props far *rmod) {
   /* */
   rmod->batnextline++;
   if (rmod->batnextline == 0) rmod->batfile[0] = 0; /* max line count reached */
+
+  /* output command on screen if echo on */
+  if (rmod->echoflag != 0) outputnl(buff);
+
   return(buff);
 }
 
