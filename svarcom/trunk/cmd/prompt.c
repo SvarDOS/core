@@ -51,9 +51,8 @@ static int cmd_prompt(struct cmd_funcparam *p) {
     strcpy(buff, "PROMPT=");
     for (i = 0;; i++) {
       buff[i + 7] = p->cmdline[p->argoffset + i];
-      if (buff[i + 7] == '\r') break;
+      if (buff[i + 7] == 0) break;
     }
-    buff[i + 7] = 0;
     env_setvar(p->env_seg, buff);
   }
 

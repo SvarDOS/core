@@ -81,9 +81,8 @@ static int cmd_path(struct cmd_funcparam *p) {
     strcpy(buff, "PATH=");
     for (i = 0;; i++) {
       buff[i + 5] = p->argv[0][i];
-      if (buff[i + 5] == '\r') break;
+      if (buff[i + 5] == 0) break;
     }
-    buff[i + 5] = 0;
     env_setvar(p->env_seg, buff);
   }
 
