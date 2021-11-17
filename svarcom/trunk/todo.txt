@@ -1,20 +1,17 @@
 
-                           =======================
-                           |  SVARCOM TODO LIST  |
-                           =======================
+                          === SVARCOM TODO LIST ===
 
 
 Below is a loose list of things that I'd like to implement within SvarCOM.
 
-==============================================================================
 
-BEFORE NEXT RELEASE:
+=== BEFORE NEXT RELEASE ======================================================
 
 pipes redirections
 basic BAT support (without workflow controls, FOR loops etc)
 
 
-AT SOME LATER TIME:
+=== AT SOME LATER TIME =======================================================
 
 translations should be cached in rmod-owned memory
 if translations reloading fails, do not retry after every command
@@ -26,7 +23,7 @@ DIR: /S (must use multiple DTAs recursively)
 COPY: /V
 command-line variables resolution (cd %MYDIR%)
 storing rmod in a buffer that can be usefully reused once rmod is installed.
-ctrl+break handler: http://www.techhelpmanual.com/563-int_23h__ctrl_break_exit_address.html
+ctrl+break handler
 
 "notify pending command" int support: http://www.techhelpmanual.com/741-int_2fh_ae00h__notify_pending_command.html
 
@@ -36,8 +33,6 @@ provide unopened FCBs to launched applications
 
 stdout redirection should not create the output file if command fails
 COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
-
-when execing an external command make sure to sync local environment (or run the program with a custom environment pointer?)
 
 dynamic resizing of environment space
 single-stepping AUTOEXEC with F8 at boot time (/Y)

@@ -408,8 +408,6 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
     return;
   }
 
-  /* printf("Exec: '%s'\r\n", cmdfile); */
-
   /* find cmdtail */
   cmdtail = cmdline;
   while (*cmdtail == ' ') cmdtail++;
@@ -426,15 +424,9 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
   rmod_cmdtail[i] = '\r';
   rmod_cmdtail[-1] = i;
 
-  printf("Exec: '");
-  for (i = 0; rmod_execprog[i] != 0; i++) {
-    printf("%c", rmod_execprog[i]);
-  }
-  printf("'\r\n");
-
   /* set up rmod to execute the command */
 
-  ExecParam->envseg = 0; /* 0 = use parent's env segment */
+  ExecParam->envseg = envseg;
   ExecParam->cmdtail = (unsigned long)MK_FP(rmod->rmodseg, 0x80); /* farptr, must be in PSP format (lenbyte args \r) */
   ExecParam->fcb1 = 0; /* TODO farptr */
   ExecParam->fcb2 = 0; /* TODO farptr */
