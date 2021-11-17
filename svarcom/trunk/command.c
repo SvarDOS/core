@@ -400,8 +400,6 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
   }
 
   RUNCMDFILE:
-  /* TODO run command through INT 0x21 */
-  /* TODO copy environment and append full exec path */
   /* TODO special handling of batch files */
   if ((ext != NULL) && (imatch(ext, "bat"))) {
     outputnl("batch processing not supported yet");
@@ -516,13 +514,10 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
 
 int main(void) {
   static struct config cfg;
-  static unsigned short rmod_seg;
   static unsigned short far *rmod_envseg;
   static unsigned short far *lastexitcode;
   static unsigned char BUFFER[4096];
   static struct rmod_props far *rmod;
-
-  parse_argv(&cfg);
 
   rmod = rmod_find();
   if (rmod == NULL) {
@@ -531,16 +526,24 @@ int main(void) {
       outputnl("ERROR: rmod_install() failed");
       return(1);
     }
+    /* look at command line parameters */
+    parse_argv(&cfg);
     /* copy flags to rmod's storage */
     rmod->flags = cfg.flags;
-/*    printf("rmod installed at seg 0x%04X\r\n", rmod_seg); */
+    /* printf("rmod installed at %Fp\r\n", rmod); */
   } else {
-/*    printf("rmod found at seg 0x%04x\r\n", rmod_seg); */
+    /* printf("rmod found at %Fp\r\n", rmod); */
+    /* if I was spawned by rmod and FLAG_EXEC_AND_QUIT is set, then I should
+     * die asap, because the command has been executed already, so I no longer
+     * have a purpose in life */
+    if (rmod->flags & FLAG_EXEC_AND_QUIT) {
+      printf("rmod + FLAG_EXEC_AND_QUIT\r\n");
+      sayonara(rmod);
+    }
   }
 
-  rmod_seg = rmod->rmodseg;
-  rmod_envseg = MK_FP(rmod_seg, RMOD_OFFSET_ENVSEG);
-  lastexitcode = MK_FP(rmod_seg, RMOD_OFFSET_LEXITCODE);
+  rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
+  lastexitcode = MK_FP(rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
 
   /* make COMPSEC point to myself */
   set_comspec_to_self(*rmod_envseg);
@@ -550,7 +553,7 @@ int main(void) {
     unsigned short far *sizptr = MK_FP(*rmod_envseg - 1, 3);
     envsiz = *sizptr;
     envsiz *= 16;
-    printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod_seg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
+    printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod->rmodseg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
   }*/
 
   do {
@@ -606,7 +609,7 @@ int main(void) {
     while (*cmdline == ' ') cmdline++;
 
     /* update rmod's ptr to COMPSPEC so it is always up to date */
-    rmod_updatecomspecptr(rmod_seg, *rmod_envseg);
+    rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
     /* handle redirections (if any) */
     if (redir_parsecmd(cmdline, BUFFER) != 0) {
@@ -627,8 +630,8 @@ int main(void) {
     /* revert stdout (in case it was redirected) */
     redir_revert();
 
-    /* execvp() replaces the current process by the new one
-    if I am still alive then external command failed to execute */
+    /* run_as_external() does not return on success, if I am still alive then
+     * external command failed to execute */
     outputnl("Bad command or file name");
 
   } while ((rmod->flags & FLAG_EXEC_AND_QUIT) == 0);

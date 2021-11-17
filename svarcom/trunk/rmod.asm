@@ -69,7 +69,7 @@ mov ax, 0x4B00         ; DOS 2+ - load & execute program
 mov dx, EXECPROG       ; DS:DX  - ASCIZ program name (preset at PSP[already)
 mov bx, EXEC_PARAM_REC ; ES:BX  - parameter block pointer
 int 0x21
-mov [EXECPROG], byte 0 ; make sure to spawn command.com after app exits
+mov [cs:EXECPROG], byte 0 ; do not run app again (+DS might have been changed)
 
 jmp short skipsig      ; enforce valid ds/ss/etc (can be lost after int 21,4b)
 
@@ -102,8 +102,7 @@ USEDEFAULTCOMSPEC:
 ; prepare the exec param block
 mov ax, [PSP_ENVSEG]
 mov [EXEC_PARAM_REC], ax
-mov ax, CMDTAIL
-mov [EXEC_PARAM_REC+2], ax
+mov [EXEC_PARAM_REC+2], word CMDTAIL
 mov [EXEC_PARAM_REC+4], cs
 
 ; execute command.com
@@ -140,8 +139,10 @@ int 0x21
 jmp skipsig
 
 ; command.com tail arguments, in PSP format: length byte followed by args and
-; terminated with \r)
-CMDTAIL db 0x00, 0x0D
+; terminated with \r) - a single 0x0A byte is passed so SvarCOM knows it is
+; called as respawn (as opposed to being invoked as a normal application)
+; this allows multiple copies of SvarCOM to stack upon each other.
+CMDTAIL db 0x01, 0x0A, 0x0D
 
 ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM", 13, 10, '$'
 

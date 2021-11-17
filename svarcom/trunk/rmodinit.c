@@ -40,7 +40,7 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   const unsigned short sizeof_rmodandprops_paras = (0x100 + rmod_len + sizeof(struct rmod_props) + 15) / 16;
   unsigned short rmodseg = 0xffff;
   unsigned short envseg, origenvseg;
-  struct rmod_props far *res = NULL;
+  struct rmod_props far *res;
 
   /* read my current env segment from PSP and save it */
   envseg = *((unsigned short *)0x2c);
@@ -189,11 +189,17 @@ struct rmod_props far *rmod_find(void) {
   unsigned short *parent = (void *)0x0C; /* parent's seg in PSP[Ch] ("prev. int22 handler") */
   unsigned short far *ptr;
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
+  unsigned char *cmdtail = (void *)0x80;
   unsigned char i;
   /* is it rmod? */
   ptr = MK_FP(*parent, 0x100);
   for (i = 0; i < 4; i++) if (ptr[i] != sig[i]) return(NULL);
-  /* match successfull (rmod is my parent) */
+  /* match successfull (rmod is my parent) - but is it really a respawn?
+   * command-line tail should contain a single character '\r' */
+  if ((cmdtail[0] != 1) || (cmdtail[1] != '\n')) return(NULL);
+  cmdtail[0] = 0;
+  cmdtail[1] = '\r';
+  /* */
   return(MK_FP(*parent, 0x100 + rmod_len));
 }
 
