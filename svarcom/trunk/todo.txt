@@ -34,6 +34,8 @@ provide unopened FCBs to launched applications
 stdout redirection should not create the output file if command fails
 COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
 
+compression of NLS strings and rmod core (lz4?)
+
 dynamic resizing of environment space
 single-stepping AUTOEXEC with F8 at boot time (/Y)
 skipping AUTOEXEC with F5 at boot time (/D)

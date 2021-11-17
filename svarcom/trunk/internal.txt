@@ -2,6 +2,20 @@
                     === SvarCOM implementation notes ===
 
 
+=== NLS strings ==============================================================
+
+SvarCOM can output information in many languages. To do so, it relies on a
+precompiled resource file named SVARCOM.LNG. When SvarCOM starts, it looks
+for this file in the %NLSPATH% directory and loads from it the part that
+contains the %LANG% language. All this is done by nls_langreload().
+
+The SVARCOM.LNG file is compiled by a separate tool: TLUMACZ. It takes
+CATS-style language files as input and compiles them into a single SVARCOM.LNG
+resource file. It also produces a DEFAULT.LNG with english strings only, this
+one is embedded into the SvarCOM executable to display english text in case
+SVARCOM.LNG is unavailable.
+
+
 === Batch files support ======================================================
 
 When SvarCOM executes a command, it checks first if it has a *.BAT extension.
