@@ -71,6 +71,8 @@ mov bx, EXEC_PARAM_REC ; ES:BX  - parameter block pointer
 int 0x21
 mov [EXECPROG], byte 0 ; make sure to spawn command.com after app exits
 
+jmp short skipsig      ; enforce valid ds/ss/etc (can be lost after int 21,4b)
+
 EXEC_COMMAND_COM:
 
 ; collect the exit code of previous application
