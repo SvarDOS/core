@@ -163,7 +163,9 @@ static void parse_argv(struct config *cfg) {
 }
 
 
-static void buildprompt(char *s, unsigned short envseg) {
+/* builds the prompt string and displays it. buff is filled with a zero-terminated copy of the prompt. */
+static void build_and_display_prompt(char *buff, unsigned short envseg) {
+  char *s = buff;
   /* locate the prompt variable or use the default pattern */
   const char far *fmt = env_lookup_val(envseg, "PROMPT");
   if ((fmt == NULL) || (*fmt == 0)) fmt = "$p$g"; /* fallback to default if empty */
@@ -264,7 +266,8 @@ static void buildprompt(char *s, unsigned short envseg) {
         break;
     }
   }
-  *s = '$';
+  *s = 0;
+  output(buff);
 }
 
 
@@ -416,6 +419,9 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
     for (i = 0; cmdtail[i] != 0; i++) rmod->batargs[i] = cmdtail[i];
     /* reset the 'next line to execute' counter */
     rmod->batnextline = 0;
+    /* remember the echo flag (in case bat file disables echo) */
+    rmod->flags &= ~FLAG_ECHO_BEFORE_BAT;
+    if (rmod->echoflag) rmod->flags |= FLAG_ECHO_BEFORE_BAT;
     return;
   }
 
@@ -519,34 +525,87 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
 
 
 /* fetches a line from batch file and write it to buff, increments
- * rmod counter on success. returns NULL on failure.
- * buff must start with a length byte but the returned pointer must
- * skip it. */
-static char far *getbatcmd(char *buff, struct rmod_props far *rmod) {
+ * rmod counter on success. returns 0 on success.
+ * buff starts with a length byte and is NULL-terminated */
+static int getbatcmd(char *buff, struct rmod_props far *rmod) {
   unsigned short i;
-  buff++; /* make room for the len byte */
-  /* TODO temporary hack to display a dummy message */
-  if (rmod->batnextline == 0) {
-    char *msg = "ECHO batch files not supported yet";
-    for (i = 0; msg[i] != 0; i++) buff[i] = msg[i];
-    buff[i] = 0;
-    buff[-1] = i;
-  } else {
-    rmod->batfile[0] = 0;
-    return(NULL);
+  unsigned short batname_seg = FP_SEG(rmod->batfile);
+  unsigned short batname_off = FP_OFF(rmod->batfile);
+  unsigned short filepos_cx = rmod->batnextline >> 16;
+  unsigned short filepos_dx = rmod->batnextline & 0xffff;
+  unsigned char blen = 0;
+
+  buff++; /* make room for the len byte prefix */
+
+  /* open file, jump to offset filpos, and read data into buff.
+   * result in blen (unchanged if EOF or failure). */
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+
+    /* open file (read-only) */
+    mov dx, batname_off
+    mov ax, batname_seg
+    push ds     /* save DS */
+    mov ds, ax
+    mov ax, 0x3d00
+    int 0x21    /* handle in ax on success */
+    pop ds      /* restore DS */
+    jc DONE
+    mov bx, ax  /* save handle to bx */
+
+    /* jump to file offset CX:DX */
+    mov ax, 0x4200
+    mov cx, filepos_cx
+    mov dx, filepos_dx
+    int 0x21  /* CF clear on success, DX:AX set to cur pos */
+    jc CLOSEANDQUIT
+
+    /* read the line into buff */
+    mov ah, 0x3f
+    mov cx, 255
+    mov dx, buff
+    int 0x21 /* CF clear on success, AX=number of bytes read */
+    jc CLOSEANDQUIT
+    mov blen, al
+
+    CLOSEANDQUIT:
+    /* close file (handle in bx) */
+    mov ah, 0x3e
+    int 0x21
+
+    DONE:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
   }
-  /* open file */
-  /* read until awaiting line */
-  /* copy line to buff */
-  /* close file */
-  /* */
-  rmod->batnextline++;
-  if (rmod->batnextline == 0) rmod->batfile[0] = 0; /* max line count reached */
 
-  /* output command on screen if echo on */
-  if (rmod->echoflag != 0) outputnl(buff);
+  /* printf("blen=%u filepos_cx=%u filepos_dx=%u\r\n", blen, filepos_cx, filepos_dx); */
 
-  return(buff);
+  /* on EOF - abort processing the bat file */
+  if (blen == 0) goto OOPS;
+
+  /* find nearest \n to inc batch offset and replace \r by NULL terminator
+   * I support all CR/LF, CR- and LF-terminated batch files */
+  for (i = 0; i < blen; i++) {
+    if ((buff[i] == '\r') || (buff[i] == '\n')) {
+      if ((buff[i] == '\r') && ((i+1) < blen) && (buff[i+1] == '\n')) rmod->batnextline += 1;
+      break;
+    }
+  }
+  buff[i] = 0;
+  buff[-1] = i;
+  rmod->batnextline += i + 1;
+
+  return(0);
+
+  OOPS:
+  rmod->batfile[0] = 0;
+  rmod->batnextline = 0;
+  return(-1);
 }
 
 
@@ -592,7 +651,16 @@ int main(void) {
   }*/
 
   do {
-    char far *cmdline = rmod->inputbuf + 2;
+    char far *cmdline;
+
+    if (rmod->echoflag != 0) outputnl(""); /* terminate the previous command with a CR/LF */
+
+    SKIP_NEWLINE:
+
+    /* cancel any redirections that may have been set up before */
+    redir_revert();
+
+    cmdline = rmod->inputbuf + 2;
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
@@ -604,44 +672,42 @@ int main(void) {
       goto EXEC_CMDLINE;
     }
 
-    if (rmod->echoflag != 0) outputnl(""); /* terminate the previous command with a CR/LF */
-
-    SKIP_NEWLINE:
-
-    /* print shell prompt (only if ECHO is enabled) */
-    if (rmod->echoflag != 0) {
-      char *promptptr = BUFFER;
-      buildprompt(promptptr, *rmod_envseg);
-      _asm {
-        push ax
-        push dx
-        mov ah, 0x09
-        mov dx, promptptr
-        int 0x21
-        pop dx
-        pop ax
-      }
-    }
-
-    /* revert input history terminator to \r */
-    if (cmdline[-1] != 0) {
-      cmdline[(unsigned short)(cmdline[-1])] = '\r';
-    }
-
     /* if batch file is being executed -> fetch next line */
     if (rmod->batfile[0] != 0) {
-      cmdline = getbatcmd(BUFFER + sizeof(BUFFER) - 130, rmod);
-      if (cmdline == NULL) continue;
+      char *tmpbuff = BUFFER + sizeof(BUFFER) - 256;
+      if (getbatcmd(tmpbuff, rmod) != 0) { /* end of batch */
+        redir_revert(); /* cancel redirections (if there were any) */
+        /* restore echo flag as it was before running the bat file */
+        rmod->echoflag = 0;
+        if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->echoflag = 1;
+        continue;
+      }
+      /* output prompt and command on screen if echo on and command is not
+       * inhibiting it with the @ prefix */
+      if ((rmod->echoflag != 0) && (tmpbuff[1] != '@')) {
+        build_and_display_prompt(BUFFER, *rmod_envseg);
+        outputnl(tmpbuff + 1);
+      }
+      /* strip the @ prefix if present, it is no longer useful */
+      if (tmpbuff[1] == '@') {
+        memmove(tmpbuff + 1, tmpbuff + 2, tmpbuff[0] + 1);
+        tmpbuff[0] -= 1; /* update the length byte */
+      }
+      cmdline = tmpbuff + 1;
     } else {
-      /* interactive mode: wait for user command line */
+      /* interactive mode: display prompt (if echo enabled) and wait for user
+       * command line */
+      if (rmod->echoflag != 0) build_and_display_prompt(BUFFER, *rmod_envseg);
+      /* revert input history terminator to \r so DOS or DOSKEY are not confused */
+      cmdline[(unsigned short)(cmdline[-1])] = '\r';
+      /* collect user input */
       cmdline_getinput(FP_SEG(rmod->inputbuf), FP_OFF(rmod->inputbuf));
+      /* replace \r by a zero terminator */
+      cmdline[(unsigned char)(cmdline[-1])] = 0;
     }
 
     /* if nothing entered, loop again (but without appending an extra CR/LF) */
     if (cmdline[-1] == 0) goto SKIP_NEWLINE;
-
-    /* replace \r by a zero terminator */
-    cmdline[(unsigned char)(cmdline[-1])] = 0;
 
     /* I jump here when I need to exec an initial command (/C or /K) */
     EXEC_CMDLINE:
@@ -670,7 +736,7 @@ int main(void) {
     /* perhaps this is a newly launched BAT file */
     if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
 
-    /* revert stdout (in case it was redirected) */
+    /* revert stdout (so the err msg is not redirected) */
     redir_revert();
 
     /* run_as_external() does not return on success, if I am still alive then

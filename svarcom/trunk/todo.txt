@@ -8,7 +8,9 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 === BEFORE NEXT RELEASE ======================================================
 
 pipes redirections
-basic BAT support (without workflow controls, FOR loops etc)
+autoexec.bat processing (with F5 skipping)
+make cmdline a near pointer for better performance (maybe a separate buffer)
+put the rmod->echoflag inside rmod->flags
 
 
 === AT SOME LATER TIME =======================================================
@@ -38,7 +40,6 @@ compression of NLS strings and rmod core (lz4?)
 
 dynamic resizing of environment space
 single-stepping AUTOEXEC with F8 at boot time (/Y)
-skipping AUTOEXEC with F5 at boot time (/D)
 CTTY
 LOADHIGH/LH
 

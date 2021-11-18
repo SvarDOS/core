@@ -27,6 +27,7 @@
 
 #define FLAG_EXEC_AND_QUIT 1
 #define FLAG_PERMANENT 2
+#define FLAG_ECHO_BEFORE_BAT 8
 
 struct rmod_props {
   char inputbuf[130];         /* input buffer for INT 21, AH=0x0A */
@@ -37,7 +38,7 @@ struct rmod_props {
   unsigned char echoflag;     /* ECHO ON / ECHO OFF */
   char batfile[130];          /* truename of batch file being processed */
   char batargs[130];          /* arguments of the processed batch files */
-  unsigned short batnextline; /* next line of bat file to be executed */
+  unsigned long batnextline;  /* offset in file of next bat line to process */
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */

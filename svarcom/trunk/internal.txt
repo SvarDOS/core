@@ -12,7 +12,7 @@ and removes itself from memory, letting RMOD do the job. RMOD executes the
 application, waits for it to finish and then calls back SvarCOM.
 
 
-=== NLS strings ==============================================================
+=== NLS STRINGS ==============================================================
 
 SvarCOM can output information in many languages. To do so, it relies on a
 precompiled resource file named SVARCOM.LNG. When SvarCOM starts, it looks
@@ -26,13 +26,13 @@ one is embedded into the SvarCOM executable to display english text in case
 SVARCOM.LNG is unavailable.
 
 
-=== Batch files support ======================================================
+=== BATCH FILES SUPPORT ======================================================
 
 When SvarCOM executes a command, it checks first if it has a *.BAT extension.
 If so, it switches into 'batch-processing' mode:
 
  - Writes the batch filename into its persistent (rmod-owned) buffer, along
-   with a line counter that holds the number of "next line to be executed".
+   with a counter that holds the offset of the next line to be executed.
  - When a batch file CALLs another batch file, then a new SvarCOM instance is
    started. This ensures that once the CALLed batch ends, processing will
    return to the original batch file at the correct position.
@@ -40,8 +40,7 @@ If so, it switches into 'batch-processing' mode:
 When the batch buffer is non-zero, SvarCOM does not ask the user for a
 command. Instead, it opens the batch file, jumps to the "next line to be
 executed" and loads the command from there, incrementing this counter in the
-process. The maximum length of a batch file is of 65535 lines (any lines after
-this limit will be ignored).
+process.
 
 
 ====================================================================== EOF ===

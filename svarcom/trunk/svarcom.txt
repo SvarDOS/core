@@ -14,11 +14,11 @@ Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 
 Since SvarCOM is a work-in-progress effort, it is missing a few things yet:
  - no support for pipes (eg. file.exe | more)
- - no support for batch (*.BAT) files (hence no AUTOEXEC.BAT execution)
+ - no support for advanced batch constructs (conditionals, errorlevels...)
  - a few internal commands missing: CALL, CTTY, GOTO, IF, LH, SHIFT
 
 SvarCOM is minimalist and I'd like to keep it that way. It aims to be
-functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x.
+functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.
 
 Latest version available here: http://svardos.osdn.io/svarcom
 
