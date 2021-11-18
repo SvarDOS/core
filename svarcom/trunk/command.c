@@ -347,12 +347,12 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
 
 
 static void run_as_external(char *buff, const char far *cmdline, unsigned short envseg, struct rmod_props far *rmod) {
-  char const **argvlist = (void *)(buff + 512);
-  char *cmdfile = buff + 1024;
+  char *cmdfile = buff + 512;
   const char far *pathptr;
   int lookup;
   unsigned short i;
   const char *ext;
+  char *cmd = buff + 256;
   const char far *cmdtail;
   char far *rmod_execprog = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXECPROG);
   char far *rmod_cmdtail = MK_FP(rmod->rmodseg, 0x81);
@@ -363,12 +363,18 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
     unsigned long fcb2;
   } far *ExecParam = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXECPARAM);
 
-  cmd_explode(buff + 2048, cmdline, argvlist);
-
-  /* for (i = 0; argvlist[i] != NULL; i++) printf("arg #%d = '%s'\r\n", i, argvlist[i]); */
+  /* find cmd and cmdtail */
+  i = 0;
+  cmdtail = cmdline;
+  while (*cmdtail == ' ') cmdtail++; /* skip any leading spaces */
+  while ((*cmdtail != ' ') && (*cmdtail != '/') && (*cmdtail != '+') && (*cmdtail != 0)) {
+    cmd[i++] = *cmdtail;
+    cmdtail++;
+  }
+  cmd[i] = 0;
 
   /* is this a command in curdir? */
-  lookup = lookup_cmd(cmdfile, argvlist[0], NULL, &ext);
+  lookup = lookup_cmd(cmdfile, cmd, NULL, &ext);
   if (lookup == 0) {
     /* printf("FOUND LOCAL EXEC FILE: '%s'\r\n", cmdfile); */
     goto RUNCMDFILE;
@@ -389,7 +395,7 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
       pathptr++;
     }
     buff[i] = 0;
-    lookup = lookup_cmd(cmdfile, argvlist[0], buff, &ext);
+    lookup = lookup_cmd(cmdfile, cmd, buff, &ext);
     if (lookup == 0) break;
     if (lookup == -2) return;
     if (*pathptr == ';') {
@@ -400,13 +406,6 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
   }
 
   RUNCMDFILE:
-
-  /* find cmdtail */
-  cmdtail = cmdline;
-  while (*cmdtail == ' ') cmdtail++;
-  while ((*cmdtail != ' ') && (*cmdtail != '/') && (*cmdtail != '+') && (*cmdtail != 0)) {
-    cmdtail++;
-  }
 
   /* special handling of batch files */
   if ((ext != NULL) && (imatch(ext, "bat"))) {
