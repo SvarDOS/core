@@ -32,7 +32,7 @@
 #include "doserr.h"
 
 const char *doserr(unsigned short err) {
-  static char buf[24];
+  static char buf[18] = "DOS ERROR 0x";
   switch (err) {
     case 0x00: return("Success");
     case 0x01: return("Function number invalid");
@@ -74,7 +74,7 @@ const char *doserr(unsigned short err) {
     case 0x26: return("Cannot complete file operations (EOF / out of input)");
     case 0x27: return("Insufficient disk space");
     default:
-      snprintf(buf, sizeof(buf), "DOS ERROR 0x%02X", err);
+      sprintf(buf + 12, "%02X", err);
       return(buf);
   }
 }
