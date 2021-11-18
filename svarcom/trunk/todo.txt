@@ -2,7 +2,7 @@
                           === SVARCOM TODO LIST ===
 
 
-Below is a loose list of things that I'd like to implement within SvarCOM.
+This is a loose list of things that I'd like to implement within SvarCOM.
 
 
 === BEFORE NEXT RELEASE ======================================================
