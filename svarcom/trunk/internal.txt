@@ -33,14 +33,11 @@ If so, it switches into 'batch-processing' mode:
 
  - Writes the batch filename into its persistent (rmod-owned) buffer, along
    with a counter that holds the offset of the next line to be executed.
- - When a batch file CALLs another batch file, then a new SvarCOM instance is
-   started. This ensures that once the CALLed batch ends, processing will
-   return to the original batch file at the correct position.
 
-When the batch buffer is non-zero, SvarCOM does not ask the user for a
-command. Instead, it opens the batch file, jumps to the "next line to be
-executed" and loads the command from there, incrementing this counter in the
-process.
+When the batch filename buffer is non-empty, SvarCOM does not ask the user for
+a command. Instead, it opens the batch file, jumps to the "next line to be
+executed" and loads the command from there, incrementing the line counter in
+the process.
 
 
 ====================================================================== EOF ===
