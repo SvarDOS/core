@@ -620,13 +620,13 @@ int main(void) {
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
+    /* look at command line parameters (in case env size if set there) */
+    parse_argv(&cfg);
     rmod = rmod_install(cfg.envsiz, BUFFER, BUFFER_len);
     if (rmod == NULL) {
       outputnl("ERROR: rmod_install() failed");
       return(1);
     }
-    /* look at command line parameters */
-    parse_argv(&cfg);
     /* copy flags to rmod's storage (and enable ECHO) */
     rmod->flags = cfg.flags | FLAG_ECHOFLAG;
     /* printf("rmod installed at %Fp\r\n", rmod); */
