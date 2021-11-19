@@ -527,7 +527,7 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
 
 /* fetches a line from batch file and write it to buff (NULL-terminated),
  * increments rmod counter and returns 0 on success. */
-static int getbatcmd(char *buff, struct rmod_props far *rmod) {
+static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far *rmod) {
   unsigned short i;
   unsigned short batname_seg = FP_SEG(rmod->batfile);
   unsigned short batname_off = FP_OFF(rmod->batfile);
@@ -563,7 +563,8 @@ static int getbatcmd(char *buff, struct rmod_props far *rmod) {
 
     /* read the line into buff */
     mov ah, 0x3f
-    mov cx, 255
+    xor ch, ch
+    mov cl, buffmaxlen
     mov dx, buff
     int 0x21 /* CF clear on success, AX=number of bytes read */
     jc CLOSEANDQUIT
@@ -605,6 +606,10 @@ static int getbatcmd(char *buff, struct rmod_props far *rmod) {
   return(-1);
 }
 
+
+/* max length of the cmdline storage (bytes) - includes also max length of
+ * line loaded from a BAT file (no more than 255 bytes!) */
+#define CMDLINE_MAXLEN 255
 
 int main(void) {
   static struct config cfg;
@@ -662,7 +667,7 @@ int main(void) {
     redir_revert();
 
     /* preset cmdline to point at the end of my general-purpose buffer */
-    cmdline = BUFFER + sizeof(BUFFER) - 130;
+    cmdline = BUFFER + sizeof(BUFFER) - (CMDLINE_MAXLEN + 1);
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
@@ -676,7 +681,7 @@ int main(void) {
 
     /* if batch file is being executed -> fetch next line */
     if (rmod->batfile[0] != 0) {
-      if (getbatcmd(cmdline, rmod) != 0) { /* end of batch */
+      if (getbatcmd(cmdline, CMDLINE_MAXLEN, rmod) != 0) { /* end of batch */
         /* restore echo flag as it was before running the bat file */
         rmod->flags &= ~FLAG_ECHOFLAG;
         if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
