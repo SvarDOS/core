@@ -9,6 +9,7 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 pipes redirections
 F5 skipping of autoexec.bat
+handling of %VARS% in cmdline (BAT files or interactive queries)
 
 
 === AT SOME LATER TIME =======================================================
@@ -21,9 +22,8 @@ DIR: %DIRCMD% support
 DIR: /O
 DIR: /S (must use multiple DTAs recursively)
 COPY: /V
-command-line variables resolution (cd %MYDIR%)
-storing rmod in a buffer that can be usefully reused once rmod is installed.
 ctrl+break handler
+int 24h handler (abort, retry, fail, ignore)
 
 "notify pending command" int support: http://www.techhelpmanual.com/741-int_2fh_ae00h__notify_pending_command.html
 
