@@ -8,21 +8,26 @@
 #  wmake clean     - cleans up all non-source files
 #
 
-CFLAGS = -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=command.map
+LDFLAGS = -0 -y -wx -mt -lr -we -d0 -ox -fm=command.map
+CFLAGS = -0 -wx -ms -we -d0 -ox
 # -0   generate 8086 compatible code
 # -y   ignore %WCL% if present
-# -cc  C code
 # -wx  maximum warnings level
 # -mt  TINY memory model
 # -lr  real-mode target
 # -we  any warning is considered an error
 # -d0  no debug data
 # -ox  maximum optimization level
+#
+# NOTE: wcc does not understand -mt, that is why -ms must be passed instead
 
 all: command.com
 
-command.com: deflang.h rmod.h command.c cmd.c doserr.c env.c redir.c rmodinit.c sayonara.c helpers.c cmd\*.c
-	wcl $(CFLAGS) command.c cmd.c doserr.c env.c redir.c rmodinit.c sayonara.c helpers.c
+command.com: deflang.h rmod.h command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+	*wcl $(LDFLAGS) command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+
+.c.obj:
+	wcc $(CFLAGS) $<
 
 rmod.h: file2c.com rmod.com
 	file2c /c rmod.com rmod.h rmod
@@ -31,7 +36,7 @@ deflang.h: file2c.com tlumacz\default.lng
 	file2c /l4096 tlumacz\default.lng deflang.h langblock
 
 file2c.com: file2c.c
-	wcl $(CFLAGS) file2c.c
+	wcl $(LDFLAGS) file2c.c
 
 rmod.com: rmod.asm
 	nasm -f bin -l rmod.lst -o rmod.com rmod.asm
