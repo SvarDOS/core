@@ -12,13 +12,14 @@ static void help(void) {
   puts("usage: file2c [/c] [/lxxx] infile.dat outfile.c varname");
   puts("");
   puts("/c    - define the output array as CONST");
+  puts("/s    - define the output array as STATIC");
   puts("/lxxx - enforces the output array to be xxx bytes big");
 }
 
 
 int main(int argc, char **argv) {
   char *fnamein = NULL, *fnameout = NULL, *varname = NULL;
-  char flag_c = 0;
+  char stortype = 0; /* 'c' = const ; 's' = static */
   char *flag_l = "";
   FILE *fdin, *fdout;
   unsigned long len;
@@ -30,7 +31,11 @@ int main(int argc, char **argv) {
       continue;
     }
     if ((argv[c][0] == '/') && (argv[c][1] == 'c')) {
-      flag_c = 1;
+      stortype = 'c';
+      continue;
+    }
+    if ((argv[c][0] == '/') && (argv[c][1] == 's')) {
+      stortype = 's';
       continue;
     }
     if (argv[c][0] == '/') {
@@ -68,7 +73,8 @@ int main(int argc, char **argv) {
     return(1);
   }
 
-  if (flag_c) fprintf(fdout, "const ");
+  if (stortype == 'c') fprintf(fdout, "const ");
+  if (stortype == 's') fprintf(fdout, "static ");
   fprintf(fdout, "char %s[%s] = {", varname, flag_l);
 
   for (len = 0;; len++) {
