@@ -648,7 +648,8 @@ int main(void) {
   }*/
 
   do {
-    if (rmod->flags & FLAG_ECHOFLAG) outputnl(""); /* terminate the previous command with a CR/LF */
+    /* terminate previous command with a CR/LF if ECHO ON (but not during BAT processing) */
+    if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->batfile[0] != 0)) outputnl("");
 
     SKIP_NEWLINE:
 
@@ -676,6 +677,8 @@ int main(void) {
         if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
         continue;
       }
+      /* skip any leading spaces */
+      while (*cmdline == ' ') cmdline++;
       /* output prompt and command on screen if echo on and command is not
        * inhibiting it with the @ prefix */
       if ((rmod->flags & FLAG_ECHOFLAG) && (cmdline[0] != '@')) {
