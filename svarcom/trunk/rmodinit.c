@@ -140,7 +140,6 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   _fmemset(res, 0, sizeof(*res));  /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
   res->inputbuf[0] = 128;          /* input buffer for INT 0x21, AH=0Ah*/
-  res->echoflag = 1;               /* ECHO ON */
   res->origenvseg = origenvseg;    /* original environment segment */
 
   /* write env segment to rmod's PSP */

@@ -27,6 +27,7 @@
 
 #define FLAG_EXEC_AND_QUIT 1
 #define FLAG_PERMANENT 2
+#define FLAG_ECHOFLAG 4
 #define FLAG_ECHO_BEFORE_BAT 8
 
 struct rmod_props {
@@ -35,7 +36,7 @@ struct rmod_props {
   unsigned long origparent;   /* original parent (far ptr) of the shell */
   unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
-  unsigned char echoflag;     /* ECHO ON / ECHO OFF */
+  unsigned char FFU;          /* FOR FUTURE USE */
   char batfile[130];          /* truename of batch file being processed */
   char batargs[130];          /* arguments of the processed batch files */
   unsigned long batnextline;  /* offset in file of next bat line to process */

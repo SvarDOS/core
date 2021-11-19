@@ -43,7 +43,7 @@ static int cmd_echo(struct cmd_funcparam *p) {
 
   /* ECHO without any parameter: display current state */
   if (p->argc == 0) {
-    if (p->rmod->echoflag) {
+    if (p->rmod->flags & FLAG_ECHOFLAG) {
       outputnl("ECHO is on");
     } else {
       outputnl("ECHO is off");
@@ -53,13 +53,13 @@ static int cmd_echo(struct cmd_funcparam *p) {
 
   /* ECHO ON */
   if ((p->argc == 1) && (imatch(p->argv[0], "on"))) {
-    p->rmod->echoflag = 1;
+    p->rmod->flags |= FLAG_ECHOFLAG;
     return(-1);
   }
 
   /* ECHO OFF */
   if ((p->argc == 1) && (imatch(p->argv[0], "off"))) {
-    p->rmod->echoflag = 0;
+    p->rmod->flags &= ~FLAG_ECHOFLAG;
     return(-1);
   }
 

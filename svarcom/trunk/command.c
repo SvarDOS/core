@@ -421,7 +421,7 @@ static void run_as_external(char *buff, const char far *cmdline, unsigned short 
     rmod->batnextline = 0;
     /* remember the echo flag (in case bat file disables echo) */
     rmod->flags &= ~FLAG_ECHO_BEFORE_BAT;
-    if (rmod->echoflag) rmod->flags |= FLAG_ECHO_BEFORE_BAT;
+    if (rmod->flags & FLAG_ECHOFLAG) rmod->flags |= FLAG_ECHO_BEFORE_BAT;
     return;
   }
 
@@ -625,8 +625,8 @@ int main(void) {
     }
     /* look at command line parameters */
     parse_argv(&cfg);
-    /* copy flags to rmod's storage */
-    rmod->flags = cfg.flags;
+    /* copy flags to rmod's storage (and enable ECHO) */
+    rmod->flags = cfg.flags | FLAG_ECHOFLAG;
     /* printf("rmod installed at %Fp\r\n", rmod); */
   } else {
     /* printf("rmod found at %Fp\r\n", rmod); */
@@ -653,7 +653,7 @@ int main(void) {
   do {
     char far *cmdline;
 
-    if (rmod->echoflag != 0) outputnl(""); /* terminate the previous command with a CR/LF */
+    if (rmod->flags & FLAG_ECHOFLAG) outputnl(""); /* terminate the previous command with a CR/LF */
 
     SKIP_NEWLINE:
 
@@ -678,13 +678,13 @@ int main(void) {
       if (getbatcmd(tmpbuff, rmod) != 0) { /* end of batch */
         redir_revert(); /* cancel redirections (if there were any) */
         /* restore echo flag as it was before running the bat file */
-        rmod->echoflag = 0;
-        if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->echoflag = 1;
+        rmod->flags &= ~FLAG_ECHOFLAG;
+        if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
         continue;
       }
       /* output prompt and command on screen if echo on and command is not
        * inhibiting it with the @ prefix */
-      if ((rmod->echoflag != 0) && (tmpbuff[1] != '@')) {
+      if ((rmod->flags & FLAG_ECHOFLAG) && (tmpbuff[1] != '@')) {
         build_and_display_prompt(BUFFER, *rmod_envseg);
         outputnl(tmpbuff + 1);
       }
@@ -697,7 +697,7 @@ int main(void) {
     } else {
       /* interactive mode: display prompt (if echo enabled) and wait for user
        * command line */
-      if (rmod->echoflag != 0) build_and_display_prompt(BUFFER, *rmod_envseg);
+      if (rmod->flags & FLAG_ECHOFLAG) build_and_display_prompt(BUFFER, *rmod_envseg);
       /* revert input history terminator to \r so DOS or DOSKEY are not confused */
       cmdline[(unsigned short)(cmdline[-1])] = '\r';
       /* collect user input */
