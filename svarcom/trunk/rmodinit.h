@@ -50,8 +50,8 @@ struct rmod_props {
 #define RMOD_OFFSET_EXECPROG   0x12B
 #define RMOD_OFFSET_ROUTINE    0x1AB
 
-struct rmod_props far *rmod_install(unsigned short envsize);
-struct rmod_props far *rmod_find(void);
+struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len);
+struct rmod_props far *rmod_find(unsigned short rmodcore_len);
 void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
 
 #endif

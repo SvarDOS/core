@@ -47,7 +47,7 @@ struct cmd_funcparam {
   unsigned short env_seg;   /* segment of environment block */
   struct rmod_props far *rmod; /* rmod settings */
   unsigned short argoffset; /* offset of cmdline where first argument starts */
-  const char far *cmdline;  /* original cmdline (terminated by a NULL) */
+  const char *cmdline;      /* original cmdline (terminated by a NULL) */
   char BUFFER[BUFFER_SIZE]; /* a buffer for whatever is needed */
 };
 
@@ -131,7 +131,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
 
 /* NULL if cmdline is not matching an internal command, otherwise returns a
  * pointer to a CMD_ID struct */
-static const struct CMD_ID *cmd_match(const char far *cmdline, unsigned short *argoffset) {
+static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argoffset) {
   unsigned short i;
   char buff[10];
 
@@ -189,7 +189,7 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char far *cmdline, char *BUFFER) {
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, char *BUFFER) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
   struct cmd_funcparam *p = (void *)BUFFER;

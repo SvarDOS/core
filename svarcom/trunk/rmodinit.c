@@ -28,13 +28,11 @@
 #include "env.h"
 #include "helpers.h"
 
-#include "rmodcore.h"
-
 #include "rmodinit.h"
 
 
 /* returns far pointer to rmod's settings block on success */
-struct rmod_props far *rmod_install(unsigned short envsize) {
+struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len) {
   char far *myptr, far *mcb;
   unsigned short far *owner;
   const unsigned short sizeof_rmodandprops_paras = (0x100 + rmodcore_len + sizeof(struct rmod_props) + 15) / 16;
@@ -184,7 +182,7 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
 
 /* look up my parent: if it's rmod then return a ptr to its props struct,
  * otherwise return NULL */
-struct rmod_props far *rmod_find(void) {
+struct rmod_props far *rmod_find(unsigned short rmodcore_len) {
   unsigned short *parent = (void *)0x0C; /* parent's seg in PSP[Ch] ("prev. int22 handler") */
   unsigned short far *ptr;
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};

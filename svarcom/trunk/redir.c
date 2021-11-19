@@ -32,7 +32,7 @@ static unsigned short oldstdout = 0xffff;
 /* parse commandline and performs necessary redirections. cmdline is
  * modified so all redirections are cut out.
  * returns 0 on success, non-zero otherwise */
-int redir_parsecmd(char far *cmdline, char *BUFFER) {
+int redir_parsecmd(char *cmdline, char *BUFFER) {
   unsigned short i;
   unsigned short rediroffset_stdin = 0;
   unsigned short rediroffset_stdout = 0;
@@ -82,7 +82,7 @@ int redir_parsecmd(char far *cmdline, char *BUFFER) {
     unsigned short openflag = 0x12;  /* used during the int 21h,ah=6c call */
     unsigned short errcode = 0;
     unsigned short handle = 0;
-    char far *ptr;
+    char *ptr;
     /* append? */
     if (cmdline[rediroffset_stdout] == '>') {
       openflag = 0x11;

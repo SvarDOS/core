@@ -30,7 +30,7 @@ command.com: deflang.h rmodcore.h command.obj cmd.obj doserr.obj env.obj redir.o
 	wcc $(CFLAGS) $<
 
 rmodcore.h: file2c.com rmod.com
-	file2c rmod.com rmodcore.h rmodcore
+	file2c /s /l4096 rmod.com rmodcore.h BUFFER
 
 deflang.h: file2c.com tlumacz\default.lng
 	file2c /l4096 tlumacz\default.lng deflang.h langblock

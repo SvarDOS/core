@@ -79,6 +79,7 @@
 #include "rmodinit.h"
 #include "sayonara.h"
 
+#include "rmodcore.h" /* rmod binary inside a BUFFER array */
 
 struct config {
   unsigned char flags; /* command.com flags, as defined in rmodinit.h */
@@ -349,14 +350,14 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
 }
 
 
-static void run_as_external(char *buff, const char far *cmdline, unsigned short envseg, struct rmod_props far *rmod) {
+static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod) {
   char *cmdfile = buff + 512;
   const char far *pathptr;
   int lookup;
   unsigned short i;
   const char *ext;
   char *cmd = buff + 256;
-  const char far *cmdtail;
+  const char *cmdtail;
   char far *rmod_execprog = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXECPROG);
   char far *rmod_cmdtail = MK_FP(rmod->rmodseg, 0x81);
   _Packed struct {
@@ -524,9 +525,8 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
 }
 
 
-/* fetches a line from batch file and write it to buff, increments
- * rmod counter on success. returns 0 on success.
- * buff starts with a length byte and is NULL-terminated */
+/* fetches a line from batch file and write it to buff (NULL-terminated),
+ * increments rmod counter and returns 0 on success. */
 static int getbatcmd(char *buff, struct rmod_props far *rmod) {
   unsigned short i;
   unsigned short batname_seg = FP_SEG(rmod->batfile);
@@ -534,8 +534,6 @@ static int getbatcmd(char *buff, struct rmod_props far *rmod) {
   unsigned short filepos_cx = rmod->batnextline >> 16;
   unsigned short filepos_dx = rmod->batnextline & 0xffff;
   unsigned char blen = 0;
-
-  buff++; /* make room for the len byte prefix */
 
   /* open file, jump to offset filpos, and read data into buff.
    * result in blen (unchanged if EOF or failure). */
@@ -597,7 +595,6 @@ static int getbatcmd(char *buff, struct rmod_props far *rmod) {
     }
   }
   buff[i] = 0;
-  buff[-1] = i;
   rmod->batnextline += i + 1;
 
   return(0);
@@ -613,12 +610,12 @@ int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
   static unsigned short far *lastexitcode;
-  static unsigned char BUFFER[4096];
   static struct rmod_props far *rmod;
+  static char *cmdline;
 
-  rmod = rmod_find();
+  rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
-    rmod = rmod_install(cfg.envsiz);
+    rmod = rmod_install(cfg.envsiz, BUFFER, BUFFER_len);
     if (rmod == NULL) {
       outputnl("ERROR: rmod_install() failed");
       return(1);
@@ -651,8 +648,6 @@ int main(void) {
   }*/
 
   do {
-    char far *cmdline;
-
     if (rmod->flags & FLAG_ECHOFLAG) outputnl(""); /* terminate the previous command with a CR/LF */
 
     SKIP_NEWLINE:
@@ -660,7 +655,8 @@ int main(void) {
     /* cancel any redirections that may have been set up before */
     redir_revert();
 
-    cmdline = rmod->inputbuf + 2;
+    /* preset cmdline to point at the end of my general-purpose buffer */
+    cmdline = BUFFER + sizeof(BUFFER) - 130;
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
@@ -674,9 +670,7 @@ int main(void) {
 
     /* if batch file is being executed -> fetch next line */
     if (rmod->batfile[0] != 0) {
-      char *tmpbuff = BUFFER + sizeof(BUFFER) - 256;
-      if (getbatcmd(tmpbuff, rmod) != 0) { /* end of batch */
-        redir_revert(); /* cancel redirections (if there were any) */
+      if (getbatcmd(cmdline, rmod) != 0) { /* end of batch */
         /* restore echo flag as it was before running the bat file */
         rmod->flags &= ~FLAG_ECHOFLAG;
         if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
@@ -684,30 +678,25 @@ int main(void) {
       }
       /* output prompt and command on screen if echo on and command is not
        * inhibiting it with the @ prefix */
-      if ((rmod->flags & FLAG_ECHOFLAG) && (tmpbuff[1] != '@')) {
+      if ((rmod->flags & FLAG_ECHOFLAG) && (cmdline[0] != '@')) {
         build_and_display_prompt(BUFFER, *rmod_envseg);
-        outputnl(tmpbuff + 1);
+        outputnl(cmdline);
       }
-      /* strip the @ prefix if present, it is no longer useful */
-      if (tmpbuff[1] == '@') {
-        memmove(tmpbuff + 1, tmpbuff + 2, tmpbuff[0] + 1);
-        tmpbuff[0] -= 1; /* update the length byte */
-      }
-      cmdline = tmpbuff + 1;
+      /* skip the @ prefix if present, it is no longer useful */
+      if (cmdline[0] == '@') cmdline++;
     } else {
       /* interactive mode: display prompt (if echo enabled) and wait for user
        * command line */
       if (rmod->flags & FLAG_ECHOFLAG) build_and_display_prompt(BUFFER, *rmod_envseg);
-      /* revert input history terminator to \r so DOS or DOSKEY are not confused */
-      cmdline[(unsigned short)(cmdline[-1])] = '\r';
       /* collect user input */
       cmdline_getinput(FP_SEG(rmod->inputbuf), FP_OFF(rmod->inputbuf));
-      /* replace \r by a zero terminator */
-      cmdline[(unsigned char)(cmdline[-1])] = 0;
+      /* copy it to local cmdline */
+      if (rmod->inputbuf[1] != 0) _fmemcpy(cmdline, rmod->inputbuf + 2, rmod->inputbuf[1]);
+      cmdline[(unsigned)(rmod->inputbuf[1])] = 0; /* zero-terminate local buff (oriignal is '\r'-terminated) */
     }
 
     /* if nothing entered, loop again (but without appending an extra CR/LF) */
-    if (cmdline[-1] == 0) goto SKIP_NEWLINE;
+    if (cmdline[0] == 0) goto SKIP_NEWLINE;
 
     /* I jump here when I need to exec an initial command (/C or /K) */
     EXEC_CMDLINE:

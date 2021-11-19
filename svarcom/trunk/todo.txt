@@ -9,7 +9,6 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 pipes redirections
 autoexec.bat processing (with F5 skipping)
-make cmdline a near pointer for better performance (maybe a separate buffer)
 
 
 === AT SOME LATER TIME =======================================================
