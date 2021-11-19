@@ -23,14 +23,14 @@ CFLAGS = -0 -wx -ms -we -d0 -ox
 
 all: command.com
 
-command.com: deflang.h rmod.h command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+command.com: deflang.h rmodcore.h command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 	*wcl $(LDFLAGS) command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 
 .c.obj:
 	wcc $(CFLAGS) $<
 
-rmod.h: file2c.com rmod.com
-	file2c /c rmod.com rmod.h rmod
+rmodcore.h: file2c.com rmod.com
+	file2c rmod.com rmodcore.h rmodcore
 
 deflang.h: file2c.com tlumacz\default.lng
 	file2c /l4096 tlumacz\default.lng deflang.h langblock

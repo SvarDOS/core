@@ -28,7 +28,7 @@
 #include "env.h"
 #include "helpers.h"
 
-#include "rmod.h"
+#include "rmodcore.h"
 
 #include "rmodinit.h"
 
@@ -37,7 +37,7 @@
 struct rmod_props far *rmod_install(unsigned short envsize) {
   char far *myptr, far *mcb;
   unsigned short far *owner;
-  const unsigned short sizeof_rmodandprops_paras = (0x100 + rmod_len + sizeof(struct rmod_props) + 15) / 16;
+  const unsigned short sizeof_rmodandprops_paras = (0x100 + rmodcore_len + sizeof(struct rmod_props) + 15) / 16;
   unsigned short rmodseg = 0xffff;
   unsigned short envseg, origenvseg;
   struct rmod_props far *res;
@@ -114,7 +114,7 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
     for (i = 0; i < 0x100; i++) myptr[i] = mypsp[i];
   }
   myptr = MK_FP(rmodseg, 0x100);
-  _fmemcpy(myptr, rmod, rmod_len);
+  _fmemcpy(myptr, rmodcore, rmodcore_len);
 
   /* mark rmod memory as "self owned" */
   mcb = MK_FP(rmodseg - 1, 0);
@@ -136,7 +136,7 @@ struct rmod_props far *rmod_install(unsigned short envsize) {
   }
 
   /* prepare result (rmod props) */
-  res = MK_FP(rmodseg, 0x100 + rmod_len);
+  res = MK_FP(rmodseg, 0x100 + rmodcore_len);
   _fmemset(res, 0, sizeof(*res));  /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
   res->inputbuf[0] = 128;          /* input buffer for INT 0x21, AH=0Ah*/
@@ -199,7 +199,7 @@ struct rmod_props far *rmod_find(void) {
   cmdtail[0] = 0;
   cmdtail[1] = '\r';
   /* */
-  return(MK_FP(*parent, 0x100 + rmod_len));
+  return(MK_FP(*parent, 0x100 + rmodcore_len));
 }
 
 
