@@ -131,7 +131,7 @@ static void parse_argv(struct config *cfg) {
           if (cfg->envsiz < 64) cfg->envsiz = 0;
           break;
 
-        case 'p': /* permanent shell (can't exit) */
+        case 'p': /* permanent shell (can't exit + run autoexec.bat) */
         case 'P':
           cfg->flags |= FLAG_PERMANENT;
           break;
@@ -647,9 +647,14 @@ int main(void) {
     printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod->rmodseg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
   }*/
 
+  /* on /P check for the presence of AUTOEXEC.BAT and execute it if found */
+  if (cfg.flags & FLAG_PERMANENT) {
+    if (file_getattr("AUTOEXEC.BAT") >= 0) cfg.execcmd = "AUTOEXEC.BAT";
+  }
+
   do {
     /* terminate previous command with a CR/LF if ECHO ON (but not during BAT processing) */
-    if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->batfile[0] != 0)) outputnl("");
+    if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->batfile[0] == 0)) outputnl("");
 
     SKIP_NEWLINE:
 
