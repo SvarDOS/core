@@ -6,8 +6,9 @@ SvarCOM is the SvarDOS command line interpreter, known usually under the name
 "COMMAND.COM". It is designed and maintained by Mateusz Viste, and distributed
 under the terms of the MIT license.
 
-For the time being, it is an incomplete, "work in progress" project. SvarCOM
-version 2021.0 must be considered as a "preview" version.
+For the time being, it is a work-in-progress project that is not entirely
+complete yet. SvarCOM version 2021.0 must be considered as a "preview"
+version.
 
 The goal is to make SvarCOM the default SvarDOS shell, replacing FreeCOM.
 Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
