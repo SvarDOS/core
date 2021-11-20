@@ -130,76 +130,75 @@ static int memguard_check(unsigned short rmodseg) {
 
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
-  unsigned short i;
-  const unsigned char *cmdlinelen = (unsigned char *)0x80;
-  char *cmdline = (char *)0x81;
+  const unsigned char *cmdlinelen = (void *)0x80;
+  char *cmdline = (void *)0x81;
 
   memset(cfg, 0, sizeof(*cfg));
 
   /* set a NULL terminator on cmdline */
   cmdline[*cmdlinelen] = 0;
 
-  for (i = 0;;) {
+  while (*cmdline != 0) {
 
     /* skip over any leading spaces */
-    for (;; i++) {
-      if (cmdline[i] == 0) return;
-      if (cmdline[i] != ' ') break;
+    if (*cmdline == ' ') {
+      cmdline++;
+      continue;
     }
 
-    if (cmdline[i] != '/') {
+    if (*cmdline != '/') {
       output("Invalid parameter: ");
-      outputnl(cmdline + i);
-      /* exit(1); */
-    } else {
-      i++;        /* skip the slash */
-      switch (cmdline[i]) {
-        case 'c': /* /C = execute command and quit */
-        case 'C':
-          cfg->flags |= FLAG_EXEC_AND_QUIT;
-          /* FALLTHRU */
-        case 'k': /* /K = execute command and keep running */
-        case 'K':
-          cfg->execcmd = cmdline + i + 1;
-          return;
+      outputnl(cmdline);
+      goto SKIP_TO_NEXT_ARG;
+    }
 
-        case 'e': /* preset the initial size of the environment block */
-        case 'E':
-          i++;
-          if (cmdline[i] == ':') i++; /* could be /E:size */
-          atous(&(cfg->envsiz), cmdline + i);
-          if (cfg->envsiz < 64) cfg->envsiz = 0;
-          break;
+    /* got a slash */
+    cmdline++;  /* skip the slash */
+    switch (*cmdline) {
+      case 'c': /* /C = execute command and quit */
+      case 'C':
+        cfg->flags |= FLAG_EXEC_AND_QUIT;
+        /* FALLTHRU */
+      case 'k': /* /K = execute command and keep running */
+      case 'K':
+        cfg->execcmd = cmdline + 1;
+        return;
 
-        case 'p': /* permanent shell (can't exit + run autoexec.bat) */
-        case 'P':
-          cfg->flags |= FLAG_PERMANENT;
-          break;
+      case 'e': /* preset the initial size of the environment block */
+      case 'E':
+        cmdline++;
+        if (*cmdline == ':') cmdline++; /* could be /E:size */
+        atous(&(cfg->envsiz), cmdline);
+        if (cfg->envsiz < 64) cfg->envsiz = 0;
+        break;
 
-        case '?':
-          outputnl("Starts the SvarCOM command interpreter");
-          outputnl("");
-          outputnl("COMMAND /E:nnn [/[C|K] command]");
-          outputnl("");
-          outputnl("/E:nnn     Sets the environment size to nnn bytes");
-          outputnl("/P         Makes the new command interpreter permanent (can't exit)");
-          outputnl("/C         Executes the specified command and returns");
-          outputnl("/K         Executes the specified command and continues running");
-          exit(1);
-          break;
+      case 'p': /* permanent shell (can't exit + run autoexec.bat) */
+      case 'P':
+        cfg->flags |= FLAG_PERMANENT;
+        break;
 
-        default:
-          output("Invalid switch:");
-          output(" ");
-          outputnl(cmdline + i);
-          exit(1);
-          break;
-      }
+      case '?':
+        outputnl("Starts the SvarCOM command interpreter");
+        outputnl("");
+        outputnl("COMMAND /E:nnn [/[C|K] command]");
+        outputnl("");
+        outputnl("/E:nnn     Sets the environment size to nnn bytes");
+        outputnl("/P         Makes the new command interpreter permanent (can't exit)");
+        outputnl("/C         Executes the specified command and returns");
+        outputnl("/K         Executes the specified command and continues running");
+        exit(1);
+        break;
+
+      default:
+        output("Invalid switch:");
+        output(" ");
+        outputnl(cmdline);
+        break;
     }
 
     /* move to next argument or quit processing if end of cmdline */
-    for (i++; (cmdline[i] != 0) && (cmdline[i] != ' ') && (cmdline[i] != '/'); i++);
-
+    SKIP_TO_NEXT_ARG:
+    while ((*cmdline != 0) && (*cmdline != ' ') && (*cmdline != '/')) cmdline++;
   }
 }
 
