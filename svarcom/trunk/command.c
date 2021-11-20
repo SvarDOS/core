@@ -87,6 +87,46 @@ struct config {
   unsigned short envsiz;
 };
 
+/* max length of the cmdline storage (bytes) - includes also max length of
+ * line loaded from a BAT file (no more than 255 bytes!) */
+#define CMDLINE_MAXLEN 255
+
+
+/* sets guard values at a few places in memory for later detection of
+ * overflows via memguard_check() */
+static void memguard_set(void) {
+  BUFFER[sizeof(BUFFER) - 1] = 0xC7;
+  BUFFER[sizeof(BUFFER) - (CMDLINE_MAXLEN + 3)] = 0xC7;
+}
+
+
+/* checks for valguards at specific memory locations, returns 0 on success */
+static int memguard_check(unsigned short rmodseg) {
+  /* check RMOD signature (would be overwritten in case of stack overflow */
+  static char msg[] = "!! MEMORY CORRUPTION ## DETECTED !!";
+  unsigned short far *rmodsig = MK_FP(rmodseg, 0x100 + 6);
+  if (*rmodsig != 0x2019) {
+    msg[22] = '1';
+    outputnl(msg);
+    printf("rmodseg = %04X ; *rmodsig = %04X\r\n", rmodseg, *rmodsig);
+    return(1);
+  }
+  /* check last BUFFER byte (could be overwritten by cmdline) */
+  if (BUFFER[sizeof(BUFFER) - 1] != 0xC7) {
+    msg[22] = '2';
+    outputnl(msg);
+    return(2);
+  }
+  /* check that cmdline BUFFER's end hasn't been touched by something else */
+  if (BUFFER[sizeof(BUFFER) - (CMDLINE_MAXLEN + 3)] != 0xC7) {
+    msg[22] = '3';
+    outputnl(msg);
+    return(3);
+  }
+  /* all good */
+  return(0);
+}
+
 
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
@@ -607,10 +647,6 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
 }
 
 
-/* max length of the cmdline storage (bytes) - includes also max length of
- * line loaded from a BAT file (no more than 255 bytes!) */
-#define CMDLINE_MAXLEN 255
-
 int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
@@ -637,6 +673,9 @@ int main(void) {
      * have a purpose in life */
     if (rmod->flags & FLAG_EXEC_AND_QUIT) sayonara(rmod);
   }
+
+  /* install a few guardvals in memory to detect some cases of overflows */
+  memguard_set();
 
   rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
   lastexitcode = MK_FP(rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
@@ -666,8 +705,12 @@ int main(void) {
     /* cancel any redirections that may have been set up before */
     redir_revert();
 
-    /* preset cmdline to point at the end of my general-purpose buffer */
-    cmdline = BUFFER + sizeof(BUFFER) - (CMDLINE_MAXLEN + 1);
+    /* memory check */
+    memguard_check(rmod->rmodseg);
+
+    /* preset cmdline to point at the end of my general-purpose buffer (with
+     * one extra byte for the NULL terminator and another for memguard val) */
+    cmdline = BUFFER + sizeof(BUFFER) - (CMDLINE_MAXLEN + 2);
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);

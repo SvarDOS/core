@@ -19,20 +19,23 @@ section .text    ; all goes into code segment
 SIG1 dw 0x1983   ;  +0
 SIG2 dw 0x1985   ;  +2
 SIG3 dw 0x2017   ;  +4
-SIG4 dw 0x2019   ;  +6
+SIG4 dw 0x2019   ;  +6  this acts also as a guardval to detect stack overflows
 
-FFU_UNUSED dw 0  ;  +8
+; DOS int 21h functions that I use require at least 40 bytes of stack under
+; DOS-C (FreeDOS) kernel, so here I reserve 64 bytes juste to be sure
+STACKBUF db "XXX  SVARCOM RMOD BY MATEUSZ VISTE  XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+STACKPTR dw 0
 
 ; exit code of last application
-LEXCODE  dw 0    ; +0Ah
+LEXCODE  dw 0    ; +4Ah
 
 ; offset of the COMSPEC variable in the environment block, 0 means "use
 ; boot drive". this value is patched by the transient part of COMMAND.COM
-COMSPECPTR dw 0  ; +0Ch
+COMSPECPTR dw 0  ; +4Ch
 
 ; fallback COMSPEC string used if no COMPSEC is present in the environment
 ; drive. drive is patched by the transient part of COMMAND.COM
-COMSPECBOOT db "@:\COMMAND.COM", 0 ; +0Eh
+COMSPECBOOT db "@:\COMMAND.COM", 0 ; +4Eh
 
 ; ExecParamRec used by INT 21h, AX=4b00 (load and execute program), 14 bytes:
 ;  offset  size  content
@@ -40,12 +43,12 @@ COMSPECBOOT db "@:\COMMAND.COM", 0 ; +0Eh
 ;     +2     4   address of command line to place at PSP:0080
 ;     +6     4   address of an FCB to be placed at PSP:005c
 ;    +0Ah    4   address of an FCB to be placed at PSP:006c
-EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +1Dh
+EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +5Dh
 
-; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +2Bh
+; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +6Bh
 EXECPROG dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-skipsig:         ; +ABh
+skipsig:         ; +EBh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -145,8 +148,3 @@ jmp skipsig
 CMDTAIL db 0x01, 0x0A, 0x0D
 
 ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM", 13, 10, '$'
-
-; DOS int 21h functions that I use require at least 32 bytes of stack, here I
-; allocate 64 bytes to be sure
-STACKBUF db "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
-STACKPTR db "xx"
