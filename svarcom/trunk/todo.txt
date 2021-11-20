@@ -5,48 +5,39 @@
 This is a loose list of things that I'd like to implement within SvarCOM.
 
 
-=== BEFORE NEXT RELEASE ======================================================
+=== HIGH PRIORITY ============================================================
 
-pipes redirections
 handling of %VARS% in cmdline (BAT files or interactive queries)
-
-
-=== AT SOME LATER TIME =======================================================
-
-translations should be cached in rmod-owned memory
-if translations reloading fails, do not retry after every command
-stdin redirection: command < file.txt
-DIR: /A
-DIR: %DIRCMD% support
-DIR: /O
-DIR: /S (must use multiple DTAs recursively)
-COPY: /V
+pipes redirections
+DIR /A
 ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
 
-"notify pending command" int support: http://www.techhelpmanual.com/741-int_2fh_ae00h__notify_pending_command.html
 
-INT 2F,AX=5500 support
+=== MEDIUM PRIORITY ==========================================================
 
 provide unopened FCBs to launched applications
+completed EN translation strings
+translations should be cached in rmod-owned memory
+if translations reloading fails, do not retry after every command
+DIR /O
+DIR /S (must use multiple DTAs recursively)
+stdin redirection: command < file.txt
 
+
+=== NICE TO HAVE =============================================================
+
+DIR: %DIRCMD% support
+COPY /V
+"notify pending command" support (INT 2F,AX=AE00)
+INT 2F,AX=5500 support
 stdout redirection should not create the output file if command fails
 COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
-
 compression of NLS strings and rmod core (lz4?)
-
 dynamic resizing of environment space
-single-stepping AUTOEXEC with F8 at boot time (/Y)
 CTTY
 LOADHIGH/LH
+advanced batch support: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL, SHIFT
 
-advanced batch files support:
- - CALL
- - :labels
- - FOR
- - GOTO
- - IF EXIST
- - IF ERRORLEVEL
- - SHIFT
 
 ==============================================================================
