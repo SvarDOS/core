@@ -65,6 +65,22 @@ static int cmd_ver(struct cmd_funcparam *p) {
     }
     printf("[rmod:RMOD_OFFSET_COMSPECPTR] = '%s'\r\n", buff);
     printf("[rmod:RMOD_OFFSET_LEXITCODE] = %u\r\n", *rmod_exitcode);
+    printf("rmod dump (first 64 bytes at [rmodseg:0100h]):\r\n");
+    fptr = MK_FP(p->rmod->rmodseg, 0x100);
+    for (i = 0; i < 64; i += 16) {
+      int ii;
+      for (ii = i; ii < i + 16; ii++) printf(" %02X", fptr[ii]);
+      printf("   ");
+      for (ii = i; ii < i + 16; ii++) {
+        if (fptr[ii] < ' ') {
+          printf(".");
+        } else {
+          printf("%c", fptr[ii]);
+        }
+      }
+      printf("\r\n");
+    }
+
     return(-1);
   }
 #endif
