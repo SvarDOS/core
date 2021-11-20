@@ -8,7 +8,6 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 === BEFORE NEXT RELEASE ======================================================
 
 pipes redirections
-F5 skipping of autoexec.bat
 handling of %VARS% in cmdline (BAT files or interactive queries)
 
 

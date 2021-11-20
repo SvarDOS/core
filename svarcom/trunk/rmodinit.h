@@ -25,10 +25,11 @@
 #ifndef RMODINIT_H
 #define RMODINIT_H
 
-#define FLAG_EXEC_AND_QUIT 1
-#define FLAG_PERMANENT 2
-#define FLAG_ECHOFLAG 4
-#define FLAG_ECHO_BEFORE_BAT 8
+#define FLAG_EXEC_AND_QUIT    1
+#define FLAG_PERMANENT        2
+#define FLAG_ECHOFLAG         4
+#define FLAG_ECHO_BEFORE_BAT  8
+#define FLAG_SKIP_AUTOEXEC   16
 
 struct rmod_props {
   char inputbuf[130];         /* input buffer for INT 21, AH=0x0A */

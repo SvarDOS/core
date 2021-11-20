@@ -122,6 +122,11 @@ static void parse_argv(struct config *cfg) {
         cfg->execcmd = cmdline + 1;
         return;
 
+      case 'd': /* /D = skip autoexec.bat processing */
+      case 'D':
+        cfg->flags |= FLAG_SKIP_AUTOEXEC;
+        break;
+
       case 'e': /* preset the initial size of the environment block */
       case 'E':
         cmdline++;
@@ -138,18 +143,18 @@ static void parse_argv(struct config *cfg) {
       case '?':
         outputnl("Starts the SvarCOM command interpreter");
         outputnl("");
-        outputnl("COMMAND /E:nnn [/[C|K] command]");
+        outputnl("COMMAND /E:nnn [/[C|K] [/P] [/D] command]");
         outputnl("");
-        outputnl("/E:nnn     Sets the environment size to nnn bytes");
-        outputnl("/P         Makes the new command interpreter permanent (can't exit)");
-        outputnl("/C         Executes the specified command and returns");
-        outputnl("/K         Executes the specified command and continues running");
+        outputnl("/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)");
+        outputnl("/E:nnn  Sets the environment size to nnn bytes");
+        outputnl("/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT");
+        outputnl("/C      Executes the specified command and returns");
+        outputnl("/K      Executes the specified command and continues running");
         exit(1);
         break;
 
       default:
-        output("Invalid switch:");
-        output(" ");
+        output("Invalid switch: /");
         outputnl(cmdline);
         break;
     }
@@ -648,8 +653,9 @@ int main(void) {
     printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod->rmodseg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
   }*/
 
-  /* on /P check for the presence of AUTOEXEC.BAT and execute it if found */
-  if (cfg.flags & FLAG_PERMANENT) {
+  /* on /P check for the presence of AUTOEXEC.BAT and execute it if found,
+   * but skip this check if /D was also passed */
+  if ((cfg.flags & (FLAG_PERMANENT | FLAG_SKIP_AUTOEXEC)) == FLAG_PERMANENT) {
     if (file_getattr("AUTOEXEC.BAT") >= 0) cfg.execcmd = "AUTOEXEC.BAT";
   }
 
