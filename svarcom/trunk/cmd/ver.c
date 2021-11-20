@@ -38,10 +38,13 @@ static int cmd_ver(struct cmd_funcparam *p) {
     outputnl("Displays the DOS version.");
     outputnl("");
     outputnl("ver [/about]");
+#ifdef VERDBG
+    outputnl("ver /dbg");
+#endif
     return(-1);
   }
 
-#if 1
+#ifdef VERDBG
   if ((p->argc == 1) && (imatch(p->argv[0], "/dbg"))) {
     unsigned short far *rmod_envseg = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_ENVSEG);
     unsigned char far *rmod_exitcode = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_LEXITCODE);

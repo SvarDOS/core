@@ -8,8 +8,11 @@
 #  wmake clean     - cleans up all non-source files
 #
 
+FEATURES =
+FEATURES += -DVERDBG
+
 LDFLAGS = -0 -y -wx -mt -lr -we -d0 -ox -fm=command.map
-CFLAGS = -0 -wx -ms -we -d0 -ox
+CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
 # -0   generate 8086 compatible code
 # -y   ignore %WCL% if present
 # -wx  maximum warnings level
