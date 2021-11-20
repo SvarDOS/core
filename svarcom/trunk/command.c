@@ -22,48 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * SvarCOM is a command-line interpreter.
- *
- * a little memory area is allocated as high as possible. it contains:
- *  - a signature (like XMS drivers do)
- *  - a routine for exec'ing programs
- *  - a "last command" buffer for input history
- *
- * when svarcom starts, it tries locating the routine in memory.
- *
- * if found:
- *   waits for user input and processes it. if execing something is required, set the "next exec" field in routine's memory and quit.
- *
- * if not found:
- *   installs it by creating a new PSP, set int 22 vector to the routine, set my "parent PSP" to the routine
- *   and quit.
- *
- * PSP structure
- * http://www.piclist.com/techref/dos/psps.htm
- *
- *
- *
- * === MCB ===
- *
- * each time that DOS allocates memory, it prefixes the allocated memory with
- * a 16-bytes structure called a "Memory Control Block" (MCB). This control
- * block has the following structure:
- *
- * Offset  Size     Description
- *   00h   byte     'M' =  non-last member of the MCB chain
- *                  'Z' = indicates last entry in MCB chain
- *                  other values cause "Memory Allocation Failure" on exit
- *   01h   word     PSP segment address of the owner (Process Id)
- *                  possible values:
- *                    0 = free
- *                    8 = Allocated by DOS before first user pgm loaded
- *                    other = Process Id/PSP segment address of owner
- *   03h  word      number of paragraphs related to this MCB (excluding MCB)
- *   05h  11 bytes  reserved
- *   10h  ...       start of actual allocated memory block
- */
-
 #include <i86.h>
 #include <dos.h>
 #include <stdio.h>
