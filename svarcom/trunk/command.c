@@ -275,15 +275,15 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
 }
 
 
-/* tries locating executable fname in path and fille res with result. returns 0 on success,
+/* tries locating executable fname in path and fill res with result. returns 0 on success,
  * -1 on failed match and -2 on failed match + "don't even try with other paths"
- * format is filled the offset where extension starts in fname (-1 if not found) */
-int lookup_cmd(char *res, const char *fname, const char *path, const char **extptr) {
-  unsigned short lastbslash = 0xffff;
+ * extptr contains a ptr to the extension in fname (NULL if not found) */
+static int lookup_cmd(char *res, const char *fname, const char *path, const char **extptr) {
+  unsigned short lastbslash = 0;
   unsigned short i, len;
   unsigned char explicitpath = 0;
 
-  /* does the original fname had an explicit path prefix or explicit ext? */
+  /* does the original fname has an explicit path prefix or explicit ext? */
   *extptr = NULL;
   for (i = 0; fname[i] != 0; i++) {
     switch (fname[i]) {
@@ -317,19 +317,16 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
 
   /* printf("lastbslash=%u\r\n", lastbslash); */
 
-  /* if no path prefix in fname (':' or backslash), then assemble path+filename */
-  if (!explicitpath) {
-    if (path != NULL) {
-      i = strlen(path);
-    } else {
-      i = 0;
-    }
-    if ((i != 0) && (path[i - 1] != '\\')) i++; /* add a byte for inserting a bkslash after path */
+  /* if no path prefix was found in fname (no colon or backslash) AND we have
+   * a path arg, then assemble path+filename */
+  if ((!explicitpath) && (path != NULL) && (path[0] != 0)) {
+    i = strlen(path);
+    if (path[i - 1] != '\\') i++; /* add a byte for inserting a bkslash after path */
+    /* move the filename at the place where path will end */
     memmove(res + i, res + lastbslash + 1, len - lastbslash);
-    if (i != 0) {
-      memmove(res, path, i);
-      res[i - 1] = '\\';
-    }
+    /* copy path in front of the filename and make sure there is a bkslash sep */
+    memmove(res, path, i);
+    res[i - 1] = '\\';
   }
 
   /* if no extension was initially provided, try matching COM, EXE, BAT */
