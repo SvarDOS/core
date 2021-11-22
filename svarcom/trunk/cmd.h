@@ -28,10 +28,6 @@
 #include "rmodinit.h"
 
 /* process internal commands */
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, char *BUFFER);
-
-/* explodes a command into an array of arguments where last arg is NULL
- * returns number of args */
-unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist);
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ);
 
 #endif

@@ -132,7 +132,7 @@ static int cmd_date_set(unsigned short year, unsigned char mo, unsigned char dy)
 
 static int cmd_date(struct cmd_funcparam *p) {
   struct nls_patterns *nls = (void *)(p->BUFFER);
-  char *buff = p->BUFFER + (BUFFER_SIZE / 2);
+  char *buff = p->BUFFER + sizeof(*nls);
   unsigned short i;
   unsigned short year = 0;
   unsigned char mo, dy;

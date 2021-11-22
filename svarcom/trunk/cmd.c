@@ -39,16 +39,17 @@
 #include "rmodinit.h"
 #include "sayonara.h"
 
-#define BUFFER_SIZE 2048    /* make sure this is not bigger than the static buffer in command.c */
 
 struct cmd_funcparam {
   int argc;                 /* number of arguments */
-  const char *argv[256];    /* pointers to each argument */
+  const char *argv[128];    /* pointers to each argument */
+  char argvbuf[256];        /* buffer that hold data pointed out by argv[] */
   unsigned short env_seg;   /* segment of environment block */
   struct rmod_props far *rmod; /* rmod settings */
   unsigned short argoffset; /* offset of cmdline where first argument starts */
   const char *cmdline;      /* original cmdline (terminated by a NULL) */
-  char BUFFER[BUFFER_SIZE]; /* a buffer for whatever is needed */
+  unsigned short BUFFERSZ;  /* avail space in BUFFER */
+  char BUFFER[1];           /* a buffer for whatever is needed (must be last) */
 };
 
 /* scans argv for the presence of a "/?" parameter. returns 1 if found, 0 otherwise */
@@ -167,7 +168,7 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
 
 /* explodes a command into an array of arguments where last arg is NULL
  * returns number of args */
-unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist) {
+static unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist) {
   int si = 0, argc = 0, i = 0;
   for (;;) {
     /* skip to next non-space character */
@@ -189,10 +190,11 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, char *BUFFER) {
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
   struct cmd_funcparam *p = (void *)BUFFER;
+  p->BUFFERSZ = BUFFERSZ - sizeof(*p);
 
   /* special case: is this a drive change? (like "E:") */
   if ((cmdline[0] != 0) && (cmdline[1] == ':') && ((cmdline[2] == ' ') || (cmdline[2] == 0))) {
@@ -228,7 +230,7 @@ int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char 
   /* printf("recognized internal command: '%s', tail of command at offset %u\r\n", cmdptr->cmd, argoffset); */
 
   /* prepare function parameters and feed it to the cmd handling function */
-  p->argc = cmd_explode(BUFFER + sizeof(*p), cmdline + argoffset, p->argv);
+  p->argc = cmd_explode(p->argvbuf, cmdline + argoffset, p->argv);
   p->env_seg = env_seg;
   p->rmod = rmod;
   p->argoffset = argoffset;

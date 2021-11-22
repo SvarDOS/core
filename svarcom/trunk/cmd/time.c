@@ -136,7 +136,7 @@ static int cmd_time_parse(const char *s, signed char *ho, signed char *mi, signe
 
 static int cmd_time(struct cmd_funcparam *p) {
   struct nls_patterns *nls = (void *)(p->BUFFER);
-  char *buff = p->BUFFER + (BUFFER_SIZE / 2);
+  char *buff = p->BUFFER + sizeof(*nls);
   unsigned short i;
   signed char ho = -1, mi = -1, se = -1;
 

@@ -55,7 +55,8 @@ struct copy_setup {
   char last_asciimode; /* /A or /B impacts the file preceding it and becomes the new default for all files that follow */
   char verifyflag;
   char lastitemwasplus;
-  char databuf[BUFFER_SIZE - 1024];
+  unsigned short databufsz;
+  char databuf[1];
 };
 
 
@@ -185,6 +186,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
   /* parse cmdline and fill the setup struct accordingly */
 
   memset(setup, 0, sizeof(*setup));
+  setup->databufsz = p->BUFFERSZ - sizeof(*setup);
 
   for (i = 0; i < p->argc; i++) {
 
@@ -341,7 +343,8 @@ static int cmd_copy(struct cmd_funcparam *p) {
       }
       outputnl(setup->dst);
 
-      t = cmd_copy_internal(setup->dst, 0, setup->databuf, 0, appendflag, setup->databuf, sizeof(setup->databuf));
+      // TODO: reusing setup->databuf not good idea: when 2+ files are being copied, the content of the first one overwrites the pathname of the second one!
+      t = cmd_copy_internal(setup->dst, 0, setup->databuf, 0, appendflag, setup->databuf, setup->databufsz);
       if (t != 0) {
         outputnl(doserr(t));
         return(-1);

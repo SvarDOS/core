@@ -106,8 +106,8 @@ static int cmd_dir(struct cmd_funcparam *p) {
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
   unsigned short wcols = screen_getwidth() / WCOLWIDTH; /* number of columns in wide mode */
   unsigned char wcolcount;
-  struct nls_patterns *nls = (void *)(p->BUFFER + (BUFFER_SIZE / 3));
-  char *buff2 = p->BUFFER + (BUFFER_SIZE / 3 * 2);
+  struct nls_patterns *nls = (void *)(p->BUFFER + (p->BUFFERSZ / 2));
+  char *buff2 = p->BUFFER + (p->BUFFERSZ / 2) + sizeof(*nls);
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;

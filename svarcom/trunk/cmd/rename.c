@@ -28,9 +28,9 @@
 
 static int cmd_rename(struct cmd_funcparam *p) {
   char *src = p->BUFFER;
-  char *dst = p->BUFFER + (BUFFER_SIZE / 4);
-  char *buff1 = p->BUFFER + (BUFFER_SIZE / 4 * 2);
-  char *buff2 = p->BUFFER + (BUFFER_SIZE / 4 * 3);
+  char *dst = p->BUFFER + 256;
+  char *buff1 = p->BUFFER + 512;
+  char *buff2 = p->BUFFER + 1024;
   unsigned short i, fnameoffset;
   struct DTA *dta = (void *)0x80; /* use default DTA in PSP */
 
