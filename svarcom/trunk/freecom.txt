@@ -57,7 +57,17 @@ FreeCOM code is released under the terms of a license that restrains the
 freedom of its users due to its virality (GPL).
 
 SvarCOM is released under the terms of a liberal and permissive (MIT) license
-that does not impose limitations on how users may or may not use the software.
+that does not impose limitations on how users may or may not use the software,
+it only asks for credits to be provided where credit is due.
+
+I am aware that this section, and its slightly provocating title, may trigger
+reactions from GPL enthusiasts, hence let me explain with more words. I enjoy
+creating software and I publish it for others to use for free. Should someone
+wish to extend SvarCOM with an extra feature and decide not to publish the
+source code along with the modified version, that's fine by me. My code is
+still open and free. Theirs is not, but its their work, so I find it fair that
+they have the freedom to decide how to distribute it. I certainly do not wish
+to impose my views on others.
 
 
 ====================================================================== EOF ===
