@@ -48,6 +48,7 @@
 struct copy_setup {
   const char *src[64];
   unsigned short src_count; /* how many sources are declared */
+  char cursrc[256];         /* buffer for currently processed src */
   char dst[256];
   unsigned short dstlen;
   char src_asciimode[64];
@@ -274,37 +275,37 @@ static int cmd_copy(struct cmd_funcparam *p) {
 
   for (i = 0; i < setup->src_count; i++) {
     unsigned short t;
-    unsigned short databuflen;
+    unsigned short cursrclen;
     unsigned short pathendoffset;
 
     /* resolve truename of src and write it to buffer */
-    t = file_truename(setup->src[i], setup->databuf);
+    t = file_truename(setup->src[i], setup->cursrc);
     if (t != 0) {
       output(setup->src[i]);
       output(" - ");
       outputnl(doserr(t));
       continue;
     }
-    databuflen = strlen(setup->databuf); /* remember databuf length */
+    cursrclen = strlen(setup->cursrc); /* remember cursrc length */
 
     /* if length zero, skip (not sure why this would be possible, though) */
-    if (databuflen == 0) continue;
+    if (cursrclen == 0) continue;
 
     /* if src does not end with a backslash AND it is a directory then append a backslash */
-    databuflen = path_appendbkslash_if_dir(setup->databuf);
+    cursrclen = path_appendbkslash_if_dir(setup->cursrc);
 
     /* if src ends with a '\' then append *.* */
-    if (setup->databuf[databuflen - 1] == '\\') {
-      strcat(setup->databuf, "*.*");
+    if (setup->cursrc[cursrclen - 1] == '\\') {
+      strcat(setup->cursrc, "*.*");
     }
 
-    /* remember where the path in databuf ends */
-    for (t = 0; setup->databuf[t] != 0; t++) {
-      if (setup->databuf[t] == '\\') pathendoffset = t + 1;
+    /* remember where the path in cursrc ends */
+    for (t = 0; setup->cursrc[t] != 0; t++) {
+      if (setup->cursrc[t] == '\\') pathendoffset = t + 1;
     }
 
     /* */
-    if (findfirst(dta, setup->databuf, 0) != 0) {
+    if (findfirst(dta, setup->cursrc, 0) != 0) {
       continue;
     }
 
@@ -313,12 +314,12 @@ static int cmd_copy(struct cmd_funcparam *p) {
       if (dta->attr & DOS_ATTR_DIR) continue; /* skip directories */
 
       /* compute full path/name of the file */
-      strcpy(setup->databuf + pathendoffset, dta->fname);
+      strcpy(setup->cursrc + pathendoffset, dta->fname);
 
       /* if there was no destination, then YOU are the destination now!
        * this handles situations like COPY a.txt+b.txt+c.txt */
       if (setup->dst[0] == NULL) {
-        strcpy(setup->dst, setup->databuf);
+        strcpy(setup->dst, setup->cursrc);
         setup->dstlen = strlen(setup->dst);
         copiedcount_in++;
         copiedcount_out++;
@@ -328,12 +329,12 @@ static int cmd_copy(struct cmd_funcparam *p) {
       /* is dst ending with a backslash? then append fname to it */
       if (setup->dst[setup->dstlen - 1] == '\\') strcpy(setup->dst + setup->dstlen, dta->fname);
 
-      /* now databuf contains the full source and dst contains the full dest... COPY TIME! */
+      /* now cursrc contains the full source and dst contains the full dest... COPY TIME! */
 
       /* if dst file exists already -> overwrite it or append?
           - if dst is a dir (dstlen-1 points at a \\) -> overwrite
           - otherwise: if copiedcount_in==0 overwrite, else append */
-      output(setup->databuf);
+      output(setup->cursrc);
       if ((setup->dst[setup->dstlen - 1] == '\\') || (copiedcount_in == 0)) {
         appendflag = 0;
         output(" > ");
@@ -344,8 +345,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
       }
       outputnl(setup->dst);
 
-      // TODO: reusing setup->databuf not good idea: when 2+ files are being copied, the content of the first one overwrites the pathname of the second one!
-      t = cmd_copy_internal(setup->dst, 0, setup->databuf, 0, appendflag, setup->databuf, setup->databufsz);
+      t = cmd_copy_internal(setup->dst, 0, setup->cursrc, 0, appendflag, setup->databuf, setup->databufsz);
       if (t != 0) {
         outputnl(doserr(t));
         return(-1);
