@@ -54,7 +54,7 @@ clean: .SYMBOLIC
 pkg: svarcom.zip svarcsrc.zip
 
 svarcom.zip: command.com
-	zip -9 -j svarcom.zip command.com svarcom.txt freecom.txt tlumacz\svarcom.lng
+	zip -9 -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt tlumacz\svarcom.lng
 
 svarcsrc.zip: .SYMBOLIC
 	zip -9 -r svarcsrc.zip makefile *.c *.h *.txt *.asm tlumacz cmd
