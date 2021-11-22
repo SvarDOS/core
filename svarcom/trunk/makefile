@@ -35,8 +35,8 @@ cmd.obj: cmd.c cmd\*.c
 .c.obj:
 	wcc $(CFLAGS) $<
 
-rmodcore.h: file2c.com rmod.com
-	file2c /s /l4096 rmod.com rmodcore.h BUFFER
+rmodcore.h: file2c.com rmod.bin
+	file2c /s /l4096 rmod.bin rmodcore.h BUFFER
 
 deflang.h: file2c.com tlumacz\default.lng
 	file2c /l4096 tlumacz\default.lng deflang.h langblock
@@ -44,8 +44,8 @@ deflang.h: file2c.com tlumacz\default.lng
 file2c.com: file2c.c
 	wcl $(LDFLAGS) file2c.c
 
-rmod.com: rmod.asm
-	nasm -f bin -l rmod.lst -o rmod.com rmod.asm
+rmod.bin: rmod.asm
+	nasm -f bin -l rmod.lst -o rmod.bin rmod.asm
 
 clean: .SYMBOLIC
 	del *.com
