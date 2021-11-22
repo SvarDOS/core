@@ -7,11 +7,11 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 === HIGH PRIORITY ============================================================
 
-handling of %1 %2 %3 etc in BAT files
 pipes redirections
 DIR /A
 ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
+advanced batch support: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL, SHIFT
 
 
 === MEDIUM PRIORITY ==========================================================
@@ -38,7 +38,6 @@ compression of NLS strings and rmod core (lz4?)
 dynamic resizing of environment space
 CTTY
 LOADHIGH/LH
-advanced batch support: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL, SHIFT
 
 
 ==============================================================================

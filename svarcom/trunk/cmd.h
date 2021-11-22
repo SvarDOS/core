@@ -30,4 +30,12 @@
 /* process internal commands */
 int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ);
 
+/* explodes a command into an array of arguments where last arg is NULL.
+ * if argvlist is not NULL, it will be filled with pointers that point to buff
+ * locations. buff is filled with all the arguments, each argument being
+ * zero-separated. buff is terminated with an empty argument to mark the end
+ * of arguments.
+ * returns number of args */
+unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist);
+
 #endif

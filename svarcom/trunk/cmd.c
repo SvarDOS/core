@@ -166,9 +166,13 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
 }
 
 
-/* explodes a command into an array of arguments where last arg is NULL
+/* explodes a command into an array of arguments where last arg is NULL.
+ * if argvlist is not NULL, it will be filled with pointers that point to buff
+ * locations. buff is filled with all the arguments, each argument being
+ * zero-separated. buff is terminated with an empty argument to mark the end
+ * of arguments.
  * returns number of args */
-static unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist) {
+unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist) {
   int si = 0, argc = 0, i = 0;
   for (;;) {
     /* skip to next non-space character */
@@ -176,7 +180,8 @@ static unsigned short cmd_explode(char *buff, const char far *s, char const **ar
     /* end of string? */
     if (s[si] == 0) break;
     /* set argv ptr */
-    argvlist[argc++] = buff + i;
+    if (argvlist) argvlist[argc] = buff + i;
+    argc++;
     /* find next arg delimiter (spc, null, slash or plus) while copying arg to local buffer */
     do {
       buff[i++] = s[si++];
@@ -185,7 +190,8 @@ static unsigned short cmd_explode(char *buff, const char far *s, char const **ar
     /* is this end of string? */
     if (s[si] == 0) break;
   }
-  argvlist[argc] = NULL;
+  buff[i] = 0; /* terminate with one extra zero to tell "this is the end of list" */
+  if (argvlist) argvlist[argc] = NULL;
   return(argc);
 }
 

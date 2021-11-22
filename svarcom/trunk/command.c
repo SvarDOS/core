@@ -356,7 +356,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   int lookup;
   unsigned short i;
   const char *ext;
-  char *cmd = buff + 256;
+  char *cmd = buff + 1024;
   const char *cmdtail;
   char far *rmod_execprog = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXECPROG);
   char far *rmod_cmdtail = MK_FP(rmod->rmodseg, 0x81);
@@ -416,8 +416,11 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     /* copy truename of the bat file to rmod buff */
     for (i = 0; cmdfile[i] != 0; i++) rmod->batfile[i] = cmdfile[i];
     rmod->batfile[i] = 0;
-    /* copy args of the bat file to rmod buff */
-    for (i = 0; cmdtail[i] != 0; i++) rmod->batargs[i] = cmdtail[i];
+
+    /* explode args of the bat file and store them in rmod buff */
+    cmd_explode(buff, cmdline, NULL);
+    _fmemcpy(rmod->batargv, buff, sizeof(rmod->batargv));
+
     /* reset the 'next line to execute' counter */
     rmod->batnextline = 0;
     /* remember the echo flag (in case bat file disables echo) */
@@ -661,7 +664,23 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
 
     /* digit? (bat arg) */
     if ((line[1] >= '0') && (line[1] <= '9')) {
-      /* TODO */
+      unsigned short argid = line[1] - '0';
+      unsigned short i;
+      const char far *argv = rmod->batargv;
+
+      /* locate the proper arg */
+      for (i = 0; i != argid; i++) {
+        /* if string is 0, then end of list reached */
+        if (*argv == 0) break;
+        /* jump to next arg */
+        while (*argv != 0) argv++;
+        argv++;
+      }
+
+      /* copy the arg to result */
+      for (i = 0; (argv[i] != 0) && (reslen < ressz); i++) {
+        res[reslen++] = argv[i];
+      }
       line++;  /* skip the digit */
       continue;
     }

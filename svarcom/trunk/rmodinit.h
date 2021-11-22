@@ -39,7 +39,7 @@ struct rmod_props {
   unsigned char flags;        /* command line parameters */
   unsigned char FFU;          /* FOR FUTURE USE */
   char batfile[130];          /* truename of batch file being processed */
-  char batargs[130];          /* arguments of the processed batch files */
+  char batargv[130];          /* args of the batch call (0-separated) */
   unsigned long batnextline;  /* offset in file of next bat line to process */
 };
 
