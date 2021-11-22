@@ -52,14 +52,14 @@ struct config {
 
 /* sets guard values at a few places in memory for later detection of
  * overflows via memguard_check() */
-static void memguard_set(void) {
+static void memguard_set(char *cmdlinebuf) {
   BUFFER[sizeof(BUFFER) - 1] = 0xC7;
-  BUFFER[sizeof(BUFFER) - (CMDLINE_MAXLEN + 3)] = 0xC7;
+  cmdlinebuf[CMDLINE_MAXLEN] = 0xC7;
 }
 
 
 /* checks for valguards at specific memory locations, returns 0 on success */
-static int memguard_check(unsigned short rmodseg) {
+static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
   /* check RMOD signature (would be overwritten in case of stack overflow */
   static char msg[] = "!! MEMORY CORRUPTION ## DETECTED !!";
   unsigned short far *rmodsig = MK_FP(rmodseg, 0x100 + 6);
@@ -69,14 +69,14 @@ static int memguard_check(unsigned short rmodseg) {
     printf("rmodseg = %04X ; *rmodsig = %04X\r\n", rmodseg, *rmodsig);
     return(1);
   }
-  /* check last BUFFER byte (could be overwritten by cmdline) */
+  /* check last BUFFER byte */
   if (BUFFER[sizeof(BUFFER) - 1] != 0xC7) {
     msg[22] = '2';
     outputnl(msg);
     return(2);
   }
-  /* check that cmdline BUFFER's end hasn't been touched by something else */
-  if (BUFFER[sizeof(BUFFER) - (CMDLINE_MAXLEN + 3)] != 0xC7) {
+  /* check last cmdlinebuf byte */
+  if (cmdlinebuf[CMDLINE_MAXLEN] != 0xC7) {
     msg[22] = '3';
     outputnl(msg);
     return(3);
@@ -614,6 +614,7 @@ int main(void) {
   static unsigned short far *rmod_envseg;
   static unsigned short far *lastexitcode;
   static struct rmod_props far *rmod;
+  static char cmdlinebuf[CMDLINE_MAXLEN + 2]; /* 1 extra byte for 0-terminator and another for memguard */
   static char *cmdline;
 
   rmod = rmod_find(BUFFER_len);
@@ -637,7 +638,7 @@ int main(void) {
   }
 
   /* install a few guardvals in memory to detect some cases of overflows */
-  memguard_set();
+  memguard_set(cmdlinebuf);
 
   rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
   lastexitcode = MK_FP(rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
@@ -669,11 +670,10 @@ int main(void) {
     redir_revert();
 
     /* memory check */
-    memguard_check(rmod->rmodseg);
+    memguard_check(rmod->rmodseg, cmdlinebuf);
 
-    /* preset cmdline to point at the end of my general-purpose buffer (with
-     * one extra byte for the NULL terminator and another for memguard val) */
-    cmdline = BUFFER + sizeof(BUFFER) - (CMDLINE_MAXLEN + 2);
+    /* preset cmdline to point at the dedicated buffer */
+    cmdline = cmdlinebuf;
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
@@ -733,7 +733,7 @@ int main(void) {
     }
 
     /* try matching (and executing) an internal command */
-    if (cmd_process(rmod, *rmod_envseg, cmdline, BUFFER) >= -1) {
+    if (cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER)) >= -1) {
       /* internal command executed */
       redir_revert(); /* revert stdout (in case it was redirected) */
       continue;
