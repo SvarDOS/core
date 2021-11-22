@@ -64,7 +64,7 @@ struct copy_setup {
  * - copy is performed in ASCII mode if asciiflag set (stop at first EOF in src
  *   and append an EOF in dst).
  * - returns zero on success, DOS error code on error */
-unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src, char srcascii, unsigned char appendflag, void *buff, unsigned short buffsz) {
+static unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src, char srcascii, unsigned char appendflag, void *buff, unsigned short buffsz) {
   unsigned short errcode = 0;
   unsigned short srch = 0xffff, dsth = 0xffff;
   _asm {
@@ -74,6 +74,7 @@ unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src
     mov ax, 0x3d00 /* DOS 2+ -- open an existing file, read access mode */
     mov dx, src    /* ASCIIZ fname */
     int 0x21       /* CF clear on success, handle in AX */
+    jc FAIL
     mov [srch], ax /* store src handle in memory */
 
     /* check appendflag so I know if I have to try opening dst for append */
