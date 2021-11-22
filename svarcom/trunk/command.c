@@ -617,6 +617,64 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
 }
 
 
+/* replaces %-variables in a BAT line with resolved values:
+ * %PATH%       -> replaced by the contend of the PATH env variable
+ * %UNDEFINED%  -> undefined variables are replaced by nothing ("")
+ * %NOTCLOSED   -> NOTCLOSED
+ * %1           -> first argument of the batch file (or nothing if no arg) */
+static void batpercrepl(char *res, unsigned short ressz, const char *line, const struct rmod_props far *rmod, unsigned short envseg) {
+  unsigned short lastperc = 0xffff;
+  unsigned short reslen = 0;
+
+  if (ressz == 0) return;
+  ressz--; /* reserve one byte for the NULL terminator */
+
+  for (; (reslen < ressz) && (*line != 0); line++) {
+    /* if not a percent, I don't care */
+    if (*line != '%') {
+      res[reslen++] = *line;
+      continue;
+    }
+
+    /* *** perc char handling *** */
+
+    /* closing perc? */
+    if (lastperc != 0xffff) {
+      /* %% is '%' */
+      if (lastperc == reslen) {
+        res[reslen++] = '%';
+      } else {   /* otherwise variable name */
+        const char far *ptr;
+        res[reslen] = 0;
+        reslen = lastperc;
+        ptr = env_lookup_val(envseg, res + reslen);
+        if (ptr != NULL) {
+          while ((*ptr != 0) && (reslen < ressz)) {
+            res[reslen++] = *ptr;
+            ptr++;
+          }
+        }
+      }
+      lastperc = 0xffff;
+      continue;
+    }
+
+    /* digit? (bat arg) */
+    if ((line[1] >= '0') && (line[1] <= '9')) {
+      /* TODO */
+      line++;  /* skip the digit */
+      continue;
+    }
+
+    /* opening perc */
+    lastperc = reslen;
+
+  }
+
+  res[reslen] = 0;
+}
+
+
 int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
@@ -695,12 +753,14 @@ int main(void) {
 
     /* if batch file is being executed -> fetch next line */
     if (rmod->batfile[0] != 0) {
-      if (getbatcmd(cmdline, CMDLINE_MAXLEN, rmod) != 0) { /* end of batch */
+      if (getbatcmd(BUFFER, CMDLINE_MAXLEN, rmod) != 0) { /* end of batch */
         /* restore echo flag as it was before running the bat file */
         rmod->flags &= ~FLAG_ECHOFLAG;
         if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
         continue;
       }
+      /* %-decoding of variables (%PATH%, %1, %%...), result in cmdline */
+      batpercrepl(cmdline, CMDLINE_MAXLEN, BUFFER, rmod, *rmod_envseg);
       /* skip any leading spaces */
       while (*cmdline == ' ') cmdline++;
       /* output prompt and command on screen if echo on and command is not

@@ -7,7 +7,7 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 === HIGH PRIORITY ============================================================
 
-handling of %VARS% in cmdline (BAT files or interactive queries)
+handling of %1 %2 %3 etc in BAT files
 pipes redirections
 DIR /A
 ctrl+break handler
@@ -23,6 +23,7 @@ if translations reloading fails, do not retry after every command
 DIR /O
 DIR /S (must use multiple DTAs recursively)
 stdin redirection: command < file.txt
+prompt $t, $d, $v
 
 
 === NICE TO HAVE =============================================================
