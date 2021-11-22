@@ -31,6 +31,7 @@
 #include <process.h>
 
 #include "cmd.h"
+#include "doserr.h"
 #include "env.h"
 #include "helpers.h"
 #include "redir.h"
@@ -536,6 +537,7 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
   unsigned short filepos_cx = rmod->batnextline >> 16;
   unsigned short filepos_dx = rmod->batnextline & 0xffff;
   unsigned char blen = 0;
+  unsigned short errv = 0;
 
   /* open file, jump to offset filpos, and read data into buff.
    * result in blen (unchanged if EOF or failure). */
@@ -546,6 +548,7 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
     push dx
 
     /* open file (read-only) */
+    mov bx, 0xffff        /* preset BX to 0xffff to detect error conditions */
     mov dx, batname_off
     mov ax, batname_seg
     push ds     /* save DS */
@@ -553,7 +556,7 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
     mov ax, 0x3d00
     int 0x21    /* handle in ax on success */
     pop ds      /* restore DS */
-    jc DONE
+    jc ERR
     mov bx, ax  /* save handle to bx */
 
     /* jump to file offset CX:DX */
@@ -561,7 +564,7 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
     mov cx, filepos_cx
     mov dx, filepos_dx
     int 0x21  /* CF clear on success, DX:AX set to cur pos */
-    jc CLOSEANDQUIT
+    jc ERR
 
     /* read the line into buff */
     mov ah, 0x3f
@@ -569,11 +572,17 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
     mov cl, buffmaxlen
     mov dx, buff
     int 0x21 /* CF clear on success, AX=number of bytes read */
-    jc CLOSEANDQUIT
+    jc ERR
     mov blen, al
+    jmp CLOSEANDQUIT
+
+    ERR:
+    mov errv, ax
 
     CLOSEANDQUIT:
-    /* close file (handle in bx) */
+    /* close file (if bx contains a handle) */
+    cmp bx, 0xffff
+    je DONE
     mov ah, 0x3e
     int 0x21
 
@@ -585,6 +594,8 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
   }
 
   /* printf("blen=%u filepos_cx=%u filepos_dx=%u\r\n", blen, filepos_cx, filepos_dx); */
+
+  if (errv != 0) outputnl(doserr(errv));
 
   /* on EOF - abort processing the bat file */
   if (blen == 0) goto OOPS;
