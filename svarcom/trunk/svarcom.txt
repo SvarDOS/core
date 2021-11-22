@@ -14,12 +14,16 @@ The goal is to make SvarCOM the default SvarDOS shell, replacing FreeCOM.
 Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 
 Since SvarCOM is a work-in-progress effort, it is missing a few things yet:
- - no support for pipes (eg. file.exe | more)
- - no support for advanced batch constructs (conditionals, errorlevels...)
+ - pipes (cmd.exe | more) and stdin redirections (cmd.exe < file)
+ - advanced batch constructs (conditionals, errorlevels...)
  - a few internal commands missing: CALL, CTTY, GOTO, IF, LH, SHIFT
+ - DIR misses a few switches (/S, /O, /A)
+ - ... (see TODO.TXT for more information)
 
 SvarCOM is minimalist and I'd like to keep it that way. It aims to be
 functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.
+
+As of version 2021.0, SvarCOM's resident footprint is under 2 KiB.
 
 Translation strings are stored in the file SVARCOM.LNG, which should be
 placed in a directory pointed at by %NLSPATH% for SvarCOM to be able to output
