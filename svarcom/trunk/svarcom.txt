@@ -29,7 +29,7 @@ Translation strings are stored in the file SVARCOM.LNG, which should be
 placed in a directory pointed at by %NLSPATH% for SvarCOM to be able to output
 messages in non-english languages. SvarCOM's language is controlled by the
 %LANG% environment variable. NOTE: at this time translations aren't available
-yet, with the proof-of-concept exception of the 'PAUSE' command.
+yet, with the proof-of-concept exceptions of the 'PAUSE' and 'SHIFT' commands.
 
 Latest version available here: http://svardos.osdn.io/svarcom
 

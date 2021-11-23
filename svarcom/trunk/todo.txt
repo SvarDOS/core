@@ -7,11 +7,12 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 === HIGH PRIORITY ============================================================
 
+redirections to be handled (applied) by RMOD
 pipes redirections
 DIR /A
 ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
-advanced batch support: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL, SHIFT
+advanced batch constructs: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL
 
 
 === MEDIUM PRIORITY ==========================================================
@@ -28,8 +29,10 @@ prompt $t, $d, $v
 
 === NICE TO HAVE =============================================================
 
-DIR: %DIRCMD% support
+DIR %DIRCMD% lookup
 COPY /V
+COPY /Y
+COPY ASCII mode support
 "notify pending command" support (INT 2F,AX=AE00)
 INT 2F,AX=5500 support
 stdout redirection should not create the output file if command fails
@@ -38,6 +41,7 @@ compression of NLS strings and rmod core (lz4?)
 dynamic resizing of environment space
 CTTY
 LOADHIGH/LH
+tlumacz: detect incomplete translation files and fill missing strings with EN
 
 
 ==================================================================== [EOF] ===

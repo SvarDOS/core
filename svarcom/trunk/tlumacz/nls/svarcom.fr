@@ -5,5 +5,10 @@
 # Translator: Mateusz Viste
 #
 
+# PAUSE
 15.0:Suspends l'ex‚cution d'un programme batch
 15.1:Appuyez sur une touche pour continuer...
+
+# SHIFT
+16.0:Change la position des arguments dans un fichier batch:
+16.1:L'argument %1 devient %0, l'argument %2 devient %1, etc.

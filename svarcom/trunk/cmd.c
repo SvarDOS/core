@@ -81,6 +81,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/rename.c"
 #include "cmd/rmdir.c"
 #include "cmd/set.c"
+#include "cmd/shift.c"
 #include "cmd/time.c"
 #include "cmd/type.c"
 #include "cmd/ver.c"
@@ -121,6 +122,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"RENAME",  cmd_rename},
   {"RMDIR",   cmd_rmdir},
   {"SET",     cmd_set},
+  {"SHIFT",   cmd_shift},
   {"TIME",    cmd_time},
   {"TYPE",    cmd_type},
   {"VER",     cmd_ver},
