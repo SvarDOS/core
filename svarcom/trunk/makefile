@@ -32,6 +32,9 @@ command.com: rmodcore.h command.obj cmd.obj doserr.obj env.obj redir.obj rmodini
 cmd.obj: cmd.c cmd\*.c
 	wcc $(CFLAGS) cmd.c
 
+command.obj: command.c rmodcore.h
+	wcc $(CFLAGS) command.c
+
 helpers.obj: helpers.c deflang.h
 	wcc $(CFLAGS) helpers.c
 
