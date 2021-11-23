@@ -26,11 +26,14 @@ CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
 
 all: command.com
 
-command.com: deflang.h rmodcore.h command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+command.com: rmodcore.h command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 	*wcl $(LDFLAGS) command.obj cmd.obj doserr.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 
 cmd.obj: cmd.c cmd\*.c
 	wcc $(CFLAGS) cmd.c
+
+helpers.obj: helpers.c deflang.h
+	wcc $(CFLAGS) helpers.c
 
 .c.obj:
 	wcc $(CFLAGS) $<
