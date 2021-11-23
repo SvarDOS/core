@@ -1,0 +1,14 @@
+#
+# SvarCOM translation file
+# Lang: POLISH
+#
+# Translator: Mateusz Viste
+#
+
+# PAUSE
+15.0:Wstrzymuje przetwarzanie pliku wsadowego
+15.1:Naciśnij dowolny klawisz aby kontynuować...
+
+# SHIFT
+16.0:Zmienia pozycję argumentów w pliku wsadowym:
+16.1:Argument %1 staje się %0, argument %2 staje się %1, itd.
