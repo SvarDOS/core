@@ -12,10 +12,6 @@ DIR /A
 ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
 advanced batch constructs: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL
-del review: sometimes says "file not found" while file xxx exists, or does
-            not complain when even though file does not exists... also it
-            probably does not work with deleting anything in non-current
-            directory
 when reverting redirections I should probably close the old handle
 
 

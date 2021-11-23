@@ -77,9 +77,8 @@ static int cmd_del(struct cmd_funcparam *p) {
   file_truename(delspec, buff);
 
   /* is delspec pointing at a directory? if so, add a \*.* */
-  { int attr = file_getattr(delspec);
-    if ((attr > 0) && (attr & DOS_ATTR_DIR)) strcat(buff, "\\????????.???");
-  }
+  i = path_appendbkslash_if_dir(buff);
+  if (buff[i - 1] == '\\') strcat(buff, "????????.???");
 
   /* parse delspec in buff and remember where last backslash or slash is */
   for (i = 0; buff[i] != 0; i++) if (buff[i] == '\\') pathlimit = i + 1;
@@ -96,15 +95,22 @@ static int cmd_del(struct cmd_funcparam *p) {
     /* exec FindFirst or FindNext */
     if (i == 0) {
       err = findfirst(dta, buff, DOS_ATTR_RO | DOS_ATTR_SYS | DOS_ATTR_HID);
+      if (err != 0) { /* report the error only if query had no wildcards */
+        for (i = 0; buff[i] != 0; i++) if (buff[i] == '?') break;
+        if (buff[i] == 0) outputnl(doserr(err));
+        break;
+      }
     } else {
-      err = findnext(dta);
+      if (findnext(dta) != 0) break; /* do not report errors on findnext() */
     }
 
-    if (err != 0) break;
+    /* prep the full path/name of the file in buff */
+    /* NOTE: buff contained the search pattern but it is no longer needed so I
+     * can reuse it now */
+    strcpy(buff + pathlimit, fname);
 
     /* ask if confirmation required: PLIK.TXT  Delete (Y/N)? */
     if (confirmflag) {
-      strcpy(buff + pathlimit, fname); /* note: buff contained the search pattern but it no longer needed so I can reuse it now */
       output(buff);
       output(" \t");
       if (askchoice("Delete (Y/N)?", "YN") != 0) continue;
@@ -112,12 +118,16 @@ static int cmd_del(struct cmd_funcparam *p) {
 
     /* del found file */
     _asm {
+      push ax
+      push dx
       mov ah, 0x41      /* delete a file, DS:DX points to an ASCIIZ filespec (no wildcards allowed) */
-      mov dx, fname
+      mov dx, buff
       int 0x21
       jnc DONE
       mov [err], ax
       DONE:
+      pop dx
+      pop ax
     }
 
     if (err != 0) {
@@ -127,5 +137,6 @@ static int cmd_del(struct cmd_funcparam *p) {
       break;
     }
   }
+
   return(-1);
 }
