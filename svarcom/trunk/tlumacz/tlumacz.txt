@@ -8,4 +8,4 @@ This file must be then placed in the %NLSPATH% directory so SvarCOM can find it.
 SvarCOM's language is controlled by the LANG variable (eg. "SET LANG=PL").
 
 a DEFAULT.LNG file will also be generated, it contains translation strings
-for english only. This file is only useful for SvarCOM building.
+for english only. This file is only useful for building SvarCOM.
