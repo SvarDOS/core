@@ -12,7 +12,6 @@ DIR /A
 ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
 advanced batch constructs: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL
-when reverting redirections I should probably close the old handle
 
 
 === MEDIUM PRIORITY ==========================================================
@@ -35,7 +34,6 @@ COPY /Y
 COPY ASCII mode support
 "notify pending command" support (INT 2F,AX=AE00)
 INT 2F,AX=5500 support
-stdout redirection should not create the output file if command fails
 COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
 compression of NLS strings and rmod core (lz4?)
 dynamic resizing of environment space

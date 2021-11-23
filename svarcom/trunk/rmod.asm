@@ -177,9 +177,12 @@ REVERT_REDIR_IF_ANY:
 mov bx, [OLD_STDOUT]
 cmp bx, 0xffff
 je STDOUT_DONE
-; revert the stdout handle (dst in BX alread)
+; revert the stdout handle (dst in BX already)
 mov cx, 1        ; src handle (1=stdout)
 mov ah, 0x46     ; redirect a handle
+int 0x21
+; close the old handle (still in bx)
+mov ah, 0x3e
 int 0x21
 mov [OLD_STDOUT], word 0xffff ; mark stdout as "not redirected"
 STDOUT_DONE:
@@ -212,5 +215,6 @@ mov ah, 0x46           ; "redirect a handle"
 int 0x21
 ; close the original file handle, I no longer need it
 mov ah, 0x3e           ; close a file handle (handle in BX)
+int 0x21
 NO_STDOUT_REDIR:
 ret

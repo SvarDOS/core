@@ -157,6 +157,9 @@ void redir_revert(void) {
     mov cx, 1           /* src handle (1=stdout) */
     mov ah, 0x46        /* redirect a handle */
     int 0x21
+    /* close old handle (in bx already) */
+    mov ah, 0x3e
+    int 0x21
     mov [oldstdout], 0xffff
     DONE:
   }
