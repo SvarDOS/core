@@ -28,7 +28,7 @@
 #include "rmodinit.h"
 
 /* process internal commands */
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ);
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *r);
 
 /* explodes a command into an array of arguments where last arg is NULL.
  * if argvlist is not NULL, it will be filled with pointers that point to buff

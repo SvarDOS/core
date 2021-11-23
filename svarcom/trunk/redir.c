@@ -22,21 +22,21 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <string.h> /* memset() */
+
 #include "doserr.h"
 #include "helpers.h"
+#include "rmodinit.h"
 
 #include "redir.h"
 
 static unsigned short oldstdout = 0xffff;
 
+
 /* parse commandline and performs necessary redirections. cmdline is
- * modified so all redirections are cut out.
- * returns 0 on success, non-zero otherwise */
-int redir_parsecmd(char *cmdline, char *BUFFER) {
+ * modified so all redirections are cut out. */
+void redir_parsecmd(struct redir_data *d, char *cmdline) {
   unsigned short i;
-  unsigned short rediroffset_stdin = 0;
-  unsigned short rediroffset_stdout = 0;
-  unsigned short pipesoffsets[16];
   unsigned short pipescount = 0;
 
   /* NOTE:
@@ -53,50 +53,50 @@ int redir_parsecmd(char *cmdline, char *BUFFER) {
   /* preset oldstdout to 0xffff in case no redirection is required */
   oldstdout = 0xffff;
 
+  /* clear out the redir_data struct */
+  memset(d, 0, sizeof(*d));
+
+  /* parse the command line and fill struct with pointers */
   for (i = 0;; i++) {
     if (cmdline[i] == '>') {
       cmdline[i] = 0;
-      rediroffset_stdout = i + 1;
+      if (cmdline[i + 1] == '>') {
+        i++;
+        d->stdout_openflag = 0x11;  /* used during int 21h,AH=6C */
+      } else {
+        d->stdout_openflag = 0x12;
+      }
+      d->stdoutfile = cmdline + i + 1;
+      while (d->stdoutfile[0] == ' ') d->stdoutfile++;
     } else if (cmdline[i] == '<') {
       cmdline[i] = 0;
-      rediroffset_stdin = i + 1;
+      d->stdinfile = cmdline + i + 1;
+      while (d->stdinfile[0] == ' ') d->stdinfile++;
     } else if (cmdline[i] == '|') {
       cmdline[i] = 0;
-      pipesoffsets[pipescount++] = i + 1;
+      if (pipescount < REDIR_MAX_PIPES) {
+        d->pipes[pipescount++] = cmdline + i + 1;
+        while (d->pipes[pipescount][0] == ' ') d->pipes[pipescount]++;
+      }
     } else if (cmdline[i] == 0) {
       break;
     }
   }
+}
 
-  if (rediroffset_stdin != 0) {
+
+/* apply stdin/stdout redirections defined in redir_data, returns 0 on success */
+int redir_apply(const struct redir_data *d) {
+  if (d->stdinfile != NULL) {
     outputnl("ERROR: stdin redirection is not supported yet");
     return(-1);
   }
 
-  if (pipescount != 0) {
-    outputnl("ERROR: pipe redirections are not supported yet");
-    return(-1);
-  }
-
-  if (rediroffset_stdout != 0) {
-    unsigned short openflag = 0x12;  /* used during the int 21h,ah=6c call */
+  if (d->stdoutfile != NULL) {
+    unsigned short openflag = d->stdout_openflag;
     unsigned short errcode = 0;
     unsigned short handle = 0;
-    char *ptr;
-    /* append? */
-    if (cmdline[rediroffset_stdout] == '>') {
-      openflag = 0x11;
-      rediroffset_stdout++;
-    }
-
-    /* copy dst file to BUFFER */
-    ptr = cmdline + rediroffset_stdout;
-    while (*ptr == ' ') ptr++; /* skip leading white spaces */
-    for (i = 0;; i++) {
-      BUFFER[i] = ptr[i];
-      if ((BUFFER[i] == ' ') || (BUFFER[i] == 0)) break;
-    }
-    BUFFER[i] = 0;
+    const char *myptr = d->stdoutfile;
 
     /* */
     _asm {
@@ -109,7 +109,7 @@ int redir_parsecmd(char *cmdline, char *BUFFER) {
       mov bx, 1          /* access mode (0=read, 1=write, 2=r+w */
       xor cx, cx         /* attributes when(if) creating the file (0=normal) */
       mov dx, [openflag] /* action if file exists (0x11=open, 0x12=truncate)*/
-      mov si, BUFFER     /* ASCIIZ filename */
+      mov si, myptr      /* ASCIIZ filename */
       int 0x21           /* AX=handle on success (CF clear), otherwise dos err */
       mov [handle], ax   /* save the file handler */
       jnc DUPSTDOUT

@@ -350,7 +350,7 @@ static int lookup_cmd(char *res, const char *fname, const char *path, const char
 }
 
 
-static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod) {
+static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir) {
   char *cmdfile = buff + 512;
   const char far *pathptr;
   int lookup;
@@ -429,9 +429,30 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     return;
   }
 
-  /* copy full filename to execute */
+  /* copy full filename to execute, along with redirected files (if any) */
   for (i = 0; cmdfile[i] != 0; i++) rmod_execprog[i] = cmdfile[i];
-  rmod_execprog[i] = 0;
+  rmod_execprog[i++] = 0;
+  if (redir->stdinfile) {
+    unsigned short far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDINFILE);
+    unsigned short t;
+    *farptr = i;
+    for (t = 0;; t++) {
+      rmod_execprog[i++] = redir->stdinfile[t];
+      if (redir->stdinfile[t] == 0) break;
+    }
+  }
+  if (redir->stdoutfile) {
+    unsigned short far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTFILE);
+    unsigned short t;
+    *farptr = i;
+    for (t = 0;; t++) {
+      rmod_execprog[i++] = redir->stdoutfile[t];
+      if (redir->stdoutfile[t] == 0) break;
+    }
+    /* openflag */
+    farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTAPP);
+    *farptr = redir->stdout_openflag;
+  }
 
   /* copy cmdtail to rmod's PSP and compute its len */
   for (i = 0; cmdtail[i] != 0; i++) rmod_cmdtail[i] = cmdtail[i];
@@ -701,6 +722,7 @@ int main(void) {
   static struct rmod_props far *rmod;
   static char cmdlinebuf[CMDLINE_MAXLEN + 2]; /* 1 extra byte for 0-terminator and another for memguard */
   static char *cmdline;
+  static struct redir_data redirprops;
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
@@ -814,25 +836,18 @@ int main(void) {
     rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
     /* handle redirections (if any) */
-    if (redir_parsecmd(cmdline, BUFFER) != 0) {
-      outputnl("");
-      continue;
-    }
+    redir_parsecmd(&redirprops, cmdline);
 
     /* try matching (and executing) an internal command */
-    if (cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER)) >= -1) {
+    if (cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops) >= -1) {
       /* internal command executed */
-      redir_revert(); /* revert stdout (in case it was redirected) */
       continue;
     }
 
     /* if here, then this was not an internal command */
-    run_as_external(BUFFER, cmdline, *rmod_envseg, rmod);
+    run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops);
     /* perhaps this is a newly launched BAT file */
     if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
-
-    /* revert stdout (so the err msg is not redirected) */
-    redir_revert();
 
     /* run_as_external() does not return on success, if I am still alive then
      * external command failed to execute */

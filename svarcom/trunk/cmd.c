@@ -36,6 +36,7 @@
 #include "doserr.h"
 #include "env.h"
 #include "helpers.h"
+#include "redir.h"
 #include "rmodinit.h"
 #include "sayonara.h"
 
@@ -198,9 +199,10 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ) {
+int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
+  int cmdres;
   struct cmd_funcparam *p = (void *)BUFFER;
   p->BUFFERSZ = BUFFERSZ - sizeof(*p);
 
@@ -237,6 +239,9 @@ int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char 
 
   /* printf("recognized internal command: '%s', tail of command at offset %u\r\n", cmdptr->cmd, argoffset); */
 
+  /* apply redirections (if any) */
+  if (redir_apply(redir) != 0) return(-1);
+
   /* prepare function parameters and feed it to the cmd handling function */
   p->argc = cmd_explode(p->argvbuf, cmdline + argoffset, p->argv);
   p->env_seg = env_seg;
@@ -244,5 +249,10 @@ int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char 
   p->argoffset = argoffset;
   p->cmdline = cmdline;
 
-  return((cmdptr->func_ptr)(p));
+  cmdres = (cmdptr->func_ptr)(p);
+
+  /* cancel redirections */
+  redir_revert();
+
+  return(cmdres);
 }

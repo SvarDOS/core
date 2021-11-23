@@ -25,10 +25,21 @@
 #ifndef REDIR_H
 #define REDIR_H
 
+#define REDIR_MAX_PIPES 15
+
+struct redir_data {
+  char *pipes[REDIR_MAX_PIPES + 1];
+  char *stdinfile;
+  char *stdoutfile;
+  unsigned short stdout_openflag; /* 0x11 or 0x12, used for the 'extended open' call */
+};
+
 /* parse commandline and performs necessary redirections. cmdline is
- * modified so all redirections are cut out.
- * returns 0 on success, non-zero otherwise */
-int redir_parsecmd(char *cmdline, char *BUFFER);
+ * modified so all redirections are cut out. */
+void redir_parsecmd(struct redir_data *r, char *cmdline);
+
+/* apply stdin/stdout redirections defined in redir_data, returns 0 on success */
+int redir_apply(const struct redir_data *d);
 
 /* restores previous stdout/stdin handlers if they have been redirected */
 void redir_revert(void);

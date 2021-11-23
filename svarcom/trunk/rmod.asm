@@ -48,7 +48,13 @@ EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +5Dh
 ; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +6Bh
 EXECPROG dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-skipsig:         ; +EBh
+; offset within EXECPROG for out and in filenames in case stdin or stdout
+; needs to be redirected (0xffff=no redirection)
+REDIR_OUTFIL dw 0xffff    ; +EBh
+REDIR_INFIL dw 0xffff     ; +EDh
+REDIR_OUTAPPEND dw 0      ; +EFh
+
+skipsig:         ; +F1h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -56,6 +62,12 @@ mov ds, ax
 mov es, ax
 mov ss, ax
 mov sp, STACKPTR
+
+; revert stdin/stdout redirections (if any) to their initial state
+call REVERT_REDIR_IF_ANY
+
+; redirect stdout if required
+call REDIR_OUTFILE_IF_REQUIRED
 
 ; should I executed command.com or a pre-set application?
 or [EXECPROG], byte 0
@@ -148,3 +160,57 @@ jmp skipsig
 CMDTAIL db 0x01, 0x0A, 0x0D
 
 ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM", 13, 10, '$'
+
+; variables used to revert stdin/stdout to their initial state
+OLD_STDOUT dw 0xffff
+OLD_STDIN  dw 0xffff
+
+
+; *** ROUTINES ***************************************************************
+
+
+; revert stdin/stdout redirections (if any) to their initial state
+; all memory accesses are CS-prefixes because this code may be called at
+; times when DS is out of whack.
+REVERT_REDIR_IF_ANY:
+; is stdout redirected?
+mov bx, [OLD_STDOUT]
+cmp bx, 0xffff
+je STDOUT_DONE
+; revert the stdout handle (dst in BX alread)
+mov cx, 1        ; src handle (1=stdout)
+mov ah, 0x46     ; redirect a handle
+int 0x21
+mov [OLD_STDOUT], word 0xffff ; mark stdout as "not redirected"
+STDOUT_DONE:
+ret
+
+
+; redirect stdout if REDIR_OUTFIL points to something
+REDIR_OUTFILE_IF_REQUIRED:
+mov si, [REDIR_OUTFIL]
+cmp si, 0xffff
+je NO_STDOUT_REDIR
+add si, EXECPROG       ; si=output file
+mov ax, 0x6c00         ; Extended Open/Create
+mov bx, 1              ; access mode (0=read, 1=write, 2=r+w)
+xor cx, cx             ; file attribs when(if) file is created (0=normal)
+mov dx, [REDIR_OUTAPPEND] ; action if file exist (0x11=open, 0x12=truncate)
+int 0x21               ; ax=handle on success (CF clear)
+mov [REDIR_OUTFIL], word 0xffff
+jc NO_STDOUT_REDIR     ; TODO: abort with an error message instead
+; duplicate current stdout so I can revert it later
+push ax                ; save my file handle in stack
+mov ah, 0x45           ; duplicate file handle BX
+mov bx, 1              ; 1=stdout
+int 0x21               ; ax=new (duplicated) file handle
+mov [OLD_STDOUT], ax   ; save the old handle in memory
+; redirect stdout to my file
+pop bx                 ; dst handle
+mov cx, 1              ; src handle (1=stdout)
+mov ah, 0x46           ; "redirect a handle"
+int 0x21
+; close the original file handle, I no longer need it
+mov ah, 0x3e           ; close a file handle (handle in BX)
+NO_STDOUT_REDIR:
+ret
