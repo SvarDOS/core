@@ -166,9 +166,11 @@ OLD_STDOUT dw 0xffff
 OLD_STDIN  dw 0xffff
 
 
+; ****************************************************************************
 ; *** ROUTINES ***************************************************************
+; ****************************************************************************
 
-
+; ----------------------------------------------------------------------------
 ; revert stdin/stdout redirections (if any) to their initial state
 ; all memory accesses are CS-prefixes because this code may be called at
 ; times when DS is out of whack.
@@ -187,8 +189,10 @@ int 0x21
 mov [OLD_STDOUT], word 0xffff ; mark stdout as "not redirected"
 STDOUT_DONE:
 ret
+; ----------------------------------------------------------------------------
 
 
+; ----------------------------------------------------------------------------
 ; redirect stdout if REDIR_OUTFIL points to something
 REDIR_OUTFILE_IF_REQUIRED:
 mov si, [REDIR_OUTFIL]
@@ -202,19 +206,34 @@ mov dx, [REDIR_OUTAPPEND] ; action if file exist (0x11=open, 0x12=truncate)
 int 0x21               ; ax=handle on success (CF clear)
 mov [REDIR_OUTFIL], word 0xffff
 jc NO_STDOUT_REDIR     ; TODO: abort with an error message instead
+
+; jump to end of file if flag was 0x11 (required for >> redirections)
+cmp [REDIR_OUTAPPEND], word 0x11
+jne SKIP_JMPEOF
+mov bx, ax
+mov ax, 0x4202         ; jump to position EOF - CX:DX in handle BX
+xor cx, cx
+xor dx, dx
+int 0x21
+mov ax, bx             ; put my handle back in ax, as expected by later code
+SKIP_JMPEOF:
+
 ; duplicate current stdout so I can revert it later
 push ax                ; save my file handle in stack
 mov ah, 0x45           ; duplicate file handle BX
 mov bx, 1              ; 1=stdout
 int 0x21               ; ax=new (duplicated) file handle
 mov [OLD_STDOUT], ax   ; save the old handle in memory
+
 ; redirect stdout to my file
 pop bx                 ; dst handle
 mov cx, 1              ; src handle (1=stdout)
 mov ah, 0x46           ; "redirect a handle"
 int 0x21
+
 ; close the original file handle, I no longer need it
 mov ah, 0x3e           ; close a file handle (handle in BX)
 int 0x21
 NO_STDOUT_REDIR:
 ret
+; ----------------------------------------------------------------------------

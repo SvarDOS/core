@@ -111,18 +111,29 @@ int redir_apply(const struct redir_data *d) {
       mov dx, [openflag] /* action if file exists (0x11=open, 0x12=truncate)*/
       mov si, myptr      /* ASCIIZ filename */
       int 0x21           /* AX=handle on success (CF clear), otherwise dos err */
-      mov [handle], ax   /* save the file handler */
-      jnc DUPSTDOUT
-      mov [errcode], ax
+      mov handle, ax     /* save the file handler */
+      jnc JMPEOF
+      mov errcode, ax
       jmp DONE
-      DUPSTDOUT:
+
+      JMPEOF:
+      cmp openflag, word ptr 0x11
+      jne DUPSTDOUT
+      /* jump to the end of the file (required for >> redirections) */
+      mov ax, 0x4202     /* jump to position EOF - CX:DX in handle BX */
+      mov bx, handle
+      xor cx, cx
+      xor dx, dx
+      int 0x21
+
       /* save (duplicate) current stdout so I can revert it later */
+      DUPSTDOUT:
       mov ah, 0x45       /* duplicate file handle */
       mov bx, 1          /* handle to dup (1=stdout) */
       int 0x21           /* ax = new file handle */
-      mov [oldstdout], ax
+      mov oldstdout, ax
       /* redirect the stdout handle */
-      mov bx, [handle]   /* dst handle */
+      mov bx, handle     /* dst handle */
       mov cx, 1          /* src handle (1=stdout) */
       mov ah, 0x46       /* redirect a handle */
       int 0x21
