@@ -7,7 +7,7 @@ and FreeCOM in FreeDOS. But why not using FreeCOM in the first place?
 
 The FreeCOM project is an impressive piece of software, but there are a few
 things that I do not like about it. SvarCOM is my attempt at addressing these
-things through a completely new implementation. SvarCOM is composed of
+issues through a completely new implementation. SvarCOM is composed of
 entirely original code and does not borrow any code from MS-DOS or FreeCOM.
 
 
@@ -33,8 +33,8 @@ that FreeCOM is unable to switch its language dynamically (ie. following
 changes made to the LANG environment variable). It also makes the translation
 more difficult.
 
-SvarCOM uses CATS-style translations in a precompiled form and supports
-dynamic language changes through the %LANG% environment variable.
+SvarCOM uses CATS-style translations and supports dynamic language changes
+through the %LANG% environment variable.
 
 
 === CODE COMPLEXITY ==========================================================
@@ -61,12 +61,12 @@ that does not impose limitations on how users may or may not use the software,
 it only asks for credits to be provided where credit is due.
 
 I am aware that this section, and its slightly provocating title, may trigger
-reactions from GPL enthusiasts, hence let me explain with more words. I enjoy
+reactions from GPL enthusiasts. Let me explain with more words. I enjoy
 creating software and I publish it for others to use for free. Should someone
 wish to extend SvarCOM with an extra feature and decide not to publish the
 source code along with the modified version, that's fine by me. My code is
 still open and free. Theirs is not, but its their work, so I find it fair that
-they have the freedom to decide how to distribute it. I certainly do not wish
+they have the freedom to decide how to distribute it. I certainly do not want
 to impose my views on others.
 
 
