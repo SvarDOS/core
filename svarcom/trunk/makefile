@@ -57,10 +57,20 @@ clean: .SYMBOLIC
 	del *.com
 	del *.obj
 
-pkg: svarcom.zip svarcsrc.zip
+pkg: svarcom.zip
 
 svarcom.zip: command.com
-	zip -9 -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt tlumacz\svarcom.lng
-
-svarcsrc.zip: .SYMBOLIC
-	zip -9 -r svarcsrc.zip makefile *.c *.h *.txt *.asm tlumacz cmd
+	zip -9 -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt history.txt tlumacz\svarcom.lng
+	mkdir source
+	copy makefile source\
+	copy *.c source\
+	copy *.h source\
+	copy *.txt source\
+	copy *.asm source\
+	mkdir source\cmd
+	copy cmd\*.* source\cmd\
+	mkdir source\tlumacz
+	copy tlumacz\*.* source\tlumacz\
+	mkdir source\tlumacz\lang
+	copy tlumacz\lang\*.* source\tlumacz\lang\
+	zip -9 -r -m svarcom.zip source
