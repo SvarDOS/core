@@ -56,6 +56,11 @@ rmod.bin: rmod.asm
 clean: .SYMBOLIC
 	del *.com
 	del *.obj
+	del rmod.bin
+	del rmod.lst
+	del rmodcore.h
+	del deflang.h
+	del command.map
 
 pkg: svarcom.zip
 
