@@ -17,7 +17,7 @@ advanced batch constructs: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL
 === MEDIUM PRIORITY ==========================================================
 
 provide unopened FCBs to launched applications
-completed EN translation strings
+complete EN translation strings
 translations should be cached in rmod-owned memory
 if translations reloading fails, do not retry after every command
 DIR /O
@@ -28,10 +28,11 @@ prompt $t, $d, $v
 
 === NICE TO HAVE =============================================================
 
+respawn COMMAND.COM entirely from memory if it survived last application
 DIR %DIRCMD% lookup
 COPY /V
 COPY /Y
-COPY ASCII mode support
+COPY ASCII mode support?
 "notify pending command" support (INT 2F,AX=AE00)
 INT 2F,AX=5500 support
 COMSPEC self-setting does not work under MS-DOS 5/6 (no exepath in env block)
@@ -42,4 +43,4 @@ LOADHIGH/LH
 tlumacz: detect incomplete translation files and fill missing strings with EN
 
 
-==================================================================== [EOF] ===
+====================================================================== EOF ===

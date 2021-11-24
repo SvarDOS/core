@@ -1,4 +1,5 @@
 
+
                     === SvarCOM implementation notes ===
 
 
@@ -40,4 +41,4 @@ executed" and loads the command from there, incrementing the line counter in
 the process.
 
 
-====================================================================== EOF ===
+===================================================================== EOF ====

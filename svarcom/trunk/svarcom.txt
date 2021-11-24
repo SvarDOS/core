@@ -1,4 +1,5 @@
 
+
                                === SVARCOM ===
 
 
@@ -16,9 +17,9 @@ Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
 Since SvarCOM is a work-in-progress effort, it is missing a few things yet:
  - pipes (cmd.exe | more) and stdin redirections (cmd.exe < file)
  - advanced batch constructs (conditionals, errorlevels...)
- - a few internal commands missing: CALL, CTTY, GOTO, IF, LH, SHIFT
+ - a few internal commands missing: CALL, CTTY, GOTO, IF, LH
  - DIR misses a few switches (/S, /O, /A)
- - ... (see TODO.TXT for more information)
+ - ... (see TODO.TXT for more details)
 
 SvarCOM is minimalist and I'd like to keep it that way. It aims to be
 functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.
@@ -57,6 +58,7 @@ REM         - records comments (remarks) in a batch file or CONFIG.SYS
 REN/RENAME  - renames a file or files
 RMDIR       - removes (deletes) a directory
 SET         - displays, sets or removes DOS environment variables
+SHIFT       - changes the position of arguments in a batch file
 TIME        - displays or sets the system time
 TYPE        - displays the contents of a text file
 VER         - displays the DOS version
@@ -89,4 +91,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-==================================================================== [EOF] ===
+====================================================================== EOF ===
