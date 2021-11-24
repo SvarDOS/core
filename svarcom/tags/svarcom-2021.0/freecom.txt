@@ -1,0 +1,73 @@
+
+                         === SVARCOM vs FREECOM ===
+
+
+SvarCOM is a DOS command interpreter (shell), similar to COMMAND.COM in MS-DOS
+and FreeCOM in FreeDOS. But why not using FreeCOM in the first place?
+
+The FreeCOM project is an impressive piece of software, but there are a few
+things that I do not like about it. SvarCOM is my attempt at addressing these
+issues through a completely new implementation. SvarCOM is composed of
+entirely original code and does not borrow any code from MS-DOS or FreeCOM.
+
+
+=== MEMORY FOOTPRINT =========================================================
+
+FreeCOM is not suitable for low-memory machines. It takes about 55K of
+conventional memory when XMS is unavailable. XMS being a 386+ thing, FreeCOM
+is a poor fit for pre-386 machines. There is the KSSF hack, but it is a kludge
+with many limitations. As pointed out by one of the FreeCOM authors, FreeCOM
+is designed with 21'st century machines in mind and not IBM PC compatibles.
+
+SvarCOM does not rely on XMS and performs runtime swapping that works on any
+IBM PC compatible machine.
+
+
+=== NLS RESSOURCES ===========================================================
+
+FreeCOM requires custom NLS ressources. While the vast majority of FreeDOS
+programs use a single "standard" (CATS), FreeCOM uses a different approach
+with NLS strings built into the binary. This makes it necessary to distribute
+as many binary blobs as there are supported languages. Another consequence is
+that FreeCOM is unable to switch its language dynamically (ie. following
+changes made to the LANG environment variable). It also makes the translation
+more difficult.
+
+SvarCOM uses CATS-style translations and supports dynamic language changes
+through the %LANG% environment variable.
+
+
+=== CODE COMPLEXITY ==========================================================
+
+FreeCOM is a complex beast: it aims for compatibility with multiple compilers
+and supports many embedded features. This makes the code uneasy to follow and
+changes require careful testing on all supported compilers and all possible
+build variants.
+
+SvarCOM, on the other hand, is meant to be simple and universal. It is
+compiled with OpenWatcom only, which makes a ton of IFDEF's go away. It also
+does not integrate extra features that can be reasonably implemented through
+external tools (typically: DOSKEY). It strives to reimplement the baseline
+functionality of MS-DOS 5/6.
+
+
+=== NON-FREE LICENSE =========================================================
+
+FreeCOM code is released under the terms of a license that restrains the
+freedom of its users due to its virality (GPL).
+
+SvarCOM is released under the terms of a liberal and permissive (MIT) license
+that does not impose limitations on how users may or may not use the software,
+it only asks for credits to be provided where credit is due.
+
+I am aware that this section, and its slightly provocating title, may trigger
+reactions from GPL enthusiasts. Let me explain with more words. I enjoy
+creating software and I publish it for others to use for free. Should someone
+wish to extend SvarCOM with an extra feature and decide not to publish the
+source code along with the modified version, that's fine by me. My code is
+still open and free. Theirs is not, but its their work, so I find it fair that
+they have the freedom to decide how to distribute it. I certainly do not want
+to impose my views on others.
+
+
+====================================================================== EOF ===

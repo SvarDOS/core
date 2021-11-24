@@ -1,0 +1,14 @@
+#
+# SvarCOM translation file
+# Lang: ENGLISH
+#
+# Translator: Mateusz Viste
+#
+
+# PAUSE
+15.0:Suspends the execution of a batch script
+15.1:Press any key to continue...
+
+# SHIFT
+16.0:Changes the position of arguments in a batch file:
+16.1:Argument %1 becomes %0, argument %2 becomes %1, etc.

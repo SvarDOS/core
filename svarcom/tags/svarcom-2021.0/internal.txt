@@ -1,0 +1,44 @@
+
+
+                    === SvarCOM implementation notes ===
+
+
+=== SWAPPING =================================================================
+
+While conventional RAM is scarce, a command line interpreter must make effort
+to reduce its memory footprint when launching applications. SvarCOM does that
+by installing a small executable module in memory, called RMOD (for Resident
+MODule). SvarCOM pre-sets RMOD so knows how to execute the external program
+and removes itself from memory, letting RMOD do the job. RMOD executes the
+application, waits for it to finish and then calls back SvarCOM.
+
+
+=== NLS STRINGS ==============================================================
+
+SvarCOM can output information in many languages. To do so, it relies on a
+precompiled resource file named SVARCOM.LNG. When SvarCOM starts, it looks
+for this file in the %NLSPATH% directory and loads from it the part that
+contains the %LANG% language. All this is done by nls_langreload().
+
+The SVARCOM.LNG file is compiled by a separate tool: TLUMACZ. It takes
+CATS-style language files as input and compiles them into a single SVARCOM.LNG
+resource file. It also produces a DEFAULT.LNG with english strings only, this
+one is embedded into the SvarCOM executable to display english text in case
+SVARCOM.LNG is unavailable.
+
+
+=== BATCH FILES SUPPORT ======================================================
+
+When SvarCOM executes a command, it checks first if it has a *.BAT extension.
+If so, it switches into 'batch-processing' mode:
+
+ - Writes the batch filename into its persistent (rmod-owned) buffer, along
+   with a counter that holds the offset of the next line to be executed.
+
+When the batch filename buffer is non-empty, SvarCOM does not ask the user for
+a command. Instead, it opens the batch file, jumps to the "next line to be
+executed" and loads the command from there, incrementing the line counter in
+the process.
+
+
+===================================================================== EOF ====
