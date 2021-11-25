@@ -26,16 +26,16 @@ SIG4 dw 0x2019   ;  +6  this acts also as a guardval to detect stack overflows
 STACKBUF db "XXX  SVARCOM RMOD BY MATEUSZ VISTE  XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 STACKPTR dw 0
 
-; exit code of last application
-LEXCODE  dw 0    ; +4Ah
-
 ; offset of the COMSPEC variable in the environment block, 0 means "use
 ; boot drive". this value is patched by the transient part of COMMAND.COM
-COMSPECPTR dw 0  ; +4Ch
+COMSPECPTR dw 0  ; +4Ah
 
 ; fallback COMSPEC string used if no COMPSEC is present in the environment
 ; drive. drive is patched by the transient part of COMMAND.COM
-COMSPECBOOT db "@:\COMMAND.COM", 0 ; +4Eh
+COMSPECBOOT db "@:\COMMAND.COM", 0 ; +4Ch
+
+; exit code of last application
+LEXCODE  db 0    ; +5Bh
 
 ; ExecParamRec used by INT 21h, AX=4b00 (load and execute program), 14 bytes:
 ;  offset  size  content
@@ -43,18 +43,18 @@ COMSPECBOOT db "@:\COMMAND.COM", 0 ; +4Eh
 ;     +2     4   address of command line to place at PSP:0080
 ;     +6     4   address of an FCB to be placed at PSP:005c
 ;    +0Ah    4   address of an FCB to be placed at PSP:006c
-EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +5Dh
+EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +5Ch
 
-; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +6Bh
+; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +6Ah
 EXECPROG dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 ; offset within EXECPROG for out and in filenames in case stdin or stdout
 ; needs to be redirected (0xffff=no redirection)
-REDIR_OUTFIL dw 0xffff    ; +EBh
-REDIR_INFIL dw 0xffff     ; +EDh
-REDIR_OUTAPPEND dw 0      ; +EFh
+REDIR_OUTFIL dw 0xffff    ; +EAh
+REDIR_INFIL dw 0xffff     ; +ECh
+REDIR_OUTAPPEND dw 0      ; +EEh
 
-skipsig:         ; +F1h
+skipsig:         ; +F0h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -93,8 +93,7 @@ EXEC_COMMAND_COM:
 ; collect the exit code of previous application
 mov ah, 0x4D
 int 0x21
-xor ah, ah          ; clear out termination status, I only want the exit code
-mov [LEXCODE], ax
+mov [LEXCODE], al
 
 ; zero out the exec param block (14 bytes)
 mov al, 0              ; byte to write
