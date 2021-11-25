@@ -228,7 +228,7 @@ int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char 
         pop dx
         pop ax
       }
-      if (curdrive != drive) puts(doserr(0x0f));
+      if (curdrive != drive) outputnl(doserr(0x0f));
       return(-1);
     }
   }
