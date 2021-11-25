@@ -70,6 +70,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/copy.c"
 #include "cmd/date.c"
 #include "cmd/del.c"
+#include "cmd/if.c"
 #include "cmd/vol.c"     /* must be included before dir.c due to dependency */
 #include "cmd/dir.c"
 #include "cmd/echo.c"
@@ -110,6 +111,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"ECHO",    cmd_echo},
   {"ERASE",   cmd_del},
   {"EXIT",    cmd_exit},
+  {"IF",      cmd_if},
   {"LH",      cmd_notimpl},
   {"LOADHIGH",cmd_notimpl},
   {"MD",      cmd_mkdir},
