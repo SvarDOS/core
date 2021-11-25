@@ -219,8 +219,16 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
           xor dl,dl       /* DL = drive number (00h = default, 01h = A:, etc) */
           mov si, s       /* DS:SI -> 64-byte buffer for ASCIZ pathname */
           int 0x21
+          jc DONE         /* leave path empty on error */
+          /* move s ptr forward to end (0-termintor) of pathname */
+          NEXTBYTE:
+          mov si, s
+          cmp byte ptr [si], 0
+          je DONE
+          inc s
+          jmp NEXTBYTE
+          DONE:
         }
-        while (*s != 0) s++; /* move ptr forward to end of pathname */
         break;
       case 'V':  /* $V = DOS version number */
       case 'v':

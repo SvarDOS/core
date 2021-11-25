@@ -3,7 +3,13 @@
                     === SvarCOM's history / changelog ===
 
 
+=== ver 2021.1 (xxxx.xx.xx) ==================================================
+
+ - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
+
+
 === ver 2021.0 (2021.11.24) ==================================================
+
  - first public release, after roughly a month of work
 
 
