@@ -99,6 +99,15 @@ static unsigned short cmd_dir_df(unsigned long *freebytes, unsigned char drv) {
 }
 
 
+static void dir_pagination(unsigned short *availrows) {
+  *availrows -= 1;
+  if (*availrows == 0) {
+    press_any_key();
+    *availrows = screen_getheight() - 1;
+  }
+}
+
+
 static int cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
@@ -207,6 +216,8 @@ static int cmd_dir(struct cmd_funcparam *p) {
 
   if (filespecptr == NULL) filespecptr = ".";
 
+  availrows = screen_getheight() - 2;
+
   /* special case: "DIR drive:" (truename() fails on "C:" under MS-DOS 6.0) */
   if ((filespecptr[0] != 0) && (filespecptr[1] == ':') && (filespecptr[2] == 0)) {
     if ((filespecptr[0] >= 'a') && (filespecptr[0] <= 'z')) {
@@ -236,6 +247,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
     for (i = 0; buff2[i] != 0; i++) if (buff2[i] == '?') buff2[i] = 0;
     outputnl(buff2);
     outputnl("");
+    availrows -= 3;
   }
 
   /* if dir: append a backslash (also get its len) */
@@ -250,7 +262,6 @@ static int cmd_dir(struct cmd_funcparam *p) {
     return(-1);
   }
 
-  availrows = screen_getheight();
   wcolcount = 0; /* may be used for columns counting with wide mode */
 
   do {
@@ -306,6 +317,8 @@ static int cmd_dir(struct cmd_funcparam *p) {
         if (++wcolcount == wcols) {
           wcolcount = 0;
           outputnl("");
+        } else {
+          availrows++; /* wide mode is the only one that does not write one line per file */
         }
         break;
 
@@ -314,14 +327,14 @@ static int cmd_dir(struct cmd_funcparam *p) {
         break;
     }
 
-    if ((flags & DIR_FLAG_PAUSE) && (--availrows < 2)) {
-      press_any_key();
-      availrows = screen_getheight();
-    }
+    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
 
   } while (findnext(dta) == 0);
 
-  if (wcolcount != 0) outputnl(""); /* in wide mode make sure to end on a clear row */
+  if (wcolcount != 0) {
+    outputnl(""); /* in wide mode make sure to end on a clear row */
+    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+  }
 
   /* print out summary (unless bare output mode) */
   if (format != DIR_OUTPUT_BARE) {
@@ -336,6 +349,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
     output(buff2 + i);
     output(" ");
     outputnl("bytes");
+    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) outputnl(doserr(i));
@@ -345,6 +359,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
     output(buff2 + i);
     output(" ");
     outputnl("bytes free");
+    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
   return(-1);

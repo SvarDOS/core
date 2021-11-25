@@ -6,6 +6,7 @@
 === ver 2021.1 (xxxx.xx.xx) ==================================================
 
  - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
+ - DIR: fixed /P pagination in wide mode
 
 
 === ver 2021.0 (2021.11.24) ==================================================
