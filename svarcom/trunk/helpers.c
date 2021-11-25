@@ -38,9 +38,10 @@
 #include "helpers.h"
 
 
-/* case-insensitive comparison of strings, returns non-zero on equality */
-int imatch(const char *s1, const char *s2) {
-  for (;;) {
+/* case-insensitive comparison of strings, compares up to maxlen characters.
+ * returns non-zero on equality. */
+int imatchlim(const char *s1, const char *s2, unsigned short maxlen) {
+  while (maxlen--) {
     char c1, c2;
     c1 = *s1;
     c2 = *s2;
@@ -48,10 +49,11 @@ int imatch(const char *s1, const char *s2) {
     if ((c2 >= 'a') && (c2 <= 'z')) c2 -= ('a' - 'A');
     /* */
     if (c1 != c2) return(0);
-    if (c1 == 0) return(1);
+    if (c1 == 0) break;
     s1++;
     s2++;
   }
+  return(1);
 }
 
 

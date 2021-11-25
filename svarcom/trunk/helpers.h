@@ -25,8 +25,11 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
-/* case-insensitive comparison of strings, returns non-zero on equality */
-int imatch(const char *s1, const char *s2);
+/* case-insensitive comparison of strings, compares up to maxlen characters.
+ * returns non-zero on equality. */
+int imatchlim(const char *s1, const char *s2, unsigned short maxlen);
+
+#define imatch(a,b) imatchlim(a,b,0xffff)
 
 /* returns zero if s1 starts with s2 */
 int strstartswith(const char *s1, const char *s2);
