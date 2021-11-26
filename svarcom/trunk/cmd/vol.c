@@ -93,7 +93,7 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
 }
 
 
-static int cmd_vol(struct cmd_funcparam *p) {
+static enum cmd_result cmd_vol(struct cmd_funcparam *p) {
   char drv = 0;
   char curdrv = 0;
   unsigned short i;
@@ -102,21 +102,21 @@ static int cmd_vol(struct cmd_funcparam *p) {
     outputnl("Displays the disk volume label and serial number, if they exist.");
     outputnl("");
     outputnl("VOL [drive:]");
-    return(-1);
+    return(CMD_OK);
   }
 
   for (i = 0; i < p->argc; i++) {
     if (p->argv[i][0] == '/') {
       outputnl("Invalid switch");
-      return(-1);
+      return(CMD_FAIL);
     }
     if (drv != 0) {
       outputnl("Too many parameters");
-      return(-1);
+      return(CMD_FAIL);
     }
     if ((p->argv[i][0] == 0) || (p->argv[i][1] != ':') || (p->argv[i][2] != 0)) {
       outputnl("Invalid parameter format");
-      return(-1);
+      return(CMD_FAIL);
     }
     drv = p->argv[i][0];
     /* convert drive letter to a value 1..x (1=A, 2=B, etc) */
@@ -141,10 +141,10 @@ static int cmd_vol(struct cmd_funcparam *p) {
     drv = curdrv;
   } else if (!isdrivevalid(drv)) { /* is specified drive valid? */
     outputnl("Invalid drive");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   cmd_vol_internal(drv, p->BUFFER);
 
-  return(-1);
+  return(CMD_OK);
 }

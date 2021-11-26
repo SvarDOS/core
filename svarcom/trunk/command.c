@@ -731,6 +731,7 @@ int main(void) {
   static char cmdlinebuf[CMDLINE_MAXLEN + 2]; /* 1 extra byte for 0-terminator and another for memguard */
   static char *cmdline;
   static struct redir_data redirprops;
+  static enum cmd_result cmdres;
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
@@ -847,19 +848,25 @@ int main(void) {
     redir_parsecmd(&redirprops, cmdline);
 
     /* try matching (and executing) an internal command */
-    if (cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops) >= -1) {
+    cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops);
+    if ((cmdres == CMD_OK) || (cmdres == CMD_FAIL)) {
       /* internal command executed */
+      continue;
+    } else if (cmdres == CMD_CHANGED) { /* cmdline changed, needs to be reprocessed */
+      goto EXEC_CMDLINE;
+    } else if (cmdres == CMD_NOTFOUND) {
+      /* this was not an internal command, try matching an external command */
+      run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops);
+      /* perhaps this is a newly launched BAT file */
+      if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
+      /* run_as_external() does not return on success, if I am still alive then
+       * external command failed to execute */
+      outputnl("Bad command or file name");
       continue;
     }
 
-    /* if here, then this was not an internal command */
-    run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops);
-    /* perhaps this is a newly launched BAT file */
-    if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
-
-    /* run_as_external() does not return on success, if I am still alive then
-     * external command failed to execute */
-    outputnl("Bad command or file name");
+    /* I should never ever land here */
+    outputnl("INTERNAL ERR: INVALID CMDRES");
 
   } while ((rmod->flags & FLAG_EXEC_AND_QUIT) == 0);
 

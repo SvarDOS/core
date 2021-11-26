@@ -26,7 +26,7 @@
  * break
  */
 
-static int cmd_break(struct cmd_funcparam *p) {
+static enum cmd_result cmd_break(struct cmd_funcparam *p) {
   unsigned char brkflag = 0;
 
   if (cmd_ishlp(p)) {
@@ -35,7 +35,7 @@ static int cmd_break(struct cmd_funcparam *p) {
     outputnl("BREAK [ON | OFF]");
     outputnl("");
     outputnl("Type BREAK without a parameter to display the current BREAK setting.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* no params: display current break state */
@@ -56,13 +56,13 @@ static int cmd_break(struct cmd_funcparam *p) {
     } else {
       outputnl("BREAK is on");
     }
-    return(-1);
+    return(CMD_OK);
   }
 
   /* too many params? */
   if (p->argc > 1) {
     outputnl("Too many parameters");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* exactly 1 parameter - "on" or "off" */
@@ -70,7 +70,7 @@ static int cmd_break(struct cmd_funcparam *p) {
     brkflag = 1;
   } else if (!imatch(p->argv[0], "off")) {
     outputnl("Invalid parameter");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* set break accordingly to brkflag */
@@ -86,5 +86,5 @@ static int cmd_break(struct cmd_funcparam *p) {
     pop ax
   }
 
-  return(-1);
+  return(CMD_OK);
 }

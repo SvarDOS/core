@@ -134,7 +134,7 @@ static int cmd_time_parse(const char *s, signed char *ho, signed char *mi, signe
 }
 
 
-static int cmd_time(struct cmd_funcparam *p) {
+static enum cmd_result cmd_time(struct cmd_funcparam *p) {
   struct nls_patterns *nls = (void *)(p->BUFFER);
   char *buff = p->BUFFER + sizeof(*nls);
   unsigned short i;
@@ -147,13 +147,13 @@ static int cmd_time(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("Type TIME with no parameters to display the current time and a prompt for a");
     outputnl("new one. Press ENTER to keep the same time.");
-    return(-1);
+    return(CMD_OK);
   }
 
   i = nls_getpatterns(nls);
   if (i != 0) {
     outputnl(doserr(i));
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* display current time if no args */
@@ -225,6 +225,7 @@ static int cmd_time(struct cmd_funcparam *p) {
     if (buff[1] == 0) break; /* empty string = do not change time */
     if (cmd_time_parse(buff + 2, &ho, &mi, &se, nls) == 0) break;
     outputnl("Invalid time");
+    return(CMD_FAIL);
   }
 
   if (ho >= 0) {
@@ -249,5 +250,5 @@ static int cmd_time(struct cmd_funcparam *p) {
     }
   }
 
-  return(-1);
+  return(CMD_OK);
 }

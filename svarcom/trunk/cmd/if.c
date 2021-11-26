@@ -37,7 +37,7 @@
 #define JMP_NEXT_ARG(s) while ((*s != ' ') && (*s != 0)) s++; while (*s == ' ') s++;
 
 
-static int cmd_if(struct cmd_funcparam *p) {
+static enum cmd_result cmd_if(struct cmd_funcparam *p) {
   unsigned char negflag = 0;
   unsigned short i;
   const char *s = p->cmdline + p->argoffset;
@@ -56,7 +56,7 @@ static int cmd_if(struct cmd_funcparam *p) {
     outputnl("string1==string2  condition: both strings must be equal");
     outputnl("EXIST filename    condition: filename exists");
     outputnl("command           command to carry out if condition is met.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* negation? */
@@ -80,11 +80,11 @@ static int cmd_if(struct cmd_funcparam *p) {
     if (*s == 0) goto SYNTAX_ERR;
     /* is errorlevel matching? */
     if (i <= *rmod_exitcode) negflag ^= 1;
-    if (negflag) {
-      output("EXEC (TO BE IMPLEMENTED): ");
-      outputnl(s);
+    if (negflag) { /* let's exec command (write it to start of cmdline and exec again) */
+      memmove((void *)(p->cmdline), s, strlen(s) + 1);  /* cmdline and s share the same memory! */
+      return(CMD_CHANGED);
     }
-    return(-1);
+    return(CMD_OK);
   }
 
   /* TODO IF EXISTS fname */
@@ -95,5 +95,5 @@ static int cmd_if(struct cmd_funcparam *p) {
   /* invalid syntax */
   outputnl("Syntax error");
 
-  return(-1);
+  return(CMD_FAIL);
 }

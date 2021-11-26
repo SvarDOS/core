@@ -29,7 +29,7 @@
 #define PVER "2021.0"
 #define COPYRDATE "2021"
 
-static int cmd_ver(struct cmd_funcparam *p) {
+static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
   unsigned char maj = 0, min = 0;
 
@@ -41,7 +41,7 @@ static int cmd_ver(struct cmd_funcparam *p) {
 #ifdef VERDBG
     outputnl("ver /dbg");
 #endif
-    return(-1);
+    return(CMD_OK);
   }
 
 #ifdef VERDBG
@@ -84,7 +84,7 @@ static int cmd_ver(struct cmd_funcparam *p) {
       printf("\r\n");
     }
 
-    return(-1);
+    return(CMD_OK);
   }
 #endif
 
@@ -97,12 +97,12 @@ static int cmd_ver(struct cmd_funcparam *p) {
     outputnl("Program ten dedykuje Milenie i Mojmirowi. Zycze wam, byscie w swoim zyciu");
     outputnl("potrafili docenic wartosci minionych pokolen, jednoczesnie czerpiac radosc");
     outputnl("z prostych przyjemnosci dnia codziennego.  Lair, jesien 2021.");
-    return(-1);
+    return(CMD_OK);
   }
 
   if (p->argc != 0) {
     outputnl("Invalid parameter");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   _asm {
@@ -122,5 +122,5 @@ static int cmd_ver(struct cmd_funcparam *p) {
 
   outputnl(buff);
   outputnl("SvarCOM shell ver " PVER);
-  return(-1);
+  return(CMD_OK);
 }

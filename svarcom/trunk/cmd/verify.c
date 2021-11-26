@@ -26,18 +26,18 @@
  * verify
  */
 
-static int cmd_verify(struct cmd_funcparam *p) {
+static enum cmd_result cmd_verify(struct cmd_funcparam *p) {
 
   if (cmd_ishlp(p)) {
     outputnl("Tells DOS whether to verify that files are written correctly to disk.");
     outputnl("\r\nVERIFY [ON | OFF]\r\n");
     outputnl("Type VERIFY without a parameter to display its current setting.");
-    return(-1);
+    return(CMD_OK);
   }
 
   if (p->argc > 1) {
     outputnl("Too many parameters");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   if (p->argc == 0) {
@@ -54,7 +54,7 @@ static int cmd_verify(struct cmd_funcparam *p) {
     } else {
       outputnl("VERIFY is on");
     }
-    return(-1);
+    return(CMD_OK);
   }
 
   /* argc == 1*/
@@ -80,7 +80,8 @@ static int cmd_verify(struct cmd_funcparam *p) {
     }
   } else {
     outputnl("Must specify ON or OFF");
+    return(CMD_FAIL);
   }
 
-  return(-1);
+  return(CMD_OK);
 }

@@ -30,7 +30,7 @@
  */
 
 
-static int cmd_set(struct cmd_funcparam *p) {
+static enum cmd_result cmd_set(struct cmd_funcparam *p) {
   char far *env = MK_FP(p->env_seg, 0);
   char *buff = p->BUFFER;
 
@@ -43,7 +43,7 @@ static int cmd_set(struct cmd_funcparam *p) {
     outputnl("string    Specifies a series of characters to assign to the variable");
     outputnl("");
     outputnl("Type SET without parameters to display the current environment variables.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* no arguments - display content */
@@ -86,12 +86,15 @@ static int cmd_set(struct cmd_funcparam *p) {
     /* commit variable to environment */
     i = env_setvar(p->env_seg, buff);
     if (i == ENV_INVSYNT) goto syntax_err;
-    if (i == ENV_NOTENOM) outputnl("Not enough available space within the environment block");
+    if (i == ENV_NOTENOM) {
+      outputnl("Not enough available space within the environment block");
+      return(CMD_FAIL);
+    }
   }
-  return(-1);
+  return(CMD_OK);
 
   syntax_err:
 
   outputnl("Syntax error");
-  return(-1);
+  return(CMD_FAIL);
 }

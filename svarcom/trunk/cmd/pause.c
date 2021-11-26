@@ -27,13 +27,12 @@
  */
 
 
-static int cmd_pause(struct cmd_funcparam *p) {
+static enum cmd_result cmd_pause(struct cmd_funcparam *p) {
   if (cmd_ishlp(p)) {
     nls_outputnl(15, 0);
     outputnl("\r\nPAUSE");
-    return(-1);
+  } else {
+    press_any_key();
   }
-
-  press_any_key();
-  return(-1);
+  return(CMD_OK);
 }

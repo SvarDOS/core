@@ -26,7 +26,7 @@
  * handler for all "not implemented yet" commands
  */
 
-static int cmd_notimpl(struct cmd_funcparam *p) {
+static enum cmd_result cmd_notimpl(struct cmd_funcparam *p) {
   outputnl("This command is not implemented yet. Sorry!");
-  return(-1);
+  return(CMD_FAIL);
 }

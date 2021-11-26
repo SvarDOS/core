@@ -161,7 +161,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
 }
 
 
-static int cmd_copy(struct cmd_funcparam *p) {
+static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   struct copy_setup *setup = (void *)(p->BUFFER);
   unsigned short i;
   unsigned short copiedcount_in = 0, copiedcount_out = 0; /* number of input/output copied files */
@@ -182,7 +182,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
     outputnl("for source (using wildcards or file1+file2+file3 format).");
     outputnl("");
     outputnl("NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* parse cmdline and fill the setup struct accordingly */
@@ -207,7 +207,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
         setup->verifyflag = 1;
       } else {
         outputnl("Invalid switch");
-        return(-1);
+        return(CMD_FAIL);
       }
       continue;
     }
@@ -217,7 +217,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
       /* a plus cannot appear after destination or before first source */
       if ((setup->dst[0] != 0) || (setup->src_count == 0)) {
         outputnl("Invalid syntax");
-        return(-1);
+        return(CMD_FAIL);
       }
       setup->lastitemwasplus = 1;
       /* a plus may be immediately followed by a filename - if so, emulate
@@ -241,11 +241,11 @@ static int cmd_copy(struct cmd_funcparam *p) {
     /* must be a dst then */
     if (setup->dst[0] != 0) {
       outputnl("Invalid syntax");
-      return(-1);
+      return(CMD_FAIL);
     }
     if (file_truename(p->argv[i], setup->dst) != 0) {
       outputnl("Invalid destination");
-      return(-1);
+      return(CMD_FAIL);
     }
     setup->dst_asciimode = setup->last_asciimode;
     /* if dst is a directory then append a backslash */
@@ -267,7 +267,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
   /* must have at least one source */
   if (setup->src_count == 0) {
     outputnl("Required parameter missing");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* perform the operation based on setup directives:
@@ -348,7 +348,7 @@ static int cmd_copy(struct cmd_funcparam *p) {
       t = cmd_copy_internal(setup->dst, 0, setup->cursrc, 0, appendflag, setup->databuf, setup->databufsz);
       if (t != 0) {
         outputnl(doserr(t));
-        return(-1);
+        return(CMD_FAIL);
       }
 
       copiedcount_in++;
@@ -359,5 +359,5 @@ static int cmd_copy(struct cmd_funcparam *p) {
   sprintf(setup->databuf, "%u file(s) copied", copiedcount_out);
   outputnl(setup->databuf);
 
-  return(-1);
+  return(CMD_OK);
 }

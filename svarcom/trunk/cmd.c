@@ -40,6 +40,8 @@
 #include "rmodinit.h"
 #include "sayonara.h"
 
+#include "cmd.h"
+
 
 struct cmd_funcparam {
   int argc;                 /* number of arguments */
@@ -89,12 +91,10 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/ver.c"
 #include "cmd/verify.c"
 
-#include "cmd.h"
-
 
 struct CMD_ID {
   const char *cmd;
-  int (*func_ptr)(struct cmd_funcparam *); /* pointer to handling function */
+  enum cmd_result (*func_ptr)(struct cmd_funcparam *); /* pointer to handling function */
 };
 
 const struct CMD_ID INTERNAL_CMDS[] = {
@@ -201,10 +201,10 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir) {
+enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
-  int cmdres;
+  enum cmd_result cmdres;
   struct cmd_funcparam *p = (void *)BUFFER;
   p->BUFFERSZ = BUFFERSZ - sizeof(*p);
 
@@ -230,19 +230,20 @@ int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char 
         pop dx
         pop ax
       }
-      if (curdrive != drive) outputnl(doserr(0x0f));
-      return(-1);
+      if (curdrive == drive) return(CMD_OK);
+      outputnl(doserr(0x0f));
+      return(CMD_FAIL);
     }
   }
 
   /* try matching an internal command */
   cmdptr = cmd_match(cmdline, &argoffset);
-  if (cmdptr == NULL) return(-2); /* command is not recognized as internal */
+  if (cmdptr == NULL) return(CMD_NOTFOUND); /* command is not recognized as internal */
 
   /* printf("recognized internal command: '%s', tail of command at offset %u\r\n", cmdptr->cmd, argoffset); */
 
   /* apply redirections (if any) */
-  if (redir_apply(redir) != 0) return(-1);
+  if (redir_apply(redir) != 0) return(CMD_FAIL);
 
   /* prepare function parameters and feed it to the cmd handling function */
   p->argc = cmd_explode(p->argvbuf, cmdline + argoffset, p->argv);

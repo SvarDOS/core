@@ -29,12 +29,12 @@
  *
  */
 
-static int cmd_exit(struct cmd_funcparam *p) {
+static enum cmd_result cmd_exit(struct cmd_funcparam *p) {
   if (cmd_ishlp(p)) {
     outputnl("EXIT\r\n");
     outputnl("Quits the COMMAND.COM program (command interpreter)");
   } else {
     sayonara(p->rmod);
   }
-  return(-1);
+  return(CMD_OK);
 }

@@ -26,7 +26,7 @@
  * chcp
  */
 
-static int cmd_chcp(struct cmd_funcparam *p) {
+static enum cmd_result cmd_chcp(struct cmd_funcparam *p) {
   unsigned short nnn = 0;
   unsigned short errcode = 0;
 
@@ -38,13 +38,13 @@ static int cmd_chcp(struct cmd_funcparam *p) {
     outputnl("nnn  Specifies a code page number");
     outputnl("");
     outputnl("Type CHCP without a parameter to display the active code page number.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* too many parameters */
   if (p->argc > 1) {
     outputnl("Too many parameters");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* one param? must be numeric in range 1+ */
@@ -52,7 +52,7 @@ static int cmd_chcp(struct cmd_funcparam *p) {
     unsigned char nlsfuncflag = 0;
     if (atous(&nnn, p->argv[0]) != 0) {
       outputnl("Invalid code page number");
-      return(-1);
+      return(CMD_FAIL);
     }
     _asm {
       /* verify that NLSFUNC is installed */
@@ -81,6 +81,7 @@ static int cmd_chcp(struct cmd_funcparam *p) {
       outputnl("NLSFUNC not installed");
     } else if (errcode != 0) {
       outputnl("Failed to change code page");
+      return(CMD_FAIL);
     }
 
   } else { /* no parameter given: display active code page */
@@ -106,8 +107,9 @@ static int cmd_chcp(struct cmd_funcparam *p) {
       outputnl(p->BUFFER);
     } else {
       outputnl(doserr(errcode));
+      return(CMD_FAIL);
     }
   }
 
-  return(-1);
+  return(CMD_OK);
 }

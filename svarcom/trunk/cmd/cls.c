@@ -26,7 +26,7 @@
  * cls
  */
 
-static int cmd_cls(struct cmd_funcparam *p) {
+static enum cmd_result cmd_cls(struct cmd_funcparam *p) {
   unsigned char screenw, screenh;
   const char *ansiesc = "\x1B[2J$";
 
@@ -34,7 +34,7 @@ static int cmd_cls(struct cmd_funcparam *p) {
     outputnl("Clears the screen");
     outputnl("");
     outputnl("CLS");
-    return(-1);
+    return(CMD_OK);
   }
 
   screenw = screen_getwidth();
@@ -83,5 +83,5 @@ static int cmd_cls(struct cmd_funcparam *p) {
     DONE:
   }
 
-  return(-1);
+  return(CMD_OK);
 }

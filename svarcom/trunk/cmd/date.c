@@ -130,7 +130,7 @@ static int cmd_date_set(unsigned short year, unsigned char mo, unsigned char dy)
 }
 
 
-static int cmd_date(struct cmd_funcparam *p) {
+static enum cmd_result cmd_date(struct cmd_funcparam *p) {
   struct nls_patterns *nls = (void *)(p->BUFFER);
   char *buff = p->BUFFER + sizeof(*nls);
   unsigned short i;
@@ -144,13 +144,13 @@ static int cmd_date(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("Type DATE with no parameters to display the current date and a prompt for a");
     outputnl("new one. Press ENTER to keep the same date.");
-    return(-1);
+    return(CMD_OK);
   }
 
   i = nls_getpatterns(nls);
   if (i != 0) {
     outputnl(doserr(i));
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* display current date if no args */
@@ -222,5 +222,5 @@ static int cmd_date(struct cmd_funcparam *p) {
     outputnl("Invalid date");
   }
 
-  return(-1);
+  return(CMD_OK);
 }

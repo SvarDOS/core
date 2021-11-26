@@ -26,7 +26,7 @@
  * rename/ren
  */
 
-static int cmd_rename(struct cmd_funcparam *p) {
+static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   char *src = p->BUFFER;
   char *dst = p->BUFFER + 256;
   char *buff1 = p->BUFFER + 512;
@@ -42,20 +42,20 @@ static int cmd_rename(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("Note that you cannot specify a new drive or path for your destination file.");
     outputnl("Use MOVE to rename a directory, or to move files from one directory to another.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* I expect exactly two arguments */
   if (p->argc != 2) {
     outputnl("Invalid syntax");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* convert src to truename format */
   i = file_truename(p->argv[0], src);
   if (i != 0) {
     outputnl(doserr(i));
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* copy src path to buffers and remember where the filename starts */
@@ -74,7 +74,7 @@ static int cmd_rename(struct cmd_funcparam *p) {
       case '\\':
       case '/':
         outputnl("Invalid destination");
-        return(-1);
+        return(CMD_FAIL);
     }
     buff1[fnameoffset + i] = p->argv[1][i];
     if (buff1[fnameoffset + i] == 0) break;
@@ -84,7 +84,7 @@ static int cmd_rename(struct cmd_funcparam *p) {
   i = file_truename(buff1, dst);
   if (i != 0) {
     outputnl(doserr(i));
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* we're good to go, src and dst should look somehow like that now:
@@ -159,5 +159,5 @@ static int cmd_rename(struct cmd_funcparam *p) {
     i = findnext(dta);
   }
 
-  return(-1);
+  return(CMD_OK);
 }

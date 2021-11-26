@@ -26,7 +26,7 @@
  * rmdir
  */
 
-static int cmd_rmdir(struct cmd_funcparam *p) {
+static enum cmd_result cmd_rmdir(struct cmd_funcparam *p) {
   const char *dname = p->argv[0];
   unsigned short err = 0;
 
@@ -35,22 +35,22 @@ static int cmd_rmdir(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("RMDIR [drive:]path");
     outputnl("RD [drive:]path");
-    return(-1);
+    return(CMD_OK);
   }
 
   if (p->argc == 0) {
     outputnl("Required parameter missing");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   if (p->argc > 1) {
     outputnl("Too many parameters");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   if (p->argv[0][0] == '/') {
     outputnl("Invalid parameter");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   _asm {
@@ -68,7 +68,10 @@ static int cmd_rmdir(struct cmd_funcparam *p) {
     pop ax
   }
 
-  if (err != 0) outputnl(doserr(err));
+  if (err != 0) {
+    outputnl(doserr(err));
+    return(CMD_FAIL);
+  }
 
-  return(-1);
+  return(CMD_OK);
 }

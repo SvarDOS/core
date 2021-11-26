@@ -108,7 +108,7 @@ static void dir_pagination(unsigned short *availrows) {
 }
 
 
-static int cmd_dir(struct cmd_funcparam *p) {
+static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
   unsigned short i;
@@ -150,7 +150,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
     outputnl("/S Displays files in specified directory and all subdirectories");
     outputnl("/B Uses bare format (no heading information or summary)");
     outputnl("/L Uses lowercases");
-    return(-1);
+    return(CMD_OK);
   }
 
   i = nls_getpatterns(nls);
@@ -170,7 +170,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
         case 'A':
           /* TODO */
           outputnl("/A NOT IMPLEMENTED YET");
-          return(-1);
+          return(CMD_FAIL);
           break;
         case 'b':
         case 'B':
@@ -184,7 +184,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
         case 'O':
           /* TODO */
           outputnl("/O NOT IMPLEMENTED YET");
-          return(-1);
+          return(CMD_FAIL);
           break;
         case 'p':
         case 'P':
@@ -195,7 +195,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
         case 'S':
           /* TODO */
           outputnl("/S NOT IMPLEMENTED YET");
-          return(-1);
+          return(CMD_FAIL);
           break;
         case 'w':
         case 'W':
@@ -203,12 +203,12 @@ static int cmd_dir(struct cmd_funcparam *p) {
           break;
         default:
           outputnl("Invalid switch");
-          return(-1);
+          return(CMD_FAIL);
       }
     } else {  /* filespec */
       if (filespecptr != NULL) {
         outputnl("Too many parameters");
-        return(-1);
+        return(CMD_FAIL);
       }
       filespecptr = p->argv[i];
     }
@@ -231,7 +231,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
   }
   if (i != 0) {
     outputnl(doserr(i));
-    return(-1);
+    return(CMD_FAIL);
   }
 
   if (format != DIR_OUTPUT_BARE) {
@@ -259,7 +259,7 @@ static int cmd_dir(struct cmd_funcparam *p) {
   i = findfirst(dta, p->BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC);
   if (i != 0) {
     outputnl(doserr(i));
-    return(-1);
+    return(CMD_FAIL);
   }
 
   wcolcount = 0; /* may be used for columns counting with wide mode */
@@ -362,5 +362,5 @@ static int cmd_dir(struct cmd_funcparam *p) {
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
-  return(-1);
+  return(CMD_OK);
 }

@@ -26,7 +26,7 @@
  * echo
  */
 
-static int cmd_echo(struct cmd_funcparam *p) {
+static enum cmd_result cmd_echo(struct cmd_funcparam *p) {
   unsigned short offs = FP_OFF(p->cmdline) + 5;
   unsigned short segm = FP_SEG(p->cmdline);
 
@@ -38,7 +38,7 @@ static int cmd_echo(struct cmd_funcparam *p) {
     outputnl("ECHO [message]");
     outputnl("");
     outputnl("Type ECHO without parameters to display the current echo setting.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* ECHO without any parameter: display current state */
@@ -48,19 +48,19 @@ static int cmd_echo(struct cmd_funcparam *p) {
     } else {
       outputnl("ECHO is off");
     }
-    return(-1);
+    return(CMD_OK);
   }
 
   /* ECHO ON */
   if ((p->argc == 1) && (imatch(p->argv[0], "on"))) {
     p->rmod->flags |= FLAG_ECHOFLAG;
-    return(-1);
+    return(CMD_OK);
   }
 
   /* ECHO OFF */
   if ((p->argc == 1) && (imatch(p->argv[0], "off"))) {
     p->rmod->flags &= ~FLAG_ECHOFLAG;
-    return(-1);
+    return(CMD_OK);
   }
 
   /* ECHO MSG (start at cmdline+5 since first 5 are "ECHO" + separator) */
@@ -95,5 +95,5 @@ static int cmd_echo(struct cmd_funcparam *p) {
     pop ax
   }
 
-  return(-1);
+  return(CMD_OK);
 }

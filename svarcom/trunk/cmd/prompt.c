@@ -29,19 +29,19 @@
  *
  */
 
-static int cmd_prompt(struct cmd_funcparam *p) {
+static enum cmd_result cmd_prompt(struct cmd_funcparam *p) {
 
   if (cmd_ishlp(p)) {
     outputnl("Changes the DOS command prompt.");
     outputnl("");
     outputnl("PROMPT [new command prompt specification]");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* no parameter - restore default prompt path */
   if (p->argc == 0) {
     env_dropvar(p->env_seg, "PROMPT");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* otherwise set PROMPT to whatever is passed on command-line */
@@ -56,5 +56,5 @@ static int cmd_prompt(struct cmd_funcparam *p) {
     env_setvar(p->env_seg, buff);
   }
 
-  return(-1);
+  return(CMD_OK);
 }

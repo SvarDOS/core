@@ -26,7 +26,7 @@
  * shift
  */
 
-static int cmd_shift(struct cmd_funcparam *p) {
+static enum cmd_result cmd_shift(struct cmd_funcparam *p) {
   char far *batargv = p->rmod->batargv;
   char far *nextarg;
 
@@ -35,11 +35,11 @@ static int cmd_shift(struct cmd_funcparam *p) {
     nls_outputnl(16, 1);
     outputnl("");
     outputnl("SHIFT");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* abort if batargv is empty */
-  if (*batargv == 0) return(-1);
+  if (*batargv == 0) return(CMD_OK);
 
   /* find the next argument in batargv */
   for (nextarg = batargv + 1; *nextarg != 0; nextarg++);
@@ -48,5 +48,5 @@ static int cmd_shift(struct cmd_funcparam *p) {
   /* move down batargv so 2nd argument is at the head now */
   _fmemmove(batargv, nextarg, sizeof(p->rmod->batargv) - (nextarg - batargv));
 
-  return(-1);
+  return(CMD_OK);
 }

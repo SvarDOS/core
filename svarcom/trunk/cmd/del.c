@@ -26,7 +26,7 @@
  * del/erase
  */
 
-static int cmd_del(struct cmd_funcparam *p) {
+static enum cmd_result cmd_del(struct cmd_funcparam *p) {
   const char *delspec = NULL;
   unsigned short err = 0;
   unsigned short confirmflag = 0;
@@ -45,12 +45,12 @@ static int cmd_del(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("[drive:][path]filename  Specifies the file(s) to delete.");
     outputnl("/P  Prompts for confirmation before deleting each file.");
-    return(-1);
+    return(CMD_OK);
   }
 
   if (p->argc == 0) {
     outputnl("Required parameter missing");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* scan argv for delspec and possible /p or /v */
@@ -63,11 +63,11 @@ static int cmd_del(struct cmd_funcparam *p) {
         output("Invalid switch:");
         output(" ");
         outputnl(p->argv[i]);
-        return(-1);
+        return(CMD_FAIL);
       }
     } else if (delspec != NULL) { /* otherwise its a delspec */
       outputnl("Too many parameters");
-      return(-1);
+      return(CMD_FAIL);
     } else {
       delspec = p->argv[i];
     }
@@ -87,7 +87,7 @@ static int cmd_del(struct cmd_funcparam *p) {
    * confirmation set, ask for a global confirmation */
   if ((confirmflag == 0) && (imatch(buff + pathlimit, "????????.???"))) {
     outputnl("All files in directory will be deleted!");
-    if (askchoice("Are you sure (Y/N)?", "YN") != 0) return(-1);
+    if (askchoice("Are you sure (Y/N)?", "YN") != 0) return(CMD_FAIL);
   }
 
   for (i = 0;; i = 1) {
@@ -138,5 +138,6 @@ static int cmd_del(struct cmd_funcparam *p) {
     }
   }
 
-  return(-1);
+  if (err == 0) return(CMD_OK);
+  return(CMD_FAIL);
 }

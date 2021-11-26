@@ -27,8 +27,16 @@
 
 #include "rmodinit.h"
 
+/* what cmd_process may return */
+enum cmd_result {
+  CMD_OK,         /* command executed and succeeded */
+  CMD_FAIL,       /* command executed and failed */
+  CMD_NOTFOUND,   /* no such command (not an internal command) */
+  CMD_CHANGED     /* command-line transformed, please reparse it */
+};
+
 /* process internal commands */
-int cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *r);
+enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *r);
 
 /* explodes a command into an array of arguments where last arg is NULL.
  * if argvlist is not NULL, it will be filled with pointers that point to buff

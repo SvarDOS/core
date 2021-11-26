@@ -28,7 +28,7 @@
  * Displays or sets a search path for executable files.
  */
 
-static int cmd_path(struct cmd_funcparam *p) {
+static enum cmd_result cmd_path(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
 
   /* help screen (/?) */
@@ -42,7 +42,7 @@ static int cmd_path(struct cmd_funcparam *p) {
            "only in the current directory.\r\n"
            "\r\n"
            "Type PATH without parameters to display the current path.\r\n");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* no parameter - display current path */
@@ -58,13 +58,13 @@ static int cmd_path(struct cmd_funcparam *p) {
       }
       outputnl(buff);
     }
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* more than 1 parameter */
   if (p->argc > 1) {
     outputnl("Too many parameters");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* IF HERE: THERE IS EXACTLY 1 ARGUMENT (argc == 1) */
@@ -72,7 +72,7 @@ static int cmd_path(struct cmd_funcparam *p) {
   /* reset the PATH string (PATH ;) */
   if (imatch(p->argv[0], ";")) {
     env_dropvar(p->env_seg, "PATH");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* otherwise set PATH to whatever is passed on command-line */
@@ -86,5 +86,5 @@ static int cmd_path(struct cmd_funcparam *p) {
     env_setvar(p->env_seg, buff);
   }
 
-  return(-1);
+  return(CMD_OK);
 }

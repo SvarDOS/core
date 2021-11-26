@@ -35,7 +35,7 @@
  */
 
 
-static int cmd_cd(struct cmd_funcparam *p) {
+static enum cmd_result cmd_cd(struct cmd_funcparam *p) {
   char *buffptr = p->BUFFER;
 
   /* CD /? */
@@ -51,20 +51,20 @@ static int cmd_cd(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("Type CD drive: to display the current directory in the specified drive.");
     outputnl("Type CD without parameters to display the current drive and directory.");
-    return(-1);
+    return(CMD_OK);
   }
 
   /* one argument max */
   if (p->argc > 1) {
     outputnl("Too many parameters");
-    return(-1);
+    return(CMD_FAIL);
   }
 
   /* no argument? display current drive and dir ("CWD") */
   if (p->argc == 0) {
     curpathfordrv(buffptr, 0);
     outputnl(buffptr);
-    return(-1);
+    return(CMD_OK);
   }
 
   /* argument can be either a drive (D:) or a path */
@@ -98,8 +98,9 @@ static int cmd_cd(struct cmd_funcparam *p) {
     }
     if (err != 0) {
       outputnl(doserr(err));
+      return(CMD_FAIL);
     }
   }
 
-  return(-1);
+  return(CMD_OK);
 }
