@@ -3,13 +3,14 @@
                     === SvarCOM's history / changelog ===
 
 
-=== ver 2021.1 (xxxx.xx.xx) ==================================================
+=== ver 2021.1 (xx.xx.2021) ==================================================
 
  - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
  - DIR: fixed /P pagination in wide mode
+ - implemented IF command (IF EXIST, IF ERRORLEVEL, IF str==str)
 
 
-=== ver 2021.0 (2021.11.24) ==================================================
+=== ver 2021.0 (24.11.2021) ==================================================
 
  - first public release, after roughly a month of work
 

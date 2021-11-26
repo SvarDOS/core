@@ -76,12 +76,11 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
     } else {
       atous(&i, s);
     }
+    /* move s to command */
     JMP_NEXT_ARG(s);
-    if (*s == 0) goto SYNTAX_ERR;
     /* is errorlevel matching? */
     if (i <= *rmod_exitcode) negflag ^= 1;
-    if (negflag) goto EXEC_S_CMD;
-    return(CMD_OK);
+    goto EXEC_S_CMD_IF_NEGFLAG_SET;
   }
 
   /* IF EXIST fname (or wildcard)
@@ -93,26 +92,47 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
     /* copy filename to buffer */
     for (i = 0; (s[i] != ' ') && (s[i] != 0); i++) p->BUFFER[i] = s[i];
     p->BUFFER[i] = 0;
-    /* move s to exec command */
+    /* move s to command */
     JMP_NEXT_ARG(s);
-    if (*s == 0) goto SYNTAX_ERR;
+    if (*s == 0) goto SYNTAX_ERR; /* check now to avoid moving the diskette drive if syntax bad anyway */
     /* does file exist? */
     if (findfirst(dta, p->BUFFER, 0) == 0) negflag ^= 1;
-    if (negflag) goto EXEC_S_CMD;
-    return(CMD_OK);
+    goto EXEC_S_CMD_IF_NEGFLAG_SET;
   }
 
-  /* TODO IF str1==str2 */
-
-  SYNTAX_ERR:
+  /* IF str1==str2 ? (and if that's not it, then it's a syntax error) */
+  if (strstr(s, "==") != NULL) {
+    /* copy first argument to BUFF, until first '=' or space */
+    for (i = 0; (s[i] != '=') && (s[i] != ' '); i++) p->BUFFER[i] = s[i];
+    /* 1st arg cannot be empty */
+    if (i == 0) goto SYNTAX_ERR;
+    /* terminate buff string and move s forward to the equality char (or space) */
+    p->BUFFER[i++] = 0;
+    s += i;
+    while (*s == ' ') s++;
+    /* if second char is not a '=' then syntax error (equality sign is not
+     * allowed in first string) */
+    if (*s != '=') goto SYNTAX_ERR;
+    /* skip all trailing equality chars (MSDOS accepts many of them, ie all
+     * these are fine: "dupa==dupa", "dupa===dupa", "dupa====dupa", etc) */
+    while (*s == '=') s++;
+    while (*s == ' ') s++; /* skip any leading spaces */
+    /* move along until space or NULL terminator, checking equality */
+    for (i = 0; (p->BUFFER[i] != 0) && (p->BUFFER[i] == s[i]); i++);
+    if ((p->BUFFER[i] == 0) && (s[i] == ' ')) negflag ^= 1;
+    JMP_NEXT_ARG(s);
+    goto EXEC_S_CMD_IF_NEGFLAG_SET;
+  }
 
   /* invalid syntax */
+  SYNTAX_ERR:
   outputnl("Syntax error");
-
   return(CMD_FAIL);
 
   /* let's exec command (write it to start of cmdline and parse again) */
-  EXEC_S_CMD:
+  EXEC_S_CMD_IF_NEGFLAG_SET:
+  if (*s == 0) goto SYNTAX_ERR;
+  if (negflag == 0) return(CMD_OK);
   memmove((void *)(p->cmdline), s, strlen(s) + 1);  /* cmdline and s share the same memory! */
   return(CMD_CHANGED);
 }
