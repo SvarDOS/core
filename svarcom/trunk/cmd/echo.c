@@ -27,8 +27,7 @@
  */
 
 static enum cmd_result cmd_echo(struct cmd_funcparam *p) {
-  unsigned short offs = FP_OFF(p->cmdline) + 5;
-  unsigned short segm = FP_SEG(p->cmdline);
+  const char *arg = p->cmdline + 5;
 
   /* display help only if /? is the only argument */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
@@ -67,13 +66,11 @@ static enum cmd_result cmd_echo(struct cmd_funcparam *p) {
   _asm {
     push ax
     push dx
-    push ds
     push si
 
-    mov si, [offs]
+    mov si, [arg]
     cld           /* clear direction flag (DF) so lodsb increments SI */
     mov ah, 0x02  /* display char from DL */
-    mov ds, [segm]
     NEXTYBTE:
     lodsb         /* load byte at DS:[SI] into AL and inc SI (if DF clear) */
     or al, al     /* is AL == 0? then end of string reached */
@@ -90,7 +87,6 @@ static enum cmd_result cmd_echo(struct cmd_funcparam *p) {
     int 0x21
 
     pop si
-    pop ds
     pop dx
     pop ax
   }

@@ -7,7 +7,6 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 === HIGH PRIORITY ============================================================
 
-echo: no need to consider cmdline like a far ptr (it is not)
 pipes redirections
 DIR /A
 ctrl+break handler
