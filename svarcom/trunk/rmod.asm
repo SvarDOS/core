@@ -1,5 +1,5 @@
 ;
-; rmod - resident module of the SvarCOM command interpreter
+; rmod - resident module of the SvarCOM command interpreter (NASM code)
 ;
 ; Copyright (C) 2021 Mateusz Viste
 ; MIT license
@@ -54,7 +54,16 @@ REDIR_OUTFIL dw 0xffff    ; +EAh
 REDIR_INFIL dw 0xffff     ; +ECh
 REDIR_OUTAPPEND dw 0      ; +EEh
 
-skipsig:         ; +F0h
+; CTRL+BREAK (int 23h) handler
+; According to the TechHelp! Manual: "If you want to abort (exit to the parent
+; process), then set the carry flag and return via a FAR RET. This causes DOS
+; to perform normal cleanup and exit to the parent." (otherwise use iret)
+BREAK_HANDLER:            ; +F0h
+stc
+retf
+
+
+skipsig:                  ; +F2h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -62,6 +71,11 @@ mov ds, ax
 mov es, ax
 mov ss, ax
 mov sp, STACKPTR
+
+; set up myself as break handler
+mov ax, 0x2523  ; set int vector 23h
+mov dx, BREAK_HANDLER
+int 0x21
 
 ; revert stdin/stdout redirections (if any) to their initial state
 call REVERT_REDIR_IF_ANY

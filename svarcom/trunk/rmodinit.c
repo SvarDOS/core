@@ -133,6 +133,20 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     owner[1] = 0;
   }
 
+  /* set CTRL+BREAK handler to rmod */
+  _asm {
+    push ax
+    push dx
+    push ds
+    mov ax, 0x2523
+    mov ds, rmodseg
+    mov dx, RMOD_OFFSET_BRKHANDLER
+    int 0x21
+    pop ds
+    pop dx
+    pop ax
+  }
+
   /* prepare result (rmod props) */
   res = MK_FP(rmodseg, 0x100 + rmodcore_len);
   _fmemset(res, 0, sizeof(*res));  /* zero out */

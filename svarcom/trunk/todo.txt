@@ -9,7 +9,6 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 pipes redirections
 DIR /A
-ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
 advanced batch constructs: CALL, FOR, GOTO
 IF EXIST on an empty drive should not lead to the 'Abort, Retry, Fail' prompt
