@@ -12,6 +12,7 @@ DIR /A
 ctrl+break handler
 int 24h handler (abort, retry, fail, ignore)
 advanced batch constructs: CALL, :labels, FOR, GOTO, IF EXIST/ERRORLEVEL
+IF EXIST on an empty drive should not lead to the 'Abort, Retry, Fail' prompt
 
 
 === MEDIUM PRIORITY ==========================================================

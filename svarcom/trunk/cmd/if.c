@@ -54,7 +54,7 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
     outputnl("NOT               command is executed only if condition is NOT met");
     outputnl("ERRORLEVEL num    condition: last program returned an exit code >= num");
     outputnl("string1==string2  condition: both strings must be equal");
-    outputnl("EXIST filename    condition: filename exists");
+    outputnl("EXIST filename    condition: filename exists (wildcards accepted)");
     outputnl("command           command to carry out if condition is met.");
     return(CMD_OK);
   }
@@ -80,14 +80,28 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
     if (*s == 0) goto SYNTAX_ERR;
     /* is errorlevel matching? */
     if (i <= *rmod_exitcode) negflag ^= 1;
-    if (negflag) { /* let's exec command (write it to start of cmdline and exec again) */
-      memmove((void *)(p->cmdline), s, strlen(s) + 1);  /* cmdline and s share the same memory! */
-      return(CMD_CHANGED);
-    }
+    if (negflag) goto EXEC_S_CMD;
     return(CMD_OK);
   }
 
-  /* TODO IF EXISTS fname */
+  /* IF EXIST fname (or wildcard)
+   * TODO: checking for a file on an empty diskette drive should NOT lead bother
+   *       the user with the stupid 'retry, abort, fail' query! */
+  if (imatchlim(s, "EXIST ", 6)) {
+    struct DTA *dta = (void *)(0x80); /* default dta location */
+    JMP_NEXT_ARG(s);
+    /* copy filename to buffer */
+    for (i = 0; (s[i] != ' ') && (s[i] != 0); i++) p->BUFFER[i] = s[i];
+    p->BUFFER[i] = 0;
+    /* move s to exec command */
+    JMP_NEXT_ARG(s);
+    if (*s == 0) goto SYNTAX_ERR;
+    /* does file exist? */
+    if (findfirst(dta, p->BUFFER, 0) == 0) negflag ^= 1;
+    if (negflag) goto EXEC_S_CMD;
+    return(CMD_OK);
+  }
+
   /* TODO IF str1==str2 */
 
   SYNTAX_ERR:
@@ -96,4 +110,9 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
   outputnl("Syntax error");
 
   return(CMD_FAIL);
+
+  /* let's exec command (write it to start of cmdline and parse again) */
+  EXEC_S_CMD:
+  memmove((void *)(p->cmdline), s, strlen(s) + 1);  /* cmdline and s share the same memory! */
+  return(CMD_CHANGED);
 }
