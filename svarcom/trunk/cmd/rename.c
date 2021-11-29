@@ -54,7 +54,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   /* convert src to truename format */
   i = file_truename(p->argv[0], src);
   if (i != 0) {
-    outputnl(doserr(i));
+    nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 
@@ -83,7 +83,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   /* apply truename to dest to normalize wildcards into ? chars */
   i = file_truename(buff1, dst);
   if (i != 0) {
-    outputnl(doserr(i));
+    nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 
@@ -101,7 +101,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
    */
 
   i = findfirst(dta, src, 0);
-  if (i != 0) outputnl(doserr(i));
+  if (i != 0) nls_outputnl_doserr(i);
 
   while (i == 0) {
     /* write found fname into buff1 and dst fname into buff2 - both in FCB
@@ -153,7 +153,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
       output(" -> ");
       output(buff2 + fnameoffset);
       output("  ");
-      outputnl(doserr(i));
+      nls_outputnl_doserr(i);
     }
     /* next please */
     i = findnext(dta);

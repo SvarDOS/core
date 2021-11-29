@@ -24,7 +24,6 @@
 
 #include <string.h> /* memset() */
 
-#include "doserr.h"
 #include "helpers.h"
 #include "rmodinit.h"
 
@@ -148,7 +147,7 @@ int redir_apply(const struct redir_data *d) {
       pop ax
     }
     if (errcode != 0) {
-      outputnl(doserr(errcode));
+      nls_outputnl_doserr(errcode);
       return(-1);
     }
   }

@@ -34,16 +34,22 @@ int imatchlim(const char *s1, const char *s2, unsigned short maxlen);
 /* returns zero if s1 starts with s2 */
 int strstartswith(const char *s1, const char *s2);
 
-/* outputs a NULL-terminated string to stdout */
-void output_internal(const char *s, unsigned char nl);
+/* outputs a NULL-terminated string to handle (hSTDOUT or hSTDERR) */
+void output_internal(const char *s, unsigned char nl, unsigned char handle);
 
 /* outputs a NULL-terminated NLS string to stdout */
 void nls_output_internal(unsigned short id, unsigned char nl);
 
-#define output(x) output_internal(x, 0)
-#define outputnl(x) output_internal(x, 1)
+#define hSTDOUT 1
+#define hSTDERR 2
+
+#define output(x) output_internal(x, 0, hSTDOUT)
+#define outputnl(x) output_internal(x, 1, hSTDOUT)
 #define nls_output(x,y) nls_output_internal((x << 8) | y, 0)
 #define nls_outputnl(x,y) nls_output_internal((x << 8) | y, 1)
+
+/* output DOS error e to stderr */
+void nls_outputnl_doserr(unsigned short e);
 
 /*
  * FileInfoRec (DTA) format:

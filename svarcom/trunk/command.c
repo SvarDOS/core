@@ -31,7 +31,6 @@
 #include <process.h>
 
 #include "cmd.h"
-#include "doserr.h"
 #include "env.h"
 #include "helpers.h"
 #include "redir.h"
@@ -624,7 +623,7 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
 
   /* printf("blen=%u filepos_cx=%u filepos_dx=%u\r\n", blen, filepos_cx, filepos_dx); */
 
-  if (errv != 0) outputnl(doserr(errv));
+  if (errv != 0) nls_outputnl_doserr(errv);
 
   /* on EOF - abort processing the bat file */
   if (blen == 0) goto OOPS;

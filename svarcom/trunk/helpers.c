@@ -68,9 +68,9 @@ int strstartswith(const char *s1, const char *s2) {
 }
 
 
-/* outputs a NULL-terminated string to stdout */
-void output_internal(const char *s, unsigned char nl) {
-  const static unsigned char *crlf = "\r\n$";
+/* outputs a NULL-terminated string to handle (1=stdout 2=stderr) */
+void output_internal(const char *s, unsigned char nl, unsigned char handle) {
+  const static unsigned char *crlf = "\r\n";
   _asm {
     push ds
     pop es         /* make sure es=ds (scasb uses es) */
@@ -88,16 +88,19 @@ void output_internal(const char *s, unsigned char nl) {
 
     /* output by writing to stdout */
     /* mov ah, 0x40 */  /* DOS 2+ -- write to file via handle */
-    mov bx, 1      /* handle 1 is always stdout */
+    xor bh, bh
+    mov bl, handle /* set handle (1=stdout 2=stderr) */
     /* mov cx, xxx */ /* write CX bytes */
     /* mov dx, s   */ /* DS:DX is the source of bytes to "write" */
     int 0x21
     WRITEDONE:
 
     /* print out a CR/LF trailer if nl set */
-    or byte ptr [nl], 0
+    test byte ptr [nl], 0xff
     jz FINITO
-    mov ah, 0x09
+    /* bx still contains handle */
+    mov ah, 0x40 /* "write to file" */
+    mov cx, 2
     mov dx, crlf
     int 0x21
     FINITO:
@@ -105,22 +108,41 @@ void output_internal(const char *s, unsigned char nl) {
 }
 
 
-void nls_output_internal(unsigned short id, unsigned char nl) {
+static const char *nlsblock_findstr(unsigned short id) {
   const char *ptr = langblock + 4; /* first 4 bytes are lang id and lang len */
-  const char *NOTFOUND = "NLS_STRING_NOT_FOUND";
   /* find the string id in langblock memory */
   for (;;) {
     if (((unsigned short *)ptr)[0] == id) {
       ptr += 3;
-      break;
+      return(ptr);
     }
-    if (ptr[2] == 0) {
-      ptr = NOTFOUND;
-      break;
-    }
+    if (ptr[2] == 0) return(NULL);
     ptr += ptr[2] + 3;
   }
-  output_internal(ptr, nl);
+}
+
+
+void nls_output_internal(unsigned short id, unsigned char nl) {
+  const char *NOTFOUND = "NLS_STRING_NOT_FOUND";
+  const char *ptr = nlsblock_findstr(id);
+  if (ptr == NULL) ptr = NOTFOUND;
+  output_internal(ptr, nl, hSTDOUT);
+}
+
+
+/* output DOS error e to stderr */
+void nls_outputnl_doserr(unsigned short e) {
+  static char errstr[16];
+  const char *ptr = NULL;
+  /* find string in nls block */
+  if (e < 0xff) ptr = nlsblock_findstr(0xff00 | e);
+  /* if not found, use a fallback */
+  if (ptr == NULL) {
+    sprintf(errstr, "DOS ERR %u", e);
+    ptr = errstr;
+  }
+  /* display */
+  output_internal(ptr, 1, hSTDERR);
 }
 
 

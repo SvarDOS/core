@@ -9,6 +9,7 @@
  - DIR: fixed /P pagination in wide mode
  - implemented IF command (IF EXIST, IF ERRORLEVEL, IF str==str)
  - added a break handler (running application can be aborted with CTRL+C)
+ - Error messages are output to stderr
 
 
 === ver 2021.0 (24.11.2021) ==================================================

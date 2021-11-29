@@ -283,7 +283,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
     if (t != 0) {
       output(setup->src[i]);
       output(" - ");
-      outputnl(doserr(t));
+      nls_outputnl_doserr(t);
       continue;
     }
     cursrclen = strlen(setup->cursrc); /* remember cursrc length */
@@ -347,7 +347,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
       t = cmd_copy_internal(setup->dst, 0, setup->cursrc, 0, appendflag, setup->databuf, setup->databufsz);
       if (t != 0) {
-        outputnl(doserr(t));
+        nls_outputnl_doserr(t);
         return(CMD_FAIL);
       }
 

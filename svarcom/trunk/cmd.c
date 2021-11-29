@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "doserr.h"
 #include "env.h"
 #include "helpers.h"
 #include "redir.h"
@@ -231,7 +230,7 @@ enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg,
         pop ax
       }
       if (curdrive == drive) return(CMD_OK);
-      outputnl(doserr(0x0f));
+      nls_outputnl_doserr(0x0f);
       return(CMD_FAIL);
     }
   }

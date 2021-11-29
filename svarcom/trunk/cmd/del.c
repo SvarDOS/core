@@ -97,7 +97,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
       err = findfirst(dta, buff, DOS_ATTR_RO | DOS_ATTR_SYS | DOS_ATTR_HID);
       if (err != 0) { /* report the error only if query had no wildcards */
         for (i = 0; buff[i] != 0; i++) if (buff[i] == '?') break;
-        if (buff[i] == 0) outputnl(doserr(err));
+        if (buff[i] == 0) nls_outputnl_doserr(err);
         break;
       }
     } else {
@@ -133,7 +133,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
     if (err != 0) {
       output(fname);
       output(": ");
-      outputnl(doserr(err));
+      nls_outputnl_doserr(err);
       break;
     }
   }

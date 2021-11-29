@@ -154,7 +154,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   i = nls_getpatterns(nls);
-  if (i != 0) outputnl(doserr(i));
+  if (i != 0) nls_outputnl_doserr(i);
 
   /* parse command line */
   for (i = 0; i < p->argc; i++) {
@@ -230,7 +230,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     i = file_truename(filespecptr, p->BUFFER);
   }
   if (i != 0) {
-    outputnl(doserr(i));
+    nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 
@@ -258,7 +258,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   i = findfirst(dta, p->BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC);
   if (i != 0) {
-    outputnl(doserr(i));
+    nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 
@@ -352,7 +352,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
-    if (i != 0) outputnl(doserr(i));
+    if (i != 0) nls_outputnl_doserr(i);
     alignpos += 13 + 13;
     memset(buff2, ' ', alignpos); /* align the freebytes value to same column as totbytes */
     i = nls_format_number(buff2 + alignpos, summary_totsz, nls);

@@ -149,7 +149,7 @@ static enum cmd_result cmd_date(struct cmd_funcparam *p) {
 
   i = nls_getpatterns(nls);
   if (i != 0) {
-    outputnl(doserr(i));
+    nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 

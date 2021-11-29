@@ -106,7 +106,7 @@ static enum cmd_result cmd_chcp(struct cmd_funcparam *p) {
       sprintf(p->BUFFER, "Active code page: %d", nnn);
       outputnl(p->BUFFER);
     } else {
-      outputnl(doserr(errcode));
+      nls_outputnl_doserr(errcode);
       return(CMD_FAIL);
     }
   }

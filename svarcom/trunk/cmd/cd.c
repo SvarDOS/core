@@ -97,7 +97,7 @@ static enum cmd_result cmd_cd(struct cmd_funcparam *p) {
       }
     }
     if (err != 0) {
-      outputnl(doserr(err));
+      nls_outputnl_doserr(err);
       return(CMD_FAIL);
     }
   }
