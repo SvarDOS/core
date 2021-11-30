@@ -12,3 +12,43 @@
 # SHIFT
 16.0:Zmienia pozycję argumentów w pliku wsadowym:
 16.1:Argument %1 staje się %0, argument %2 staje się %1, itd.
+
+# DOS ERRORS
+255.1:Błędny numer funkcji
+255.2:Nie znaleziono pliku
+255.3:Nie znaleziono ścieżki
+255.4:Zbyt wiele otwartych plików (brak dostępnych uchwytów)
+255.5:Brak dostępu
+255.6:Nieprawidłowy uchwyt
+255.7:Zniszczony blok kontroli pamięci
+255.8:Niewystarczająca pamięć
+255.9:Nieprawidłowy adres bloku pamięci
+255.10:Nieprawidłowe środowisko
+255.11:Nieprawidłowy format
+255.12:Nieprawidłowy kod dostepu
+255.13:Nieprawidłowe dane
+255.15:Nieprawidłowy napęd
+255.16:Dokonano próby usunięcia bieżącego katalogu
+255.17:Nie to samo urządzenie
+255.18:Brak dalszych plików
+255.19:Dysk chroniony przed zapisem
+255.20:Nieznana jednostka
+255.21:Napęd nie jest gotowy
+255.22:Nieznane polecenie
+255.23:Błąd danych (CRC)
+255.24:Nieprawidłowa długość struktury zapytania
+255.25:Błąd wyszukiwania
+255.26:Nieznany typ nośnika (dysk niezgodny z DOS)
+255.27:Nie znaleziono sektora
+255.28:Brak papieru w drukarce
+255.29:Błąd zapisu
+255.30:Błąd odczytu
+255.31:Ogólna awaria
+255.32:Naruszenie zasad współdzielenia
+255.33:Naruszenie blokady
+255.34:Nieprawidłowa zmiana dysku
+255.35:Niedostępne FCB
+255.36:Przepełnienie bufora udostępniania
+255.37:Niezgodność strony kodowej
+255.38:Nie można ukończyć operacji na pliku (EOF / brak danych wejściowych)
+255.39:Za mało miejsca na dysku
