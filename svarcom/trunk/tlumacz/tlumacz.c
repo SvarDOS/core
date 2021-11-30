@@ -30,6 +30,25 @@
 #include <string.h>
 
 
+
+struct bitmap {
+  unsigned char bits[8192];
+};
+
+static void bitmap_set(struct bitmap *b, unsigned short id) {
+  b->bits[id / 8] |= 1 << (id & 7);
+}
+
+static int bitmap_get(const struct bitmap *b, unsigned short id) {
+  return(b->bits[id / 8] & (1 << (id & 7)));
+}
+
+static void bitmap_init(struct bitmap *b) {
+  memset(b, 0, sizeof(struct bitmap));
+}
+
+
+
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
 static unsigned short readl(char *dst, size_t dstsz, FILE *fd) {
@@ -83,13 +102,15 @@ static char *parseline(unsigned short *id, char *s) {
 
 
 /* opens a CATS-style file and compiles it into a ressources lang block */
-static unsigned short gen_langstrings(unsigned char *buff, const char *langid) {
+static unsigned short gen_langstrings(unsigned char *buff, const char *langid, struct bitmap *b, const struct bitmap *refb, const unsigned char *refblock) {
   unsigned short len = 0, linelen;
   FILE *fd;
   char fname[] = "NLS\\SVARCOM.XX";
   char linebuf[512];
   char *ptr;
   unsigned short id, linecount;
+
+  bitmap_init(b);
 
   strcpy(fname + strlen(fname) - 2, langid);
 
@@ -119,6 +140,36 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid) {
     buff[len++] = strlen(ptr) + 1;
     memcpy(buff + len, ptr, strlen(ptr) + 1);
     len += strlen(ptr) + 1;
+
+    /* if reference bitmap provided: check that the id is valid */
+    if ((refb != NULL) && (bitmap_get(refb, id) == 0)) {
+      printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
+    }
+
+    /* make sure this id is not already present */
+    if (bitmap_get(b, id) == 0) {
+      /* set bit in bitmap to remember I have this string */
+      bitmap_set(b, id);
+    } else {
+      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);
+    }
+  }
+
+  fclose(fd);
+
+  /* if refblock provided, pull missing strings from it */
+  if (refblock != NULL) {
+    for (;;) {
+      id = *((unsigned short *)refblock);
+      if ((id == 0) && (refblock[2] == 0)) break;
+      if (bitmap_get(b, id) == 0) {
+        printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
+        /* copy missing string from refblock */
+        memcpy(buff + len, refblock, refblock[2] + 3);
+        len += refblock[2] + 3;
+      }
+      refblock += refblock[2] + 3;
+    }
   }
 
   /* write the block terminator (0-long string) */
@@ -126,16 +177,18 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid) {
   buff[len++] = 0; /* id */
   buff[len++] = 0; /* len */
 
-  fclose(fd);
-
   return(len);
 }
 
 
+#define MEMBLOCKSZ 65500
+
 int main(int argc, char **argv) {
   FILE *fd;
   int ecode = 0;
-  char *buff;
+  char *buff, *refblock;
+  static struct bitmap bufbitmap;
+  static struct bitmap refbitmap;
   unsigned short i;
 
   if (argc < 2) {
@@ -143,8 +196,9 @@ int main(int argc, char **argv) {
     return(1);
   }
 
-  buff = malloc(65500);
-  if (buff == NULL) {
+  buff = malloc(MEMBLOCKSZ);
+  refblock = malloc(MEMBLOCKSZ);
+  if ((buff == NULL) || (refblock == NULL)) {
     puts("out of memory");
     return(1);
   }
@@ -175,7 +229,7 @@ int main(int argc, char **argv) {
     if (id[0] >= 'a') id[0] -= 'a' - 'A';
     if (id[1] >= 'a') id[1] -= 'a' - 'A';
 
-    sz = gen_langstrings(buff, id);
+    sz = gen_langstrings(buff, id, &bufbitmap, (i != 1)?&refbitmap:NULL, (i != 1)?refblock:NULL);
     if (sz == 0) {
       printf("ERROR COMPUTING LANG '%s'\r\n", id);
       ecode = 1;
@@ -191,8 +245,8 @@ int main(int argc, char **argv) {
       ecode = 1;
       break;
     }
-    /* if EN, then it is also the default block */
-    if (strcmp(id, "EN") == 0) {
+    /* compute the default block for reference language */
+    if (i == 1) {
       FILE *fd2;
       fd2 = fopen("DEFAULT.LNG", "wb");
       if (fd2 == NULL) {
@@ -203,6 +257,9 @@ int main(int argc, char **argv) {
       fwrite(&sz, 1, 2, fd2);   /* lang block size */
       fwrite(buff, 1, sz, fd2); /* langblock content (strings) */
       fclose(fd2);
+      /* remember reference data for other languages */
+      memcpy(refblock, buff, MEMBLOCKSZ);
+      memcpy(&refbitmap, &bufbitmap, sizeof(struct bitmap));
     }
   }
 
