@@ -28,7 +28,7 @@
 255.12:Access code invalid
 255.13:Data invalid
 255.15:Invalid drive
-255.16:Attemted to remove current directory
+255.16:Attempted to remove current directory
 255.17:Not same device
 255.18:No more files
 255.19:Disk write-protected
