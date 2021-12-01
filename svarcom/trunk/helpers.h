@@ -38,15 +38,16 @@ int strstartswith(const char *s1, const char *s2);
 void output_internal(const char *s, unsigned char nl, unsigned char handle);
 
 /* outputs a NULL-terminated NLS string to stdout */
-void nls_output_internal(unsigned short id, unsigned char nl);
+void nls_output_internal(unsigned short id, unsigned char nl, unsigned char handle);
 
 #define hSTDOUT 1
 #define hSTDERR 2
 
 #define output(x) output_internal(x, 0, hSTDOUT)
 #define outputnl(x) output_internal(x, 1, hSTDOUT)
-#define nls_output(x,y) nls_output_internal((x << 8) | y, 0)
-#define nls_outputnl(x,y) nls_output_internal((x << 8) | y, 1)
+#define nls_output(x,y) nls_output_internal((x << 8) | y, 0, hSTDOUT)
+#define nls_outputnl(x,y) nls_output_internal((x << 8) | y, 1, hSTDOUT)
+#define nls_outputnl_err(x,y) nls_output_internal((x << 8) | y, 1, hSTDERR)
 
 /* output DOS error e to stderr */
 void nls_outputnl_doserr(unsigned short e);
@@ -115,8 +116,8 @@ _Packed struct nls_patterns {
 #define DOS_ATTR_ARC 32
 
 /* find first matching files using a FindFirst DOS call
- * attr contains DOS attributes that files MUST have (ie attr=0 will match all
- * files)
+ * attr contains DOS attributes that files MAY have (ie attr=0 will match only
+ * files that have no attributes at all)
  * returns 0 on success or a DOS err code on failure */
 unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short attr);
 

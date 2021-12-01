@@ -122,11 +122,11 @@ static const char *nlsblock_findstr(unsigned short id) {
 }
 
 
-void nls_output_internal(unsigned short id, unsigned char nl) {
+void nls_output_internal(unsigned short id, unsigned char nl, unsigned char handle) {
   const char *NOTFOUND = "NLS_STRING_NOT_FOUND";
   const char *ptr = nlsblock_findstr(id);
   if (ptr == NULL) ptr = NOTFOUND;
-  output_internal(ptr, nl, hSTDOUT);
+  output_internal(ptr, nl, handle);
 }
 
 

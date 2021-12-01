@@ -108,6 +108,57 @@ static void dir_pagination(unsigned short *availrows) {
 }
 
 
+/* parse an attr list like "Ar-hS" and fill bitfield into attrfilter_may and attrfilter_must.
+ * /AHS   -> adds S and H to mandatory attribs ("must")
+ * /A-S   -> removes S from allowed attribs ("may")
+ * returns non-zero on error. */
+static int dir_parse_attr_list(const char *arg, unsigned char *attrfilter_may, unsigned char *attrfilter_must) {
+  for (; *arg != 0; arg++) {
+    unsigned char curattr;
+    char not;
+    if (*arg == '-') {
+      not = 1;
+      arg++;
+    } else {
+      not = 0;
+    }
+    switch (*arg) {
+      case 'd':
+      case 'D':
+        curattr = DOS_ATTR_DIR;
+        break;
+      case 'r':
+      case 'R':
+        curattr = DOS_ATTR_RO;
+        break;
+      case 'a':
+      case 'A':
+        curattr = DOS_ATTR_ARC;
+        break;
+      case 'h':
+      case 'H':
+        curattr = DOS_ATTR_HID;
+        break;
+      case 's':
+      case 'S':
+        curattr = DOS_ATTR_SYS;
+        break;
+      default:
+        return(-1);
+    }
+    /* update res bitfield */
+    if (not) {
+      *attrfilter_may &= ~curattr;
+    } else {
+      *attrfilter_must |= curattr;
+    }
+  }
+  return(0);
+}
+
+
+#define DIR_ATTR_DEFAULT (DOS_ATTR_RO | DOS_ATTR_DIR | DOS_ATTR_ARC)
+
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
@@ -120,6 +171,8 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
+  unsigned char attrfilter_may = DIR_ATTR_DEFAULT;
+  unsigned char attrfilter_must = 0;
 
   #define DIR_FLAG_PAUSE  1
   #define DIR_FLAG_RECUR  4
@@ -159,18 +212,35 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* parse command line */
   for (i = 0; i < p->argc; i++) {
     if (p->argv[i][0] == '/') {
-      char arg;
+      const char *arg = p->argv[i] + 1;
       char neg = 0;
       /* detect negations and get actual argument */
-      if (p->argv[i][1] == '-') neg = 1;
-      arg = p->argv[i][1 + neg];
+      if (*arg == '-') {
+        neg = 1;
+        arg++;
+      }
       /* */
-      switch (arg) {
+      switch (*arg) {
         case 'a':
         case 'A':
-          /* TODO */
-          outputnl("/A NOT IMPLEMENTED YET");
-          return(CMD_FAIL);
+          arg++;
+          /* preset defaults */
+          attrfilter_may = DIR_ATTR_DEFAULT;
+          attrfilter_must = 0;
+          /* /-A only allowed without further parameters (used to cancel possible previous /Asmth) */
+          if (neg) {
+            if (*arg != 0) {
+              nls_outputnl_err(0, 2); /* invalid switch */
+              return(CMD_FAIL);
+            }
+          } else {
+            /* start with "allow everything" */
+            attrfilter_may = (DOS_ATTR_ARC | DOS_ATTR_DIR | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_RO);
+            if (dir_parse_attr_list(arg, &attrfilter_may, &attrfilter_must) != 0) {
+              nls_outputnl_err(0, 3); /* invalid parameter format */
+              return(CMD_FAIL);
+            }
+          }
           break;
         case 'b':
         case 'B':
@@ -202,12 +272,12 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           format = DIR_OUTPUT_WIDE;
           break;
         default:
-          outputnl("Invalid switch");
+          nls_outputnl_err(0, 2); /* invalid switch */
           return(CMD_FAIL);
       }
     } else {  /* filespec */
       if (filespecptr != NULL) {
-        outputnl("Too many parameters");
+        nls_outputnl_err(0, 4); /* too many parameters */
         return(CMD_FAIL);
       }
       filespecptr = p->argv[i];
@@ -256,7 +326,8 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* if ends with a \ then append ????????.??? */
   if (p->BUFFER[i - 1] == '\\') strcat(p->BUFFER, "????????.???");
 
-  i = findfirst(dta, p->BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_DIR | DOS_ATTR_ARC);
+  /* ask DOS for list of files, but only with allowed attribs */
+  i = findfirst(dta, p->BUFFER, attrfilter_may);
   if (i != 0) {
     nls_outputnl_doserr(i);
     return(CMD_FAIL);
@@ -265,6 +336,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   wcolcount = 0; /* may be used for columns counting with wide mode */
 
   do {
+    /* if mandatory attribs are requested, filter them now */
+    if ((attrfilter_must & dta->attr) != attrfilter_must) continue;
+
+    /* if file contains attributes that are not allowed -> skip */
+    if ((~attrfilter_may & dta->attr) != 0) continue;
+
+    /* turn string lcase (/L) */
     if (flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
 
     summary_fcount++;

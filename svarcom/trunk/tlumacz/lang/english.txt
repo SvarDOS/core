@@ -5,6 +5,12 @@
 # Translator: Mateusz Viste
 #
 
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Invalid syntax
+0.2:Invalid switch
+0.3:Invalid parameter format
+0.4:Too many parameters
+
 # PAUSE
 15.0:Suspends the execution of a batch script
 15.1:Press any key to continue...
