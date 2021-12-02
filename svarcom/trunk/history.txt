@@ -6,6 +6,7 @@
 === ver 2021.1 (xx.xx.2021) ==================================================
 
  - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
+ - piping support (like dir/b | sort)
  - DIR: fixed /P pagination in wide mode
  - DIR: implemented /A
  - implemented IF command (IF EXIST, IF ERRORLEVEL, IF str==str)

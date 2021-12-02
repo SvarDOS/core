@@ -24,6 +24,7 @@
 
 #include <string.h> /* memset() */
 
+#include "env.h"
 #include "helpers.h"
 #include "rmodinit.h"
 
@@ -32,13 +33,44 @@
 static unsigned short oldstdout = 0xffff;
 
 
+/* compute a filename to be used for pipes */
+static unsigned short gentmpfile(char *s) {
+  unsigned short err = 0;
+  /* do I have a %temp% path? */
+  /* TODO */
+
+  /* if fails, then use truename(\) */
+  if (file_truename(".\\", s) != 0) *s = 0;
+
+  /* create file */
+  _asm {
+    mov ah, 0x5a
+    mov dx, s
+    xor cx, cx /* file attributes */
+    int 0x21
+    jnc CLOSEFILE
+    mov err, ax
+    jmp DONE
+    /* close file handle */
+    CLOSEFILE:
+    mov ah, 0x3e
+    mov bx, ax
+    int 0x21
+    DONE:
+  }
+  return(err);
+}
+
+#include <stdio.h>
 /* parse commandline and performs necessary redirections. cmdline is
- * modified so all redirections are cut out. */
-void redir_parsecmd(struct redir_data *d, char *cmdline) {
+ * modified so all redirections are cut out.
+ * piped commands are move to awaitingcmd for later execution
+ * returns 0 on success, DOS err on failure */
+unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd) {
   unsigned short i;
   unsigned short pipescount = 0;
 
-  /* NOTE:
+  /* NOTES:
    *
    * 1. while it is possible to type a command with multiple
    *    redirections, MSDOS executes only the last redirection.
@@ -47,6 +79,7 @@ void redir_parsecmd(struct redir_data *d, char *cmdline) {
    *    not seem to matter for MSDOS. piped commands are executed first (in
    *    the order they appear) and the result of the last one is redirected to
    *    whenever the last > points at.
+   *    stdin redirection (<) is (obviously) applied to the first command only
    */
 
   /* preset oldstdout to 0xffff in case no redirection is required */
@@ -54,6 +87,8 @@ void redir_parsecmd(struct redir_data *d, char *cmdline) {
 
   /* clear out the redir_data struct */
   memset(d, 0, sizeof(*d));
+
+  *awaitingcmd = 0;
 
   /* parse the command line and fill struct with pointers */
   for (i = 0;; i++) {
@@ -81,15 +116,42 @@ void redir_parsecmd(struct redir_data *d, char *cmdline) {
       break;
     }
   }
+
+  /* if pipes present, write them to awaitingcmd (and stdout redirection too) */
+  if (pipescount != 0) {
+    static char tmpfile[130];
+    for (i = 0; i < pipescount; i++) {
+      if (i != 0) _fstrcat(awaitingcmd, "|");
+      _fstrcat(awaitingcmd, d->pipes[i]);
+    }
+    /* append stdout redirection so I don't forget about it for the last command of the pipe queue */
+    if (d->stdoutfile != NULL) {
+      if (d->stdout_openflag == 0x11) {
+        _fstrcat(awaitingcmd, ">>");
+      } else {
+        _fstrcat(awaitingcmd, ">");
+      }
+      d->stdoutfile = NULL;
+    }
+    /* redirect stdin of next command from a temp file (that is used as my output) */
+    _fstrcat(awaitingcmd, "<");
+    i = gentmpfile(tmpfile);
+    if (i != 0) return(i);
+    _fstrcat(awaitingcmd, tmpfile);
+    /* same file is used as my stdout */
+    d->stdoutfile = tmpfile;
+    d->stdout_openflag = 0x12;
+    /* TODO I need to remember that the tmp file must be removed... */
+/*    outputnl("awaitingcmd:");
+    for (i = 0; awaitingcmd[i] != 0; i++) printf("%c", awaitingcmd[i]);
+    printf("\r\n");*/
+  }
+  return(0);
 }
 
 
-/* apply stdin/stdout redirections defined in redir_data, returns 0 on success */
+/* apply stdout redirections defined in redir_data, returns 0 on success */
 int redir_apply(const struct redir_data *d) {
-  if (d->stdinfile != NULL) {
-    outputnl("ERROR: stdin redirection is not supported yet");
-    return(-1);
-  }
 
   if (d->stdoutfile != NULL) {
     unsigned short openflag = d->stdout_openflag;
@@ -156,7 +218,7 @@ int redir_apply(const struct redir_data *d) {
 }
 
 
-/* restores previous stdout/stdin handlers if they have been redirected */
+/* restores previous stdout handle if is has been redirected */
 void redir_revert(void) {
   _asm {
     /* if oldstdout is 0xffff then not redirected */

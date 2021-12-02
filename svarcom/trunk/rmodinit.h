@@ -41,6 +41,7 @@ struct rmod_props {
   char batfile[130];          /* truename of batch file being processed */
   char batargv[130];          /* args of the batch call (0-separated) */
   unsigned long batnextline;  /* offset in file of next bat line to process */
+  char awaitingcmd[130];      /* command to exec next time (if any) */
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */

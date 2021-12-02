@@ -731,6 +731,7 @@ int main(void) {
   static char *cmdline;
   static struct redir_data redirprops;
   static enum cmd_result cmdres;
+  static unsigned short i; /* general-purpose variable for short-lived things */
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
@@ -793,6 +794,13 @@ int main(void) {
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
 
+    /* load awaiting command, if any (used to run piped commands) */
+    if (rmod->awaitingcmd[0] != 0) {
+      _fstrcpy(cmdline, rmod->awaitingcmd);
+      rmod->awaitingcmd[0] = 0;
+      goto EXEC_CMDLINE;
+    }
+
     /* skip user input if I have a command to exec (/C or /K) */
     if (cfg.execcmd != NULL) {
       cmdline = cfg.execcmd;
@@ -844,7 +852,12 @@ int main(void) {
     rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
     /* handle redirections (if any) */
-    redir_parsecmd(&redirprops, cmdline);
+    i = redir_parsecmd(&redirprops, cmdline, rmod->awaitingcmd);
+    if (i != 0) {
+      nls_outputnl_doserr(i);
+      rmod->awaitingcmd[0] = 0;
+      continue;
+    }
 
     /* try matching (and executing) an internal command */
     cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops);

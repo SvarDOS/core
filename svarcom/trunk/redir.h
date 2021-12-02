@@ -35,8 +35,10 @@ struct redir_data {
 };
 
 /* parse commandline and performs necessary redirections. cmdline is
- * modified so all redirections are cut out. */
-void redir_parsecmd(struct redir_data *r, char *cmdline);
+ * modified so all redirections are cut out.
+ * piped commands are move to awaitingcmd for later execution
+ * returns 0 on success, DOS err on failure */
+unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd);
 
 /* apply stdin/stdout redirections defined in redir_data, returns 0 on success */
 int redir_apply(const struct redir_data *d);

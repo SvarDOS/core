@@ -81,7 +81,7 @@ int 0x21
 call REVERT_REDIR_IF_ANY
 
 ; redirect stdout if required
-call REDIR_OUTFILE_IF_REQUIRED
+call REDIR_INOUTFILE_IF_REQUIRED
 
 ; should I executed command.com or a pre-set application?
 or [EXECPROG], byte 0
@@ -201,13 +201,28 @@ mov ah, 0x3e
 int 0x21
 mov [OLD_STDOUT], word 0xffff ; mark stdout as "not redirected"
 STDOUT_DONE:
+
+; is stdin redirected?
+mov bx, [OLD_STDIN]
+cmp bx, 0xffff
+je STDIN_DONE
+; revert the stdout handle (dst in BX already)
+xor cx, cx       ; src handle (0=stdin)
+mov ah, 0x46     ; redirect a handle
+int 0x21
+; close the old handle (still in bx)
+mov ah, 0x3e
+int 0x21
+mov [OLD_STDIN], word 0xffff ; mark stdin as "not redirected"
+STDIN_DONE:
+
 ret
 ; ----------------------------------------------------------------------------
 
 
 ; ----------------------------------------------------------------------------
 ; redirect stdout if REDIR_OUTFIL points to something
-REDIR_OUTFILE_IF_REQUIRED:
+REDIR_INOUTFILE_IF_REQUIRED:
 mov si, [REDIR_OUTFIL]
 cmp si, 0xffff
 je NO_STDOUT_REDIR
@@ -248,5 +263,33 @@ int 0x21
 mov ah, 0x3e           ; close a file handle (handle in BX)
 int 0x21
 NO_STDOUT_REDIR:
+
+; *** redirect stdin if REDIR_INFIL points to something ***
+mov dx, [REDIR_INFIL]
+cmp dx, 0xffff
+je NO_STDIN_REDIR
+add dx, EXECPROG       ; ds:dx=file
+mov ax, 0x3d00         ; open file for read
+int 0x21               ; ax=handle on success (CF clear)
+mov [REDIR_INFIL], word 0xffff
+jc NO_STDIN_REDIR      ; TODO: abort with an error message instead
+
+; duplicate current stdin so I can revert it later
+push ax                ; save my file handle in stack
+mov ah, 0x45           ; duplicate file handle BX
+xor bx, bx             ; 0=stdin
+int 0x21               ; ax=new (duplicated) file handle
+mov [OLD_STDIN], ax    ; save the old handle in memory
+
+; redirect stdout to my file
+pop bx                 ; dst handle
+xor cx, cx             ; src handle (0=stdin)
+mov ah, 0x46           ; "redirect a handle"
+int 0x21
+
+; close the original file handle, I no longer need it
+mov ah, 0x3e           ; close a file handle (handle in BX)
+int 0x21
+NO_STDIN_REDIR:
 ret
 ; ----------------------------------------------------------------------------
