@@ -45,25 +45,24 @@ LEXCODE  db 0    ; +5Bh
 ;    +0Ah    4   address of an FCB to be placed at PSP:006c
 EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +5Ch
 
-; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)  ; +6Ah
-EXECPROG dd 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)
+EXECPROG: times 128 db 0                                     ; +6Ah
 
-; offset within EXECPROG for out and in filenames in case stdin or stdout
-; needs to be redirected (0xffff=no redirection)
-REDIR_OUTFIL dw 0xffff    ; +EAh
-REDIR_INFIL dw 0xffff     ; +ECh
-REDIR_OUTAPPEND dw 0      ; +EEh
+; File where stdin and stdout should be redirected (0 = no redirection)
+REDIR_INFIL:     times 128 db 0     ; +EAh
+REDIR_OUTFIL:    times 128 db 0     ; +16Ah
+REDIR_OUTAPPEND: dw 0               ; +1EAh
 
 ; CTRL+BREAK (int 23h) handler
 ; According to the TechHelp! Manual: "If you want to abort (exit to the parent
 ; process), then set the carry flag and return via a FAR RET. This causes DOS
 ; to perform normal cleanup and exit to the parent." (otherwise use iret)
-BREAK_HANDLER:            ; +F0h
+BREAK_HANDLER:            ; +1ECh
 stc
 retf
 
 
-skipsig:                  ; +F2h
+skipsig:                  ; +1EEh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -223,16 +222,15 @@ ret
 ; ----------------------------------------------------------------------------
 ; redirect stdout if REDIR_OUTFIL points to something
 REDIR_INOUTFILE_IF_REQUIRED:
-mov si, [REDIR_OUTFIL]
-cmp si, 0xffff
+cmp [REDIR_OUTFIL], byte 0
 je NO_STDOUT_REDIR
-add si, EXECPROG       ; si=output file
+mov si, REDIR_OUTFIL   ; si = output file
 mov ax, 0x6c00         ; Extended Open/Create
 mov bx, 1              ; access mode (0=read, 1=write, 2=r+w)
 xor cx, cx             ; file attribs when(if) file is created (0=normal)
 mov dx, [REDIR_OUTAPPEND] ; action if file exist (0x11=open, 0x12=truncate)
 int 0x21               ; ax=handle on success (CF clear)
-mov [REDIR_OUTFIL], word 0xffff
+mov [REDIR_OUTFIL], byte 0
 jc NO_STDOUT_REDIR     ; TODO: abort with an error message instead
 
 ; jump to end of file if flag was 0x11 (required for >> redirections)
@@ -249,7 +247,7 @@ SKIP_JMPEOF:
 ; duplicate current stdout so I can revert it later
 push ax                ; save my file handle in stack
 mov ah, 0x45           ; duplicate file handle BX
-mov bx, 1              ; 1=stdout
+mov bx, 1              ; 1 = stdout
 int 0x21               ; ax=new (duplicated) file handle
 mov [OLD_STDOUT], ax   ; save the old handle in memory
 
@@ -265,13 +263,12 @@ int 0x21
 NO_STDOUT_REDIR:
 
 ; *** redirect stdin if REDIR_INFIL points to something ***
-mov dx, [REDIR_INFIL]
-cmp dx, 0xffff
+cmp [REDIR_INFIL], byte 0
 je NO_STDIN_REDIR
-add dx, EXECPROG       ; ds:dx=file
+mov dx, REDIR_INFIL    ; dx:dx = file
 mov ax, 0x3d00         ; open file for read
 int 0x21               ; ax=handle on success (CF clear)
-mov [REDIR_INFIL], word 0xffff
+mov [REDIR_INFIL], byte 0
 jc NO_STDIN_REDIR      ; TODO: abort with an error message instead
 
 ; duplicate current stdin so I can revert it later

@@ -63,26 +63,50 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
   /* check RMOD signature (would be overwritten in case of stack overflow */
   static char msg[] = "!! MEMORY CORRUPTION ## DETECTED !!";
   unsigned short far *rmodsig = MK_FP(rmodseg, 0x100 + 6);
+  unsigned char far *rmod = MK_FP(rmodseg, 0);
+
   if (*rmodsig != 0x2019) {
     msg[22] = '1';
-    outputnl(msg);
-    printf("rmodseg = %04X ; *rmodsig = %04X\r\n", rmodseg, *rmodsig);
-    return(1);
+    goto FAIL;
   }
+
   /* check last BUFFER byte */
   if (BUFFER[sizeof(BUFFER) - 1] != 0xC7) {
     msg[22] = '2';
-    outputnl(msg);
-    return(2);
+    goto FAIL;
   }
+
   /* check last cmdlinebuf byte */
   if (cmdlinebuf[CMDLINE_MAXLEN] != 0xC7) {
     msg[22] = '3';
-    outputnl(msg);
-    return(3);
+    goto FAIL;
   }
-  /* all good */
+
+  /* check rmod exec buf */
+  if (rmod[RMOD_OFFSET_EXECPROG + 127] != 0) {
+    msg[22] = '4';
+    goto FAIL;
+  }
+
+  /* check rmod exec stdin buf */
+  if (rmod[RMOD_OFFSET_STDINFILE + 127] != 0) {
+    msg[22] = '5';
+    goto FAIL;
+  }
+
+  /* check rmod exec stdout buf */
+  if (rmod[RMOD_OFFSET_STDOUTFILE + 127] != 0) {
+    msg[22] = '6';
+    goto FAIL;
+  }
+
+  /* else all good */
   return(0);
+
+  /* error handling */
+  FAIL:
+  outputnl(msg);
+  return(1);
 }
 
 
@@ -421,8 +445,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   /* special handling of batch files */
   if ((ext != NULL) && (imatch(ext, "bat"))) {
     /* copy truename of the bat file to rmod buff */
-    for (i = 0; cmdfile[i] != 0; i++) rmod->batfile[i] = cmdfile[i];
-    rmod->batfile[i] = 0;
+    _fstrcpy(rmod->batfile, cmdfile);
 
     /* explode args of the bat file and store them in rmod buff */
     cmd_explode(buff, cmdline, NULL);
@@ -437,28 +460,21 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   }
 
   /* copy full filename to execute, along with redirected files (if any) */
-  for (i = 0; cmdfile[i] != 0; i++) rmod_execprog[i] = cmdfile[i];
-  rmod_execprog[i++] = 0;
+  _fstrcpy(rmod_execprog, cmdfile);
+
+  /* copy stdin file if a redirection is needed */
   if (redir->stdinfile) {
-    unsigned short far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDINFILE);
-    unsigned short t;
-    *farptr = i;
-    for (t = 0;; t++) {
-      rmod_execprog[i++] = redir->stdinfile[t];
-      if (redir->stdinfile[t] == 0) break;
-    }
+    char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDINFILE);
+    _fstrcpy(farptr, redir->stdinfile);
   }
+
+  /* same for stdout file */
   if (redir->stdoutfile) {
-    unsigned short far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTFILE);
-    unsigned short t;
-    *farptr = i;
-    for (t = 0;; t++) {
-      rmod_execprog[i++] = redir->stdoutfile[t];
-      if (redir->stdoutfile[t] == 0) break;
-    }
+    char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTFILE);
+    unsigned short far *farptr16 = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTAPP);
+    _fstrcpy(farptr, redir->stdoutfile);
     /* openflag */
-    farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTAPP);
-    *farptr = redir->stdout_openflag;
+    *farptr16 = redir->stdout_openflag;
   }
 
   /* copy cmdtail to rmod's PSP and compute its len */
