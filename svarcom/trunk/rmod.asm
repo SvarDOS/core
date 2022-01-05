@@ -206,7 +206,7 @@ STDOUT_DONE:
 mov bx, [OLD_STDIN]
 cmp bx, 0xffff
 je STDIN_DONE
-; revert the stdout handle (dst in BX already)
+; revert the stdin handle (dst in BX already)
 xor cx, cx       ; src handle (0=stdin)
 mov ah, 0x46     ; redirect a handle
 int 0x21
