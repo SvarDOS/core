@@ -684,7 +684,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
               "#netmask = 255.255.255.0\r\n"
               "#nameserver = 192.168.0.1\r\n"
               "#nameserver = 192.168.0.2\r\n"
-              "#gateway = 192.168.1.1\r\n");
+              "#gateway = 192.168.0.1\r\n");
   fclose(fd);
 }
 
