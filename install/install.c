@@ -507,12 +507,16 @@ static int preparedrive(char sourcedrv) {
     if (mkdir(buff) == 0) {
       rmdir(buff);
     } else {
-      char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
+      char *list[3];
       newscreen(0);
-      list[0] = kittengets(0, 6, list[0]);
-      list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 3, "ERROR: Drive %c: seems to be unformated. Do you wish to format it?"), cselecteddrive);
       video_putstring(7, 1, COLOR_BODY[mono], buff, -1);
+
+      snprintf(buff, sizeof(buff), kittengets(0, 7, "Format drive %c:"), cselecteddrive);
+      list[0] = buff;
+      list[1] = kittengets(0, 2, "Quit to DOS");
+      list[2] = NULL;
+
       choice = menuselect(12, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
@@ -536,12 +540,16 @@ static int preparedrive(char sourcedrv) {
     /* is the disk empty? */
     newscreen(0);
     if (diskempty(selecteddrive) != 0) {
-      char *list[] = { "Proceed with formatting", "Quit to DOS", NULL};
+      char *list[3];
       int y = 6;
-      list[0] = kittengets(0, 6, list[0]);
-      list[1] = kittengets(0, 2, list[1]);
       snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. SvarDOS must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
+
+      snprintf(buff, sizeof(buff), kittengets(0, 7, "Format drive %c:"), cselecteddrive);
+      list[0] = buff;
+      list[1] = kittengets(0, 2, "Quit to DOS");
+      list[2] = NULL;
+
       choice = menuselect(++y, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);

@@ -12,7 +12,6 @@
 0.3:Samodejno ustvari particijo
 0.4:Zaženi program za particioniranje FDISK
 0.5:Pritisnite tipko...
-0.6:Nadaljuj s formatiranjem
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Gor/dol = izbira | Enter = potrdi izbiro | Esc = prejšnji zaslon
 0.11:Gor/dol = izbira | Enter = potrdi izbiro | Esc = izhod v DOS
@@ -29,7 +28,7 @@
 3.0:NAPAKA: Pogon %c: ni bil najden. Morda je treba najprej ustvariti particijo na trdem disku. Prosimo, ustvarite vsaj eno particijo, da lahko namestite SvarDOS. Velika mora biti vsaj %d MB.\n\nUstvarite jo lahko sami s programom FDISK, lahko pa jo program za namestitev ustvari samodejno. Namestitev lahko tudi prekinete in uporabite svoj program za particioniranje.
 3.1:Računalnik se bo zdaj ponovno zagnal.
 3.2:NAPAKA: Pogon %c: je odstranljiv medij. Namestitev bo prekinjena.
-3.3:NAPAKA: Pogon %c: ni formatiran. Ali ga želite formatirati?
+3.3:NAPAKA: Pogon %c: ni formatiran.
 3.4:NAPAKA: Pogon %c: je premajhen. SvarDOS zahteva vsaj %d MB prostora.
 3.5:NAPAKA: Pogon %c: ni prazen. SvarDOS mora biti nameščen na prazen pogon.\n\nLahko ga formatirate in s tem izpraznite, vendar bo to IZBRISALO VSE PODATKE na njem.
 3.6:Namestitev operacijskega sistema SvarDOS na pogon %c: se bo začela.

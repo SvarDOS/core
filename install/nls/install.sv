@@ -20,8 +20,6 @@
 0.4:K”r FDISK-partitioneringsverktyget
 #0.5:Press any key...
 0.5:Tryck p† en tangent...
-#0.6:Proceed with formatting
-0.6:G† vidare med formatteringen
 # Every string below must be at most 78 characters long! (used in status bar)
 # Varje str„ng nedan m†ste vara som mest 78 bokst„ver l†ng (anv„nds i statusbaren)
 #0.10:Up/Down = Select entry | Enter = Confirm choice | ESC = Previous screen
@@ -52,7 +50,7 @@
 #3.2:ERROR: Drive %c: is a removable device. Installation aborted.
 3.2:FEL: Enhet %c: „r ett removable device. Installationen avbryts.
 #3.3:ERROR: Drive %c: seems to be unformated. Do you wish to format it?
-3.3:FEL: Enhet %c: verkar vara oformaterad. Vill du formatera den?
+3.3:FEL: Enhet %c: verkar vara oformaterad.
 #3.4:ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB.
 3.4:FEL: Enhet %c: „r inte tillr„ckligt stor! SvarDOS beh”ver en disk som „r minst %d MiB.
 #3.5:ERROR: Drive %c: is not empty. SvarDOS must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk.

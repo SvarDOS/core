@@ -12,7 +12,6 @@
 0.3:Erstelle eine Partition automatisch
 0.4:Partitionierungswerkzeug FDISK ausführen
 0.5:Beliebige Taste drücken...
-0.6:Mit dem Formatieren fortfahren
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Hoch/Runter=Eintrag wählen | Enter=Bestätigen | ESC=Vorheriger Bildschirm
 0.11:Hoch/Runter=Eintrag wählen | Enter=Bestätigen | ESC=Zurück zu DOS
@@ -29,7 +28,7 @@
 3.0:FEHLER: Laufwerk %c: konnte nicht gefunden werden. Vielleicht muss die Festplatte zuerst partitioniert werden. Bitte erstellen Sie mindestens eine primäre Partition auf Ihrer Festplatte, so dass SvarDOS darauf installiert werden kann. Beachten Sie, dass SvarDOS mindestens %d MiB des verfügbaren Speicherplatzes benötigt.\n\nSie können das Partitionierungswerkzeug FDISK verwenden, um die erforderliche Partition manuell zu erstellen, oder Sie können das Installationsprogramm die Festplatte automatisch partitionieren lassen. Sie können auch die Installation abbrechen, um einen anderen Partitionsmanager Ihrer Wahl zu verwenden.
 3.1:Ihr Computer wird jetzt neu gestartet.
 3.2:FEHLER: Laufwerk %c: ist ein Wechselmedium. Installation abgebrochen.
-3.3:FEHLER: Laufwerk %c: scheint unformatiert zu sein. Möchten Sie es jetzt formatieren?
+3.3:FEHLER: Laufwerk %c: scheint unformatiert zu sein.
 3.4:FEHLER: Laufwerk %c: ist nicht groß genug! SvarDOS benötigt mindestens %d MiB.
 3.5:FEHLER: Laufwerk %c: ist nicht leer. SvarDOS muss auf einem leeren Datenträger installiert werden.\n\nSie können den Datenträger jetzt formatieren, um ihn zu leeren. Beachten Sie jedoch, dass dies ALLE AKTUELLEN DATEN auf Ihrer Festplatte löscht.
 3.6:Die Installation von SvarDOS auf Laufwerk %c: beginnt nun.

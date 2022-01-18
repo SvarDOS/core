@@ -12,7 +12,6 @@
 0.3:Disk b”lmn otomatik olarak oluŸtur
 0.4:FDISK disk b”lm oluŸturma aracn ‡alŸtr
 0.5:Herhangi bir tuŸa basn...
-0.6:Bi‡imlendirmeye baŸla
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Yukar/AŸa§ = Unsur se‡ | Enter = Se‡imi do§rula | ESC = ™nceki ekran
 0.11:Yukar/AŸa§ = Unsur se‡ | Enter = Se‡imi do§rula | ESC = Dos'a ‡k
@@ -29,7 +28,7 @@
 3.0:HATA: %c: srcs bulunamad. Belki sabit diskinizde ”nce b”lm oluŸturmanz gerekmektedir. Ltfen sabit diskinizde en az bir b”lm oluŸturun ki SvarDOS o b”lme kurulabilsin. SvarDOS'nn en az %d MiB disk alanna ihtiya‡ duydu§unu unutmayn.\n\nGerekli b”lm elle oluŸturmak i‡in FDISK b”lm oluŸturma aracn kullanabilir ya da kurulumun diskinizde otomatik olarak b”lm oluŸturmasna izin verebilirsiniz. BaŸka bir b”lm y”neticisi kullanmak i‡in kurulumu iptal de edebilirsiniz.
 3.1:Bilgisayarnz Ÿimdi yeniden baŸlayacaktr.
 3.2:HATA: %c: srcs ‡karlabilir bir cihazdr. Kurulum iptal edilmiŸtir.
-3.3:HATA: %c: bi‡imlendirilmemiŸ g”zkmektedir. Bi‡imlendirmek ister misiniz?
+3.3:HATA: %c: bi‡imlendirilmemiŸ g”zkmektedir.
 3.4:HATA: %c: srcs yeteri kadar byk de§ildir! SvarDOS en az %d MiB boyutunda bir diske ihtiya‡ duyar.
 3.5:HATA: %c: srcs boŸ de§ildir. SvarDOS, boŸ bir diske kurulmaldr.\n\nDiski boŸaltmak i‡in Ÿimdi bi‡imlendirebilirsiniz. Bununla beraber, bunun diskinizdeki TšM GšNCEL VER˜LER˜ S˜LECE¦˜N˜ unutmaynz.
 3.6:SvarDOS'nn %c: srcsne kurulumu baŸlamak zeredir.
