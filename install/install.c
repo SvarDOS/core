@@ -469,8 +469,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = kittengets(0, 4, list[1]);
       list[2] = kittengets(0, 2, list[2]);
       snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so SvarDOS can be installed on it. Note, that SvarDOS requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVARDOS_DISK_REQ);
-      putstringwrap(4, 1, COLOR_BODY[mono], buff);
-      switch (menuselect(14, -1, 5, list, -1)) {
+      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY[mono], buff), -1, 5, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /AUTO %d", driveid);
           system(buff);
