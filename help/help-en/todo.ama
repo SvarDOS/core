@@ -11,27 +11,34 @@
 
 * validate that CORE is 100%% 8086-compatible
 
-* Networking setup at install time -> should crynwr be part of the install
-  set? Or only selected drivers? Or maybe this could be provided as a
-  "supplemental" floppy disk?
-
-* make the COMMAND package smaller so there is no need for multiple
-  lang-dependant copies of the binary
+* replace FreeCOM by SvarCOM
 
 * improve installer so user can choose the target disk
 
+* COUNTRY settings shall be configurable by localcfg (and user should be
+  able to define local preferences through an easy-to-use wizard during
+  install time)
+
+* out-of-the box networking support:
+ - requires shipping lots of packet drivers with SvarDOS... Should CRYNWR be
+   part of the install set? Or only selected, most popular drivers? Or maybe
+   this could be provided as a "supplemental" floppy disk?
+ - user should be asked for its NIC model at install time
+ - installer could also ask for a basic DHCP / static configuration
+
 * add a "link" tool so users can easily create "links" to their favorite
-  programs (esp. things like zip/unzip, etc)
+  programs (esp. things like zip/unzip, etc). Might be something integrated
+  within SvarCOM, or a third-party TSR.
 
 * install.com - MBR changes could be done by the installer itself instead of
   system()-calling fdisk
 
 * help - write more useful content!
-  -> basic DOS commands (directories, copy/rename/delete files, etc)
-  -> common configuration files (autoexec, config.sys, pkg.cfg, wattcp.cfg..)
-  -> networking guide
-  -> memory management basics
-  -> ...
+  - basic DOS commands (directories, copy/rename/delete files, etc)
+  - common configuration files (autoexec, config.sys, pkg.cfg, wattcp.cfg..)
+  - networking guide
+  - memory management basics
+  - ...
 
 * test new versions of software and update packages accordingly. special care
   must be taken for core things: kernel, freecom, fdisk, himemx...
@@ -42,9 +49,11 @@
   languages -> would be nice to have some kind of web interface for submitting
   and reviewing translations
 
-* pkgnet.exe: implement the 'checkup' action for easy update checks
+* pkgnet.exe:
+ - implement the 'checkup' action for easy update checks
+ - support for alternative versions (eg: pkgnet pull dosmid@0.9.1)
 
-* possibly plenty of other things
+* possibly plenty of other things...
 
 
                         =============================
