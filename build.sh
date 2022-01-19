@@ -2,7 +2,7 @@
 #
 # SvarDOS build script
 # http://svardos.osdn.io
-# Copyright (C) 2016-2021 Mateusz Viste
+# Copyright (C) 2016-2022 Mateusz Viste
 #
 # This script generates the SvarDOS repository index and builds ISO CD images.
 # It should be executed each time that a package has been modified, added or
@@ -52,7 +52,7 @@ set -e
 
 
 # list of packages to be part of CORE (always installed)
-COREPKGS="amb attrib chkdsk choice command cpidos deltree devload diskcopy display dosfsck edit fc fdapm fdisk format help himemx kernel keyb keyb_lay label mem mode more move pkg pkgnet shsucdx sort tree"
+COREPKGS="amb attrib chkdsk choice command cpidos deltree devload diskcopy display dosfsck edit fc fdapm fdisk format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree"
 
 # list of packages to be part of EXTRA (only sometimes installed, typically drivers)
 EXTRAPKGS="pcntpk udvd2"
@@ -71,8 +71,15 @@ function dorepo {
   find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "source/*" ';'
   find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
 
-  # build repo idx
+  # hide all alternative versions under a different extension so the index builder is
+  # not confused (filename of an alt version contains a dash, eg. "DOSMID-0.9.5.zip")
+  rename .zip .altver "$REPOROOT"/*-*.zip
+
+  # build repo index
   $BUILDIDX "$REPOROOT/"
+
+  # unhide all alt versions
+  rename .altver .zip "$REPOROOT"/*.altver
 }
 
 
