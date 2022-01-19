@@ -49,11 +49,11 @@
   languages -> would be nice to have some kind of web interface for submitting
   and reviewing translations
 
-* pkgnet.exe:
- - implement the 'checkup' action for easy update checks
- - support for alternative versions (eg: pkgnet pull dosmid@0.9.1)
+* all CORE packages should be NLS-aware (ie. translatable)
 
-* possibly plenty of other things...
+* pkgnet.exe: implement the 'checkup' action for easy update checks
+
+* possibly plenty of other things
 
 
                         =============================
