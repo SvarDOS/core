@@ -1,10 +1,9 @@
 /*
  * pkgnet - pulls SvarDOS packages from the project's online repository
- * Copyright (C) 2021 Mateusz Viste
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2021 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2022 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,8 +38,8 @@
 #include "../pkg/lsm.h"
 
 
-#define PVER "20210906"
-#define PDATE "2021"
+#define PVER "20220119"
+#define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.osdn.io"
 
@@ -74,6 +73,7 @@ static void help(void) {
   puts("");
   puts("usage:  pkgnet search <term>");
   puts("        pkgnet pull <package>");
+  puts("        pkgnet pull <package>-<version>");
   puts("        pkgnet checkup");
   puts("");
   puts("actions:");
@@ -96,12 +96,15 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url, in
   if ((argc == 3) && (strcasecmp(argv[1], "search") == 0)) {
     sprintf(url, "/repo/?a=search&p=%s", argv[2]);
   } else if ((argc == 3) && (strcasecmp(argv[1], "pull") == 0)) {
-    if ((strlen(argv[2]) > 8) || (argv[2][0] == 0)) {
-      puts("ERROR: package name must be 8 characters maximum");
-      return(-1);
-    }
+    unsigned short i;
     sprintf(url, "/repo/?a=pull&p=%s", argv[2]);
-    sprintf(outfname, "%s.zip", argv[2]);
+    /* copy argv[2] into outfname, but stop at first '-' or null terminator
+     * this trims any '-version' part in filename to respect 8+3 */
+    for (i = 0; (argv[2][i] != 0) && (argv[2][i] != '-') && (i < 8); i++) {
+      outfname[i] = argv[2][i];
+    }
+    /* add the zip extension to filename */
+    strcpy(outfname + i, ".zip");
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
     sprintf(url, "/repo/?a=checkup");
     *ispost = 1;

@@ -12,7 +12,7 @@ release: pkgnet.exe .symbolic
 	mkdir appinfo
 	copy pkgnet.exe bin
 	copy pkgnet.lsm appinfo
-	zip -9 -r -m pkgnet.zip bin appinfo
+	zip -9 -k -r -m pkgnet.zip bin appinfo
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
 	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
