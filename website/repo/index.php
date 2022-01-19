@@ -2,10 +2,11 @@
 
 /*
   pkgnet interface
-  Copyright (C) 2021 Mateusz Viste
+  Copyright (C) 2021-2022 Mateusz Viste
 
  === API ===
   ?a=pull&p=PACKAGE           downloads the zip archive containing PACKAGE
+  ?a=pull&p=PACKAGE-VER       downloads the zip containing PACKAGE in version VER
   ?a=search&p=PHRASE          list packages that match PHRASE
   ?a=checkup                  list of packages+versions in $_POST
 */
@@ -112,7 +113,14 @@ if ($a === 'search') {
     if ((stristr($pkg[0], $p)) || (stristr($pkg[2], $p))) {
       echo str_pad(strtoupper($pkg[0]), 12) . str_pad("ver: {$pkg[1]}", 13) . str_pad("size: " . nicesize(filesize($pkg[0] . '.zip')), 13) . "BSUM: " . sprintf("%04X", $pkg[3]) . "\r\n";
       echo wordwrap($pkg[2], 79, "\r\n", true);
-      echo "\r\n\r\n";
+      echo "\r\n";
+      // do I have any alt versions?
+      $altvers = glob("{$pkg[0]}-*.zip");
+      if (!empty($altvers)) {
+        $alts = str_replace('.zip', '', $altvers);
+        echo wordwrap("[alt versions: " . implode(', ', $alts), 79, "\r\n", true) . "]\r\n";
+      }
+      echo "\r\n";
       $matches++;
     }
   }
