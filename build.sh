@@ -15,7 +15,7 @@
 
 PKGDIR=`realpath ./packages`
 REPOROOT=`realpath ./website/repo`
-BUILDIDX=`realpath ./buildidx/buildidx`
+BUILDIDX=`realpath ./buildidx/buildidx.php`
 PUBDIR=`realpath ./website/download`
 CDROOT=`realpath ./cdroot`
 FLOPROOT=`realpath ./floproot`
@@ -71,15 +71,8 @@ function dorepo {
   find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "source/*" ';'
   find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
 
-  # hide all alternative versions under a different extension so the index builder is
-  # not confused (filename of an alt version contains a dash, eg. "DOSMID-0.9.5.zip")
-  rename .zip .altver "$REPOROOT"/*-*.zip
-
   # build repo index
-  $BUILDIDX "$REPOROOT/"
-
-  # unhide all alt versions
-  rename .altver .zip "$REPOROOT"/*.altver
+  php "$BUILDIDX" "$REPOROOT"
 }
 
 

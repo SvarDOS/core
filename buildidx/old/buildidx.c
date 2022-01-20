@@ -1,6 +1,6 @@
 /*
   SvarDOS repo index builder
-  Copyright (C) Mateusz Viste 2012-2021
+  Copyright (C) Mateusz Viste 2012-2022
 
   buildidx computes an index tsv file for the SvarDOS repository.
   it must be executed pointing to a directory that stores packages (zip)
@@ -33,7 +33,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 
-#define pVer "2021-02-11"
+#define pVer "2022-01-20"
 
 
 /* computes the BSD sum of a file and returns it. returns 0 on error. */

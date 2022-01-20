@@ -4,11 +4,11 @@ buildidx is a little program that generates an index.tsv file for the SvarDOS re
 
 * Requirements *
 
-To operate properly, buildidx needs 'unzip' to be available.
+To operate properly, buildidx needs php and php-zip.
 
 
 * How to use it *
 
 Put all your packages into a single directory, for ex. "mystuff", and call buildidx with the directory as a parameter:
 
-./buildidx mystuff
+php buildidx.php mystuff
