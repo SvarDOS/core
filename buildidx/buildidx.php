@@ -41,11 +41,12 @@ function file2bsum($fname) {
 
     $buff = fread($fd, 1024 * 1024);
 
-    foreach (str_split($buff) as $b) {
+    $slen = strlen($buff);
+    for ($i = 0; $i < $slen; $i++) {
       // rotr
       $result = ($result >> 1) | ($result << 15);
       // add and truncate to 16 bits
-      $result += ord($b);
+      $result += ord($buff[$i]);
       $result &= 0xffff;
     }
   }
