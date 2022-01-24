@@ -11,7 +11,8 @@
 0.2:Zurck zu DOS
 0.3:Erstelle eine Partition automatisch
 0.4:Partitionierungswerkzeug FDISK ausfhren
-0.5:Beliebige Taste drcken...
+0.5:Drcken Sie eine beliebige Taste...
+0.7:Laufwerk %c: formatieren
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Hoch/Runter=Eintrag w„hlen | Enter=Best„tigen | ESC=Vorheriger Bildschirm
 0.11:Hoch/Runter=Eintrag w„hlen | Enter=Best„tigen | ESC=Zurck zu DOS
@@ -22,12 +23,12 @@
 1.5:SvarDOS untersttzt verschiedene Tastaturlayouts. W„hlen Sie das gewnschte Tastaturlayout aus.
 
 ### WELCOME SCREEN ###
-2.0:Sie sind dabei, SvarDOS zu installieren: ein kostenloses, MS-DOS-kompatibles Betriebssystem basierend auf FreeDOS. SvarDOS kommt mit einer Vielzahl von Anwendungen von Drittanbietern.\n\nWARNUNG: Wenn auf Ihrem PC bereits ein anderes Betriebssystem installiert ist, startet dieses m”glicherweise nicht mehr, sobald SvarDOS installiert ist.
+2.0:Sie sind dabei, SvarDOS zu installieren: ein freies und quelloffenes, MS-DOS-kompatibles Betriebssystem basierend auf FreeDOS. SvarDOS kommt mit einer Vielzahl von Anwendungen von Drittanbietern.\n\nWARNUNG: Wenn auf Ihrem PC bereits ein anderes Betriebssystem installiert ist, startet dieses m”glicherweise nicht mehr, sobald SvarDOS installiert ist.
 
 ### DISK SETUP ###
 3.0:FEHLER: Laufwerk %c: konnte nicht gefunden werden. Vielleicht muss die Festplatte zuerst partitioniert werden. Bitte erstellen Sie mindestens eine prim„re Partition auf Ihrer Festplatte, so dass SvarDOS darauf installiert werden kann. Beachten Sie, dass SvarDOS mindestens %d MiB des verfgbaren Speicherplatzes ben”tigt.\n\nSie k”nnen das Partitionierungswerkzeug FDISK verwenden, um die erforderliche Partition manuell zu erstellen, oder Sie k”nnen das Installationsprogramm die Festplatte automatisch partitionieren lassen. Sie k”nnen auch die Installation abbrechen, um einen anderen Partitionsmanager Ihrer Wahl zu verwenden.
 3.1:Ihr Computer wird jetzt neu gestartet.
-3.2:FEHLER: Laufwerk %c: ist ein Wechselmedium. Installation abgebrochen.
+3.2:FEHLER: Laufwerk %c: ist ein Wechseldatentr„ger. Installation abgebrochen.
 3.3:FEHLER: Laufwerk %c: scheint unformatiert zu sein.
 3.4:FEHLER: Laufwerk %c: ist nicht groá genug! SvarDOS ben”tigt mindestens %d MiB.
 3.5:FEHLER: Laufwerk %c: ist nicht leer. SvarDOS muss auf einem leeren Datentr„ger installiert werden.\n\nSie k”nnen den Datentr„ger jetzt formatieren, um ihn zu leeren. Beachten Sie jedoch, dass dies ALLE AKTUELLEN DATEN auf Ihrer Festplatte l”scht.
@@ -39,7 +40,7 @@
 4.1:*** LEGEN SIE DEN DATENTRGER, DER DIE BEN™TIGTE DATEI ENTHLT, EIN UND DRšCKEN SIE EINE BELIEBIGE TASTE ***
 
 ### END SCREEN ###
-5.0:Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie das Installationsmedium.
+5.0:Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie den Installationsdatentr„ger.
 5.1:Installation von SvarDOS abgeschlossen. Bitte starten Sie Ihren Computer neu.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
