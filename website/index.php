@@ -10,7 +10,7 @@
   </head>
   <body>
 
-    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=repo">Repo</a> I <a href="phpamb.php?fname=help/help-en.amb">Help</a><!-- I <a href="?p=nls">NLS</a>--></p>
+    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=repo">Packages</a> I <a href="phpamb.php?fname=help/help-en.amb">Help</a><!-- I <a href="?p=nls">NLS</a>--></p>
 
 <?php
 
