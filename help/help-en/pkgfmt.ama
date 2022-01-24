@@ -38,10 +38,10 @@ For "core" packages, we have this:
 
   APPINFO            Put the program's LSM file here
   BIN                Binaries, such as exe and com files
-  DOC\%PKGNAME%      Package documentation
+  DOC\PKGNAME        Package documentation
   HELP               Used ONLY by the "help" package
-  NLS\%PKGNAME%      Localizations (NLS language files) of the package
-  SOURCE\%PKGNAME%   The source code (optional)
+  NLS\PKGNAME        Localizations (NLS language files) of the package
+  SOURCE\PKGNAME     The source code (optional)
 
 Non-core packages use a slightly different directory organization. For
 example, if we were to consider a package FOO, we might end up with the
