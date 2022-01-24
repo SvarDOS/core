@@ -25,7 +25,9 @@
 
     <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? The project has a <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a> just for that. You may also wish to take a look at the <a href="phpamb.php?fname=help/help-en.amb&amp;f=todo.ama">project's "todo list"</a>.</p>
 
-    <h2>Downloads</h2>
+    <?php
+    echo '<h2>Downloads (build date: ' . gmdate('d M Y', filemtime('download/svardos-cd.zip')) . ')</h2>'
+    ?>
 
     <ul>
       <li><a href="download/svardos-cd.zip">SvarDOS install CD (ISO)</a></li>
