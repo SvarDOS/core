@@ -52,7 +52,7 @@ set -e
 
 
 # list of packages to be part of CORE (always installed)
-COREPKGS="amb attrib chkdsk choice command cpidos deltree devload diskcopy display dosfsck edit fc fdapm fdisk format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree"
+COREPKGS="amb attrib chkdsk choice command cpidos deltree devload diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree"
 
 # list of packages to be part of EXTRA (only sometimes installed, typically drivers)
 EXTRAPKGS="pcntpk udvd2"
