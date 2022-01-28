@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -66,6 +66,21 @@ char far *env_lookup_val(unsigned short env_seg, const char *varname) {
     if (*r == '=') return(r + 1);
     if (*r == 0) return(r);
     r++;
+  }
+}
+
+
+/* locates the value of env variable varname and copies it to result, up to
+ * ressz bytes (incl. the NULL terminator). returns the length of the value on
+ * success, 0 if var not found or couldn't fit in ressz). */
+unsigned short env_lookup_valcopy(char *res, unsigned short ressz, unsigned short env_seg, const char *varname) {
+  unsigned short i;
+  char far *v = env_lookup_val(env_seg, varname);
+  if (v == NULL) return(0);
+  for (i = 0;; i++) {
+    if (ressz-- == 0) return(0);
+    res[i] = v[i];
+    if (res[i] == 0) return(i);
   }
 }
 

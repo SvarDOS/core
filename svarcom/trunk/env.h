@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,6 @@
 
 /*
  * routines used to manipulate the environment block
- * Copyright (C) 2021, Mateusz Viste
  */
 
 #ifndef ENV_H
@@ -39,6 +38,11 @@ char far *env_lookup(unsigned short env_seg, const char *varname);
  * to the 'NAME=value' string, it returns a pointer to value (or NULL if
  * var not found) */
 char far *env_lookup_val(unsigned short env_seg, const char *varname);
+
+/* locates the value of env variable varname and copies it to result, up to
+ * ressz bytes (incl. the NULL terminator). returns the length of the value on
+ * success, 0 if var not found or couldn't fit in ressz). */
+unsigned short env_lookup_valcopy(char *res, unsigned short ressz, unsigned short env_seg, const char *varname);
 
 /* returns the size, in bytes, of the allocated environment block */
 unsigned short env_allocsz(unsigned short env_seg);
