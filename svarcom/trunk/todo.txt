@@ -9,7 +9,6 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 delete temporary files after pipe redirections
 write temporary pipe files to %TEMP% if defined
-test pipe redirections (multiple redirections, failure to create file, ...)
 int 24h handler (abort, retry, fail, ignore)
 advanced batch constructs: CALL, FOR, GOTO
 IF EXIST on an empty drive should not lead to the 'Abort, Retry, Fail' prompt
@@ -23,7 +22,6 @@ translations should be cached in rmod-owned memory
 if translations reloading fails, do not retry after every command
 DIR /O
 DIR /S (must use multiple DTAs recursively)
-stdin redirection: command < file.txt
 prompt $t, $d, $v
 
 
