@@ -185,4 +185,13 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 /* reload nls ressources from svarcom.lng into langblock */
 void nls_langreload(char *buff, unsigned short env);
 
+/* locates executable fname in path and fill res with result. returns 0 on success,
+ * -1 on failed match and -2 on failed match + "don't even try with other paths"
+ * extptr is filled with a ptr to the extension in fname (NULL if no extension) */
+int lookup_cmd(char *res, const char *fname, const char *path, const char **extptr);
+
+/* fills fname with the path and filename to the linkfile related to the
+ * executable link "linkname". returns 0 on success. */
+int link_computefname(char *fname, const char *linkname, unsigned short env_seg);
+
 #endif

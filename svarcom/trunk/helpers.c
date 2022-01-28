@@ -754,3 +754,98 @@ void nls_langreload(char *buff, unsigned short env) {
 
   if (errcode != 0) printf("AX=%04x\r\n", errcode);
 }
+
+
+/* locates executable fname in path and fill res with result. returns 0 on success,
+ * -1 on failed match and -2 on failed match + "don't even try with other paths"
+ * extptr is filled with a ptr to the extension in fname (NULL if no extension) */
+int lookup_cmd(char *res, const char *fname, const char *path, const char **extptr) {
+  unsigned short lastbslash = 0;
+  unsigned short i, len;
+  unsigned char explicitpath = 0;
+
+  /* does the original fname has an explicit path prefix or explicit ext? */
+  *extptr = NULL;
+  for (i = 0; fname[i] != 0; i++) {
+    switch (fname[i]) {
+      case ':':
+      case '\\':
+        explicitpath = 1;
+        *extptr = NULL; /* extension is the last dot AFTER all path delimiters */
+        break;
+      case '.':
+        *extptr = fname + i + 1;
+        break;
+    }
+  }
+
+  /* normalize filename */
+  if (file_truename(fname, res) != 0) return(-2);
+
+  /* printf("truename: %s\r\n", res); */
+
+  /* figure out where the command starts and if it has an explicit extension */
+  for (len = 0; res[len] != 0; len++) {
+    switch (res[len]) {
+      case '?':   /* abort on any wildcard character */
+      case '*':
+        return(-2);
+      case '\\':
+        lastbslash = len;
+        break;
+    }
+  }
+
+  /* printf("lastbslash=%u\r\n", lastbslash); */
+
+  /* if no path prefix was found in fname (no colon or backslash) AND we have
+   * a path arg, then assemble path+filename */
+  if ((!explicitpath) && (path != NULL) && (path[0] != 0)) {
+    i = strlen(path);
+    if (path[i - 1] != '\\') i++; /* add a byte for inserting a bkslash after path */
+    /* move the filename at the place where path will end */
+    memmove(res + i, res + lastbslash + 1, len - lastbslash);
+    /* copy path in front of the filename and make sure there is a bkslash sep */
+    memmove(res, path, i);
+    res[i - 1] = '\\';
+  }
+
+  /* if no extension was initially provided, try matching COM, EXE, BAT */
+  if (*extptr == NULL) {
+    const char *ext[] = {".COM", ".EXE", ".BAT", NULL};
+    len = strlen(res);
+    for (i = 0; ext[i] != NULL; i++) {
+      strcpy(res + len, ext[i]);
+      /* printf("? '%s'\r\n", res); */
+      *extptr = ext[i] + 1;
+      if (file_getattr(res) >= 0) return(0);
+    }
+  } else { /* try finding it as-is */
+    /* printf("? '%s'\r\n", res); */
+    if (file_getattr(res) >= 0) return(0);
+  }
+
+  /* not found */
+  if (explicitpath) return(-2); /* don't bother trying other paths, the caller had its own path preset anyway */
+  return(-1);
+}
+
+
+/* fills fname with the path and filename to the linkfile related to the
+ * executable link "linkname". returns 0 on success. */
+int link_computefname(char *fname, const char *linkname, unsigned short env_seg) {
+  unsigned short pathlen;
+
+  /* fetch %DOSDIR% */
+  pathlen = env_lookup_valcopy(fname, 128, env_seg, "DOSDIR");
+  if (pathlen == 0) {
+    outputnl("%DOSDIR% not defined");
+    return(-1);
+  }
+
+  /* prep filename: %DOSDIR%\LINKS\PKG.LNK */
+  if (fname[pathlen - 1] == '\\') pathlen--;
+  sprintf(fname + pathlen, "\\LINKS\\%s.LNK", linkname);
+
+  return(0);
+}

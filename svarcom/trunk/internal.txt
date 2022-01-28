@@ -41,4 +41,13 @@ executed" and loads the command from there, incrementing the line counter in
 the process.
 
 
+=== EXECUTABLE LINKS =========================================================
+
+SvarCOM features special support for "executable links". This allows to run
+selected programs from any directory, but without the need to copy these
+programs to a directory in %PATH%. Executable links are flat files written in
+%DOSDIR%\LINKS. Each file there contains the directory where the matching
+program should be looked for.
+
+
 ===================================================================== EOF ====

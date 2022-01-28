@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -76,6 +76,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/dir.c"
 #include "cmd/echo.c"
 #include "cmd/exit.c"
+#include "cmd/ln.c"
 #include "cmd/mkdir.c"
 #include "cmd/path.c"
 #include "cmd/pause.c"
@@ -112,6 +113,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"EXIT",    cmd_exit},
   {"IF",      cmd_if},
   {"LH",      cmd_notimpl},
+  {"LN",      cmd_ln},
   {"LOADHIGH",cmd_notimpl},
   {"MD",      cmd_mkdir},
   {"MKDIR",   cmd_mkdir},

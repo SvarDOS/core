@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -306,81 +306,6 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
 }
 
 
-/* tries locating executable fname in path and fill res with result. returns 0 on success,
- * -1 on failed match and -2 on failed match + "don't even try with other paths"
- * extptr contains a ptr to the extension in fname (NULL if not found) */
-static int lookup_cmd(char *res, const char *fname, const char *path, const char **extptr) {
-  unsigned short lastbslash = 0;
-  unsigned short i, len;
-  unsigned char explicitpath = 0;
-
-  /* does the original fname has an explicit path prefix or explicit ext? */
-  *extptr = NULL;
-  for (i = 0; fname[i] != 0; i++) {
-    switch (fname[i]) {
-      case ':':
-      case '\\':
-        explicitpath = 1;
-        *extptr = NULL; /* extension is the last dot AFTER all path delimiters */
-        break;
-      case '.':
-        *extptr = fname + i + 1;
-        break;
-    }
-  }
-
-  /* normalize filename */
-  if (file_truename(fname, res) != 0) return(-2);
-
-  /* printf("truename: %s\r\n", res); */
-
-  /* figure out where the command starts and if it has an explicit extension */
-  for (len = 0; res[len] != 0; len++) {
-    switch (res[len]) {
-      case '?':   /* abort on any wildcard character */
-      case '*':
-        return(-2);
-      case '\\':
-        lastbslash = len;
-        break;
-    }
-  }
-
-  /* printf("lastbslash=%u\r\n", lastbslash); */
-
-  /* if no path prefix was found in fname (no colon or backslash) AND we have
-   * a path arg, then assemble path+filename */
-  if ((!explicitpath) && (path != NULL) && (path[0] != 0)) {
-    i = strlen(path);
-    if (path[i - 1] != '\\') i++; /* add a byte for inserting a bkslash after path */
-    /* move the filename at the place where path will end */
-    memmove(res + i, res + lastbslash + 1, len - lastbslash);
-    /* copy path in front of the filename and make sure there is a bkslash sep */
-    memmove(res, path, i);
-    res[i - 1] = '\\';
-  }
-
-  /* if no extension was initially provided, try matching COM, EXE, BAT */
-  if (*extptr == NULL) {
-    const char *ext[] = {".COM", ".EXE", ".BAT", NULL};
-    len = strlen(res);
-    for (i = 0; ext[i] != NULL; i++) {
-      strcpy(res + len, ext[i]);
-      /* printf("? '%s'\r\n", res); */
-      *extptr = ext[i] + 1;
-      if (file_getattr(res) >= 0) return(0);
-    }
-  } else { /* try finding it as-is */
-    /* printf("? '%s'\r\n", res); */
-    if (file_getattr(res) >= 0) return(0);
-  }
-
-  /* not found */
-  if (explicitpath) return(-2); /* don't bother trying other paths, the caller had its own path preset anyway */
-  return(-1);
-}
-
-
 static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir) {
   char *cmdfile = buff + 512;
   const char far *pathptr;
@@ -420,10 +345,9 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
 
   /* try matching something in PATH */
   pathptr = env_lookup_val(envseg, "PATH");
-  if (pathptr == NULL) return;
 
   /* try each path in %PATH% */
-  for (;;) {
+  while (pathptr) {
     for (i = 0;; i++) {
       buff[i] = *pathptr;
       if ((buff[i] == 0) || (buff[i] == ';')) break;
@@ -431,14 +355,67 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     }
     buff[i] = 0;
     lookup = lookup_cmd(cmdfile, cmd, buff, &ext);
-    if (lookup == 0) break;
+    if (lookup == 0) goto RUNCMDFILE;
     if (lookup == -2) return;
     if (*pathptr == ';') {
       pathptr++;
     } else {
-      return;
+      break;
     }
   }
+
+  /* last chance: is it an executable link? (trim extension from cmd first) */
+  for (i = 0; (cmd[i] != 0) && (cmd[i] != '.') && (i < 9); i++) buff[128 + i] = cmd[i];
+  buff[128 + i] = 0;
+  if ((i < 9) && (link_computefname(buff, buff + 128, envseg) == 0)) {
+    /* try opening the link file (if it exists) and read it into buff */
+    i = 0;
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+
+      mov ax, 0x3d00  /* DOS 2+ - OPEN EXISTING FILE, READ-ONLY */
+      mov dx, buff    /* file name */
+      int 0x21
+      jc ERR_FOPEN
+      /* file handle in AX, read from file now */
+      mov bx, ax      /* file handle */
+      mov ah, 0x3f    /* Read from file via handle bx */
+      mov cx, 128     /* up to 128 bytes */
+      /* mov dx, buff */ /* dest buffer (already set) */
+      int 0x21        /* read up to 256 bytes from file and write to buff */
+      jc ERR_READ
+      mov i, ax
+      ERR_READ:
+      mov ah, 0x3e    /* close file handle in BX */
+      int 0x21
+      ERR_FOPEN:
+
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
+
+    /* did I read anything? */
+    if (i != 0) {
+      buff[i] = 0;
+      /* trim buff at first \n or \r, just in case someone fiddled with the
+       * link file using a text editor */
+      for (i = 0; (buff[i] != 0) && (buff[i] != '\r') && (buff[i] != '\n'); i++);
+      buff[i] = 0;
+      /* lookup check */
+      if (buff[0] != 0) {
+        lookup = lookup_cmd(cmdfile, cmd, buff, &ext);
+        if (lookup == 0) goto RUNCMDFILE;
+      }
+    }
+  }
+
+  /* all failed (ie. executable file not found) */
+  return;
 
   RUNCMDFILE:
 
