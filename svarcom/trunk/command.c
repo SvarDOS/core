@@ -39,6 +39,15 @@
 
 #include "rmodcore.h" /* rmod binary inside a BUFFER array */
 
+/* this version byte is used to tag RMOD so I can easily make sure that
+ * the RMOD struct I find in memory is one that I know. Should the version
+ * mismatch, then it would likely mean that SvarCOM has been upgraded and
+ * RMOD should not be accessed as its structure might no longer be in sync
+ * with what I think it is.
+ *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***          */
+#define BYTE_VERSION 3
+
+
 struct config {
   unsigned char flags; /* command.com flags, as defined in rmodinit.h */
   char *execcmd;
@@ -738,12 +747,22 @@ int main(void) {
     /* copy flags to rmod's storage (and enable ECHO) */
     rmod->flags = cfg.flags | FLAG_ECHOFLAG;
     /* printf("rmod installed at %Fp\r\n", rmod); */
+    rmod->version = BYTE_VERSION;
   } else {
     /* printf("rmod found at %Fp\r\n", rmod); */
     /* if I was spawned by rmod and FLAG_EXEC_AND_QUIT is set, then I should
      * die asap, because the command has been executed already, so I no longer
      * have a purpose in life */
     if (rmod->flags & FLAG_EXEC_AND_QUIT) sayonara(rmod);
+    /* */
+    if (rmod->version != BYTE_VERSION) {
+      outputnl("SVARCOM VERSION CHANGED. SYSTEM HALTED. PLEASE REBOOT YOUR COMPUTER.");
+      _asm {
+        HALT:
+        hlt
+        jmp HALT
+      }
+    }
   }
 
   /* install a few guardvals in memory to detect some cases of overflows */

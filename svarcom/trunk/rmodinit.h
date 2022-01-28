@@ -37,7 +37,7 @@ struct rmod_props {
   unsigned long origparent;   /* original parent (far ptr) of the shell */
   unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
-  unsigned char FFU;          /* FOR FUTURE USE */
+  unsigned char version;      /* used to detect mismatch between rmod and SvarCOM */
   char batfile[130];          /* truename of batch file being processed */
   char batargv[130];          /* args of the batch call (0-separated) */
   unsigned long batnextline;  /* offset in file of next bat line to process */
