@@ -871,7 +871,7 @@ int main(void) {
     rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
     /* handle redirections (if any) */
-    i = redir_parsecmd(&redirprops, cmdline, rmod->awaitingcmd);
+    i = redir_parsecmd(&redirprops, cmdline, rmod->awaitingcmd, *rmod_envseg);
     if (i != 0) {
       nls_outputnl_doserr(i);
       rmod->awaitingcmd[0] = 0;

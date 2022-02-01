@@ -34,13 +34,22 @@ static unsigned short oldstdout = 0xffff;
 
 
 /* compute a filename to be used for pipes */
-static unsigned short gentmpfile(char *s) {
+static unsigned short gentmpfile(char *s, unsigned short envseg) {
   unsigned short err = 0;
-  /* do I have a %temp% path? */
-  /* TODO */
+  unsigned short i;
 
-  /* if fails, then use truename(\) */
-  if (file_truename(".\\", s) != 0) *s = 0;
+  /* do I have a %temp% path? */
+  i = env_lookup_valcopy(s, 116, envseg, "TEMP");
+  if (i > 0) {
+    /* make sure it is terminated by a backslash (required by int 0x21, ah=5a) */
+    if (s[i - 1] != '\\') {
+      s[i++] = '\\';
+      s[i] = 0;
+    }
+  } else {
+    /* if fails, then use truename(.\) */
+    if (file_truename(".\\", s) != 0) *s = 0;
+  }
 
   /* create file */
   _asm {
@@ -66,7 +75,7 @@ static unsigned short gentmpfile(char *s) {
  * modified so all redirections are cut out.
  * piped commands are moved to awaitingcmd for later execution
  * returns 0 on success, DOS err on failure */
-unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd) {
+unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd, unsigned short envseg) {
   unsigned short i;
   unsigned short pipescount = 0;
 
@@ -135,16 +144,12 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
     }
     /* redirect stdin of next command from a temp file (that is used as my output) */
     _fstrcat(awaitingcmd, "<");
-    i = gentmpfile(tmpfile);
+    i = gentmpfile(tmpfile, envseg);
     if (i != 0) return(i);
     _fstrcat(awaitingcmd, tmpfile);
     /* same file is used as my stdout */
     d->stdoutfile = tmpfile;
     d->stdout_openflag = 0x12;
-    /* TODO I need to remember that the tmp file must be removed... */
-/*    outputnl("awaitingcmd:");
-    for (i = 0; awaitingcmd[i] != 0; i++) printf("%c", awaitingcmd[i]);
-    printf("\r\n");*/
   }
   return(0);
 }
