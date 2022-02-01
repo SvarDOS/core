@@ -7,7 +7,6 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 === HIGH PRIORITY ============================================================
 
-delete temporary files after pipe redirections
 write temporary pipe files to %TEMP% if defined
 int 24h handler (abort, retry, fail, ignore)
 advanced batch constructs: CALL, FOR, GOTO

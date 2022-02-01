@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,7 +36,7 @@ enum cmd_result {
 };
 
 /* process internal commands */
-enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *r);
+enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *r, unsigned char delstdin);
 
 /* explodes a command into an array of arguments where last arg is NULL.
  * if argvlist is not NULL, it will be filled with pointers that point to buff

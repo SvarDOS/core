@@ -202,7 +202,7 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
-enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir) {
+enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir, unsigned char delstdin) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
   enum cmd_result cmdres;
@@ -257,6 +257,29 @@ enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg,
 
   /* cancel redirections */
   redir_revert();
+
+  /* delete stdin temporary file */
+  if (delstdin) {
+    const char *fname = redir->stdinfile;
+    unsigned short doserr = 0;
+    _asm {
+      push ax
+      push dx
+      mov ah, 0x41  /* delete a file */
+      mov dx, fname /* DS:DX - filename to delete */
+      int 0x21
+      jnc DONE
+      mov doserr, ax
+      DONE:
+      pop dx
+      pop ax
+    }
+    if (doserr) {
+      output(fname);
+      output(": ");
+      nls_outputnl_doserr(doserr);
+    }
+  }
 
   return(cmdres);
 }

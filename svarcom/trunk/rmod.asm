@@ -52,17 +52,21 @@ EXECPROG: times 128 db 0                                     ; +6Ah
 REDIR_INFIL:     times 128 db 0     ; +EAh
 REDIR_OUTFIL:    times 128 db 0     ; +16Ah
 REDIR_OUTAPPEND: dw 0               ; +1EAh
+REDIR_DEL_STDIN: db 0               ; +1ECh  indicates that the stdin file
+                                    ;        should be deleted (pipes). This
+                                    ;        MUST contain the 1st char of
+                                    ;        REDIR_INFIL!
 
 ; CTRL+BREAK (int 23h) handler
 ; According to the TechHelp! Manual: "If you want to abort (exit to the parent
 ; process), then set the carry flag and return via a FAR RET. This causes DOS
 ; to perform normal cleanup and exit to the parent." (otherwise use iret)
-BREAK_HANDLER:            ; +1ECh
+BREAK_HANDLER:            ; +1EDh
 stc
 retf
 
 
-skipsig:                  ; +1EEh
+skipsig:                  ; +1EFh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -79,7 +83,7 @@ int 0x21
 ; revert stdin/stdout redirections (if any) to their initial state
 call REVERT_REDIR_IF_ANY
 
-; redirect stdout if required
+; redirect stdin and/or stdout if required
 call REDIR_INOUTFILE_IF_REQUIRED
 
 ; should I executed command.com or a pre-set application?
@@ -184,8 +188,6 @@ OLD_STDIN  dw 0xffff
 
 ; ----------------------------------------------------------------------------
 ; revert stdin/stdout redirections (if any) to their initial state
-; all memory accesses are CS-prefixes because this code may be called at
-; times when DS is out of whack.
 REVERT_REDIR_IF_ANY:
 ; is stdout redirected?
 mov bx, [OLD_STDOUT]
@@ -213,6 +215,19 @@ int 0x21
 mov ah, 0x3e
 int 0x21
 mov [OLD_STDIN], word 0xffff ; mark stdin as "not redirected"
+
+; delete stdin file if required
+cmp [REDIR_DEL_STDIN], byte 0
+je STDIN_DONE
+; revert the original file and delete it
+mov ah, [REDIR_DEL_STDIN]
+mov [REDIR_INFIL], ah
+mov ah, 0x41     ; DOS 2+ - delete file pointed at by DS:DX
+mov dx, REDIR_INFIL
+int 0x21
+mov [REDIR_INFIL], byte 0
+mov [REDIR_DEL_STDIN], byte 0
+
 STDIN_DONE:
 
 ret

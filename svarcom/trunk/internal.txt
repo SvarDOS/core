@@ -41,6 +41,26 @@ executed" and loads the command from there, incrementing the line counter in
 the process.
 
 
+=== PIPING COMMANDS ==========================================================
+
+Piping a command means redirecting its standard output (stdout) to the
+standard input (stdin) of another command. While redirection of file handles
+is a concept well supported by the DOS kernels, piping is not, in part due to
+the mono-task nature of DOS. SvarCOM provides piping support through following
+logic:
+1. user-entered (or batch-acquired) command line is analyzed for any kind of
+   redirections (incl. pipes) by redir_parsecmd(). If the command appears to
+   be piped, then redir_parsecmd() enforces a stdout redirection to a
+   temporary file and moves all the pipe chain to an RMOD-owned buffer named
+   "awaitingcmd", appending an stdin redirection so the next command's stdin
+   is fed from the temporary file. The command is then executed.
+2. before further execution, SvarCOM looks into its "awaitingcmd" buffer, and
+   if it is non-empty, it runs its content.
+3. when loading commands from the awaitingcmd, SvarCOM sets a special
+   "delete_stdin_file" flag and passes it to command-executing functions so
+   these remember to delete the stdin-redirected file.
+
+
 === GLOBAL EXECUTABLE LINKS ==================================================
 
 SvarCOM features special support for "global executable links". This allows to

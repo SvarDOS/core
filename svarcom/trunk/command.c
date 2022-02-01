@@ -315,7 +315,7 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
 }
 
 
-static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir) {
+static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir, unsigned char delete_stdin_file) {
   char *cmdfile = buff + 512;
   const char far *pathptr;
   int lookup;
@@ -451,7 +451,13 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   /* copy stdin file if a redirection is needed */
   if (redir->stdinfile) {
     char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDINFILE);
+    char far *delstdin = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDIN_DEL);
     _fstrcpy(farptr, redir->stdinfile);
+    if (delete_stdin_file) {
+      *delstdin = redir->stdinfile[0];
+    } else {
+      *delstdin = 0;
+    }
   }
 
   /* same for stdout file */
@@ -734,6 +740,7 @@ int main(void) {
   static struct redir_data redirprops;
   static enum cmd_result cmdres;
   static unsigned short i; /* general-purpose variable for short-lived things */
+  static unsigned char delete_stdin_file;
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
@@ -794,9 +801,6 @@ int main(void) {
 
     SKIP_NEWLINE:
 
-    /* cancel any redirections that may have been set up before */
-    redir_revert();
-
     /* memory check */
     memguard_check(rmod->rmodseg, cmdlinebuf);
 
@@ -810,7 +814,10 @@ int main(void) {
     if (rmod->awaitingcmd[0] != 0) {
       _fstrcpy(cmdline, rmod->awaitingcmd);
       rmod->awaitingcmd[0] = 0;
+      delete_stdin_file = 1;
       goto EXEC_CMDLINE;
+    } else {
+      delete_stdin_file = 0;
     }
 
     /* skip user input if I have a command to exec (/C or /K) */
@@ -872,7 +879,7 @@ int main(void) {
     }
 
     /* try matching (and executing) an internal command */
-    cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops);
+    cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops, delete_stdin_file);
     if ((cmdres == CMD_OK) || (cmdres == CMD_FAIL)) {
       /* internal command executed */
       continue;
@@ -880,7 +887,7 @@ int main(void) {
       goto EXEC_CMDLINE;
     } else if (cmdres == CMD_NOTFOUND) {
       /* this was not an internal command, try matching an external command */
-      run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops);
+      run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops, delete_stdin_file);
       /* perhaps this is a newly launched BAT file */
       if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
       /* run_as_external() does not return on success, if I am still alive then
