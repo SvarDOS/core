@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -51,20 +51,20 @@ static unsigned short gentmpfile(char *s) {
     jnc CLOSEFILE
     mov err, ax
     jmp DONE
-    /* close file handle */
+    /* close file handle (handle still in BX) */
     CLOSEFILE:
-    mov ah, 0x3e
     mov bx, ax
+    mov ah, 0x3e
     int 0x21
     DONE:
   }
   return(err);
 }
 
-#include <stdio.h>
+
 /* parse commandline and performs necessary redirections. cmdline is
  * modified so all redirections are cut out.
- * piped commands are move to awaitingcmd for later execution
+ * piped commands are moved to awaitingcmd for later execution
  * returns 0 on success, DOS err on failure */
 unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd) {
   unsigned short i;
@@ -222,10 +222,10 @@ int redir_apply(const struct redir_data *d) {
 void redir_revert(void) {
   _asm {
     /* if oldstdout is 0xffff then not redirected */
-    cmp word ptr [oldstdout], 0xffff
-    je DONE
-    /* redirect the stdout handle */
     mov bx, [oldstdout] /* dst handle */
+    cmp bx, 0xffff
+    je DONE
+    /* redirect the stdout handle (handle already in BX) */
     mov cx, 1           /* src handle (1=stdout) */
     mov ah, 0x46        /* redirect a handle */
     int 0x21
