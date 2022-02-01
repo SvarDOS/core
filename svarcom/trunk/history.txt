@@ -3,7 +3,7 @@
                     === SvarCOM's history / changelog ===
 
 
-=== ver 2022.0 (xx.xx.2022) ==================================================
+=== ver 2022.0 (01.02.2022) ==================================================
 
  - added "global executable links" support (new command: LN)
  - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
@@ -12,7 +12,7 @@
  - DIR: implemented /A
  - implemented IF command (IF EXIST, IF ERRORLEVEL, IF str==str)
  - added a break handler (running application can be aborted with CTRL+C)
- - Error messages are output to stderr
+ - DOS error messages are output to stderr
 
 
 === ver 2021.0 (24.11.2021) ==================================================

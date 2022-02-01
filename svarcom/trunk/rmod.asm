@@ -1,7 +1,7 @@
 ;
 ; rmod - resident module of the SvarCOM command interpreter (NASM code)
 ;
-; Copyright (C) 2021 Mateusz Viste
+; Copyright (C) 2021-2022 Mateusz Viste
 ; MIT license
 ;
 ; this is installed in memory by the transient part of SvarCOM. it has only
