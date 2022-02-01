@@ -65,7 +65,7 @@ clean: .SYMBOLIC
 pkg: svarcom.zip
 
 svarcom.zip: command.com
-	zip -9 -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt history.txt tlumacz\svarcom.lng
+	zip -9kDX -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt history.txt tlumacz\svarcom.lng
 	mkdir source
 	copy makefile source\
 	copy *.c source\
@@ -78,4 +78,4 @@ svarcom.zip: command.com
 	copy tlumacz\*.* source\tlumacz\
 	mkdir source\tlumacz\lang
 	copy tlumacz\lang\*.* source\tlumacz\lang\
-	zip -9 -r -m svarcom.zip source
+	zip -9rkDX -m svarcom.zip source
