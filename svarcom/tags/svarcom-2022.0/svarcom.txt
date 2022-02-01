@@ -1,0 +1,107 @@
+
+
+                               === SVARCOM ===
+
+
+SvarCOM is the SvarDOS command line interpreter, known usually under the name
+"COMMAND.COM". It is designed and maintained by Mateusz Viste, and distributed
+under the terms of the MIT license.
+
+The goal is to make SvarCOM the default SvarDOS shell, replacing FreeCOM.
+Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
+
+SvarCOM is a work-in-progress effort. As such, it still lacks a few things:
+ - a few internal commands missing: CALL, CTTY, GOTO, LH
+ - DIR misses two switches: /S, /O
+
+SvarCOM is minimalist and I'd like to keep it that way. It aims to be
+functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.
+
+As of version 2022.0, SvarCOM's resident footprint is under 2 KiB.
+
+Translation strings are stored in the file SVARCOM.LNG, which should be
+placed in a directory pointed at by %NLSPATH% for SvarCOM to be able to output
+messages in non-english languages. SvarCOM's language is controlled by the
+%LANG% environment variable. NOTE: at this time translations aren't available
+yet, with the proof-of-concept exceptions of the 'PAUSE' and 'SHIFT' commands.
+
+Latest version available here: http://svardos.osdn.io/svarcom
+
+
+=== INTERNAL COMMANDS ========================================================
+
+SvarCOM implements the following internal commands. For help on each command,
+run it with a "/?" argument.
+
+BREAK       - sets or clears extended CTRL+C checking
+CD/CHDIR    - displays the name of or changes the current directory
+CHCP        - displays or sets the active code page number
+CLS         - clears the screen
+COPY        - copies one or more files to another location
+DATE        - displays or sets the system date
+DEL/ERASE   - deletes one or more files
+DIR         - displays a list of files and subdirectories in a directory
+ECHO        - displays messages, or turns command-echoing on or off
+EXIT        - quits the command.com program (command interpreter)
+IF          - performs conditional processing in batch programs
+LN          - adds, deletes and displays global executable links
+MD/MKDIR    - creates a directory
+PATH        - displays or sets a search path for executable files
+PAUSE       - suspends processing of a batch program
+PROMPT      - changes the DOS command prompt
+REM         - records comments (remarks) in a batch file or CONFIG.SYS
+REN/RENAME  - renames a file or files
+RMDIR       - removes (deletes) a directory
+SET         - displays, sets or removes DOS environment variables
+SHIFT       - changes the position of arguments in a batch file
+TIME        - displays or sets the system time
+TYPE        - displays the contents of a text file
+VER         - displays the DOS version
+VERIFY      - tells DOS whether to verify that files are written correctly
+VOL         - displays the disk volume label and serial number
+
+
+=== INSTALLATION =============================================================
+
+Installing SvarCOM requires to either copy it to the root of your boot drive
+replacing your current COMMAND.COM, or adding a SHELL directive to your
+CONFIG.SYS file to instruct DOS that it should load SvarCOM as its shell, eg.:
+
+  SHELL=C:\SVARCOM\COMMAND.COM
+
+Some DOSes support a SHELLHIGH directive that loads the shell in high memory.
+It is pointless to use it to load SvarCOM. SvarCOM will load its resident part
+as high as possible on its own.
+
+SvarCOM supports multiple languages. To enable SvarCOM using them it is
+necessary to define an NLSPATH environment variable that would point to a
+directory and copy the SVARCOM.LNG file there. Once done, SvarCOM will try
+loading whatever language is being set up in the LANG environment variable.
+
+
+=== LICENSE ==================================================================
+
+SvarCOM is published under the terms of the MIT license.
+
+Copyright (C) 2021-2022 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+====================================================================== EOF ===

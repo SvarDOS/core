@@ -1,0 +1,60 @@
+#
+# SvarCOM translation file
+# Lang: ENGLISH
+#
+# Translator: Mateusz Viste
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Invalid syntax
+0.2:Invalid switch
+0.3:Invalid parameter format
+0.4:Too many parameters
+
+# PAUSE
+15.0:Suspends the execution of a batch script
+15.1:Press any key to continue...
+
+# SHIFT
+16.0:Changes the position of arguments in a batch file:
+16.1:Argument %1 becomes %0, argument %2 becomes %1, etc.
+
+# DOS ERRORS
+255.1:Function number invalid
+255.2:File not found
+255.3:Path not found
+255.4:Too many open files (no handles available)
+255.5:Access denied
+255.6:Invalid handle
+255.7:Memory control block destroyed
+255.8:Insufficient memory
+255.9:Memory block address invalid
+255.10:Environment invalid
+255.11:Format invalid
+255.12:Access code invalid
+255.13:Data invalid
+255.15:Invalid drive
+255.16:Attempted to remove current directory
+255.17:Not same device
+255.18:No more files
+255.19:Disk write-protected
+255.20:Unknown unit
+255.21:Drive not ready
+255.22:Unknown command
+255.23:Data error (CRC)
+255.24:Bad request structure length
+255.25:Seek error
+255.26:Unknown media type (non-DOS disk)
+255.27:Sector not found
+255.28:Printer out of paper
+255.29:Write fault
+255.30:Read fault
+255.31:General failure
+255.32:Sharing violation
+255.33:Lock violation
+255.34:Disk change invalid
+255.35:FCB unavailable
+255.36:Sharing buffer overflow
+255.37:Code page mismatch
+255.38:Cannot complete file operations (EOF / out of input)
+255.39:Insufficient disk space
