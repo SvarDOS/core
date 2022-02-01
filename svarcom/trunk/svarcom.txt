@@ -61,6 +61,24 @@ VERIFY      - tells DOS whether to verify that files are written correctly
 VOL         - displays the disk volume label and serial number
 
 
+=== INSTALLATION =============================================================
+
+Installing SvarCOM requires to either copy it to the root of your boot drive
+replacing your current COMMAND.COM, or adding a SHELL directive to your
+CONFIG.SYS file to instruct DOS that it should load SvarCOM as its shell, eg.:
+
+  SHELL=C:\SVARCOM\COMMAND.COM
+
+Some DOSes support a SHELLHIGH directive that loads the shell in high memory.
+It is pointless to use it to load SvarCOM. SvarCOM will load its resident part
+as high as possible on its own.
+
+SvarCOM supports multiple languages. To enable SvarCOM using them it is
+necessary to define an NLSPATH environment variable that would point to a
+directory and copy the SVARCOM.LNG file there. Once done, SvarCOM will try
+loading whatever language is being set up in the LANG environment variable.
+
+
 === LICENSE ==================================================================
 
 SvarCOM is published under the terms of the MIT license.
