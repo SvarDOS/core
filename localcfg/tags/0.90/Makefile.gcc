@@ -1,0 +1,12 @@
+#
+# localcfg Makefile for GCC
+#
+
+all: localcfg
+
+localcfg: localcfg.c country.c
+	gcc -Wall -Wextra -pedantic -O3 -std=c89 -Wformat-security -o localcfg localcfg.c country.c
+
+clean:
+	rm -f localcfg
+	rm -f *.o
