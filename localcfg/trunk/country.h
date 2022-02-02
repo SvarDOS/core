@@ -1,6 +1,6 @@
 /*
  * functions that read/write from/to the localcfg country.sys-like file.
- * Copyright (C) Mateusz Viste 2015
+ * Copyright (C) Mateusz Viste 2015-2022
  */
 
 #ifndef country_h_sentinel
@@ -18,30 +18,39 @@ enum COUNTRY_TIMEFMT {
 };
 
 
+
 struct country {
-  char currency[5]; /* currency symbold, ASCIIZ, 4 letters max */
-  enum COUNTRY_DATEFMT datefmt; /* date format */
-  enum COUNTRY_TIMEFMT timefmt; /* time format */
-  short id;         /* international ID */
-  short codepage;   /* usual codepage */
-  unsigned char currencyprec; /* currency precision (2 = 0.12) */
-  unsigned char currencydecsym; /* set if the currency symbol should replace the decimal point */
-  unsigned char currencyspace; /* set if the currency symbol should be one space away from the value */
-  unsigned char currencypos; /* 0=currency symbol precedes the value, 1=follows it */
-  char decimal;     /* decimal separator (like . or ,) */
-  char thousands;   /* thousands separatot */
-  char datesep;     /* date separator (usually '-', '.' or '/') */
-  char timesep;     /* time separator (usually ':') */
-  char yes;         /* the "yes" character (example: 'Y') */
-  char no;          /* the "no" character (example: 'N') */
+
+  struct {
+    unsigned short id;          /* international id (48=PL, 33=FR, 01=US...) */
+    unsigned short codepage;    /* usual codepage */
+    unsigned short datefmt;     /* date format */
+    char currsym[5];            /* currency symbol */
+    char thousands[2];          /* thousands separator */
+    char decimal[2];            /* decimal separator (like . or ,) */
+    char datesep[2];            /* date separator (usually '-', '.' or '/') */
+    char timesep[2];            /* time separator (usually ':') */
+    unsigned char currpos:1;    /* 0=currency precedes the value, 1=follows it */
+    unsigned char currspace:1;  /* set if the currency symbol should be one space away from the value */
+    unsigned char currdecsym:1; /* set if the currency symbol should replace the decimal point */
+    unsigned char ZEROED:5;
+    unsigned char currprec;     /* currency precision (2 = 0.12) */
+    unsigned char timefmt;      /* time format */
+  } CTYINFO;
+
+  struct {
+    char yes[2];
+    char no[2];
+  } YESNO;
+
 };
 
 /* Loads data from a country.sys file into a country struct.
  * Returns 0 on success, non-zero otherwise. */
-int country_read(struct country *countrydata, char *fname);
+int country_read(struct country *countrydata, const char *fname);
 
 /* Computes a new country.sys file based on data from a country struct.
  * Returns 0 on success, non-zero otherwise. */
-int country_write(char *fname, struct country *countrydata);
+int country_write(const char *fname, struct country *countrydata);
 
 #endif

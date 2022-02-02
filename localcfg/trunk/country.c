@@ -1,6 +1,6 @@
 /*
- * functions that read/write from/to the localcfg country.sys-like file.
- * Copyright (C) Mateusz Viste 2015
+ * functions that reads/writes from/to the localcfg country.sys-like file.
+ * Copyright (C) Mateusz Viste 2015-2022
  */
 
 #include <stdio.h>
@@ -9,36 +9,43 @@
 #include "country.h"
 
 
-#define READSHORT(x) (short)(x[0] | (x[1] << 8))
+struct funchdr {
+  unsigned char funcname[8];
+  unsigned short funcsiz;
+};
+
 
 /* fills a country struct with default values */
 static void country_default(struct country *countrydata) {
-  /* first clears the memory */
-  memset(countrydata, 0, sizeof(struct country));
-  /* fill in fields - only non-zero values */
-  countrydata->id = 1;
-  countrydata->codepage = 437;
-  /* countrydata->datefmt = COUNTRY_DATE_MDY;
-  countrydata->timefmt = COUNTRY_TIME12; */
-  countrydata->currency[0] = '$';
-  countrydata->decimal = '.';
-  countrydata->thousands = ',';
-  countrydata->datesep = '/';
-  countrydata->timesep = ':';
-  countrydata->currencyprec = 2;
-  /* countrydata->currencydecsym = 0; */
-  /* countrydata->currencyspace = 0; */
-  /* countrydata->currencypos = 0; */
-  countrydata->yes = 'Y';
-  countrydata->no = 'N';
+
+  /* first clear the memory */
+  bzero(countrydata, sizeof(struct country));
+
+  /* fill in CTYINFO fields (non-zero values only) */
+  countrydata->CTYINFO.id = 1;
+  countrydata->CTYINFO.codepage = 437;
+  /* countrydata->CTYINFO.datefmt = COUNTRY_DATE_MDY;
+  countrydata->CTYINFO.timefmt = COUNTRY_TIME12; */
+  countrydata->CTYINFO.currsym[0] = '$';
+  countrydata->CTYINFO.decimal[0] = '.';
+  countrydata->CTYINFO.thousands[0] = ',';
+  countrydata->CTYINFO.datesep[0] = '/';
+  countrydata->CTYINFO.timesep[0] = ':';
+  countrydata->CTYINFO.currprec = 2;
+  /* countrydata->CTYINFO.currencydecsym = 0; */
+  /* countrydata->CTYINFO.currencyspace = 0; */
+  /* countrydata->CTYINFO.currencypos = 0; */
+
+  /* fill in YESNO fields (non-zero values only) */
+  countrydata->YESNO.yes[0] = 'Y';
+  countrydata->YESNO.no[0] = 'N';
 }
 
 
 /* Loads data from a country.sys file into a country struct.
  * Returns 0 on success, non-zero otherwise. */
-int country_read(struct country *countrydata, char *fname) {
+int country_read(struct country *countrydata, const char *fname) {
   unsigned char filebuff[1024];
-  unsigned char buff[64];
   short firstentryoffs;
   unsigned char *subfunctions[16] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
                                      NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
@@ -58,22 +65,19 @@ int country_read(struct country *countrydata, char *fname) {
   fclose(fd);
 
   /* check that it's a country file - should start with 0xFF COUNTRY 0x00 */
-  if (filebuff[0] != 0xFF) return(-2);
-  if (strcmp((char *)filebuff + 1, "COUNTRY") != 0) return(-2);
+  if (memcmp(filebuff, "\377COUNTRY\0", 9) != 0) return(-2);
 
   /* check that it's one of my country.sys files - should contain a trailer */
-  memcpy(buff, filebuff + filesize - 8, 8);
-  buff[8] = 0;
-  if (strcmp((char *)buff, "LOCALCFG") != 0) return(-3);
+  if (memcmp(filebuff + filesize - 8, "LOCALCFG", 8) != 0) return(-3);
 
   /* read the offset of the entries index - must be at least 23 */
   functiondata = filebuff + 19;
-  firstentryoffs = READSHORT(functiondata);
+  firstentryoffs = *((unsigned short *)functiondata);
   if ((firstentryoffs < 23) || (firstentryoffs >= filesize)) return(-4);
   functiondata = filebuff + firstentryoffs;
 
   /* how many entries do we have? I expect exactly one. */
-  if (READSHORT(functiondata) != 1) return(-5);
+  if (*((unsigned short *)functiondata) != 1) return(-5);
   /* skip to the first country entry */
   functiondata += 2;
 
@@ -86,76 +90,31 @@ int country_read(struct country *countrydata, char *fname) {
   /* printf("Codepage = %d\n", READSHORT(functiondata)); */
   functiondata += 2; /* skip codepage */
   functiondata += 4; /* skip reserved fields */
-  firstentryoffs = READSHORT(functiondata); /* read offset of the subfunctions index */
+  firstentryoffs = *((unsigned short *)functiondata); /* read offset of the subfunctions index */
   functiondata = filebuff + firstentryoffs;
 
   /* read all subfunctions, but no more than 15 */
-  subfunctionscount = READSHORT(functiondata);
+  subfunctionscount = *((unsigned short *)functiondata);
   /* printf("Found %d subfunctions\n", subfunctionscount); */
   functiondata += 2;
   for (x = 0; (x < 15) && (x < subfunctionscount); x++) {
-    short size = READSHORT(functiondata);
+    short size = *((unsigned short *)functiondata);
     functiondata += 2;
     functiondata += 2; /* skip ID of the subfunction */
-    subfunctions[x] = filebuff + READSHORT(functiondata);
+    subfunctions[x] = filebuff + *((unsigned short *)functiondata);
     /* printf("subfunction %d at 0x%p\n", x, subfunctions[x]); */
     functiondata += size - 2;
   }
 
   /* load every subfunction, and feed the country struct with data */
   for (x = 0; subfunctions[x] != NULL; x++) {
-    short functionsize;
-    /* the function name should always start with 0xFF */
-    if (subfunctions[x][0] != 0xFF) return(-6);
-    /* load the subfunction's name, and act accordingly */
-    memcpy(buff, subfunctions[x] + 1, 7);
-    buff[7] = 0;
-    functiondata = subfunctions[x] + 8;
-    functionsize = READSHORT(functiondata);
+    struct funchdr *hdr = (void *)(subfunctions[x]);
     functiondata = subfunctions[x] + 10;
     /* */
-    if (strcmp((char *)buff, "YESNO  ") == 0) {
-      if (functionsize != 4) continue;
-      countrydata->yes = functiondata[0];
-      countrydata->no = functiondata[2];
-    } else if (strcmp((char *)buff, "CTYINFO") == 0) {
-      if (functionsize != 22) continue;
-      /* ID */
-      countrydata->id = READSHORT(functiondata);
-      functiondata += 2;
-      /* codepage */
-      countrydata->codepage = READSHORT(functiondata);
-      functiondata += 2;
-      /* date format */
-      countrydata->datefmt = READSHORT(functiondata);
-      functiondata += 2;
-      /* currency symbol */
-      countrydata->currency[0] = functiondata[0];
-      countrydata->currency[1] = functiondata[1];
-      countrydata->currency[2] = functiondata[2];
-      countrydata->currency[3] = functiondata[3];
-      countrydata->currency[4] = 0;
-      functiondata += 5;
-      /* thousands separator, decimal sep, date sep, time sep */
-      countrydata->thousands = READSHORT(functiondata);
-      functiondata += 2;
-      countrydata->decimal = READSHORT(functiondata);
-      functiondata += 2;
-      countrydata->datesep = READSHORT(functiondata);
-      functiondata += 2;
-      countrydata->timesep = READSHORT(functiondata);
-      functiondata += 2;
-      /* currency format */
-      countrydata->currencypos = *functiondata & 1;
-      countrydata->currencyspace = (*functiondata >> 1) & 1;
-      countrydata->currencydecsym = (*functiondata >> 2) & 1;
-      functiondata += 1;
-      /* currency precision */
-      countrydata->currencyprec = *functiondata;
-      functiondata += 1;
-      /* time format */
-      countrydata->timefmt = *functiondata;
-      functiondata += 1;
+    if ((memcmp(hdr->funcname, "\377YESNO  ", 8) == 0) && (hdr->funcsiz == 4)) {
+      memcpy(&(countrydata->YESNO), functiondata, hdr->funcsiz);
+    } else if ((memcmp(hdr->funcname, "\377CTYINFO", 8) == 0) && (hdr->funcsiz == 22)) {
+      memcpy(&(countrydata->CTYINFO), functiondata, hdr->funcsiz);
     }
   }
 
@@ -166,15 +125,10 @@ int country_read(struct country *countrydata, char *fname) {
 #define MSB(x) (((x) >> 8) & 0xff)
 #define LSB(x) ((x) & 0xff)
 
-#define DWORDB1(x) ((x) & 0xff)
-#define DWORDB2(x) (((x) >> 8) & 0xff)
-#define DWORDB3(x) (((x) >> 16) & 0xff)
-#define DWORDB4(x) (((x) >> 24) & 0xff)
-
 
 /* Computes a new country.sys file based on data from a country struct.
  * Returns 0 on success, non-zero otherwise. */
-int country_write(char *fname, struct country *c) {
+int country_write(const char *fname, struct country *c) {
   unsigned char filebuff[1024];
   short filesize = 0;
   FILE *fd;
@@ -232,41 +186,37 @@ int country_write(char *fname, struct country *c) {
                                           240, 241, 242, 243, 244, 245, 246, 247,
                                           248, 249, 250, 251, 252, 253, 254, 255};
 
+  /* zero out filebuff */
+  bzero(filebuff, sizeof(filebuff));
+
   /* compute the country.sys structures */
   memcpy(filebuff, "\377COUNTRY\0\0\0\0\0\0\0\0\1\0\1", 19); /* header */
   filesize = 19;
   /* first entry offset (always current offset+4) */
-  filebuff[filesize + 0] = DWORDB1(filesize+4);
-  filebuff[filesize + 1] = DWORDB2(filesize+4);
-  filebuff[filesize + 2] = DWORDB3(filesize+4);
-  filebuff[filesize + 3] = DWORDB4(filesize+4);
   filesize += 4;
+  memcpy(filebuff + filesize - 4, &filesize, sizeof(filesize));
   /* number of entries */
-  filebuff[filesize++] = 1;
-  filebuff[filesize++] = 0;
+  filebuff[filesize] = 1;
+  filesize += 2;
   /* first (and only) entry / size, country, codepage, reserved(2), offset */
   filebuff[filesize++] = 12; /* size LSB */
   filebuff[filesize++] = 0;  /* size MSB */
-  filebuff[filesize++] = LSB(c->id);   /* country LSB */
-  filebuff[filesize++] = MSB(c->id);   /* country MSB */
-  filebuff[filesize++] = LSB(c->codepage); /* codepage LSB */
-  filebuff[filesize++] = MSB(c->codepage); /* codepage MSB */
-  filebuff[filesize++] = 0; /* reserved */
-  filebuff[filesize++] = 0; /* reserved */
-  filebuff[filesize++] = 0; /* reserved */
-  filebuff[filesize++] = 0; /* reserved */
-  filebuff[filesize + 0] = DWORDB1(filesize+4); /* offset for subfunctions list (ptr + 4) */
-  filebuff[filesize + 1] = DWORDB2(filesize+4); /* offset for subfunctions list (ptr + 4) */
-  filebuff[filesize + 2] = DWORDB3(filesize+4); /* offset for subfunctions list (ptr + 4) */
-  filebuff[filesize + 3] = DWORDB4(filesize+4); /* offset for subfunctions list (ptr + 4) */
+  filebuff[filesize++] = LSB(c->CTYINFO.id);   /* country LSB */
+  filebuff[filesize++] = MSB(c->CTYINFO.id);   /* country MSB */
+  filebuff[filesize++] = LSB(c->CTYINFO.codepage); /* codepage LSB */
+  filebuff[filesize++] = MSB(c->CTYINFO.codepage); /* codepage MSB */
+  filesize += 4;       /* reserved bytes */
+
   filesize += 4;
+  memcpy(filebuff + filesize - 4, &filesize, sizeof(filesize));
+
   /* index of subfunctions */
-  filebuff[filesize++] = 7; /* there are 7 subfunctions */
-  filebuff[filesize++] = 0;
+  filebuff[filesize] = 7; /* there are 7 subfunctions */
+  filesize += 2;
   for (x = 0; x < 7; x++) { /* dump each subfunction (size, id, offset) */
     /* size is always 6 */
-    filebuff[filesize++] = 6;
-    filebuff[filesize++] = 0;
+    filebuff[filesize] = 6;
+    filesize += 2;
     /* id of the subfunction */
     filebuff[filesize++] = LSB(subfunction_id[x]);
     filebuff[filesize++] = MSB(subfunction_id[x]);
@@ -274,52 +224,25 @@ int country_write(char *fname, struct country *c) {
     subfunction_ptr[x] = filesize;
     filesize += 4;
   }
+
   /* write the CTYINFO subfunction */
-  filebuff[subfunction_ptr[0]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[0]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[0]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[0]+3] = DWORDB4(filesize); /* correct value */
+  memcpy(filebuff + subfunction_ptr[0], &filesize, sizeof(filesize));
+
   /* subfunction header */
   memcpy(filebuff + filesize, "\377CTYINFO", 8);
   filesize += 8;
   /* subfunction size */
-  filebuff[filesize++] = 22;
-  filebuff[filesize++] = 0;
+  filebuff[filesize] = 22;
+  filesize += 2;
+
   /* country preferences */
-  filebuff[filesize++] = LSB(c->id); /* ID */
-  filebuff[filesize++] = MSB(c->id); /* ID */
-  filebuff[filesize++] = LSB(c->codepage); /* CP */
-  filebuff[filesize++] = MSB(c->codepage); /* CP */
-  filebuff[filesize++] = LSB(c->datefmt); /* date format */
-  filebuff[filesize++] = MSB(c->datefmt); /* date format */
-  for (x = 0; x < 5; x++) {
-    filebuff[filesize++] = c->currency[x]; /* currency */
-  }
-  filebuff[filesize++] = LSB(c->thousands);  /* thousands separator LSB */
-  filebuff[filesize++] = MSB(c->thousands);  /* thousands separator MSB */
-  filebuff[filesize++] = LSB(c->decimal);    /* decimal separator LSB */
-  filebuff[filesize++] = MSB(c->decimal);    /* decimal separator MSB */
-  filebuff[filesize++] = LSB(c->datesep);    /* date separator LSB */
-  filebuff[filesize++] = MSB(c->datesep);    /* date separator MSB */
-  filebuff[filesize++] = LSB(c->timesep);    /* time separator LSB */
-  filebuff[filesize++] = MSB(c->timesep);    /* time separator MSB */
-  filebuff[filesize] = c->currencydecsym; /* currency format (bit 2) */
-  filebuff[filesize] <<= 8;
-  filebuff[filesize] |= c->currencyspace; /* currency format (bit 1) */
-  filebuff[filesize] <<= 8;
-  filebuff[filesize++] |= c->currencypos; /* currency format (bit 0) */
-  filebuff[filesize++] = c->currencyprec; /* currency precision */
-  filebuff[filesize++] = c->timefmt;      /* time format */
+  memcpy(filebuff + filesize, &(c->CTYINFO), 22);
+  filesize += 22;
 
   /* write the UCASE subfunction (used for LCASE, too) */
-  filebuff[subfunction_ptr[1]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[1]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[1]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[1]+3] = DWORDB4(filesize); /* correct value */
-  filebuff[subfunction_ptr[2]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[2]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[2]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[2]+3] = DWORDB4(filesize); /* correct value */
+  memcpy(filebuff + subfunction_ptr[1], &filesize, sizeof(filesize));
+  memcpy(filebuff + subfunction_ptr[2], &filesize, sizeof(filesize));
+
   /* subfunction header */
   memcpy(filebuff + filesize, "\377UCASE  ", 8);
   filesize += 8;
@@ -327,15 +250,12 @@ int country_write(char *fname, struct country *c) {
   filebuff[filesize++] = 128;
   filebuff[filesize++] = 0;
   /* UCASE table */
-  for (x = 0; x < 128; x++) {
-    filebuff[filesize++] = ucase_437[x];
-  }
+  memcpy(filebuff + filesize, ucase_437, 128);
+  filesize += 128;
 
   /* write the FCHAR subfunction (filename terminator table) */
-  filebuff[subfunction_ptr[3]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[3]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[3]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[3]+3] = DWORDB4(filesize); /* correct value */
+  memcpy(filebuff + subfunction_ptr[3], &filesize, sizeof(filesize));
+
   /* subfunction header */
   memcpy(filebuff + filesize, "\377FCHAR  ", 8);
   filesize += 8;
@@ -368,10 +288,8 @@ int country_write(char *fname, struct country *c) {
   filebuff[filesize++] = 44;  /* , */
 
   /* write the COLLATE subfunction */
-  filebuff[subfunction_ptr[4]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[4]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[4]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[4]+3] = DWORDB4(filesize); /* correct value */
+  memcpy(filebuff + subfunction_ptr[4], &filesize, sizeof(filesize));
+
   /* subfunction header */
   memcpy(filebuff + filesize, "\377COLLATE", 8);
   filesize += 8;
@@ -379,15 +297,11 @@ int country_write(char *fname, struct country *c) {
   filebuff[filesize++] = LSB(256);
   filebuff[filesize++] = MSB(256);
   /* collation for standard CP437 */
-  for (x = 0; x < 256; x++) {
-    filebuff[filesize++] = collate_437[x];
-  }
+  memcpy(filebuff + filesize, collate_437, 256);
+  filesize += 256;
 
   /* write the DBCS subfunction */
-  filebuff[subfunction_ptr[5]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[5]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[5]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[5]+3] = DWORDB4(filesize); /* correct value */
+  memcpy(filebuff + subfunction_ptr[5], &filesize, sizeof(filesize));
   /* subfunction header */
   memcpy(filebuff + filesize, "\377DBCS   ", 8);
   filesize += 8;
@@ -399,18 +313,13 @@ int country_write(char *fname, struct country *c) {
   filebuff[filesize++] = 0;
 
   /* write the YESNO subfunction */
-  filebuff[subfunction_ptr[6]+0] = DWORDB1(filesize); /* update the    */
-  filebuff[subfunction_ptr[6]+1] = DWORDB2(filesize); /* subfunction   */
-  filebuff[subfunction_ptr[6]+2] = DWORDB3(filesize); /* pointer with  */
-  filebuff[subfunction_ptr[6]+3] = DWORDB4(filesize); /* correct value */
+  memcpy(filebuff + subfunction_ptr[6], &filesize, sizeof(filesize));
   memcpy(filebuff + filesize, "\377YESNO  ", 8);
   filesize += 8;
-  filebuff[filesize++] = 4;  /* size (LSB) */
-  filebuff[filesize++] = 0;  /* size (MSB) */
-  filebuff[filesize++] = c->yes;  /* "Yes" letter */
-  filebuff[filesize++] = 0;
-  filebuff[filesize++] = c->no;   /* "No" letter */
-  filebuff[filesize++] = 0;
+  filebuff[filesize] = 4;  /* size (LSB) */
+  filesize += 2;
+  memcpy(filebuff + filesize, &(c->YESNO), 4);
+  filesize += 4;
 
   /* write the file trailer */
   memcpy(filebuff + filesize, "LOCALCFG", 8);

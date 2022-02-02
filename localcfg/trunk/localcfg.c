@@ -19,13 +19,13 @@
 
 #include "country.h"
 
-#define PVER "0.90"
+#define PVER "20220202"
 #define PDATE "2015-2022"
 
 
 static void about(void) {
-  puts("localcfg v" PVER " - locales configuration for DOS\n"
-       "Copyright (C) Mateusz Viste 2015 / http://localcfg.sourceforge.net\n"
+  puts("localcfg ver " PVER " - locales configuration for DOS\n"
+       "Copyright (C) Mateusz Viste " PDATE "\n"
        "\n"
        "localcfg creates a custom COUNTRY.SYS-like file matching your preferences.\n"
        "\n"
@@ -53,16 +53,16 @@ static void about(void) {
 
 static char *datestring(struct country *c) {
   static char result[16];
-  switch (c->datefmt) {
+  switch (c->CTYINFO.datefmt) {
     case COUNTRY_DATE_MDY:
-      sprintf(result, "12%c31%c1990", c->datesep, c->datesep);
+      sprintf(result, "12%c31%c1990", c->CTYINFO.datesep[0], c->CTYINFO.datesep[0]);
       break;
     case COUNTRY_DATE_DMY:
-      sprintf(result, "31%c12%c1990", c->datesep, c->datesep);
+      sprintf(result, "31%c12%c1990", c->CTYINFO.datesep[0], c->CTYINFO.datesep[0]);
       break;
     case COUNTRY_DATE_YMD:
     default:
-      sprintf(result, "1990%c12%c31", c->datesep, c->datesep);
+      sprintf(result, "1990%c12%c31", c->CTYINFO.datesep[0], c->CTYINFO.datesep[0]);
       break;
   }
   return(result);
@@ -71,10 +71,10 @@ static char *datestring(struct country *c) {
 
 static char *timestring(struct country *c) {
   static char result[16];
-  if (c->timefmt == COUNTRY_TIME12) {
-    sprintf(result, "11%c59%c59 PM", c->timesep, c->timesep);
+  if (c->CTYINFO.timefmt == COUNTRY_TIME12) {
+    sprintf(result, "11%c59%c59 PM", c->CTYINFO.timesep[0], c->CTYINFO.timesep[0]);
   } else {
-    sprintf(result, "23%c59%c59", c->timesep, c->timesep);
+    sprintf(result, "23%c59%c59", c->CTYINFO.timesep[0], c->CTYINFO.timesep[0]);
   }
   return(result);
 }
@@ -97,24 +97,24 @@ static char *currencystring(struct country *c) {
   decimalpart[8] = '9';
   decimalpart[9] = 0;
   /* prepare the decimal string first */
-  if (c->currencyprec < 9) {
-    decimalpart[c->currencyprec] = 0;
+  if (c->CTYINFO.currprec < 9) {
+    decimalpart[c->CTYINFO.currprec] = 0;
   }
   /* prepare the currency space string */
-  if (c->currencyspace != 0) {
+  if (c->CTYINFO.currspace != 0) {
     space[0] = ' ';
   }
   /* prepare the currency and decimal symbols */
-  if (c->currencydecsym != 0) { /* currency replaces the decimal point */
-    sprintf(decsym, "%s", c->currency);
+  if (c->CTYINFO.currdecsym != 0) { /* currency replaces the decimal point */
+    sprintf(decsym, "%s", c->CTYINFO.currsym);
     cursym[0] = 0;
   } else {
-    sprintf(decsym, "%c", c->decimal);
-    sprintf(cursym, "%s", c->currency);
+    sprintf(decsym, "%c", c->CTYINFO.decimal[0]);
+    sprintf(cursym, "%s", c->CTYINFO.currsym);
   }
-  if (c->currencyprec == 0) decsym[0] = 0;
+  if (c->CTYINFO.currprec == 0) decsym[0] = 0;
   /* compute the final string */
-  if (c->currencypos == 0) { /* currency precedes value */
+  if (c->CTYINFO.currpos == 0) { /* currency precedes value */
     sprintf(result, "%s%s99%s%s", cursym, space, decsym, decimalpart);
   } else { /* currency follows value or replaces decimal symbol */
     sprintf(result, "99%s%s%s%s", decsym, decimalpart, space, cursym);
@@ -154,91 +154,91 @@ static int processarg(char *arg, struct country *c) {
   if (stringstartswith(arg, "country:") == 0) {
     intvalue = atoi(value);
     if ((intvalue > 0) && (intvalue < 1000)) {
-      c->id = intvalue;
+      c->CTYINFO.id = intvalue;
       return(0);
     }
   } else if (stringstartswith(arg, "cp:") == 0) {
     intvalue = atoi(value);
     if ((intvalue > 0) && (intvalue < 1000)) {
-      c->codepage = intvalue;
+      c->CTYINFO.codepage = intvalue;
       return(0);
     }
   } else if (stringstartswith(arg, "decim:") == 0) {
     if (value[1] == 0) { /* value must be exactly one character */
-      c->decimal = *value;
+      c->CTYINFO.decimal[0] = *value;
       return(0);
     }
   } else if (stringstartswith(arg, "thous:") == 0) {
     if (value[1] == 0) { /* value must be exactly one character */
-      c->thousands = *value;
+      c->CTYINFO.thousands[0] = *value;
       return(0);
     }
   } else if (stringstartswith(arg, "datesep:") == 0) {
     if (value[1] == 0) { /* value must be exactly one character */
-      c->datesep = *value;
+      c->CTYINFO.datesep[0] = *value;
       return(0);
     }
   } else if (stringstartswith(arg, "timesep:") == 0) {
     if (value[1] == 0) { /* value must be exactly one character */
-      c->timesep = *value;
+      c->CTYINFO.timesep[0] = *value;
       return(0);
     }
   } else if (stringstartswith(arg, "datefmt:") == 0) {
     if (strcmp(value, "MDY") == 0) {
-      c->datefmt = COUNTRY_DATE_MDY;
+      c->CTYINFO.datefmt = COUNTRY_DATE_MDY;
       return(0);
     } else if (strcmp(value, "DMY") == 0) {
-      c->datefmt = COUNTRY_DATE_DMY;
+      c->CTYINFO.datefmt = COUNTRY_DATE_DMY;
       return(0);
     } else if (strcmp(value, "YMD") == 0) {
-      c->datefmt = COUNTRY_DATE_YMD;
+      c->CTYINFO.datefmt = COUNTRY_DATE_YMD;
       return(0);
     }
   } else if (stringstartswith(arg, "timefmt:") == 0) {
     if (value[1] == 0) {
       if ((value[0] >= '0') && (value[0] <= '1')) {
-        c->timefmt = value[0] - '0';
+        c->CTYINFO.timefmt = value[0] - '0';
         return(0);
       }
     }
   } else if (stringstartswith(arg, "curr:") == 0) {
     if (strlen(value) <= 4) {
-      strcpy(c->currency, value);
+      strcpy(c->CTYINFO.currsym, value);
       return(0);
     }
   } else if (stringstartswith(arg, "currpos:") == 0) {
     if (value[1] == 0) {
       if (value[0] == '0') {
-        c->currencypos = 0;
+        c->CTYINFO.currpos = 0;
         return(0);
       } else if (value[0] == '1') {
-        c->currencypos = 1;
+        c->CTYINFO.currpos = 1;
         return(0);
       } else if (value[0] == '2') {
-        c->currencypos = 0;
-        c->currencydecsym = 1;
+        c->CTYINFO.currpos = 0;
+        c->CTYINFO.currdecsym = 1;
         return(0);
       }
     }
   } else if (stringstartswith(arg, "currspc:") == 0) {
     if (value[1] == 0) {
       if ((value[0] >= '0') && (value[0] <= '1')) {
-        c->currencyspace = value[0] - '0';
+        c->CTYINFO.currspace = value[0] - '0';
         return(0);
       }
     }
   } else if (stringstartswith(arg, "currprec:") == 0) {
     if (value[1] == 0) {
       if ((value[0] >= '0') && (value[0] <= '9')) {
-        c->currencyprec = value[0] - '0';
+        c->CTYINFO.currprec = value[0] - '0';
         return(0);
       }
     }
   } else if (stringstartswith(arg, "yesno:") == 0) {
     /* string must be exactly 2 characters long */
     if ((value[0] != 0) && (value[1] != 0) && (value[2] == 0)) {
-      c->yes = value[0];
-      c->no = value[1];
+      c->YESNO.yes[0] = value[0];
+      c->YESNO.no[0] = value[1];
       return(0);
     }
   }
@@ -300,19 +300,19 @@ int main(int argc, char **argv) {
     }
   }
 
-  printf("Country intl code.....: %03d\n", cntdata.id);
-  printf("Codepage..............: %d\n", cntdata.codepage);
-  printf("Decimal separator.....: %c\n", cntdata.decimal);
-  printf("Thousands separator...: %c\n", cntdata.thousands);
+  printf("Country intl code.....: %03d\n", cntdata.CTYINFO.id);
+  printf("Codepage..............: %d\n", cntdata.CTYINFO.codepage);
+  printf("Decimal separator.....: %c\n", cntdata.CTYINFO.decimal[0]);
+  printf("Thousands separator...: %c\n", cntdata.CTYINFO.thousands[0]);
   printf("Date format...........: %s\n", datestring(&cntdata));
   printf("Time format...........: %s\n", timestring(&cntdata));
-  printf("Yes/No letters........: %c/%c\n", cntdata.yes, cntdata.no);
+  printf("Yes/No letters........: %c/%c\n", cntdata.YESNO.yes[0], cntdata.YESNO.no[0]);
   printf("Currency example......: %s\n", currencystring(&cntdata));
 
   printf("\n"
          "Please make sure your CONFIG.SYS contains a COUNTRY directive that points to\n"
          "your custom preferences file:\n"
-         "COUNTRY=%03d,%03d,%s\n\n", cntdata.id, cntdata.codepage, fname);
+         "COUNTRY=%03d,%03d,%s\n\n", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
 
   /* if anything changed, write the new file */
   if (changedflag != 0) country_write(fname, &cntdata);

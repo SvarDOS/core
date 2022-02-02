@@ -1,7 +1,8 @@
 localcfg history file
 
-* localcfg xxxx (merged into the SvarDOS project)
+* localcfg ver 20220202 (merged into the SvarDOS project)
  - COUNTRY=xxx example contains the actual codepage and path to COUNTRY.SYS
+ - improved loading/saving routines so they rely on memory structures
 
 * localcfg v0.90 [02 June 2015]
  - first public release
