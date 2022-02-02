@@ -66,6 +66,7 @@ PROGS    | User programs, tools...
 Note: "DOC", "NLS", "BIN" and "HELP" directories are strictly reserved to
       CORE packages.
 
+
 %hLSM meta-data files
 
 Every package MUST contain an LSM file in its "APPINFO" directory. This LSM
@@ -76,3 +77,34 @@ format is very simple, it must contain at least two lines:
   description: package description
 
 Any other lines are ignored by the SvarDOS package manager.
+
+
+%hPackage versions
+
+The version present in the LSM file is meant to reflect the version of the
+packaged software, but it may happen that a package needs to be changed to
+fix a strictly packaging-related issue (for example a forgotten documentation
+file or a recompilation of the binary using a better set of flags...). In such
+case, the version of the software does not change, but the version of the
+package itself needs to change so users know something changed. That's what
+"SvarDOS revisions" come in. A version string is basically following such
+format:
+
+  UPSTREAM_VER[+SVARREV]
+
+UPSTREAM_VER is the exact version string advertised by the software. It may
+be pretty much anything. This upstream version may be optionally followed by a
+plus sign and the SvarDOS revision. In the even that the upstream version
+already contains a plus sign, then SvarDOS revision is delimited with a tilde.
+
+The SvarDOS revision starts at 0 and increments each time that the given
+upstream revision is repackaged. The SvarDOS revision restarts whenever the
+upstream version changes. The SvarDOS revision of 0 is always hidden.
+
+Examples:
+
+FDISK 1.54      <- originally packaged version
+FDISK 1.54+1    <- package has been changed, but not the upstream version
+FDISK 1.55      <- upstream version increased, so SvarDOS rev restarts
+FDISK 1.55+1    <- new version of the package, but still contains FDISK 1.55
+FDISK 1.55+2    <- another new version of the package, etc

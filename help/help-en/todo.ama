@@ -9,8 +9,6 @@
   - multi-lang (kitten library)
   - capable of (limited) copy/pasting between two files
 
-* validate that CORE is 100%% 8086-compatible
-
 * replace FreeCOM by SvarCOM
 
 * improve installer so user can choose the target disk
@@ -26,10 +24,6 @@
  - user should be asked for its NIC model at install time
  - installer could also ask for a basic DHCP / static configuration
 
-* add a "link" tool so users can easily create "links" to their favorite
-  programs (esp. things like zip/unzip, etc). Might be something integrated
-  within SvarCOM, or a third-party TSR.
-
 * install.com - MBR changes could be done by the installer itself instead of
   system()-calling fdisk
 
@@ -41,7 +35,7 @@
   - ...
 
 * test new versions of software and update packages accordingly. special care
-  must be taken for core things: kernel, freecom, fdisk, himemx...
+  must be taken for core things: kernel, command.com, fdisk, himemx...
 
 * add new, useful software to the SvarDOS repository (see the %lpkgrules.ama:rules%t)
 
@@ -49,9 +43,7 @@
   languages -> would be nice to have some kind of web interface for submitting
   and reviewing translations
 
-* all CORE packages should be NLS-aware (ie. translatable)
-
-* pkgnet.exe: implement the 'checkup' action for easy update checks
+* all user-facing CORE packages should be NLS-aware (translatable)
 
 * possibly plenty of other things
 
