@@ -1,17 +1,14 @@
 
 localcfg - locales editor for DOS
-Copyright (C) Mateusz Viste 2015
 
 
 *** About ***
 
-localcfg is a 16 bit tool designed for DOS. It provides an easy way of
-configurating system locales by generating a custom COUNTRY.SYS file that
-reflects the exact preferences of the user.
+localcfg is a 16 bit DOS tool that provides an easy way of configurating system
+locales by generating a custom COUNTRY.SYS file that reflects user's
+preferences.
 
-Run localcfg /? for exact usage instructions.
-
-website: http://localcfg.sourceforge.net/
+Run localcfg /? for usage instructions.
 
 
 *** License ***
@@ -19,7 +16,7 @@ website: http://localcfg.sourceforge.net/
 localcfg is written by Mateusz Viste, and released under the BSD "2-clause"
 license, included below.
 
- Copyright (C) 2015 Mateusz Viste
+ Copyright (C) 2015-2022 Mateusz Viste
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
