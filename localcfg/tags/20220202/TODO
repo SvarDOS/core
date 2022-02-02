@@ -1,0 +1,5 @@
+ - when file doesn't exist, it should always be created (even if no
+   modification switch has been used)
+ - when trying to open a country.sys file that is not localcfg-computed, the
+   error message should specifically say so
+ - translation support (svarlang)
