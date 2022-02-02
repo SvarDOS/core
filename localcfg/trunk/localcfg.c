@@ -1,6 +1,7 @@
 /*
- * Locales configuration for DOS
- * Copyright (C) Mateusz Viste 2015
+ * Locales configuration for SvarDOS
+ *
+ * Copyright (C) Mateusz Viste 2015-2022
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -19,7 +20,7 @@
 #include "country.h"
 
 #define PVER "0.90"
-#define PDATE "2015"
+#define PDATE "2015-2022"
 
 
 static void about(void) {
@@ -246,18 +247,42 @@ static int processarg(char *arg, struct country *c) {
 }
 
 
+/* converts a path to its canonic representation, returns 0 on success
+ * or DOS err on failure (invalid drive) */
+static unsigned short file_truename(const char *dst, char *src) {
+  unsigned short res = 0;
+  _asm {
+    push es
+    mov ah, 0x60  /* query truename, DS:SI=src, ES:DI=dst */
+    push ds
+    pop es
+    mov si, src
+    mov di, dst
+    int 0x21
+    jnc DONE
+    mov [res], ax
+    DONE:
+    pop es
+  }
+  return(res);
+}
+
+
 int main(int argc, char **argv) {
   struct country cntdata;
   int changedflag;
   int x;
-  char *fname;
+  static char fname[130];
 
   if ((argc < 2) || (argv[1][0] == '/')) {
     about();
     return(1);
   }
 
-  fname = argv[1];
+  if (file_truename(fname, argv[1]) != 0) {
+    puts("ERROR: bad file path");
+    return(1);
+  }
 
   x = country_read(&cntdata, fname);
   if (x != 0) {
@@ -285,9 +310,9 @@ int main(int argc, char **argv) {
   printf("Currency example......: %s\n", currencystring(&cntdata));
 
   printf("\n"
-         "Note: Please make sure your CONFIG.SYS contains a COUNTRY directive pointing\n"
-         "      to your custom preferences file. Example:\n"
-         "      COUNTRY=%03d,,C:\\MYPREFS.SYS\n\n", cntdata.id);
+         "Please make sure your CONFIG.SYS contains a COUNTRY directive that points to\n"
+         "your custom preferences file:\n"
+         "COUNTRY=%03d,%03d,%s\n\n", cntdata.id, cntdata.codepage, fname);
 
   /* if anything changed, write the new file */
   if (changedflag != 0) country_write(fname, &cntdata);
