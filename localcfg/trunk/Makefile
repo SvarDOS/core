@@ -5,7 +5,7 @@
 all: localcfg.com
 
 localcfg.com: localcfg.c country.c
-	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox localcfg.c country.c
+	wcl -0 -y -cc -wx -mt -lr -zp1 -we -d0 -ox localcfg.c country.c
 	upx --8086 -9 localcfg.com
 
 clean: .SYMBOLIC
