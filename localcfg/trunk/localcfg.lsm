@@ -1,14 +1,2 @@
-Begin3
-Title:           localcfg
-Version:         0.90
-Entered-date:    02 June 2015
-Description:     locales preferences configuration tool
-Keywords:        country.sys
-Author:          Mateusz Viste
-Maintained-by:
-Primary-site:
-Alternate-site:
-Original-site:   http://localcfg.sourceforge.net
-Platforms:       DOS
-Copying-policy:  BSD
-End
+version:     xxx
+description: locales preferences configuration tool (country.sys-like)
