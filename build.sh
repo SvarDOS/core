@@ -184,7 +184,7 @@ prep_flop 80 2  9  720
 DOSEMUDIR='dosemu-prep-files'
 mkdir "$DOSEMUDIR"
 # INSTALL.BAT
-echo 'IF NOT EXIST C:\TMP\NUL MKDIR C:\TMP'
+echo 'IF NOT EXIST C:\TMP\NUL MKDIR C:\TMP' >> "$DOSEMUDIR/install.bat"
 echo 'mkdir %DOSDIR%' >> "$DOSEMUDIR/install.bat"
 echo 'mkdir %DOSDIR%\cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO # pkg config file - specifies locations where packages should be installed >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
