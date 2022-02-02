@@ -36,11 +36,11 @@
 
 static void about(void) {
   puts("localcfg ver " PVER " - locales configuration for DOS\n"
-       "Copyright (C) Mateusz Viste " PDATE "\n"
+       "Copyright (C) " PDATE " Mateusz Viste\n"
        "\n"
-       "localcfg creates a custom COUNTRY.SYS-like file matching your preferences.\n"
+       "localcfg creates or edits a custom COUNTRY.SYS-like file with your preferences.\n"
        "\n"
-       "usage: localcfg myprefs.sys [options]\n"
+       "usage: localcfg [COUNTRY.SYS] [options]\n"
        "\n"
        "options allow to configure country locales to your likening, as follows:\n"
        "  /country:XX indicates your country code is XX (1 for USA, 33 for France, etc)\n"
@@ -58,6 +58,9 @@ static void about(void) {
        "  /currspc:X  space between the currency and the value (0=no, 1=yes)\n"
        "  /currprec:X currency's precision (number of decimal digits, 0..9)\n"
        "  /yesno:XY   sets the 'Yes/No' letter to XY (default: YN)\n"
+       "\n"
+       "If COUNTRY.SYS location is not provided, then localcfg tries loading it\n"
+       "from %DOSDIR%\\CFG\\COUNTRY.SYS\n"
       );
 }
 
@@ -279,21 +282,47 @@ static unsigned short file_truename(const char *dst, char *src) {
 }
 
 
+static void default_country_path(char *s) {
+  char *dosdir = getenv("DOSDIR");
+  size_t dosdirlen;
+  s[0] = 0;
+  if (dosdir == NULL) return;
+  dosdirlen = strlen(dosdir);
+  if (dosdirlen == 0) return;
+  /* drop trailing backslash if present */
+  if (dosdir[dosdirlen - 1] == '\\') dosdirlen--;
+  /* copy dosdir to s and append the rest of the path */
+  memcpy(s, dosdir, dosdirlen);
+  strcpy(s + dosdirlen, "\\CFG\\COUNTRY.SYS");
+}
+
+
 int main(int argc, char **argv) {
   struct country cntdata;
   int changedflag;
   int x;
   static char fname[130];
 
-  if ((argc < 2) || (argv[1][0] == '/')) {
-    about();
-    return(1);
+  /* scan argv looking for the path to country.sys */
+  for (x = 1; x < argc; x++) {
+    if (argv[x][0] != '/') {
+      if (fname[0] != 0) {
+        puts("ERROR: file path can be provided only once");
+        return(1);
+      }
+      /* */
+      if (file_truename(fname, argv[x]) != 0) {
+        puts("ERROR: bad file path");
+        return(1);
+      }
+    } else if (strcmp(argv[x], "/?") == 0) { /* is it /? */
+      about();
+      return(1);
+    }
   }
 
-  if (file_truename(fname, argv[1]) != 0) {
-    puts("ERROR: bad file path");
-    return(1);
-  }
+  /* if no file path provided, look into %DOSDIR%\CFG\COUNTRY.SYS */
+  if (fname[0] == 0) default_country_path(fname);
 
   x = country_read(&cntdata, fname);
   if (x != 0) {
@@ -301,12 +330,14 @@ int main(int argc, char **argv) {
     return(2);
   }
 
-  changedflag = argc - 2;
+  changedflag = 0;
 
   /* process command line arguments */
-  while (--argc > 1) {
-    if (processarg(argv[argc], &cntdata) != 0) {
-      about();
+  for (x = 1; x < argc; x++) {
+    if (argv[x][0] != '/') continue; /* skip country.sys filename (processed earlier) */
+    changedflag++;
+    if (processarg(argv[x], &cntdata) != 0) {
+      puts("ERROR: invalid parameter syntax");
       return(3);
     }
   }
@@ -321,8 +352,7 @@ int main(int argc, char **argv) {
   printf("Currency example......: %s\n", currencystring(&cntdata));
 
   printf("\n"
-         "Please make sure your CONFIG.SYS contains a COUNTRY directive that points to\n"
-         "your custom preferences file:\n"
+         "Make sure that your CONFIG.SYS contains this directive:\n"
          "COUNTRY=%03d,%03d,%s\n\n", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
 
   /* if anything changed, write the new file */
