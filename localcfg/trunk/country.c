@@ -14,6 +14,8 @@ struct funchdr {
   unsigned short funcsiz;
 };
 
+static unsigned char filebuff[1024];
+
 
 /* fills a country struct with default values */
 static void country_default(struct country *countrydata) {
@@ -45,7 +47,6 @@ static void country_default(struct country *countrydata) {
 /* Loads data from a country.sys file into a country struct.
  * Returns 0 on success, non-zero otherwise. */
 int country_read(struct country *countrydata, const char *fname) {
-  unsigned char filebuff[1024];
   short firstentryoffs;
   unsigned char *subfunctions[16] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
                                      NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
@@ -129,7 +130,6 @@ int country_read(struct country *countrydata, const char *fname) {
 /* Computes a new country.sys file based on data from a country struct.
  * Returns 0 on success, non-zero otherwise. */
 int country_write(const char *fname, struct country *c) {
-  unsigned char filebuff[1024];
   short filesize = 0;
   FILE *fd;
   int x;
