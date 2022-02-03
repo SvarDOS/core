@@ -23,7 +23,7 @@ clean: .SYMBOLIC
 	del deflang.c
 	del localcfg.lng
 
-buildpkg: localcfg.com
+buildpkg: localcfg.com .SYMBOLIC
 	mkdir appinfo
 	mkdir source
 	mkdir source\localcfg
@@ -52,5 +52,6 @@ buildpkg: localcfg.com
 	rmdir source\localcfg
 	rmdir source
 	rmdir bin
+	rmdir doc\localcfg
 	rmdir doc
 	rmdir nls
