@@ -3,8 +3,7 @@
  *
  * usage: tlumacz en fr pl etc
  *
- * computes a svarcom.lng file that contains all language ressources found
- * inside dirname.
+ * computes an out.lng file that contains all language ressources.
  *
  * DAT format:
  *
@@ -203,7 +202,7 @@ int main(int argc, char **argv) {
     return(1);
   }
 
-  fd = fopen("svarcom.lng", "wb");
+  fd = fopen("out.lng", "wb");
   if (fd == NULL) {
     puts("ERR: failed to open or create SVARCOM.LNG");
     return(1);
