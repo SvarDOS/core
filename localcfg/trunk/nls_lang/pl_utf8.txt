@@ -47,7 +47,9 @@
 
 ### ERROR MESSAGES ########################################################
 
-9.0:BŁĄD: ścieżka do pliku może zostać podana tylko raz.
-9.1:BŁĄD: zła ścieżka do pliku.
-9.2:BŁĄD: nie zdołano wczytać pliku.
-9.3:BŁĄD: nieprawidłowa składnia parametru.
+9.0:BŁĄD: ścieżka do pliku może zostać podana tylko raz
+9.1:BŁĄD: zła ścieżka do pliku
+9.2:BŁĄD: nie zdołano wczytać pliku
+9.3:BŁĄD: nieprawidłowa składnia parametru
+9.4:BŁĄD: plik nie jest prawidłowym plikiem COUNTRY.SYS
+9.5:BŁĄD: plik nie został stworzony za pomocą LOCALCFG

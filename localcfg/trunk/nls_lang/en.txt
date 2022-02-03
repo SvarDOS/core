@@ -47,7 +47,9 @@
 
 ### ERROR MESSAGES ########################################################
 
-9.0:ERROR: file path can be provided only once.
+9.0:ERROR: file path can be provided only once
 9.1:ERROR: bad path to file
 9.2:ERROR: failed to read the file
 9.3:ERROR: invalid parameter syntax
+9.4:ERROR: the file is not a valid COUNTRY.SYS
+9.5:ERROR: the file has not been created with LOCALCFG

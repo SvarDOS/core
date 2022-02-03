@@ -72,7 +72,9 @@ enum NLS_STRINGS {
   NLS_ERR_FILEPATHTWICE = 0x0900,
   NLS_ERR_BADPATH       = 0x0901,
   NLS_ERR_READFAIL      = 0x0902,
-  NLS_ERR_INVPARAM      = 0x0903
+  NLS_ERR_INVPARAM      = 0x0903,
+  NLS_ERR_INVFORMAT     = 0x0904,
+  NLS_ERR_NOTLOCALCFG   = 0x0905
 };
 
 
@@ -412,7 +414,13 @@ int main(int argc, char **argv) {
 
   x = country_read(&cntdata, fname);
   if (x != 0) {
-    nls_puts(NLS_ERR_READFAIL);
+    if (x == COUNTRY_ERR_INV_FORMAT) {
+      nls_puts(NLS_ERR_INVFORMAT);
+    } else if (x == COUNTRY_ERR_NOT_LOCALCFG) {
+      nls_puts(NLS_ERR_NOTLOCALCFG);
+    } else {
+      nls_puts(NLS_ERR_READFAIL);
+    }
     return(2);
   }
 

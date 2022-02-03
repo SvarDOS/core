@@ -66,10 +66,10 @@ int country_read(struct country *countrydata, const char *fname) {
   fclose(fd);
 
   /* check that it's a country file - should start with 0xFF COUNTRY 0x00 */
-  if (memcmp(filebuff, "\377COUNTRY\0", 9) != 0) return(-2);
+  if (memcmp(filebuff, "\377COUNTRY\0", 9) != 0) return(COUNTRY_ERR_INV_FORMAT);
 
   /* check that it's one of my country.sys files - should contain a trailer */
-  if (memcmp(filebuff + filesize - 8, "LOCALCFG", 8) != 0) return(-3);
+  if (memcmp(filebuff + filesize - 8, "LOCALCFG", 8) != 0) return(COUNTRY_ERR_NOT_LOCALCFG);
 
   /* read the offset of the entries index - must be at least 23 */
   functiondata = filebuff + 19;

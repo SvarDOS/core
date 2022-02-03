@@ -17,7 +17,8 @@ enum COUNTRY_TIMEFMT {
   COUNTRY_TIME24 = 1  /* 24h format   (like 18:32) */
 };
 
-
+#define COUNTRY_ERR_INV_FORMAT -86
+#define COUNTRY_ERR_NOT_LOCALCFG -87
 
 struct country {
 
