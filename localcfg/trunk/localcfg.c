@@ -76,26 +76,54 @@ enum NLS_STRINGS {
 };
 
 
-static void nls_puts(enum NLS_STRINGS id) {
-  puts(svarlang_strid(id));
-}
-
-
-static void nls_put(enum NLS_STRINGS id) {
-  printf("%s", svarlang_strid(id));
+static void output(const char *s) {
+  _asm {
+    /* set cx to strlen(s) */
+    push ds
+    pop es
+    mov di, s
+    xor al, al
+    cld
+    mov cx, 0xff
+    repne scasb  /* compare ES:DI with AL, inc DI until match */
+    mov cx, di
+    sub cx, s
+    dec cx
+    /* output via DOS */
+    mov ah, 0x40  /* write to handle */
+    mov bx, 1     /* 1=stdout */
+    mov dx, s
+    int 0x21
+  }
 }
 
 
 static void crlf(void) {
-  puts("");
+  output("\r\n");
+}
+
+
+static void outputnl(const char *s) {
+  output(s);
+  crlf();
+}
+
+
+static void nls_put(enum NLS_STRINGS id) {
+  output(svarlang_strid(id));
+}
+
+
+static void nls_puts(enum NLS_STRINGS id) {
+  nls_put(id);
+  crlf();
 }
 
 
 static void about(void) {
-  printf("localcfg ");
+  output("localcfg ");
   nls_put(NLS_HLP_VER);
-  puts(" " PVER ", (C) " PDATE " Mateusz Viste");
-  crlf();
+  outputnl(" " PVER ", (C) " PDATE " Mateusz Viste");
   nls_puts(NLS_HLP_DESC);
   crlf();
   nls_puts(NLS_HLP_USAGE);
@@ -359,7 +387,8 @@ int main(int argc, char **argv) {
   struct country cntdata;
   int changedflag;
   int x;
-  static char fname[130];
+  char fname[130];
+  char buff[128];
 
   svarlang_autoload("localcfg");
 
@@ -403,26 +432,34 @@ int main(int argc, char **argv) {
   }
 
   nls_put(NLS_INFO_COUNTRY);
-  printf(" %03d\r\n", cntdata.CTYINFO.id);
+  sprintf(buff, " %03d", cntdata.CTYINFO.id);
+  outputnl(buff);
   nls_put(NLS_INFO_CODEPAGE);
-  printf(" %d\r\n", cntdata.CTYINFO.codepage);
+  sprintf(buff, " %d", cntdata.CTYINFO.codepage);
+  outputnl(buff);
   nls_put(NLS_INFO_DECSEP);
-  printf(" %c\r\n", cntdata.CTYINFO.decimal[0]);
+  sprintf(buff, " %c", cntdata.CTYINFO.decimal[0]);
+  outputnl(buff);
   nls_put(NLS_INFO_THOUSEP);
-  printf(" %c\r\n", cntdata.CTYINFO.thousands[0]);
+  sprintf(buff, " %c", cntdata.CTYINFO.thousands[0]);
+  outputnl(buff);
   nls_put(NLS_INFO_DATEFMT);
-  printf(" %s\r\n", datestring(&cntdata));
+  sprintf(buff, " %s", datestring(&cntdata));
+  outputnl(buff);
   nls_put(NLS_INFO_TIMEFMT);
-  printf(" %s\r\n", timestring(&cntdata));
+  sprintf(buff, " %s", timestring(&cntdata));
+  outputnl(buff);
   nls_put(NLS_INFO_YESNO);
-  printf(" %c/%c\r\n", cntdata.YESNO.yes[0], cntdata.YESNO.no[0]);
+  sprintf(buff, " %c/%c", cntdata.YESNO.yes[0], cntdata.YESNO.no[0]);
+  outputnl(buff);
   nls_put(NLS_INFO_CURREXAMPLE);
-  printf(" %s\r\n", currencystring(&cntdata));
+  sprintf(" %s", currencystring(&cntdata));
+  outputnl(buff);
 
   crlf();
   nls_puts(NLS_MAKESURE);
-  printf("COUNTRY=%03d,%03d,%s", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
-  crlf();
+  sprintf(buff, "COUNTRY=%03d,%03d,%s", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
+  outputnl(buff);
 
   /* if anything changed, write the new file */
   if (changedflag != 0) country_write(fname, &cntdata);
