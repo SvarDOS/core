@@ -28,40 +28,98 @@
 #include <stdlib.h> /* atoi() */
 #include <string.h> /* strchr */
 
+#include "svarlang.lib/svarlang.h"
+
 #include "country.h"
 
-#define PVER "20220202"
+#define PVER "20220203"
 #define PDATE "2015-2022"
 
 
+enum NLS_STRINGS {
+  NLS_HLP_VER           = 0x0000,
+  NLS_HLP_DESC          = 0x0001,
+  NLS_HLP_USAGE         = 0x0002,
+  NLS_HLP_OPTIONS       = 0x0003,
+  NLS_HLP_COUNTRY       = 0x000A,
+  NLS_HLP_CP            = 0x000B,
+  NLS_HLP_DECIM         = 0x000C,
+  NLS_HLP_THOUS         = 0x000D,
+  NLS_HLP_DATESEP       = 0x000E,
+  NLS_HLP_DATEFMT       = 0x000F,
+  NLS_HLP_TIMESEP       = 0x0010,
+  NLS_HLP_TIMEFMT       = 0x0011,
+  NLS_HLP_CURR          = 0x0012,
+  NLS_HLP_CURRPOS0      = 0x0013,
+  NLS_HLP_CURRPOS1      = 0x0014,
+  NLS_HLP_CURRPOS2      = 0x0015,
+  NLS_HLP_CURRSPC       = 0x0016,
+  NLS_HLP_CURRPREC      = 0x0017,
+  NLS_HLP_YESNO         = 0x0018,
+  NLS_HLP_INFOLOC1      = 0x0032,
+  NLS_HLP_INFOLOC2      = 0x0033,
+
+  NLS_INFO_COUNTRY      = 0x0700,
+  NLS_INFO_CODEPAGE     = 0x0701,
+  NLS_INFO_DECSEP       = 0x0702,
+  NLS_INFO_THOUSEP      = 0x0703,
+  NLS_INFO_DATEFMT      = 0x0704,
+  NLS_INFO_TIMEFMT      = 0x0705,
+  NLS_INFO_YESNO        = 0x0706,
+  NLS_INFO_CURREXAMPLE  = 0x0707,
+  NLS_MAKESURE          = 0x0709,
+
+  NLS_ERR_FILEPATHTWICE = 0x0900,
+  NLS_ERR_BADPATH       = 0x0901,
+  NLS_ERR_READFAIL      = 0x0902,
+  NLS_ERR_INVPARAM      = 0x0903
+};
+
+
+static void nls_puts(enum NLS_STRINGS id) {
+  puts(svarlang_strid(id));
+}
+
+
+static void nls_put(enum NLS_STRINGS id) {
+  printf("%s", svarlang_strid(id));
+}
+
+
+static void crlf(void) {
+  puts("");
+}
+
+
 static void about(void) {
-  puts("localcfg ver " PVER " - locales configuration for DOS\n"
-       "Copyright (C) " PDATE " Mateusz Viste\n"
-       "\n"
-       "localcfg creates or edits a custom COUNTRY.SYS-like file with your preferences.\n"
-       "\n"
-       "usage: localcfg [COUNTRY.SYS] [options]\n"
-       "\n"
-       "options allow to configure country locales to your likening, as follows:\n"
-       "  /country:XX indicates your country code is XX (1 for USA, 33 for France, etc)\n"
-       "  /cp:XXX     adapts country data for codepage XXX (example: '437')\n"
-       "  /decim:X    reconfigures the decimal symbol to be 'X'");
-  puts("  /thous:X    reconfigures the thousands symbol to be 'X'\n"
-       "  /datesep:X  sets the date separator to 'X' (for example '/')\n"
-       "  /datefmt:X  sets the date format, can be: MDY, DMY or YMD\n"
-       "  /timesep:X  sets the time separator to 'X' (for example ':')\n"
-       "  /timefmt:X  sets the time format: 0=12h with AM/PM or 1=24h\n"
-       "  /curr:XXX   sets the currency to XXX (a string of 1 to 4 characters)\n"
-       "  /currpos:X  sets the currency symbol position to X, where X is either");
-  puts("              0=currency precedes the value, 1=currency follows the value and\n"
-       "              2=currency replaces the decimal sign\n"
-       "  /currspc:X  space between the currency and the value (0=no, 1=yes)\n"
-       "  /currprec:X currency's precision (number of decimal digits, 0..9)\n"
-       "  /yesno:XY   sets the 'Yes/No' letter to XY (default: YN)\n"
-       "\n"
-       "If COUNTRY.SYS location is not provided, then localcfg tries loading it\n"
-       "from %DOSDIR%\\CFG\\COUNTRY.SYS\n"
-      );
+  printf("localcfg ");
+  nls_put(NLS_HLP_VER);
+  puts(" " PVER ", (C) " PDATE " Mateusz Viste");
+  crlf();
+  nls_puts(NLS_HLP_DESC);
+  crlf();
+  nls_puts(NLS_HLP_USAGE);
+  crlf();
+  nls_puts(NLS_HLP_OPTIONS);
+  crlf();
+  nls_puts(NLS_HLP_COUNTRY);
+  nls_puts(NLS_HLP_CP);
+  nls_puts(NLS_HLP_DECIM);
+  nls_puts(NLS_HLP_THOUS);
+  nls_puts(NLS_HLP_DATESEP);
+  nls_puts(NLS_HLP_DATEFMT);
+  nls_puts(NLS_HLP_TIMESEP);
+  nls_puts(NLS_HLP_TIMEFMT);
+  nls_puts(NLS_HLP_CURR);
+  nls_puts(NLS_HLP_CURRPOS0);
+  nls_puts(NLS_HLP_CURRPOS1);
+  nls_puts(NLS_HLP_CURRPOS2);
+  nls_puts(NLS_HLP_CURRSPC);
+  nls_puts(NLS_HLP_CURRPREC);
+  nls_puts(NLS_HLP_YESNO);
+  crlf();
+  nls_puts(NLS_HLP_INFOLOC1);
+  nls_puts(NLS_HLP_INFOLOC2);
 }
 
 
@@ -303,16 +361,18 @@ int main(int argc, char **argv) {
   int x;
   static char fname[130];
 
+  svarlang_autoload("localcfg");
+
   /* scan argv looking for the path to country.sys */
   for (x = 1; x < argc; x++) {
     if (argv[x][0] != '/') {
       if (fname[0] != 0) {
-        puts("ERROR: file path can be provided only once");
+        nls_puts(NLS_ERR_FILEPATHTWICE);
         return(1);
       }
       /* */
       if (file_truename(fname, argv[x]) != 0) {
-        puts("ERROR: bad file path");
+        nls_puts(NLS_ERR_BADPATH);
         return(1);
       }
     } else if (strcmp(argv[x], "/?") == 0) { /* is it /? */
@@ -326,7 +386,7 @@ int main(int argc, char **argv) {
 
   x = country_read(&cntdata, fname);
   if (x != 0) {
-    printf("ERROR: failed to read the preference file [%d]\n", x);
+    nls_puts(NLS_ERR_READFAIL);
     return(2);
   }
 
@@ -337,23 +397,32 @@ int main(int argc, char **argv) {
     if (argv[x][0] != '/') continue; /* skip country.sys filename (processed earlier) */
     changedflag++;
     if (processarg(argv[x], &cntdata) != 0) {
-      puts("ERROR: invalid parameter syntax");
+      nls_puts(NLS_ERR_INVPARAM);
       return(3);
     }
   }
 
-  printf("Country intl code.....: %03d\n", cntdata.CTYINFO.id);
-  printf("Codepage..............: %d\n", cntdata.CTYINFO.codepage);
-  printf("Decimal separator.....: %c\n", cntdata.CTYINFO.decimal[0]);
-  printf("Thousands separator...: %c\n", cntdata.CTYINFO.thousands[0]);
-  printf("Date format...........: %s\n", datestring(&cntdata));
-  printf("Time format...........: %s\n", timestring(&cntdata));
-  printf("Yes/No letters........: %c/%c\n", cntdata.YESNO.yes[0], cntdata.YESNO.no[0]);
-  printf("Currency example......: %s\n", currencystring(&cntdata));
+  nls_put(NLS_INFO_COUNTRY);
+  printf(" %03d\r\n", cntdata.CTYINFO.id);
+  nls_put(NLS_INFO_CODEPAGE);
+  printf(" %d\r\n", cntdata.CTYINFO.codepage);
+  nls_put(NLS_INFO_DECSEP);
+  printf(" %c\r\n", cntdata.CTYINFO.decimal[0]);
+  nls_put(NLS_INFO_THOUSEP);
+  printf(" %c\r\n", cntdata.CTYINFO.thousands[0]);
+  nls_put(NLS_INFO_DATEFMT);
+  printf(" %s\r\n", datestring(&cntdata));
+  nls_put(NLS_INFO_TIMEFMT);
+  printf(" %s\r\n", timestring(&cntdata));
+  nls_put(NLS_INFO_YESNO);
+  printf(" %c/%c\r\n", cntdata.YESNO.yes[0], cntdata.YESNO.no[0]);
+  nls_put(NLS_INFO_CURREXAMPLE);
+  printf(" %s\r\n", currencystring(&cntdata));
 
-  printf("\n"
-         "Make sure that your CONFIG.SYS contains this directive:\n"
-         "COUNTRY=%03d,%03d,%s\n\n", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
+  crlf();
+  nls_puts(NLS_MAKESURE);
+  printf("COUNTRY=%03d,%03d,%s", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
+  crlf();
 
   /* if anything changed, write the new file */
   if (changedflag != 0) country_write(fname, &cntdata);
