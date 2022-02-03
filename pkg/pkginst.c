@@ -1,6 +1,6 @@
 /*
  * This file is part of pkg (SvarDOS)
- * Copyright (C) 2012-2021 Mateusz Viste
+ * Copyright (C) 2012-2022 Mateusz Viste
  */
 
 #include <ctype.h>     /* toupper() */
@@ -15,6 +15,7 @@
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_listfiles()... */
 #include "showinst.h"  /* pkg_loadflist() */
+#include "svarlang.lib\svarlang.h"
 
 #include "pkginst.h"   /* include self for control */
 
@@ -75,7 +76,7 @@ int is_package_installed(const char *pkgname, const char *dosdir) {
 /* checks that pkgname is NOT installed. return 0 on success, non-zero otherwise. */
 static int validate_package_not_installed(const char *pkgname, const char *dosdir) {
   if (is_package_installed(pkgname, dosdir) != 0) {
-    kitten_printf(3, 18, "Package %s is already installed! You might want to use the 'update' action.", pkgname);
+    kitten_printf(3, 18, pkgname); /* "Package %s is already installed! You might want to use the 'update' action." */
     puts("");
     return(-1);
   }
@@ -115,12 +116,12 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
 
   *zipfd = fopen(zipfile, "rb");
   if (*zipfd == NULL) {
-    kitten_puts(3, 8, "ERROR: Invalid zip archive! Package not installed.");
+    puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
     goto RAII;
   }
   ziplinkedlist = zip_listfiles(*zipfd);
   if (ziplinkedlist == NULL) {
-    kitten_puts(3, 8, "ERROR: Invalid zip archive! Package not installed.");
+    puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
     goto RAII;
   }
   /* if updating, load the list of files belonging to the current package */
@@ -157,7 +158,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     }
     /* validate that the file has a valid filename (8+3, no shady chars...) */
     if (validfilename(curzipnode->filename) != 0) {
-      kitten_puts(3, 23, "ERROR: Package contains an invalid filename:");
+      puts(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
@@ -166,20 +167,19 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist);
     strcat(fname, shortfile);
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
-      kitten_puts(3, 9, "ERROR: Package contains a file that already exists locally:");
+      puts(svarlang_str(3, 9)); /* "ERROR: Package contains a file that already exists locally:" */
       printf(" %s\n", fname);
       goto RAII_ERR;
     }
     /* abort if any entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
-      kitten_printf(3, 20, "ERROR: Package contains an encrypted file:");
-      puts("");
+      puts(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
     /* abort if any file is compressed with an unsupported method */
     if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
-      kitten_printf(8, 2, "ERROR: Package contains a file compressed with an unsupported method (%d):", curzipnode->compmethod);
+      kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
       puts("");
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
@@ -190,7 +190,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
   }
   /* if appinfo file not found, this is not a real FreeDOS package */
   if (appinfopresence != 1) {
-    kitten_printf(3, 12, "ERROR: Package do not contain the %s file! Not a valid FreeDOS package.", appinfofile);
+    kitten_printf(3, 12, appinfofile); /* "ERROR: Package do not contain the %s file! Not a valid SvarDOS package." */
     puts("");
     goto RAII_ERR;
   }
@@ -232,7 +232,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   sprintf(buff, "%s\\%s", dosdir, packageslst);
   lstfd = fopen(buff, "wb"); /* opening it in binary mode, because I like to have control over line terminators (CR/LF) */
   if (lstfd == NULL) {
-    kitten_printf(3, 10, "ERROR: Could not create %s!", buff);
+    kitten_printf(3, 10, buff); /* "ERROR: Could not create %s!" */
     puts("");
     return(-2);
   }
@@ -250,7 +250,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     /* Now unzip the file */
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
     if (unzip_result != 0) {
-      kitten_printf(8, 3, "ERROR: failed extracting '%s' to '%s'!", curzipnode->filename, fulldestfilename);
+      kitten_printf(8, 3, curzipnode->filename, fulldestfilename); /* "ERROR: failed extracting '%s' to '%s'!" */
       printf(" [%d]\n", unzip_result);
       filesextractedfailure += 1;
     } else {
@@ -260,7 +260,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   }
   fclose(lstfd);
 
-  kitten_printf(3, 19, "Package %s installed: %ld files extracted, %ld errors.", pkgname, filesextractedsuccess, filesextractedfailure);
+  kitten_printf(3, 19, pkgname, filesextractedsuccess, filesextractedfailure); /* "Package %s installed: %ld files extracted, %ld errors." */
   puts("");
   return(filesextractedfailure);
 }

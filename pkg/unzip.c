@@ -3,7 +3,7 @@
  * returns 0 on success
  *
  * this file is part of pkg (SvarDOS)
- * copyright (C) 2021 Mateusz Viste
+ * copyright (C) 2021-2022 Mateusz Viste
  */
 
 #include <stdio.h>
@@ -12,6 +12,7 @@
 #include "helpers.h"
 #include "kprintf.h"
 #include "libunzip.h"
+#include "svarlang.lib\svarlang.h"
 
 #include "unzip.h"
 
@@ -23,13 +24,13 @@ int unzip(const char *zipfile) {
 
   fd = fopen(zipfile, "rb");
   if (fd == NULL) {
-    kitten_puts(10, 1, "ERROR: Failed to open the archive file");
+    puts(svarlang_str(10, 1)); /* "ERROR: Failed to open the archive file" */
     return(1);
   }
 
   zlist = zip_listfiles(fd);
   if (zlist == NULL) {
-    kitten_puts(10, 2, "ERROR: Invalid ZIP archive");
+    puts(svarlang_str(10, 2)); /* "ERROR: Invalid ZIP archive" */
     fclose(fd);
     return(-1);
   }
@@ -47,7 +48,7 @@ int unzip(const char *zipfile) {
     if (znode->flags == ZIP_FLAG_ISADIR) goto OK;
     /* file already exists? */
     if (fileexists(znode->filename) != 0) {
-      kitten_puts(10, 3, "ERROR: File already exists");
+      puts(svarlang_str(10, 3)); /* "ERROR: File already exists" */
       r = 1;
       continue;
     }
@@ -59,7 +60,7 @@ int unzip(const char *zipfile) {
       continue;
     }
     OK:
-    kitten_puts(10, 0, "OK");
+    puts(svarlang_str(10, 0)); /* "OK" */
   }
 
   zip_freelist(&zlist);

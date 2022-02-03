@@ -5,7 +5,7 @@
 
 CFLAGS = -0 -mc -os -wx -we -d0 -i=zlib
 LDFLAGS = -lr -fe=pkg.exe
-LIBS = zlib\zlib_c.lib
+LIBS = zlib\zlib_c.lib svarlang.lib\svarlngc.lib
 
 all: pkg.exe
 
@@ -13,25 +13,32 @@ release: pkg.exe .symbolic
 	mkdir appinfo
 	mkdir bin
 	mkdir nls
-	copy nls_utf8\pkg_en.txt nls\pkg.en
-	utf8tocp 850 nls_utf8\pkg_de.txt > nls\pkg.de
-	utf8tocp 850 nls_utf8\pkg_fr.txt > nls\pkg.fr
-	utf8tocp 850 nls_utf8\pkg_dk.txt > nls\pkg.dk
-	utf8tocp 852 nls_utf8\pkg_si.txt > nls\pkg.si
-	utf8tocp 857 nls_utf8\pkg_tr.txt > nls\pkg.tr
-	utf8tocp maz nls_utf8\pkg_pl.txt > nls\pkg.pl
+	copy pkg.lng nls
 	upx --8086 -9 pkg.exe -o bin\pkg.exe
 	copy pkg.lsm appinfo
-	zip -9moDkr pkg.zip appinfo bin nls
+	zip -9moDkrX pkg.zip appinfo bin nls
 	rmdir appinfo
 	rmdir bin
 	rmdir nls
 
-pkg.exe: kitten.obj main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj
+pkg.exe: main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj deflang.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
 
-kitten.obj: kitten\kitten.c
-	wcc $(CFLAGS) kitten\kitten.c
+deflang.obj: nls_utf8\pkg_en.txt
+	cd nls_utf8
+	copy pkg_en.txt en.txt
+	utf8tocp 850 pkg_de.txt > de.txt
+	utf8tocp 850 pkg_fr.txt > fr.txt
+	utf8tocp 850 pkg_dk.txt > dk.txt
+	utf8tocp 852 pkg_si.txt > si.txt
+	utf8tocp 857 pkg_tr.txt > tr.txt
+	utf8tocp maz pkg_pl.txt > pl.txt
+	..\svarlang.lib\tlumacz en de fr dk si tr pl
+	move out.lng ..\pkg.lng
+	move deflang.c ..
+	del ??.txt
+	cd ..
+	wcc $(CFLAGS) deflang.c
 
 main.obj: main.c
 	wcc $(CFLAGS) main.c

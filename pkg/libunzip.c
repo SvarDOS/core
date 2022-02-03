@@ -88,7 +88,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
       /* create new entry and link it into the list */
       newentry = calloc(sizeof(struct ziplist) + filenamelen, 1);
       if (newentry == NULL) {
-        kitten_printf(2, 14, "Out of memory! (%s)", "libunzip");
+        kitten_printf(2, 14, "libunzip"); /* "Out of memory! (%s)" */
         puts("");
         zip_freelist(&reslist);
         break;
@@ -149,7 +149,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
       /* no need to read the header we just have to skip it */
       fseek(fd, 12, SEEK_CUR); /* the header is 3x4 bytes (CRC + compressed len + uncompressed len) */
     } else { /* unknown sig */
-      kitten_printf(8, 1, "unknown zip sig: 0x%08lx", entrysig);
+      kitten_printf(8, 1, entrysig); /* "unknown zip sig: 0x%08lx" */
       puts("");
       zip_freelist(&reslist);
       break;

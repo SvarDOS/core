@@ -29,7 +29,7 @@ static int checkfordoubledirlist(const struct customdirs *dirlist) {
   for (; dirlist != NULL; dirlist = dirlist->next) {
     for (curpos = dirlist->next; curpos != NULL; curpos = curpos->next) {
       if (strcasecmp(curpos->name, dirlist->name) == 0) {
-        kitten_printf(7, 0, "ERROR: custom dir '%s' is listed twice!", curpos->name);
+        kitten_printf(7, 0, curpos->name); /* "ERROR: custom dir '%s' is listed twice!" */
         puts("");
         return(-1);
       }
@@ -44,7 +44,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
   for (; dirlist != NULL; dirlist = dirlist->next) {
     /* the location must be at least 3 characters long to be a valid absolute path (like 'c:\')*/
     if (strlen(dirlist->location) < 3) {
-      kitten_printf(7, 15, "ERROR: custom dir '%s' is not a valid absolute path!", dirlist->name);
+      kitten_printf(7, 15, dirlist->name); /* "ERROR: custom dir '%s' is not a valid absolute path!" */
       puts("");
       return(-1);
     }
@@ -52,7 +52,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
     if ((dirlist->location[1] != ':') ||
        ((dirlist->location[2] != '/') && (dirlist->location[2] != '\\')) ||
        (((dirlist->location[0] < 'a') || (dirlist->location[0] > 'z')) && ((dirlist->location[0] < 'A') || (dirlist->location[0] > 'Z')))) {
-      kitten_printf(7, 15, "ERROR: custom dir '%s' is not a valid absolute path!", dirlist->name);
+      kitten_printf(7, 15, dirlist->name); /* "ERROR: custom dir '%s' is not a valid absolute path!" */
       puts("");
       return(-1);
     }
@@ -63,7 +63,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
         (strcasecmp(dirlist->name, "help") == 0) ||
         (strcasecmp(dirlist->name, "nls") == 0) ||
         (strcasecmp(dirlist->name, "packages") == 0)) {
-      kitten_printf(7, 16, "ERROR: custom dir '%s' is a reserved name!", dirlist->name);
+      kitten_printf(7, 16, dirlist->name); /* "ERROR: custom dir '%s' is a reserved name!" */
       puts("");
       return(-1);
     }
@@ -96,7 +96,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
   snprintf(token, sizeof(token), "%s\\cfg\\pkg.cfg", dosdir);
   fd = fopen(token, "r");
   if (fd == NULL) {
-    kitten_printf(7, 1, "ERROR: Could not open config file (%s)!", token);
+    kitten_printf(7, 1, token); /* "ERROR: Could not open config file (%s)!" */
     puts("");
     return(-1);
   }
@@ -111,7 +111,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
     if ((token[0] == '#') || (token[0] == 0)) continue;
 
     if ((value == NULL) || (value[0] == 0)) {
-      kitten_printf(7, 4, "Warning: token with empty value on line #%d", nline);
+      kitten_printf(7, 4, nline); /* "Warning: token with empty value on line #%d" */
       puts("");
       continue;
     }
@@ -123,7 +123,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
       /* find nearer space */
       for (i = 0; (value[i] != ' ') && (value[i] != 0); i++);
       if (value[i] == 0) {
-        kitten_printf(7, 11, "Warning: Invalid 'DIR' directive found at line #%d", nline);
+        kitten_printf(7, 11, nline); /* "Warning: Invalid 'DIR' directive found at line #%d" */
         puts("");
         continue;
       }
@@ -135,14 +135,14 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
       removeDoubleBackslashes(location);
       if (location[strlen(location) - 1] != '\\') strcat(location, "\\"); /* make sure to end dirs with a backslash */
       if (addnewdir(dirlist, value, location) != 0) {
-        kitten_printf(2, 14, "Out of memory! (%s)", "addnewdir");
+        kitten_printf(2, 14, "addnewdir"); /* "Out of memory! (%s)" */
         puts("");
         freeconf(dirlist);
         fclose(fd);
         return(-1);
       }
     } else { /* unknown token */
-      kitten_printf(7, 8, "Warning: Unknown token '%s' at line #%d", token, nline);
+      kitten_printf(7, 8, token, nline); /* "Warning: Unknown token '%s' at line #%d" */
       puts("");
     }
   }

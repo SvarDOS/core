@@ -1,6 +1,6 @@
 /*
  * This file is part of PKG (SvarDOS)
- * Copyright (C) 2013-2021 Mateusz Viste
+ * Copyright (C) 2013-2022 Mateusz Viste
  */
 
 #include <stdio.h>
@@ -14,6 +14,7 @@
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_freelist()... */
 #include "lsm.h"
+#include "svarlang.lib\svarlang.h"
 
 #include "showinst.h"  /* include self for control */
 
@@ -28,7 +29,7 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
   sprintf(buff, "%s\\packages", dosdir);
   dp = opendir(buff);
   if (dp == NULL) {
-    kitten_printf(9, 0, "ERROR: Could not access directory %s", buff);
+    kitten_printf(9, 0, buff); /* "ERROR: Could not access directory %s" */
     puts("");
     return(-1);
   }
@@ -52,7 +53,7 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
     puts("");
     matchfound = 1;
   }
-  if (matchfound == 0) kitten_puts(5, 0, "No package matched the search.");
+  if (matchfound == 0) puts(svarlang_str(5, 0)); /* "No package matched the search." */
 
   closedir(dp);
   return(0);
@@ -78,7 +79,7 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
   sprintf(buff, "%s\\packages\\%s.lst", dosdir, pkgname);
   fd = fopen(buff, "rb");
   if (fd == NULL) {
-    kitten_printf(9, 1, "ERROR: Local package '%s' not found.", pkgname);
+    kitten_printf(9, 1, pkgname); /* "ERROR: Local package '%s' not found." */
     puts("");
     return(NULL);
   }
@@ -90,7 +91,7 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
     /* add the new node to the result */
     newnode = malloc(sizeof(struct flist_t) + strlen(buff));
     if (newnode == NULL) {
-      kitten_printf(2, 14, "Out of memory! (%s)", "malloc failure");
+      kitten_printf(2, 14, "malloc failure"); /* "Out of memory! (%s)" */
       continue;
     }
     newnode->next = res;

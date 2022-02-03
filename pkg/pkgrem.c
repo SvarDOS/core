@@ -1,6 +1,6 @@
 /*
  * This file is part of the pkg (SvarDOS) project.
- * Copyright (C) Mateusz Viste 2012-2021
+ * Copyright (C) Mateusz Viste 2012-2022
  */
 
 #include <ctype.h>    /* toupper() */
@@ -32,7 +32,7 @@ static struct dirliststruct *rememberdir(struct dirliststruct *dirlist, const ch
   /* not in the list yet - add it */
   res = malloc(sizeof(struct dirliststruct) + strlen(path));
   if (res == NULL) {  /* out of memory */
-    kitten_printf(4, 3, "Out of memory! Could not store directory %s!", path);
+    kitten_printf(4, 3, path); /* "Out of memory! Could not store directory %s!" */
     puts("");
     return(NULL);
   }
@@ -74,7 +74,7 @@ int pkgrem(const char *pkgname, const char *dosdir) {
   sprintf(fpath, "%s\\packages\\%s.lst", dosdir, pkgname);
   flist = fopen(fpath, "rb");
   if (flist == NULL) {
-    kitten_printf(4, 0, "Package %s is not installed, so not removed.", pkgname);
+    kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
     puts("");
     return(-1);
   }
@@ -103,7 +103,7 @@ int pkgrem(const char *pkgname, const char *dosdir) {
     if (strcasecmp(buff, fpath) == 0) continue;
 
     /* remove it */
-    kitten_printf(4, 4, "removing %s", buff);
+    kitten_printf(4, 4, buff); /* "removing %s" */
     puts("");
     unlink(buff);
   }
@@ -136,7 +136,7 @@ int pkgrem(const char *pkgname, const char *dosdir) {
 
   /* remove the lst file */
   unlink(fpath);
-  kitten_printf(4, 5, "Package %s has been removed.", pkgname);
+  kitten_printf(4, 5, pkgname); /* "Package %s has been removed." */
   puts("");
   return(0);
 }

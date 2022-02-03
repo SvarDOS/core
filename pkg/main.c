@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2021 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2022 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,7 @@
 #include <stdlib.h>   /* malloc() and friends */
 #include <string.h>   /* strcasecmp() */
 
-#include "kitten/kitten.h"
+#include "svarlang.lib/svarlang.h"
 #include "kprintf.h"
 #include "libunzip.h"
 #include "pkginst.h"
@@ -53,17 +53,17 @@ enum ACTIONTYPES {
 static int showhelp(void) {
   puts("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
   puts("");
-  kitten_puts(1, 0, "PKG is the package installer for SvarDOS.");
+  puts(svarlang_str(1, 0)); /* "PKG is the package installer for SvarDOS." */
   puts("");
-  kitten_puts(1, 20, "Usage: pkg install package.zip");
-  kitten_puts(1, 21, "       pkg update package.zip");
-  kitten_puts(1, 22, "       pkg remove package");
-  kitten_puts(1, 23, "       pkg listfiles package");
-  kitten_puts(1, 24, "       pkg listlocal [filter]");
-  kitten_puts(1, 27, "       pkg unzip file.zip");
+  puts(svarlang_str(1, 20)); /* "Usage: pkg install package.zip */
+  puts(svarlang_str(1, 21)); /* "       pkg update package.zip" */
+  puts(svarlang_str(1, 22)); /* "       pkg remove package" */
+  puts(svarlang_str(1, 23)); /* "       pkg listfiles package" */
+  puts(svarlang_str(1, 24)); /* "       pkg listlocal [filter]" */
+  puts(svarlang_str(1, 27)); /* "       pkg unzip file.zip" */
   puts("");
-  kitten_puts(1, 25, "PKG is published under the MIT license.");
-  kitten_puts(1, 26, "It is configured through %DOSDIR%\\CFG\\PKG.CFG");
+  puts(svarlang_str(1, 25)); /* "PKG is published under the MIT license." */
+  puts(svarlang_str(1, 26)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
   return(1);
 }
 
@@ -108,7 +108,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
   if (lastdot <= lastpathdelim) lastdot = t; /* a dot before last path delimiters is not an extension prefix */
   t = lastdot - (lastpathdelim + 1);
   if (t + 1 > sizeof(pkgname)) {
-    kitten_puts(3, 24, "ERROR: package name too long");
+    puts(svarlang_str(3, 24)); /* "ERROR: package name too long" */
     return(1);
   }
   memcpy(pkgname, file + lastpathdelim + 1, t);
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
   const char *dosdir;
   struct customdirs *dirlist;
 
-  kittenopen("pkg"); /* NLS init */
+  svarlang_autoload("pkg"); /* NLS init */
 
   action = parsearg(argc, argv);
   if (action == ACTION_HELP) {
@@ -142,8 +142,8 @@ int main(int argc, char **argv) {
   /* read the DOSDIR environment variable */
   dosdir = getenv("DOSDIR");
   if (dosdir == NULL) {
-    kitten_puts(2, 2, "%DOSDIR% not set! You should make it point to the FreeDOS main directory.");
-    kitten_puts(2, 3, "Example: SET DOSDIR=C:\\FDOS");
+    puts(svarlang_str(2, 2)); /* "%DOSDIR% not set! You should make it point to the FreeDOS main directory." */
+    puts(svarlang_str(2, 3)); /* "Example: SET DOSDIR=C:\FDOS" */
     goto GAMEOVER;
   }
 
@@ -173,7 +173,6 @@ int main(int argc, char **argv) {
   }
 
   GAMEOVER:
-  kittenclose(); /* NLS de-init */
   if (res != 0) return(1);
   return(0);
 }
