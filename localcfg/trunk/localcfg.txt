@@ -1,5 +1,5 @@
 
-localcfg - locales editor for DOS
+localcfg - SvarDOS locales editor
 
 
 *** About ***
