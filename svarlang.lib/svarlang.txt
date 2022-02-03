@@ -1,14 +1,71 @@
-tlumacz is a "compiler" that builds the SvarCOM multi-lang ressource file out
-of a collection of CATS/Kitten text files.
 
- usage: tlumacz en fr pl ...
+              SVARLANG.LIB - THE SVARDOS TRANSLATION C LIBRARY
 
-tlumacz generates a SVARCOM.LNG file that contains all language ressources.
-This file must be then placed in the %NLSPATH% directory so SvarCOM can find it.
-SvarCOM's language is controlled by the LANG variable (eg. "SET LANG=PL").
 
-the first language acts as a reference, its strings will be used to fill any
-missing translations in other files.
+SvarLANG is a library and tooling for enabling SvarDOS applications to easily
+support multiple languages.
 
-a DEFAULT.LNG file is also generated, it contains only translation strings for
-the reference language. This file is only useful for building SvarCOM.
+
+### PREPARING TRANSLATION FILES ###
+
+The translation files must be CATS-style text files in the usual format:
+
+1.1:Hello, World!
+1.2:Help screen
+2.0:Type /? for more options
+
+The files must be named as EN.TXT, DE.TXT, FR.TXT, etc. Then, they must be
+"compiled" into SvarLANG's binary format using the TLUMACZ tool:
+
+tlumacz en fr pl (...)
+
+The first language provided in the command line is the reference language and
+is used both as the default (embedded in the application) language, as well as
+to substitute messages missing in other languages.
+
+TLUMACZ computes two files:
+
+ * OUT.LNG   - the binary file that contains all translations
+ * DEFLANG.C - the default translations that will be embedded into the program
+
+Then, DEFLANG.C must be compiled and linked to your program along with
+SVARLNGx.LIB. From there, you will be able to use the following calls:
+
+/* loads translations for program PROGNAME, language LANG, in the path NLSPATH.
+ * returns 0 on success. */
+int svarlang_load(const char *progname, const char *lang, const char *nlspath);
+
+/* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH. */
+int svarlang_autoload(const char *progname);
+
+/* Returns a pointer to the string "id". Does not require svalang_load() to be
+ * executed, but then it will only return the reference language strings.
+ * a string id is the concatenation of the CATS-style identifiers, for example
+ * string 1,0 becomes 0x0100, string 2.10 is 0x020A, etc. */
+const char *svarlang_strid(unsigned short id);
+
+/* a convenience definition to fetch strings by their CATS-style pairs instead
+ * of the 16-bit id. */
+#define svarlang_str(x, y) svarlang_strid((x << 8) | y)
+
+
+### ENVIRONMENT ###
+
+All translations files should be placed in the %NLSPATH% directory and should
+be named the same as the program's name, with the LNG extension (for example
+"INSTALL.LNG" if the program is named "INSTALL").
+
+The %LANG% environment variable defines what language should be loaded.
+
+
+### WHY IS IT BETTER THAN CATS? ###
+
+The CATS library is heavier and slower, as it embeds a text-file parser.
+Translations also take more disk space since each file is in a separate file
+leading to cluster waste. Finally, CATS requires default strings to be part of
+the application's source code, while SvarLANG keeps all strings in TXT files
+and embedds the default one inside the application in an automated way at
+compile time.
+
+
+======================================================================= EOF ===

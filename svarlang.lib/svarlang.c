@@ -26,9 +26,12 @@
 #include <stdlib.h>  /* NULL */
 #include <string.h>  /* memcmp(), strcpy() */
 
-#include "deflang.c"
-
 #include "svarlang.h"
+
+
+/* supplied through DEFLANG.C */
+extern char svarlang_mem[];
+extern const unsigned short svarlang_memsz;
 
 
 const char *svarlang_strid(unsigned short id) {
@@ -86,7 +89,7 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
     }
 
     /* found - but do I have enough memory space? */
-    if (buff16[1] >= sizeof(svarlang_mem)) {
+    if (buff16[1] >= svarlang_memsz) {
       fclose(fd);
       return(-4);
     }

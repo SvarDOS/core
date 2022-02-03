@@ -22,24 +22,17 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef SVARLANG_H
-#define SVARLANG_H
+#include <stdlib.h>
 
-/* loads translations for program PROGNAME, language LANG, in the path NLSPATH.
- * returns 0 on success. */
-int svarlang_load(const char *progname, const char *lang, const char *nlspath);
+#include "svarlang.h"
 
-/* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH. */
-int svarlang_autoload(const char *progname);
-
-/* Returns a pointer to the string "id". Does not require svalang_load() to be
- * executed, but then it will only return the reference language strings.
- * a string id is the concatenation of the CATS-style identifiers, for example
- * string 1,0 becomes 0x0100, string 2.10 is 0x020A, etc. */
-const char *svarlang_strid(unsigned short id);
-
-/* a convenience definition to fetch strings by their CATS-style pairs instead
- * of the 16-bit id. */
-#define svarlang_str(x, y) svarlang_strid((x << 8) | y)
-
-#endif
+int svarlang_autoload(const char *progname) {
+  const char *s;
+  char langid[3];
+  s = getenv("LANG");
+  if ((s == NULL) || (*s == 0)) return(-1);
+  langid[0] = s[0];
+  langid[1] = s[1];
+  langid[2] = 0;
+  return(svarlang_load(progname, langid, getenv("NLSPATH")));
+}

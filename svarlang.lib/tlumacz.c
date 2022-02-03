@@ -181,7 +181,7 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
 }
 
 
-#define MEMBLOCKSZ 65500
+#define MEMBLOCKSZ 65000
 
 int main(int argc, char **argv) {
   FILE *fd;
@@ -255,7 +255,8 @@ int main(int argc, char **argv) {
         break;
       }
       fprintf(fd2, "/* THIS FILE HAS BEEN AUTOGENERATE BY TLUMACZ (PART OF THE SVARLANG LIBRARY) */\r\n");
-      fprintf(fd2, "static char svarlang_mem[%u] = {\r\n", sz * 2);
+      fprintf(fd2, "const unsigned short svarlang_memsz = %uu;\r\n", sz * 2);
+      fprintf(fd2, "char svarlang_mem[%u] = {\r\n", sz * 2);
       for (x = 0; x < sz; x++) {
         fprintf(fd2, "%u", buff[x]);
         if (x + 1 < sz) fprintf(fd2, ",");
