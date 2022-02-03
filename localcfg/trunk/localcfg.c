@@ -151,8 +151,7 @@ static void about(void) {
 }
 
 
-static char *datestring(struct country *c) {
-  static char result[16];
+static char *datestring(char *result, struct country *c) {
   switch (c->CTYINFO.datefmt) {
     case COUNTRY_DATE_MDY:
       sprintf(result, "12%c31%c1990", c->CTYINFO.datesep[0], c->CTYINFO.datesep[0]);
@@ -169,8 +168,7 @@ static char *datestring(struct country *c) {
 }
 
 
-static char *timestring(struct country *c) {
-  static char result[16];
+static char *timestring(char *result, struct country *c) {
   if (c->CTYINFO.timefmt == COUNTRY_TIME12) {
     sprintf(result, "11%c59%c59 PM", c->CTYINFO.timesep[0], c->CTYINFO.timesep[0]);
   } else {
@@ -180,8 +178,7 @@ static char *timestring(struct country *c) {
 }
 
 
-static char *currencystring(struct country *c) {
-  static char result[16];
+static char *currencystring(char *result, struct country *c) {
   char decimalpart[16];
   char space[2] = {0, 0};
   char decsym[8];
@@ -387,8 +384,8 @@ int main(int argc, char **argv) {
   struct country cntdata;
   int changedflag;
   int x;
-  char fname[130];
-  char buff[128];
+  static char fname[130];
+  static char buff[64];
 
   svarlang_autoload("localcfg");
 
@@ -444,22 +441,23 @@ int main(int argc, char **argv) {
   sprintf(buff, " %c", cntdata.CTYINFO.thousands[0]);
   outputnl(buff);
   nls_put(NLS_INFO_DATEFMT);
-  sprintf(buff, " %s", datestring(&cntdata));
-  outputnl(buff);
+  output(" ");
+  outputnl(datestring(buff, &cntdata));
   nls_put(NLS_INFO_TIMEFMT);
-  sprintf(buff, " %s", timestring(&cntdata));
-  outputnl(buff);
+  output(" ");
+  outputnl(timestring(buff, &cntdata));
   nls_put(NLS_INFO_YESNO);
   sprintf(buff, " %c/%c", cntdata.YESNO.yes[0], cntdata.YESNO.no[0]);
   outputnl(buff);
   nls_put(NLS_INFO_CURREXAMPLE);
-  sprintf(" %s", currencystring(&cntdata));
-  outputnl(buff);
+  output(" ");
+  outputnl(currencystring(buff, &cntdata));
 
   crlf();
   nls_puts(NLS_MAKESURE);
-  sprintf(buff, "COUNTRY=%03d,%03d,%s", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage, fname);
-  outputnl(buff);
+  sprintf(buff, "COUNTRY=%03d,%03d,", cntdata.CTYINFO.id, cntdata.CTYINFO.codepage);
+  output(buff);
+  outputnl(fname);
 
   /* if anything changed, write the new file */
   if (changedflag != 0) country_write(fname, &cntdata);
