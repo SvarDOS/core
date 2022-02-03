@@ -35,3 +35,4 @@ tlumacz.exe: tlumacz.c
 clean: .symbolic
 	del *.exe
 	del *.obj
+	del *.lib
