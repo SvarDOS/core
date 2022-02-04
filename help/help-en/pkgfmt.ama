@@ -86,7 +86,7 @@ packaged software, but it may happen that a package needs to be changed to
 fix a strictly packaging-related issue (for example a forgotten documentation
 file or a recompilation of the binary using a better set of flags...). In such
 case, the version of the software does not change, but the version of the
-package itself needs to change so users know something changed. That's what
+package itself needs to change so users know something changed. That's where
 "SvarDOS revisions" come in. A version string is basically following such
 format:
 
@@ -94,7 +94,7 @@ format:
 
 UPSTREAM_VER is the exact version string advertised by the software. It may
 be pretty much anything. This upstream version may be optionally followed by a
-plus sign and the SvarDOS revision. In the even that the upstream version
+plus sign and the SvarDOS revision. In the event that the upstream version
 already contains a plus sign, then SvarDOS revision is delimited with a tilde.
 
 The SvarDOS revision starts at 0 and increments each time that the given
