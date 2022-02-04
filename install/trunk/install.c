@@ -630,7 +630,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
     snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
   }
   fprintf(fd, "SHELLHIGH=C:\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", buff);
-  fprintf(fd, "REM COUNTRY=001,437,C:\\SVARDOS\\CONF\\COUNTRY.SYS\r\n");
+  fprintf(fd, "REM COUNTRY=001,%u,C:\\SVARDOS\\CFG\\COUNTRY.SYS\r\n", locales->codepage);
   fprintf(fd, "REM DEVICE=C:\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n");
   fclose(fd);
   /*** AUTOEXEC.BAT ***/
