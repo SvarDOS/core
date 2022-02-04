@@ -28,7 +28,9 @@ instructions to the user about how the program is meant to be used.
 The program must be free - that is, available at no financial cost. It doesn't
 have to comply to an OSI-approved license or be open-source (even if that
 would be preferred), but at the very least it must be free for personal,
-non-commercial use.
+non-commercial use. This includes "Freeware", "postcardware", etc. "Shareware"
+is acceptable, too, as long as the shareware version of the program fullfills
+the conditions of usefulness, quality and allows repackaged distribution.
 
 %hDistribution allowed
 
@@ -38,9 +40,9 @@ being redistributed in a re-packaged form.
 
 %!CORE EXCEPTIONS
 
-Please note that, while the above rules are valid for all third-party packages
-that may be distributed with SvarDOS, it does not apply to the 'core' packages
-that contain the operating system itself. SvarDOS being a free (as in "libre")
-operating system, all "core" packages must comply to a libre-like license - be
-it GPL, BSD, MIT, public domain, or anything that allows for unrestricted
-distribution, provides source code and allows to modify it freely.
+While the above rules are valid for all third-party packages that may be
+distributed with SvarDOS, it does NOT apply to the "CORE" packages that contain
+the operating system itself. SvarDOS being a free (as in "libre") operating
+system, all CORE packages must comply to a libre-like license - be it GPL, BSD,
+MIT, public domain, or anything that allows for unrestricted distribution,
+provides source code and allows to modify it freely.
