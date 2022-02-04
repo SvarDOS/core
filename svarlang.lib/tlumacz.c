@@ -16,9 +16,9 @@
  *
  * Inside a LANG BLOCK is a set of strings:
  *
- * II L S  where II is the string's 16-bit identifier, L is its length (1-255)
- *         and S is the actual string. All strings are ASCIIZ-formatted (ie.
- *         end with a NULL terminator).
+ * II LL S  where II is the string's 16-bit identifier, LL is its length
+ *          (1-65535) and S is the actual string. All strings are ASCIIZ (ie.
+ *          they end with a NULL terminator).
  *
  * The list of strings ends with a single 0-long string.
  */
@@ -35,15 +35,15 @@ struct bitmap {
 };
 
 static void bitmap_set(struct bitmap *b, unsigned short id) {
-  b->bits[id / 8] |= 1 << (id & 7);
+  b->bits[id >> 3] |= 1 << (id & 7);
 }
 
 static int bitmap_get(const struct bitmap *b, unsigned short id) {
-  return(b->bits[id / 8] & (1 << (id & 7)));
+  return(b->bits[id >> 3] & (1 << (id & 7)));
 }
 
 static void bitmap_init(struct bitmap *b) {
-  memset(b, 0, sizeof(struct bitmap));
+  bzero(b, sizeof(struct bitmap));
 }
 
 
@@ -105,7 +105,7 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
   unsigned short len = 0, linelen;
   FILE *fd;
   char fname[] = "XX.TXT";
-  char linebuf[512];
+  static char linebuf[8192];
   char *ptr;
   unsigned short id, linecount;
 
@@ -128,17 +128,22 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
     /* read id and get ptr to actual string ("1.15:string") */
     ptr = parseline(&id, linebuf);
     if (ptr == NULL) {
-      printf("ERROR: line #%u of %s is malformed\r\n", linecount, fname);
+      printf("ERROR: line #%u of %s is malformed (linelen = %u):\r\n", linecount, fname, linelen);
+      puts(linebuf);
       len = 0;
       break;
     }
 
-    /* write string into block (II L S) */
+    /* write string into block (II LL S) */
     memcpy(buff + len, &id, 2);
     len += 2;
-    buff[len++] = strlen(ptr) + 1;
-    memcpy(buff + len, ptr, strlen(ptr) + 1);
-    len += strlen(ptr) + 1;
+    {
+      unsigned short slen = strlen(ptr) + 1;
+      memcpy(buff + len, &slen, 2);
+      len += 2;
+      memcpy(buff + len, ptr, slen);
+      len += slen;
+    }
 
     /* if reference bitmap provided: check that the id is valid */
     if ((refb != NULL) && (bitmap_get(refb, id) == 0)) {
@@ -159,15 +164,17 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
   /* if refblock provided, pull missing strings from it */
   if (refblock != NULL) {
     for (;;) {
-      id = *((unsigned short *)refblock);
-      if ((id == 0) && (refblock[2] == 0)) break;
+      unsigned short slen;
+      id = ((unsigned short *)refblock)[0];
+      slen = ((unsigned short *)refblock)[1];
+      if ((id == 0) && (slen == 0)) break;
       if (bitmap_get(b, id) == 0) {
         printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
         /* copy missing string from refblock */
-        memcpy(buff + len, refblock, refblock[2] + 3);
-        len += refblock[2] + 3;
+        memcpy(buff + len, refblock, slen + 4);
+        len += slen + 4;
       }
-      refblock += refblock[2] + 3;
+      refblock += slen + 4;
     }
   }
 
@@ -175,6 +182,8 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
   buff[len++] = 0; /* id */
   buff[len++] = 0; /* id */
   buff[len++] = 0; /* len */
+  buff[len++] = 0; /* len */
+  buff[len++] = 0; /* empty string */
 
   return(len);
 }

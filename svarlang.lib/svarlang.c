@@ -38,12 +38,9 @@ const char *svarlang_strid(unsigned short id) {
   const char *ptr = svarlang_mem;
   /* find the string id in langblock memory */
   for (;;) {
-    if (((unsigned short *)ptr)[0] == id) {
-      ptr += 3;
-      return(ptr);
-    }
-    if (ptr[2] == 0) return(NULL);
-    ptr += ptr[2] + 3;
+    if (((unsigned short *)ptr)[0] == id) return(ptr + 4);
+    if (((unsigned short *)ptr)[1] == 0) return(ptr + 2); /* end of strings - return an empty string */
+    ptr += ((unsigned short *)ptr)[1] + 4;
   }
 }
 

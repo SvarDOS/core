@@ -35,7 +35,8 @@ int svarlang_autoload(const char *progname);
 /* Returns a pointer to the string "id". Does not require svalang_load() to be
  * executed, but then it will only return the reference language strings.
  * a string id is the concatenation of the CATS-style identifiers, for example
- * string 1,0 becomes 0x0100, string 2.10 is 0x020A, etc. */
+ * string 1,0 becomes 0x0100, string 2.10 is 0x020A, etc.
+ * It NEVER returns NULL, if id not found then an empty string is returned */
 const char *svarlang_strid(unsigned short id);
 
 /* a convenience definition to fetch strings by their CATS-style pairs instead
