@@ -1,10 +1,9 @@
 /*
  * SVARDOS INSTALL PROGRAM
- * Copyright (C) 2021 Mateusz Viste
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2021 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2022 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,7 +33,7 @@
 #include <string.h>  /* memcpy() */
 #include <unistd.h>
 
-#include "kitten\kitten.h"
+#include "svarlang.lib\svarlang.h"
 
 #include "input.h"
 #include "video.h"
@@ -65,7 +64,7 @@ static int mono = 0;
 
 struct slocales {
   char lang[4];
-  char *keybcode;
+  const char *keybcode;
   unsigned int codepage;
   int egafile;
   int keybfile;
@@ -85,7 +84,7 @@ static void reboot(void) {
 
 
 /* outputs a string to screen with taking care of word wrapping. returns amount of lines. */
-static int putstringwrap(int y, int x, unsigned short attr, char *s) {
+static int putstringwrap(int y, int x, unsigned short attr, const char *s) {
   int linew, lincount;
   linew = 80;
   if (x >= 0) linew -= (x << 1);
@@ -114,8 +113,9 @@ static int putstringwrap(int y, int x, unsigned short attr, char *s) {
 
 /* an NLS wrapper around video_putstring(), also performs line wrapping when
  * needed. returns the amount of lines that were output */
-static int putstringnls(int y, int x, unsigned short attr, int nlsmaj, int nlsmin, char *s) {
-  s = kittengets(nlsmaj, nlsmin, s);
+static int putstringnls(int y, int x, unsigned short attr, int nlsmaj, int nlsmin) {
+  const char *s = svarlang_str(nlsmaj, nlsmin);
+  if (s == NULL) s = "";
   return(putstringwrap(y, x, attr, s));
 }
 
@@ -151,7 +151,7 @@ static int fcopy(const char *f2, const char *f1, void *buff, size_t buffsz) {
 }
 
 
-static int menuselect(int ypos, int xpos, int height, char **list, int listlen) {
+static int menuselect(int ypos, int xpos, int height, const char **list, int listlen) {
   int i, offset = 0, res = 0, count, width = 0;
   /* count how many positions there is, and check their width */
   for (count = 0; (list[count] != NULL) && (count != listlen); count++) {
@@ -218,23 +218,23 @@ static int menuselect(int ypos, int xpos, int height, char **list, int listlen) 
 }
 
 static void newscreen(int statusbartype) {
-  char *msg;
-  msg = kittengets(0, 0, "SVARDOS INSTALLATION");
+  const char *msg;
+  msg = svarlang_strid(0x00); /* "SVARDOS INSTALLATION" */
   video_putcharmulti(0, 0, COLOR_TITLEBAR[mono], ' ', 80, 1);
   video_putstring(0, 40 - (strlen(msg) >> 1), COLOR_TITLEBAR[mono], msg, -1);
   video_clear(COLOR_BODY[mono], 80, -80);
   switch (statusbartype) {
     case 1:
-      msg = kittengets(0, 11, "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS");
+      msg = svarlang_strid(0x000B); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS" */
       break;
     case 2:
-      msg = kittengets(0, 5, "Press any key...");
+      msg = svarlang_strid(0x0005); /* "Press any key..." */
       break;
     case 3:
       msg = "";
       break;
     default:
-      msg = kittengets(0, 10, "Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen");
+      msg = svarlang_strid(0x000A); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen" */
       break;
   }
   video_putchar(24, 0, COLOR_TITLEBAR[mono], ' ');
@@ -244,7 +244,7 @@ static void newscreen(int statusbartype) {
 
 /* fills a slocales struct accordingly to the value of its keyboff member */
 static void kblay2slocal(struct slocales *locales) {
-  char *m;
+  const char *m;
   for (m = kblayouts[locales->keyboff]; *m != 0; m++); /* skip layout name */
   m++;
   /* skip keyb code and copy it to locales.keybcode */
@@ -259,8 +259,8 @@ static void kblay2slocal(struct slocales *locales) {
 
 static int selectlang(struct slocales *locales) {
   int choice, x;
-  char *msg;
-  char *langlist[] = {
+  const char *msg;
+  const char *langlist[] = {
     "English",
     "French",
     "German",
@@ -274,11 +274,11 @@ static int selectlang(struct slocales *locales) {
   };
 
   newscreen(1);
-  msg = kittengets(1, 0, "Welcome to SvarDOS");
+  msg = svarlang_strid(0x0100); /* "Welcome to SvarDOS" */
   x = 40 - (strlen(msg) >> 1);
   video_putstring(4, x, COLOR_BODY[mono], msg, -1);
   video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
-  putstringnls(8, -1, COLOR_BODY[mono], 1, 1, "Please select your language from the list below:");
+  putstringnls(8, -1, COLOR_BODY[mono], 1, 1); /* "Please select your language from the list below:" */
   choice = menuselect(11, -1, 11, langlist, -1);
   if (choice < 0) return(MENUPREV);
   /* populate locales with default values */
@@ -341,7 +341,7 @@ static int selectkeyb(struct slocales *locales) {
   int menuheight, choice;
   if (locales->keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
   newscreen(0);
-  putstringnls(5, 1, COLOR_BODY[mono], 1, 5, "SvarDOS supports different keyboard layouts. Choose the keyboard layout that you want.");
+  putstringnls(5, 1, COLOR_BODY[mono], 1, 5); /* "SvarDOS supports different keyboard layouts */
   menuheight = locales->keyblen + 2;
   if (menuheight > 13) menuheight = 13;
   choice = menuselect(10, -1, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
@@ -356,11 +356,12 @@ static int selectkeyb(struct slocales *locales) {
 /* returns 0 if installation must proceed, non-zero otherwise */
 static int welcomescreen(void) {
   int c;
-  char *choice[] = {"Install SvarDOS to disk", "Quit to DOS", NULL};
-  choice[0] = kittengets(0, 1, choice[0]);
-  choice[1] = kittengets(0, 2, choice[1]);
+  const char *choice[3];
+  choice[0] = svarlang_strid(0x0001);
+  choice[1] = svarlang_strid(0x0002);
+  choice[2] = NULL;
   newscreen(0);
-  putstringnls(4, 1, COLOR_BODY[mono], 2, 0, "You are about to install SvarDOS: a free, MSDOS-compatible operating system based on the FreeDOS kernel. SvarDOS targets 386+ computers and comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once SvarDOS is installed.");
+  putstringnls(4, 1, COLOR_BODY[mono], 2, 0); /* "You are about to install SvarDOS */
   c = menuselect(13, -1, 4, choice, -1);
   if (c < 0) return(MENUPREV);
   if (c == 0) return(MENUNEXT);
@@ -463,12 +464,13 @@ static int preparedrive(char sourcedrv) {
   for (;;) {
     driveremovable = isdriveremovable(selecteddrive);
     if (driveremovable < 0) {
-      char *list[] = { "Create a partition automatically", "Run the FDISK partitioning tool", "Quit to DOS", NULL};
+      const char *list[4];
       newscreen(0);
-      list[0] = kittengets(0, 3, list[0]);
-      list[1] = kittengets(0, 4, list[1]);
-      list[2] = kittengets(0, 2, list[2]);
-      snprintf(buff, sizeof(buff), kittengets(3, 0, "ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one partition on your hard disk, so SvarDOS can be installed on it. Note, that SvarDOS requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice."), cselecteddrive, SVARDOS_DISK_REQ);
+      list[0] = svarlang_str(0, 3); /* Create a partition automatically */
+      list[1] = svarlang_str(0, 4); /* Run the FDISK tool */
+      list[2] = svarlang_str(0, 2); /* Quit to DOS */
+      list[3] = NULL;
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0300), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: could not be found. Note, that SvarDOS requires at least %d MiB of available disk space */
       switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY[mono], buff), -1, 5, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /AUTO %d", driveid);
@@ -490,16 +492,16 @@ static int preparedrive(char sourcedrv) {
       sprintf(buff, "FDISK /AMBR %d", driveid);
       system(buff); /* writes BOOT.MBR into actual MBR */
       newscreen(2);
-      putstringnls(10, 10, COLOR_BODY[mono], 3, 1, "Your computer will reboot now.");
-      putstringnls(12, 10, COLOR_BODY[mono], 0, 5, "Press any key...");
+      putstringnls(10, 10, COLOR_BODY[mono], 3, 1); /* "Your computer will reboot now." */
+      putstringnls(12, 10, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
       input_getkey();
       reboot();
       return(MENUQUIT);
     } else if (driveremovable > 0) {
       newscreen(2);
-      snprintf(buff, sizeof(buff), kittengets(3, 2, "ERROR: Drive %c: is a removable device. Installation aborted."), cselecteddrive);
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0302), cselecteddrive); /* "ERROR: Drive %c: is a removable device */
       video_putstring(9, 1, COLOR_BODY[mono], buff, -1);
-      putstringnls(11, 2, COLOR_BODY[mono], 0, 5, "Press any key...");
+      putstringnls(11, 2, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
       return(MENUQUIT);
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
@@ -507,14 +509,14 @@ static int preparedrive(char sourcedrv) {
     if (mkdir(buff) == 0) {
       rmdir(buff);
     } else {
-      char *list[3];
+      const char *list[3];
       newscreen(0);
-      snprintf(buff, sizeof(buff), kittengets(3, 3, "ERROR: Drive %c: seems to be unformated. Do you wish to format it?"), cselecteddrive);
+      snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
       video_putstring(7, 1, COLOR_BODY[mono], buff, -1);
 
-      snprintf(buff, sizeof(buff), kittengets(0, 7, "Format drive %c:"), cselecteddrive);
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
       list[0] = buff;
-      list[1] = kittengets(0, 2, "Quit to DOS");
+      list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
       list[2] = NULL;
 
       choice = menuselect(12, -1, 4, list, -1);
@@ -531,23 +533,23 @@ static int preparedrive(char sourcedrv) {
     if (ds < SVARDOS_DISK_REQ) {
       int y = 9;
       newscreen(2);
-      snprintf(buff, sizeof(buff), kittengets(3, 4, "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB."), cselecteddrive, SVARDOS_DISK_REQ);
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
-      putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
+      putstringnls(++y, 1, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
       input_getkey();
       return(MENUQUIT);
     }
     /* is the disk empty? */
     newscreen(0);
     if (diskempty(selecteddrive) != 0) {
-      char *list[3];
+      const char *list[3];
       int y = 6;
-      snprintf(buff, sizeof(buff), kittengets(3, 5, "ERROR: Drive %c: is not empty. SvarDOS must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk."), cselecteddrive);
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0305), cselecteddrive); /* "ERROR: Drive %c: not empty" */
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
 
-      snprintf(buff, sizeof(buff), kittengets(0, 7, "Format drive %c:"), cselecteddrive);
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
       list[0] = buff;
-      list[1] = kittengets(0, 2, "Quit to DOS");
+      list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
       list[2] = NULL;
 
       choice = menuselect(++y, -1, 4, list, -1);
@@ -560,10 +562,11 @@ static int preparedrive(char sourcedrv) {
       continue;
     } else {
       /* final confirmation */
-      char *list[] = { "Install SvarDOS", "Quit to DOS", NULL};
-      list[0] = kittengets(0, 1, list[0]);
-      list[1] = kittengets(0, 2, list[1]);
-      snprintf(buff, sizeof(buff), kittengets(3, 6, "The installation of SvarDOS to %c: is about to begin."), cselecteddrive);
+      const char *list[3];
+      list[0] = svarlang_strid(0x0001); /* Install SvarDOS */
+      list[1] = svarlang_strid(0x0002); /* Quit to DOS */
+      list[2] = NULL;
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
       video_putstring(7, -1, COLOR_BODY[mono], buff, -1);
       choice = menuselect(10, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
@@ -655,7 +658,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "REM CTMOUSE\r\n");
   fprintf(fd, "\r\n");
   fprintf(fd, "ECHO.\r\n");
-  fprintf(fd, "ECHO %s\r\n", kittengets(6, 0, "Welcome to SvarDOS! Type 'HELP' if you need help."));
+  fprintf(fd, "ECHO %s\r\n", svarlang_strid(0x0600)); /* "Welcome to SvarDOS!" */
   fclose(fd);
   /*** CREATE DIRECTORY FOR CONFIGURATION FILES ***/
   snprintf(buff, sizeof(buff), "%c:\\SVARDOS", targetdrv);
@@ -749,13 +752,13 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     while (*pkgptr == 0) pkgptr++;
     if (*pkgptr == 0xff) break;
     /* install the package */
-    snprintf(buff, sizeof(buff), kittengets(4, 0, "Installing package %d/%d: %s"), i+1, pkglistlen, pkgptr);
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Installing package %d/%d: %s" */
     strcat(buff, "       ");
     video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
     /* wait for new diskette if package not found */
     snprintf(buff, sizeof(buff), "%c:\\%s.zip", srcdrv, pkgptr);
     while (fileexists(buff) != 0) {
-      putstringnls(12, 1, COLOR_BODY[mono], 4, 1, "*** INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY ***");
+      putstringnls(12, 1, COLOR_BODY[mono], 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
       input_getkey();
       video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
     }
@@ -785,7 +788,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
               "ECHO %s\r\n"
-              "ECHO.\r\n", kittengets(5, 1, "SvarDOS installation is over. Please restart your computer now."));
+              "ECHO.\r\n", svarlang_strid(0x0501)); /* "SvarDOS installation is over. Please restart your computer now" */
   fclose(fd);
 
   /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
@@ -807,8 +810,8 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
 static void finalreboot(void) {
   int y = 9;
   newscreen(2);
-  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0, "Your computer will reboot now.\nPlease remove the installation disk from your drive.");
-  putstringnls(++y, 1, COLOR_BODY[mono], 0, 5, "Press any key...");
+  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0); /* "Your computer will reboot now.\nPlease remove the installation disk from your drive" */
+  putstringnls(++y, 1, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
   input_getkey();
   reboot();
 }
@@ -862,15 +865,11 @@ int main(void) {
   /* init screen and detect mono status */
   mono = video_init();
 
-  kittenopen("INSTALL"); /* load initial NLS support */
-
  SelectLang:
   action = selectlang(&locales); /* welcome to svardos, select your language */
   if (action != MENUNEXT) goto Quit;
-  setenv("LANG", locales.lang, 1);
   loadcp(&locales);
-  kittenclose(); /* reload NLS with new language */
-  kittenopen("INSTALL"); /* NLS support */
+  svarlang_load("INSTALL", locales.lang, ".\\"); /* NLS support */
   action = selectkeyb(&locales);  /* what keyb layout should we use? */
   if (action == MENUQUIT) goto Quit;
   if (action == MENUPREV) goto SelectLang;
@@ -889,7 +888,6 @@ int main(void) {
   finalreboot(); /* remove the CD and reboot */
 
  Quit:
-  kittenclose(); /* close NLS support */
   video_clear(0x0700, 0, 0);
   video_movecursor(0, 0);
   return(0);

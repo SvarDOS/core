@@ -152,8 +152,8 @@ done
 
 
 # prepare the content of the boot (install) floppy
-cp "install/install.com" "$FLOPROOT/"
-cp "install/nls/"install.?? "$FLOPROOT/"
+cp "install/trunk/install.com" "$FLOPROOT/"
+cp "install/trunk/install.lng" "$FLOPROOT/"
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
 unzip -Cj packages/cpidos.zip 'cpi/ega*.cpx' -d "$FLOPROOT/"
 unzip -Cj packages/command.zip bin/command.com -d "$FLOPROOT/"
@@ -184,7 +184,7 @@ prep_flop 80 2  9  720
 DOSEMUDIR='dosemu-prep-files'
 mkdir "$DOSEMUDIR"
 # INSTALL.BAT
-echo 'IF NOT EXIST C:\TMP\NUL MKDIR C:\TMP' >> "$DOSEMUDIR/install.bat"
+echo 'IF NOT EXIST C:\TEMP\NUL MKDIR C:\TEMP' >> "$DOSEMUDIR/install.bat"
 echo 'mkdir %DOSDIR%' >> "$DOSEMUDIR/install.bat"
 echo 'mkdir %DOSDIR%\cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO # pkg config file - specifies locations where packages should be installed >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
@@ -221,7 +221,7 @@ echo "@ECHO OFF" >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET DOSDIR=C:\SVARDOS' >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET WATTCP.CFG=%DOSDIR%\CFG' >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET DIRCMD=/p/ogne' >> "$DOSEMUDIR/autoexec.bat"
-echo 'SET TEMP=C:\TMP' >> "$DOSEMUDIR/autoexec.bat"
+echo 'SET TEMP=C:\TEMP' >> "$DOSEMUDIR/autoexec.bat"
 echo 'PATH %DOSDIR%\BIN' >> "$DOSEMUDIR/autoexec.bat"
 echo "" >> "$DOSEMUDIR/autoexec.bat"
 echo "REM *** this is a one-time setup script used only during first initialization ***" >> "$DOSEMUDIR/autoexec.bat"

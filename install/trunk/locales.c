@@ -46,7 +46,7 @@ static void addnew(char *countrycode, char *humanlang, char *keybcode, unsigned 
     if (lastcountry[0] != 0) {
       fprintf(fdoff, "#define OFFLEN_%s %d\r\n", lastcountry, curoffset - curcountryoffset);
     } else {
-      fprintf(fdkeyb, "char *kblayouts[] = {\r\n");
+      fprintf(fdkeyb, "const char *kblayouts[] = {\r\n");
     }
     /* open new one, if any */
     if (countrycode[0] != 0) {
