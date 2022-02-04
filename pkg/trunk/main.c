@@ -116,7 +116,10 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
   /* prepare the zip file and install it */
   zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
   if (zipfileidx != NULL) {
-    res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
+    /* remove the old version of the package if we are UPDATING it */
+    res = 0;
+    if (flags & PKGINST_UPDATE) res = pkgrem(pkgname, dosdir);
+    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
     zip_freelist(&zipfileidx);
   }
 
