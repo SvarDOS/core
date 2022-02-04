@@ -67,5 +67,9 @@ the application's source code, while SvarLANG keeps all strings in TXT files
 and embedds the default one inside the application in an automated way at
 compile time.
 
+There is also a licensing issue: CATS/Kitten libraries are published under the
+terms of a viral license. SvarLANG, on the other hand, is published under a
+truly free, liberal license (MIT).
+
 
 ======================================================================= EOF ===
