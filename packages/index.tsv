@@ -1,0 +1,334 @@
+120below	2012	Short, winter-themed adventure game	371
+4dos	8.00	4DOS replaces the default command interpreter that are	65238
+adlibtrk	2.3.57	Adlib Tracker, supports OPL2/OPL3 FM, 9 channels and up to 255 instruments	44906
+adplay	1.6a	multiple formats music player using OPL2/3 audio	59389
+amb	20201223	AMB (Ancient Machine Book) book reader	58781
+ansimat	0.93	graphical viewer of ANSI files, can also convert ANSI files to graphic files or FLiC animations	4274
+append	5.0-0.6	enables programs to open files in specified directories as if they were in current dir	9748
+arj	2.78	The open-source ARJ archiver.	40009
+assign	1.4	Assign a drive letter to a different drive	59266
+atari800	2.2.0	A free and portable Atari800/XL/XE/5200 emulator	62750
+attrib	2.1	Display and set file attributes	57698
+augos	4	computer version of the Go game	65172
+b64	0.06R	Utility that implements the Base64	25510
+bcc	0.16.2	Bruce's C compiler is a simple C compiler that produces 8086 assembler.	10723
+biew	6.10	Biew is a binary/hexadecimal viewer/editor.	38441
+bladeenc	0.94.1	Blade's MP3 Encoder generates MP3 files from WAV/AIFF/RAW data	17970
+blocek	1.4	A graphical text editor with unicode and pictures formats support	7404
+bmp2png	1.62	command-line tool that converts BMP images to PNG (and vice versa)	15359
+bolitare	0.62a	A Freecell clone for DOS	5587
+boom	2.02	A GPL port of the Doom source code. Packaged with FreeDoom for a complete gameplaying experience.	37255
+bootfix	1.4	Bootfix is a boot sector testing and fixing tool.	34960
+bsum	1.1	tiny tool that computes the BSD checksum of files	27065
+btitanic	1	Text based Infocom style adventure game.	51654
+bwbasic	2.60	The Bywater BASIC interpreter	42502
+bz2	1.0.5	BZIP2 compression program	4151
+cabext	1.4	CABExtract can extract files from a variety of Microsoft CAB formats.	58327
+cache	1.0	disable/enable your processor's cache	61888
+calc387	28Jan96	tiny (1K) command-line calculator, requires a 387+ FPU	16860
+cdogs	1.06	C-DOGS is a sequel of Cyberdogs (walk around nuking bad guys)	38766
+chicken2	2.0	shooting game involving chickens	58301
+chip8	2.2.0	CHIP-8 Emulator bundled with several CHIP-8 games.	50623
+chkdsk	0.9.2 beta	Check the disk for errors.	25796
+choice	4.4	Present a choice to the user and wait for a key (uses kitten instead of cats)	65030
+clamav	0.95.3/9047/Wed Feb 25 21:59:41 2009	ClamAV scans files and directories for viruses	51575
+clamdb	51	The Virus database for ClamAV	31025
+codebrk	1.0	text-mode implementation of the master mind logic game, many features	26486
+command	0.84 pre 2	The FreeDOS Command Shell	32543
+comp	1.04	Compare files and display their differences	63525
+cpidos	3.0	Package of DISPLAY-type, UPX-compressed CPI files with various DOS codepages.	37268
+cpied	1.3c	a GUI-driven CPI font editor	3964
+cpp2ccmt	0.5	A C++ to C comment converter.	45410
+crc32	20040215	calculates the standard 32-bit CRC checksum of files	31175
+crynwr	2006-09-02	A collection of free packet drivers from the Crynwr company	6862
+csphinx	2.0	Sphinx C-- is a compiler half-way between C and ASM	64737
+ctmouse	2.1b4	tiny mouse driver that supports many protocols of serial and PS/2 mice	42498
+ctorrent	dnh3.2	CTorrent is a BitTorrent client implemented in C++ to be lightweight and quick.	16886
+curl	7.21.6	Curl is a command line tool for transfering data specified with URL syntax.	2557
+cwsdpmi	7	32-bit DPMI DOS extender designed for DJGPP.	62352
+cyberdog	1.0	walk around nuking bad guys	31012
+daa2iso	0.1.7e	A tool for converting single and multipart DAA and GBI images to the original ISO format.	12706
+ddlink	1.6	small & simple PC file transfer program (COM, LPT, ethernet)	16379
+debug	1.25	A program testing and editing tool	44019
+defrag	1.32	Defragmentation utility.	16778
+deltree	1.02g	delete files and directories with all included files and subdirectories	30687
+desi3	6.03	The DESI-III 2D-CAD system.	28108
+devload	3.25	Commandline device driver loading program, supports UMBs	16605
+dialog	1.1-20080819	Display dialog boxes in shell scripts	64823
+dillo	3.0p9	A graphical web browser known for its speed and small footprint.	25025
+diskcomp	06jun2003	Disk comparing utility	24727
+diskcopy	beta 0.95	Copy one disk or image file to an other	49122
+display	0.13b	FreeDOS driver for codepage management (screen or printer)	40849
+djgpp	2.03	DJGPP environnement	14049
+djgpp_bn	2.21.1	DJGPP binutils: linker, assembler, etc...	54150
+djgpp_bs	2.4.1	DJGPP Bison (a parser generator that is compatible with YACC)	65079
+djgpp_db	7.5	DJGPP Debugger (GDB)	13460
+djgpp_fq	2.30	DJGPP FAQ documentation	24955
+djgpp_fx	2.5.4	DJGPP Flex (fast lexical analyzer generator)	64699
+djgpp_gc	4.71	DJGPP GCC (C compiler)	60998
+djgpp_gp	4.71	DJGPP GPP (C++ compiler)	14179
+djgpp_mk	3.79.1	DJGPP make	19250
+djgpp_ob	4.71	DJGPP Objective-C compiler	4305
+djgpp_rh	1.5	DJGPP RHIDE editor	6815
+djgpp_tx	4.12	DJGPP Texinfo (info file viewer)	27211
+dn2	2.14 beta	DOS Navigator 2 OpenSource is a file manager based on DOS Navigator (c) 1991-99 by RIT Research Labs.	33176
+dog	0.8.3b	an alternative command.com shell, similar to FreeCOM, but different.	7459
+dos32a	9.1.2	DOS/32A is a DOS extender.	45271
+dosfsck	2.11c	checks the consistency of PC/MS-DOS file systems and optionally tries to repair them	7713
+doshexed	1.2f	Hex editor and viewer	8808
+dosidle	2.10	CPU cooling TSR	32872
+doskey	2.8	command-line enhancement TSR with history, auto completion and more	21308
+doslfn	0.41	Provides the long filename (LFN) API in plain DOS (without Windows)	38
+dosmid	0.9.6	lightweight MIDI player for many synths (AWE,MPU401,OPL,GUS...)	22055
+dosrifs	2.0	Drive sharing TSR between two PCs over serial link (drive mapping)	25414
+doszip	2.52	DOSZIP is an opensource Norton Commander clone	54422
+drhimem	2.34	HIMEM XMS and UMB memory manager from DR-DOS	32169
+drmind	1.0	logic game, find secret pattern using deduction (Mastermind clone)	20134
+du	1.0	displays disk usage, ala UNIX 'du'	19998
+dualvga	0.9	use TWO color displays on a single PC (requires 2 PCI cards)	117
+dwj	3.4.1	an MP3 jukebox program designed to run on MAME cabinets	21541
+dwol	1.0	tiny Wake-On-LAN (WOL) tool for DOS	40808
+e1000pkt	February 1, 2007	Packet driver for Intel(R) PRO/1000 adapters, f.i. 82544, 82540, 82545, 82541, and 82547 based Ethernet controllers.	1847
+e3	2.7.1	a mini text editor that comes in both a 32 and 16bit version	57789
+edit	0.9a	FreeDOS improved clone of MS-DOS Edit	40718
+edlin	2.10c	The edlin program is the FreeDOS standard line editor.	35320
+eidl	1.0	reduces power consumption by HALTing the CPU when DOS is idle	43807
+electrom	2006	Electro Man is a 2d platform game. Spaceship, aliens, cyborgs and shooting.	25451
+eliza	1.01	one of the earliest computer chatterbots AI	23167
+elvis	2.2	a clone of vi/ex, the standard UNIX editor. Supports nearly all vi/ex commands	15655
+empong	0.91	Emeritus Pong is a clone of the good old "Pong" game.	58939
+etherdfs	0.8.2	Ethernet DOS file system (maps remote drive over raw Ethernet)	24028
+ethtools	8feb2010	A set of diagnostic tools for ethernet networks. Built using the WatTCP stack. Includes ETHWHAT, WWWATCH, ETHSEND, ETHDUMP, ETHWATCH, ETHSHOW,	18473
+euphoria	3.1.1	The Euphoria interpreter/compiler	34874
+eval100	1.00	mathematical expression calculator, 80 bits double precision	3849
+ewsnake	0.5	A clone of the classic snake game (aka 'nibbles').	38000
+exe2bin	1.5	Convert an exe file to bin format	41791
+fasm	1.71.57	fast but powerful 80x86 assembler	2816
+fbc	1.05.0	FreeBASIC, a 32-bit BASIC Compiler	29845
+fbc_help	1.05.0	Help system for the FreeBASIC compiler (FBHELP v0.8b)	55674
+fc	3.03	File compare utility	43113
+fceu	0.81	FCE Ultra is an open-source NES emulator	31484
+fdapm	2009sep11	APM / ACPI control/info, energy saving TSR/control, cache flush, rebooting... {a replacement for MS-DOS POWER}	17924
+fdisk	1.3.4	fixed disk tool, creates and deletes partitions	64187
+fdxms	0.94	Replacement XMS driver for '386 systems or better	36611
+fdxms286	0.03.Temperaments	Replacement XMS driver for '286 systems or better.	11692
+fed	2.24	A folding text editor with color syntax highlighting and more	47535
+find	3.0a LFN (24 Sep 2007)	Display all lines in one or more files that contain a given string	62817
+fmines	1.00	A minesweeper-like game with some nice graphical themes.	15406
+format	0.91v (14 Jan 2006)	Disk formatting program -- creates FAT file systems and lowlevel-formats floppy disks	49917
+foxcalc	0.92	A nice calculator. It have a TUI and mouse support.	26605
+foxtype	0.16	Advanced (graphic mode) text file viewer supporting UTF-8	51677
+fpc	2.6.0	A self-hosting 32-/64-bit Pascal compiler supporting Turbo and Delphi dialects.	32176
+freedoom	3.30	SMMU is a Doom source port derived from MBF and Boom. This version is packaged with FreeDoom for a complete gameplaying experience.	51840
+frotz	2.43	An interpreter for Infocom games and other Z-machine games.	12034
+ft2	2.08	FastTracker 2, a MOD/XM tracker for music composing	57499
+ftetris	1.54	tetris clone with joypad support	39510
+gcdrom	2.4	SATA native IDE CD/DVD-ROM driver for DOS	29077
+gifsicle	1.70	manipulates GIF images and animations in a variety of ways.	20997
+glaunch	0.9.8	Universal front end for emulators.	46331
+gnubc	1.02	bc is an arbitrary precision numeric processing language. Syntax is similar to C, but differs in many substantial areas. It supports interactive execution of statements. bc is a utility included in the POSIX P1003.2/D11 draft standard.	59521
+gnuchess	4.0 patch 60	GNU Chess is a communal chess program. Contributors donate their time and effort in order to make it a stronger, better, sleeker program.	61616
+gopherus	1.2.1	text-based gopher browser	48108
+grep	2.0	grep searches files (or standard input) for lines that match a given pattern. The pattern may be a regular expression or a literal string.	35862
+gsplay	1.0	a standard MIDI file player.	44939
+gzip	1.2.4	GNU zip compression - a file archiver tool, like PKZIP	51897
+hangman	1.05	Multilingual hangman game with many dictionaries	61369
+happylnd	1.1	A classic jump'n'run combined with original puzzle elements, a game full of surprises. Explore the big levels and collect various fruits for bonus. Save the Happylanders in order to rid the world of evilness.	28070
+help	20220204	SvarDOS help (manual)	34924
+hexcomp	1.0.4	graphically compares binary files	22317
+himemx	3.34	HimemX is a XMS memory manager derived from FreeDOS Himem	56072
+hip	2.1	Hide In Picture is a steganography program that hides files inside pictures	48213
+hiram	1.9	Upper Memory (UMB) Extender for 80286, 80386, 80486 CPUs	2516
+htget	1.06	HTGET is a file grabber that will get files from HTTP servers.	29224
+ihpfs	1.29	Maps a HPFS (OS/2) partition as drive under plain DOS (read-only)	57647
+infoplus	1.58 alpha	Public domain system information tool by Andrew Rossmann.	65432
+insight	1.24	real-mode DOS 16-bit debugger	57543
+ivan	0.50	A graphical roguelike game.	25445
+jemm	5.78	Jemm386 is an Expanded Memory Manager for DOS, based on the source of FreeDOS EMM386. It has several advantages compared to FreeDOS and/or MS-DOS EMM386. * needs only 192 bytes DOS memory * needs very little extended memory * is faster * works with MS-DOS, FreeDOS and EDR-DOS * will use features implemented on later CPUs to further increase speed * unlike FreeDOS Emm386 Jemm386 has full VDS support * can be loaded from the command line	17220
+jumpbump	2.0	Jump'n Bump is a bloody shooting game with fluffy bunnies	2818
+jwasm	2.11	JWasm is a free MASM-compatible assembler supporting 16, 32 and 64-bit code generation.	51391
+kernel	2042	The FreeDOS Kernel (supports FAT12/FAT16/FAT32)	7510
+keyb	2.01	Keyboard driver (BIOS level) for international support	9132
+keyb_lay	3.1	Keyboard layouts for KEYB	63433
+kiloblas	2.0	Kiloblaster is a fast-paced space shooter arcade game	34910
+kraptor	Apr_2004	Kraptor is an open-source Raptor-like game complete with several levels.	57745
+label	1.4b.ea	Sets or changes the disk volume label	21219
+lame	3.98.4	manipulates MP3 files, including conversion to and from other formats	7316
+lbacache	2008apr07	Disk cache, caches reads for max 8 CHS/LBA HDDs and FDDs (XMS, 386+)	14302
+less	291	Less is a program similar to more, but which allows backward movement in the file as well as forward movement. Also, less does not have to read the entire input file before starting, so with large input files it starts up faster than text editors like vi.	6300
+lha	2006-10-09	archiver working with LHA / LZH archives	55140
+lincrawl	4.0.0b26	A fun game in the grand tradition of games like Rogue, Hack and Moria.	46856
+linkln	1.1	Create "links" to EXE or COM files to overcome 160 character limit of PATH variable.	58255
+links	2.13	Links is a Lynx-like text and graphics WWW browser.	39599
+liquiwar	5.6.3	A unique multiplayer wargame.	39139
+localcfg	20220203	locales preferences configuration tool (country.sys-like)	51548
+lowp	1.0	enables power saving states on AMD mobile CPUs	65522
+lpq1	2	lpq1 is a file compressor and archiver	11787
+lptdrv	0.7	a tool to control LPT-attached devices manually or on a time basis	25577
+lscolor	16may1995	Displays directory's content in a similar way to the UNIX "ls" command.	8196
+lua	5.2.2	Lua is an embeddable scripting language	54363
+lzip	1.9	A data compressor based on the LZMA algorithm.	28892
+lzma	4.32.7	Works with .lzma compressed files (different from 7-zip)	39179
+lzop	0.96	a compressor similar to gzip, that favors speed over compression ratio	18709
+magnetic	2.3	An interpreter for Magnetic Scrolls adventures.	64488
+mamasoy	2018	Mama Soybean's Delicious Oyster Sauce, Sokoban-like CGA logic game	62476
+mbedit	8.64	mbedit is a full screen text editor with macro option, online calculator, command history buffer, hex editor and many other features.	11149
+mbldr	1.46	alternative MBR boot loader that fits in a single sector	50767
+mbrtool	2.2.100	backups, restores and manipulates harddisk MBRs	14230
+mbrwiz	1.52	MBR management tool (set partitions active, hide them, backup MBR...)	29739
+md5sum	3.0	MD5 Checksummer	3115
+meka	0.70	MEKA is a Multi machine emulator.	6658
+mem	1.11	Displays the amount of used and free memory in your system	36060
+memtest	2.00	MEMTEST is a program for testing DRAM (main memory) of PC-compatible computers built on Intel 386 or higher processor.	50150
+memteste	2003	MEMTESTE is a MEMTEST loader (RAM tester)	58502
+mines	0.96	MiNES is an editor for iNES ROMS.	13105
+mips	1.20	benchmark program for pre-486 computers	53136
+mirmagic	2.0.2	An arcade style game like "Deflektor" (C 64) or "Mindbender" (Amiga)	7114
+mirror	0.2	Records information about the disk for possible data recovery.	1443
+mkeyb	0.40	Very small Keyboarddriver, 500-700 Bytes resident	16050
+mlyaht	2.2	Yaht dice game, text-mode, aka Yahtzee, 1 to 6 players	34559
+mode	2015-11-25	Set the mode of your devices:	54500
+more	4.3	Displays the contents of a text file one page at a time	45502
+move	3.3a	Moves files from here to there	36189
+mplayer	1.0rc2	MPlayer is a movie player ported from Linux.	14702
+mpxplay	1.60	plays multiple audio formats w/ built-in modern soundcard drivers	33730
+msedit	0.11	Mateusz' Saucy Editor	65060
+mtcp	2013-04-26	collection of TCP/IP tools for 16 bit DOS: DHCP, IRC, FTP, Telnet, Netcat, HTGet, Ping, SNTP	7474
+nansi	4.0d (2007may26)	An ANSI driver for DOS	46619
+nasm	2.12.02	The Netwide Assembler (UPX Compressed Version)	62626
+nconvert	6.88	multi-format commandline image converter	57574
+nesticle	X.XX	NES emulator	21940
+nethack	3.4.3	A single player dungeon exploration game.	40483
+newsnuz	0.98	usenet (NNTP) reader based on WatTCP	58976
+nge_nibb	0.1.0	A clone of Nibbles, an old arcade game.	11333
+nlsfunc	0.4	NLSFUNC adds NLS (National Language Support) functionality	65083
+nosefart	1.92	NSF player (NES music player)	12581
+nssi	0.60.45	system (hardware) information	42018
+ntfs	30Mar2001	Enables access to ntfs partitions	49102
+ntool	1.5	NTOOL is just another incarnation of the famous program NETCAT, based on the WatTCP stack.	17028
+nyet	1.1	A text-mode tetris clone.	43615
+opencp	2.6.0pre6	OpenCubic Player is a multi-format (mp3,wav,mid...) music player	44261
+opengem	6	Graphical desktop manager. Includes several GUI apps.	53117
+ow	1.9	Open Watcom C/C++ compiler	56883
+ozonegui	0.5.3.0	oZone Desktop environment	6272
+p7zip	4.65	port of 7za (command line version of 7zip, a high-compression file archiver)	40206
+pacificc	7.51	Freeware version of the Pacific C compiler.	32943
+paint2	2	PowerPaint 2 is a mouse-driven graphic paint program that supports paint1 file type and two other types	8225
+pakupaku	1.6	A pacman clone using text mode only.	31077
+part	2.37	Partition Manager can: Save and restore MBR; Create and delete partitions; View hard disks' IDE                  information; Format and resize FAT-16 and FAT-32 file systems; Comes with Advanced Boot Managers.	40319
+password	0.50	Password program -- Protects your computer from stranger's access	55985
+pbox	0.11	A console-mode passwords manager using AES-encrypted storage	38115
+pcfile	5.01	PC-File database program	2423
+pcisleep	12 mar 2005	PCISLEEP lists and sleeps pci cards.	31427
+pcntpk	03.10	packet driver for AMD PCNET ethernet adapters (crynwr)	42291
+pdtree	1.02	graphically displays the folder structure of a drive or path	23137
+pede	20-Nov-2003	A clone of centepede for the Atari	14225
+perl	5.8.8	perl is a language combining some features of C, sed, awk and shell	37370
+pg	1.16	Displays the contents of a text file one page at a time	9117
+pgme	2015-07-26	Program Manager Eternity application and utility launcher and Font tools for DOS. (Requires mouse)	36231
+pico	3.96	simple text editor in the style of the Pine Composer	9521
+picosntp	0.9.1	SNTP client for DOS, based on picoTCP	46467
+picotcp	20151119	picoTCP networking stack (library and configuration tools)	2
+ping	2.2	The ping internet diagnostic tool. This version is extracted from the Watt-32 v2.2 suite.	35785
+pkg	20220204	SvarDOS package manager installs, removes and updates packages	30756
+pkgnet	20220119	pulls packages and updates from the internet SvarDOS repository	61177
+plutcav	2019	Plutonium Caverns, a sokoban-like logic game with VGA graphics	57246
+pngcrush	1.7.66	PNG compression/optimization tool	21350
+print	1.02.ea	Print files in the background while you do other things.	35069
+provox	6.6	the PROVOX screen reader	51574
+psrinvad	1.1	Space Invaders Game Clone	10956
+qtetris	1.4.1	A clone of the TETRIS game, and a tribute to the Queen band at the same time.	52487
+quadnet	1.0	Fastpaced cosmic-like shooter	8469
+qvpro	2.61	QuickView Pro is a multimedia viewer (video, music, images...)	22688
+rcal	1.0	big-num calculator, floating point, 8086+, mimics "paper roll" calculators	64491
+rdisk	4-Aug-12	RDISK is a simple and small RAMdisk driver, for use when resizing or other features are not needed.	47244
+rdosumb	1.1Fa	Upper memory manager (UMB) for 80286 and newer	64538
+recover	0.1 (BETA)	Recover disks or lost files.	48860
+regina	3.7	Port of Regina Rexx interpreter with SAA Rexx API support.	37613
+replace	1.2	Replaces files in the destination directory with files from the source directory that have the same name.	57977
+rocknes	4.00 beta 1	NES emulator	35196
+row4	1.0	Connect 4 tokens of same color in one row, text mode, very small	54871
+rsync	2.2.5	rsync is a utility software that synchronizes files and directories from one location to another while minimizing data transfer by using delta encoding when appropriate. This rsync port is necessarily a sub-set of the full rsync, partly because of memory limitations and partly because of the peculiarities of DOS. The main differences are: Client only ; No support for rsh or ssh ; File names on the server must be in DOS format ; File data is not compressed.	22223
+runtime	2.1b	Times the execution of a program, and tells you its run time	5401
+savepart	3.70	Partition Saving save/restore/copy parts or whole disks.	22024
+search	1.0	Locates files on your computer	25258
+share	08/2006	Installs file sharing and locking capabilities on your hard disk - for FreeDOS kernel only	25607
+shsucdx	3.05	Free CDROM extender for DOS	36426
+shsufdrv	1.02	SHSUFDRV is a driver for floppy and hard disk images. SHSURDRV copies the image to RAM and/or creates RAM drives.	22773
+simcoupe	1.0	A SAM Coupe Emulator.	44437
+slowdos	1.03	Simulate an older CPU by adding software delays.	43716
+slowdown	3.10	slow down the computer, different methods available	7724
+sneese	0.853b	SNEeSe is a Super NintEndo Entertainment System Emulator.	2533
+snova	B	Text based adventure game set in the future.	50820
+sort	1.5.1	Sort the contents of a text file, optionally using the NLS collate table	57012
+sqlite	3.5.6	An Embeddable SQL Database Engine	63022
+srdisk	2.09c	Resizeable Ramdisk. Srdisk is fast and able to use over 32 MB of XMS and EMS memory. The size of the disk can be changed without rebooting or loss of content. Diskcopy compatible.	41256
+sshdos	0.93	SSH client for DOS.  Also contains SSH, SCP and SFTP in both 8086 and 386 versions.	37173
+sstep	1.0	frequency and voltage control for Intel Speedstep capable CPUs	11609
+sudoku86	1.0.3	a 16-bit Sudoku game for DOS and 8086/8088 CPUs	10292
+swpedit	4.4	the Swift Programmers Editor, small but supports files up to 64 KiB	49328
+swsubst	3.2	SUBST and JOIN	38494
+tar	1.12	A tape archiver	39336
+tcalc	3.0	command-line calculator	24044
+tde	5.1v	TDE is a simple, public domain, multi-file/multi-window binary and text file editor written for IBM PCs and close compatibles running DOS, Win32 (console)	1708
+te	1.7	Tiny Editor, very small (10K), supports files up to 64K	63646
+tee	2.0.3	Saves a copy of its input to a file, while printing a copy to stdout	14152
+teo	1.8.2	An emulator of the Thomson TO8 microcomputer.	52159
+terminal	3.2	a tiny vt100/ansi terminal for every pc	26625
+testdisk	7.0	Testdisk checks partition/bootsector of disks; Photorec recovers many types of data	40262
+tetris2k	?	DOS Tetris 2KB Size	64418
+tinyaes	3.12	A very small AES/Rijndael file encryption tool	49479
+topbench	0.38h	benchmark program with a huge database of systems	22631
+touch	1.4.4	Set the date + time stamp on a file like *nix "touch"	50876
+tppatch	-	Patching tool for RUNTIME 200 bug in programs compiled with Turbo Pascal.	51639
+tree	3.7.2	Graphically displays the folder structure of a drive or path.	32411
+ttm	0.95	TeraLogic Texture Maker is a texture/background generator	15989
+turbogo	2.0	game of Go with an extensive help system	26051
+tweak	1.6b	edits VGA registers, allows to test non-standard video modes	8005
+udvd2	30-Apr-13	CD/DVD UltraDMA device driver	26490
+uhex	1.0.4	uHex is a simple and fast hex editor	55260
+umbdrvr	5.22	UMB provider device driver	20676
+umbpci	3.83	EMM386 replacement for UMB management in real mode	39806
+umm	0.3	UMB enabler, registers hardware UMB memory as available, req. 286+	34182
+undelete	2008	Undelete allows to undelete erased (but recoverable) files from a FAT16/FAT32 filesystem.	43425
+unformat	0.8	Unformat a disk that you accidentally formatted.	29073
+unrar	3.80	Unrar is a file decompressor with high compression ratio.	29394
+unrtf	0.21.5	converts document in RTF format to other formats (html,latex,txt...)	29672
+unzip	6.00	A file decompression tool, like PKUNZIP.	32320
+uptime	7.02	Reports computer's uptime, similar to UNIX "uptime"	37428
+upx	3.91	UPX is a free, portable, extendable, high-performance executable packer for several different executable formats. It achieves an excellent compression ratio.	20719
+uram	2003.8.16	Upper memory manager (UMB provider)	46282
+urthwurm	2002	guide a worm through 10 levels of caves (SFCave remake)	11982
+usbdos	2010-01-30	collection of DOS drivers for UHCI (USB 1.1 12Mbit/1.5Mbit)	50033
+use_umbs	2.0	UMB memory provider (enabler)	3388
+utf8tocp	0.9.4	converts UTF-8 text files to other codepages and back	54013
+v8power	16.05.06	V8Power Tools batch file enhancement utilities for DOS.	59508
+vertigo	0.26	A flight simulator that focuses on realism of the flight model.	12024
+vice	2.2	Versatile Commodore 8-bit Emulator, emulates C64, C128, VIC20, PET, PLUS4 and CBM-II.	34187
+vitetris	0.55	A terminal-based Tetris clone.	16179
+vmsmount	0.5b	A DOS redirector for mounting VMware's shared folders	28219
+vncview	3.3.7	VNC viewer for 8086+, based on Xvncviewer	19553
+vpcfcopy	0.01	manages disk (or floppy) images	4507
+wde	3.0b	Wde is a disk editor.	37369
+wget	1.11.2	The non-interactive network downloader.	17964
+which	2.1	which is a utility born in the UNIX world that enables users	51105
+wing	0.7	A galaga-like space shooter.	36941
+ww1	1.0	A text based trivia game.	3991
+xargon	3.0	side-scrolling platform game similar to Jill of the Jungle	22308
+xcdrom	2.2	XCDROM is a DOS driver for CDROMS.	401
+xcopy	1.4	Copies files and directory trees.	8872
+xf25	2.5	PC Xformer, the Atari 800XL Emulator For MS-DOS Compatible PCs	39746
+xfdisk	0.9.3 Beta	Xfdisk is a fdisk like software that is used to partition disks.	62810
+xgrep	1.03	Fast UNIX-like `grep' clone supporting regular expressions	5207
+xmgr	4-Aug-12	XMGR is a DOS driver which works as an "XMS manager" and provides up to 4-GB of XMS memory.	63976
+xmsdsk	1.9I	xmsdsk is a ramdisk driver	63444
+yapcbr	1.02	layer 2 bridge for packet drivers (turns a PC into a switch)	51336
+youloose	1.0	be the first to place four disks in a row	4006
+z26	1.58	An Atari 2600 Emulator	13629
+zboy	0.60	GameBoy classic emulator	19132
+zerofill	1.02	Fills empty space on a drive with zeros. It helps virtual machine, and disk compression softwares to compact the volume.	58956
+zip	2.3	A file archiver tool, like PKZIP.	13032
+zmiy	0.85.2	A snake game (like Nibbles) for DOS and 8086	49735
+zoo	2.1	Manipulate zoo archives.	9504
+zsnes	1.51	A Super Nintendo emulator.	11833
+zxspectr	3.4	A full-featured ZX Spectrum emulator.	9420
