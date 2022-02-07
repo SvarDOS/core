@@ -5,7 +5,7 @@
 
 <?php
 
-$handle = fopen('repo/index.tsv', "rb");
+$handle = fopen('../packages/index.tsv', "rb");
 if ($handle === FALSE) {
   echo "<p>ERROR: INDEX FILE NOT FOUND</p>\n";
   exit(0);
@@ -17,7 +17,7 @@ echo "<thead><tr><th>PACKAGE</th><th>VERSION</th><th>DESCRIPTION</th></tr></thea
 
 while (($arr = fgetcsv($handle, 1024, "\t")) !== FALSE) {
   // format: pkgname | version | desc | bsdsum
-  echo "<tr><td><a href=\"repo/{$arr[0]}.zip\">{$arr[0]}</a></td><td>{$arr[1]}</td><td>{$arr[2]}</td></tr>\n";
+  echo "<tr><td><a href=\"repo/?a=pull&amp;p={$arr[0]}\">{$arr[0]}</a></td><td>{$arr[1]}</td><td>{$arr[2]}</td></tr>\n";
 }
 echo "</table>\n";
 

@@ -63,6 +63,13 @@ if (empty($_GET['a'])) {
   exit(0);
 }
 
+// switch to the packages directory
+if (chdir('../../packages') === false) {
+  http_response_code(404);
+  echo "ERROR: server-side error, cannot access packages\r\n";
+  exit(0);
+}
+
 $a = strtolower($_GET['a']);
 
 $p = '';
@@ -82,6 +89,8 @@ if (!empty($_GET['v'])) $v = $_GET['v'];
 
 if ($a === 'pull') {
   if (file_exists($p . '.zip')) {
+    header('Content-Disposition: attachment; filename="' . $p . '.zip"');
+    header('Content-Type: application/octet-stream');
     readfile($p . '.zip');
   } else {
     http_response_code(404);
