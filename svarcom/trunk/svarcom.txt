@@ -49,9 +49,9 @@ MD/MKDIR    - creates a directory
 PATH        - displays or sets a search path for executable files
 PAUSE       - suspends processing of a batch program
 PROMPT      - changes the DOS command prompt
+RD/RMDIR    - removes (deletes) a directory
 REM         - records comments (remarks) in a batch file or CONFIG.SYS
 REN/RENAME  - renames a file or files
-RMDIR       - removes (deletes) a directory
 SET         - displays, sets or removes DOS environment variables
 SHIFT       - changes the position of arguments in a batch file
 TIME        - displays or sets the system time
@@ -67,11 +67,13 @@ Installing SvarCOM requires to either copy it to the root of your boot drive
 replacing your current COMMAND.COM, or adding a SHELL directive to your
 CONFIG.SYS file to instruct DOS that it should load SvarCOM as its shell, eg.:
 
-  SHELL=C:\SVARCOM\COMMAND.COM
+  SHELL=C:\SVARCOM\COMMAND.COM /P
 
 Some DOSes support a SHELLHIGH directive that loads the shell in high memory.
 It is pointless to use it to load SvarCOM. SvarCOM will load its resident part
-as high as possible on its own.
+as high as possible on its own, enforcing this through SHELLHIGH could even
+be harmful since SvarCOM wouldn't be able to relocate to the highest address
+as it would be allocated by SHELLHIGH already.
 
 SvarCOM supports multiple languages. To enable SvarCOM using them it is
 necessary to define an NLSPATH environment variable that would point to a
