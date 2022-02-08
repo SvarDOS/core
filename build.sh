@@ -127,8 +127,6 @@ done
 
 
 # prepare the content of the boot (install) floppy
-cp "install/trunk/install.com" "$FLOPROOT/"
-cp "install/trunk/install.lng" "$FLOPROOT/"
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
 unzip -Cj packages/cpidos.zip 'cpi/ega*.cpx' -d "$FLOPROOT/"
 unzip -Cj packages/command.zip bin/command.com -d "$FLOPROOT/"
