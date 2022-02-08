@@ -26,17 +26,19 @@
     <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? The project has a <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a> just for that. You may also wish to take a look at the <a href="phpamb.php?fname=help/help-en.amb&amp;f=todo.ama">project's "todo list"</a>.</p>
 
     <?php
-    echo '<h2>Downloads (build date: ' . gmdate('d M Y', filemtime('download/svardos-cd.zip')) . ')</h2>'
+    $lastver = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
+
+    echo '<h2>Downloads (build date: ' . gmdate('d M Y', filemtime("download/{$lastver}/svardos-{$lastver}-cd.zip")) . ')</h2>'
     ?>
 
     <ul>
-      <li><a href="download/svardos-cd.zip">SvarDOS install CD (ISO)</a></li>
-      <li><a href="download/svardos-floppy-2880k.zip">SvarDOS install on 2.88M floppy disks</a></li>
-      <li><a href="download/svardos-floppy-1440k.zip">SvarDOS install on 1.44M floppy disks</a></li>
-      <li><a href="download/svardos-floppy-1200k.zip">SvarDOS install on 1.2M floppy disks</a></li>
-      <li><a href="download/svardos-floppy-720k.zip">SvarDOS install on 720K floppy disks</a></li>
-      <li><a href="download/svardos-usb.zip">SvarDOS install on a bootable USB image</a></li>
-      <li><a href="download/svardos-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-cd.zip">SvarDOS install CD (ISO)</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-2880k.zip">SvarDOS install on 2.88M floppy disks</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1440k.zip">SvarDOS install on 1.44M floppy disks</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1200k.zip">SvarDOS install on 1.2M floppy disks</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-720k.zip">SvarDOS install on 720K floppy disks</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-usb.zip">SvarDOS install on a bootable USB image</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
     </ul>
 
     <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files are stored.</p>

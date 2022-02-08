@@ -13,9 +13,10 @@
 
 ### parameters block starts here ############################################
 
+CURDATE=`date +%Y%m%d`
 PKGDIR=`realpath ./packages`
 REPOROOT=`realpath ./packages`
-PUBDIR=`realpath ./website/download`
+PUBDIR=`realpath ./website/download`/$CURDATE
 CDROOT=`realpath ./cdroot`
 FLOPROOT=`realpath ./floproot`
 CUSTFILES=`realpath ./files`
@@ -99,7 +100,7 @@ function prep_flop {
 
   # zip the images (and remove them at the same time)
   rm -f "$PUBDIR/svardos-floppy-$4k.zip"
-  zip -9 -rmj "$PUBDIR/svardos-floppy-$4k.zip" $4/*
+  zip -9 -rmj "$PUBDIR/svardos-$CURDATE-floppy-$4k.zip" $4/*
 
   # clean up
   rmdir $4
@@ -113,6 +114,7 @@ origdir=`pwd`
 
 mkdir "$CDROOT"
 mkdir "$FLOPROOT"
+mkdir "$PUBDIR"
 
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
@@ -205,7 +207,7 @@ echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
 echo "ECHO Welcome to SvarDOS (powered by DOSEMU)! Type HELP if you are lost." >> "$DOSEMUDIR/autoexec.bat"
 echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
 rm -f "$PUBDIR/svardos-dosemu.zip"
-zip -rm9jk "$PUBDIR/svardos-dosemu.zip" "$DOSEMUDIR"
+zip -rm9jk "$PUBDIR/svardos-$CURDATE-dosemu.zip" "$DOSEMUDIR"
 rmdir "$DOSEMUDIR"
 
 # prepare the USB bootable image
@@ -218,14 +220,14 @@ done
 
 # compress the USB image
 rm -f "$PUBDIR/svardos-usb.zip"
-zip -mj9 "$PUBDIR/svardos-usb.zip" "$USBIMG"
+zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
 
 # prepare the USB-ZIP bootable image
 #USBZIPIMG=$PUBDIR/svardos-usbzip.img
 #cat files/usb-zip.mbr "$PUBDIR/svardos-zip100.img" > $USBZIPIMG
 
-CDISO="$PUBDIR/svardos-cd.iso"
-CDZIP="$PUBDIR/svardos-cd.zip"
+CDISO="$PUBDIR/svardos-$CURDATE-cd.iso"
+CDZIP="$PUBDIR/svardos-$CURDATE-cd.zip"
 
 # delete previous (if any) iso
 echo "cleaning up old versions..."
