@@ -39,4 +39,4 @@
       <li><a href="download/svardos-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
     </ul>
 
-    <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="https://osdn.net/projects/svardos/scm/svn/tree/head/">project's SVN</a>, where all the build-related files are stored.</p>
+    <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files are stored.</p>
