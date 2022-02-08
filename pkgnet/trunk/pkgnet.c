@@ -35,13 +35,13 @@
 #include "net.h"
 #include "unchunk.h"
 
-#include "../pkg/lsm.h"
+#include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220119"
+#define PVER "20220208"
 #define PDATE "2021-2022"
 
-#define HOSTADDR "svardos.osdn.io"
+#define HOSTADDR "svardos.org"
 
 
 /* returns length of all http headers, or 0 if uncomplete yet */

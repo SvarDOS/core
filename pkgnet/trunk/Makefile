@@ -12,7 +12,8 @@ release: pkgnet.exe .symbolic
 	mkdir appinfo
 	copy pkgnet.exe bin
 	copy pkgnet.lsm appinfo
-	zip -9 -k -r -m pkgnet.zip bin appinfo
+	zip -9krDX -m pkgnet.zip bin appinfo
+	zip -9krDX pkgnet.src Makefile *.c *.h pkgnet.lsm watt32
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
 	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
@@ -20,14 +21,14 @@ pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
 pkgnet.obj: pkgnet.c
 	*wcc $(CFLAGS) pkgnet.c
 
-trim.obj: ..\pkg\trim.c
-	*wcc $(CFLAGS) ..\pkg\trim.c
+trim.obj: ..\..\pkg\trunk\trim.c
+	*wcc $(CFLAGS) ..\..\pkg\trunk\trim.c
 
-lsm.obj: ..\pkg\lsm.c
-	*wcc $(CFLAGS) ..\pkg\lsm.c
+lsm.obj: ..\..\pkg\trunk\lsm.c
+	*wcc $(CFLAGS) ..\..\pkg\trunk\lsm.c
 
-helpers.obj: ..\pkg\helpers.c
-	*wcc $(CFLAGS) ..\pkg\helpers.c
+helpers.obj: ..\..\pkg\trunk\helpers.c
+	*wcc $(CFLAGS) ..\..\pkg\trunk\helpers.c
 
 net.obj: net.c
 	*wcc $(CFLAGS) net.c
