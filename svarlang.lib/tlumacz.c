@@ -100,6 +100,30 @@ static char *parseline(unsigned short *id, char *s) {
 }
 
 
+/* converts escape sequences like "\n" or "\t" into actual bytes, returns
+ * the new length of the string. */
+static unsigned short unesc_string(char *linebuff) {
+  unsigned short i;
+  for (i = 0; linebuff[i] != 0; i++) {
+    if (linebuff[i] != '\\') continue;
+    strcpy(linebuff + i, linebuff + i + 1);
+    if (linebuff[i] == 0) break;
+    switch (linebuff[i]) {
+      case 'n':
+        linebuff[i] = '\n';
+        break;
+      case 'r':
+        linebuff[i] = '\r';
+        break;
+      case 't':
+        linebuff[i] = '\t';
+        break;
+    }
+  }
+  return(i);
+}
+
+
 /* opens a CATS-style file and compiles it into a ressources lang block */
 static unsigned short gen_langstrings(unsigned char *buff, const char *langid, struct bitmap *b, const struct bitmap *refb, const unsigned char *refblock) {
   unsigned short len = 0, linelen;
@@ -124,6 +148,9 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
     linelen = readl(linebuf, sizeof(linebuf), fd);
     if (linelen == 0xffff) break; /* EOF */
     if ((linelen == 0) || (linebuf[0] == '#')) continue;
+
+    /* convert escaped chars to actual bytes (\n -> newline, etc) */
+    linelen = unesc_string(linebuf);
 
     /* read id and get ptr to actual string ("1.15:string") */
     ptr = parseline(&id, linebuf);
