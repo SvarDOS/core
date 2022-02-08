@@ -14,8 +14,7 @@
 ### parameters block starts here ############################################
 
 PKGDIR=`realpath ./packages`
-REPOROOT=`realpath ./website/repo`
-BUILDIDX=`realpath ./buildidx/buildidx.php`
+REPOROOT=`realpath ./packages`
 PUBDIR=`realpath ./website/download`
 CDROOT=`realpath ./cdroot`
 FLOPROOT=`realpath ./floproot`
@@ -59,21 +58,6 @@ EXTRAPKGS="pcntpk udvd2"
 
 # all packages
 ALLPKGS="$COREPKGS $EXTRAPKGS"
-
-
-# function that builds the packages repository
-function dorepo {
-  # clear out the web repo and copy all zip files to it
-  rm "$REPOROOT"/*.zip
-  cp "$PKGDIR"/*.zip "$REPOROOT/"
-  # now strip the sources from repo versions
-  find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "SOURCE/*" ';'
-  find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "source/*" ';'
-  find "$REPOROOT/" -iname '*.zip' -exec zip "{}" -d "Source/*" ';'
-
-  # build repo index
-  php "$BUILDIDX" "$REPOROOT"
-}
 
 
 # prepares image for floppy sets of:
@@ -124,20 +108,11 @@ function prep_flop {
 
 ### actual code flow starts here ############################################
 
-# check presence of the buildidx tool
-if [ ! -f "$BUILDIDX" ] ; then
-  echo "buildidx not found at $BUILDIDX"
-  exit 1
-fi
-
 # remember where I am, so I can get back here once all is done
 origdir=`pwd`
 
 mkdir "$CDROOT"
 mkdir "$FLOPROOT"
-
-# build the repo (also builds the listing.txt file)
-dorepo
 
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
