@@ -1,0 +1,76 @@
+
+
+                             BUILD SERVER SETUP
+
+
+
+=== INTRO =====================================================================
+
+The SvarDOS build system is entirely stored in the project's svn repository.
+This includes many components:
+
+ - SvarDOS-specific tools (install, pkg, pkgnet, localcfg, svarcom, help, ...)
+ - SvarDOS packages
+ - SvarDOS website
+ - build scripts and tools
+
+This means that the project's svn tree contains everything that is required
+to build SvarDOS.
+
+
+=== SVN SERVICE ===============================================================
+
+The server must have a subversion service installed with the SvarDOS repository
+imported.
+
+The only specific configuration concerns a post-commit hook that should be set
+up to create a /tmp/svados_repo_changed.flag file whenever a commit is made to
+the repo. Such hook script can be as simple as this:
+
+  echo date > /tmp/svardos_repo_changed.flag
+  exit 0
+
+
+=== SVN CLIENT ================================================================
+
+The SvarDOS repository should be checked out in /srv/svardos/:
+
+$ svn co svn://127.0.0.1/svardos /srv/svardos
+
+
+=== WEB SERVICE ===============================================================
+
+A web server with PHP must be running (typically Apache). The PHP installation
+needs the php-zip extension (required by buildidx), and the Apache web root
+should point at /srv/svardos/website.
+
+
+=== CRON ACTIONS ==============================================================
+
+A cron job should be configured to run frequently (like every minute) and
+execute the /srv/svardos/cron.sh script. This script is responsible for
+checking out the local svardos repo whenever a new commit is being made, and
+rebuilds the index of the packages repository.
+
+
+=== MIRRORING THE PROJECT'S SVN ===============================================
+
+Mirroring the project's svn tree (containing all build scripts, packages, etc)
+is the best way to make a backup copy of the entire SvarDOS build system along
+with all its history. To achieve such mirror, one needs to create an empty
+svn repository and populate it using svnsync:
+
+$ svnadmin create /srv/svardos-mirror
+$ svnsync init file:///srv/svardos-mirror svn://svn.svardos.org/svardos
+$ svn up /srv/svardos-mirror
+
+The same procedure can be used to migrate the SvarDOS build system from one
+server to another.
+
+NOTE: The target svn server must allow modification of revision properties.
+      This is achieved with a svn "pre-revprop-change" hook of two lines:
+        #!/bin/sh
+        exit 0
+
+
+======================================================================= EOF ===
