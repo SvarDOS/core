@@ -1,8 +1,6 @@
     <h1>SvarDOS - an open-source DOS distribution</h1>
     <p class="copyr">for PCs of the 1980-2000 era</p>
 
-    <!--<div style="margin: -1em auto 2em auto; width: 21em; border: 1px #777 solid; background-color: #fff; padding: 0.1em 0.5em; color: #a00; font-size: 1.1em; border-radius: 0.3em;">This project is very much "work-in-progress", not everything works yet! Wanna help? Get in touch through the project's mailing list!</div>-->
-
     <p>SvarDOS is an open-source project that is meant to integrate the best out of the currently available DOS tools, drivers and games. DOS development has been abandoned by commercial players a very long time ago, mostly during early nineties. Nowadays, it survives solely through the efforts of hobbyists and retro-enthusiasts, but this is a highly sparse and unorganized ecosystem. SvarDOS aims to collect available DOS software, package it and make it easy to find and install applications using a network-enabled package manager (like apt-get, but for DOS and able to run even on a 8086 PC).</p>
 
     <h2>Minimalist and 8086-compatible</h2>
@@ -23,7 +21,7 @@
 
     <h2>Community and help</h2>
 
-    <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? The project has a <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a> just for that. You may also wish to take a look at the <a href="phpamb.php?fname=help/help-en.amb&amp;f=todo.ama">project's "todo list"</a>.</p>
+    <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? The project has a <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a> just for that. You may also wish to take a look at the <a href="phpamb.php?fname=help/help-en.amb&amp;f=todo.ama">project's "todo list"</a> and <a href="https://osdn.net/projects/svardos/ticket/">ticket list</a>.</p>
 
     <?php
     $lastver = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
