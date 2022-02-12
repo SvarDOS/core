@@ -21,6 +21,6 @@ fi
 # repo changed! delete the flag file, refresh the local copy of the repo and rebuild packages index
 rm "$FLAGFILE"
 svn up "$SVNREPODIR"
-php "$SVNREPODIR/buildidx/buildidx.php" ""$SVNREPODIR/packages/"
+php "$SVNREPODIR/buildidx/buildidx.php" "$SVNREPODIR/packages/"
 
 exit 0
