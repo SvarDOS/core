@@ -10,7 +10,7 @@
   </head>
   <body>
 
-    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=repo">Packages</a> I <a href="phpamb.php?fname=help/help-en">Help</a><!-- I <a href="?p=nls">NLS</a>--></p>
+    <p style="margin: 0 0 -1em auto; font-size: 0.9em; text-align: right;"><a href="/">Main page</a> I <a href="?p=repo">Packages</a> I <a href="?p=help">Help</a><!-- I <a href="?p=nls">NLS</a>--></p>
 
 <?php
 
@@ -21,6 +21,8 @@
       readfile('index-nls.htm');
     } else if ($p == 'repo') {
       include 'index-repo.php';
+    } else if ($p == 'help') {
+      include 'index-help.php';
     } else if ($p == 'test') {
       include 'index-main.php';
     } else { // else display the front page
