@@ -1,0 +1,21 @@
+
+                            %h*** SVARDOS HELP ***
+
+This help documentation is a work-in-progress thing. For the time being it
+provides only very limited content. (wanna help building it? get in touch with
+us on the SvarDOS %lcontact.ama:mailing list%t!)
+
+=== Chapters =================================================================
+
+ * %lpkg.ama:Packages management (install/remove/update software)
+ * %lnetwork.ama:Networking
+
+ * %lfreedos.ama:SvarDOS vs FreeDOS: what is the story?
+ * %ltodo.ama:The project's "TODO" list
+ * %lcontact.ama:How do I get in touch with the SvarDOS community?
+
+ * %lhistory.ama:SvarDOS origins
+ * %lmeaning.ama:What does "Svarog" mean?
+ * %l8086.ama:8086 compatibility list
+
+==============================================================================

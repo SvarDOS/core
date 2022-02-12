@@ -1,0 +1,53 @@
+
+%hSvarDOS: The project's TODO list
+
+* Replace the default (FreeDOS) edit with a smaller alternative (?) that is:
+  - TINY (a dozen of KiBs or so)
+  - relatively simple: no need for advanced text editing features, just enough
+    to comfortably edit small (<64K) configuration files
+  - 8086-compatible and have modest memory requirements
+  - multi-lang (kitten library)
+  - capable of (limited) copy/pasting between two files
+
+* replace FreeCOM by SvarCOM
+
+* improve installer so user can choose the target disk
+
+* COUNTRY settings shall be configurable by localcfg (and user should be
+  able to define local preferences through an easy-to-use wizard during
+  install time)
+
+* out-of-the box networking support:
+ - requires shipping lots of packet drivers with SvarDOS... Should CRYNWR be
+   part of the install set? Or only selected, most popular drivers? Or maybe
+   this could be provided as a "supplemental" floppy disk?
+ - user should be asked for its NIC model at install time
+ - installer could also ask for a basic DHCP / static configuration
+
+* install.com - MBR changes could be done by the installer itself instead of
+  system()-calling fdisk
+
+* help - write more useful content!
+  - basic DOS commands (directories, copy/rename/delete files, etc)
+  - common configuration files (autoexec, config.sys, pkg.cfg, wattcp.cfg..)
+  - networking guide
+  - memory management basics
+  - ...
+
+* test new versions of software and update packages accordingly. special care
+  must be taken for core things: kernel, command.com, fdisk, himemx...
+
+* add new, useful software to the SvarDOS repository (see the %lpkgrules.ama:rules%t)
+
+* further NLS support, improvements of existing translations and adding new
+  languages -> would be nice to have some kind of web interface for submitting
+  and reviewing translations
+
+* all user-facing CORE packages should be NLS-aware (translatable)
+
+* possibly plenty of other things
+
+
+                        =============================
+                          %hWanna help? %lcontact.ama:Get in touch!
+                        =============================

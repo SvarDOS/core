@@ -1,0 +1,54 @@
+
+%hNetworking
+
+For enabling network connectivity you first need to know what kind of network
+adapter you have, and obtain a suitable packet driver for it. The "crynwr"
+package contains lots of packet drivers for a variety of network adapters.
+There is also a packet driver for Intel Pro cards in the e1000pkt package, and
+a driver for AMD PC-NET cards in the pcntpk package.
+
+You need to get the packet driver for your card onto the machine, and load it.
+Then, you should be able to access the internet and get anything else you need
+using wget, htget, gopherus and other network-enabled applications.
+
+Note that packet drivers are mostly available for old-ish interfaces. If you
+have some modern ethernet card, then there might not be a packet driver
+available for it.
+
+%hFILE SHARING
+
+Perhaps these links could provide some pointers:
+<http://wiki.freedos.org/wiki/index.php/Networking_FreeDOS_-_MS_Client>
+<https://www.lazybrowndog.net/freedos/virtualbox/?page_id=374>
+
+There is also EtherDFS, which is a very lightweight and easy solution for
+file-sharing between DOS and Linux (but it does require a Linux PC and some
+basic understanding of how Linux works):
+<http://etherdfs.sourceforge.net/>
+
+%hVIRTUALBOX - PACKET DRIVER
+
+VirtualBox is able to emulate an AMD PC-NET NIC (you need to make sure of that
+in the configuration of your VM, VirtualBox calls it "PCnet-FAST III" and it
+should be set to "NAT"). Then, in SvarDOS you have to install the pcntpk.zip
+package - you don't even need to download it, it's already present on the
+installation image so it should be as simple as that:
+
+pkg install a:\pcntpk.zip
+
+Finally, load it as such:
+
+C:\DRIVERS\PCNTPK\PCNTPK INT=0x60
+
+...and that's it. From now on, you should be able to search through the
+available online packages and install extra software, for example:
+
+pkgnet pull gopherus
+pkg install gopherus.zip
+
+(gopherus is a gopher browser)
+
+To search through the list of available packages in the online repository, use
+that:
+
+pkgnet search your_search_term

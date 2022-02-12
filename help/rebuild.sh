@@ -1,11 +1,19 @@
 #!/bin/sh
+#
+# builds AMB-based help files for each available language
+# this is a Linux shell script that requires following tools to be in path:
+#  - ambpack
+#  - zip
+#
+
 set -e
 
 VER=`date +%Y%m%d`
 
-echo "SVARDOS HELP SYSTEM ver $VER" > help-en/title
-ambpack c help-en help-en.amb
-rm help-en/title
+# amb-pack all languages
+for d in ./help-?? ; do
+ambpack c $d $d.amb
+done
 
 mkdir bin
 mkdir help
@@ -15,5 +23,6 @@ mv help-*.amb help
 echo "version: $VER" >> appinfo/help.lsm
 echo "description: SvarDOS help (manual)" >> appinfo/help.lsm
 cp help/help-*.amb ../website/help/
-zip -9rkm help.zip appinfo bin help
+zip -9rkDX -m help.zip appinfo bin help
+rmdir appinfo bin help
 mv help.zip ../packages/

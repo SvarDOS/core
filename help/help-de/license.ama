@@ -1,0 +1,16 @@
+
+%hSvarDOS licensing
+
+SvarDOS is a DOS distribution made of many different software bricks, hence a
+single license can hardly be applied to all. However, the CORE system (that
+is the SvarDOS installer, bootable images and all CORE packages) is carefully
+assembled from software that is "free" (as in "Freedom"), ie. that grants the 3
+basic FOSS liberties: freedom to use, modify, and redistribute. This includes,
+but is not necessarily limited to, software released under following licenses:
+GNU GPLv2, GNU GPLv3, BSD, MIT, EUPL and Public domain.
+
+Note that, while the above applies to the core of the SvarDOS distribution, it
+does not cover all extra packages. Additional software packages may or may not
+be FOSS, they are only guaranteed to be "gratis for non-commercial use".
+
+Read more: %lpkgrules.ama:Packages inclusion rules

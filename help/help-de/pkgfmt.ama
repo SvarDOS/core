@@ -1,0 +1,110 @@
+
+Package files provide an easy way to manage software on SvarDOS. These
+packages must adhere to a strict convention so they can be handled properly
+by the SvarDOS package manager.
+
+
+%hPackage filenames
+
+Packages names must follow some basic rules. They shall be max. 8 letters long
+(but should not be too short either, since a 1 or 2-letters package name might
+be confusing), and must not be composed of characters other than a-b, 0-9 and
+'_'. This for backward compatibility with short file names (8+3) and ISO 9660
+file systems (used on CDROMs). The package filename is always followed by the
+.ZIP extension.
+
+
+%hPackage files
+
+SvarDOS uses ZIP files as its package file format. This format has been chosen
+because ZIP files under DOS have become the de facto way to distribute
+collections of files. Also, the ZIP file format is well documented, well
+supported, and in the public domain.
+
+Here below is the recommended command line that can be used to create a
+package for a program named EXAMPLE using info-zip:
+
+  zip -9rkDX EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+
+If you are using 7za to create your packages, then use this:
+
+  7za a -mm=deflate -mx=9 -tzip EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+
+
+%hPackage directory structure
+
+The directory structure of a package depends on the type of packages.
+For "core" packages, we have this:
+
+  APPINFO            Put the program's LSM file here
+  BIN                Binaries, such as exe and com files
+  DOC\PKGNAME        Package documentation
+  HELP               Used ONLY by the "help" package
+  NLS\PKGNAME        Localizations (NLS language files) of the package
+  SOURCE\PKGNAME     The source code (optional)
+
+Non-core packages use a slightly different directory organization. For
+example, if we were to consider a package FOO, we might end up with the
+following structure:
+
+  APPINFO\FOO.LSM    Package meta file for the FOO program
+  PROGS\FOO\FOO.EXE  The program's executable
+  PROGS\FOO\FOO.TXT  Some documentation
+  PROGS\FOO\FILE.DAT Data file used by the FOO program
+  SOURCE\FOO\*       here would be stored the foo's source code (optional)
+
+Note the 'PROGS' directory above. This is a category to which the package
+belong. The package installer might change this directory at install time,
+depending on the user's preferences. Possible categories are listed below:
+
+Category | Description
+DEVEL    | Development tools (mostly compilers)
+DRIVERS  | Drivers
+GAMES    | Games
+PROGS    | User programs, tools...
+
+Note: "DOC", "NLS", "BIN" and "HELP" directories are strictly reserved to
+      CORE packages.
+
+
+%hLSM meta-data files
+
+Every package MUST contain an LSM file in its "APPINFO" directory. This LSM
+file is a text file that contains basic information about the package. Its
+format is very simple, it must contain at least two lines:
+
+  version: x.y.z
+  description: package description
+
+Any other lines are ignored by the SvarDOS package manager.
+
+
+%hPackage versions
+
+The version present in the LSM file is meant to reflect the version of the
+packaged software, but it may happen that a package needs to be changed to
+fix a strictly packaging-related issue (for example a forgotten documentation
+file or a recompilation of the binary using a better set of flags...). In such
+case, the version of the software does not change, but the version of the
+package itself needs to change so users know something changed. That's where
+"SvarDOS revisions" come in. A version string is basically following such
+format:
+
+  UPSTREAM_VER[+SVARREV]
+
+UPSTREAM_VER is the exact version string advertised by the software. It may
+be pretty much anything. This upstream version may be optionally followed by a
+plus sign and the SvarDOS revision. In the event that the upstream version
+already contains a plus sign, then SvarDOS revision is delimited with a tilde.
+
+The SvarDOS revision starts at 0 and increments each time that the given
+upstream revision is repackaged. The SvarDOS revision restarts whenever the
+upstream version changes. The SvarDOS revision of 0 is always hidden.
+
+Examples:
+
+FDISK 1.54      <- originally packaged version
+FDISK 1.54+1    <- package has been changed, but not the upstream version
+FDISK 1.55      <- upstream version increased, so SvarDOS rev restarts
+FDISK 1.55+1    <- new version of the package, but still contains FDISK 1.55
+FDISK 1.55+2    <- another new version of the package, etc
