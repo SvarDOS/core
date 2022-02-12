@@ -64,7 +64,7 @@ Fußnoten:
 05) Ersetzte Datei mit BSUM F098. Ohne Option "-1" bei TC++. UPX mit
     Option "--8086" verwendet.
 06) Beendet sich mit: "At least a 80386 is required."
-07) pce-ibmpc: Zeigt 1.024 KB konventionellen Speicher an, aber 0 KB frei
+07) pce-ibmpc: Zeigt 1.024 KB konventionellen Speicher an, aber 0 KB frei.
 08) Beendet sich mit: "Must have at least a 386."
 09) Beendet sich mit: "No 386+ CPU; UDVD2 not loaded!"
 
