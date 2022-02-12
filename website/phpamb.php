@@ -1,7 +1,7 @@
 <?php
 // php reader of AMB files -- turns an AMB book into a web page
 //
-// Copyright (C) 2020 Mateusz Viste
+// Copyright (C) 2020-2022 Mateusz Viste
 // http://amb.osdn.io
 //
 // MIT license
@@ -24,10 +24,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-$VERSION = "20201218";
+$VERSION = "20220212";
 
 function getamafile($ambfname, $amafname) {
-  if (! is_file($ambfname)) return(FALSE);
+  if (! is_file($ambfname)) {
+    // if its a flat dir, just load the file
+    if (is_dir($ambfname)) return(file_get_contents($ambfname . '/' . $amafname));
+    return(FALSE);
+  }
   $fd = fopen($ambfname, "rb");
   if ($fd === FALSE) return(FALSE);
   // read header (AMB1)
@@ -87,21 +91,21 @@ $unicodemap = array();
 for ($i = 0; $i < 128; $i++) $unicodemap[$i] = $i; // low ascii is the same
 
 $unicodemaptemp = unpack('v128', getamafile($ambfname, 'unicode.map'));
-if ($unicodemaptemp === FALSE) $unicodemaptemp = array_fill(0, 128, 0xfffd);
-$unicodemap = array_merge($unicodemap, $unicodemaptemp);
-
-/* convert the unicode map so it contains actual html code instead of glyph values */
-for ($i = 0; $i < 256; $i++) {
-  if ($unicodemap[$i] < 128) {
-    $unicodemap[$i] = htmlspecialchars(chr($unicodemap[$i]), ENT_HTML5);
-  } else {
-    $unicodemap[$i] = '&#' . $unicodemap[$i] . ';';
+if ($unicodemaptemp === FALSE) {
+  $unicodemap = FALSE;
+} else {
+  $unicodemap = array_merge($unicodemap, $unicodemaptemp);
+  /* convert the unicode map so it contains actual html code instead of glyph values */
+  for ($i = 0; $i < 256; $i++) {
+    if ($unicodemap[$i] < 128) {
+      $unicodemap[$i] = htmlspecialchars(chr($unicodemap[$i]), ENT_HTML5);
+    } else {
+      $unicodemap[$i] = '&#' . $unicodemap[$i] . ';';
+    }
   }
+  // perform UTF-8 conversion of the title
+  $title = txttoutf8($title, $unicodemap);
 }
-
-
-// perform UTF-8 conversion of the title
-$title = txttoutf8($title, $unicodemap);
 
 
 echo "<!DOCTYPE html>\n";
@@ -120,7 +124,11 @@ echo "<div><span><a href=\"?fname={$ambfname}\" class=\"liketext\">{$title}</a><
 /* detect links first, before any htmlization occurs */
 $ama = preg_replace('!(https?|ftp)://([-A-Z0-9./_*?&;%=#~:]+)!i', 'LiNkStArTxXx$0LiNkEnDxXx', $ama);
 
-$amacontent = str_split($ama, 1);
+if ($unicodemap !== FALSE) {
+  $amacontent = str_split($ama, 1);
+} else {
+  $amacontent = mb_str_split($ama, 1, 'utf-8');
+}
 $escnow = 0;  // next char is an escape code
 $readlink = 0; // a link target is being read
 $opentag = ''; // do I have a currently open html tag?
@@ -170,7 +178,11 @@ foreach ($amacontent as $c) {
   if ($c == '%') {
     $escnow = 1;
   } else {
-    $out .= $unicodemap[ord($c)];  // convert characters into HTML unicode codes
+    if ($unicodemap !== FALSE) {
+      $out .= $unicodemap[ord($c)];  // convert characters into HTML unicode codes
+    } else {
+      $out .= $c;
+    }
   }
 }
 
