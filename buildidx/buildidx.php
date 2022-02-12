@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  12 feb 2022: skip source packages from being processed (*.src.zip)
   20 jan 2022: rewritten the code from ANSI C to PHP for easier maintenance
   13 feb 2021: 'title' LSM field is no longer looked after
   11 feb 2021: lsm headers are no longer checked, so it is compatible with the simpler lsm format used by SvarDOS
@@ -111,6 +112,11 @@ foreach ($pkgfiles as $zipfile) {
     echo "skipping: {$zipfile}\n";
     continue; // skip alt vers (like dosmid-0.9.2.zip)
   }
+  if (strstr($zipfile, '.src.zip')) {
+    echo "skipping source: {$zipfile}\n";
+    continue;
+  }
+
 
   $path_parts = pathinfo($zipfile);
   $pkg = strtolower($path_parts['filename']);
