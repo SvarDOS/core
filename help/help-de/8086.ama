@@ -1,67 +1,72 @@
 
-%h8086 compatibility
+%h8086-Kompatibilität
 
-This page presents the 8086-compatibility status of each SvarDOS "CORE"
-package.
+Diese Seite zeigt den Status der 8086-Kompatibilität jedes SvarDOS-
+Kernpaketes.
 
-%bPACKAGE     VERSION   EXECUTABLE BSUM  8086 ok?*   Checked on
-amb        20201223      amb.com A11A     yes      2022-01-30
-attrib          2.1   attrib.com 2C15     yes      2022-01-30
-chkdsk   0.9.2 beta   chkdsk.exe E2A9     yes      2022-01-30
-choice          4.4   choice.exe 8311     yes      2022-01-30
-command  0.84 pre 2  command.com E64E     yes      2022-01-30  01)
-cpidos          3.0         none   -       -       2022-01-30
-debug          1.25    debug.com 2E6B     yes      2022-01-31
-debug          1.25   debugx.com EA59     yes      2022-01-31
-deltree  1.02g.mrlg  deltree.com E20D      no      2022-01-30  02)
-deltree       1.02g  deltree.com AB16     yes      2022-01-31  03)
-devload        3.25  devload.com B91B     yes      2022-01-30
-diskcopy  beta 0.95 diskcopy.exe 3558     yes      2022-01-30
-display       0.13b  display.exe 5903     yes      2022-01-30
-dosfsck       2.11c  dosfsck.exe 1CB8     yes      2022-01-30
-edit           0.9a     edit.exe 8F1A     yes      2022-01-30
-fc             3.03       fc.exe E718     yes      2022-01-30
-fdapm     2009sep11    fdapm.com A74A     yes      2022-01-30
-fdapm     2009sep11 idledpms.com C8BD     yes      2022-01-30
-fdisk         1.3.4    fdisk.exe F098      no      2022-01-30  04)
-fdisk         1.3.4    fdisk.exe 98BF     yes      2022-01-31  05)
-find       3.0a LFN     find.com A9DA     yes      2022-01-30
-format        0.91v   format.exe F11E     yes      2022-01-30
-help       20220124         none   -       -       2022-01-30
-himemx         3.34   himemx.exe C8E6     yes      2022-01-30  06)
-kernel         2042      sys.com BF43     yes      2022-01-30
-kernel         2042   kernel.sys A9B2     yes      2022-01-30
-keyb           2.01     keyb.exe 945C     yes      2022-01-30
-keyb_lay        3.1         none   -       -       2022-01-30
-label       1.4b.ea    label.exe 1F5D     yes      2022-01-30
-localcfg       0.90 localcfg.com E424     yes      2022-01-30
-mem           1.11r      mem.exe 2BB8     yes      2022-01-30  07)
-mode     2015-11-25     mode.com BA1E     yes      2022-01-30
-more            4.3     more.exe 729B     yes      2022-01-30
-move           3.3a     move.exe D3E4     yes      2022-01-30
-pkg        20210212      pkg.exe 9FAB     yes      2022-01-30
-pkgnet     20220119   pkgnet.exe 3D2F     yes      2022-01-30
-shsucdx        3.05  shcdx86.com 0A74     yes      2022-01-30
-shsucdx        3.05  shsucdx.com E5A5     yes      2022-01-30  08)
-sort          1.5.1     sort.exe 21C2     yes      2022-01-30
-tree          3.7.2     tree.com 2370     yes      2022-01-30
-(pcntpk)      03.10   pcntpk.com 38C7     yes      2022-01-30
-(udvd2)   30-Apr-13    udvd2.sys D3AB     yes      2022-01-30  09)
+%bPAKET       VERSION     PROGRAMM BSUM  8086-OK?*   Geprüft am
+amb        20201223      amb.com A11A      Ja      2022-01-30
+attrib          2.1   attrib.com 2C15      Ja      2022-01-30
+chkdsk   0.9.2 beta   chkdsk.exe E2A9      Ja      2022-01-30
+choice          4.4   choice.exe 8311      Ja      2022-01-30
+command  0.84 pre 2  command.com E64E      Ja      2022-01-30  01)
+cpidos          3.0            -   -       -       2022-01-30
+debug          1.25    debug.com 2E6B      Ja      2022-01-31
+debug          1.25   debugx.com EA59      Ja      2022-01-31
+deltree  1.02g.mrlg  deltree.com E20D     Nein     2022-01-30  02)
+deltree       1.02g  deltree.com AB16      Ja      2022-01-31  03)
+devload        3.25  devload.com B91B      Ja      2022-01-30
+diskcopy  beta 0.95 diskcopy.exe 3558      Ja      2022-01-30
+display       0.13b  display.exe 5903      Ja      2022-01-30
+dosfsck       2.11c  dosfsck.exe 1CB8      Ja      2022-01-30
+edit           0.9a     edit.exe 8F1A      Ja      2022-01-30
+fc             3.03       fc.exe E718      Ja      2022-01-30
+fdapm     2009sep11    fdapm.com A74A      Ja      2022-01-30
+fdapm     2009sep11 idledpms.com C8BD      Ja      2022-01-30
+fdisk         1.3.4    fdisk.exe F098     Nein     2022-01-30  04)
+fdisk         1.3.4    fdisk.exe 98BF      Ja      2022-01-31  05)
+find       3.0a LFN     find.com A9DA      Ja      2022-01-30
+format        0.91v   format.exe F11E      Ja      2022-01-30
+help       20220124            -   -       -       2022-01-30
+himemx         3.34   himemx.exe C8E6      Ja      2022-01-30  06)
+kernel         2042      sys.com BF43      Ja      2022-01-30
+kernel         2042   kernel.sys A9B2      Ja      2022-01-30
+keyb           2.01     keyb.exe 945C      Ja      2022-01-30
+keyb_lay        3.1            -   -       -       2022-01-30
+label       1.4b.ea    label.exe 1F5D      Ja      2022-01-30
+localcfg       0.90 localcfg.com E424      Ja      2022-01-30
+mem           1.11r      mem.exe 2BB8      Ja      2022-01-30  07)
+mode     2015-11-25     mode.com BA1E      Ja      2022-01-30
+more            4.3     more.exe 729B      Ja      2022-01-30
+move           3.3a     move.exe D3E4      Ja      2022-01-30
+pkg        20210212      pkg.exe 9FAB      Ja      2022-01-30
+pkgnet     20220119   pkgnet.exe 3D2F      Ja      2022-01-30
+shsucdx        3.05  shcdx86.com 0A74      Ja      2022-01-30
+shsucdx        3.05  shsucdx.com E5A5      Ja      2022-01-30  08)
+sort          1.5.1     sort.exe 21C2      Ja      2022-01-30
+tree          3.7.2     tree.com 2370      Ja      2022-01-30
+(pcntpk)      03.10   pcntpk.com 38C7      Ja      2022-01-30  **
+(udvd2)   30-Apr-13    udvd2.sys D3AB      Ja      2022-01-30  09)
 
-* Executable does its normal job or exits gracefully with a hint.
+* Programm arbeitet entweder ganz normal oder beendet sich mit einem
+  freundlichen Hinweis auf den nicht unterstützten Prozessor.
 
-Notes:
-01) also has localized versions from cmd-de.com (German) to cmd-tr.com
-    (Turkish)
-02) pce-ibmpc: undefined operation [C1 04] -> uncompressing with UPX
-    made it work
-03) replaced BSUM E20D file; used UPX --8086 option
-04) pce-ibmpc: undefined operation [C1 e1] -> needed a full rebuild
-05) replaced BSUM F098 file; no -1 option for TC++; used UPX --8086 option
-06) exits with "At least a 80386 is required."
-07) under pce-ibmpc reports 1,024K of conventional memory, but 0K free
-08) exits with "Must have at least a 386."
-09) exits with "No 386+ CPU; UDVD2 not loaded!"
+** Pakete in runden Klammern sind keine Kernpakete, aber dennoch auf dem
+   Installationsmedium vorhanden.
+
+Fußnoten:
+01) Enthält auch lokalisierte Versionen von cmd-de.com (Deutsch) bis
+    cmd-tr.com (Türkisch).
+02) pce-ibmpc: undefined operation [C1 04] -> Dekomprimieren mit UPX machte
+    es lauffähig.
+03) Ersetzte Datei mit BSUM E20D. UPX mit Option "--8086" verwendet.
+04) pce-ibmpc: undefined operation [C1 e1] -> Brauchte ein volles Rebuild.
+05) Ersetzte Datei mit BSUM F098. Ohne Option "-1" bei TC++. UPX mit
+    Option "--8086" verwendet.
+06) Beendet sich mit: "At least a 80386 is required."
+07) pce-ibmpc: Zeigt 1.024 KB konventionellen Speicher an, aber 0 KB frei
+08) Beendet sich mit: "Must have at least a 386."
+09) Beendet sich mit: "No 386+ CPU; UDVD2 not loaded!"
 
 ------------------------------------------------------------------------------
-Article by Robert Riebisch
+Artikel von Robert Riebisch
