@@ -12,7 +12,7 @@ VER=`date +%Y%m%d`
 
 # amb-pack all languages
 for d in ./help-?? ; do
-ambpack c $d $d.amb
+ambpack cc $d $d.amb
 done
 
 mkdir bin
