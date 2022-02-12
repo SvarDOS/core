@@ -48,7 +48,7 @@ tree          3.7.2     tree.com 2370     yes      2022-01-30
 (pcntpk)      03.10   pcntpk.com 38C7     yes      2022-01-30
 (udvd2)   30-Apr-13    udvd2.sys D3AB     yes      2022-01-30  09)
 
-* Executable does its normal job or exits gracefully with a hint.
+* Executable does its normal job or exits with a friendly hint.
 
 Notes:
 01) also has localized versions from cmd-de.com (German) to cmd-tr.com
