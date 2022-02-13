@@ -4,15 +4,15 @@
 Um Software in Ihrem SvarDOS-System zu installieren oder zu entfernen,
 verwenden Sie den Befehl "pkg". pkg ist ein Paketverwaltungsprogramm, um das
 Installieren neuer Software aus SvarDOS-Paketen und das Entfernen vorhandener
-Software vom System zu ermöglichen. Um etwas über die richtige Verwendung von
+Software vom System zu ermÃ¶glichen. Um etwas Ã¼ber die richtige Verwendung von
 pkg zu erfahren, geben Sie pkg /? an der SvarDOS-Befehlszeile ein.
 
-Sie können viele SvarDOS-Pakete von der SvarDOS-Homepage
+Sie kÃ¶nnen viele SvarDOS-Pakete von der SvarDOS-Homepage
 <http://svardos.osdn.io> beziehen. Wenn Ihr SvarDOS-System mit dem Internet
-verbunden ist, dann können Sie auch den Befehl "pkgnet" verwenden. pkgnet ist
+verbunden ist, dann kÃ¶nnen Sie auch den Befehl "pkgnet" verwenden. pkgnet ist
 ein Netzwerkwerkzeug, das es einfach macht, nach SvarDOS-Paketen im SvarDOS-
 Projektarchiv zu suchen und sie auf der Stelle herunterzuladen. Geben Sie
-pkgnet /? an der SvarDOS-Befehlszeile ein, um etwas über die richtige
+pkgnet /? an der SvarDOS-Befehlszeile ein, um etwas Ã¼ber die richtige
 Verwendung von pkgnet zu erfahren.
 
 See also:
