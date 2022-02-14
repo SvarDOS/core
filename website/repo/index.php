@@ -5,8 +5,8 @@
   Copyright (C) 2021-2022 Mateusz Viste
 
  === API ===
-  ?a=pull&p=PACKAGE           downloads the zip archive containing PACKAGE
-  ?a=pull&p=PACKAGE-VER       downloads the zip containing PACKAGE in version VER
+  ?a=pull&p=PACKAGE           downloads the zip archive (svp) containing PACKAGE
+  ?a=pull&p=PACKAGE-VER       downloads the zip (svp) containing PACKAGE in version VER
   ?a=search&p=PHRASE          list packages that match PHRASE
   ?a=checkup                  list of packages+versions in $_POST
 */
@@ -88,10 +88,10 @@ if (!empty($_GET['v'])) $v = $_GET['v'];
 // pull action is easy (does not require looking into pkg list), do it now
 
 if ($a === 'pull') {
-  if (file_exists($p . '.zip')) {
-    header('Content-Disposition: attachment; filename="' . $p . '.zip"');
+  if (file_exists($p . '.svp')) {
+    header('Content-Disposition: attachment; filename="' . $p . '.svp"');
     header('Content-Type: application/octet-stream');
-    readfile($p . '.zip');
+    readfile($p . '.svp');
   } else {
     http_response_code(404);
     echo "ERROR: package not found on server\r\n";
@@ -120,13 +120,13 @@ if ($a === 'search') {
   $matches = 0;
   while (($pkg = fgetcsv($handle, 1024, "\t")) !== FALSE) {
     if ((stristr($pkg[0], $p)) || (stristr($pkg[2], $p))) {
-      echo str_pad(strtoupper($pkg[0]), 12) . str_pad("ver: {$pkg[1]} ", 16) . str_pad("size: " . nicesize(filesize($pkg[0] . '.zip')), 16) . "BSUM: " . sprintf("%04X", $pkg[3]) . "\r\n";
+      echo str_pad(strtoupper($pkg[0]), 12) . str_pad("ver: {$pkg[1]} ", 16) . str_pad("size: " . nicesize(filesize($pkg[0] . '.svp')), 16) . "BSUM: " . sprintf("%04X", $pkg[3]) . "\r\n";
       echo wordwrap($pkg[2], 79, "\r\n", true);
       echo "\r\n";
       // do I have any alt versions?
-      $altvers = glob("{$pkg[0]}-*.zip");
+      $altvers = glob("{$pkg[0]}-*.svp");
       if (!empty($altvers)) {
-        $alts = str_replace('.zip', '', $altvers);
+        $alts = str_replace('.svp', '', $altvers);
         echo wordwrap("[alt versions: " . implode(', ', $alts), 79, "\r\n", true) . "]\r\n";
       }
       echo "\r\n";
