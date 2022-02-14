@@ -30,6 +30,5 @@ cp help.bat bin
 mv help-*.amb help
 echo "version: $VER" >> appinfo/help.lsm
 echo "description: SvarDOS help (manual)" >> appinfo/help.lsm
-zip -9rkDX -m help.zip appinfo bin help
+zip -9rkDX -m help.svp appinfo bin help
 rmdir appinfo bin help
-mv help.zip ../packages/
