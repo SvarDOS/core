@@ -1,32 +1,36 @@
 
-%hSvarDOS origins (history from the point of view of its creator)
+%hUrsprünge von SvarDOS (Geschichte aus der Sicht seines Schöpfers)
 
-Mateusz Viste says:
+Mateusz Viste beschreibt:
 
-In the years 2005-2015 I used to perform packaging work for the FreeDOS
-project. I wasn't pleased with the packaging tool that FreeDOS used back then
-(FDPKG), so in 2012 I started working on a new package manager, with network
-support, automatic updates, etc - I named it FDNPKG. Later I also devised a
-scripted way of generating an "always up to date" FreeDOS CD that I
-unimaginatively called "all_cd.iso". This CD included FDNPKG and all the
-FreeDOS packages available at the given moment.
+In den Jahren 2005-2015 habe ich Paketierungsarbeiten für das FreeDOS-Projekt
+durchgeführt. Ich war nicht zufrieden mit dem Paketierungswerkzeug, das
+FreeDOS damals verwendete (FDPKG), also begann ich 2012 mit der Arbeit an
+einem neuen Paketmanager, mit Netzwerkunterstützung, automatischen Updates
+usw. - ich nannte es FDNPKG. Später entwickelte ich auch ein Skript, um eine
+"immer aktuelle" FreeDOS-CD zu erzeugen, die ich fantasielos "all_cd.iso"
+nannte. Diese CD enthielt FDNPKG und alle FreeDOS-Pakete, die zum gegebenen
+Zeitpunkt verfügbar waren.
 
-I still wasn't satisfied with how FreeDOS clings to its notion of "releases"
-and that it cannot include some software because of licensing issues, so in
-2016 I decided to create my own distribution, that I called Svarog386 (there
-was also a Svarog86 project that I had created a couple months earlier,
-dedicated to 8086 machines). Svarog386 naturally relied on the FreeDOS kernel
-and used the FDNPKG package manager.
+Ich war immer noch nicht damit zufrieden, wie FreeDOS an seiner Vorstellung
+von "Versionen" festhielt und dass es manche Software aufgrund von
+Lizenzproblemen nicht enthalten kann. Also beschloss ich 2016 meine eigene
+Distribution zu erstellen, die ich Svarog386 nannte. (Es gab auch ein
+Svarog86-Projekt, das ich ein paar Monate zuvor erstellt hatte, das für 8086-
+Maschinen gedacht war). Svarog386 basierte natürlich auf dem FreeDOS-Kernel
+und verwendete den FDNPKG-Paketmanager.
 
-Then, in 2021, I found it increasingly annoying to look after two separate
-distributions. Over time, FDNPKG also became a huge piece of protected mode
-code, and although it was magnificent code, I was no longer happy with it: too
-many features, too much data processing, too much memory required... In a
-word: too much fluff. I longed for something simpler, that would do perhaps
-less, but with more transparency towards the user - and something that would
-work in real mode with not much RAM, so it could run even on ancient 8086
-machines.
+Dann, im Jahr 2021, fand ich es zunehmend lästig, mich um zwei getrennte
+Distributionen zu kümmern. Mit der Zeit war FDNPKG auch zu einem riesigen
+Stück Protected-Mode-Code geworden, und obwohl es ein großartiger Code war,
+war ich nicht mehr glücklich damit: zu viele Funktionen, zu viel
+Datenverarbeitung, zu viel Speicherbedarf... Mit einem mit einem Wort: zu viel
+Schnickschnack. Ich sehnte mich nach etwas Einfacherem, das vielleicht
+weniger, aber mit mehr Transparenz für den Benutzer machen würde - und etwas,
+das im Real-Modus mit wenig RAM arbeiten würde, so dass es sogar auf alten
+8086-Maschinen laufen könnte.
 
-The result of these thoughts was SvarDOS: a distribution that replaced both
-Svarog86 and Svarog386, and that came with its own package manager - a much
-simpler (and in my opinion much more elegant) tool than FDNPKG.
+Das Ergebnis dieser Überlegungen war SvarDOS: eine Distribution, die sowohl
+Svarog86 und Svarog386 ersetzte und mit einem eigenen Paketmanager
+ausgestattet war - einem viel einfacheren (und meiner Meinung nach viel
+eleganterem) Werkzeug als FDNPKG.
