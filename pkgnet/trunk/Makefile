@@ -12,8 +12,10 @@ release: pkgnet.exe .symbolic
 	mkdir appinfo
 	copy pkgnet.exe bin
 	copy pkgnet.lsm appinfo
-	zip -9krDX -m pkgnet.zip bin appinfo
-	zip -9krDX pkgnet.src Makefile *.c *.h pkgnet.lsm watt32
+	zip -9krDX -m pkgnet.svp bin appinfo
+	rmdir bin
+	rmdir appinfo
+	zip -9krDX pkgnet.zip Makefile *.c *.h pkgnet.lsm watt32
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
 	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe

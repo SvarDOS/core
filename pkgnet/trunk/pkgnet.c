@@ -38,7 +38,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220208"
+#define PVER "20220214"
 #define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.org"
@@ -103,8 +103,8 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url, in
     for (i = 0; (argv[2][i] != 0) && (argv[2][i] != '-') && (i < 8); i++) {
       outfname[i] = argv[2][i];
     }
-    /* add the zip extension to filename */
-    strcpy(outfname + i, ".zip");
+    /* add the svp extension to filename */
+    strcpy(outfname + i, ".svp");
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
     sprintf(url, "/repo/?a=checkup");
     *ispost = 1;
