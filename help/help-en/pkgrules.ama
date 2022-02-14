@@ -41,8 +41,8 @@ being redistributed in a re-packaged form.
 %!CORE EXCEPTIONS
 
 While the above rules are valid for all third-party packages that may be
-distributed with SvarDOS, it does NOT apply to the "CORE" packages that contain
-the operating system itself. SvarDOS being a free (as in "libre") operating
-system, all CORE packages must comply to a libre-like license - be it GPL, BSD,
-MIT, public domain, or anything that allows for unrestricted distribution,
-provides source code and allows to modify it freely.
+distributed with SvarDOS, it does NOT apply to the "CORE" packages that
+contain the operating system itself. SvarDOS being a free (as in "libre")
+operating system, all CORE packages must comply to a libre-like license - be
+it GPL, BSD, MIT, public domain, or anything that allows for unrestricted
+distribution, provides source code and allows to modify it freely.
