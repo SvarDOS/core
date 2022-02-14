@@ -1,48 +1,53 @@
 
-                     %h*** Packages inclusion rules ***
+               %h*** Regeln für die Einbeziehung von Paketen ***
 
-SvarDOS is a DOS distribution that comes with plenty of third-party packages.
-With time, packages get updated and new packages are being added. However,
-SvarDOS is not a shareware distribution CD, nor it is a "warez" production of
-any kind. Every software that is distributed within SvarDOS must comply to a
-few common sense rules, as listed below.
+SvarDOS ist eine DOS-Distribution, die mit vielen Paketen von Drittanbietern
+ausgeliefert wird. Mit der Zeit werden Pakete aktualisiert und neue Pakete
+werden hinzugefügt. SvarDOS ist jedoch weder eine Shareware-Distributions-CD
+noch eine "Warez"-Produktion irgendeiner Art. Jede Software, die mit SvarDOS
+weitergegeben wird, muss ein paar Regeln des gesunden Menschenverstands
+einhalten, die im Folgenden aufgeführt sind.
 
-%hObjective usefulness
+%hObjektive Nützlichkeit
 
-The distributed software must be useful. There is no point in distributing
-hundreds of "Hello World" programs for example. The software must be useable
-as a finished product and provide some features that are proven to be seeked
-by at least a subset of the user base. Games are considered useful, as long as
-they fulfill their goal of providing actual distraction.
+Die weitergegebene Software muss nützlich sein. Es hat keinen Sinn,
+beispielsweise Hunderte von "Hallo Welt"-Programmen zu verteilen. Die Software
+muss als fertiges Produkt benutzbar sein und einige Funktionen bieten, die
+nachweislich zumindest von einer Teilmenge der Benutzer gesucht werden. Spiele
+werden als nützlich angesehen, solange sie ihr Ziel erfüllen, eine
+tatsächliche Ablenkung zu bieten.
 
-%hReasonable quality
+%hAngemessene Qualität
 
-The packaged program must exhibit traits of reasonable quality. This means
-that it should have a deterministic behavior, and be free of undesirable
-side-effects to the user's computer (not crashing, freezing, resulting in
-unexpected loss of data, etc). It should also provide clear, non-ambiguous
-instructions to the user about how the program is meant to be used.
+Das paketierte Programm muss Eigenschaften von angemessener Qualität
+aufweisen. Das bedeutet, dass es ein deterministisches Verhalten aufweisen und
+keine unerwünschten Nebeneffekte auf dem Computer des Benutzers haben sollte
+(kein Absturz, kein Einfrieren, kein unerwarteter Datenverlust, usw.).
+Außerdem sollte es dem Benutzer klare, nicht zweideutige Anweisungen geben,
+wie das Programm zu verwenden ist.
 
-%hFree (no cost)
+%hKostenlos
 
-The program must be free - that is, available at no financial cost. It doesn't
-have to comply to an OSI-approved license or be open-source (even if that
-would be preferred), but at the very least it must be free for personal,
-non-commercial use. This includes "Freeware", "postcardware", etc. "Shareware"
-is acceptable, too, as long as the shareware version of the program fullfills
-the conditions of usefulness, quality and allows repackaged distribution.
+Das Programm muss kostenlos sein, d. h. es muss ohne finanzielle Kosten
+verfügbar sein. Es muss nicht einer von der OSI genehmigten Lizenz entsprechen
+oder Open-Source sein (auch wenn dies wünschenswert wäre), aber zumindest muss
+es für den persönlichen, nicht-kommerziellen Gebrauch kostenlos sein. Dies
+schließt "Freeware", "Postcardware" usw. ein. Auch "Shareware" ist akzeptabel,
+solange die Shareware-Version des Programms die Bedingungen der Nützlichkeit
+und Qualität erfüllt und eine Weitergabe in einem neuen Paket erlaubt.
 
-%hDistribution allowed
+%hWeitergabe erlaubt
 
-The program must allow distribution without restrictions, and must not forbid
-being redistributed in a re-packaged form.
+Das Programm muss eine uneingeschränkte Weitergabe erlauben und darf die
+Weitergabe in einer neu paketierten Form nicht untersagen.
 
 
-%!CORE EXCEPTIONS
+%!AUSNAHMEN FÜR DEN KERN
 
-While the above rules are valid for all third-party packages that may be
-distributed with SvarDOS, it does NOT apply to the "CORE" packages that contain
-the operating system itself. SvarDOS being a free (as in "libre") operating
-system, all CORE packages must comply to a libre-like license - be it GPL, BSD,
-MIT, public domain, or anything that allows for unrestricted distribution,
-provides source code and allows to modify it freely.
+Während die obigen Regeln für alle Pakete von Drittanbietern gelten, die mit
+SvarDOS weitergegeben werden können, gelten sie NICHT für die Kernpakete, die
+das Betriebssystem selbst enthalten. Da SvarDOS ein freies (wie in "libre"
+bzw. in "Freiheit) Betriebssystem ist, müssen alle Kernpakete einer libre-
+ähnlichen Lizenz entsprechen - sei es GPL, BSD, MIT, Public Domain oder
+irgendetwas anderes, das eine uneingeschränkte Weitergabe erlaubt, den
+Quellcode zur Verfügung stellt und erlaubt, ihn frei zu modifizieren.
