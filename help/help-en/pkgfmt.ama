@@ -11,7 +11,7 @@ Packages names must follow some basic rules. They shall be max. 8 letters long
 be confusing), and must not be composed of characters other than a-b, 0-9 and
 '_'. This for backward compatibility with short file names (8+3) and ISO 9660
 file systems (used on CDROMs). The package filename is always followed by the
-.ZIP extension.
+.SVP ("SvarDOS Package") extension.
 
 
 %hPackage files
@@ -24,11 +24,11 @@ supported, and in the public domain.
 Here below is the recommended command line that can be used to create a
 package for a program named EXAMPLE using info-zip:
 
-  zip -9rkDX EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+  zip -9rkDX EXAMPLE.SVN subdir1 subdir2 ... subdirN
 
 If you are using 7za to create your packages, then use this:
 
-  7za a -mm=deflate -mx=9 -tzip EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+  7za a -mm=deflate -mx=9 -tzip EXAMPLE.SVN subdir1 subdir2 ... subdirN
 
 
 %hPackage directory structure
@@ -41,7 +41,6 @@ For "core" packages, we have this:
   DOC\PKGNAME        Package documentation
   HELP               Used ONLY by the "help" package
   NLS\PKGNAME        Localizations (NLS language files) of the package
-  SOURCE\PKGNAME     The source code (optional)
 
 Non-core packages use a slightly different directory organization. For
 example, if we were to consider a package FOO, we might end up with the
@@ -51,7 +50,6 @@ following structure:
   PROGS\FOO\FOO.EXE  The program's executable
   PROGS\FOO\FOO.TXT  Some documentation
   PROGS\FOO\FILE.DAT Data file used by the FOO program
-  SOURCE\FOO\*       here would be stored the foo's source code (optional)
 
 Note the PROGS directory above. This is the category to which the package
 belongs. The package installer might change this directory at install time,
@@ -108,3 +106,20 @@ FDISK 1.54+1    <- package has been changed, but not the upstream version
 FDISK 1.55      <- upstream version increased, so SvarDOS rev restarts
 FDISK 1.55+1    <- new version of the package, but still contains FDISK 1.55
 FDISK 1.55+2    <- another new version of the package, etc
+
+The entire version string of a package must never exceed 16 characters.
+
+
+%hSources
+
+When a packaged software has its sources available, then it is recommended to
+archive also them. To that effect, put the sources into a ZIP archive that has
+the same filename as the package, but a *.ZIP extension (as opposed to the
+*.SVP extension of the proper package). The result would be that the packaged
+software would be distributed within two files. Example for FDISK:
+
+FDISK.SVP       <- binaries (ZIP archive following the SVP structure)
+FDISK.ZIP       <- sources (flat, unstructured ZIP archive)
+
+The ZIP file must obviously contain the source code that belongs to the exact
+same version present in the SVP package.

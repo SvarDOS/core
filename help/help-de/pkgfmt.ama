@@ -12,7 +12,7 @@ mit 1 oder 2 Buchstaben verwirrend sein könnte) und dürfen nicht aus anderen
 Zeichen als a-b, 0-9 und '_' bestehen. Dies geschieht aus Gründen der
 Abwärtskompatibilität mit kurzen Dateinamen (8+3) und ISO 9660-Dateisystemen
 (auf CD-ROMs verwendet). Auf den Dateinamen des Pakets folgt immer die
-Erweiterung .ZIP.
+Erweiterung .SVP ("SvarDOS Package").
 
 
 %hPaketdateien
@@ -25,11 +25,11 @@ gut dokumentiert, wird gut unterstützt und ist Public Domain.
 Nachfolgend finden Sie die empfohlene Befehlszeile, mit der Sie ein Paket für
 ein Programm namens BEISPIEL mit info-zip erstellen können:
 
-  zip -9rkDX BEISPIEL.ZIP untverz1 untverz2 ... untverzN
+  zip -9rkDX BEISPIEL.SVP untverz1 untverz2 ... untverzN
 
 Wenn Sie 7za verwenden, um Ihre Pakete zu erstellen, dann verwenden Sie dies:
 
-  7za a -mm=deflate -mx=9 -tzip BEISPIEL.ZIP untverz1 untverz2 ... untverzN
+  7za a -mm=deflate -mx=9 -tzip BEISPIEL.SVP untverz1 untverz2 ... untverzN
 
 
 %hVerzeichnisstruktur für Pakete
@@ -42,7 +42,6 @@ Für Kernpakete haben wir dies:
   DOC\PKGNAME        Dokumentation zum Paket
   HELP               Wird NUR vom Paket "help" verwendet
   NLS\PKGNAME        Lokalisierungen (NLS-Sprachdateien) des Pakets
-  SOURCE\PKGNAME     Der Quellcode (optional)
 
 Nicht-Kernpakete verwenden eine etwas andere Verzeichnisstruktur. Wenn wir
 zum Beispiel ein Paket FOO betrachten, könnten wir die folgende Struktur
@@ -52,7 +51,6 @@ erhalten:
   PROGS\FOO\FOO.EXE  Die ausführbare Datei des Programms
   PROGS\FOO\FOO.TXT  Eine Dokumentation
   PROGS\FOO\FILE.DAT Vom Programm FOO verwendete Datendatei
-  SOURCE\FOO\*       Hier wird der Quellcode von foo gespeichert (optional)
 
 Beachten Sie das Verzeichnis PROGS oben. Dies ist die Kategorie, zu der das
 Paket gehört. Der Paketinstaller kann dieses Verzeichnis bei der Installation
@@ -114,3 +112,20 @@ FDISK 1.54+1    <- Paket wurde geändert, aber nicht die Upstream-Version
 FDISK 1.55      <- Upstream-Version erhöhte sich, so dass SvarDOS neu startet
 FDISK 1.55+1    <- neue Version des Pakets, enthält aber immer noch FDISK 1.55
 FDISK 1.55+2    <- eine weitere neue Version des Pakets, usw.
+
+The entire version string of a package must never exceed 16 characters.
+
+
+%hDer Quellcode
+
+When a packaged software has its sources available, then it is recommended to
+archive also them. To that effect, put the sources into a ZIP archive that has
+the same filename as the package, but a *.ZIP extension (as opposed to the
+*.SVP extension of the proper package). The result would be that the packaged
+software would be distributed within two files. Example for FDISK:
+
+FDISK.SVP       <- binaries (ZIP archive following the SVP structure)
+FDISK.ZIP       <- sources (flat, unstructured ZIP archive)
+
+The ZIP file must obviously contain the source code that belongs to the exact
+same version present in the SVP package.
