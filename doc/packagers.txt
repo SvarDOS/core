@@ -6,7 +6,7 @@
 
 === HOW TO CREATE A PACKAGE? ==================================================
 
-Packaging software for SvarDOS implies creating a ZIP package that can be
+Packaging software for SvarDOS implies creating an SVP package that can be
 installed with "pkg". This file will not discuss this aspect, you should find
 all necessary information about this topic in the SvarDOS help:
 
@@ -40,14 +40,14 @@ on your disk. Inside you will find all SvarDOS packages.
 
 === UPLOADING A NEW PACKAGE ===================================================
 
-So you have created this new SvarDOS ZIP package with some very cool software
+So you have created this new SvarDOS SVP package with some very cool software
 in it. Great! To upload it to the SvarDOS online repo, copy your zip package
 to your local svardos-packages directory. Then, instruct svn to add the new
 file(s) to the repo:
 
 $ cd svardos-packages
-$ svn add package.zip
-$ svn add package.src   <-- optional, only if the package has available sources
+$ svn add package.svp
+$ svn add package.zip   <-- optional, only if the package has available sources
 
 Review the changes to make sure you added the right files:
 $ svn st
@@ -70,13 +70,13 @@ First, you need to rename the current package's filename so it becomes an
 "alternative version":
 
 $ cd svardos-packages
-$ svn mv nasm.zip nasm-2.12.zip
-$ svn mv nasm.src nasm-2.12.src      <-- optional (only if package has sources)
+$ svn mv nasm.svp nasm-2.12.svp
+$ svn mv nasm.zip nasm-2.12.zip      <-- optional (only if package has sources)
 
 Then, add the new version as the "current" version:
 
-$ svn add nasm.zip
-$ svn add nasm.src                   <-- optional (only if package has sources)
+$ svn add nasm.svp
+$ svn add nasm.zip                   <-- optional (only if package has sources)
 
 Finally, review and commit your changes:
 
@@ -92,7 +92,8 @@ with SvarDOS distribution, etc. Removing a package means deleting it from the
 svn repository and commiting the change. Example:
 
 $ cd svardos-packages
-$ svn del package.zip
+$ svn del package.svp
+$ svn del package.zip       <-- only if zip with sources exists
 $ svn commit -m 'removed package PACKAGE_NAME because (reason here)'
 
 
