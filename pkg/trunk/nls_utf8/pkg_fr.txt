@@ -15,12 +15,12 @@
 1.24:       pkg listlocal [filter]
 1.27:       pkg unzip fichier.zip
 1.25:PKG est publié sous license MIT.
-1.26:Cet outil est configurable via %DOSDIR%\CFG\PKG.CFG
+1.26:Cet outil est configurable via %DOSDIR%\\CFG\\PKG.CFG
 
 ### General stuff ####
 
 2.2:%DOSDIR% non défini! Faites-le pointer vers le répertoire principal de SvarDOS.
-2.3:Exemple : SET DOSDIR=C:\SVARDOS
+2.3:Exemple : SET DOSDIR=C:\\SVARDOS
 2.14:Mémoire insuffisante! (%s)
 
 #### Installing package ####

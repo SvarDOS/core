@@ -15,12 +15,12 @@
 1.24:        pkg listlocal [filtr]
 1.27:        pkg unzip plik.zip
 1.25:PKG jest opublikowany na licencji MIT.
-1.26:Konfiguracja znajduje się w pliku %DOSDIR%\CFG\PKG.CFG
+1.26:Konfiguracja znajduje się w pliku %DOSDIR%\\CFG\\PKG.CFG
 
 ### General stuff ####
 
 2.2:%DOSDIR% nie ustawione! Ustaw by wskazywało na katalog instalacji SvarDOS.
-2.3:Przykład: SET DOSDIR=C:\SVARDOS
+2.3:Przykład: SET DOSDIR=C:\\SVARDOS
 2.14:Brak pamięci! (%s)
 
 #### Installing package ####
