@@ -1,54 +1,57 @@
 
-%hNetworking
+%hVernetzung
 
-For enabling network connectivity you first need to know what kind of network
-adapter you have, and obtain a suitable packet driver for it. The "crynwr"
-package contains lots of packet drivers for a variety of network adapters.
-There is also a packet driver for Intel Pro cards in the e1000pkt package, and
-a driver for AMD PC-NET cards in the pcntpk package.
+Um eine Netzwerkverbindung zu ermöglichen, müssen Sie zunächst wissen, welche
+Art von Netzwerkadapter Sie haben, und einen geeigneten Pakettreiber für ihn
+beschaffen. Das Paket "crynwr" enthält eine Vielzahl von Pakettreibern für
+eine Vielzahl von Netzwerkadaptern. Es gibt auch einen Pakettreiber für
+Intel-Pro-Karten im Paket "e1000pkt" und einen Treiber für AMD-PC-NET-Karten
+im Paket "pcntpk".
 
-You need to get the packet driver for your card onto the machine, and load it.
-Then, you should be able to access the internet and get anything else you need
-using wget, htget, gopherus and other network-enabled applications.
+Sie müssen den Pakettreiber für Ihre Karte auf den Rechner holen und ihn
+laden. Dann sollten Sie in der Lage sein, auf das Internet zuzugreifen und
+alles andere, was Sie brauchen, mit wget, htget, gopherus und anderen
+netzwerkfähigen Anwendungen abzurufen.
 
-Note that packet drivers are mostly available for old-ish interfaces. If you
-have some modern ethernet card, then there might not be a packet driver
-available for it.
+Beachten Sie, dass Pakettreiber meist für ältere Schnittstellen verfügbar
+sind. Wenn Sie eine moderne Ethernet-Karte haben, gibt es möglicherweise
+keinen Pakettreiber für diese.
 
-%hFILE SHARING
+%hDATEIFREIGABE
 
-Perhaps these links could provide some pointers:
+Vielleicht können diese Links einige Hinweise geben:
 <http://wiki.freedos.org/wiki/index.php/Networking_FreeDOS_-_MS_Client>
 <https://www.lazybrowndog.net/freedos/virtualbox/?page_id=374>
 
-There is also EtherDFS, which is a very lightweight and easy solution for
-file-sharing between DOS and Linux (but it does require a Linux PC and some
-basic understanding of how Linux works):
+Es gibt auch EtherDFS, eine sehr leichtgewichtige und einfache Lösung für eine
+Dateifreigabe zwischen DOS und Linux (aber es erfordert einen Linux-PC und
+einige Grundkenntnisse über die Funktionsweise von Linux):
 <http://etherdfs.sourceforge.net/>
 
-%hVIRTUALBOX - PACKET DRIVER
+%hVIRTUALBOX - PAKETTREIBER
 
-VirtualBox is able to emulate an AMD PC-NET NIC (you need to make sure of that
-in the configuration of your VM, VirtualBox calls it "PCnet-FAST III" and it
-should be set to "NAT"). Then, in SvarDOS you have to install the pcntpk.zip
-package - you don't even need to download it, it's already present on the
-installation image so it should be as simple as that:
+VirtualBox ist in der Lage, eine AMD-PC-NET-Netzwerkkarte zu emulieren (Sie
+müssen dies in der Konfiguration Ihrer VM sicherstellen, VirtualBox nennt es
+"PCnet-FAST III" und es sollte auf "NAT" eingestellt sein). Dann müssen Sie in
+SvarDOS das Paket pcntpk.zip installieren - Sie brauchen es nicht einmal
+herunterzuladen, es ist bereits auf dem Installationsdatenträger vorhanden,
+also sollte es so einfach sein:
 
 pkg install a:\pcntpk.zip
 
-Finally, load it as such:
+Laden Sie ihn schließlich als solchen:
 
 C:\DRIVERS\PCNTPK\PCNTPK INT=0x60
 
-...and that's it. From now on, you should be able to search through the
-available online packages and install extra software, for example:
+...und das war's. Von nun an sollten Sie in der Lage sein, die verfügbaren
+Online-Pakete zu durchsuchen und zusätzliche Software zu installieren, z. B.:
 
 pkgnet pull gopherus
 pkg install gopherus.zip
 
-(gopherus is a gopher browser)
+(gopherus ist ein Gopher-Browser.)
 
-To search through the list of available packages in the online repository, use
-that:
+Um die Liste der verfügbaren Pakete im Online-Projektarchiv zu durchsuchen,
+benutzen Sie:
 
-pkgnet search your_search_term
+pkgnet search Ihr_Suchbegriff
