@@ -1,16 +1,19 @@
 
-%hSvarDOS licensing
+%hSvarDOS-Lizensierung
 
-SvarDOS is a DOS distribution made of many different software bricks, hence a
-single license can hardly be applied to all. However, the CORE system (that
-is the SvarDOS installer, bootable images and all CORE packages) is carefully
-assembled from software that is "free" (as in "Freedom"), ie. that grants the 3
-basic FOSS liberties: freedom to use, modify, and redistribute. This includes,
-but is not necessarily limited to, software released under following licenses:
-GNU GPLv2, GNU GPLv3, BSD, MIT, EUPL and Public domain.
+SvarDOS ist eine DOS-Distribution, die aus vielen verschiedenen
+Software-Bausteinen besteht, daher kann eine einzige Lizenz kaum auf alle
+angewendet werden. Das Kernsystem (d. h. das SvarDOS-Installationsprogramm,
+die bootfähigen Images und alle Kernpakete) wurde jedoch sorgfältig aus
+Software zusammengestellt, die "frei" (wie in "Freiheit") ist, d. h., die die
+drei grundlegenden FOSS-Freiheiten gewährt: Freiheit der Nutzung, der
+Veränderung und der Weitergabe. Dies beinhaltet Software, ist aber nicht
+notwendigerweise darauf beschränkt, die unter den folgenden Lizenzen
+veröffentlicht wurde: GNU GPLv2, GNU GPLv3, BSD, MIT, EUPL und Public Domain.
 
-Note that, while the above applies to the core of the SvarDOS distribution, it
-does not cover all extra packages. Additional software packages may or may not
-be FOSS, they are only guaranteed to be "gratis for non-commercial use".
+Beachten Sie, dass die obigen Angaben zwar für den Kern der SvarDOS-
+Distribution gelten, aber nicht für alle zusätzlichen Pakete. Zusätzliche
+Softwarepakete können FOSS sein oder auch nicht, sie sind nur garantiert
+"kostenlos für nicht-kommerzielle Nutzung".
 
-Read more: %lpkgrules.ama:Packages inclusion rules
+Lesen Sie mehr: %lpkgrules.ama:Regeln für die Einbeziehung von Paketen
