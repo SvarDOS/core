@@ -43,7 +43,7 @@ Grundsätzlich kann alles, was objektiv nützlich, von angemessener Qualität
 sowie kostenlos ist und legal in Form eines Pakets verteilt werden darf, in
 SvarDOS aufgenommen werden. Die einzige Ausnahme ist das "Kernsystem" (d.h.
 das Betriebssystem selbst), das ausschließlich auf freier Software basiert.
-Lesen Sie mehr über %lpkgrules.ama:SvarDOS package inclusion rules%t.
+Lesen Sie mehr über %lpkgrules.ama:SvarDOS-Regeln für die Einbeziehung von Paketen%t.
 
 %hFreeDOS inbegriffen!
 
@@ -52,4 +52,4 @@ etwas unterscheiden, SvarDOS ohne FreeDOS nicht existieren würde. In der Tat
 verwendet SvarDOS den exzellenten FreeDOS-Kernel, sowie einige andere
 Programme aus dem aus dem FreeDOS-Ökosystem.
 
-Lesen Sie auch: %lhistory.ama:SvarDOS history
+Lesen Sie auch: %lhistory.ama:Ursprünge von SvarDOS

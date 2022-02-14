@@ -15,6 +15,6 @@ Projektarchiv zu suchen und sie auf der Stelle herunterzuladen. Geben Sie
 pkgnet /? an der SvarDOS-Befehlszeile ein, um etwas über die richtige
 Verwendung von pkgnet zu erfahren.
 
-See also:
- * %lpkgfmt.ama:The technical format of a SvarDOS package
- * %lpkgrules.ama:Packages inclusion rules
+Siehe auch:
+ * %lpkgfmt.ama:Das technische Format eines SvarDOS-Pakets
+ * %lpkgrules.ama:Regeln für die Einbeziehung von Paketen
