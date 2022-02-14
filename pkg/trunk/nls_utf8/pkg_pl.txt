@@ -8,8 +8,8 @@
 #### Help ####
 
 1.0:Menadżer pakietów dla SvarDOS.
-1.20:Użycie: pkg install pakiet.zip
-1.21:        pkg update pakiet.zip
+1.20:Użycie: pkg install pakiet.svp
+1.21:        pkg update pakiet.svp
 1.22:        pkg remove pakiet
 1.23:        pkg listfiles pakiet
 1.24:        pkg listlocal [filtr]

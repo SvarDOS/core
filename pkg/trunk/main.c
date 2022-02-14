@@ -55,8 +55,8 @@ static int showhelp(void) {
   puts("");
   puts(svarlang_str(1, 0)); /* "PKG is the package installer for SvarDOS." */
   puts("");
-  puts(svarlang_str(1, 20)); /* "Usage: pkg install package.zip */
-  puts(svarlang_str(1, 21)); /* "       pkg update package.zip" */
+  puts(svarlang_str(1, 20)); /* "Usage: pkg install package.svp */
+  puts(svarlang_str(1, 21)); /* "       pkg update package.svp" */
   puts(svarlang_str(1, 22)); /* "       pkg remove package" */
   puts(svarlang_str(1, 23)); /* "       pkg listfiles package" */
   puts(svarlang_str(1, 24)); /* "       pkg listlocal [filter]" */

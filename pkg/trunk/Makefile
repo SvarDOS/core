@@ -16,7 +16,8 @@ release: pkg.exe .symbolic
 	copy pkg.lng nls
 	upx --8086 -9 pkg.exe -o bin\pkg.exe
 	copy pkg.lsm appinfo
-	zip -9moDkrX pkg.zip appinfo bin nls
+	zip -9moDkrX pkg.svp appinfo bin nls
+	zip -9oDkrX pkg.zip nls_utf8 svarlang.lib zlib *.c *.h pkg.lsm makefile
 	rmdir appinfo
 	rmdir bin
 	rmdir nls
