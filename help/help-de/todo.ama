@@ -1,53 +1,63 @@
 
-%hSvarDOS: The project's TODO list
+%hSvarDOS: Die Aufgabenliste des Projektes
 
-* Replace the default (FreeDOS) edit with a smaller alternative (?) that is:
-  - TINY (a dozen of KiBs or so)
-  - relatively simple: no need for advanced text editing features, just enough
-    to comfortably edit small (<64K) configuration files
-  - 8086-compatible and have modest memory requirements
-  - multi-lang (kitten library)
-  - capable of (limited) copy/pasting between two files
+* den Standard-Editor (FreeDOS) durch eine kleinere Alternative (?) ersetzen,
+  die sei:
+  - WINZIG (ein Dutzend KiBs oder so)
+  - relativ einfach: keine Notwendigkeit für fortgeschrittene
+    Textbearbeitungsfunktionen, gerade genug, um kleine (<64K)
+    Konfigurationsdateien bequem zu bearbeiten
+  - 8086-kompatibel und mit geringem Speicherbedarf
+  - mehrsprachig (kitten-Bibliothek)
+  - (eingeschränktes) Kopieren/Einfügen zwischen zwei Dateien möglich
 
-* replace FreeCOM by SvarCOM
+* FreeCOM durch SvarCOM ersetzen
 
-* improve installer so user can choose the target disk
+* Verbesserung des Installationsprogramms, damit der Benutzer das Ziellaufwerk
+  auswählen kann
 
-* COUNTRY settings shall be configurable by localcfg (and user should be
-  able to define local preferences through an easy-to-use wizard during
-  install time)
+* COUNTRY-Einstellungen sollen durch localcfg konfigurierbar sein (und der
+  Benutzer sollte dazu in die Lage versetzt werden, lokale Präferenzen durch
+  einen einfach zu bedienenden Assistenten während der Installation zu
+  definieren)
 
-* out-of-the box networking support:
- - requires shipping lots of packet drivers with SvarDOS... Should CRYNWR be
-   part of the install set? Or only selected, most popular drivers? Or maybe
-   this could be provided as a "supplemental" floppy disk?
- - user should be asked for its NIC model at install time
- - installer could also ask for a basic DHCP / static configuration
+* sofort einsatzbereite Netzwerkunterstützung:
+ - erfordert die Auslieferung einer Vielzahl von Pakettreibern mit SvarDOS...
+   Sollte CRYNWR Teil des Installationssatzes sein? Oder nur ausgewählte,
+   besonders beliebte Treiber? Oder könnte dies vielleicht als "zusätzliche"
+   Diskette bereitgestellt werden?
+ - Benutzer sollte bei der Installation nach seinem Netzwerkkartenmodell
+   gefragt werden
+ - Das Installationsprogramm könnte auch nach einer grundlegenden DHCP/
+   statischen Konfiguration fragen.
 
-* install.com - MBR changes could be done by the installer itself instead of
-  system()-calling fdisk
+* install.com - MBR-Änderungen könnten vom Installationsprogramm selbst
+  vorgenommen werden, anstatt fdisk per system() aufzurufen
 
-* help - write more useful content!
-  - basic DOS commands (directories, copy/rename/delete files, etc)
-  - common configuration files (autoexec, config.sys, pkg.cfg, wattcp.cfg..)
-  - networking guide
-  - memory management basics
+* Hilfesystem - Mehr nützliche Inhalte Schreiben!
+  - grundlegende DOS-Befehle (Verzeichnisse, Dateien kopieren/umbenennen/
+    löschen, usw.)
+  - allgemeine Konfigurationsdateien (autoexec, config.sys, pkg.cfg,
+    wattcp.cfg..)
+  - Netzwerkleitfaden
+  - Grundlagen der Speicherverwaltung
   - ...
 
-* test new versions of software and update packages accordingly. special care
-  must be taken for core things: kernel, command.com, fdisk, himemx...
+* neue Softwareversionen testen und die Pakete entsprechend aktualisieren.
+  Besondere Vorsicht ist geboten bei Kernel, command.com, fdisk, himemx...
 
-* add new, useful software to the SvarDOS repository (see the %lpkgrules.ama:rules%t)
+* neue, nützliche Software zum SvarDOS-Projektarchiv hinzufügen
+  (siehe %lpkgrules.ama:Paketierungsregeln%t)
 
-* further NLS support, improvements of existing translations and adding new
-  languages -> would be nice to have some kind of web interface for submitting
-  and reviewing translations
+* weitere NLS-Unterstützung, Verbesserung bestehender Übersetzungen und
+  Hinzufügung neuer Sprachen -> es wäre schön, eine Art Web-Schnittstelle für
+  die Einreichung und Überprüfung von Übersetzungen zu haben
 
-* all user-facing CORE packages should be NLS-aware (translatable)
+* alle benutzerseitigen Kernpakete sollten NLS-fähig (übersetzbar) sein
 
-* possibly plenty of other things
+* möglicherweise viele andere Dinge
 
 
-                        =============================
-                          %hWanna help? %lcontact.ama:Get in touch!
-                        =============================
+                =============================================
+                  %hWollen Sie helfen?? %lcontact.ama:Treten Sie in Kontakt!
+                =============================================
