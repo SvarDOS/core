@@ -113,19 +113,20 @@ FDISK 1.55      <- Upstream-Version erhöhte sich, so dass SvarDOS neu startet
 FDISK 1.55+1    <- neue Version des Pakets, enthält aber immer noch FDISK 1.55
 FDISK 1.55+2    <- eine weitere neue Version des Pakets, usw.
 
-The entire version string of a package must never exceed 16 characters.
+Die gesamte Versionszeichenkette eines Pakets darf niemals mehr als 16 Zeichen
+umfassen.
 
 
-%hDer Quellcode
+%hQuellen
 
-When a packaged software has its sources available, then it is recommended to
-archive also them. To that effect, put the sources into a ZIP archive that has
-the same filename as the package, but a *.ZIP extension (as opposed to the
-*.SVP extension of the proper package). The result would be that the packaged
-software would be distributed within two files. Example for FDISK:
+Wenn die Quellen eines Softwarepakets verfügbar sind, empfiehlt es sich, auch
+diese zu archivieren. Legen Sie zu diesem Zweck die Quellen in ein ZIP-Archiv
+mit demselben Dateinamen wie das Paket, aber mit der Erweiterung *.ZIP (im
+Gegensatz zur Erweiterung *.SVP des eigentlichen Pakets). Das Ergebnis wäre,
+dass das Softwarepaket in zwei Dateien verteilt würde. Beispiel für FDISK:
 
-FDISK.SVP       <- binaries (ZIP archive following the SVP structure)
-FDISK.ZIP       <- sources (flat, unstructured ZIP archive)
+FDISK.SVP       <- Binärdateien (ZIP-Archiv entsprechend der SVP-Struktur)
+FDISK.ZIP       <- Quellen (flaches, unstrukturiertes ZIP-Archiv)
 
-The ZIP file must obviously contain the source code that belongs to the exact
-same version present in the SVP package.
+Die ZIP-Datei muss natürlich den Quellcode enthalten, der genau zu der Version
+gehört, die im SVP-Paket enthalten ist.
