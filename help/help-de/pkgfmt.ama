@@ -1,110 +1,116 @@
 
-Package files provide an easy way to manage software on SvarDOS. These
-packages must adhere to a strict convention so they can be handled properly
-by the SvarDOS package manager.
+Paketdateien bieten eine einfache Möglichkeit, Software unter SvarDOS zu
+verwalten. Diese Pakete müssen sich an eine strenge Konvention halten, damit
+sie vom SvarDOS-Paketmanager richtig behandelt werden können.
 
 
-%hPackage filenames
+%hDateinamen von Paketen
 
-Packages names must follow some basic rules. They shall be max. 8 letters long
-(but should not be too short either, since a 1 or 2-letters package name might
-be confusing), and must not be composed of characters other than a-b, 0-9 and
-'_'. This for backward compatibility with short file names (8+3) and ISO 9660
-file systems (used on CDROMs). The package filename is always followed by the
-.ZIP extension.
-
-
-%hPackage files
-
-SvarDOS uses ZIP files as its package file format. This format has been chosen
-because ZIP files under DOS have become the de facto way to distribute
-collections of files. Also, the ZIP file format is well documented, well
-supported, and in the public domain.
-
-Here below is the recommended command line that can be used to create a
-package for a program named EXAMPLE using info-zip:
-
-  zip -9rkDX EXAMPLE.ZIP subdir1 subdir2 ... subdirN
-
-If you are using 7za to create your packages, then use this:
-
-  7za a -mm=deflate -mx=9 -tzip EXAMPLE.ZIP subdir1 subdir2 ... subdirN
+Die Namen der Pakete müssen einigen Grundregeln entsprechen. Sie sollen max. 8
+Buchstaben lang sein (sollten aber auch nicht zu kurz sein, da ein Paketname
+mit 1 oder 2 Buchstaben verwirrend sein könnte) und dürfen nicht aus anderen
+Zeichen als a-b, 0-9 und '_' bestehen. Dies geschieht aus Gründen der
+Abwärtskompatibilität mit kurzen Dateinamen (8+3) und ISO 9660-Dateisystemen
+(auf CD-ROMs verwendet). Auf den Dateinamen des Pakets folgt immer die
+Erweiterung .ZIP.
 
 
-%hPackage directory structure
+%hPaketdateien
 
-The directory structure of a package depends on the type of packages.
-For "core" packages, we have this:
+SvarDOS verwendet ZIP-Dateien als Paketdateiformat. Dieses Format wurde
+gewählt, weil ZIP-Dateien unter DOS de facto zum Standardformat für die
+Verteilung von Dateisammlungen geworden sind. Außerdem ist das ZIP-Dateiformat
+gut dokumentiert, wird gut unterstützt und ist Public Domain.
 
-  APPINFO            Put the program's LSM file here
-  BIN                Binaries, such as exe and com files
-  DOC\PKGNAME        Package documentation
-  HELP               Used ONLY by the "help" package
-  NLS\PKGNAME        Localizations (NLS language files) of the package
-  SOURCE\PKGNAME     The source code (optional)
+Nachfolgend finden Sie die empfohlene Befehlszeile, mit der Sie ein Paket für
+ein Programm namens BEISPIEL mit info-zip erstellen können:
 
-Non-core packages use a slightly different directory organization. For
-example, if we were to consider a package FOO, we might end up with the
-following structure:
+  zip -9rkDX BEISPIEL.ZIP untverz1 untverz2 ... untverzN
 
-  APPINFO\FOO.LSM    Package meta file for the FOO program
-  PROGS\FOO\FOO.EXE  The program's executable
-  PROGS\FOO\FOO.TXT  Some documentation
-  PROGS\FOO\FILE.DAT Data file used by the FOO program
-  SOURCE\FOO\*       here would be stored the foo's source code (optional)
+Wenn Sie 7za verwenden, um Ihre Pakete zu erstellen, dann verwenden Sie dies:
 
-Note the 'PROGS' directory above. This is a category to which the package
-belong. The package installer might change this directory at install time,
-depending on the user's preferences. Possible categories are listed below:
-
-Category | Description
-DEVEL    | Development tools (mostly compilers)
-DRIVERS  | Drivers
-GAMES    | Games
-PROGS    | User programs, tools...
-
-Note: "DOC", "NLS", "BIN" and "HELP" directories are strictly reserved to
-      CORE packages.
+  7za a -mm=deflate -mx=9 -tzip BEISPIEL.ZIP untverz1 untverz2 ... untverzN
 
 
-%hLSM meta-data files
+%hVerzeichnisstruktur für Pakete
 
-Every package MUST contain an LSM file in its "APPINFO" directory. This LSM
-file is a text file that contains basic information about the package. Its
-format is very simple, it must contain at least two lines:
+Die Verzeichnisstruktur eines Pakets hängt von der Art des Pakets ab.
+Für Kernpakete haben wir dies:
+
+  APPINFO            Legen Sie die LSM-Datei des Programms hier ab
+  BIN                Binärdateien, wie z. B. exe- und com-Dateien
+  DOC\PKGNAME        Dokumentation zum Paket
+  HELP               Wird NUR vom Paket "help" verwendet
+  NLS\PKGNAME        Lokalisierungen (NLS-Sprachdateien) des Pakets
+  SOURCE\PKGNAME     Der Quellcode (optional)
+
+Nicht-Kernpakete verwenden eine etwas andere Verzeichnisstruktur. Wenn wir
+zum Beispiel ein Paket FOO betrachten, könnten wir die folgende Struktur
+erhalten:
+
+  APPINFO\FOO.LSM    Paket-Metadatei für das Programm FOO
+  PROGS\FOO\FOO.EXE  Die ausführbare Datei des Programms
+  PROGS\FOO\FOO.TXT  Eine Dokumentation
+  PROGS\FOO\FILE.DAT Vom Programm FOO verwendete Datendatei
+  SOURCE\FOO\*       Hier wird der Quellcode von foo gespeichert (optional)
+
+Beachten Sie das Verzeichnis PROGS oben. Dies ist die Kategorie, zu der das
+Paket gehört. Der Paketinstaller kann dieses Verzeichnis bei der Installation
+anpassen, je nach den Präferenzen des Benutzers. Mögliche Kategorien sind
+unten aufgeführt:
+
+Kategorie | Beschreibung
+DEVEL     | Entwicklungswerkzeuge (hauptsächlich Compiler)
+DRIVERS   | Treiber
+GAMES     | Spiele
+PROGS     | Anwendungen, Hilfsprogramme...
+
+Hinweis: Die Verzeichnisse "DOC", "NLS", "BIN" und "HELP" sind ausschließlich
+         den Kernpaketen vorbehalten.
+
+
+%hLSM-Metadaten-Dateien
+
+Jedes Paket MUSS eine LSM-Datei in seinem "APPINFO"-Verzeichnis enthalten.
+Diese LSM-Datei ist eine Textdatei, die grundlegende Informationen über das
+Paket enthält. Ihr Format ist sehr einfach, sie muss mindestens zwei Zeilen
+enthalten:
 
   version: x.y.z
-  description: package description
+  description: Beschreibung des Pakets
 
-Any other lines are ignored by the SvarDOS package manager.
+Alle anderen Zeilen werden vom SvarDOS-Paketmanager ignoriert.
 
 
-%hPackage versions
+%hPaketversionen
 
-The version present in the LSM file is meant to reflect the version of the
-packaged software, but it may happen that a package needs to be changed to
-fix a strictly packaging-related issue (for example a forgotten documentation
-file or a recompilation of the binary using a better set of flags...). In such
-case, the version of the software does not change, but the version of the
-package itself needs to change so users know something changed. That's where
-"SvarDOS revisions" come in. A version string is basically following such
-format:
+Die in der LSM-Datei enthaltene Version soll die Version der Software
+widerspiegeln, aber es kann vorkommen, dass ein Paket geändert werden muss, um
+um ein rein paketbezogenes Problem zu beheben (zum Beispiel eine vergessene
+Dokumentationsdatei oder eine Neukompilierung der Binärdatei unter Verwendung
+eines besseren Satzes von Flags...). In einem solchen Fall ändert sich die
+Version der Software nicht, aber die Version des Pakets selbst muss sich
+ändern, damit die Benutzer wissen, dass sich etwas geändert hat. Das ist der
+Punkt, wo "SvarDOS-Revisionen" ins Spiel kommen. Eine Versionszeichenkette hat
+im Wesentlichen folgendes Format:
 
   UPSTREAM_VER[+SVARREV]
 
-UPSTREAM_VER is the exact version string advertised by the software. It may
-be pretty much anything. This upstream version may be optionally followed by a
-plus sign and the SvarDOS revision. In the event that the upstream version
-already contains a plus sign, then SvarDOS revision is delimited with a tilde.
+UPSTREAM_VER ist die genaue Versionsbezeichnung, die von der Software selbst
+angegeben wird. Sie kann so ziemlich alles sein. Dieser Upstream-Version kann
+optional ein Pluszeichen und die SvarDOS-Revision folgen. Falls die Upstream-
+Version bereits ein Pluszeichen enthält, wird die SvarDOS-Revision mit einer
+Tilde abgeteilt.
 
-The SvarDOS revision starts at 0 and increments each time that the given
-upstream revision is repackaged. The SvarDOS revision restarts whenever the
-upstream version changes. The SvarDOS revision of 0 is always hidden.
+Die SvarDOS-Revision beginnt bei 0 und wird jedes Mal um 1 erhöht, wenn die
+gegebene Upstream-Revision neu paketiert wird. Die SvarDOS-Revision wird bei
+jeder Änderung der Upstream-Version neu gestartet. Die SvarDOS-Revision 0 ist
+immer versteckt.
 
-Examples:
+Beispiele:
 
-FDISK 1.54      <- originally packaged version
-FDISK 1.54+1    <- package has been changed, but not the upstream version
-FDISK 1.55      <- upstream version increased, so SvarDOS rev restarts
-FDISK 1.55+1    <- new version of the package, but still contains FDISK 1.55
-FDISK 1.55+2    <- another new version of the package, etc
+FDISK 1.54      <- ursprünglich paketierte Version
+FDISK 1.54+1    <- Paket wurde geändert, aber nicht die Upstream-Version
+FDISK 1.55      <- Upstream-Version erhöhte sich, so dass SvarDOS neu startet
+FDISK 1.55+1    <- neue Version des Pakets, enthält aber immer noch FDISK 1.55
+FDISK 1.55+2    <- eine weitere neue Version des Pakets, usw.
