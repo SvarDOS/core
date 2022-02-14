@@ -1,0 +1,68 @@
+#
+# PKG language file
+#
+# Language..: Slovene
+# Translator: Matej Horvat (http://matejhorvat.si/)
+# Updated...: 2016-12-12
+
+#### Help ####
+
+1.0:To je upravitelj paketov za SvarDOS.
+1.20:Usage: pkg install package.svp
+1.21:       pkg update package.svp
+1.22:       pkg remove package
+1.23:       pkg listfiles package
+1.24:       pkg listlocal [filter]
+1.27:       pkg unzip file.zip
+1.25:PKG is published under the MIT license.
+1.26:It is configured through %DOSDIR%\CFG\PKG.CFG
+
+### General stuff ####
+
+2.0:Spremenljivka TEMP ni nastavljena! Kaže naj na imenik, kamor se da pisati.
+2.3:Primer: SET DOSDIR=C:\SVARDOS
+2.14:Ni dovolj spomina! (%s)
+
+#### Installing package ####
+
+3.8:NAPAKA: Neveljavna ZIP datoteka! Paketa ni mogoče namestiti.
+3.9:NAPAKA: Paket vsebuje datoteko, ki že obstaja na tem računalniku:
+3.10:NAPAKA: Ni mogoče ustvariti %s.
+3.12:NAPAKA: Paket ne vsebuje datoteke %s; to ni veljaven FreeDOS paket.
+3.18:Paket %s je že nameščen! Morda želite uporabiti dejavnost UPDATE.
+3.19:Paket %s nameščen: %d datotek razširjenih, %d napak.
+3.20:NAPAKA: paket vsebuje šifrirano datoteko:
+3.23:NAPAKA: paket vsebuje neveljavno ime datoteke:
+3.24:NAPAKA: package name too long
+
+#### Removing package ####
+
+4.0:Paket %s ni nameščen, zato ga ni mogoče odstraniti.
+4.3:Ni dovolj spomina. Ni mogoče shraniti imenika %s!
+4.4:odstranjujem %s
+4.5:Paket %s odstranjen.
+
+#### Searching package ####
+
+5.0:Noben paket ne ustreza iskalnim zahtevam.
+
+#### Loading configuration ####
+
+7.0:NAPAKA: Zbirka %s je našteta dvakrat!
+7.1:NAPAKA: Ni mogoče odpreti nastavitvene datoteke %s.
+7.4:Warning: token with empty value on line #%d
+7.8:Opozorilo: neznan ukaz "%s" v vrstici %d
+7.11:Opozorilo: Neveljaven ukaz DIR v vrstici %d.
+7.15:NAPAKA: custom dir '%s' is not a valid absolute path!
+7.16:NAPAKA: custom dir '%s' is a reserved name!
+
+#### Unziping package ####
+
+8.1:Neznana vrsta datoteke ZIP: 0x%08x
+8.2:NAPAKA: Paket vsebuje datoteko, ki je stisnjena z nepodprto metodo (%d):
+8.3:NAPAKA med razširjanjem %s v %s!
+
+#### Handling the local list of installed packages ####
+
+9.0:NAPAKA: Dostop do imenika %s ni mogoč
+9.1:NAPAKA: Ni mogoče najti lokalnega paketa %s

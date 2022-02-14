@@ -1,0 +1,74 @@
+# Help Message
+# FDNPKG language file
+# Time-stamp: "2017-03-09 22:50:34 joerg"
+#
+# Language..: German
+# Translator: Jörg Jenderek
+# Version...: 0.99.4
+
+
+#### Help ####
+
+1.0:Dies ist der Paketmanager für SvarDOS.
+1.20:Gebrauch: pkg install package.svp
+1.21:          pkg update package.svp
+1.22:          pkg remove package
+1.23:          pkg listfiles package
+1.24:          pkg listlocal [filter]
+1.27:          pkg unzip datei.zip
+1.25:PKG is published under the MIT license.
+1.26:It is configured through %DOSDIR%\CFG\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% nicht gesetzt! Sie sollte auf das SvarDOS-Hauptverzeichnis verweisen.
+2.3:Beispiel: SET DOSDIR=C:\SVARDOS
+2.14:Kein Speicher mehr! (%s)
+
+#### Installing package ####
+
+3.8:FEHLER: Ungültiges Zip-Archiv! Paket nicht installiert.
+3.9:FEHLER: Paket enthält eine Datei, die bereits lokal existiert:
+3.10:FEHLER: %s konnte nicht erstellt werden!
+3.12:FEHLER: Paket enthält nicht die Datei %s! Kein gültiges FreeDOS-Paket.
+3.18:Paket %s ist bereits installiert! Sie sollten die 'update' Aktion verwenden.
+3.19:Paket %s installiert: %d Dateien extrahiert, %d Fehler.
+3.20:FEHLER: Paket enthält eine verschlüsselte Datei:
+3.23:FEHLER: Paket enthält einen ungültigen Dateinamen:
+3.24:FEHLER: package name too long
+
+#### Removing package ####
+
+4.0:Paket %s ist nicht installiert, daher nicht entfernt.
+4.3:Kein Speicher mehr! Konnte das Verzeichnis %s nicht speichern!
+4.4:entferne %s
+4.5:Paket %s wurde entfernt.
+
+#### Searching package ####
+
+5.0:Kein Paket entspricht der Suche.
+
+#### Loading configuration ####
+
+7.0:FEHLER: Repository '%s' wird zweimal aufgeführt!
+7.1:FEHLER: Konfigurationsdatei '%s' konnte nicht geöffnet werden!
+7.4:Warnung: Token mit leerem Wert in Zeile #%d
+7.8:Warnung: Unbekanntes Token '%s' in Zeile #%d
+7.11:Warnung: Ungültige 'DIR'-Richtlinie in Zeile #%d
+7.15:FEHLER: spezielles Verzeichnis '%s' ist kein gültiger absoluter Pfad!
+7.16:FEHLER: spezielles Verzeichnis '%s' ist ein reservierter Name!
+
+#### Unziping package ####
+
+8.1:unbekannte ZIP-Signatur: 0x%08lx
+8.2:FEHLER: Paket enthält eine Datei mit nicht unterstützter Komprimierung (%d):
+8.3:FEHLER beim Extrahieren von '%s' zu '%s'!
+
+#### Handling the local list of installed packages ####
+
+9.0:FEHLER: konnte nicht auf das Verzeichnis %s zugreifen.
+9.1:FEHLER: Lokales Paket %s nicht gefunden.
+
+# Local Variables:
+# coding:cp850-dos
+# End:
