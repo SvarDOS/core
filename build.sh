@@ -77,10 +77,10 @@ function prep_flop {
   for p in $ALLPKGS ; do
     # if copy fails, then probably the floppy is full - try again after
     # creating an additional floppy image
-    if ! mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.zip" ::/ ; then
+    if ! mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
       curdisk=$((curdisk+1))
       mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$4/disk$curdisk.img"
-      mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.zip" ::/
+      mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.svp" ::/
     fi
   done
 
@@ -118,30 +118,30 @@ mkdir "$PUBDIR"
 
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
-  cp "$REPOROOT/$pkg.zip" "$CDROOT/"
+  cp "$REPOROOT/$pkg.svp" "$CDROOT/"
   echo "$pkg" >> "$FLOPROOT/install.lst"
 done
 
 # add EXTRA packages to CDROOT (but not in the list of packages so instal won't install them by default)
 for pkg in $EXTRAPKGS ; do
-  cp "$REPOROOT/$pkg.zip" "$CDROOT/"
+  cp "$REPOROOT/$pkg.svp" "$CDROOT/"
 done
 
 
 # prepare the content of the boot (install) floppy
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
-unzip -Cj packages/cpidos.zip 'cpi/ega*.cpx' -d "$FLOPROOT/"
-unzip -Cj packages/command.zip bin/command.com -d "$FLOPROOT/"
-unzip -Cj packages/display.zip bin/display.exe -d "$FLOPROOT/"
-unzip -Cj packages/edit.zip bin/edit.exe -d "$FLOPROOT/"
-unzip -Cj packages/fdapm.zip bin/fdapm.com -d "$FLOPROOT/"
-unzip -Cj packages/fdisk.zip bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
-unzip -Cj packages/format.zip bin/format.exe -d "$FLOPROOT/"
-unzip -Cj packages/kernel.zip bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
-unzip -Cj packages/mem.zip bin/mem.exe -d "$FLOPROOT/"
-unzip -Cj packages/mode.zip bin/mode.com -d "$FLOPROOT/"
-unzip -Cj packages/more.zip bin/more.exe -d "$FLOPROOT/"
-unzip -Cj packages/pkg.zip bin/pkg.exe -d "$FLOPROOT/"
+unzip -Cj packages/cpidos.svp 'cpi/ega*.cpx' -d "$FLOPROOT/"
+unzip -Cj packages/command.svp bin/command.com -d "$FLOPROOT/"
+unzip -Cj packages/display.svp bin/display.exe -d "$FLOPROOT/"
+unzip -Cj packages/edit.svp bin/edit.exe -d "$FLOPROOT/"
+unzip -Cj packages/fdapm.svp bin/fdapm.com -d "$FLOPROOT/"
+unzip -Cj packages/fdisk.svp bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
+unzip -Cj packages/format.svp bin/format.exe -d "$FLOPROOT/"
+unzip -Cj packages/kernel.svp bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
+unzip -Cj packages/mem.svp bin/mem.exe -d "$FLOPROOT/"
+unzip -Cj packages/mode.svp bin/mode.com -d "$FLOPROOT/"
+unzip -Cj packages/more.svp bin/more.exe -d "$FLOPROOT/"
+unzip -Cj packages/pkg.svp bin/pkg.exe -d "$FLOPROOT/"
 
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
@@ -168,9 +168,9 @@ echo 'ECHO DIR GAMES C:\ >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO DIR DRIVERS C:\DRIVERS\ >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO DIR DEVEL C:\DEVEL\ >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
 for p in $COREPKGS ; do
-  cp "$CDROOT/$p.zip" "$DOSEMUDIR/"
-  echo "pkg install $p.zip" >> "$DOSEMUDIR/install.bat"
-  echo "del $p.zip" >> "$DOSEMUDIR/install.bat"
+  cp "$CDROOT/$p.svp" "$DOSEMUDIR/"
+  echo "pkg install $p.svp" >> "$DOSEMUDIR/install.bat"
+  echo "del $p.svp" >> "$DOSEMUDIR/install.bat"
 done
 echo 'ECHO my_ip = dhcp >> %DOSDIR%\CFG\WATTCP.CFG' >> "$DOSEMUDIR/install.bat"
 echo 'del pkg.exe' >> "$DOSEMUDIR/install.bat"
@@ -180,9 +180,9 @@ echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO  SVARDOS SETUP COMPLETED ' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO.' >> "$DOSEMUDIR/install.bat"
-unzip -Cj packages/kernel.zip bin/kernel.sys -d "$DOSEMUDIR/"
-unzip -Cj packages/command.zip bin/command.com -d "$DOSEMUDIR/"
-unzip -Cj packages/pkg.zip bin/pkg.exe -d "$DOSEMUDIR/"
+unzip -Cj packages/kernel.svp bin/kernel.sys -d "$DOSEMUDIR/"
+unzip -Cj packages/command.svp bin/command.com -d "$DOSEMUDIR/"
+unzip -Cj packages/pkg.svp bin/pkg.exe -d "$DOSEMUDIR/"
 # CONFIG.SYS
 echo 'FILES=50' >> "$DOSEMUDIR/config.sys"
 echo 'DOS=HIGH,UMB' >> "$DOSEMUDIR/config.sys"
@@ -215,7 +215,7 @@ USBIMG=$PUBDIR/svardos-usb.img
 cp files/boot-svardos.img $USBIMG
 mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
 for p in $ALLPKGS ; do
-  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.zip" ::/
+  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
 done
 
 # compress the USB image

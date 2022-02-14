@@ -756,14 +756,14 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     strcat(buff, "       ");
     video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
     /* wait for new diskette if package not found */
-    snprintf(buff, sizeof(buff), "%c:\\%s.zip", srcdrv, pkgptr);
+    snprintf(buff, sizeof(buff), "%c:\\%s.svp", srcdrv, pkgptr);
     while (fileexists(buff) != 0) {
       putstringnls(12, 1, COLOR_BODY[mono], 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
       input_getkey();
       video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
     }
     /* proceed with package copy (buff contains the src filename already) */
-    snprintf(buff + 32, sizeof(buff) - 32, "%c:\\temp\\%s.zip", targetdrv, pkgptr);
+    snprintf(buff + 32, sizeof(buff) - 32, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
     if (fcopy(buff + 32, buff, buff, sizeof(buff)) != 0) {
       video_putstring(10, 30, COLOR_BODY[mono], "READ ERROR", -1);
       input_getkey();
@@ -771,7 +771,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
       return(-1);
     }
     /* write install instruction to post-install script */
-    fprintf(fd, "pkg install %s.zip\r\ndel %s.zip\r\n", pkgptr, pkgptr);
+    fprintf(fd, "pkg install %s.svp\r\ndel %s.svp\r\n", pkgptr, pkgptr);
     /* jump to next entry or end of list */
     while ((*pkgptr != 0) && (*pkgptr != 0xff)) pkgptr++;
     if (*pkgptr == 0xff) break;
@@ -848,7 +848,7 @@ static void loadcp(const struct slocales *locales) {
  * returns 0 if found, non-zero otherwise */
 static int checkinstsrc(char drv) {
   char fname[16];
-  snprintf(fname, sizeof(fname), "%c:\\ATTRIB.ZIP", drv);
+  snprintf(fname, sizeof(fname), "%c:\\ATTRIB.SVP", drv);
   return(fileexists(fname));
 }
 #endif
