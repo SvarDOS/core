@@ -53,8 +53,8 @@ following structure:
   PROGS\FOO\FILE.DAT Data file used by the FOO program
   SOURCE\FOO\*       here would be stored the foo's source code (optional)
 
-Note the 'PROGS' directory above. This is a category to which the package
-belong. The package installer might change this directory at install time,
+Note the PROGS directory above. This is the category to which the package
+belongs. The package installer might change this directory at install time,
 depending on the user's preferences. Possible categories are listed below:
 
 Category | Description
