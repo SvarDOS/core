@@ -4,12 +4,13 @@
   Copyright (C) Mateusz Viste 2012-2022
 
   buildidx computes an index tsv file for the SvarDOS repository.
-  it must be executed pointing to a directory that stores packages (zip)
+  it must be executed pointing to a directory that stores packages (*.svp)
   files. buildidx will generate the index file and save it into the package
   repository.
 
   requires php-zip
 
+  14 feb 2022: packages are expected to have the *.svp extension
   12 feb 2022: skip source packages from being processed (*.src.zip)
   20 jan 2022: rewritten the code from ANSI C to PHP for easier maintenance
   13 feb 2021: 'title' LSM field is no longer looked after
@@ -28,7 +29,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220120";
+$PVER = "20220214";
 
 
 // computes the BSD sum of a file and returns it
@@ -105,18 +106,13 @@ $pkgfiles = scandir($repodir);
 $pkglist = '';
 $pkgcount = 0;
 
-// iterate over each zip file
+// iterate over each svp package
 foreach ($pkgfiles as $zipfile) {
-  if (!preg_match('/.zip$/i', $zipfile)) continue; // skip non-zip files
+  if (!preg_match('/.svp$/i', $zipfile)) continue; // skip non-svp files
   if (strchr($zipfile, '-')) {
     echo "skipping: {$zipfile}\n";
-    continue; // skip alt vers (like dosmid-0.9.2.zip)
+    continue; // skip alt vers (like dosmid-0.9.2.svp)
   }
-  if (strstr($zipfile, '.src.zip')) {
-    echo "skipping source: {$zipfile}\n";
-    continue;
-  }
-
 
   $path_parts = pathinfo($zipfile);
   $pkg = strtolower($path_parts['filename']);
@@ -145,7 +141,7 @@ foreach ($pkgfiles as $zipfile) {
 
 }
 
-echo "DONE - processed " . $pkgcount . " zip files\n";
+echo "DONE - processed " . $pkgcount . " svp packages\n";
 
 file_put_contents($repodir . '/index.tsv', $pkglist);
 
