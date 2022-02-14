@@ -97,7 +97,7 @@ be pretty much anything. This upstream version may be optionally followed by a
 plus sign and the SvarDOS revision. In the event that the upstream version
 already contains a plus sign, then SvarDOS revision is delimited with a tilde.
 
-The SvarDOS revision starts at 0 and increments each time that the given
+The SvarDOS revision starts at 0 and increments by 1 each time that the given
 upstream revision is repackaged. The SvarDOS revision restarts whenever the
 upstream version changes. The SvarDOS revision of 0 is always hidden.
 
