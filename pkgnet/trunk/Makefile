@@ -24,7 +24,7 @@ release: pkgnet.exe .symbolic
 	zip -9krDX pkgnet.zip Makefile *.c *.h pkgnet.lsm watt32 svarlang.lib
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
-	cd nls
+	cd nls_utf8
 	utf8tocp 437 en_utf8.txt > en.txt
 	utf8tocp maz pl_utf8.txt > pl.txt
 	..\svarlang.lib\tlumacz en pl
