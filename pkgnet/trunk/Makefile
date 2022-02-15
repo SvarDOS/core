@@ -11,6 +11,7 @@ release: pkgnet.exe .symbolic
 	mkdir bin
 	mkdir appinfo
 	mkdir nls
+	upx --8086 -9 pkgnet.exe
 	copy pkgnet.exe bin
 	copy pkgnet.lsm appinfo
 	copy pkgnet.lng nls
