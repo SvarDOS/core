@@ -24,11 +24,11 @@ supported, and in the public domain.
 Here below is the recommended command line that can be used to create a
 package for a program named EXAMPLE using info-zip:
 
-  zip -9rkDX EXAMPLE.SVN subdir1 subdir2 ... subdirN
+  zip -9rkDX EXAMPLE.SVP subdir1 subdir2 ... subdirN
 
 If you are using 7za to create your packages, then use this:
 
-  7za a -mm=deflate -mx=9 -tzip EXAMPLE.SVN subdir1 subdir2 ... subdirN
+  7za a -mm=deflate -mx=9 -tzip EXAMPLE.SVP subdir1 subdir2 ... subdirN
 
 
 %hPackage directory structure
