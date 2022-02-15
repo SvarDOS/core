@@ -23,7 +23,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *
- * http://svardos.osdn.io
+ * http://svardos.org
  */
 
 #include <direct.h> /* opendir() and friends */
@@ -35,13 +35,19 @@
 #include "net.h"
 #include "unchunk.h"
 
+#include "svarlang.lib\svarlang.h"
+
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220214"
+#define PVER "20220215"
 #define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.org"
+
+
+/* convenience define that outputs nls strings to screen (followed by CR/LF) */
+#define putsnls(x,y) puts(svarlang_strid((x << 8) | y))
 
 
 /* returns length of all http headers, or 0 if uncomplete yet */
@@ -69,20 +75,20 @@ static unsigned short detecthttpheadersend(const unsigned char *buff) {
 static void help(void) {
   puts("pkgnet ver " PVER " -- Copyright (C) " PDATE " Mateusz Viste");
   puts("");
-  puts("pkgnet is the SvarDOS package downloader.");
+  putsnls(1, 0);  /* "pkgnet is the SvarDOS package downloader" */
   puts("");
-  puts("usage:  pkgnet search <term>");
-  puts("        pkgnet pull <package>");
-  puts("        pkgnet pull <package>-<version>");
-  puts("        pkgnet checkup");
+  putsnls(1, 1);  /* "usage:  pkgnet search <term>" */
+  putsnls(1, 2);  /* "        pkgnet pull <package>" */
+  putsnls(1, 3);  /* "        pkgnet pull <package>-<version>" */
+  putsnls(1, 6);  /* "        pkgnet checkup" */
   puts("");
-  puts("actions:");
-  puts(" search   - asks remote repository for the list of matching packages");
-  puts(" pull     - downloads package into current directory");
-  puts(" checkup  - lists updates available for your system");
+  putsnls(1, 7);  /* "actions:" */
+  puts("");
+  putsnls(1, 8);  /* "search   - asks remote repository for the list of matching packages" */
+  putsnls(1, 9);  /* "pull     - downloads package into current directory" */
+  putsnls(1, 10); /* "checkup  - lists updates available for your system" */
   puts("");
   printf("Watt32 kernel: %s", net_engine());
-  puts("");
   puts("");
 }
 
@@ -186,7 +192,7 @@ static unsigned short checkupdata(char *buff) {
   if (dosdir == NULL) {
     dosdir = getenv("DOSDIR");
     if ((dosdir == NULL) || (dosdir[0] == 0)) {
-      puts("ERROR: %DOSDIR% not set");
+      putsnls(9, 0); /* "ERROR: %DOSDIR% not set" */
       return(0);
     }
   }
@@ -196,7 +202,7 @@ static unsigned short checkupdata(char *buff) {
     sprintf(buff, "%s\\packages", dosdir);
     dp = opendir(buff);
     if (dp == NULL) {
-      puts("ERROR: Could not access %DOSDIR%\\packages directory");
+      putsnls(9, 1); /* "ERROR: Could not access %DOSDIR%\\packages directory" */
       return(0);
     }
   }
@@ -246,7 +252,8 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
 
   sock = net_connect(ipaddr, 80);
   if (sock == NULL) {
-    puts("ERROR: failed to connect to " HOSTADDR);
+    printf(svarlang_strid(0x0902), HOSTADDR); /* "ERROR: failed to connect to " HOSTADDR */
+    puts("");
     goto SHITQUIT;
   }
 
@@ -255,7 +262,8 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     int connstate = net_isconnected(sock);
     if (connstate > 0) break;
     if (connstate < 0) {
-      puts("ERROR: connection error");
+      printf(svarlang_strid(0x0902), HOSTADDR); /* "ERROR: failed to connect to " HOSTADDR */
+      puts("");
       goto SHITQUIT;
     }
     _asm int 28h;  /* DOS idle */
@@ -269,7 +277,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   }
 
   if (net_send(sock, buffer, strlen((char *)buffer)) != (int)strlen((char *)buffer)) {
-    puts("ERROR: failed to send HTTP query to remote server");
+    putsnls(9, 3); /* "ERROR: failed to send a HTTP query to remote server" */
     goto SHITQUIT;
   }
 
@@ -286,14 +294,14 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
         hlen = sprintf(hbuf, "%X\r\n", blen);
       }
       if (net_send(sock, hbuf, hlen) != hlen) {
-        puts("ERROR: failed to send POST data to remote server");
+        putsnls(9, 4); /* "ERROR: failed to send POST data to remote server" */
         goto SHITQUIT;
       }
       /* add trailing CR/LF to buffer as required by chunked mode */
       buffer[blen++] = '\r';
       buffer[blen++] = '\n';
       if (net_send(sock, buffer, blen) != blen) {
-        puts("ERROR: failed to send POST data to remote server");
+        putsnls(9, 4); /* "ERROR: failed to send POST data to remote server" */
         goto SHITQUIT;
       }
     } while (blen != 2);
@@ -304,7 +312,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
 
   /* transmission error? */
   if (byteread < 0) {
-    printf("ERROR: communication error (%d)", byteread);
+    printf(svarlang_strid(0x0905), byteread); /* "ERROR: TCP communication error #%d" */
     puts("");
     goto SHITQUIT;
   }
@@ -313,7 +321,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   if ((httpcode >= 200) && (httpcode <= 299) && (*outfname != 0)) {
     fd = fopen(outfname, "wb");
     if (fd == NULL) {
-      printf("ERROR: failed to create file %s", outfname);
+      printf(svarlang_strid(0x0906), outfname); /* "ERROR: failed to create file %s" */
       puts("");
       goto SHITQUIT;
     }
@@ -333,7 +341,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
       if (fd != NULL) {
         int i;
         if (fwrite(buffer, 1, byteread, fd) != byteread) {
-          printf("ERROR: failed to write data to file %s after %ld bytes", outfname, flen);
+          printf(svarlang_strid(0x0907), outfname, flen); /* "ERROR: failed to write data to file %s after %ld bytes" */
           puts("");
           break;
         }
@@ -363,7 +371,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
 
     } else { /* check for timeout (byteread == 0) */
       if (time(NULL) - lastactivity > 20) { /* TIMEOUT! */
-        puts("ERROR: Timeout while waiting for data");
+        putsnls(9, 8); /* "ERROR: Timeout while waiting for data" */
         goto SHITQUIT;
       }
       /* waiting for packets - release a CPU cycle in the meantime */
@@ -404,10 +412,12 @@ int main(int argc, char **argv) {
     char outfname[16];
   } *mem;
 
+  svarlang_autoload("PKGNET");
+
   /* allocate memory */
   mem = malloc(sizeof(*mem));
   if (mem == NULL) {
-    puts("ERROR: out of memory");
+    putsnls(9, 9); /* "ERROR: out of memory" */
     return(1);
   }
 
@@ -416,21 +426,21 @@ int main(int argc, char **argv) {
 
   /* if outfname requested, make sure that file does not exist yet */
   if ((mem->outfname[0] != 0) && (fexists(mem->outfname))) {
-    printf("ERROR: file %s already exists", mem->outfname);
+    printf(svarlang_strid(0x090A), mem->outfname); /* "ERROR: file %s already exists" */
     puts("");
     return(1);
   }
 
   /* init network stack */
   if (net_init() != 0) {
-    puts("ERROR: Network subsystem initialization failed");
+    putsnls(9, 11); /* "ERROR: Network subsystem initialization failed" */
     return(1);
   }
 
   puts(""); /* required because watt-32 likes to print out garbage sometimes ("configuring through DHCP...") */
 
   if (net_dnsresolve(mem->ipaddr, HOSTADDR) != 0) {
-    puts("ERROR: DNS resolution failed");
+    putsnls(9, 12); /* "ERROR: DNS resolution failed" */
     return(1);
   }
 
@@ -439,7 +449,7 @@ int main(int argc, char **argv) {
 
   if (mem->outfname[0] != 0) {
     /* print bsum, size, filename */
-    printf("Downloaded %ld KiB into %s (BSUM: %04X)", flen >> 10, mem->outfname, bsum);
+    printf(svarlang_strid(0x0200), flen >> 10, mem->outfname, bsum); /* Downloaded %ld KiB into %s (BSUM: %04X) */
     puts("");
   }
 

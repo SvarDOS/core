@@ -3,22 +3,35 @@
 #
 
 CFLAGS = -j -ml -0 -bt=dos -wx -we -d0 -ox -dNOLFN -i=watt32\inc
-LIB = watt32\lib\wattcpwl.lib
+LIB = watt32\lib\wattcpwl.lib svarlang.lib\svarlngl.lib
 
 all: pkgnet.exe
 
 release: pkgnet.exe .symbolic
 	mkdir bin
 	mkdir appinfo
+	mkdir nls
 	copy pkgnet.exe bin
 	copy pkgnet.lsm appinfo
-	zip -9krDX -m pkgnet.svp bin appinfo
+	copy pkgnet.lng nls
+	if exist pkgnet.svp del pkgnet.svp
+	zip -9krDX -m pkgnet.svp bin appinfo nls
 	rmdir bin
 	rmdir appinfo
-	zip -9krDX pkgnet.zip Makefile *.c *.h pkgnet.lsm watt32
+	rmdir nls
+	if exist pkgnet.zip del pkgnet.zip
+	zip -9krDX pkgnet.zip Makefile *.c *.h pkgnet.lsm watt32 svarlang.lib
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
-	wcl -lr -k4096 $(LIB) pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
+	cd nls
+	utf8tocp 437 en_utf8.txt > en.txt
+	utf8tocp maz pl_utf8.txt > pl.txt
+	..\svarlang.lib\tlumacz en pl
+	del ??.txt
+	move /y deflang.c ..\deflang.c
+	move /y out.lng ..\pkgnet.lng
+	cd ..
+	*wcl -lr -k4096 $(LIB) pkgnet.obj deflang.c net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
 
 pkgnet.obj: pkgnet.c
 	*wcc $(CFLAGS) pkgnet.c
