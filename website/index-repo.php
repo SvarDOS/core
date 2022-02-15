@@ -5,22 +5,21 @@
 
 <?php
 
-$handle = fopen('../packages/index.tsv', "rb");
-if ($handle === FALSE) {
-  echo "<p>ERROR: INDEX FILE NOT FOUND</p>\n";
-  exit(0);
-}
+$db = json_decode(file_get_contents('../packages/_index.json'), true);
 
 echo "<table>\n";
 
 echo "<thead><tr><th>PACKAGE</th><th>VERSION</th><th>DESCRIPTION</th></tr></thead>\n";
 
-while (($arr = fgetcsv($handle, 1024, "\t")) !== FALSE) {
-  // format: pkgname | version | desc | bsdsum
-  echo "<tr><td><a href=\"repo/?a=pull&amp;p={$arr[0]}\">{$arr[0]}</a></td><td>{$arr[1]}</td><td>{$arr[2]}</td></tr>\n";
+foreach ($db as $pkg => $meta) {
+
+  $desc = $meta['desc'];
+  $pref = array_shift($meta['versions']); // get first version (that's the preferred one)
+  $ver = $pref['ver'];
+  $bsum = $pref['bsum'];
+
+  echo "<tr><td><a href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a></td><td>{$ver}</td><td>{$desc}</td></tr>\n";
 }
 echo "</table>\n";
-
-fclose($handle);
 
 ?>

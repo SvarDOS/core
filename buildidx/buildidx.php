@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  15 feb 2022: index is generated as json, contains all filenames and alt versions
   14 feb 2022: packages are expected to have the *.svp extension
   12 feb 2022: skip source packages from being processed (*.src.zip)
   20 jan 2022: rewritten the code from ANSI C to PHP for easier maintenance
@@ -29,7 +30,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220214";
+$PVER = "20220215";
 
 
 // computes the BSD sum of a file and returns it
@@ -91,7 +92,7 @@ function parse_lsm($s) {
 
 // ***************** MAIN ROUTINE *********************************************
 
-echo "SvarDOS repository index generator ver {$PVER}\n";
+//echo "SvarDOS repository index generator ver {$PVER}\n";
 
 if (($_SERVER['argc'] != 2) || ($_SERVER['argv'][1][0] == '-')) {
   echo "usage: php buildidx.php repodir\n";
@@ -100,50 +101,69 @@ if (($_SERVER['argc'] != 2) || ($_SERVER['argv'][1][0] == '-')) {
 
 $repodir = $_SERVER['argv'][1];
 
-echo "building index for directory {$repodir}...\n";
-
 $pkgfiles = scandir($repodir);
-$pkglist = '';
 $pkgcount = 0;
 
-// iterate over each svp package
-foreach ($pkgfiles as $zipfile) {
-  if (!preg_match('/.svp$/i', $zipfile)) continue; // skip non-svp files
-  if (strchr($zipfile, '-')) {
-    echo "skipping: {$zipfile}\n";
-    continue; // skip alt vers (like dosmid-0.9.2.svp)
-  }
+// do a list of all svp packages with their available versions and descriptions
 
-  $path_parts = pathinfo($zipfile);
-  $pkg = strtolower($path_parts['filename']);
+$pkgdb = array();
+foreach ($pkgfiles as $fname) {
+  if (!preg_match('/.svp$/i', $fname)) continue; // skip non-svp files
 
-  $zipfile_fullpath = realpath($repodir . '/' . $zipfile);
+  $path_parts = pathinfo($fname);
+  $pkgnam = explode('-', $path_parts['filename'])[0];
+  $pkgfullpath = realpath($repodir . '/' . $fname);
 
-  $lsm = read_file_from_zip($zipfile_fullpath, "appinfo/{$pkg}.lsm");
+  $lsm = read_file_from_zip($pkgfullpath, "appinfo/{$pkgnam}.lsm");
   if ($lsm == false) {
-    echo "ERROR: pkg {$z} does not contain an LSM file at the expected location\n";
-    exit(1);
+    echo "ERROR: pkg {$fname} does not contain an LSM file at the expected location\n";
+    continue;
   }
-
   $lsmarray = parse_lsm($lsm);
   if (empty($lsmarray['version'])) {
-    echo "ERROR: lsm file in {$zipfile} does not contain a version\n";
-    var_dump($lsmarray);
-    exit(1);
+    echo "ERROR: lsm file in {$fname} does not contain a version\n";
+    continue;
   }
   if (empty($lsmarray['description'])) {
-    echo "ERROR: lsm file in {$zipfile} does not contain a description\n";
-    exit(1);
+    echo "ERROR: lsm file in {$fname} does not contain a description\n";
+    continue;
   }
 
-  $pkglist .= "{$pkg}\t{$lsmarray['version']}\t{$lsmarray['description']}\t" . file2bsum($zipfile_fullpath) . "\n";
+  $meta['fname'] = $fname;
+  $meta['desc'] = $lsmarray['description'];
+
+  $pkgdb[$pkgnam][$lsmarray['version']] = $meta;
+}
+
+$db = array();
+
+// iterate over each svp package
+foreach ($pkgdb as $pkg => $versions) {
+
+  // sort filenames by version, highest first
+  uksort($versions, "version_compare");
+  $versions = array_reverse($versions, true);
+
+  foreach ($versions as $ver => $meta) {
+    $fname = $meta['fname'];
+    $desc = $meta['desc'];
+
+    $bsum = file2bsum(realpath($repodir . '/' . $fname));
+
+    $meta2['ver'] = strval($ver);
+    $meta2['bsum'] = $bsum;
+
+    if (empty($db[$pkg]['desc'])) $db[$pkg]['desc'] = $desc;
+    $db[$pkg]['versions'][$fname] = $meta2;
+  }
+
   $pkgcount++;
 
 }
 
-echo "DONE - processed " . $pkgcount . " svp packages\n";
+if ($pkgcount < 100) echo "WARNING: an unexpectedly low number of packages has been found in the repo ({$pkgcount})\n";
 
-file_put_contents($repodir . '/index.tsv', $pkglist);
+file_put_contents($repodir . '/_index.json', json_encode($db));
 
 exit(0);
 
