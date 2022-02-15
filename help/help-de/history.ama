@@ -7,7 +7,7 @@ In den Jahren 2005-2015 habe ich Paketierungsarbeiten für das FreeDOS-Projekt
 durchgeführt. Ich war nicht zufrieden mit dem Paketierungswerkzeug, das
 FreeDOS damals verwendete (FDPKG), also begann ich 2012 mit der Arbeit an
 einem neuen Paketmanager, mit Netzwerkunterstützung, automatischen Updates
-usw. - ich nannte es FDNPKG. Später entwickelte ich auch ein Skript, um eine
+usw. - ich nannte ihn FDNPKG. Später entwickelte ich auch ein Skript, um eine
 "immer aktuelle" FreeDOS-CD zu erzeugen, die ich fantasielos "all_cd.iso"
 nannte. Diese CD enthielt FDNPKG und alle FreeDOS-Pakete, die zum gegebenen
 Zeitpunkt verfügbar waren.
