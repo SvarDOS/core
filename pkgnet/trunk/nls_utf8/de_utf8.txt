@@ -1,0 +1,48 @@
+#
+# PKGNET TRANSLATION FILE
+#
+# LANG  : DE
+# AUTHOR: ROBERT RIEBISCH
+#
+
+###############################################################################
+# HELP SCREEN                                                                 #
+###############################################################################
+
+1.0:pkgnet ist der SvarDOS-Paketdownloader.
+1.1:Syntax:  pkgnet search <Suchbegriff>
+1.2:         pkgnet pull <Paketname>
+1.3:         pkgnet pull <Paketname>-<Paketversion>
+1.4:         pkgnet pullsrc <Paketname>
+1.4:         pkgnet pullsrc <Paketname>-<Paketversion>
+1.6:         pkgnet checkup
+1.7:Aktionen:
+1.8:search   - fragt die Liste der passenden Pakete von der Paketquelle ab
+1.9:pull     - lädt das angegebene Paket ins aktuelle Verzeichnis herunter
+1.10:checkup  - zeigt die für Ihr System verfügbaren Updates an
+
+
+###############################################################################
+# OPERATIONS                                                                  #
+###############################################################################
+
+2.0:%ld KiB nach %s (BSUM: %04X) heruntergeladen
+
+
+###############################################################################
+# ERROR MESSAGES                                                              #
+###############################################################################
+
+9.0:FEHLER: Variable %DOSDIR% ist nicht gesetzt
+9.1:FEHLER: Konnte nicht auf das Verzeichnis %DOSDIR%\\packages zugreifen
+9.2:FEHLER: Verbindung mit %s fehlgeschlagen
+9.3:FEHLER: Senden einer HTTP-Abfrage an den Remote-Server fehlgeschlagen
+9.4:FEHLER: Senden von POST-Daten an den Remote-Server fehlgeschlagen
+9.5:FEHLER: TCP-Kommunikationsfehler #%d
+9.6:FEHLER: Erstellen der Datei %s fehlgeschlagen
+9.7:FEHLER: Schreiben von Daten in die Datei %s nach %ld Byte fehlgeschlagen
+9.8:FEHLER: Zeitüberschreitung beim Warten auf Daten
+9.9:FEHLER: Arbeitsspeicher erschöpft
+9.10:FEHLER: Datei %s bereits vorhanden
+9.11:FEHLER: Initialisierung des Netzwerksubsystems fehlgeschlagen
+9.12:FEHLER: DNS-Auflösung fehlgeschlagen
