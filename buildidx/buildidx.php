@@ -76,6 +76,21 @@ function read_file_from_zip($z, $fil) {
 }
 
 
+function read_list_of_files_in_zip($z) {
+  $zip = new ZipArchive;
+  if ($zip->open($z, ZipArchive::RDONLY) !== true) {
+    echo "ERROR: failed to open zip file '{$z}'\n";
+    return(false);
+  }
+
+  $res = array();
+  for ($i = 0; $i < $zip->numFiles; $i++) $res[] = $zip->getNameIndex($i);
+
+  $zip->close();
+  return($res);
+}
+
+
 // reads a LSM string and returns it in the form of an array
 function parse_lsm($s) {
   $res = array();
@@ -88,6 +103,12 @@ function parse_lsm($s) {
     $res[$tok] = $val;
   }
   return($res);
+}
+
+
+// on PHP 8+ there is str_starts_with(), but not on PHP 7 so I use this
+function str_head_is($haystack, $needle) {
+  return strpos($haystack, $needle) === 0;
 }
 
 
@@ -132,6 +153,30 @@ foreach ($pkgfiles as $fname) {
   if (empty($lsmarray['description'])) {
     echo "ERROR: lsm file in {$fname} does not contain a description\n";
     continue;
+  }
+
+  // validate the files present in the archive
+  $listoffiles = read_list_of_files_in_zip($pkgfullpath);
+  foreach ($listoffiles as $f) {
+    $f = strtolower($f);
+    // LSM file is ok
+    if ($f === "appinfo/{$pkgnam}.lsm") continue;
+    if ($f === "appinfo/") continue;
+    // well-known dirs are okay
+    if (str_head_is($f, 'bin/')) continue;
+    if (str_head_is($f, "doc/{$pkgnam}/")) continue;
+    if ($f === 'doc/') continue;
+    if (str_head_is($f, "nls/{$pkgnam}.")) continue;
+    if ($f === 'nls/') continue;
+    if (str_head_is($f, "progs/{$pkgnam}/")) continue;
+    if ($f === 'progs/') continue;
+    if (str_head_is($f, "devel/{$pkgnam}/")) continue;
+    if ($f === 'devel/') continue;
+    if (str_head_is($f, "games/{$pkgnam}/")) continue;
+    if ($f === 'games/') continue;
+    if (str_head_is($f, "drivers/{$pkgnam}/")) continue;
+    if ($f === 'drivers/') continue;
+    echo "WARNING: pkg {$fname} contains a file in an illegal location: {$f}\n";
   }
 
   $meta['fname'] = $fname;
