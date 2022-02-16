@@ -167,6 +167,7 @@ foreach ($pkgfiles as $fname) {
 
   // special rule for djgpp_* packages: they put their files in djgpp
   if (str_head_is($pkgnam, 'djgpp_')) $pkgdir = 'djgpp';
+  if ($pkgnam == 'fbc_help') $pkgdir = 'fbc'; // FreeBASIC help goes to the FreeBASIC dir
 
   foreach ($listoffiles as $f) {
     $f = strtolower($f);
