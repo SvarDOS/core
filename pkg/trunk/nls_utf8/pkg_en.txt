@@ -1,13 +1,14 @@
 #
 # PKG language file
 #
-# Language..: English
-# Translator: Mateusz Viste
+# Language....: English
+# Author......: Mateusz Viste
+# Last updated: 16 Feb 2022
 #
 
 #### Help ####
 
-1.0:PKG is the package installer for SvarDOS.
+1.0:PKG is the SvarDOS package manager.
 1.20:Usage: pkg install package.svp
 1.21:       pkg update package.svp
 1.22:       pkg remove package

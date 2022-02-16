@@ -1,5 +1,5 @@
 /*
- * PKG - SvarDOS package installer
+ * PKG - SvarDOS package manager
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
@@ -53,7 +53,7 @@ enum ACTIONTYPES {
 static int showhelp(void) {
   puts("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
   puts("");
-  puts(svarlang_str(1, 0)); /* "PKG is the package installer for SvarDOS." */
+  puts(svarlang_str(1, 0)); /* "PKG is the SvarDOS package manager." */
   puts("");
   puts(svarlang_str(1, 20)); /* "Usage: pkg install package.svp */
   puts(svarlang_str(1, 21)); /* "       pkg update package.svp" */
