@@ -1,0 +1,48 @@
+#
+# PKGNET TRANSLATION FILE
+#
+# LANG  : PL
+# AUTHOR: MATEUSZ VISTE
+#
+
+###############################################################################
+# HELP SCREEN                                                                 #
+###############################################################################
+
+1.0:pkgnet, program do pobierania pakietów SvarDOS.
+1.1:użycie:  pkgnet search <wyrażenie>
+1.2:         pkgnet pull <pakiet>
+1.3:         pkgnet pull <pakiet>-<wersja>
+1.4:         pkgnet pullsrc <pakiet>
+1.4:         pkgnet pullsrc <pakiet>-<wersja>
+1.6:         pkgnet checkup
+1.7:akcje:
+1.8:search   - pyta zdalne repozytorium o listę pakietów pasujących do wyrażenia
+1.9:pull     - pobiera dany pakiet do bieżącego katalogu
+1.10:checkup  - wyświetla dostępne aktualizacje dla twojego systemu
+
+
+###############################################################################
+# OPERATIONS                                                                  #
+###############################################################################
+
+2.0:Pobrano %ld KiB do %s (BSUM: %04X)
+
+
+###############################################################################
+# ERROR MESSAGES                                                              #
+###############################################################################
+
+9.0:BŁĄD: zmienna %DOSDIR% nie jest ustawiona
+9.1:BŁĄD: dostęp do katalogu %DOSDIR%\\packages nie powiódł się
+9.2:BŁĄD: połączenie do %s nie powiodło się
+9.3:BŁĄD: nie zdołano wysłać zapytania HTTP do zdalnego serwera
+9.4:BŁĄD: nie zdołano wysłać danych POST do zdalnego serwera
+9.5:BŁĄD: błąd komunikacji TCP #%d
+9.6:BŁĄD: nie zdołano utworzyć pliku %s
+9.7:BŁĄD: nie zdołano zapisać danych do pliku %s po %ld bajtach
+9.8:BŁĄD: osiągnięto limit czasu oczekiwania na dane
+9.9:BŁĄD: brak pamięci
+9.10:BŁĄD: plik %s już istnieje
+9.11:BŁĄD: inicjalizacja podsystemu sieciowego nie powiodła się
+9.12:BŁĄD: rozwiązywanie nazwy DNS nie powiodło się
