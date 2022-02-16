@@ -126,6 +126,12 @@ $repodir = $_SERVER['argv'][1];
 $pkgfiles = scandir($repodir);
 $pkgcount = 0;
 
+
+// load the list of CORE packages
+
+$core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree devload diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
+
+
 // do a list of all svp packages with their available versions and descriptions
 
 $pkgdb = array();
@@ -156,7 +162,6 @@ foreach ($pkgfiles as $fname) {
   }
 
   // validate the files present in the archive
-  $core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree devload diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
   $listoffiles = read_list_of_files_in_zip($pkgfullpath);
   foreach ($listoffiles as $f) {
     $f = strtolower($f);
@@ -164,7 +169,7 @@ foreach ($pkgfiles as $fname) {
     if ($f === "appinfo/{$pkgnam}.lsm") continue;
     if ($f === "appinfo/") continue;
     // CORE packages are premium citizens and can do a little more
-    if (array_search($pkgnam, $core_packages_list)) {
+    if (array_search($pkgnam, $core_packages_list) !== false) {
       if (str_head_is($f, 'bin/')) continue;
     }
     // well-known dirs are okay
