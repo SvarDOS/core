@@ -30,7 +30,7 @@
 3.8:FEHLER: Ungültiges Zip-Archiv! Paket nicht installiert.
 3.9:FEHLER: Paket enthält eine Datei, die bereits lokal existiert:
 3.10:FEHLER: %s konnte nicht erstellt werden!
-3.12:FEHLER: Paket enthält nicht die Datei %s! Kein gültiges FreeDOS-Paket.
+3.12:FEHLER: Paket enthält nicht die Datei %s! Kein gültiges SvarDOS-Paket.
 3.18:Paket %s ist bereits installiert! Sie sollten die 'update' Aktion verwenden.
 3.19:Paket %s installiert: %d Dateien extrahiert, %d Fehler.
 3.20:FEHLER: Paket enthält eine verschlüsselte Datei:

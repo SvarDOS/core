@@ -145,8 +145,8 @@ int main(int argc, char **argv) {
   /* read the DOSDIR environment variable */
   dosdir = getenv("DOSDIR");
   if (dosdir == NULL) {
-    puts(svarlang_str(2, 2)); /* "%DOSDIR% not set! You should make it point to the FreeDOS main directory." */
-    puts(svarlang_str(2, 3)); /* "Example: SET DOSDIR=C:\FDOS" */
+    puts(svarlang_str(2, 2)); /* "%DOSDIR% not set! You should make it point to the SvarDOS main directory." */
+    puts(svarlang_str(2, 3)); /* "Example: SET DOSDIR=C:\SVARDOS" */
     goto GAMEOVER;
   }
 

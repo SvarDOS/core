@@ -28,7 +28,7 @@
 3.8:Fejl: Ugyldigt zip arkiv! Pakken blev ikke installeret.
 3.9:Fejl: Pakken indeholder en fil som findes lokalt allerede:
 3.10:Fejl: Kan ikke oprette %s!
-3.12:Fejl: Pakken indeholder ikke filen %s! Er ikke en gyldig FreeDOS pakke.
+3.12:Fejl: Pakken indeholder ikke filen %s! Er ikke en gyldig SvarDOS pakke.
 3.18:Pakke %s er installeret allerede! Benyt 'update' handlingen i stedet.
 3.19:Pakke %s installeret: %d filer udpakket, %d fejl.
 3.20:Fejl: Pakken indeholder en krypteret fil:

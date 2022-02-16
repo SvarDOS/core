@@ -188,7 +188,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     prevzipnode = curzipnode;
     curzipnode = curzipnode->nextfile;
   }
-  /* if appinfo file not found, this is not a real FreeDOS package */
+  /* if appinfo file not found, this is not a real SvarDOS package */
   if (appinfopresence != 1) {
     kitten_printf(3, 12, appinfofile); /* "ERROR: Package do not contain the %s file! Not a valid SvarDOS package." */
     puts("");
