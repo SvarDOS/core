@@ -176,12 +176,12 @@ foreach ($pkgfiles as $fname) {
     // CORE packages are premium citizens and can do a little more
     if (array_search($pkgnam, $core_packages_list) !== false) {
       if (str_head_is($f, 'bin/')) continue;
+      if (str_head_is($f, "doc/{$pkgdir}/")) continue;
+      if ($f === 'doc/') continue;
+      if (str_head_is($f, "nls/{$pkgdir}.")) continue;
+      if ($f === 'nls/') continue;
     }
-    // well-known dirs are okay
-    if (str_head_is($f, "doc/{$pkgdir}/")) continue;
-    if ($f === 'doc/') continue;
-    if (str_head_is($f, "nls/{$pkgdir}.")) continue;
-    if ($f === 'nls/') continue;
+    // well-known "category" dirs are okay
     if (str_head_is($f, "progs/{$pkgdir}/")) continue;
     if ($f === 'progs/') continue;
     if (str_head_is($f, "devel/{$pkgdir}/")) continue;
