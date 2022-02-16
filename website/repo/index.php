@@ -86,7 +86,10 @@ if (empty($_GET['a'])) {
 }
 
 $lang = 'en';
-if (!empty($_GET['lang'])) $lang = strtolower($_GET['lang']);
+if ((!empty($_GET['lang'])) && (preg_match('/[a-zA-Z][a-zA-Z]/', $_GET['lang']))) $lang = strtolower($_GET['lang']);
+
+// load pkg desc translations
+$descdb = json_decode(file_get_contents("pkg_desc_{$lang}.json"), true);
 
 // switch to the packages directory
 if (chdir('../../packages') === false) {
@@ -167,8 +170,17 @@ if ($a === 'search') {
       // fetch first (preferred) version
       $prefver_fname = array_key_first($meta['versions']);
       $prefver = array_shift($meta['versions']);
-      echo str_pad(strtoupper($pkg), 12) . str_pad(get_msg('VER', $lang) . " {$prefver['ver']} ", 16) . str_pad(get_msg('SIZE', $lang) . ' ' . nicesize(filesize($prefver_fname)), 16) . "BSUM: " . sprintf("%04X", $prefver['bsum']) . "\r\n";
-      echo wordwrap($meta['desc'], 79, "\r\n", true);
+      echo str_pad(strtoupper($pkg), 12);
+      echo str_pad(get_msg('VER', $lang) . " {$prefver['ver']} ", 16);
+      echo str_pad(get_msg('SIZE', $lang) . ' ' . nicesize(filesize($prefver_fname)), 16) . "BSUM: " . sprintf("%04X", $prefver['bsum']) . "\r\n";
+
+      // do I have a localized version of the description?
+      if (!empty($descdb[$pkg])) {
+        echo wordwrap(cp_conv($descdb[$pkg], $lang), 79, "\r\n", true);
+      } else {
+        echo wordwrap($meta['desc'], 79, "\r\n", true);
+      }
+
       echo "\r\n";
       // do I have any alt versions?
       $altlist = array();
