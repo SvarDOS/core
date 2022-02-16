@@ -12,6 +12,28 @@
 */
 
 
+// messages in different languages (and necessary mappings for codepage conversions)
+include 'lang.php';
+
+
+// convert a utf-8 string into codepage related to lang
+function cp_conv($s, $lang) {
+  global $CP_UTF, $CP_ENC;
+  $res = str_replace($CP_UTF[$lang], $CP_ENC[$lang], $s);
+  return($res);
+}
+
+
+function get_msg($id, $lang) {
+  global $MSG;
+  if (!empty($MSG[$id][$lang])) {
+    return cp_conv($MSG[$id][$lang], $lang);
+  } else {
+    echo $MSG[$id]['en'];
+  }
+}
+
+
 function nicesize($bytes) {
   if ($bytes < 1024) return(round($bytes / 1024, 1) . "K");
   if ($bytes < 1024 * 1024) return(round($bytes / 1024) . "K");
@@ -62,6 +84,9 @@ if (empty($_GET['a'])) {
   echo "ERROR: no action specified\r\n";
   exit(0);
 }
+
+$lang = 'en';
+if (!empty($_GET['lang'])) $lang = strtolower($_GET['lang']);
 
 // switch to the packages directory
 if (chdir('../../packages') === false) {
@@ -126,7 +151,7 @@ if ($a === 'pull') {
     readfile($fname);
   } else {
     http_response_code(404);
-    echo "ERROR: package not found on server\r\n";
+    echo get_msg('PKG_NOT_FOUND', $lang) . "\r\n";
   }
   exit(0);
 }
@@ -136,12 +161,13 @@ if ($a === 'pull') {
 
 if ($a === 'search') {
   $matches = 0;
+  header('Content-Type: text/plain');
   foreach ($db as $pkg => $meta) {
     if ((stristr($pkg, $p)) || (stristr($meta['desc'], $p))) {
       // fetch first (preferred) version
       $prefver_fname = array_key_first($meta['versions']);
       $prefver = array_shift($meta['versions']);
-      echo str_pad(strtoupper($pkg), 12) . str_pad("ver: {$prefver['ver']} ", 16) . str_pad("size: " . nicesize(filesize($prefver_fname)), 16) . "BSUM: " . sprintf("%04X", $prefver['bsum']) . "\r\n";
+      echo str_pad(strtoupper($pkg), 12) . str_pad(get_msg('VER', $lang) . " {$prefver['ver']} ", 16) . str_pad(get_msg('SIZE', $lang) . ' ' . nicesize(filesize($prefver_fname)), 16) . "BSUM: " . sprintf("%04X", $prefver['bsum']) . "\r\n";
       echo wordwrap($meta['desc'], 79, "\r\n", true);
       echo "\r\n";
       // do I have any alt versions?
@@ -150,13 +176,13 @@ if ($a === 'search') {
         $altlist[] = $pkg . '-' . $altver['ver'];
       }
       if (!empty($altlist)) {
-        echo wordwrap("[alt versions: " . implode(', ', $altlist), 79, "\r\n", true) . "]\r\n";
+        echo wordwrap('[' . get_msg('ALT_VERS', $lang) . ' ' . implode(', ', $altlist), 79, "\r\n", true) . "]\r\n";
       }
       echo "\r\n";
       $matches++;
     }
   }
-  if ($matches == 0) echo "No matching package found.\r\n";
+  if ($matches == 0) echo get_msg('NO_MATCHING_PKG', $lang) . "\r\n";
 }
 
 
@@ -177,17 +203,17 @@ if ($a === 'checkup') {
     // found version mismatch
     if ($found == 0) {
       echo str_pad('', 58, '-') . "\r\n";
-      tabulprint(array('PACKAGE', 'INSTALLED (LOCAL)', 'AVAILABLE (REMOTE)'), array(8, 20, 20));
+      tabulprint(array(get_msg('PACKAGE', $lang), get_msg('INSTALLED', $lang), get_msg('AVAILABLE', $lang)), array(8, 20, 20));
       tabulprint(array('----------', '----------------------', '----------------------'), array(10, 22, 22), false);
     }
     $found++;
     tabulprint(array('' . $rpkg[0], $rpkg[1], $prefver['ver']), array(8, 20, 20));
   }
   if ($found == 0) {
-    echo "no available updates\r\n";
+    echo get_msg('NO_UPDATES', $lang) . "\r\n";
   } else {
     echo str_pad('', 58, '-') . "\r\n";
-    echo "found {$found} differing package(s)\r\n";
+    echo get_msg('FOUND_DIFFER', $lang) . ' ' . $found . "\r\n";
   }
 }
 
