@@ -40,7 +40,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220215"
+#define PVER "20220216"
 #define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.org"
@@ -96,14 +96,16 @@ static void help(void) {
 /* parses command line arguments and fills outfname and url accordingly
  * returns 0 on success, non-zero otherwise */
 static int parseargv(int argc, char * const *argv, char *outfname, char *url, int *ispost) {
+  const char *lang = getenv("LANG");
+  if (lang == NULL) lang = "";
   *outfname = 0;
   *url = 0;
   *ispost = 0;
   if ((argc == 3) && (strcasecmp(argv[1], "search") == 0)) {
-    sprintf(url, "/repo/?a=search&p=%s", argv[2]);
+    sprintf(url, "/repo/?a=search&p=%s&lang=%s", argv[2], lang);
   } else if ((argc == 3) && (strcasecmp(argv[1], "pull") == 0)) {
     unsigned short i;
-    sprintf(url, "/repo/?a=pull&p=%s", argv[2]);
+    sprintf(url, "/repo/?a=pull&p=%s&lang=%s", argv[2], lang);
     /* copy argv[2] into outfname, but stop at first '-' or null terminator
      * this trims any '-version' part in filename to respect 8+3 */
     for (i = 0; (argv[2][i] != 0) && (argv[2][i] != '-') && (i < 8); i++) {
@@ -112,7 +114,7 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url, in
     /* add the svp extension to filename */
     strcpy(outfname + i, ".svp");
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
-    sprintf(url, "/repo/?a=checkup");
+    sprintf(url, "/repo/?a=checkup&lang=%s", lang);
     *ispost = 1;
   } else {
     help();
