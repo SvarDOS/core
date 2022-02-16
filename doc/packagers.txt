@@ -46,8 +46,8 @@ to your local svardos-packages directory. Then, instruct svn to add the new
 file(s) to the repo:
 
 $ cd svardos-packages
-$ svn add package.svp
-$ svn add package.zip   <-- optional, only if the package has available sources
+$ svn add package-ver.svp
+$ svn add package-ver.zip   <-- optional, only if package has available sources
 
 Review the changes to make sure you added the right files:
 $ svn st
@@ -63,25 +63,27 @@ two.
 === UPDATING A PACKAGE (ADD A NEW VERSION) ====================================
 
 Let's imagine that we have a package named NASM in version 2.12. A new version
-of this software has been released, you tested it, found it stable so you
+2.15 of this software has been released, you tested it, found it stable so you
 packaged it. How to add it to the SvarDOS packages repository?
 
-First, you need to rename the current package's filename so it becomes an
-"alternative version":
+Add the new version of your package:
 
-$ cd svardos-packages
-$ svn mv nasm.svp nasm-2.12.svp
-$ svn mv nasm.zip nasm-2.12.zip      <-- optional (only if package has sources)
-
-Then, add the new version as the "current" version:
-
-$ svn add nasm.svp
-$ svn add nasm.zip                   <-- optional (only if package has sources)
+$ svn add nasm-2.15.svp
+$ svn add nasm-2.15.zip              <-- optional (only if package has sources)
 
 Finally, review and commit your changes:
 
 $ svn st
-$ svn commit -m 'updated NASM to version 2.13'
+$ svn commit -m 'updated NASM to version 2.15'
+
+The repository server will automatically serve the latest available version as
+the "preferred" version to users. The version strings are processed (and
+compared with each other) through the PHP version_compare() function documented
+here: <https://www.php.net/manual/en/function.version-compare>
+
+This function works relatively well, but it might fail on some exotic version
+strings. For the time being, there is no way to flag a specific package version
+as being "preferred".
 
 
 === REMOVING A PACKAGE ========================================================
