@@ -214,17 +214,17 @@ if ($a === 'checkup') {
     if (strcasecmp($prefver['ver'], $rpkg[1]) == 0) continue;
     // found version mismatch
     if ($found == 0) {
-      echo str_pad('', 58, '-') . "\r\n";
-      tabulprint(array(get_msg('PACKAGE', $lang), get_msg('INSTALLED', $lang), get_msg('AVAILABLE', $lang)), array(8, 20, 20));
-      tabulprint(array('----------', '----------------------', '----------------------'), array(10, 22, 22), false);
+      echo str_pad('', 78, '-') . "\r\n";
+      tabulprint(array(get_msg('PACKAGE', $lang), get_msg('INSTALLED', $lang), get_msg('AVAILABLE', $lang)), array(8, 30, 30));
+      tabulprint(array('----------', '--------------------------------', '--------------------------------'), array(10, 32, 32), false);
     }
     $found++;
-    tabulprint(array('' . $rpkg[0], $rpkg[1], $prefver['ver']), array(8, 20, 20));
+    tabulprint(array('' . $rpkg[0], $rpkg[1], $prefver['ver']), array(8, 30, 30));
   }
   if ($found == 0) {
     echo get_msg('NO_UPDATES', $lang) . "\r\n";
   } else {
-    echo str_pad('', 58, '-') . "\r\n";
+    echo str_pad('', 78, '-') . "\r\n";
     echo get_msg('FOUND_DIFFER', $lang) . ' ' . $found . "\r\n";
   }
 }
