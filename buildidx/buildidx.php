@@ -163,6 +163,11 @@ foreach ($pkgfiles as $fname) {
 
   // validate the files present in the archive
   $listoffiles = read_list_of_files_in_zip($pkgfullpath);
+  $pkgdir = $pkgnam;
+
+  // special rule for djgpp_* packages: they put their files in djgpp
+  if (str_head_is($pkgnam, 'djgpp_')) $pkgdir = 'djgpp';
+
   foreach ($listoffiles as $f) {
     $f = strtolower($f);
     // LSM file is ok
@@ -173,17 +178,17 @@ foreach ($pkgfiles as $fname) {
       if (str_head_is($f, 'bin/')) continue;
     }
     // well-known dirs are okay
-    if (str_head_is($f, "doc/{$pkgnam}/")) continue;
+    if (str_head_is($f, "doc/{$pkgdir}/")) continue;
     if ($f === 'doc/') continue;
-    if (str_head_is($f, "nls/{$pkgnam}.")) continue;
+    if (str_head_is($f, "nls/{$pkgdir}.")) continue;
     if ($f === 'nls/') continue;
-    if (str_head_is($f, "progs/{$pkgnam}/")) continue;
+    if (str_head_is($f, "progs/{$pkgdir}/")) continue;
     if ($f === 'progs/') continue;
-    if (str_head_is($f, "devel/{$pkgnam}/")) continue;
+    if (str_head_is($f, "devel/{$pkgdir}/")) continue;
     if ($f === 'devel/') continue;
-    if (str_head_is($f, "games/{$pkgnam}/")) continue;
+    if (str_head_is($f, "games/{$pkgdir}/")) continue;
     if ($f === 'games/') continue;
-    if (str_head_is($f, "drivers/{$pkgnam}/")) continue;
+    if (str_head_is($f, "drivers/{$pkgdir}/")) continue;
     if ($f === 'drivers/') continue;
     echo "WARNING: pkg {$fname} contains a file in an illegal location: {$f}\n";
   }
