@@ -35,8 +35,8 @@ deflang.obj: nls_utf8\pkg_en.txt
 	utf8tocp 857 pkg_tr.txt > tr.txt
 	utf8tocp maz pkg_pl.txt > pl.txt
 	..\svarlang.lib\tlumacz en de fr dk si tr pl
-	move out.lng ..\pkg.lng
-	move deflang.c ..
+	move /y out.lng ..\pkg.lng
+	move /y deflang.c ..
 	del ??.txt
 	cd ..
 	wcc $(CFLAGS) deflang.c
