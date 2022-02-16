@@ -30,6 +30,7 @@
 #include <string.h>   /* strcasecmp() */
 
 #include "svarlang.lib/svarlang.h"
+#include "helpers.h"
 #include "kprintf.h"
 #include "libunzip.h"
 #include "pkginst.h"
@@ -113,6 +114,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
   }
   memcpy(pkgname, file + lastpathdelim + 1, t);
   pkgname[t] = 0;
+  strtolower(pkgname); /* package name must be all lower-case for further file matching in the zip file */
   /* prepare the zip file and install it */
   zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
   if (zipfileidx != NULL) {
