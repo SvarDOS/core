@@ -16,7 +16,7 @@ release: pkgnet.exe .symbolic
 	copy pkgnet.lsm appinfo
 	copy pkgnet.lng nls
 	if exist pkgnet.svp del pkgnet.svp
-	zip -9krDX -m pkgnet.svp bin appinfo nls
+	zip -9krDX -m pkgnet.svp bin appinfo nls_utf8
 	rmdir bin
 	rmdir appinfo
 	rmdir nls
