@@ -16,12 +16,12 @@ release: pkgnet.exe .symbolic
 	copy pkgnet.lsm appinfo
 	copy pkgnet.lng nls
 	if exist pkgnet.svp del pkgnet.svp
-	zip -9krDX -m pkgnet.svp bin appinfo nls_utf8
+	zip -9krDX -m pkgnet.svp bin appinfo nls
 	rmdir bin
 	rmdir appinfo
 	rmdir nls
 	if exist pkgnet.zip del pkgnet.zip
-	zip -9krDX pkgnet.zip Makefile *.c *.h pkgnet.lsm watt32 svarlang.lib
+	zip -9krDX pkgnet.zip Makefile *.c *.h nls_utf8 pkgnet.lsm watt32 svarlang.lib
 
 pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
 	cd nls_utf8
