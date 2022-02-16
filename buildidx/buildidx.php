@@ -147,7 +147,7 @@ foreach ($pkgfiles as $fname) {
     continue;
   }
   if (strlen($lsmarray['version']) > 16) {
-    echo "WARNING: version string in lsm file of {$fname} is too long (16 chars max)\n";
+    echo "ERROR: version string in lsm file of {$fname} is too long (16 chars max)\n";
     continue;
   }
   if (empty($lsmarray['description'])) {
