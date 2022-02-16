@@ -22,4 +22,17 @@ foreach ($db as $pkg => $meta) {
 }
 echo "</table>\n";
 
+$errs = trim(file_get_contents('../packages/_buildidx.log'));
+if (!empty($errs)) echo '<p style="color: #f00; font-weigth: bold;">Note to SvarDOS packagers: inconsistencies have been detected in the repository, please <a href="?p=repo&amp;showlogs=1#logs">review them</a>.</p>';
+
+if ($_GET['showlogs'] == 1) {
+  echo "<p style=\"font-size: 0.8em;\"><a name=\"logs\">DEBUG REPO BUILD LOGS</a>:<br>\n";
+  if (empty($errs)) {
+    echo "no buildidx errors to display\n";
+  } else {
+    echo nl2br(htmlentities($errs));
+  }
+  echo "</p>\n";
+}
+
 ?>
