@@ -26,7 +26,7 @@
     <?php
     $lastver = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
 
-    echo '<h2>Downloads (build date: ' . gmdate('d M Y', filemtime("download/{$lastver}/svardos-{$lastver}-cd.zip")) . ')</h2>'
+    echo '<h2>Downloads (build ' . $lastver . ')</h2>'
     ?>
 
     <ul>
