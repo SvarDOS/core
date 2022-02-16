@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  16 feb 2022: added warning about overlong version strings
   15 feb 2022: index is generated as json, contains all filenames and alt versions
   14 feb 2022: packages are expected to have the *.svp extension
   12 feb 2022: skip source packages from being processed (*.src.zip)
@@ -30,7 +31,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220215";
+$PVER = "20220216";
 
 
 // computes the BSD sum of a file and returns it
@@ -122,6 +123,10 @@ foreach ($pkgfiles as $fname) {
   $lsmarray = parse_lsm($lsm);
   if (empty($lsmarray['version'])) {
     echo "ERROR: lsm file in {$fname} does not contain a version\n";
+    continue;
+  }
+  if (strlen($lsmarray['version']) > 16) {
+    echo "WARNING: version string in lsm file of {$fname} is too long (16 chars max)\n";
     continue;
   }
   if (empty($lsmarray['description'])) {
