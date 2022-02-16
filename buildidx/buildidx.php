@@ -3,7 +3,7 @@
   SvarDOS repo index builder
   Copyright (C) Mateusz Viste 2012-2022
 
-  buildidx computes an index tsv file for the SvarDOS repository.
+  buildidx computes an index json file for the SvarDOS repository.
   it must be executed pointing to a directory that stores packages (*.svp)
   files. buildidx will generate the index file and save it into the package
   repository.

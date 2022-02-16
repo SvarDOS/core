@@ -1,5 +1,5 @@
 
-buildidx is a little program that generates an index.tsv file for the SvarDOS repository.
+buildidx is a little program that generates an _index.json file for the SvarDOS repository.
 
 
 * Requirements *
