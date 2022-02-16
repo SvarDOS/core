@@ -10,7 +10,7 @@
 
   requires php-zip
 
-  16 feb 2022: added warning about overlong version strings
+  16 feb 2022: added warning about overlong version strings and wild files location
   15 feb 2022: index is generated as json, contains all filenames and alt versions
   14 feb 2022: packages are expected to have the *.svp extension
   12 feb 2022: skip source packages from being processed (*.src.zip)
@@ -156,14 +156,18 @@ foreach ($pkgfiles as $fname) {
   }
 
   // validate the files present in the archive
+  $core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree devload diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
   $listoffiles = read_list_of_files_in_zip($pkgfullpath);
   foreach ($listoffiles as $f) {
     $f = strtolower($f);
     // LSM file is ok
     if ($f === "appinfo/{$pkgnam}.lsm") continue;
     if ($f === "appinfo/") continue;
+    // CORE packages are premium citizens and can do a little more
+    if (array_search($pkgnam, $core_packages_list)) {
+      if (str_head_is($f, 'bin/')) continue;
+    }
     // well-known dirs are okay
-    if (str_head_is($f, 'bin/')) continue;
     if (str_head_is($f, "doc/{$pkgnam}/")) continue;
     if ($f === 'doc/') continue;
     if (str_head_is($f, "nls/{$pkgnam}.")) continue;
