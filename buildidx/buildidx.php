@@ -195,6 +195,7 @@ foreach ($pkgfiles as $fname) {
     // CORE packages are premium citizens and can do a little more
     if (array_search($pkgnam, $core_packages_list) !== false) {
       if (str_head_is($f, 'bin/')) continue;
+      if (str_head_is($f, 'cpi/')) continue;
       if (str_head_is($f, "doc/{$pkgdir}/")) continue;
       if ($f === 'doc/') continue;
       if (str_head_is($f, "nls/{$pkgdir}.")) continue;
