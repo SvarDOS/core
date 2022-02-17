@@ -1,0 +1,68 @@
+#
+# FDNPKG language file
+#
+# Language..: Danish
+# Translator: Henrik Schick-Hansen
+#
+
+#### Help ####
+
+1.0:Pakke administrator til SvarDOS.
+1.20:Anvendelse: pkg install package.svp
+1.21:            pkg update package.svp
+1.22:            pkg remove package
+1.23:            pkg listfiles package
+1.24:            pkg listlocal [filter]
+1.27:            pkg unzip file.zip
+1.25:PKG is published under the MIT license.
+1.26:It is configured through %DOSDIR%\\CFG\\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% ikke sat! DOSDIR skal pege på SvarDOS hoved biblioteket.
+2.3:Eksempel: SET DOSDIR=C:\\SVARDOS
+2.14:Hukommelse opbrugt! (%s)
+
+#### Installing package ####
+
+3.8:Fejl: Ugyldigt zip arkiv! Pakken blev ikke installeret.
+3.9:Fejl: Pakken indeholder en fil som findes lokalt allerede:
+3.10:Fejl: Kan ikke oprette %s!
+3.12:Fejl: Pakken indeholder ikke filen %s! Er ikke en gyldig SvarDOS pakke.
+3.18:Pakke %s er installeret allerede! Benyt 'update' handlingen i stedet.
+3.19:Pakke %s installeret: %d filer udpakket, %d fejl.
+3.20:Fejl: Pakken indeholder en krypteret fil:
+3.23:ERROR: Package contains an invalid filename:
+3.24:ERROR: package name too long
+
+#### Removing package ####
+
+4.0:Pakken %s er ikke installeret, og kan derfor ikke slettes.
+4.3:Hukommelse opbrugt! Kan ikke gemme biblioteket %s!
+4.4:sletter %s
+4.5:Pakken %s er slettet.
+
+#### Searching package ####
+
+5.0:Ingen pakke passer med søgningen.
+
+#### Loading configuration ####
+
+7.0:Fejl: opbevaringsstedet '%s' er oplistet to gange!
+7.1:Fejl: Kan ikke åbne opsætningsfilen '%s'!
+7.4:Advarsel: tomt udtryk i linje #%d
+7.8:Advarsel: Ukendt udtryk '%s' i linje #%d
+7.11:Advarsel: Ugyldigt 'DIR' direktiv fundet i linje #%d
+7.15:Fejl: tilpasset bib '%s' er ikke en gyldig og fuldstændig sti!
+7.16:Fejl: tilpasset bib '%s' er et reserveret navn!
+
+#### Unziping package ####
+
+8.1:ukendt zip signatur: 0x%08x
+8.2:Fejl: Pakkeindhold komprimeret med en ikke understøttet metode (%d):
+8.3:Fejl under udpakning af '%s' til '%s'!
+
+#### Handling the local list of installed packages ####
+
+9.0:Fejl: Kan ikke få adgang til %s biblioteket.
+9.1:Fejl: Lokal pakke %s ikke fundet.
