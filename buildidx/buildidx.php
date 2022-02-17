@@ -140,10 +140,10 @@ $pkgfiles = scandir($repodir);
 $pkgcount = 0;
 
 
-// load the list of CORE packages
+// load the list of CORE and MSDOS_COMPAT packages
 
 $core_packages_list = load_core_list($repodir);
-
+$msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice command cpidos debug defrag deltree diskcopy display edit edlin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mode more move nlsfunc print share shsucdx sort tree undelete unformat xcopy');
 
 // do a list of all svp packages with their available versions and descriptions
 
@@ -204,8 +204,9 @@ foreach ($pkgfiles as $fname) {
     // LSM file is ok
     if ($f === "appinfo/{$pkgnam}.lsm") continue;
     if ($f === "appinfo/") continue;
-    // CORE packages are premium citizens and can do a little more
-    if (array_search($pkgnam, $core_packages_list) !== false) {
+    // CORE and MSDOS_COMPAT packages are premium citizens and can do a little more
+    if ((array_search($pkgnam, $core_packages_list) !== false)
+       || (array_search($pkgnam, $msdos_compat_list) !== false)) {
       if (str_head_is($f, 'bin/')) continue;
       if (str_head_is($f, 'cpi/')) continue;
       if (str_head_is($f, "doc/{$pkgdir}/")) continue;
