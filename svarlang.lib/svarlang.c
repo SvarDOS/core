@@ -67,10 +67,9 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
   for (i = 0; (nlspath[i] != 0) && (nlspath[i] != ';'); i++) buff[i] = nlspath[i];
   nlspath += i;
 
-  /* ignore the trailing backslash (I add one myself) */
-  if ((i > 0) && (buff[i - 1] == '\\')) i--;
+  /* add a trailing backslash if there is none (non-empty paths empty) */
+  if ((i > 0) && (buff[i - 1] != '\\')) buff[i++] = '\\';
 
-  buff[i++] = '\\';
   strcpy(buff + i, progname);
   strcat(buff + i, ".lng");
 
