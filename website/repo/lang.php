@@ -15,9 +15,9 @@ $MSG = array();
 $CP_UTF['en'] = array();
 $CP_ENC['en'] = array();
 
-// DE (cp850? -> FIXME)
-$CP_UTF['de'] = array();
-$CP_ENC['de'] = array();
+// DE (cp850)
+$CP_UTF['de'] = array('ä',   'ö',   'ü',   'ß');
+$CP_ENC['de'] = array("\x84","\x94","\x81","\xe1");
 
 // PL (mazovia)
 $CP_UTF['pl'] = array('Ą',   'Ć',   'Ę',   'Ł',   'Ń',   'Ó',   'Ś',   'Ż',   'Ź',   'ą',   'ć',   'ę',   'ł',   'ń',   'ó',   'ś',   'ż',   'ź');
