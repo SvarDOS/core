@@ -11,25 +11,25 @@ svarlngs.lib: autoload.c svarlang.c
 	wcc $(CFLAGS) -ms autoload.c
 	wcc $(CFLAGS) -ms svarlang.c
 	if exist svarlngs.lib del svarlngs.lib
-	wlib svarlngs.lib +autoload.obj +svarlang.obj
+	wlib -n svarlngs.lib +autoload.obj +svarlang.obj
 
 svarlngc.lib: autoload.c svarlang.c
 	wcc $(CFLAGS) -mc autoload.c
 	wcc $(CFLAGS) -mc svarlang.c
 	if exist svarlngc.lib del svarlngc.lib
-	wlib svarlngc.lib +autoload.obj +svarlang.obj
+	wlib -n svarlngc.lib +autoload.obj +svarlang.obj
 
 svarlngm.lib: autoload.c svarlang.c
 	wcc $(CFLAGS) -mm autoload.c
 	wcc $(CFLAGS) -mm svarlang.c
 	if exist svarlngm.lib del svarlngm.lib
-	wlib svarlngm.lib +autoload.obj +svarlang.obj
+	wlib -n svarlngm.lib +autoload.obj +svarlang.obj
 
 svarlngl.lib: autoload.c svarlang.c
 	wcc $(CFLAGS) -ml autoload.c
 	wcc $(CFLAGS) -ml svarlang.c
 	if exist svarlngl.lib del svarlngl.lib
-	wlib svarlngl.lib +autoload.obj +svarlang.obj
+	wlib -n svarlngl.lib +autoload.obj +svarlang.obj
 
 
 tlumacz.exe: tlumacz.c
