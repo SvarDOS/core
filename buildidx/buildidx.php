@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  17 feb 2022: checking for non-8+3 filenames in packages and duplicates + devload no longer part of CORE
   16 feb 2022: added warning about overlong version strings and wild files location
   15 feb 2022: index is generated as json, contains all filenames and alt versions
   14 feb 2022: packages are expected to have the *.svp extension
@@ -129,7 +130,7 @@ $pkgcount = 0;
 
 // load the list of CORE packages
 
-$core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree devload diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
+$core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
 
 
 // do a list of all svp packages with their available versions and descriptions
