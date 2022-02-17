@@ -214,6 +214,8 @@ foreach ($pkgfiles as $fname) {
       if (str_head_is($f, "nls/{$pkgdir}.")) continue;
       if ($f === 'nls/') continue;
     }
+    // the help package is allowed to put files in... help
+    if (($pkgnam == 'help') && (str_head_is($f, 'help/'))) continue;
     // well-known "category" dirs are okay
     if (str_head_is($f, "progs/{$pkgdir}/")) continue;
     if ($f === 'progs/') continue;
