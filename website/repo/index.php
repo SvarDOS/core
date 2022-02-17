@@ -29,7 +29,7 @@ function get_msg($id, $lang) {
   if (!empty($MSG[$id][$lang])) {
     return cp_conv($MSG[$id][$lang], $lang);
   } else {
-    echo $MSG[$id]['en'];
+    return $MSG[$id]['en'];
   }
 }
 
