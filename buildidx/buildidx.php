@@ -32,7 +32,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220216";
+$PVER = "20220217";
 
 
 // computes the BSD sum of a file and returns it
@@ -113,6 +113,18 @@ function str_head_is($haystack, $needle) {
 }
 
 
+// returns an array that contains CORE packages (populated from the core subdirectory in pkgdir)
+function load_core_list($repodir) {
+  $res = array();
+
+  foreach (scandir($repodir . '/core/') as $f) {
+    if (!preg_match('/\.svp$/', $f)) continue;
+    $res[] = explode('.', $f)[0];
+  }
+  return($res);
+}
+
+
 // ***************** MAIN ROUTINE *********************************************
 
 //echo "SvarDOS repository index generator ver {$PVER}\n";
@@ -130,7 +142,7 @@ $pkgcount = 0;
 
 // load the list of CORE packages
 
-$core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
+$core_packages_list = load_core_list($repodir);
 
 
 // do a list of all svp packages with their available versions and descriptions

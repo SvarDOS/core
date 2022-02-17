@@ -1,12 +1,12 @@
 #!/bin/bash
 #
 # SvarDOS build script
-# http://svardos.osdn.io
+# http://svardos.org
 # Copyright (C) 2016-2022 Mateusz Viste
 #
-# This script generates the SvarDOS repository index and builds ISO CD images.
-# It should be executed each time that a package has been modified, added or
-# removed.
+# This script generates the SvarDOS repository index and builds floppy and CD
+# images. It should be executed each time that a CORE package has been
+# modified, added or removed.
 #
 # usage: ./build.sh [noclean]
 #
@@ -14,11 +14,10 @@
 ### parameters block starts here ############################################
 
 CURDATE=`date +%Y%m%d`
-PKGDIR=`realpath ./packages`
 REPOROOT=`realpath ./packages`
 PUBDIR=`realpath ./website/download`/$CURDATE
-CDROOT=`realpath ./cdroot`
-FLOPROOT=`realpath ./floproot`
+CDROOT=`realpath ./tmp_cdroot.build`
+FLOPROOT=`realpath ./tmp_floproot.build`
 CUSTFILES=`realpath ./files`
 
 GENISOIMAGE=''    # can be mkisofs, genisoimage or empty for autodetection
@@ -52,7 +51,7 @@ set -e
 
 
 # list of packages to be part of CORE (always installed)
-COREPKGS="amb attrib chkdsk choice command cpidos debug deltree diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mode more move pkg pkgnet shsucdx sort tree"
+COREPKGS=`ls -1 'packages/core' | grep -o '^[a-z]*'`
 
 # list of packages to be part of EXTRA (only sometimes installed, typically drivers)
 EXTRAPKGS="pcntpk udvd2"
@@ -118,11 +117,11 @@ mkdir "$PUBDIR"
 
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
-  cp "$REPOROOT/$pkg.svp" "$CDROOT/"
+  cp "$REPOROOT/core/$pkg.svp" "$CDROOT/"
   echo "$pkg" >> "$FLOPROOT/install.lst"
 done
 
-# add EXTRA packages to CDROOT (but not in the list of packages so instal won't install them by default)
+# add EXTRA packages to CDROOT (but not in the list of packages to install)
 for pkg in $EXTRAPKGS ; do
   cp "$REPOROOT/$pkg.svp" "$CDROOT/"
 done
@@ -130,18 +129,18 @@ done
 
 # prepare the content of the boot (install) floppy
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
-unzip -Cj packages/cpidos.svp 'cpi/ega*.cpx' -d "$FLOPROOT/"
-unzip -Cj packages/command.svp bin/command.com -d "$FLOPROOT/"
-unzip -Cj packages/display.svp bin/display.exe -d "$FLOPROOT/"
-unzip -Cj packages/edit.svp bin/edit.exe -d "$FLOPROOT/"
-unzip -Cj packages/fdapm.svp bin/fdapm.com -d "$FLOPROOT/"
-unzip -Cj packages/fdisk.svp bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
-unzip -Cj packages/format.svp bin/format.exe -d "$FLOPROOT/"
-unzip -Cj packages/kernel.svp bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
-unzip -Cj packages/mem.svp bin/mem.exe -d "$FLOPROOT/"
-unzip -Cj packages/mode.svp bin/mode.com -d "$FLOPROOT/"
-unzip -Cj packages/more.svp bin/more.exe -d "$FLOPROOT/"
-unzip -Cj packages/pkg.svp bin/pkg.exe -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/command.svp" bin/command.com -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/display.svp" bin/display.exe -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/edit.svp" bin/edit.exe -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/fdisk.svp" bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/format.svp" bin/format.exe -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/mem.svp" bin/mem.exe -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/mode.svp" bin/mode.com -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/more.svp" bin/more.exe -d "$FLOPROOT/"
+unzip -Cj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
@@ -156,7 +155,7 @@ prep_flop 80 2  9  720
 #prep_flop 96 64 32 98304 "$PUBDIR/svardos-zip100.img" # ZIP 100M (for USB boot in "USB-ZIP mode")
 
 # prepare the DOSEMU boot zip
-DOSEMUDIR='dosemu-prep-files'
+DOSEMUDIR='tmp_dosemu-prep-files.build'
 mkdir "$DOSEMUDIR"
 # INSTALL.BAT
 echo 'IF NOT EXIST C:\TEMP\NUL MKDIR C:\TEMP' >> "$DOSEMUDIR/install.bat"
@@ -180,9 +179,9 @@ echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO  SVARDOS SETUP COMPLETED ' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO.' >> "$DOSEMUDIR/install.bat"
-unzip -Cj packages/kernel.svp bin/kernel.sys -d "$DOSEMUDIR/"
-unzip -Cj packages/command.svp bin/command.com -d "$DOSEMUDIR/"
-unzip -Cj packages/pkg.svp bin/pkg.exe -d "$DOSEMUDIR/"
+unzip -Cj "$REPOROOT/core/kernel.svp" bin/kernel.sys -d "$DOSEMUDIR/"
+unzip -Cj "$REPOROOT/core/command.svp" bin/command.com -d "$DOSEMUDIR/"
+unzip -Cj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$DOSEMUDIR/"
 # CONFIG.SYS
 echo 'FILES=50' >> "$DOSEMUDIR/config.sys"
 echo 'DOS=HIGH,UMB' >> "$DOSEMUDIR/config.sys"
