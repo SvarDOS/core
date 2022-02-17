@@ -23,8 +23,8 @@
       include 'index-repo.php';
     } else if ($p == 'help') {
       include 'index-help.php';
-    } else if ($p == 'test') {
-      include 'index-main.php';
+    } else if ($p == 'files') {
+      include 'index-files.php';
     } else { // else display the front page
       include 'index-main.php';
     }
