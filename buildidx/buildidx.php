@@ -130,7 +130,7 @@ $pkgcount = 0;
 
 // load the list of CORE packages
 
-$core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb keyb_lay label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
+$core_packages_list = explode(' ', 'amb attrib chkdsk choice command cpidos debug deltree diskcopy display dosfsck edit fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mode more move pkg pkgnet shsucdx sort tree');
 
 
 // do a list of all svp packages with their available versions and descriptions
