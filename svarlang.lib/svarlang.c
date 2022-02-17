@@ -52,15 +52,22 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
   unsigned short buff16[2];
   unsigned short i;
 
-  if ((lang == NULL) || (nlspath == NULL)) return(-1);
+  if (lang == NULL) return(-1);
+  if (nlspath == NULL) nlspath = ""; /* nlspath can be NULL, treat is as empty */
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */
 
-  /* copy nlspath to buff and remember len */
-  for (i = 0; nlspath[i] != 0; i++) buff[i] = nlspath[i];
+  TRYNEXTPATH:
 
-  /* */
+  /* skip any leading ';' separators */
+  while (*nlspath == ';') nlspath++;
+
+  /* copy nlspath to buff and remember len */
+  for (i = 0; (nlspath[i] != 0) && (nlspath[i] != ';'); i++) buff[i] = nlspath[i];
+  nlspath += i;
+
+  /* ignore the trailing backslash (I add one myself) */
   if ((i > 0) && (buff[i - 1] == '\\')) i--;
 
   buff[i++] = '\\';
@@ -68,7 +75,10 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
   strcat(buff + i, ".lng");
 
   fd = fopen(buff, "rb");
-  if (fd == NULL) return(-2);
+  if (fd == NULL) { /* failed to open file - either abort or try next path */
+    if (*nlspath == 0) return(-2);
+    goto TRYNEXTPATH;
+  }
 
   /* read hdr, should be "SvL\33" */
   if ((fread(buff, 1, 4, fd) != 4) || (memcmp(buff, "SvL\33", 4) != 0)) {

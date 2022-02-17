@@ -25,11 +25,25 @@
 #ifndef SVARLANG_H
 #define SVARLANG_H
 
-/* loads translations for program PROGNAME, language LANG, in the path NLSPATH.
- * returns 0 on success. */
-int svarlang_load(const char *progname, const char *lang, const char *nlspath);
+/* loads translations for program progname, language lang, in paths.
+ *
+ * only the two first letters of the lang strings are meaningful and they are
+ * case insensitive.
+ *
+ * paths can be either a directory path (like "C:\DATA") or a list of paths
+ * separated by a semicolon (example: "C:\DATA;.\LANGS;."). It may also be
+ * NULL, in which case only the current directory will be searched.
+ *
+ * a typical call would be this: svarlang_load("myprog", "PL", NULL);
+ *
+ * this function returns 0 on success, non-zero otherwise. It is still possible
+ * to call svarlang_strid() after a load failure, the previously loaded
+ * language will be used then, or the default language if no loading has been
+ * done yet. */
+int svarlang_load(const char *progname, const char *lang, const char *paths);
 
-/* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH. */
+/* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH.
+ * this call should be used only by "CORE" SvarDOS programs. */
 int svarlang_autoload(const char *progname);
 
 /* Returns a pointer to the string "id". Does not require svalang_load() to be
