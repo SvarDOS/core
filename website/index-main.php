@@ -24,7 +24,12 @@
     <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? The project has a <a href="https://lists.osdn.me/mailman/listinfo/svardos-users">mailing list</a> just for that. You may also wish to take a look at the <a href="phpamb.php?fname=help/help-en&amp;f=todo.ama">project's "todo list"</a> and <a href="https://osdn.net/projects/svardos/ticket/">ticket list</a>.</p>
 
     <?php
-    $lastver = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
+    $flist = scandir('download/', SCANDIR_SORT_DESCENDING);
+    foreach ($flist as $f) {
+      if (!preg_match('/^[0-9]*$/', $f)) continue;
+      $lastver = $f;
+      break;
+    }
 
     echo '<h2>Downloads (build ' . $lastver . ')</h2>'
     ?>
