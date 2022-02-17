@@ -1,0 +1,47 @@
+#
+# This is a localization file for the SvarDOS INSTALL program
+#
+# Language..: Italian
+# Codepage..: 850/858/437
+# Translator: Roberto Mariottini
+# Revision..: 2
+#
+
+### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
+0.0:INSTALLAZIONE DI SVARDOS
+0.1:Installa SvarDOS
+0.2:Esci al DOS
+0.3:Crea automaticamente una partizione
+0.4:Esegui lo strumento di partizionamento FDISK
+0.5:Premi un tasto...
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:Su/Giù = Seleziona | Invio = Conferma la scelta | ESC = Precedente
+0.11:Su/Giù = Seleziona | Invio = Conferma la scelta | ESC = Esci al DOS
+
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
+1.0:Benvenuto in SvarDOS
+1.1:Seleziona la lingua desiderata dalla lista seguente:
+1.5:SvarDOS supporta le tastiere usate in paesi differenti. Scegli la tastiera che stai usando.
+
+### WELCOME SCREEN ###
+2.0:Stai per installare SvarDOS: un sistema operativo libero, compatibile con MSDOS, basato sul kernel di FreeDOS. SvarDOS include una varietà di applicazioni di terze parti.\n\nATTENZIONE: Se il tuo PC ha già un altro sistema operativo installato, l'altro sistema operativo potrebbe non essere in grado di ripartire dopo aver installato SvarDOS.
+
+### DISK SETUP ###
+3.0:ERRORE: L'unità %c: non è stata trovata. Forse perché l'hard disk deve essere prima partizionato. Occorre creare almeno una partizione sull'hard disk per poterci installare SvarDOS. Notare che SvarDOS richiede almeno %d MiB di spazio libero su disco.\n\nPuoi usare lo strumento di partizionamento FDISK per creare la partizione manualmente, o lasciare che il programma di installazione partizioni il disco automaticamente. Puoi anche annullare l'installazione per usare lo strumento di partizionamento che preferisci.
+3.1:Il computer sarà ora riavviato.
+3.2:ERRORE: L'unità %c: è un disco rimovibile. Installazione annullata.
+3.3:ERRORE: L'unità %c: non sembra essere formattata.
+3.4:ERRORE: L'unità %c: non è abbastanza capiente! SvarDOS richiede un disco di almeno %d MiB.
+3.5:ERRORE: L'unità %c: non è vuota. SvarDOS deve essere installato su un disco vuoto.\n\nPuoi formattare il disco adesso, per svuotarlo. Nota che questa operazione CANCELLERA' TUTTI I DATI presenti sul disco.
+3.6:L'installazione di SvarDOS in %c: sta per cominciare.
+
+### PACKAGES INSTALLATION ###
+# example: "Installing package 4/50: FDISK"
+4.0:Installazione del pacchetto %d/%d: %s
+
+### END SCREEN ###
+5.0:Il computer sarà riavviato.\nRimuovere il disco di installazione dall'unità.
+5.1:L'installazione di SvarDOS è terminata. Please restart your computer now.
+
+### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
+6.0:Benvenuto in SvarDOS! Scrivi 'HELP' se hai bisogno di aiuto.
