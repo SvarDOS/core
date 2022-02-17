@@ -162,7 +162,7 @@ foreach ($pkgfiles as $fname) {
 
   $lsm = read_file_from_zip($pkgfullpath, "appinfo/{$pkgnam}.lsm");
   if ($lsm == false) {
-    echo "ERROR: pkg {$fname} does not contain an LSM file at the expected location\n";
+    echo "ERROR: {$fname} does not contain an LSM file at the expected location\n";
     continue;
   }
   $lsmarray = parse_lsm($lsm);
@@ -186,6 +186,7 @@ foreach ($pkgfiles as $fname) {
   // special rule for "parent and children" packages
   if (str_head_is($pkgnam, 'djgpp_')) $pkgdir = 'djgpp'; // djgpp_* packages put their files in djgpp
   if ($pkgnam == 'fbc_help') $pkgdir = 'fbc'; // FreeBASIC help goes to the FreeBASIC dir
+  if ($pkgnam == 'clamdb') $pkgdir = 'clamav'; // data patterns for clamav
 
   // array used to detect duplicated entries after lower-case conversion
   $duparr = array();
