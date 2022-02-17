@@ -44,4 +44,6 @@
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
     </ul>
 
-    <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files are stored.</p>
+    <p>The links above point to the latest stable build of installation images (that is, build <?php echo $lastver?>) and that's the build we recommend. Otherwise, archival and staging builds can be found in our <a href="?p=files">files section</a>, but that's only if you like living dangerously.</p>
+
+    <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files and scripts are stored.</p>
