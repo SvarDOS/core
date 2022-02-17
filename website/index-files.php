@@ -1,4 +1,4 @@
-<h1>SvarDOS releases</h1>
+<h1>SvarDOS files</h1>
 <p class="copyr">latest build, archival versions, staging releases... it's all here!</p>
 
 <?php
