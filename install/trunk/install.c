@@ -640,7 +640,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "@ECHO OFF\r\n");
   fprintf(fd, "SET TEMP=C:\\TEMP\r\n");
   fprintf(fd, "SET DOSDIR=C:\\SVARDOS\r\n");
-  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
+  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS;.\r\n");
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
   fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
   fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n");
@@ -869,7 +869,7 @@ int main(void) {
   action = selectlang(&locales); /* welcome to svardos, select your language */
   if (action != MENUNEXT) goto Quit;
   loadcp(&locales);
-  svarlang_load("INSTALL", locales.lang, ".\\"); /* NLS support */
+  svarlang_load("INSTALL", locales.lang, NULL); /* NLS support */
   action = selectkeyb(&locales);  /* what keyb layout should we use? */
   if (action == MENUQUIT) goto Quit;
   if (action == MENUPREV) goto SelectLang;
