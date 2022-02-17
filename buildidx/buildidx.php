@@ -165,12 +165,29 @@ foreach ($pkgfiles as $fname) {
   $listoffiles = read_list_of_files_in_zip($pkgfullpath);
   $pkgdir = $pkgnam;
 
-  // special rule for djgpp_* packages: they put their files in djgpp
-  if (str_head_is($pkgnam, 'djgpp_')) $pkgdir = 'djgpp';
+  // special rule for "parent and children" packages
+  if (str_head_is($pkgnam, 'djgpp_')) $pkgdir = 'djgpp'; // djgpp_* packages put their files in djgpp
   if ($pkgnam == 'fbc_help') $pkgdir = 'fbc'; // FreeBASIC help goes to the FreeBASIC dir
+
+  // array used to detect duplicated entries after lower-case conversion
+  $duparr = array();
 
   foreach ($listoffiles as $f) {
     $f = strtolower($f);
+    $path_array = explode('/', $f);
+    // emit a warning when non-8+3 filenames are spotted and find duplicates
+    foreach ($path_array as $item) {
+      if (empty($item)) continue; // skip empty items at end of paths (eg. appinfo/)
+      if (!preg_match("/[a-z0-9!#$%&'()@^_`{}~-]{1,8}(\.[a-z0-9!#$%&'()@^_`{}~-]{1,3}){0,1}/", $item)) {
+        echo "WARNING: {$fname} contains a non-8+3 path (or weird char): {$item} (in $f)\n";
+      }
+    }
+    // look for dups
+    if (array_search($f, $duparr) !== false) {
+      echo "WARNING: {$fname} contains a duplicated entry: '{$f}'\n";
+    } else {
+      $duparr[] = $f;
+    }
     // LSM file is ok
     if ($f === "appinfo/{$pkgnam}.lsm") continue;
     if ($f === "appinfo/") continue;
@@ -191,7 +208,7 @@ foreach ($pkgfiles as $fname) {
     if ($f === 'games/') continue;
     if (str_head_is($f, "drivers/{$pkgdir}/")) continue;
     if ($f === 'drivers/') continue;
-    echo "WARNING: pkg {$fname} contains a file in an illegal location: {$f}\n";
+    echo "WARNING: {$fname} contains a file in an illegal location: {$f}\n";
   }
 
   $meta['fname'] = $fname;
