@@ -149,7 +149,12 @@ $msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice command cp
 
 $pkgdb = array();
 foreach ($pkgfiles as $fname) {
-  if (!preg_match('/.svp$/i', $fname)) continue; // skip non-svp files
+  if (!preg_match('/\.svp$/i', $fname)) continue; // skip non-svp files
+
+  if (!preg_match('/^[a-zA-Z0-9+. _-]*\.svp$/', $fname)) {
+    echo "ERROR: {$fname} has a very weird name\n";
+    continue;
+  }
 
   $path_parts = pathinfo($fname);
   $pkgnam = explode('-', $path_parts['filename'])[0];
@@ -234,6 +239,7 @@ foreach ($pkgfiles as $fname) {
   $pkgdb[$pkgnam][$lsmarray['version']] = $meta;
 }
 
+
 $db = array();
 
 // iterate over each svp package
@@ -261,6 +267,29 @@ foreach ($pkgdb as $pkg => $versions) {
 }
 
 if ($pkgcount < 100) echo "WARNING: an unexpectedly low number of packages has been found in the repo ({$pkgcount})\n";
+
+$json_blob = json_encode($db);
+if ($json_blob === false) {
+  echo "ERROR: JSON convertion failed! -> ";
+  switch (json_last_error()) {
+    case JSON_ERROR_DEPTH:
+      echo 'maximum stack depth exceeded';
+      break;
+    case JSON_ERROR_STATE_MISMATCH:
+      echo 'underflow of the modes mismatch';
+      break;
+    case JSON_ERROR_CTRL_CHAR:
+      echo 'unexpected control character found';
+      break;
+    case JSON_ERROR_UTF8:
+      echo 'malformed utf-8 characters';
+      break;
+    default:
+      echo "unknown error";
+      break;
+  }
+  echo "\n";
+}
 
 file_put_contents($repodir . '/_index.json', json_encode($db));
 
