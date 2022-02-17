@@ -15,7 +15,7 @@ $MSG = array();
 $CP_UTF['en'] = array();
 $CP_ENC['en'] = array();
 
-// DE (cp850)
+// DE (cp437, cp850, cp858 have all the same layout for these)
 $CP_UTF['de'] = array('ä',   'ö',   'ü',   'Ä',   'Ö',   'Ü',   'ß');
 $CP_ENC['de'] = array("\x84","\x94","\x81","\x8e","\x99","\x9a","\xe1");
 
