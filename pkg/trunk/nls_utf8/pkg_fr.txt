@@ -66,3 +66,11 @@
 
 9.0:ERREUR: échec de l'accès au répertoire "%s"
 9.1:ERREUR: le paquet local  %s n'a pas été trouvé
+
+#### unzip ####
+
+10.0:OK
+10.1:ERREUR: Échec d'ouverture du fichier d'archive
+10.2:ERREUR: Archive ZIP invalide
+10.3:ERREUR: Fichier déjà existant
+10.4:ERREUR: Échec de unzip (%d)
