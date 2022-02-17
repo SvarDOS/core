@@ -143,7 +143,7 @@ $pkgcount = 0;
 // load the list of CORE and MSDOS_COMPAT packages
 
 $core_packages_list = load_core_list($repodir);
-$msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice command cpidos debug defrag deltree diskcomp diskcopy display edit edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort swsubst tree undelete unformat xcopy');
+$msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice command comp cpidos debug defrag deltree diskcomp diskcopy display edit edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort swsubst tree undelete unformat xcopy');
 
 // do a list of all svp packages with their available versions and descriptions
 
