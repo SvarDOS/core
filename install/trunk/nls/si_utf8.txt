@@ -39,7 +39,7 @@
 
 ### END SCREEN ###
 5.0:Računalnik se bo zdaj ponovno zagnal.\nProsimo, odstranite namestitveni medij.
-5.1:SvarDOS je nameščen. Please restart your computer now.
+5.1:SvarDOS (build %s) je nameščen. Restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Dobrodošli v SvarDOS! Če potrebujete pomoč, vtipkajte HELP.

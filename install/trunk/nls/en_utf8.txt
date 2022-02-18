@@ -41,7 +41,7 @@
 
 ### END SCREEN ###
 5.0:Your computer will reboot now.\nPlease remove the installation disk from your drive.
-5.1:SvarDOS installation is over. Please restart your computer now.
+5.1:SvarDOS (build %s) has been installed. Restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Welcome to SvarDOS! Type 'HELP' if you need help.

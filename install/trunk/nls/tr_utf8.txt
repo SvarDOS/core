@@ -39,7 +39,7 @@
 
 ### END SCREEN ###
 5.0:Bilgisayarınız şimdi yeniden başlayacaktır.\nLütfen kurulum diskini sürücünüzden çıkarın.
-5.1:SvarDOS kurulumu sona ermiştir. Please restart your computer now.
+5.1:SvarDOS (build %s) kurulumu sona ermiştir. Restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:SvarDOS'ya hoş geldiniz! Yardıma ihtiyacınız varsa 'HELP' yazınız.

@@ -23,7 +23,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *
- * http://svardos.osdn.io
+ * http://svardos.org
  */
 
 #include <dos.h>
@@ -699,7 +699,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
 }
 
 
-static int installpackages(char targetdrv, char srcdrv, const struct slocales *locales) {
+static int installpackages(char targetdrv, char srcdrv, const struct slocales *locales, const char *buildstring) {
   char pkglist[512];
   int i, pkglistlen;
   size_t pkglistflen;
@@ -743,7 +743,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   snprintf(buff, sizeof(buff), "%c:\\temp\\postinst.bat", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
-  fprintf(fd, "@ECHO OFF\r\n");
+  fprintf(fd, "@ECHO OFF\r\nECHO INSTALLING SVARDOS BUILD %s\r\n", buildstring);
 
   /* copy packages */
   pkgptr = pkglist;
@@ -787,8 +787,10 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
               "DEL AUTOEXEC.BAT\r\n");
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
-              "ECHO %s\r\n"
-              "ECHO.\r\n", svarlang_strid(0x0501)); /* "SvarDOS installation is over. Please restart your computer now" */
+              "ECHO ");
+  fprintf(fd, svarlang_strid(0x0501), buildstring); /* "SvarDOS installation is over. Please restart your computer now" */
+  fprintf(fd, "\r\n"
+              "ECHO.\r\n");
   fclose(fd);
 
   /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
@@ -854,11 +856,14 @@ static int checkinstsrc(char drv) {
 #endif
 
 
-int main(void) {
+int main(int argc, char **argv) {
   struct slocales locales;
   int targetdrv;
   int sourcedrv;
   int action;
+  const char *buildstring = "###";
+
+  if (argc != 1) buildstring = argv[1];
 
   sourcedrv = get_cur_drive() + 'A';
 
@@ -887,7 +892,7 @@ int main(void) {
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
   bootfilesgen(targetdrv, &locales); /* generate boot files and other configurations */
-  if (installpackages(targetdrv, sourcedrv, &locales) != 0) goto Quit;    /* install packages */
+  if (installpackages(targetdrv, sourcedrv, &locales, buildstring) != 0) goto Quit;    /* install packages */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */
   finalreboot(); /* remove the CD and reboot */
