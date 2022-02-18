@@ -33,10 +33,15 @@ fi
 svn up "$SVNREPODIR"
 php "$SVNREPODIR/buildidx/buildidx.php" "$SVNREPODIR/packages/" > "$SVNREPODIR/packages/_buildidx.log"
 
+
 # do I need to rebuild the install images as well?
 if [ "$NEEDTOREBUILD" -ne 0 ] ; then
+  CURDATE=`date +%Y%m%d`
+  DESTDIR="website/download/$CURDATE"
   cd "$SVNREPODIR"
-  ./build.sh "website/download/" > "website/download/0000_lastbuild.log" 2>&1
+  rm -rf "$DESTDIR"
+  mkdir "$DESTDIR"
+  ./build.sh "$DESTDIR" "$CURDATE" > "$DESTDIR/build.log" 2>&1
 fi
 
 exit 0

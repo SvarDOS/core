@@ -8,12 +8,11 @@
 # a CORE package has been modified or the build script changed. This is usually
 # done by the cron.sh script, itself called by a cron job.
 #
-# usage: ./build.sh outputdir [noclean] > logfile
+# usage: ./build.sh outputdir buildver [noclean] > logfile
 #
 
 ### parameters block starts here ############################################
 
-CURDATE=`date +%Y%m%d`
 REPOROOT=`realpath ./packages`
 CUSTFILES=`realpath ./files`
 
@@ -21,12 +20,13 @@ GENISOIMAGE=''    # can be mkisofs, genisoimage or empty for autodetection
 
 ### parameters block ends here ##############################################
 
-# look for mandatory output dir
-if [ "x$1" == "x" ] ; then
-  echo "usage: build.sh outputdir [noclean] > logfile"
+# look for mandatory output dir and build id
+if [ "x$2" == "x" ] ; then
+  echo "usage: build.sh outputdir buildver [noclean]"
   exit 1
 fi
-PUBDIR=`realpath "$1"`/$CURDATE
+CURDATE="$2"
+PUBDIR=`realpath "$1"`
 
 CDROOT="$PUBDIR/tmp_cdroot.build"
 FLOPROOT="$PUBDIR/tmp_floproot.build"
@@ -127,10 +127,6 @@ echo "##########################################################################
 echo "dest dir: $PUBDIR"
 echo "current time is `date` and it's a beautiful day somewhere in the world"
 echo
-
-# remove dest dir if it exists already, then recreate it empty
-rm -rf "$PUBDIR"
-mkdir "$PUBDIR"
 
 mkdir "$CDROOT"
 mkdir "$FLOPROOT"
