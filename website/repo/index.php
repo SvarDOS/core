@@ -116,7 +116,7 @@ if ($a != 'checkup') {
 
 // is action valid?
 
-if (($a !== 'search') && ($a !== 'checkup') && ($a !== 'pull')) {
+if (($a !== 'search') && ($a !== 'checkup') && ($a !== 'pull') && ($a !== 'pullsrc')) {
   http_response_code(404);
   echo "ERROR: invalid action\r\n";
   exit(0);
@@ -133,9 +133,9 @@ if (empty($db)) {
 }
 
 
-// pull action
+// pull or pullsrc action (svp / zip)
 
-if ($a === 'pull') {
+if (($a === 'pull') || ($a === 'pullsrc')) {
   $fname = false;
   if (empty($v)) { // take first version (that's the preferred one)
     $fname = array_key_first($db[$p]['versions']);
@@ -149,9 +149,21 @@ if ($a === 'pull') {
     }
   }
   if (file_exists($fname)) {
-    header('Content-Disposition: attachment; filename="' . $fname);
-    header('Content-Type: application/octet-stream');
-    readfile($fname);
+    if ($a === 'pullsrc') { // is it about source?
+      $fname = preg_replace('/svp$/', 'zip', $fname); // replace *.svp by *.zip
+      if (file_exists($fname)) {
+        header('Content-Disposition: attachment; filename="' . $fname);
+        header('Content-Type: application/octet-stream');
+        readfile($fname);
+      } else {
+        http_response_code(404);
+        echo get_msg('PKG_NO_SRC', $lang) . "\r\n";
+      }
+    } else {
+      header('Content-Disposition: attachment; filename="' . $fname);
+      header('Content-Type: application/octet-stream');
+      readfile($fname);
+    }
   } else {
     http_response_code(404);
     echo get_msg('PKG_NOT_FOUND', $lang) . "\r\n";
