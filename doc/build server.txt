@@ -54,8 +54,11 @@ $SVNLOOK changed -r "$REV" "$REPOS" | grep -e ' files' -e ' build.sh' -e ' packa
 # and send an information message back to the committer.
 if [ $? -eq 0 ] ; then
   echo `date` > /tmp/svardos_rebuild_please.flag
+  echo "" >&2
+  echo "---------------------------------------------------------" >&2
   echo "NOTICE: a build-impacting location has been updated." >&2
   echo "        install images have been scheduled for a rebuild." >&2
+  echo "---------------------------------------------------------" >&2
   exit 1
 fi
 
