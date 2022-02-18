@@ -67,5 +67,5 @@ Then you can spread the next line to your AUTOEXEC.BAT file, whereever needed.
 
 See also:
  * %lpkg.ama:SvarDOS packages management
- * %lnetworking.ama:Networking
+ * %lnetwork.ama:Networking
  * C:\DRIVERS\CTMOUSE\DOC\CTMOUSE.TXT
