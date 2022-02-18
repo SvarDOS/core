@@ -181,7 +181,7 @@ foreach ($amacontent as $c) {
     if ($unicodemap !== FALSE) {
       $out .= $unicodemap[ord($c)];  // convert characters into HTML unicode codes
     } else {
-      $out .= $c;
+      $out .= htmlspecialchars($c);
     }
   }
 }
