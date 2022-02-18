@@ -48,7 +48,7 @@ echo date > /tmp/svardos_repo_changed.flag
 # any change to one of these locations means that the content of the
 # installation images may have been impacted, hence a rebuild may be necessary.
 #
-$SVNLOOK changed ./ | grep -e ' files' -e ' build.sh' -e ' packages/core/'
+$SVNLOOK changed -t "$TXN" "$REPOS" | grep -e ' files' -e ' build.sh' -e ' packages/core/'
 
 # if a location matched, then set a flag so a cron job rebuilds the images
 # and send an information message back to the committer.
