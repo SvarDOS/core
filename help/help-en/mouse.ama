@@ -1,0 +1,61 @@
+
+                            %h*** MOUSE SUPPORT ***
+
+To be able to use your mouse in your programs, you need a mouse driver.
+SvarDOS has no mouse driver by default, but there's a package for it.
+It's called CTMOUSE. You need to install this package.
+
+%hINSTALLING CTMOUSE
+
+If your SvarDOS system is connected to the internet, you can just type:
+
+ pkgnet pull ctmouse
+ pkg install ctmouse.svp
+
+Otherwise you need to download 'ctmouse.svp' an another computer and supply it
+to your SvarDOS installation by, e.g., floppy disk or USB drive.
+
+Then type:
+
+ pkg install [<path to>]ctmouse.svp
+
+%hLOADING CTMOUSE
+
+If you don't care about the language CTMOUSE displays messages, then just add
+this line to your C:\AUTOEXEC.BAT. Messages will then be displayed in English.
+
+ C:\DRIVERS\CTMOUSE\CTMOUSE.EXE
+
+That's it! Now reboot your system to get the driver loaded.
+
+But if you prefer CTMOUSE messages in your own language, check if CTMOUSE is
+available in that language by looking at the CTM-*.EXE files in the
+C:\DRIVERS\CTMOUSE\CTMOUSE\ directory.
+
+BR means Brazilian Portugese, DE stands for Deutsch (German), and so on.
+If you managed to find your language supported by CTMOUSE, then add this line
+to your C:\AUTOEXEC.BAT.
+
+ C:\DRIVERS\CTMOUSE\CTMOUSE\CTM-xx.EXE
+
+(Where xx stands for your language code.)
+
+%hLANGUAGE-AWARE AUTO-SETUP
+
+To let CTMOUSE messages adapt to your SvarDOS system's language automatically,
+add the following lines to your C:\AUTOEXEC.BAT after the SET LANG=xx line.
+
+ SET CTM_BASEPATH=C:\DRIVERS\CTMOUSE
+ SET CTM_FULLPATH=%%CTM_BASEPATH%%\CTMOUSE\CTM-%%LANG%%.EXE
+ IF NOT EXIST %%CTM_FULLPATH%% SET CTM_FULLPATH=%%CTM_BASEPATH%%\CTMOUSE.EXE
+ %%CTM_FULLPATH%%
+ SET CTM_BASEPATH=
+ SET CTM_FULLPATH=
+
+This will make your SvarDOS look for the translated CTMOUSE version first.
+If that does not exist, then it falls back to English.
+
+See also:
+ * %lpkg.ama:SvarDOS packages management
+ * %lnetworking.ama:Networking
+ * C:\DRIVERS\CTMOUSE\DOC\CTMOUSE.TXT
