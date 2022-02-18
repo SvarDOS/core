@@ -81,7 +81,14 @@ should point at /srv/svardos/website.
 A cron job should be configured to run frequently (like every minute) and
 execute the /srv/svardos/cron.sh script. This script is responsible for
 checking out the local svardos repo whenever a new commit is being made, and
-rebuilds the index of the packages repository.
+rebuilds the index of the packages repository, and potentially (re)builds the
+installation floppy images as well. To do so, it requires a few dependencies to
+be present on the server:
+ - zip
+ - unzip
+ - mtools (mformat, mcopy, etc)
+ - unix2dos (usually part of a dos2unix package)
+ - mkisofs or genisoimage
 
 
 === MIRRORING THE PROJECT'S SVN ===============================================
