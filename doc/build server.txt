@@ -34,11 +34,11 @@ executable (chmod +x):
 
 SVNLOOK=/usr/bin/svnlook
 REPOS="$1"
-TXN="$2"
+REV="$2"
 
 # first of all, make sure to set a flag that says "svn content changed" so a
 # cron job can update its local copy later
-echo date > /tmp/svardos_repo_changed.flag
+echo `date` > /tmp/svardos_repo_changed.flag
 
 # check if any of the following locations have been updated during the commit:
 #  - files
@@ -48,16 +48,18 @@ echo date > /tmp/svardos_repo_changed.flag
 # any change to one of these locations means that the content of the
 # installation images may have been impacted, hence a rebuild may be necessary.
 #
-$SVNLOOK changed -t "$TXN" "$REPOS" | grep -e ' files' -e ' build.sh' -e ' packages/core/'
+$SVNLOOK changed -r "$REV" "$REPOS" | grep -e ' files' -e ' build.sh' -e ' packages/core/' > /dev/null
 
 # if a location matched, then set a flag so a cron job rebuilds the images
 # and send an information message back to the committer.
 if [ $? -eq 0 ] ; then
-  echo date > /tmp/svardos_rebuild_please.flag
+  echo `date` > /tmp/svardos_rebuild_please.flag
   echo "NOTICE: a build-impacting location has been updated." >&2
   echo "        install images have been scheduled for a rebuilt." >&2
   exit 1
 fi
+
+exit 0
 
 
 === SVN CLIENT ================================================================
