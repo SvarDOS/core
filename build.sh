@@ -167,15 +167,12 @@ echo
 
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
-#mformat -C -f 2880 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
-#mcopy -sQm -i "$CDROOT/boot.img" "$FLOPROOT/"* ::/
 
 # prepare images for floppies in different sizes (args are C H S SIZE)
 prep_flop 80 2 36 2880 "$CDROOT/boot.img"
 prep_flop 80 2 18 1440
 prep_flop 80 2 15 1200
 prep_flop 80 2  9  720
-#prep_flop 96 64 32 98304 "$PUBDIR/svardos-zip100.img" # ZIP 100M (for USB boot in "USB-ZIP mode")
 
 echo
 echo "### Computing DOSEMU.zip"
@@ -251,20 +248,12 @@ done
 # compress the USB image
 zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
 
-# prepare the USB-ZIP bootable image
-#USBZIPIMG=$PUBDIR/svardos-usbzip.img
-#cat files/usb-zip.mbr "$PUBDIR/svardos-zip100.img" > $USBZIPIMG
-
 echo
 echo "### Generating ISO CD image"
 echo
 
 CDISO="$PUBDIR/svardos-$CURDATE-cd.iso"
 CDZIP="$PUBDIR/svardos-$CURDATE-cd.zip"
-
-# delete previous (if any) iso
-#echo "cleaning up old versions..."
-#rm -f "$CDISO" "$CDZIP"
 
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/boot.img"
 
@@ -282,10 +271,6 @@ if [ "x$2" != "xnoclean" ] ; then
 fi
 
 cd "$origdir"
-
-#cd svnlschk
-#./webgen.sh
-#cd ..
 
 echo
 echo "### ALL DONE! ###"
