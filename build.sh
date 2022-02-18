@@ -163,6 +163,24 @@ unzip -CLj "$REPOROOT/core/mode.svp" bin/mode.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOT/core/more.svp" bin/more.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 
+# generate a simple autoexec.bat file
+echo '@ECHO OFF' > "$FLOPROOT/autoexec.bat"
+echo '' >> "$FLOPROOT/autoexec.bat"
+echo 'REM Load DISPLAY driver if present' >> "$FLOPROOT/autoexec.bat"
+echo 'IF EXIST DISPLAY.EXE DISPLAY CON=(EGA,,1)' >> "$FLOPROOT/autoexec.bat"
+echo '' >> "$FLOPROOT/autoexec.bat"
+echo 'FDAPM APMDOS' >> "$FLOPROOT/autoexec.bat"
+echo '' >> "$FLOPROOT/autoexec.bat"
+echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
+echo 'ECHO  ********************' >> "$FLOPROOT/autoexec.bat"
+echo 'ECHO   WELCOME TO SVARDOS' >> "$FLOPROOT/autoexec.bat"
+echo 'ECHO  ********************' >> "$FLOPROOT/autoexec.bat"
+echo "ECHO  build: $CURDATE" >> "$FLOPROOT/autoexec.bat"
+echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
+echo '' >> "$FLOPROOT/autoexec.bat"
+echo "INSTALL $CURDATE" >> "$FLOPROOT/autoexec.bat"
+unix2dos "$FLOPROOT/autoexec.bat"
+
 
 echo
 echo "### Computing the USB image"
