@@ -23,12 +23,41 @@ to build SvarDOS.
 The server must have a subversion service installed with the SvarDOS repository
 imported.
 
-The only specific configuration concerns a post-commit hook that should be set
-up to create a /tmp/svados_repo_changed.flag file whenever a commit is made to
-the repo. Such hook script can be as simple as this:
+The only specific configuration concerns a post-commit hook that creates a flag
+file at /tmp/svados_repo_changed.flag whenever a commit is made to the repo and
+another flag in /tmp/svardos_rebuilt_please.flag if the commit might impact the
+content of installation images. Here below is the necessary post-commit hook,
+it should be placed in the hooks/ directory of the svn server and made
+executable (chmod +x):
 
-  echo date > /tmp/svardos_repo_changed.flag
-  exit 0
+#!/bin/sh
+
+SVNLOOK=/usr/bin/svnlook
+REPOS="$1"
+TXN="$2"
+
+# first of all, make sure to set a flag that says "svn content changed" so a
+# cron job can update its local copy later
+echo date > /tmp/svardos_repo_changed.flag
+
+# check if any of the following locations have been updated during the commit:
+#  - files
+#  - packages/core/
+#  - build.sh
+#
+# any change to one of these locations means that the content of the
+# installation images may have been impacted, hence a rebuild may be necessary.
+#
+$SVNLOOK changed ./ | grep -e ' files' -e ' build.sh' -e ' packages/core/'
+
+# if a location matched, then set a flag so a cron job rebuilds the images
+# and send an information message back to the committer.
+if [ $? -eq 0 ] ; then
+  echo date > /tmp/svardos_rebuild_please.flag
+  echo "NOTICE: a build-impacting location has been updated." >&2
+  echo "        install images have been scheduled for a rebuilt." >&2
+  exit 1
+fi
 
 
 === SVN CLIENT ================================================================
