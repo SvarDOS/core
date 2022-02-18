@@ -98,7 +98,7 @@ function prep_flop {
   echo "" >> "$WORKDIR/readme.txt"
   echo "These images are raw floppy disk dumps. To write them on an actual floppy disk, you have to use a low-level sector copying tool, like dd." >> "$WORKDIR/readme.txt"
   echo "" >> "$WORKDIR/readme.txt"
-  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$WORKDIR/readme.txt"
+  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.org" >> "$WORKDIR/readme.txt"
 
   unix2dos "$WORKDIR/readme.txt"
 
@@ -147,20 +147,38 @@ echo
 echo "### Populating the floppy root at $FLOPROOT"
 echo
 
-# prepare the content of the boot (install) floppy
+# prepare the content of the boot (install) floppy, unzipping everything
+# in lowercase (-L) to avoid any case mismatching later in the build process
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/command.svp" bin/command.com -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/display.svp" bin/display.exe -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/edit.svp" bin/edit.exe -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/fdisk.svp" bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/format.svp" bin/format.exe -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/mem.svp" bin/mem.exe -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/mode.svp" bin/mode.com -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/more.svp" bin/more.exe -d "$FLOPROOT/"
-unzip -Cj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/command.svp" bin/command.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/display.svp" bin/display.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/edit.svp" bin/edit.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/fdisk.svp" bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/format.svp" bin/format.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/mem.svp" bin/mem.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/mode.svp" bin/mode.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/more.svp" bin/more.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
+
+
+echo
+echo "### Computing the USB image"
+echo
+
+# prepare the USB bootable image
+USBIMG=$PUBDIR/svardos-usb.img
+cp files/boot-svardos.img $USBIMG
+mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
+for p in $ALLPKGS ; do
+  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
+done
+
+# compress the USB image
+zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
+
 
 echo
 echo "### Creating floppy images"
@@ -174,6 +192,23 @@ prep_flop 80 2 36 2880 "$PUBDIR" "$CDROOT/boot.img"
 prep_flop 80 2 18 1440 "$PUBDIR"
 prep_flop 80 2 15 1200 "$PUBDIR"
 prep_flop 80 2  9  720 "$PUBDIR"
+
+# special case for 360K diskettes: some files must be deleted to make some room,
+# for this reason the 360K floppy must be generated as last (after all other
+# floppies and after the USB image)
+rm "$FLOPROOT"/*.cpx
+rm "$FLOPROOT"/install.lng
+rm "$FLOPROOT"/display.exe
+rm "$FLOPROOT"/mode.com
+rm "$FLOPROOT"/edit.*
+# another hack: the COMMAND.SVP package must be stripped from any cmd-?? files
+# otherwise it does not fit on a 360K floppy
+zip -d "$CDROOT/command.svp" 'BIN/CMD-??.COM'
+#
+prep_flop 40 2  9  360 "$PUBDIR"
+# now put back the original command.svp package (ISO CD still needs to be built)
+cp "$REPOROOT/core/command.svp" "$CDROOT/"
+
 
 echo
 echo "### Computing DOSEMU.zip"
@@ -233,21 +268,6 @@ echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
 rm -f "$PUBDIR/svardos-dosemu.zip"
 zip -rm9jk "$PUBDIR/svardos-$CURDATE-dosemu.zip" "$DOSEMUDIR"
 rmdir "$DOSEMUDIR"
-
-echo
-echo "### Computing the USB image"
-echo
-
-# prepare the USB bootable image
-USBIMG=$PUBDIR/svardos-usb.img
-cp files/boot-svardos.img $USBIMG
-mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
-for p in $ALLPKGS ; do
-  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
-done
-
-# compress the USB image
-zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
 
 echo
 echo "### Generating ISO CD image"
