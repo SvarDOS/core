@@ -40,7 +40,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220216"
+#define PVER "20220218"
 #define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.org"
@@ -80,6 +80,8 @@ static void help(void) {
   putsnls(1, 1);  /* "usage:  pkgnet search <term>" */
   putsnls(1, 2);  /* "        pkgnet pull <package>" */
   putsnls(1, 3);  /* "        pkgnet pull <package>-<version>" */
+  putsnls(1, 4);  /* "        pkgnet pullsrc <package>" */
+  putsnls(1, 5);  /* "        pkgnet pullsrc <package>-<version>" */
   putsnls(1, 6);  /* "        pkgnet checkup" */
   puts("");
   putsnls(1, 7);  /* "actions:" */
@@ -103,16 +105,21 @@ static int parseargv(int argc, char * const *argv, char *outfname, char *url, in
   *ispost = 0;
   if ((argc == 3) && (strcasecmp(argv[1], "search") == 0)) {
     sprintf(url, "/repo/?a=search&p=%s&lang=%s", argv[2], lang);
-  } else if ((argc == 3) && (strcasecmp(argv[1], "pull") == 0)) {
+  } else if ((argc == 3) && ((strcasecmp(argv[1], "pull") == 0) || (strcasecmp(argv[1], "pullsrc") == 0))) {
     unsigned short i;
-    sprintf(url, "/repo/?a=pull&p=%s&lang=%s", argv[2], lang);
     /* copy argv[2] into outfname, but stop at first '-' or null terminator
      * this trims any '-version' part in filename to respect 8+3 */
     for (i = 0; (argv[2][i] != 0) && (argv[2][i] != '-') && (i < 8); i++) {
       outfname[i] = argv[2][i];
     }
-    /* add the svp extension to filename */
-    strcpy(outfname + i, ".svp");
+    /* add the extension (svp or zip) to filename and compute url */
+    if (strcasecmp(argv[1], "pull") == 0) {
+      sprintf(url, "/repo/?a=pull&p=%s&lang=%s", argv[2], lang);
+      strcpy(outfname + i, ".svp");
+    } else {
+      sprintf(url, "/repo/?a=pullsrc&p=%s&lang=%s", argv[2], lang);
+      strcpy(outfname + i, ".zip");
+    }
   } else if ((argc == 2) && (strcasecmp(argv[1], "checkup") == 0)) {
     sprintf(url, "/repo/?a=checkup&lang=%s", lang);
     *ispost = 1;

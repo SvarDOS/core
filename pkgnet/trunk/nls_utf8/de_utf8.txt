@@ -14,7 +14,7 @@
 1.2:         pkgnet pull <Paketname>
 1.3:         pkgnet pull <Paketname>-<Paketversion>
 1.4:         pkgnet pullsrc <Paketname>
-1.4:         pkgnet pullsrc <Paketname>-<Paketversion>
+1.5:         pkgnet pullsrc <Paketname>-<Paketversion>
 1.6:         pkgnet checkup
 1.7:Aktionen:
 1.8:search   - fragt die Liste der passenden Pakete von der Paketquelle ab

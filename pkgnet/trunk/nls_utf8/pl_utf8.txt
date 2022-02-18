@@ -14,7 +14,7 @@
 1.2:         pkgnet pull <pakiet>
 1.3:         pkgnet pull <pakiet>-<wersja>
 1.4:         pkgnet pullsrc <pakiet>
-1.4:         pkgnet pullsrc <pakiet>-<wersja>
+1.5:         pkgnet pullsrc <pakiet>-<wersja>
 1.6:         pkgnet checkup
 1.7:akcje:
 1.8:search   - pyta zdalne repozytorium o listę pakietów pasujących do wyrażenia
