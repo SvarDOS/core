@@ -55,6 +55,16 @@ add the following lines to your C:\AUTOEXEC.BAT after the SET LANG=xx line.
 This will make your SvarDOS look for the translated CTMOUSE version first.
 If that does not exist, then it falls back to English.
 
+%hMULTI-CONFIG SVARDOS SYSTEMS
+
+If you decided to have multiple configurations in your CONFIG.SYS/AUTOEXEC.BAT
+you would save the lines from LANGUAGE-AWARE AUTO-SETUP to a batch file, e.g.,
+C:\BATCH\LOAD-CTM.BAT. Add an @ECHO OFF as the first line.
+
+Then you can spread the next line to your AUTOEXEC.BAT file, whereever needed.
+
+ CALL C:\BATCH\LOAD-CTM.BAT
+
 See also:
  * %lpkg.ama:SvarDOS packages management
  * %lnetworking.ama:Networking
