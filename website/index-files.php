@@ -19,7 +19,7 @@ $dir = '.';
 
 if (!empty($_GET['dir'])) {
   $dir = $_GET['dir'];
-  if (!preg_match('/^[0-9]{8}(\.staging){0,1}$/', $dir)) {
+  if (!preg_match('/^[0-9]{8}$/', $dir)) {
     echo '<p style="font-size: 2em; text-align: center; font-weight: bold;">I AM WATCHING YOU</p>';
     exit(0);
   }

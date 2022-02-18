@@ -4,11 +4,13 @@
 # http://svardos.org
 # Copyright (C) 2016-2022 Mateusz Viste
 #
-# This script generates the SvarDOS repository index and builds floppy and CD
-# images. It should be executed each time that a CORE package has been
-# modified, added or removed.
+# This script builds floppy and CD images. It should be executed each time that
+# a CORE package has been modified or the build script changed. Before running
+# it looks for the presence of a /tmp/svardos_repo_changed.flag and stops if
+# no such flag exists. This flag is expected to be created by an svn
+# post-commit hook when an important svn change is detected.
 #
-# usage: ./build.sh outputdir [noclean]
+# usage: ./build.sh outputdir [noclean] > logfile
 #
 
 ### parameters block starts here ############################################
@@ -26,7 +28,7 @@ if [ "x$1" == "x" ] ; then
   echo "usage: build.sh outputdir [noclean] > logfile"
   exit 1
 fi
-PUBDIR=`realpath "$1"`/$CURDATE.staging
+PUBDIR=`realpath "$1"`/$CURDATE
 
 CDROOT="$PUBDIR/tmp_cdroot.build"
 FLOPROOT="$PUBDIR/tmp_floproot.build"
@@ -126,7 +128,10 @@ echo "dest dir: $PUBDIR"
 echo "current time is `date` and it's a beautiful day somewhere in the world"
 echo
 
+# remove dest dir if it exists already, then recreate it empty
+rm -rf "$PUBDIR"
 mkdir "$PUBDIR"
+
 mkdir "$CDROOT"
 mkdir "$FLOPROOT"
 
