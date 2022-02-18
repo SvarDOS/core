@@ -870,6 +870,8 @@ int main(void) {
   if (action != MENUNEXT) goto Quit;
   loadcp(&locales);
   svarlang_load("INSTALL", locales.lang, NULL); /* NLS support */
+
+ SelectKeyb:
   action = selectkeyb(&locales);  /* what keyb layout should we use? */
   if (action == MENUQUIT) goto Quit;
   if (action == MENUPREV) goto SelectLang;
@@ -877,7 +879,10 @@ int main(void) {
  WelcomeScreen:
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto Quit;
-  if (action == MENUPREV) goto SelectLang;
+  if (action == MENUPREV) {
+    if (locales.keyblen > 1) goto SelectKeyb; /* if there is a choice of more than 1 layout, ask for it */
+    goto SelectLang;
+  }
   targetdrv = preparedrive(sourcedrv); /* what drive should we install from? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
