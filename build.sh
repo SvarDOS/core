@@ -75,44 +75,46 @@ ALLPKGS="$COREPKGS $EXTRAPKGS"
 # $2 heads (sides)
 # $3 sectors per track
 # $4 size
-# $5 where to put a copy of the image (optional)
+# $5 working directory (for temporary files etc)
+# $6 where to put a copy of the image (optional)
 function prep_flop {
-  mkdir $4
-  mformat -C -t $1 -h $2 -s $3 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$4/disk1.img"
-  mcopy -sQm -i "$4/disk1.img" "$FLOPROOT/"* ::/
+  WORKDIR="$5/$4"
+  mkdir "$WORKDIR"
+  mformat -C -t $1 -h $2 -s $3 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
+  mcopy -sQm -i "$WORKDIR/disk1.img" "$FLOPROOT/"* ::/
 
   # now populate the floppies
   curdisk=1
   for p in $ALLPKGS ; do
     # if copy fails, then probably the floppy is full - try again after
     # creating an additional floppy image
-    if ! mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
+    if ! mcopy -mi "$WORKDIR/disk$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
       curdisk=$((curdisk+1))
-      mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$4/disk$curdisk.img"
-      mcopy -mi "$4/disk$curdisk.img" "$CDROOT/$p.svp" ::/
+      mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$WORKDIR/disk$curdisk.img"
+      mcopy -mi "$WORKDIR/disk$curdisk.img" "$CDROOT/$p.svp" ::/
     fi
   done
 
   # add a short readme
-  echo "This directory contains a set of $curdisk floppy images of the SvarDOS distribution in the $4 KB floppy format." > "$4/readme.txt"
-  echo "" >> "$4/readme.txt"
-  echo "These images are raw floppy disk dumps. To write them on an actual floppy disk, you have to use a low-level sector copying tool, like dd." >> "$4/readme.txt"
-  echo "" >> "$4/readme.txt"
-  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$4/readme.txt"
+  echo "This directory contains a set of $curdisk floppy images of the SvarDOS distribution in the $4 KB floppy format." > "$WORKDIR/readme.txt"
+  echo "" >> "$WORKDIR/readme.txt"
+  echo "These images are raw floppy disk dumps. To write them on an actual floppy disk, you have to use a low-level sector copying tool, like dd." >> "$WORKDIR/readme.txt"
+  echo "" >> "$WORKDIR/readme.txt"
+  echo "Latest SvarDOS version is available on the project's homepage: http://svardos.osdn.io" >> "$WORKDIR/readme.txt"
 
-  unix2dos "$4/readme.txt"
+  unix2dos "$WORKDIR/readme.txt"
 
   # make a copy of the image, if requested
-  if [ "x$5" != "x" ] ; then
-    cp "$4/disk1.img" $5
+  if [ "x$6" != "x" ] ; then
+    cp "$WORKDIR/disk1.img" $6
   fi
 
   # zip the images (and remove them at the same time)
   rm -f "$PUBDIR/svardos-floppy-$4k.zip"
-  zip -9 -rmj "$PUBDIR/svardos-$CURDATE-floppy-$4k.zip" $4/*
+  zip -9 -rmj "$PUBDIR/svardos-$CURDATE-floppy-$4k.zip" "$WORKDIR"/*
 
   # clean up
-  rmdir $4
+  rmdir "$WORKDIR"
 }
 
 
@@ -174,10 +176,10 @@ echo
 export MTOOLS_NO_VFAT=1
 
 # prepare images for floppies in different sizes (args are C H S SIZE)
-prep_flop 80 2 36 2880 "$CDROOT/boot.img"
-prep_flop 80 2 18 1440
-prep_flop 80 2 15 1200
-prep_flop 80 2  9  720
+prep_flop 80 2 36 2880 "$PUBDIR" "$CDROOT/boot.img"
+prep_flop 80 2 18 1440 "$PUBDIR"
+prep_flop 80 2 15 1200 "$PUBDIR"
+prep_flop 80 2  9  720 "$PUBDIR"
 
 echo
 echo "### Computing DOSEMU.zip"
