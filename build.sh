@@ -8,21 +8,29 @@
 # images. It should be executed each time that a CORE package has been
 # modified, added or removed.
 #
-# usage: ./build.sh [noclean]
+# usage: ./build.sh outputdir [noclean]
 #
 
 ### parameters block starts here ############################################
 
 CURDATE=`date +%Y%m%d`
 REPOROOT=`realpath ./packages`
-PUBDIR=`realpath ./website/download`/$CURDATE
-CDROOT=`realpath ./tmp_cdroot.build`
-FLOPROOT=`realpath ./tmp_floproot.build`
 CUSTFILES=`realpath ./files`
 
 GENISOIMAGE=''    # can be mkisofs, genisoimage or empty for autodetection
 
 ### parameters block ends here ##############################################
+
+# look for mandatory output dir
+if [ "x$1" == "x" ] ; then
+  echo "usage: build.sh outputdir [noclean] > logfile"
+  exit 1
+fi
+PUBDIR=`realpath "$1"`/$CURDATE.staging
+
+CDROOT="$PUBDIR/tmp_cdroot.build"
+FLOPROOT="$PUBDIR/tmp_floproot.build"
+
 
 # auto-detect whether to use mkisofs or genisoimage
 
@@ -111,9 +119,16 @@ function prep_flop {
 # remember where I am, so I can get back here once all is done
 origdir=`pwd`
 
+echo "###############################################################################"
+echo " STARTING BUILD $CURDATE"
+echo "###############################################################################"
+echo "dest dir: $PUBDIR"
+echo "current time is `date` and it's a beautiful day somewhere in the world"
+echo
+
+mkdir "$PUBDIR"
 mkdir "$CDROOT"
 mkdir "$FLOPROOT"
-mkdir "$PUBDIR"
 
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
@@ -126,6 +141,10 @@ for pkg in $EXTRAPKGS ; do
   cp "$REPOROOT/$pkg.svp" "$CDROOT/"
 done
 
+
+echo
+echo "### Populating the floppy root at $FLOPROOT"
+echo
 
 # prepare the content of the boot (install) floppy
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
@@ -142,6 +161,10 @@ unzip -Cj "$REPOROOT/core/mode.svp" bin/mode.com -d "$FLOPROOT/"
 unzip -Cj "$REPOROOT/core/more.svp" bin/more.exe -d "$FLOPROOT/"
 unzip -Cj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 
+echo
+echo "### Creating floppy images"
+echo
+
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
 #mformat -C -f 2880 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$CDROOT/boot.img"
@@ -154,8 +177,12 @@ prep_flop 80 2 15 1200
 prep_flop 80 2  9  720
 #prep_flop 96 64 32 98304 "$PUBDIR/svardos-zip100.img" # ZIP 100M (for USB boot in "USB-ZIP mode")
 
+echo
+echo "### Computing DOSEMU.zip"
+echo
+
 # prepare the DOSEMU boot zip
-DOSEMUDIR='tmp_dosemu-prep-files.build'
+DOSEMUDIR="$PUBDIR/tmp_dosemu-prep-files.build"
 mkdir "$DOSEMUDIR"
 # INSTALL.BAT
 echo 'IF NOT EXIST C:\TEMP\NUL MKDIR C:\TEMP' >> "$DOSEMUDIR/install.bat"
@@ -209,6 +236,10 @@ rm -f "$PUBDIR/svardos-dosemu.zip"
 zip -rm9jk "$PUBDIR/svardos-$CURDATE-dosemu.zip" "$DOSEMUDIR"
 rmdir "$DOSEMUDIR"
 
+echo
+echo "### Computing the USB image"
+echo
+
 # prepare the USB bootable image
 USBIMG=$PUBDIR/svardos-usb.img
 cp files/boot-svardos.img $USBIMG
@@ -218,19 +249,22 @@ for p in $ALLPKGS ; do
 done
 
 # compress the USB image
-rm -f "$PUBDIR/svardos-usb.zip"
 zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
 
 # prepare the USB-ZIP bootable image
 #USBZIPIMG=$PUBDIR/svardos-usbzip.img
 #cat files/usb-zip.mbr "$PUBDIR/svardos-zip100.img" > $USBZIPIMG
 
+echo
+echo "### Generating ISO CD image"
+echo
+
 CDISO="$PUBDIR/svardos-$CURDATE-cd.iso"
 CDZIP="$PUBDIR/svardos-$CURDATE-cd.zip"
 
 # delete previous (if any) iso
-echo "cleaning up old versions..."
-rm -f "$CDISO" "$CDZIP"
+#echo "cleaning up old versions..."
+#rm -f "$CDISO" "$CDZIP"
 
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/boot.img"
 
@@ -238,7 +272,12 @@ $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CD
 zip -mj9 "$CDZIP" "$CDISO"
 
 # cleanup temporary things
-if [ "x$1" != "xnoclean" ] ; then
+if [ "x$2" != "xnoclean" ] ; then
+  echo
+  echo "### Clenup of temporary directories:"
+  echo "# $CDROOT"
+  echo "# $FLOPROOT"
+  echo
   rm -rf "$CDROOT" "$FLOPROOT"
 fi
 
@@ -248,6 +287,7 @@ cd "$origdir"
 #./webgen.sh
 #cd ..
 
-echo "ALL DONE!"
+echo
+echo "### ALL DONE! ###"
 
 exit 0
