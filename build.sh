@@ -5,10 +5,8 @@
 # Copyright (C) 2016-2022 Mateusz Viste
 #
 # This script builds floppy and CD images. It should be executed each time that
-# a CORE package has been modified or the build script changed. Before running
-# it looks for the presence of a /tmp/svardos_repo_changed.flag and stops if
-# no such flag exists. This flag is expected to be created by an svn
-# post-commit hook when an important svn change is detected.
+# a CORE package has been modified or the build script changed. This is usually
+# done by the cron.sh script, itself called by a cron job.
 #
 # usage: ./build.sh outputdir [noclean] > logfile
 #
