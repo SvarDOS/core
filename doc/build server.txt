@@ -99,19 +99,27 @@ be present on the server:
 Mirroring the project's svn tree (containing all build scripts, packages, etc)
 is the best way to make a backup copy of the entire SvarDOS build system along
 with all its history. To achieve such mirror, one needs to create an empty
-svn repository and populate it using svnsync:
+svn repository:
 
 $ svnadmin create /srv/svardos-mirror
 $ svnsync init file:///srv/svardos-mirror svn://svn.svardos.org/svardos
+
+Then make this repository to accept modifications of revision properties, this
+is mandatory so it can import historical data:
+
+$ echo '#!/bin/sh' > /srv/svardos-mirror/hooks/pre-revprop-change
+$ echo 'exi 0' >> /srv/svardos-mirror/hooks/pre-revprop-change
+
+Finally, populate your mirror using svnsync (this operation has to be performed
+periodically to keep your mirror up to date):
+
 $ svn up /srv/svardos-mirror
 
 The same procedure can be used to migrate the SvarDOS build system from one
 server to another.
 
-NOTE: The target svn server must allow modification of revision properties.
-      This is achieved with a svn "pre-revprop-change" hook of two lines:
-        #!/bin/sh
-        exit 0
+NOTE: Such mirror server must not be used to send commits to. The only process
+      that should write to it is svnsync.
 
 
 ======================================================================= EOF ===
