@@ -19,7 +19,8 @@
 1.7:Aktionen:
 1.8:search   - fragt die Liste der passenden Pakete von der Paketquelle ab
 1.9:pull     - lädt das angegebene Paket ins aktuelle Verzeichnis herunter
-1.10:checkup  - zeigt die für Ihr System verfügbaren Aktualisierungen an
+1.10:pullsrc  - lädt das Quellcode-Archiv für das Paket herunter
+1.11:checkup  - zeigt die für Ihr System verfügbaren Aktualisierungen an
 
 
 ###############################################################################

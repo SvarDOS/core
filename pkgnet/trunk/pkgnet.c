@@ -88,7 +88,8 @@ static void help(void) {
   puts("");
   putsnls(1, 8);  /* "search   - asks remote repository for the list of matching packages" */
   putsnls(1, 9);  /* "pull     - downloads package into current directory" */
-  putsnls(1, 10); /* "checkup  - lists updates available for your system" */
+  putsnls(1, 10); /* "pullsrc  - downloads source code archive for package" */
+  putsnls(1, 11); /* "checkup  - lists updates available for your system" */
   puts("");
   printf("Watt32 kernel: %s", net_engine());
   puts("");
