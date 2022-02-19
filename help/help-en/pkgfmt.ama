@@ -1,4 +1,6 @@
 
+                        %h*** SVARDOS PACKAGE FORMAT ***
+
 Package files provide an easy way to manage software on SvarDOS. These
 packages must adhere to a strict convention so they can be handled properly
 by the SvarDOS package manager.
@@ -11,7 +13,7 @@ Packages names must follow some basic rules. They shall be max. 8 letters long
 be confusing), and must not be composed of characters other than a-b, 0-9 and
 '_'. This for backward compatibility with short file names (8+3) and ISO 9660
 file systems (used on CDROMs). The package filename is always followed by the
-.SVP ("SvarDOS Package") extension.
+.svp ("SvarDOS Package") extension.
 
 
 %hPackage files
@@ -22,13 +24,19 @@ collections of files. Also, the ZIP file format is well documented, well
 supported, and in the public domain.
 
 Here below is the recommended command line that can be used to create a
-package for a program named EXAMPLE using info-zip:
+package for a program named EXAMPLE labelled as version "1.2.34" using
+info-zip's zip:
 
-  zip -9rkDX EXAMPLE.SVP subdir1 subdir2 ... subdirN
+  zip -9rkDX example-1.2.34.svp subdir1 subdir2 ... subdirN
 
 If you are using 7za to create your packages, then use this:
 
-  7za a -mm=deflate -mx=9 -tzip EXAMPLE.SVP subdir1 subdir2 ... subdirN
+  7za a -mm=deflate -mx=9 -tzip example-1.2.34.svp subdir1 subdir2 ... subdirN
+
+Note: The version in the filename is just an information for packagers so they
+don't need to look into each package to know what version to expect there. In
+LSM versions you might have non-filesystem-compatible stuff like "10/11/11" so
+we don't want to enforce any kind of correlation.
 
 
 %hPackage directory structure
@@ -114,12 +122,12 @@ The entire version string of a package must never exceed 16 characters.
 
 When a packaged software has its sources available, then it is recommended to
 archive also them. To that effect, put the sources into a ZIP archive that has
-the same filename as the package, but a *.ZIP extension (as opposed to the
-*.SVP extension of the proper package). The result would be that the packaged
+the same filename as the package, but a *.zip extension (as opposed to the
+*.svp extension of the proper package). The result would be that the packaged
 software would be distributed within two files. Example for FDISK:
 
-FDISK.SVP       <- binaries (ZIP archive following the SVP structure)
-FDISK.ZIP       <- sources (flat, unstructured ZIP archive)
+fdisk-1.55+2.svp       <- binaries (ZIP archive following the SVP structure)
+fdisk-1.55+2.zip       <- sources (flat, unstructured ZIP archive)
 
 The ZIP file must obviously contain the source code that belongs to the exact
 same version present in the SVP package.
