@@ -91,7 +91,7 @@ Alle anderen Zeilen werden vom SvarDOS-Paketmanager ignoriert.
 
 Die in der LSM-Datei enthaltene Version soll die Version der Software
 widerspiegeln, aber es kann vorkommen, dass ein Paket geändert werden muss, um
-um ein rein paketbezogenes Problem zu beheben (zum Beispiel eine vergessene
+ein rein paketbezogenes Problem zu beheben (zum Beispiel eine vergessene
 Dokumentationsdatei oder eine Neukompilierung der Binärdatei unter Verwendung
 eines besseren Satzes von Flags...). In einem solchen Fall ändert sich die
 Version der Software nicht, aber die Version des Pakets selbst muss sich
