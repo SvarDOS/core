@@ -40,7 +40,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220218"
+#define PVER "20220219"
 #define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.org"
@@ -448,7 +448,7 @@ int main(int argc, char **argv) {
 
   puts(""); /* required because watt-32 likes to print out garbage sometimes ("configuring through DHCP...") */
 
-  if (net_dnsresolve(mem->ipaddr, HOSTADDR) != 0) {
+  if (net_dnsresolve(mem->ipaddr, HOSTADDR, 2) != 0) {
     putsnls(9, 12); /* "ERROR: DNS resolution failed" */
     return(1);
   }

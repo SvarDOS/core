@@ -9,8 +9,9 @@
 
 struct net_tcpsocket; /* opaque struct, exact implementation in net.c */
 
-/* resolves name and fills resovled addr into ip. returns 0 on success. */
-int net_dnsresolve(char *ip, const char *name);
+/* resolves name and fills resovled addr into ip. on failure it retries r times
+ * (r=0 means "try only once"). returns 0 on success. */
+int net_dnsresolve(char *ip, const char *name, int r);
 
 /* must be called before using libtcp. returns 0 on success, or non-zero if network subsystem is not available. */
 int net_init(void);
