@@ -41,11 +41,7 @@
 
 ### END SCREEN ###
 5.0:Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie den Installationsdatenträger.
-5.1:Installation von SvarDOS (build %s) abgeschlossen. Bitte starten Sie Ihren Computer neu.
+5.1:Installation von SvarDOS (Build %s) abgeschlossen.\nBitte starten Sie Ihren Computer neu.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Willkommen bei SvarDOS! Geben Sie 'HELP' ein, wenn Sie Hilfe benötigen.
-
-# Local Variables:
-# coding:cp850-dos
-# End:
