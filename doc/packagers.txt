@@ -41,7 +41,7 @@ on your disk. Inside you will find all SvarDOS packages.
 === UPLOADING A NEW PACKAGE ===================================================
 
 So you have created this new SvarDOS SVP package with some very cool software
-in it. Great! To upload it to the SvarDOS online repo, copy your zip package
+in it. Great! To upload it to the SvarDOS online repo, copy your new package
 to your local svardos-packages directory. Then, instruct svn to add the new
 file(s) to the repo:
 
@@ -74,7 +74,7 @@ $ svn add nasm-2.15.zip              <-- optional (only if package has sources)
 Finally, review and commit your changes:
 
 $ svn st
-$ svn commit -m 'updated NASM to version 2.15'
+$ svn commit -m 'updated package NASM to version 2.15'
 
 The repository server will automatically serve the latest available version as
 the "preferred" version to users. The version strings are processed (and
