@@ -1,4 +1,6 @@
 
+                          %h*** SVARDOS-PAKETFORMAT ***
+
 Paketdateien bieten eine einfache Möglichkeit, Software unter SvarDOS zu
 verwalten. Diese Pakete müssen sich an eine strenge Konvention halten, damit
 sie vom SvarDOS-Paketmanager richtig behandelt werden können.
@@ -12,7 +14,7 @@ mit 1 oder 2 Buchstaben verwirrend sein könnte) und dürfen nicht aus anderen
 Zeichen als a-b, 0-9 und '_' bestehen. Dies geschieht aus Gründen der
 Abwärtskompatibilität mit kurzen Dateinamen (8+3) und ISO 9660-Dateisystemen
 (auf CD-ROMs verwendet). Auf den Dateinamen des Pakets folgt immer die
-Erweiterung .SVP ("SvarDOS Package").
+Erweiterung .svp ("SvarDOS Package").
 
 
 %hPaketdateien
@@ -23,14 +25,19 @@ Verteilung von Dateisammlungen geworden sind. Außerdem ist das ZIP-Dateiformat
 gut dokumentiert, wird gut unterstützt und ist Public Domain.
 
 Nachfolgend finden Sie die empfohlene Befehlszeile, mit der Sie ein Paket für
-ein Programm namens BEISPIEL mit info-zip erstellen können:
+ein Programm namens BEISPIEL mit der Versionsbezeichnung "1.2.34" mit Info-ZIP
+Zip erstellen können:
 
-  zip -9rkDX BEISPIEL.SVP untverz1 untverz2 ... untverzN
+  zip -9rkDX beispiel-1.2.34.svp uverz1 uverz2 ... uverzN
 
 Wenn Sie 7za verwenden, um Ihre Pakete zu erstellen, dann verwenden Sie dies:
 
-  7za a -mm=deflate -mx=9 -tzip BEISPIEL.SVP untverz1 untverz2 ... untverzN
+  7za a -mm=deflate -mx=9 -tzip beispiel-1.2.34.svp uverz1 uverz2 ... uverzN
 
+Hinweis: Die Version im Dateinamen ist nur eine Information für Paketierer,
+damit jene nicht in jedes Paket schauen müssen, um zu wissen, welche Version
+sie dort erwartet. In LSM-Versionen könnte man dateisysteminkompatiblen Kram
+wie "10/11/11" haben, also wollen wir keine Entsprechung erzwingen.
 
 %hVerzeichnisstruktur für Pakete
 
@@ -121,12 +128,12 @@ umfassen.
 
 Wenn die Quellen eines Softwarepakets verfügbar sind, empfiehlt es sich, auch
 diese zu archivieren. Legen Sie zu diesem Zweck die Quellen in ein ZIP-Archiv
-mit demselben Dateinamen wie das Paket, aber mit der Erweiterung *.ZIP (im
-Gegensatz zur Erweiterung *.SVP des eigentlichen Pakets). Das Ergebnis wäre,
+mit demselben Dateinamen wie das Paket, aber mit der Erweiterung *.zip (im
+Gegensatz zur Erweiterung *.svp des eigentlichen Pakets). Das Ergebnis wäre,
 dass das Softwarepaket in zwei Dateien verteilt würde. Beispiel für FDISK:
 
-FDISK.SVP       <- Binärdateien (ZIP-Archiv entsprechend der SVP-Struktur)
-FDISK.ZIP       <- Quellen (flaches, unstrukturiertes ZIP-Archiv)
+fdisk-1.55+2.svp   <- Binärdateien (ZIP-Archiv entsprechend der SVP-Struktur)
+fdisk-1.55+2.zip   <- Quellen (flaches, unstrukturiertes ZIP-Archiv)
 
 Die ZIP-Datei muss natürlich den Quellcode enthalten, der genau zu der Version
 gehört, die im SVP-Paket enthalten ist.
