@@ -25,7 +25,7 @@ supported, and in the public domain.
 
 Here below is the recommended command line that can be used to create a
 package for a program named EXAMPLE labelled as version "1.2.34" using
-info-zip's zip:
+Info-ZIP's Zip:
 
   zip -9rkDX example-1.2.34.svp subdir1 subdir2 ... subdirN
 
