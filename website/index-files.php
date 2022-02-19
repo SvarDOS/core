@@ -55,6 +55,7 @@ foreach ($flist as $f) {
   } else {
     echo "<a href=\"download/{$dir}/{$f}\">{$f}</a>";
     echo "</td><td style=\"padding: 0 1em 0 2em; color: #222;\">" . nice_filesize($dir . '/' . $f);
+    echo '</td><td style="font-size: 0.7em; color: #444;">MD5: ' . md5_file($dir . '/' . $f);
   }
 
   echo "</td></tr>\n";
