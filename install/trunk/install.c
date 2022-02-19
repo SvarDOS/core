@@ -448,6 +448,51 @@ static int fileexists(const char *fname) {
 }
 
 
+/* tries to write an empty file to drive.
+ * asks DOS to inhibit the int 24h handler for this job, so erros are
+ * gracefully reported - unfortunately this does not work under FreeDOS because
+ * the DOS-C kernel does not implement the required flag.
+ * returns 0 on success (ie. "disk exists and is writeable"). */
+static unsigned short test_drive_write(char drive, char *buff) {
+  unsigned short result = 0;
+  sprintf(buff, "%c:\\SVWRTEST.123", drive);
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+
+    mov ah, 0x6c   /* extended open/create file */
+    mov bx, 0x2001 /* open for write + inhibit int 24h handler */
+    xor cx, cx     /* file attributes on the created file */
+    mov dx, 0x0010 /* create file if does not exist, fail if it exists */
+    mov si, buff   /* filename to create */
+    int 0x21
+    jc FAILURE
+    /* close the file (handle in AX) */
+    mov bx, ax
+    mov ah, 0x3e /* close file */
+    int 0x21
+    jc FAILURE
+    /* delete the file */
+    mov ah, 0x41 /* delete file pointed out by DS:DX */
+    mov dx, buff
+    int 0x21
+    jnc DONE
+
+    FAILURE:
+    mov result, ax
+    DONE:
+
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+  return(result);
+}
+
+
 static int preparedrive(char sourcedrv) {
   int driveremovable;
   int selecteddrive = 3; /* default to 'C:' */
@@ -505,10 +550,7 @@ static int preparedrive(char sourcedrv) {
       return(MENUQUIT);
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
-    snprintf(buff, sizeof(buff), "%c:\\SVWRTEST.123", cselecteddrive);
-    if (mkdir(buff) == 0) {
-      rmdir(buff);
-    } else {
+    if (test_drive_write(cselecteddrive, buff) != 0) {
       const char *list[3];
       newscreen(0);
       snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
