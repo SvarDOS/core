@@ -19,7 +19,7 @@
 1.7:akcje:
 1.8:search   - pyta zdalne repozytorium o listę pakietów pasujących do wyrażenia
 1.9:pull     - pobiera dany pakiet do bieżącego katalogu
-1.10:pullsrc  - downloads source code archive for package
+1.10:pullsrc  - pobiera archiwum źródeł danego pakietu
 1.11:checkup  - wyświetla dostępne aktualizacje dla twojego systemu
 
 
