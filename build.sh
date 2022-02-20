@@ -302,7 +302,7 @@ zip -mj9 "$CDZIP" "$CDISO"
 # cleanup temporary things
 if [ "x$2" != "xnoclean" ] ; then
   echo
-  echo "### Clenup of temporary directories:"
+  echo "### Cleanup of temporary directories:"
   echo "# $CDROOT"
   echo "# $FLOPROOT"
   echo
