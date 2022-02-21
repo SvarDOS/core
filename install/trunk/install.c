@@ -42,6 +42,10 @@
 #include "keylay.h"
 #include "keyoff.h"
 
+/* prototype of the int24hdl() function defined in int24hdl.asm */
+void int24hdl(void);
+
+
 /* color scheme (color, mono) */
 static unsigned short COLOR_TITLEBAR[2] = {0x7000,0x7000};
 static unsigned short COLOR_BODY[2] = {0x1700,0x0700};
@@ -904,6 +908,9 @@ int main(int argc, char **argv) {
   int sourcedrv;
   int action;
   const char *buildstring = "###";
+
+  /* setup the internal int 24h handler ("always fail") */
+  int24hdl();
 
   if (argc != 1) buildstring = argv[1];
 
