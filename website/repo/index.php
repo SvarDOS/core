@@ -5,9 +5,9 @@
   Copyright (C) 2021-2022 Mateusz Viste
 
  === API ===
-  ?a=pull&p=PACKAGE           downloads the zip archive (svp) containing PACKAGE
-  ?a=pull&p=PACKAGE-VER       downloads the zip (svp) containing PACKAGE in version VER
-  ?a=search&p=PHRASE          list packages that match PHRASE
+  ?a=pull&p=PACKAGE[-VER]     downloads the svp archive of PACKAGE (possibly of VER version)
+  ?a=pullsrc&p=PACKAGE[-VER]  downloads the source zip of PACKAGE (possibly of VER version)
+  ?a=search&p=PHRASE[::cat]   list packages that match PHRASE (possibly filtered by cat category)
   ?a=checkup                  list of packages+versions in $_POST
 */
 
@@ -177,8 +177,20 @@ if (($a === 'pull') || ($a === 'pullsrc')) {
 if ($a === 'search') {
   $matches = 0;
   header('Content-Type: text/plain');
+
+  // if catfilter present, trim it out of the search term
+  $exp_cat = explode('::', $p);
+  $p = $exp_cat[0];
+  $catfilter = '';
+  if (!empty($exp_cat[1])) $catfilter = strtolower($exp_cat[1]);
+
   foreach ($db as $pkg => $meta) {
-    if ((stristr($pkg, $p)) || (stristr($meta['desc'], $p))) {
+    // apply the category filter, if any
+    if (! empty($catfilter)) {
+      if (array_search($catfilter, $meta['cats']) === false) continue;
+    }
+    // look for term
+    if ((empty($p)) || (stristr($pkg, $p)) || (stristr($meta['desc'], $p))) {
       // fetch first (preferred) version
       $prefver_fname = array_key_first($meta['versions']);
       $prefver = array_shift($meta['versions']);
