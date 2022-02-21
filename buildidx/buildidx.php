@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  21 feb 2022: buildidx collects categories looking at the dir layout of each package
   17 feb 2022: checking for non-8+3 filenames in packages and duplicates + devload no longer part of CORE
   16 feb 2022: added warning about overlong version strings and wild files location
   15 feb 2022: index is generated as json, contains all filenames and alt versions
@@ -32,7 +33,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220217";
+$PVER = "20220221";
 
 
 // computes the BSD sum of a file and returns it
@@ -191,6 +192,9 @@ foreach ($pkgfiles as $fname) {
   // array used to detect duplicated entries after lower-case conversion
   $duparr = array();
 
+  // will hold the list of categories that this package belongs to
+  $catlist = array();
+
   foreach ($listoffiles as $f) {
     $f = strtolower($f);
     $path_array = explode('/', $f);
@@ -211,8 +215,16 @@ foreach ($pkgfiles as $fname) {
     if ($f === "appinfo/{$pkgnam}.lsm") continue;
     if ($f === "appinfo/") continue;
     // CORE and MSDOS_COMPAT packages are premium citizens and can do a little more
-    if ((array_search($pkgnam, $core_packages_list) !== false)
-       || (array_search($pkgnam, $msdos_compat_list) !== false)) {
+    $core_or_msdoscompat = 0;
+    if (array_search($pkgnam, $core_packages_list) !== false) {
+      $catlist[] = 'core';
+      $core_or_msdoscompat = 1;
+    }
+    if (array_search($pkgnam, $msdos_compat_list) !== false) {
+      $catlist[] = 'msdos_compat';
+      $core_or_msdoscompat = 1;
+    }
+    if ($core_or_msdoscompat == 1) {
       if (str_head_is($f, 'bin/')) continue;
       if (str_head_is($f, 'cpi/')) continue;
       if (str_head_is($f, "doc/{$pkgdir}/")) continue;
@@ -222,6 +234,8 @@ foreach ($pkgfiles as $fname) {
     }
     // the help package is allowed to put files in... help
     if (($pkgnam == 'help') && (str_head_is($f, 'help/'))) continue;
+    // must be category-prefixed file, add it to the list of categories for this package
+    $catlist[] = explode('/', $f)[0];
     // well-known "category" dirs are okay
     if (str_head_is($f, "progs/{$pkgdir}/")) continue;
     if ($f === 'progs/') continue;
@@ -236,12 +250,17 @@ foreach ($pkgfiles as $fname) {
 
   $meta['fname'] = $fname;
   $meta['desc'] = $lsmarray['description'];
+  $meta['cats'] = array_unique($catlist);
 
   $pkgdb[$pkgnam][$lsmarray['version']] = $meta;
 }
 
 
 $db = array();
+$cats = array();
+
+// ******** compute the version-sorted list of packages with a single *********
+// ******** description and category list for each package ********************
 
 // iterate over each svp package
 foreach ($pkgdb as $pkg => $versions) {
@@ -260,6 +279,10 @@ foreach ($pkgdb as $pkg => $versions) {
     $meta2['bsum'] = $bsum;
 
     if (empty($db[$pkg]['desc'])) $db[$pkg]['desc'] = $desc;
+    if (empty($db[$pkg]['cats'])) {
+      $db[$pkg]['cats'] = $meta['cats'];
+      $cats = array_unique(array_merge($cats, $meta['cats']));
+    }
     $db[$pkg]['versions'][$fname] = $meta2;
   }
 
@@ -292,7 +315,10 @@ if ($json_blob === false) {
   echo "\n";
 }
 
-file_put_contents($repodir . '/_index.json', json_encode($db));
+file_put_contents($repodir . '/_index.json', $json_blob);
+
+$cats_json = json_encode($cats);
+file_put_contents($repodir . '/_cats.json', $cats_json);
 
 exit(0);
 
