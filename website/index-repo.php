@@ -6,14 +6,44 @@
 <p>If you wish to receive notifications about new or updated packages, you may subscribe to the <a href="http://svn.svardos.org/rss.php?repname=SvarDOS&path=%2Fpackages%2F">SvarDOS Packages RSS feed</a>.</p>
 
 <?php
+  // load the category list
+  $cats = json_decode(file_get_contents('../packages/_cats.json'), true);
+  sort($cats);
+
+  $catfilter = '';
+  if (!empty($_GET['cat'])) $catfilter = strtolower($_GET['cat']);
+?>
+
+<form action="?" method="get">
+<br>
+<p>Category filter:&nbsp;
+<input type="hidden" name="p" value="repo">
+<select name="cat">
+  <option value="">ALL</option>
+<?php
+  foreach ($cats as $c) {
+    $sel = '';
+    if ($c == $catfilter) $sel = ' selected';
+    echo '  <option value="' . $c . "\"{$sel}>" . $c . "</option>\n";
+  }
+?>
+</select>
+<input type="submit" value="refresh">
+</p>
+</form>
+
+
+<?php
 
 $db = json_decode(file_get_contents('../packages/_index.json'), true);
 
-echo "<table>\n";
+echo "<table style=\"width: 100%;\">\n";
 
 echo "<thead><tr><th>PACKAGE</th><th>VERSION</th><th>DESCRIPTION</th></tr></thead>\n";
 
 foreach ($db as $pkg => $meta) {
+
+  if ((!empty($catfilter)) && (array_search($catfilter, $meta['cats']) === false)) continue;
 
   $desc = $meta['desc'];
   $pref = array_shift($meta['versions']); // get first version (that's the preferred one)
