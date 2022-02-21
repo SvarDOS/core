@@ -101,9 +101,13 @@ function vertoarr($verstr) {
       $subver[2] = 1;
     } else if ($greek == 'beta') {
       $subver[2] = 2;
+    } else if ($greek == 'rc') {
+      $subver[2] = 3;
     } else {
       return(false);
     }
+  } else {
+    $subver[2] = 99;
   }
 
   // does the version string have a single-letter subversion? (1.0c)
