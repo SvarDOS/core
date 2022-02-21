@@ -10,7 +10,7 @@
 
   requires php-zip
 
-  21 feb 2022: buildidx collects categories looking at the dir layout of each package
+  21 feb 2022: buildidx collects categories looking at the dir layout of each package + improved version string parsing (replaced version_compare call by dos_version_compare)
   17 feb 2022: checking for non-8+3 filenames in packages and duplicates + devload no longer part of CORE
   16 feb 2022: added warning about overlong version strings and wild files location
   15 feb 2022: index is generated as json, contains all filenames and alt versions
@@ -59,6 +59,90 @@ function file2bsum($fname) {
 
   fclose($fd);
   return($result);
+}
+
+
+// translates a version string into a array of integer values.
+// Accepted formats follow:
+//    300.12.1
+//    1
+//    12.2.34.2-4.5
+//    1.2c
+//    1.01 beta+3
+//    2013-12-31
+//    20220222 alpha
+function vertoarr($verstr) {
+  $subver = array(0,0,0,0);
+
+  // switch string to lcase for easier processing and trim any leading or trailing white spaces
+  $verstr = strtolower(trim($verstr));
+
+  // replace all '-' and '/' characters to '.' (uniformization of sub-version parts delimiters)
+  $verstr = strtr($verstr, '-/', '..');
+
+  // is there a subversion value? (for example "+4" in "1.05+4")
+  $i = strrpos($verstr, '+', 1);
+  if ($i !== false) {
+    // validate the svar-version is a proper integer
+    $svarver = substr($verstr, $i + 1);
+    if (! preg_match('/[1-9][0-9]*/', $svarver)) {
+      return(false);
+    }
+    $subver[3] = intval($svarver); // set the +rev as a very minor item
+    $verstr = substr($verstr, 0, $i);
+  }
+
+  // is the version ending with ' alpha', 'beta'?
+  if (preg_match('/ (alpha|beta)$/', $verstr)) {
+    $i = strrpos($verstr, ' ');
+    $greek = substr($verstr, $i + 1);
+    $verstr = trim(substr($verstr, 0, $i));
+    if ($greek == 'alpha') {
+      $subver[2] = 1;
+    } else if ($greek == 'beta') {
+      $subver[2] = 2;
+    } else {
+      return(false);
+    }
+  }
+
+  // does the version string have a single-letter subversion? (1.0c)
+  if (preg_match('/[a-z]$/', $verstr)) {
+    $subver[1] = ord(substr($verstr, -1));
+    $verstr = substr_replace($verstr, '', -1); // remove last character from string
+  }
+
+  // validate the format is supported, should be something no more complex than 1.05.3.33
+  if (! preg_match('/[0-9][0-9.]{0,20}/', $verstr)) {
+    return(false);
+  }
+
+  // NOTE: a zero right after a separator and trailed with a digit (as in 1.01)
+  //       has a special meaning
+  $exploded = explode('.', $verstr);
+  if (count($exploded) > 16) {
+    return(false);
+  }
+  $exploded[16] = $subver[0]; // unused yet
+  $exploded[17] = $subver[1]; // a-z (1.0c)
+  $exploded[18] = $subver[2]; // alpha/beta
+  $exploded[19] = $subver[3]; // svar-ver (1.0+5)
+  for ($i = 0; $i < 20; $i++) if (empty($exploded[$i])) $exploded[$i] = '0';
+
+  ksort($exploded);
+
+  return($exploded);
+}
+
+
+function dos_version_compare($v1, $v2) {
+  $v1arr = vertoarr($v1);
+  $v2arr = vertoarr($v2);
+  for ($i = 0; $i < count($v1arr); $i++) {
+    $r = strcmp($v1arr[$i], $v2arr[$i]);
+    if ($r != 0) return($r);
+  }
+  return(0);
 }
 
 
@@ -248,6 +332,9 @@ foreach ($pkgfiles as $fname) {
     echo "WARNING: {$fname} contains a file in an illegal location: {$f}\n";
   }
 
+  // do I understand the version string?
+  if (vertoarr($lsmarray['version']) === false) echo "WARNING: {$fname} parsing of version string failed ('{$lsmarray['version']}')\n";
+
   $meta['fname'] = $fname;
   $meta['desc'] = $lsmarray['description'];
   $meta['cats'] = array_unique($catlist);
@@ -266,7 +353,7 @@ $cats = array();
 foreach ($pkgdb as $pkg => $versions) {
 
   // sort filenames by version, highest first
-  uksort($versions, "version_compare");
+  uksort($versions, "dos_version_compare");
   $versions = array_reverse($versions, true);
 
   foreach ($versions as $ver => $meta) {
