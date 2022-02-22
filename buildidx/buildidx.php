@@ -33,7 +33,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220221";
+$PVER = "20220222";
 
 
 // computes the BSD sum of a file and returns it
@@ -92,31 +92,39 @@ function vertoarr($verstr) {
     $verstr = substr($verstr, 0, $i);
   }
 
-  // is the version ending with ' alpha', 'beta'?
-  if (preg_match('/ (alpha|beta)$/', $verstr)) {
+  // is the version ending with ' alpha', 'beta', etc?
+  if (preg_match('/ (alpha|beta|gamma|delta|pre|rc)( [0-9]{1,4}){0,1}$/', $verstr)) {
+    // if there is a trailing beta-number, process it first
+    if (preg_match('/ [0-9]{1,4}$/', $verstr)) {
+      $i = strrpos($verstr, ' ');
+      $subver[2] = intval(substr($verstr, $i + 1));
+      $verstr = trim(substr($verstr, 0, $i));
+    }
     $i = strrpos($verstr, ' ');
     $greek = substr($verstr, $i + 1);
     $verstr = trim(substr($verstr, 0, $i));
     if ($greek == 'alpha') {
-      $subver[2] = 1;
+      $subver[1] = 1;
     } else if ($greek == 'beta') {
-      $subver[2] = 2;
+      $subver[1] = 2;
     } else if ($greek == 'gamma') {
-      $subver[2] = 3;
+      $subver[1] = 3;
     } else if ($greek == 'delta') {
-      $subver[2] = 4;
+      $subver[1] = 4;
+    } else if ($greek == 'pre') {
+      $subver[1] = 5;
     } else if ($greek == 'rc') {
-      $subver[2] = 5;
+      $subver[1] = 6;
     } else {
       return(false);
     }
   } else {
-    $subver[2] = 99;
+    $subver[1] = 99;
   }
 
   // does the version string have a single-letter subversion? (1.0c)
   if (preg_match('/[a-z]$/', $verstr)) {
-    $subver[1] = ord(substr($verstr, -1));
+    $subver[0] = ord(substr($verstr, -1));
     $verstr = substr_replace($verstr, '', -1); // remove last character from string
   }
 
@@ -131,9 +139,9 @@ function vertoarr($verstr) {
   if (count($exploded) > 16) {
     return(false);
   }
-  $exploded[16] = $subver[0]; // unused yet
-  $exploded[17] = $subver[1]; // a-z (1.0c)
-  $exploded[18] = $subver[2]; // alpha/beta
+  $exploded[16] = $subver[0]; // a-z (1.0c)
+  $exploded[17] = $subver[1]; // alpha/beta/gamma/delta/rc/pre
+  $exploded[18] = $subver[2]; // alpha-beta-gamma subversion (eg. "beta 9")
   $exploded[19] = $subver[3]; // svar-ver (1.0+5)
   for ($i = 0; $i < 20; $i++) if (empty($exploded[$i])) $exploded[$i] = '0';
 
@@ -147,8 +155,8 @@ function dos_version_compare($v1, $v2) {
   $v1arr = vertoarr($v1);
   $v2arr = vertoarr($v2);
   for ($i = 0; $i < count($v1arr); $i++) {
-    $r = strcmp($v1arr[$i], $v2arr[$i]);
-    if ($r != 0) return($r);
+    if ($v1arr[$i] > $v2arr[$i]) return(1);
+    if ($v1arr[$i] < $v2arr[$i]) return(-1);
   }
   return(0);
 }
