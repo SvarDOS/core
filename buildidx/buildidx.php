@@ -130,11 +130,17 @@ function vertoarr($verstr) {
     $verstr = substr_replace($verstr, '', -1); // remove last character from string
   }
 
-  // convert "30-jan-99" and "30-jan-1999" versions to "30jan99" and "30jan1999"
-  if (preg_match('/^[0-3][0-9].(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec).([0-9][0-9]){1,2}$/', $verstr)) {
-    $dy = substr($verstr, 0, 2);
-    $mo = substr($verstr, 3, 3);
-    $ye = substr($verstr, 7);
+  // convert "30-jan-99", "1999-jan-30" and "30-jan-1999" versions to "30jan99" or "30jan1999"
+  // note that dashes have already been replaced by dots
+  if (preg_match('/^([0-9][0-9]){1,2}\.(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\.([0-9][0-9]){1,2}$/', $verstr)) {
+    $verstr = str_replace('.', '', $verstr);
+  }
+
+  // convert "2009mar17" versions to "17mar2009"
+  if (preg_match('/^[0-9]{4}(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[0-9]{2}$/', $verstr)) {
+    $dy = substr($verstr, 7);
+    $mo = substr($verstr, 4, 3);
+    $ye = substr($verstr, 0, 4);
     $verstr = "{$dy}{$mo}{$ye}";
   }
 
