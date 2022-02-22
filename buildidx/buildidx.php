@@ -131,15 +131,15 @@ function vertoarr($verstr) {
   }
 
   // convert "30-jan-99" and "30-jan-1999" versions to "30jan99" and "30jan1999"
-  if (preg_match('/^[0-3][0-9]-(jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)-([0-9][0-9]){1,2}$/', $verstr)) {
+  if (preg_match('/^[0-3][0-9].(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec).([0-9][0-9]){1,2}$/', $verstr)) {
     $dy = substr($verstr, 0, 2);
     $mo = substr($verstr, 3, 3);
     $ye = substr($verstr, 7);
-    $verstr = "{$ye}{$mo}{$dy}";
+    $verstr = "{$dy}{$mo}{$ye}";
   }
 
   // convert "30jan99" versions to 99.1.30 and "30jan1999" to 1999.1.30
-  if (preg_match('/^[0-3][0-9](jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)([0-9][0-9]){1,2}$/', $verstr)) {
+  if (preg_match('/^[0-3][0-9](jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)([0-9][0-9]){1,2}$/', $verstr)) {
     $months = array('jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4, 'may' => 5, 'jun' => 6, 'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12);
     $dy = substr($verstr, 0, 2);
     $mo = $months[substr($verstr, 2, 3)];
