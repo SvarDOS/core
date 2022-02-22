@@ -92,6 +92,14 @@ function vertoarr($verstr) {
     $verstr = substr($verstr, 0, $i);
   }
 
+  // any occurence of alpha,beta,gamma,delta etc preceded by a digit should have a space separator added
+  // example: "2.6.0pre9" becomes "2.6.0 pre9"
+  $verstr = preg_replace('/([0-9])(alpha|beta|gamma|delta|pre|rc|patch)/', '$1 $2', $verstr);
+
+  // same as above, but this time adding a trailing space separator
+  // example: "2.6.0 pre9" becomes "2.6.0 pre 9"
+  $verstr = preg_replace('/(alpha|beta|gamma|delta|pre|rc|patch)([0-9])/', '$1 $2', $verstr);
+
   // is the version ending with ' alpha', 'beta', etc?
   if (preg_match('/ (alpha|beta|gamma|delta|pre|rc|patch)( [0-9]{1,4}){0,1}$/', $verstr)) {
     // if there is a trailing beta-number, process it first
