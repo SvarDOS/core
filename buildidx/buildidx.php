@@ -93,7 +93,7 @@ function vertoarr($verstr) {
   }
 
   // is the version ending with ' alpha', 'beta', etc?
-  if (preg_match('/ (alpha|beta|gamma|delta|pre|rc)( [0-9]{1,4}){0,1}$/', $verstr)) {
+  if (preg_match('/ (alpha|beta|gamma|delta|pre|rc|patch)( [0-9]{1,4}){0,1}$/', $verstr)) {
     // if there is a trailing beta-number, process it first
     if (preg_match('/ [0-9]{1,4}$/', $verstr)) {
       $i = strrpos($verstr, ' ');
@@ -115,11 +115,13 @@ function vertoarr($verstr) {
       $subver[1] = 5;
     } else if ($greek == 'rc') {
       $subver[1] = 6;
+    } else if ($greek == 'patch') { // this is a POST-release version, as opposed to all above that are PRE-release versions
+      $subver[1] = 99;
     } else {
       return(false);
     }
   } else {
-    $subver[1] = 99;
+    $subver[1] = 98; // one less than the 'patch' level
   }
 
   // does the version string have a single-letter subversion? (1.0c)
