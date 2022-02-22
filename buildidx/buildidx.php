@@ -117,7 +117,7 @@ function vertoarr($verstr) {
   }
 
   // validate the format is supported, should be something no more complex than 1.05.3.33
-  if (! preg_match('/[0-9][0-9.]{0,20}/', $verstr)) {
+  if (! preg_match('/^[0-9][0-9.]{0,20}$/', $verstr)) {
     return(false);
   }
 
