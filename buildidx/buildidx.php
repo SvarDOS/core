@@ -92,6 +92,9 @@ function vertoarr($verstr) {
     $verstr = substr($verstr, 0, $i);
   }
 
+  // beta reordering: convert "beta 0.95" to "0.95 beta"
+  if (preg_match('/^beta /', $verstr)) $verstr = substr($verstr, 5) . ' beta';
+
   // any occurence of alpha,beta,gamma,delta etc preceded by a digit should have a space separator added
   // example: "2.6.0pre9" becomes "2.6.0 pre9"
   $verstr = preg_replace('/([0-9])(alpha|beta|gamma|delta|pre|rc|patch)/', '$1 $2', $verstr);
