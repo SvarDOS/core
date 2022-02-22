@@ -101,8 +101,12 @@ function vertoarr($verstr) {
       $subver[2] = 1;
     } else if ($greek == 'beta') {
       $subver[2] = 2;
-    } else if ($greek == 'rc') {
+    } else if ($greek == 'gamma') {
       $subver[2] = 3;
+    } else if ($greek == 'delta') {
+      $subver[2] = 4;
+    } else if ($greek == 'rc') {
+      $subver[2] = 5;
     } else {
       return(false);
     }
