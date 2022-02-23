@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  23 feb 2022: basic validation of source archives (not empty + matches an existing svp file)
   21 feb 2022: buildidx collects categories looking at the dir layout of each package + improved version string parsing (replaced version_compare call by dos_version_compare)
   17 feb 2022: checking for non-8+3 filenames in packages and duplicates + devload no longer part of CORE
   16 feb 2022: added warning about overlong version strings and wild files location
@@ -33,7 +34,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220222";
+$PVER = "20220223";
 
 
 // computes the BSD sum of a file and returns it
@@ -286,7 +287,25 @@ $msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice command co
 
 $pkgdb = array();
 foreach ($pkgfiles as $fname) {
-  if (!preg_match('/\.svp$/i', $fname)) continue; // skip non-svp files
+
+  // zip files (ie. source archives)
+  if (preg_match('/\.zip$/', $fname)) {
+    // the zip archive should contain at least one file
+    if (count(read_list_of_files_in_zip($repodir . '/' . $fname)) < 1) echo "WARNING: source archive {$fname} contains no files (either empty or corrupted)\n";
+    // check that the file relates to an existing svp package
+    $svpfname = preg_replace('/zip$/', 'svp', $fname);
+    if (!file_exists($repodir . '/' . $svpfname)) echo "ERROR: orphaned source archive '{$fname}' (no matching svp file, expecting a package named '{$svpfname}')\n";
+    // that is for zip files
+    continue;
+  }
+
+  // skip (and warn about) non-svp
+  if (!preg_match('/\.svp$/', $fname)) {
+    $okfiles = array('.', '..', '_cats.json', '_index.json', 'core');
+    if (array_search($fname, $okfiles) !== false) continue;
+    echo "WARNING: wild file '{$fname} (this is either an useless file that should be removed, or a misnamed package or source archive)'\n";
+    continue;
+  }
 
   if (!preg_match('/^[a-zA-Z0-9+. _-]*\.svp$/', $fname)) {
     echo "ERROR: {$fname} has a very weird name\n";
