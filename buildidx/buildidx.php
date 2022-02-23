@@ -301,7 +301,7 @@ foreach ($pkgfiles as $fname) {
 
   // skip (and warn about) non-svp
   if (!preg_match('/\.svp$/', $fname)) {
-    $okfiles = array('.', '..', '_cats.json', '_index.json', 'core');
+    $okfiles = array('.', '..', '_cats.json', '_index.json', '_buildidx.log', 'core');
     if (array_search($fname, $okfiles) !== false) continue;
     echo "WARNING: wild file '{$fname} (this is either an useless file that should be removed, or a misnamed package or source archive)'\n";
     continue;
