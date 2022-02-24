@@ -34,6 +34,7 @@ SvarCOM implements the following internal commands. For help on each command,
 run it with a "/?" argument.
 
 BREAK       - sets or clears extended CTRL+C checking
+CALL        - calls a batch file from within another batch file
 CD/CHDIR    - displays the name of or changes the current directory
 CHCP        - displays or sets the active code page number
 CLS         - clears the screen
@@ -43,6 +44,7 @@ DEL/ERASE   - deletes one or more files
 DIR         - displays a list of files and subdirectories in a directory
 ECHO        - displays messages, or turns command-echoing on or off
 EXIT        - quits the command.com program (command interpreter)
+GOTO        - directs batch processing to a labelled line in the batch program
 IF          - performs conditional processing in batch programs
 LN          - adds, deletes and displays global executable links
 MD/MKDIR    - creates a directory
