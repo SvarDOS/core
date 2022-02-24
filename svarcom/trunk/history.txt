@@ -3,6 +3,11 @@
                     === SvarCOM's history / changelog ===
 
 
+=== ver 2022.1 (xx.xx.xxxx) ==================================================
+
+ - added CALL support for calling batch files from within batch files
+
+
 === ver 2022.0 (01.02.2022) ==================================================
 
  - added "global executable links" support (new command: LN)

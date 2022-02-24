@@ -315,7 +315,11 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
 }
 
 
-static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir, unsigned char delete_stdin_file) {
+/* a few internal flags */
+#define DELETE_STDIN_FILE 1
+#define CALL_FLAG         2
+
+static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir, unsigned char flags) {
   char *cmdfile = buff + 512;
   const char far *pathptr;
   int lookup;
@@ -430,31 +434,39 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
 
   /* special handling of batch files */
   if ((ext != NULL) && (imatch(ext, "bat"))) {
-    /* free the bat-context linked list, if present, and replace it with a new entry */
-    while (rmod->bat != NULL) {
-      struct batctx far *victim = rmod->bat;
-      rmod->bat = rmod->bat->parent;
-      rmod_ffree(victim);
-    }
-    rmod->bat = rmod_fmalloc(sizeof(struct batctx), rmod->rmodseg, "SVBATCTX");
+    struct batctx far *newbat;
+
+    /* remember the echo flag (in case bat file disables echo, only when starting first bat) */
     if (rmod->bat == NULL) {
-      outputnl("INTERNAL ERR: OUT OF MEMORY");
+      rmod->flags &= ~FLAG_ECHO_BEFORE_BAT;
+      if (rmod->flags & FLAG_ECHOFLAG) rmod->flags |= FLAG_ECHO_BEFORE_BAT;
+    }
+
+    /* if bat is not called via a CALL, then free the bat-context linked list */
+    if ((flags & CALL_FLAG) == 0) {
+      while (rmod->bat != NULL) {
+        struct batctx far *victim = rmod->bat;
+        rmod->bat = rmod->bat->parent;
+        rmod_ffree(victim);
+      }
+    }
+    /* allocate a new bat context */
+    newbat = rmod_fcalloc(sizeof(struct batctx), rmod->rmodseg, "SVBATCTX");
+    if (newbat == NULL) {
+      nls_outputnl_doserr(8); /* insufficient memory */
       return;
     }
-    _fmemset(rmod->bat, 0, sizeof(struct batctx));
 
-    /* copy truename of the bat file to rmod buff */
-    _fstrcpy(rmod->bat->fname, cmdfile);
-
+    /* fill the newly allocated batctx structure */
+    _fstrcpy(newbat->fname, cmdfile); /* truename of the BAT file */
     /* explode args of the bat file and store them in rmod buff */
     cmd_explode(buff, cmdline, NULL);
-    _fmemcpy(rmod->bat->argv, buff, sizeof(rmod->bat->argv));
+    _fmemcpy(newbat->argv, buff, sizeof(newbat->argv));
 
-    /* reset the 'next line to execute' counter */
-    rmod->bat->nextline = 0;
-    /* remember the echo flag (in case bat file disables echo) */
-    rmod->flags &= ~FLAG_ECHO_BEFORE_BAT;
-    if (rmod->flags & FLAG_ECHOFLAG) rmod->flags |= FLAG_ECHO_BEFORE_BAT;
+    /* push the new bat to the top of rmod's linked list */
+    newbat->parent = rmod->bat;
+    rmod->bat = newbat;
+
     return;
   }
 
@@ -466,7 +478,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDINFILE);
     char far *delstdin = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDIN_DEL);
     _fstrcpy(farptr, redir->stdinfile);
-    if (delete_stdin_file) {
+    if (flags & DELETE_STDIN_FILE) {
       *delstdin = redir->stdinfile[0];
     } else {
       *delstdin = 0;
@@ -744,6 +756,7 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
 }
 
 
+
 int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
@@ -754,7 +767,7 @@ int main(void) {
   static struct redir_data redirprops;
   static enum cmd_result cmdres;
   static unsigned short i; /* general-purpose variable for short-lived things */
-  static unsigned char delete_stdin_file;
+  static unsigned char flags;
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
@@ -828,10 +841,10 @@ int main(void) {
     if (rmod->awaitingcmd[0] != 0) {
       _fstrcpy(cmdline, rmod->awaitingcmd);
       rmod->awaitingcmd[0] = 0;
-      delete_stdin_file = 1;
+      flags |= DELETE_STDIN_FILE;
       goto EXEC_CMDLINE;
     } else {
-      delete_stdin_file = 0;
+      flags &= ~DELETE_STDIN_FILE;
     }
 
     /* skip user input if I have a command to exec (/C or /K) */
@@ -847,7 +860,7 @@ int main(void) {
         struct batctx far *victim = rmod->bat;
         rmod->bat = rmod->bat->parent;
         rmod_ffree(victim);
-        /* end of batch? then restore echo flag as it was before running the bat file */
+        /* end of batch? then restore echo flag as it was before running the (first) bat file */
         if (rmod->bat == NULL) {
           rmod->flags &= ~FLAG_ECHOFLAG;
           if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
@@ -898,16 +911,22 @@ int main(void) {
     }
 
     /* try matching (and executing) an internal command */
-    cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops, delete_stdin_file);
+    cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops, flags & DELETE_STDIN_FILE);
     if ((cmdres == CMD_OK) || (cmdres == CMD_FAIL)) {
       /* internal command executed */
       continue;
     } else if (cmdres == CMD_CHANGED) { /* cmdline changed, needs to be reprocessed */
       goto EXEC_CMDLINE;
+    } else if (cmdres == CMD_CHANGED_BY_CALL) { /* cmdline changed *specifically* by CALL */
+      /* the distinction is important since it changes the way batch files are processed */
+      flags |= CALL_FLAG;
+      goto EXEC_CMDLINE;
     } else if (cmdres == CMD_NOTFOUND) {
       /* this was not an internal command, try matching an external command */
-      run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops, delete_stdin_file);
-      /* perhaps this is a newly launched BAT file */
+      run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops, flags);
+      flags &= ~CALL_FLAG; /* reset callflag to make sure it is processed only once */
+
+      /* is it a newly launched BAT file? */
       if ((rmod->bat != NULL) && (rmod->bat->nextline == 0)) goto SKIP_NEWLINE;
       /* run_as_external() does not return on success, if I am still alive then
        * external command failed to execute */

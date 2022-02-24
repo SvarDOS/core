@@ -68,8 +68,13 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 struct rmod_props far *rmod_find(unsigned short rmodcore_len);
 void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
 
-/* allocate */
-void far *rmod_fmalloc(unsigned short bytes, unsigned short rmod_seg, char *ident);
+/* allocates bytes of far memory, flags it as belonging to rmod
+ * the new block can be optionally flagged as 'ident' (if not null) and zero
+ * out the newly allocated memory.
+ * returns a far ptr to the allocated block, or NULL on error */
+void far *rmod_fcalloc(unsigned short bytes, unsigned short rmod_seg, char *ident);
+
+/* free memory previously allocated by rmod_fcalloc() */
 void rmod_ffree(void far *ptr);
 
 #endif

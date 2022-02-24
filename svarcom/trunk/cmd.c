@@ -22,10 +22,15 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/* entry point for internal commands
- * matches internal commands and executes them
- * returns -1 or exit code if processed
- * returns -2 if command unrecognized
+/* entry point for internal commands, it matches internal commands and
+ * executes them.
+ *
+ * returns one of the following values:
+ *   CMD_OK               command executed successfully
+ *   CMD_FAIL             command ended in error
+ *   CMD_CHANGED          command-line has been modified (used by IF)
+ *   CMD_CHANGED_BY_CALL  command-line has been modified by CALL
+ *   CMD_NOTFOUND         command unrecognized
  */
 
 #include <i86.h>
@@ -65,6 +70,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 
 #include "cmd/_notimpl.c"
 #include "cmd/break.c"
+#include "cmd/call.c"
 #include "cmd/cd.c"
 #include "cmd/chcp.c"
 #include "cmd/cls.c"
@@ -99,6 +105,7 @@ struct CMD_ID {
 
 const struct CMD_ID INTERNAL_CMDS[] = {
   {"BREAK",   cmd_break},
+  {"CALL",    cmd_call},
   {"CD",      cmd_cd},
   {"CHCP",    cmd_chcp},
   {"CHDIR",   cmd_cd},

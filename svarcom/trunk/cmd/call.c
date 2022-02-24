@@ -22,29 +22,28 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMD_H
-#define CMD_H
+/*
+ * calls one batch program from another.
+ *
+ * CALL [drive:][path]filename [batch-parameters]
+ *
+ * batch-parameters    Specifies any command-line information required by the
+ *                     batch program.
+ */
 
-#include "rmodinit.h"
+static enum cmd_result cmd_call(struct cmd_funcparam *p) {
+  if (cmd_ishlp(p)) {
+    outputnl("Calls one batch program from another");
+    outputnl("");
+    outputnl("CALL [drive:][path]filename [batch-parameters]");
+    return(CMD_OK);
+  }
 
-/* what cmd_process may return */
-enum cmd_result {
-  CMD_OK,             /* command executed and succeeded */
-  CMD_FAIL,           /* command executed and failed */
-  CMD_NOTFOUND,       /* no such command (not an internal command) */
-  CMD_CHANGED,        /* command-line transformed, please reparse it */
-  CMD_CHANGED_BY_CALL /* command-line transformed by CALL */
-};
+  /* no argument? do nothing */
+  if (p->argc == 0) return(CMD_OK);
 
-/* process internal commands */
-enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *r, unsigned char delstdin);
+  /* change the command by moving batch filename and arguments to the start of the string */
+  memmove((void *)(p->cmdline), p->cmdline + p->argoffset, strlen(p->cmdline + p->argoffset) + 1);
 
-/* explodes a command into an array of arguments where last arg is NULL.
- * if argvlist is not NULL, it will be filled with pointers that point to buff
- * locations. buff is filled with all the arguments, each argument being
- * zero-separated. buff is terminated with an empty argument to mark the end
- * of arguments.
- * returns number of args */
-unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist);
-
-#endif
+  return(CMD_CHANGED_BY_CALL); /* notify callee that command needs to be reevaluated */
+}

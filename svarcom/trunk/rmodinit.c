@@ -228,9 +228,10 @@ void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg) {
 
 
 /* allocates bytes of far memory, flags it as belonging to rmod
- * the new block can be optionally flagged as 'ident' (if not null)
+ * the new block can be optionally flagged as 'ident' (if not null) and zero
+ * out the newly allocated memory.
  * returns a far ptr to the allocated block, or NULL on error */
-void far *rmod_fmalloc(unsigned short bytes, unsigned short rmod_seg, char *ident) {
+void far *rmod_fcalloc(unsigned short bytes, unsigned short rmod_seg, char *ident) {
   unsigned short far *owner;
   unsigned short newseg = 0;
 
@@ -289,11 +290,14 @@ void far *rmod_fmalloc(unsigned short bytes, unsigned short rmod_seg, char *iden
     }
   }
 
+  /* zero out the memory before handing it out */
+  _fmemset(MK_FP(newseg, 0), 0, bytes);
+
   return(MK_FP(newseg, 0));
 }
 
 
-/* free memory previously allocated by rmod_ffmalloc() */
+/* free memory previously allocated by rmod_fcalloc() */
 void rmod_ffree(void far *ptr) {
   unsigned short ptrseg;
   unsigned short myseg = 0;
