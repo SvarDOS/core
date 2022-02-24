@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,6 @@
 
 /*
  * a variety of helper functions
- * Copyright (C) 2021 Mateusz Viste
  */
 
 #include <i86.h>    /* MK_FP() */
@@ -130,10 +129,12 @@ void nls_output_internal(unsigned short id, unsigned char nl, unsigned char hand
 }
 
 
-/* output DOS error e to stderr */
+/* output DOS error e to stdout, if stdout is redirected then *additionally*
+ * also to stderr */
 void nls_outputnl_doserr(unsigned short e) {
   static char errstr[16];
   const char *ptr = NULL;
+  unsigned char redirflag = 0;
   /* find string in nls block */
   if (e < 0xff) ptr = nlsblock_findstr(0xff00 | e);
   /* if not found, use a fallback */
@@ -141,8 +142,31 @@ void nls_outputnl_doserr(unsigned short e) {
     sprintf(errstr, "DOS ERR %u", e);
     ptr = errstr;
   }
-  /* display */
-  output_internal(ptr, 1, hSTDERR);
+
+  /* display to stdout */
+  output_internal(ptr, 1, hSTDOUT);
+
+  /* is stdout redirected? */
+  _asm {
+    push bx
+    push dx
+
+    mov ax, 0x4400   /* query device flags */
+    mov bx, 1        /* stdout */
+    int 0x21
+    /* CF set on error and AX filled with DOS error,
+     * returns flags in DX on succes:
+     *  bit 7 reset if handle points to a file, set if handle points to a device  */
+    jc FAIL
+    mov redirflag, dl
+    and redirflag, 128
+
+    FAIL:
+    pop dx
+    pop bx
+  }
+
+  if (redirflag == 0) output_internal(ptr, 1, hSTDERR);
 }
 
 
