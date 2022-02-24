@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  24 feb 2022: added hardcoded hack to translate version 'x.xx' to '0.44' (NESticle)
   23 feb 2022: basic validation of source archives (not empty + matches an existing svp file)
   21 feb 2022: buildidx collects categories looking at the dir layout of each package + improved version string parsing (replaced version_compare call by dos_version_compare)
   17 feb 2022: checking for non-8+3 filenames in packages and duplicates + devload no longer part of CORE
@@ -34,7 +35,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220223";
+$PVER = "20220224";
 
 
 // computes the BSD sum of a file and returns it
@@ -92,6 +93,10 @@ function vertoarr($verstr) {
     $subver[3] = intval($svarver); // set the +rev as a very minor item
     $verstr = substr($verstr, 0, $i);
   }
+
+  // NESticls hack: version "x.xx" is translated to "0.44"... that sucks but that's how it is.
+  // ref: https://web.archive.org/web/20070205074631/http://www.zophar.net/NESticle/
+  if ($verstr == 'x.xx') $verstr = '0.44';
 
   // beta reordering: convert "beta 0.95" to "0.95 beta"
   if (preg_match('/^beta /', $verstr)) $verstr = substr($verstr, 5) . ' beta';
