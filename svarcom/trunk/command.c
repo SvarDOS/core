@@ -871,6 +871,8 @@ int main(void) {
       batpercrepl(cmdline, CMDLINE_MAXLEN, BUFFER, rmod, *rmod_envseg);
       /* skip any leading spaces */
       while (*cmdline == ' ') cmdline++;
+      /* skip batch labels */
+      if (*cmdline == ':') continue;
       /* output prompt and command on screen if echo on and command is not
        * inhibiting it with the @ prefix */
       if ((rmod->flags & FLAG_ECHOFLAG) && (cmdline[0] != '@')) {
