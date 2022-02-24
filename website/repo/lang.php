@@ -34,8 +34,8 @@ $MSG['PKG_NOT_FOUND']['en'] = 'ERROR: package not found on server';
 $MSG['PKG_NOT_FOUND']['de'] = 'FEHLER: Paket nicht auf dem Server gefunden';
 $MSG['PKG_NOT_FOUND']['pl'] = 'BŁĄD: Nie znaleziono pakietu na serwerze';
 
-$MSG['PKG_NO_SRC']['en'] = 'ERROR: no sources are available for this package ';
-$MSG['PKG_NO_SRC']['de'] = 'KAPUTT: nicht Quellekode gegenwart fur das Paket';
+$MSG['PKG_NO_SRC']['en'] = 'ERROR: no sources available for this package';
+$MSG['PKG_NO_SRC']['de'] = 'FEHLER: keine Quelltexte verfügbar für dieses Paket';
 $MSG['PKG_NO_SRC']['pl'] = 'BŁĄD: brak źródeł dla tego pakietu';
 
 $MSG['VER']['en'] = 'ver:';
