@@ -430,15 +430,28 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
 
   /* special handling of batch files */
   if ((ext != NULL) && (imatch(ext, "bat"))) {
+    /* free the bat-context linked list, if present, and replace it with a new entry */
+    while (rmod->bat != NULL) {
+      struct batctx far *victim = rmod->bat;
+      rmod->bat = rmod->bat->parent;
+      rmod_ffree(victim);
+    }
+    rmod->bat = rmod_fmalloc(sizeof(struct batctx), rmod->rmodseg, "SVBATCTX");
+    if (rmod->bat == NULL) {
+      outputnl("INTERNAL ERR: OUT OF MEMORY");
+      return;
+    }
+    _fmemset(rmod->bat, 0, sizeof(struct batctx));
+
     /* copy truename of the bat file to rmod buff */
-    _fstrcpy(rmod->batfile, cmdfile);
+    _fstrcpy(rmod->bat->fname, cmdfile);
 
     /* explode args of the bat file and store them in rmod buff */
     cmd_explode(buff, cmdline, NULL);
-    _fmemcpy(rmod->batargv, buff, sizeof(rmod->batargv));
+    _fmemcpy(rmod->bat->argv, buff, sizeof(rmod->bat->argv));
 
     /* reset the 'next line to execute' counter */
-    rmod->batnextline = 0;
+    rmod->bat->nextline = 0;
     /* remember the echo flag (in case bat file disables echo) */
     rmod->flags &= ~FLAG_ECHO_BEFORE_BAT;
     if (rmod->flags & FLAG_ECHOFLAG) rmod->flags |= FLAG_ECHO_BEFORE_BAT;
@@ -568,10 +581,10 @@ static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
  * increments rmod counter and returns 0 on success. */
 static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far *rmod) {
   unsigned short i;
-  unsigned short batname_seg = FP_SEG(rmod->batfile);
-  unsigned short batname_off = FP_OFF(rmod->batfile);
-  unsigned short filepos_cx = rmod->batnextline >> 16;
-  unsigned short filepos_dx = rmod->batnextline & 0xffff;
+  unsigned short batname_seg = FP_SEG(rmod->bat->fname);
+  unsigned short batname_off = FP_OFF(rmod->bat->fname);
+  unsigned short filepos_cx = rmod->bat->nextline >> 16;
+  unsigned short filepos_dx = rmod->bat->nextline & 0xffff;
   unsigned char blen = 0;
   unsigned short errv = 0;
 
@@ -640,18 +653,18 @@ static int getbatcmd(char *buff, unsigned char buffmaxlen, struct rmod_props far
    * I support all CR/LF, CR- and LF-terminated batch files */
   for (i = 0; i < blen; i++) {
     if ((buff[i] == '\r') || (buff[i] == '\n')) {
-      if ((buff[i] == '\r') && ((i+1) < blen) && (buff[i+1] == '\n')) rmod->batnextline += 1;
+      if ((buff[i] == '\r') && ((i+1) < blen) && (buff[i+1] == '\n')) rmod->bat->nextline += 1;
       break;
     }
   }
   buff[i] = 0;
-  rmod->batnextline += i + 1;
+  rmod->bat->nextline += i + 1;
 
   return(0);
 
   OOPS:
-  rmod->batfile[0] = 0;
-  rmod->batnextline = 0;
+  rmod->bat->fname[0] = 0;
+  rmod->bat->nextline = 0;
   return(-1);
 }
 
@@ -702,7 +715,8 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
     if ((line[1] >= '0') && (line[1] <= '9')) {
       unsigned short argid = line[1] - '0';
       unsigned short i;
-      const char far *argv = rmod->batargv;
+      const char far *argv = "";
+      if ((rmod != NULL) && (rmod->bat != NULL)) argv = rmod->bat->argv;
 
       /* locate the proper arg */
       for (i = 0; i != argid; i++) {
@@ -797,7 +811,7 @@ int main(void) {
 
   do {
     /* terminate previous command with a CR/LF if ECHO ON (but not during BAT processing) */
-    if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->batfile[0] == 0)) outputnl("");
+    if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->bat == NULL)) outputnl("");
 
     SKIP_NEWLINE:
 
@@ -828,11 +842,16 @@ int main(void) {
     }
 
     /* if batch file is being executed -> fetch next line */
-    if (rmod->batfile[0] != 0) {
+    if (rmod->bat != NULL) {
       if (getbatcmd(BUFFER, CMDLINE_MAXLEN, rmod) != 0) { /* end of batch */
-        /* restore echo flag as it was before running the bat file */
-        rmod->flags &= ~FLAG_ECHOFLAG;
-        if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
+        struct batctx far *victim = rmod->bat;
+        rmod->bat = rmod->bat->parent;
+        rmod_ffree(victim);
+        /* end of batch? then restore echo flag as it was before running the bat file */
+        if (rmod->bat == NULL) {
+          rmod->flags &= ~FLAG_ECHOFLAG;
+          if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
+        }
         continue;
       }
       /* %-decoding of variables (%PATH%, %1, %%...), result in cmdline */
@@ -889,7 +908,7 @@ int main(void) {
       /* this was not an internal command, try matching an external command */
       run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops, delete_stdin_file);
       /* perhaps this is a newly launched BAT file */
-      if ((rmod->batfile[0] != 0) && (rmod->batnextline == 0)) goto SKIP_NEWLINE;
+      if ((rmod->bat != NULL) && (rmod->bat->nextline == 0)) goto SKIP_NEWLINE;
       /* run_as_external() does not return on success, if I am still alive then
        * external command failed to execute */
       outputnl("Bad command or file name");

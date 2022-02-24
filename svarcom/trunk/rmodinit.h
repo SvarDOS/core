@@ -31,6 +31,15 @@
 #define FLAG_ECHO_BEFORE_BAT  8
 #define FLAG_SKIP_AUTOEXEC   16
 
+/* batch context structure used to track what batch file is being executed,
+ * at what line, arguments, whether or not it has a parent batch... */
+struct batctx {
+  char fname[130];            /* truename of batch file being processed */
+  char argv[130];             /* args of the batch call (0-separated) */
+  unsigned long nextline;     /* offset in file of next bat line to process */
+  struct batctx far *parent;  /* parent context if this batch was CALLed */
+};
+
 struct rmod_props {
   char inputbuf[130];         /* input buffer for INT 21, AH=0x0A */
   unsigned short rmodseg;     /* segment where rmod is loaded */
@@ -38,10 +47,8 @@ struct rmod_props {
   unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
   unsigned char version;      /* used to detect mismatch between rmod and SvarCOM */
-  char batfile[130];          /* truename of batch file being processed */
-  char batargv[130];          /* args of the batch call (0-separated) */
-  unsigned long batnextline;  /* offset in file of next bat line to process */
   char awaitingcmd[130];      /* command to exec next time (if any) */
+  struct batctx far *bat;
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
@@ -60,5 +67,9 @@ struct rmod_props {
 struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len);
 struct rmod_props far *rmod_find(unsigned short rmodcore_len);
 void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
+
+/* allocate */
+void far *rmod_fmalloc(unsigned short bytes, unsigned short rmod_seg, char *ident);
+void rmod_ffree(void far *ptr);
 
 #endif

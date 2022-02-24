@@ -27,7 +27,7 @@
  */
 
 static enum cmd_result cmd_shift(struct cmd_funcparam *p) {
-  char far *batargv = p->rmod->batargv;
+  char far *batargv;
   char far *nextarg;
 
   if (cmd_ishlp(p)) {
@@ -39,14 +39,15 @@ static enum cmd_result cmd_shift(struct cmd_funcparam *p) {
   }
 
   /* abort if batargv is empty */
-  if (*batargv == 0) return(CMD_OK);
+  if ((p->rmod->bat == NULL) || (p->rmod->bat->argv[0] == 0)) return(CMD_OK);
+  batargv = p->rmod->bat->argv;
 
   /* find the next argument in batargv */
   for (nextarg = batargv + 1; *nextarg != 0; nextarg++);
   nextarg++; /* move ptr past the zero terminator */
 
   /* move down batargv so 2nd argument is at the head now */
-  _fmemmove(batargv, nextarg, sizeof(p->rmod->batargv) - (nextarg - batargv));
+  _fmemmove(batargv, nextarg, sizeof(p->rmod->bat->argv) - (nextarg - batargv));
 
   return(CMD_OK);
 }

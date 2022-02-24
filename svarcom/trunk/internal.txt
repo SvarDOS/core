@@ -32,10 +32,16 @@ SVARCOM.LNG is unavailable.
 When SvarCOM executes a command, it checks first if it has a *.BAT extension.
 If so, it switches into 'batch-processing' mode:
 
- - Writes the batch filename into its persistent (rmod-owned) buffer, along
+ - allocates a "batch context" structure and attach it to rmod
+ - writes the batch filename into the batch context (rmod-owned) memory, along
    with a counter that holds the offset of the next line to be executed.
+ - a batch context has a "parent" pointer that may point to another batch
+   context (owned by a different batch instance), it is, in essence, a linked
+   list that allows batch files to call one another (typicall through the CALL
+   command) allowing SvarCOM to get back to the parent batch once the child
+   terminates.
 
-When the batch filename buffer is non-empty, SvarCOM does not ask the user for
+When the rmod batch context pointer non-NULL, SvarCOM does not ask the user for
 a command. Instead, it opens the batch file, jumps to the "next line to be
 executed" and loads the command from there, incrementing the line counter in
 the process.

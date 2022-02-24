@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -223,5 +223,99 @@ void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg) {
     *comspecptr = FP_OFF(comspecfp);
   } else {
     *comspecptr = 0;
+  }
+}
+
+
+/* allocates bytes of far memory, flags it as belonging to rmod
+ * the new block can be optionally flagged as 'ident' (if not null)
+ * returns a far ptr to the allocated block, or NULL on error */
+void far *rmod_fmalloc(unsigned short bytes, unsigned short rmod_seg, char *ident) {
+  unsigned short far *owner;
+  unsigned short newseg = 0;
+
+  /* ask DOS for a memory block (as high as possible) */
+  _asm {
+    push bx /* save initial value in BX so I can restore it later */
+
+    /* get current allocation strategy and save it on stack */
+    mov ax, 0x5800
+    int 0x21
+    push ax
+
+    /* set strategy to 'last fit, try high then low memory' */
+    mov ax, 0x5801
+    mov bx, 0x0082
+    int 0x21
+
+    /* ask for a memory block and save the given segment to rmodseg */
+    mov ah, 0x48  /* Allocate Memory */
+    mov bx, bytes
+    add bx, 15    /* convert bytes to paragraphs */
+    shr bx, 1     /* bx /= 16 */
+    shr bx, 1
+    shr bx, 1
+    shr bx, 1
+    int 0x21
+
+    /* error handling */
+    jc FAIL
+
+    /* save newly allocated segment to newseg */
+    mov newseg, ax
+
+    FAIL:
+    /* restore initial allocation strategy */
+    mov ax, 0x5801
+    pop bx
+    int 0x21
+
+    pop bx /* restore BX to its initial value */
+  }
+
+  if (newseg == 0) return(NULL);
+
+  /* mark memory as "owned by rmod" */
+  owner = (void far *)(MK_FP(newseg - 1, 1));
+  *owner = rmod_seg;
+
+  /* set the MCB description to ident, if provided */
+  if (ident) {
+    char far *mcbdesc = MK_FP(newseg - 1, 8);
+    int i;
+    _fmemset(mcbdesc, 0, 8);
+    for (i = 0; (i < 8) && (ident[i] != 0); i++) { /* field's length is limited to 8 bytes max */
+      mcbdesc[i] = ident[i];
+    }
+  }
+
+  return(MK_FP(newseg, 0));
+}
+
+
+/* free memory previously allocated by rmod_ffmalloc() */
+void rmod_ffree(void far *ptr) {
+  unsigned short ptrseg;
+  unsigned short myseg = 0;
+  unsigned short far *owner;
+  if (ptr == NULL) return;
+  ptrseg = FP_SEG(ptr);
+
+  /* get my own segment */
+  _asm {
+    mov myseg, cs
+  }
+
+  /* mark memory in MCB as my own, otherwise DOS might refuse to free it */
+  owner = MK_FP(ptrseg - 1, 1);
+  *owner = myseg;
+
+  /* free the memory block */
+  _asm {
+    push es
+    mov ah, 0x49  /* Free Memory Block */
+    mov es, ptrseg
+    int 0x21
+    pop es
   }
 }
