@@ -6,6 +6,7 @@
 === ver 2022.1 (xx.xx.xxxx) ==================================================
 
  - added CALL support for calling batch files from within batch files
+ - fixed batch processing with /C (was executing only first command)
 
 
 === ver 2022.0 (01.02.2022) ==================================================

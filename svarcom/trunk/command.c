@@ -937,7 +937,9 @@ int main(void) {
     /* I should never ever land here */
     outputnl("INTERNAL ERR: INVALID CMDRES");
 
-  } while ((rmod->flags & FLAG_EXEC_AND_QUIT) == 0);
+    /* repeat unless /C was asked - but always finish running an ongoing batch
+     * file (otherwise only first BAT command would be executed with /C) */
+  } while (((rmod->flags & FLAG_EXEC_AND_QUIT) == 0) || (rmod->bat != NULL));
 
   sayonara(rmod);
   return(0);
