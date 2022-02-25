@@ -30,14 +30,12 @@
 #include <stdio.h>  /* sprintf() */
 #include <string.h> /* memcpy() */
 
+#include "svarlang.lib\svarlang.h"
+
 #include "env.h"
 
 #include "helpers.h"
 
-
-/* supplied through DEFLANG.C */
-extern char svarlang_mem[];
-extern const unsigned short svarlang_memsz;
 
 
 /* case-insensitive comparison of strings, compares up to maxlen characters.
@@ -110,22 +108,9 @@ void output_internal(const char *s, unsigned char nl, unsigned char handle) {
 }
 
 
-static const char *nlsblock_findstr(unsigned short id) {
-  const char *ptr = svarlang_mem;
-  /* find the string id in langblock memory */
-  for (;;) {
-    if (((unsigned short *)ptr)[0] == id) {
-      return(ptr + 4);
-    }
-    if (ptr[2] == 0) return(NULL);
-    ptr += ((unsigned short *)ptr)[1] + 4;
-  }
-}
-
-
 void nls_output_internal(unsigned short id, unsigned char nl, unsigned char handle) {
   const char *NOTFOUND = "NLS_STRING_NOT_FOUND";
-  const char *ptr = nlsblock_findstr(id);
+  const char *ptr = svarlang_strid(id);
   if (ptr == NULL) ptr = NOTFOUND;
   output_internal(ptr, nl, handle);
 }
@@ -138,7 +123,7 @@ void nls_outputnl_doserr(unsigned short e) {
   const char *ptr = NULL;
   unsigned char redirflag = 0;
   /* find string in nls block */
-  if (e < 0xff) ptr = nlsblock_findstr(0xff00 | e);
+  if (e < 0xff) ptr = svarlang_strid(0xff00 | e);
   /* if not found, use a fallback */
   if (ptr == NULL) {
     sprintf(errstr, "DOS ERR %u", e);
@@ -630,149 +615,26 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 
 /* reload nls ressources from svarcom.lng into svarlang_mem */
 void nls_langreload(char *buff, unsigned short env) {
-  unsigned short i;
   const char far *nlspath;
-  char *langblockptr = svarlang_mem;
-  unsigned short lang;
-  unsigned short errcode = 0;
+  const char far *lang;
   static unsigned short lastlang;
 
   /* look up the LANG env variable, upcase it and copy to lang */
-  nlspath = env_lookup_val(env, "LANG");
-  if ((nlspath == NULL) || (nlspath[0] == 0)) return;
-  buff[0] = nlspath[0] & 0xDF;
-  buff[1] = nlspath[1] & 0xDF;
+  lang = env_lookup_val(env, "LANG");
+  if ((lang == NULL) || (lang[0] == 0)) return;
+  _fmemcpy(buff, lang, 2);
   buff[2] = 0;
 
-  memcpy(&lang, buff, 2);
-
   /* check if there is need to reload at all */
-  if (lastlang == lang) return;
+  if (memcmp(&lastlang, buff, 2) == 0) return;
 
-  /* printf("NLS RELOAD (curlang=%04X ; toload=%04X\r\n", lastlang, lang); */
-
+  buff[4] = 0;
   nlspath = env_lookup_val(env, "NLSPATH");
-  if ((nlspath == NULL) || (nlspath[0] == 0)) return;
+  if (nlspath != NULL) _fstrcpy(buff + 4, nlspath);
 
-  /* copy NLSPATH(far) to buff */
-  for (i = 0; nlspath[i] != 0; i++) buff[i] = nlspath[i];
+  if (svarlang_load("SVARCOM", buff, buff + 4) != 0) return;
 
-  /* terminate with a bkslash, if not already the case */
-  if (buff[i - 1] != '\\') buff[i++] = '\\';
-
-  /* append "svarcom.lng" */
-  strcpy(buff + i, "SVARCOM.LNG");
-
-  /* copy file content to svarlang_mem */
-  _asm {
-    push ax
-    push bx
-    push cx
-    push dx
-    push si
-    push di
-
-    /* make sure ES=DS and clear DF (will be useful for string matching) */
-    push ds
-    pop es
-    cld
-
-    /* preset SI to buff */
-    mov si, buff
-
-    /* Open File */
-    mov bx, 0xffff /* bx holds the file handle (0xffff = not set) */
-    mov ax, 0x3d00 /* DOS 2+ -- Open File for read */
-    mov dx, si     /* fname */
-    int 0x21       /* cf set on error, otherwise handle in AX */
-    jnc OPENOK
-    jmp FAIL
-    OPENOK:
-    mov bx, ax    /* save file handle to bx */
-
-    /* read hdr */
-    mov ah, 0x3f   /* DOS 2+ -- Read from File via Handle in BX */
-    mov cx, 4      /* read 4 bytes */
-    mov dx, si
-    int 0x21
-    jnc READHDROK
-    jmp FAIL
-
-    READHDROK:
-
-    cmp ax, cx  /* hdr must be 4 bytes long (SvL\x1b) */
-    jne FAIL
-    /* check that sig is Svl\x1b */
-    mov di, si
-    cld         /* scasw must inc DI */
-    mov ax, 'vS'
-    scasw       /* cmp ax, ES:[DI] and DI += 2*/
-    jne FAIL
-    mov ax, 0x1B4C
-    scasw       /* cmp ax, ES:[DI] and DI += 2*/
-    jne FAIL
-
-    READLANGID:
-    /* read lang id */
-    mov ah, 0x3f   /* Read from File via Handle in BX */
-    /* mov bx, [i]  already set */
-    mov cx, 4
-    mov dx, si
-    int 0x21
-    jc FAIL
-    cmp ax, cx
-    jne FAIL
-    /* is this the LANG I am looking for? */
-    mov ax, [lang]
-    mov di, si
-    scasw       /* cmp ax, ES:[DI] and DI += 2*/
-    je LOADSTRINGS
-    /* skip to next lang */
-    mov ax, 0x4201   /* move file pointer CX:DX bytes forward */
-    /* mov bx, [i]  file handle */
-    xor cx, cx
-    mov dx, [di]
-    int 0x21
-    jc FAIL
-    jmp READLANGID
-
-    LOADSTRINGS:
-
-    /* read strings (buff+2 bytes) into langblock */
-    mov di, langblockptr
-    mov ah, 0x3f   /* Read from File via Handle in BX */
-    mov cx, [si+2]
-    mov dx, di
-    int 0x21
-    jnc DONE
-
-    /* on error make sure to zero out langblock's header */
-    xor cx, cx
-    mov [di], cx                 /* langblock id*/
-    mov [di + 2], cx /* langblock len */
-    mov [di + 4], cx /* 1st string id */
-    mov [di + 6], cx /* 1st string len */
-
-    /* cleanup and quit */
-    FAIL:
-    mov [errcode], ax
-    DONE:
-    /* close file handle if set */
-    cmp bx, 0xffff
-    je FNOTOPEN
-    mov ah, 0x3e  /* DOS 2+ -- Close a File Handle (Handle in BX) */
-    int 0x21
-    FNOTOPEN:
-
-    pop di
-    pop si
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-  }
-
-  if (errcode == 0) lastlang = lang;
+  _fmemcpy(&lastlang, lang, 2);
 }
 
 

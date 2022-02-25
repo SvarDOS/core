@@ -38,7 +38,7 @@ command.com: rmodcore.h command.obj cmd.obj env.obj redir.obj rmodinit.obj sayon
 	MOVE /Y DEFLANG.C ..
 	CD ..
 	# build the final executable
-	*wcl $(LDFLAGS) command.obj cmd.obj deflang.c env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+	*wcl $(LDFLAGS) command.obj cmd.obj deflang.c env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj svarlang.lib\svarlngs.lib
 
 cmd.obj: cmd.c cmd\*.c
 	wcc $(CFLAGS) cmd.c
