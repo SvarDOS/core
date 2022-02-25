@@ -2,7 +2,7 @@
 # SvarCOM translation file
 # Lang: ENGLISH
 #
-# Translator: Mateusz Viste
+# Autor: Mateusz Viste
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -18,6 +18,13 @@
 # SHIFT
 16.0:Changes the position of arguments in a batch file:
 16.1:Argument %1 becomes %0, argument %2 becomes %1, etc.
+
+# GOTO
+17.0:Directs batch processing to a labelled line in the batch program.
+17.1:GOTO LABEL
+17.2:LABEL specifies a text string used in the batch program as a label.
+17.3:A label is on a line by itself and must be preceded by a colon.
+17.10:Label not found
 
 # DOS ERRORS
 255.1:Function number invalid

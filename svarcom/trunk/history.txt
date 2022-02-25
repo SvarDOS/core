@@ -5,7 +5,8 @@
 
 === ver 2022.1 (xx.xx.xxxx) ==================================================
 
- - added CALL support for calling batch files from within batch files
+ - added GOTO support (jumps to a labelled line within a batch file)
+ - added CALL support (calls batch files from within batch files)
  - DOS errors are output to stdout, and also to stderr if stdout is redirected
  - fixed batch processing with /C (was executing only first command)
 

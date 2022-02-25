@@ -5,6 +5,12 @@
 # Translator: Mateusz Viste
 #
 
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Nieprawidłowa składnia
+0.2:Nieprawidłowy przełącznik
+0.3:Nieprawidłowy format parametru
+0.4:Zbyt duża ilość parametrów
+
 # PAUSE
 15.0:Wstrzymuje przetwarzanie pliku wsadowego
 15.1:Naciśnij dowolny klawisz aby kontynuować...
@@ -12,6 +18,13 @@
 # SHIFT
 16.0:Zmienia pozycję argumentów w pliku wsadowym:
 16.1:Argument %1 staje się %0, argument %2 staje się %1, itd.
+
+# GOTO
+17.0:Kieruje przetwarzanie do wiersza o określonej etykiecie w programie wsadowym.
+17.1:GOTO ETYKIETA
+17.2:ETYKIETA to ciąg znaków wykorzystany przez program wsadowy jako etykieta.
+17.3:Etykieta znajduje się w osobnym wierszu i jest poprzedzona dwukropkiem.
+17.10:Nie znaleziono etykiety
 
 # DOS ERRORS
 255.1:Błędny numer funkcji
