@@ -20,7 +20,7 @@ with many limitations. As pointed out by one of the FreeCOM authors, FreeCOM
 is designed with 21'st century machines in mind and not IBM PC compatibles.
 
 SvarCOM does not rely on XMS and performs runtime swapping that works on any
-IBM PC compatible machine.
+IBM PC compatible machine. It's resident size is about 2K.
 
 
 === NLS RESSOURCES ===========================================================
