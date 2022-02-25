@@ -9,6 +9,9 @@
  - added CALL support (calls batch files from within batch files)
  - DOS errors are output to stdout, and also to stderr if stdout is redirected
  - fixed batch processing with /C (was executing only first command)
+ - multi-lang support relies on SvarLANG.lib instead of its own routines
+ - transient shell follows the int23h vector to locate RMOD (this is a
+   workaround so SvarCOM works even when the LINK/LN TSR is loaded)
 
 
 === ver 2022.0 (01.02.2022) ==================================================

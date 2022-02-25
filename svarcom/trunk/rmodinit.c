@@ -195,9 +195,14 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 
 
 /* look up my parent: if it's rmod then return a ptr to its props struct,
- * otherwise return NULL */
+ * otherwise return NULL
+ * since RMOD sets itself as the CTRL+BREAK handler, I look at the int23
+ * field of the PSP to locate it. Previously I was looking at PSP[Ch] (ie.
+ * "terminate address" but this was failing when using the LINK/LN TSR that
+ * intercepts DOS EXEC calls and sets itself as the parent of all launched
+ * applications */
 struct rmod_props far *rmod_find(unsigned short rmodcore_len) {
-  unsigned short *parent = (void *)0x0C; /* parent's seg in PSP[Ch] ("prev. int22 handler") */
+  unsigned short *parent = (void *)0x10; /* look in PSP[10h] ("prev. int23 handler") */
   unsigned short far *ptr;
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
   unsigned char *cmdtail = (void *)0x80;
