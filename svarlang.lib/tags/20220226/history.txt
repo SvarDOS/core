@@ -1,0 +1,3 @@
+
+20220226
+- replaced fopen() and friends by direct DOS calls (smaller memory footprint)
