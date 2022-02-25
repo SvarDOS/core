@@ -30,11 +30,14 @@
 #include <stdio.h>  /* sprintf() */
 #include <string.h> /* memcpy() */
 
-#include "deflang.h"
-
 #include "env.h"
 
 #include "helpers.h"
+
+
+/* supplied through DEFLANG.C */
+extern char svarlang_mem[];
+extern const unsigned short svarlang_memsz;
 
 
 /* case-insensitive comparison of strings, compares up to maxlen characters.
@@ -108,15 +111,14 @@ void output_internal(const char *s, unsigned char nl, unsigned char handle) {
 
 
 static const char *nlsblock_findstr(unsigned short id) {
-  const char *ptr = langblock + 4; /* first 4 bytes are lang id and lang len */
+  const char *ptr = svarlang_mem;
   /* find the string id in langblock memory */
   for (;;) {
     if (((unsigned short *)ptr)[0] == id) {
-      ptr += 3;
-      return(ptr);
+      return(ptr + 4);
     }
     if (ptr[2] == 0) return(NULL);
-    ptr += ptr[2] + 3;
+    ptr += ((unsigned short *)ptr)[1] + 4;
   }
 }
 
@@ -626,29 +628,28 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 }
 
 
-/* reload nls ressources from svarcom.lng into langblock */
+/* reload nls ressources from svarcom.lng into svarlang_mem */
 void nls_langreload(char *buff, unsigned short env) {
   unsigned short i;
   const char far *nlspath;
-  char *langblockptr = langblock;
+  char *langblockptr = svarlang_mem;
   unsigned short lang;
   unsigned short errcode = 0;
+  static unsigned short lastlang;
 
   /* look up the LANG env variable, upcase it and copy to lang */
   nlspath = env_lookup_val(env, "LANG");
   if ((nlspath == NULL) || (nlspath[0] == 0)) return;
-  buff[0] = nlspath[0];
-  buff[1] = nlspath[1];
+  buff[0] = nlspath[0] & 0xDF;
+  buff[1] = nlspath[1] & 0xDF;
   buff[2] = 0;
 
-  if (buff[0] >= 'a') buff[0] -= 'a' - 'A';
-  if (buff[1] >= 'a') buff[1] -= 'a' - 'A';
   memcpy(&lang, buff, 2);
 
   /* check if there is need to reload at all */
-  if (((unsigned short *)langblock)[0] == lang) return;
+  if (lastlang == lang) return;
 
-  /* printf("NLS RELOAD (curlang=%04X ; toload=%04X\r\n", ((unsigned short *)langblock)[0], lang); */
+  /* printf("NLS RELOAD (curlang=%04X ; toload=%04X\r\n", lastlang, lang); */
 
   nlspath = env_lookup_val(env, "NLSPATH");
   if ((nlspath == NULL) || (nlspath[0] == 0)) return;
@@ -662,7 +663,7 @@ void nls_langreload(char *buff, unsigned short env) {
   /* append "svarcom.lng" */
   strcpy(buff + i, "SVARCOM.LNG");
 
-  /* copy file content to langblock */
+  /* copy file content to svarlang_mem */
   _asm {
     push ax
     push bx
@@ -737,13 +738,8 @@ void nls_langreload(char *buff, unsigned short env) {
 
     LOADSTRINGS:
 
-    /* copy langid and langlen to langblockptr */
-    mov di, langblockptr
-    mov ax, [si]
-    stosw   /* mov [di], ax and di += 2 */
-    mov ax, [si+2]
-    stosw
     /* read strings (buff+2 bytes) into langblock */
+    mov di, langblockptr
     mov ah, 0x3f   /* Read from File via Handle in BX */
     mov cx, [si+2]
     mov dx, di
@@ -776,7 +772,7 @@ void nls_langreload(char *buff, unsigned short env) {
     pop ax
   }
 
-  if (errcode != 0) printf("AX=%04x\r\n", errcode);
+  if (errcode == 0) lastlang = lang;
 }
 
 

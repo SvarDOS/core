@@ -27,7 +27,18 @@ CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
 all: command.com
 
 command.com: rmodcore.h command.obj cmd.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
-	*wcl $(LDFLAGS) command.obj cmd.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+	# GENERATE CODEPAGE-SPECIFIG VERSIONS OUT OF UTF-8 FILES
+	CD LANG
+	utf8tocp 437 EN-UTF8.TXT > EN.TXT
+	utf8tocp 850 FR-UTF8.TXT > FR.TXT
+	utf8tocp maz PL-UTF8.TXT > PL.TXT
+	..\svarlang.lib\tlumacz en fr pl
+	DEL ??.TXT
+	MOVE /Y OUT.LNG ..\SVARCOM.LNG
+	MOVE /Y DEFLANG.C ..
+	CD ..
+	# build the final executable
+	*wcl $(LDFLAGS) command.obj cmd.obj deflang.c env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 
 cmd.obj: cmd.c cmd\*.c
 	wcc $(CFLAGS) cmd.c
@@ -35,7 +46,7 @@ cmd.obj: cmd.c cmd\*.c
 command.obj: command.c rmodcore.h
 	wcc $(CFLAGS) command.c
 
-helpers.obj: helpers.c deflang.h
+helpers.obj: helpers.c
 	wcc $(CFLAGS) helpers.c
 
 .c.obj:
@@ -43,9 +54,6 @@ helpers.obj: helpers.c deflang.h
 
 rmodcore.h: file2c.com rmod.bin
 	file2c /s /l4096 rmod.bin rmodcore.h BUFFER
-
-deflang.h: file2c.com tlumacz\default.lng
-	file2c /l4096 tlumacz\default.lng deflang.h langblock
 
 file2c.com: file2c.c
 	wcl $(LDFLAGS) file2c.c
@@ -59,23 +67,9 @@ clean: .SYMBOLIC
 	del rmod.bin
 	del rmod.lst
 	del rmodcore.h
-	del deflang.h
+	del deflang.c
 	del command.map
 
-pkg: svarcom.zip
-
-svarcom.zip: command.com
-	zip -9kDX -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt history.txt tlumacz\svarcom.lng
-	mkdir source
-	copy makefile source\
-	copy *.c source\
-	copy *.h source\
-	copy *.txt source\
-	copy *.asm source\
-	mkdir source\cmd
-	copy cmd\*.* source\cmd\
-	mkdir source\tlumacz
-	copy tlumacz\*.* source\tlumacz\
-	mkdir source\tlumacz\lang
-	copy tlumacz\lang\*.* source\tlumacz\lang\
-	zip -9rkDX -m svarcom.zip source
+release: command.com
+	#zip -9kDX -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt history.txt tlumacz\svarcom.lng
+	zip -9rkDX svarcom.zip makefile *.c *.h *.txt *.asm cmd lang svarlang.lib
