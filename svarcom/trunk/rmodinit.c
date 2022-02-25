@@ -323,3 +323,13 @@ void rmod_ffree(void far *ptr) {
     pop es
   }
 }
+
+
+/* free the entire linked list of bat ctx nodes (and set its rmod ptr to NULL) */
+void rmod_free_bat_llist(struct rmod_props far *rmod) {
+  while (rmod->bat != NULL) {
+    struct batctx far *victim = rmod->bat;
+    rmod->bat = rmod->bat->parent;
+    rmod_ffree(victim);
+  }
+}

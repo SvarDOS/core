@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -76,5 +76,8 @@ void far *rmod_fcalloc(unsigned short bytes, unsigned short rmod_seg, char *iden
 
 /* free memory previously allocated by rmod_fcalloc() */
 void rmod_ffree(void far *ptr);
+
+/* free the entire linked list of bat ctx nodes (and set its rmod ptr to NULL) */
+void rmod_free_bat_llist(struct rmod_props far *rmod);
 
 #endif

@@ -443,13 +443,8 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     }
 
     /* if bat is not called via a CALL, then free the bat-context linked list */
-    if ((flags & CALL_FLAG) == 0) {
-      while (rmod->bat != NULL) {
-        struct batctx far *victim = rmod->bat;
-        rmod->bat = rmod->bat->parent;
-        rmod_ffree(victim);
-      }
-    }
+    if ((flags & CALL_FLAG) == 0) rmod_free_bat_llist(rmod);
+
     /* allocate a new bat context */
     newbat = rmod_fcalloc(sizeof(struct batctx), rmod->rmodseg, "SVBATCTX");
     if (newbat == NULL) {
