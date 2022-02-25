@@ -70,6 +70,25 @@ clean: .SYMBOLIC
 	del deflang.c
 	del command.map
 
-release: command.com
-	#zip -9kDX -j svarcom.zip command.com svarcom.txt todo.txt freecom.txt history.txt tlumacz\svarcom.lng
+release: command.com .SYMBOLIC
+	# drop old packages if present
+	IF EXIST svarcom.zip DEL svarcom.zip
+	IF EXIST svarcom.svp DEL svarcom.svp
+	# source package
 	zip -9rkDX svarcom.zip makefile *.c *.h *.txt *.asm cmd lang svarlang.lib
+	# SvarDOS binary package
+	mkdir appinfo
+	mkdir bin
+	mkdir doc
+	mkdir doc\svarcom
+	mkdir nls
+	copy command.com bin
+	copy *.txt doc\svarcom\
+	copy svarcom.lsm appinfo\
+	copy svarcom.lng nls\
+	zip -9rkDX -m svarcom.svp appinfo bin doc nls
+	rmdir appinfo
+	rmdir bin
+	rmdir nls
+	rmdir doc\svarcom
+	rmdir doc
