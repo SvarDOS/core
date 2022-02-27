@@ -29,10 +29,11 @@ all: command.com
 command.com: rmodcore.h command.obj cmd.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 	# GENERATE CODEPAGE-SPECIFIG VERSIONS OUT OF UTF-8 FILES
 	CD LANG
+	utf8tocp 850 DE-UTF8.TXT > DE.TXT
 	utf8tocp 437 EN-UTF8.TXT > EN.TXT
 	utf8tocp 850 FR-UTF8.TXT > FR.TXT
 	utf8tocp maz PL-UTF8.TXT > PL.TXT
-	..\svarlang.lib\tlumacz en fr pl
+	..\svarlang.lib\tlumacz en de fr pl
 	DEL ??.TXT
 	MOVE /Y OUT.LNG ..\SVARCOM.LNG
 	MOVE /Y DEFLANG.C ..
