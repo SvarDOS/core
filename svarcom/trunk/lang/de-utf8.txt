@@ -63,6 +63,6 @@
 255.34:Datenträgerwechsel ungültig
 255.35:Dateisteuerblock (FCB) nicht verfügbar
 255.36:Freigabepufferüberlauf
-255.37:Nichtübereinstimmung der Codepage
+255.37:Nichtübereinstimmung der Codeseite
 255.38:Kann Dateivorgänge nicht abschließen (EOF / keine Eingabe mehr)
 255.39:Unzureichender Datenträgerplatz
