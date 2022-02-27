@@ -1,15 +1,16 @@
 #
-# LOCALCFG TRANSLATION FILE
+# LOCALCFG language file
 #
-# LANGUAGE: ENGLISH
-# TRANSLATOR: MATEUSZ VISTE
+# Language...: English
+# Authors....: Mateusz Viste, Robert Riebisch
+# Last update: 27 Feb 2022
 #
 
 ### HELP SCREEN ###########################################################
 
 0.0:version
 0.1:creates or edits COUNTRY.SYS local preferences
-0.2:usage: localcfg [COUNTRY.SYS] [options]
+0.2:usage: localcfg [drive:][path][COUNTRY.SYS] [options]
 0.3:options:
 
 0.10:/country:XX set the country code to XX (1=USA, 33=France, 48=Poland, etc)
