@@ -11,8 +11,9 @@ localcfg.com: localcfg.c country.c deflang.c
 
 deflang.c: nls_lang\*.txt
 	cd nls_lang
+	utf8tocp 850 de_utf8.txt > de.txt
 	utf8tocp maz pl_utf8.txt > pl.txt
-	..\svarlang.lib\tlumacz en pl
+	..\svarlang.lib\tlumacz en de pl
 	move out.lng ..\localcfg.lng
 	move deflang.c ..\
 	cd ..
