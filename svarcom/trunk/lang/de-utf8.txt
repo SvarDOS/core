@@ -2,7 +2,7 @@
 # SvarCOM language file
 #
 # Language...: German
-# Author.....: Robert Riebisch
+# Authors....: Robert Riebisch
 # Last update: 27 Feb 2022
 #
 
