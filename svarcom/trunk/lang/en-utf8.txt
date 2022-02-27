@@ -26,6 +26,15 @@
 17.3:A label is on a line by itself and must be preceded by a colon.
 17.10:Label not found
 
+# FOR
+18.0:Runs a specified command for each file in a set of files.
+18.1:FOR %variable IN (set) DO command [parameters]
+18.2:%variable    a replaceable parameter name.
+18.3:(set)        a set of one of more space-separated files. Wildcards allowed.
+18.4:command      the command to carry out for each matched file.
+18.5:parameters   parameters or switches for the specified command.
+18.6:To use FOR in a batch program, use %%variable instead of %variable.
+
 # DOS ERRORS
 255.1:Function number invalid
 255.2:File not found

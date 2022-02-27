@@ -20,11 +20,20 @@
 16.1:Argument %1 staje się %0, argument %2 staje się %1, itd.
 
 # GOTO
-17.0:Kieruje przetwarzanie do wiersza o określonej etykiecie w programie wsadowym.
+17.0:Kieruje przetwarzanie programu wsadowego do wiersza o określonej etykiecie.
 17.1:GOTO ETYKIETA
 17.2:ETYKIETA to ciąg znaków wykorzystany przez program wsadowy jako etykieta.
 17.3:Etykieta znajduje się w osobnym wierszu i jest poprzedzona dwukropkiem.
 17.10:Nie znaleziono etykiety
+
+# FOR
+18.0:Wykonuje określone polecenie na każdym pliku sposród zestawu plików.
+18.1:FOR %zmienna IN (zestaw) DO polecenie [parametry]
+18.2:%zmienna    nazwa zmiennej.
+18.3:(zestaw)    zestaw plików, oddzielone spacjami. Znaki wieloznaczne dozwolone.
+18.4:polecenie   polecenie do wykonania na każdym z pasujących plików.
+18.5:parametry   parametry lub przełączniki dla określonego polecenia.
+18.6:Aby użyć FOR w programie wsadowym, użyj %%zmienna zamiast %zmienna.
 
 # DOS ERRORS
 255.1:Błędny numer funkcji
