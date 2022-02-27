@@ -147,11 +147,16 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     pop ax
   }
 
+  /* mark the input buffer as empty */
+  myptr = MK_FP(rmodseg, RMOD_OFFSET_INPUTBUF);
+  myptr[0] = 128;
+  myptr[1] = 0;
+  myptr[2] = '\r';
+
   /* prepare result (rmod props) */
   res = MK_FP(rmodseg, 0x100 + rmodcore_len);
   _fmemset(res, 0, sizeof(*res));  /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
-  res->inputbuf[0] = 128;          /* input buffer for INT 0x21, AH=0Ah*/
   res->origenvseg = origenvseg;    /* original environment segment */
 
   /* write env segment to rmod's PSP */
@@ -196,13 +201,9 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 
 /* look up my parent: if it's rmod then return a ptr to its props struct,
  * otherwise return NULL
- * since RMOD sets itself as the CTRL+BREAK handler, I look at the int23
- * field of the PSP to locate it. Previously I was looking at PSP[Ch] (ie.
- * "terminate address" but this was failing when using the LINK/LN TSR that
- * intercepts DOS EXEC calls and sets itself as the parent of all launched
- * applications */
+ * I look at PSP[Ch] to locate RMOD (ie. the "terminate address") */
 struct rmod_props far *rmod_find(unsigned short rmodcore_len) {
-  unsigned short *parent = (void *)0x10; /* look in PSP[10h] ("prev. int23 handler") */
+  unsigned short *parent = (void *)0x0C;
   unsigned short far *ptr;
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
   unsigned char *cmdtail = (void *)0x80;

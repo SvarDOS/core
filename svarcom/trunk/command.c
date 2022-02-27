@@ -803,14 +803,6 @@ int main(void) {
   /* make COMPSEC point to myself */
   set_comspec_to_self(*rmod_envseg);
 
-/*  {
-    unsigned short envsiz;
-    unsigned short far *sizptr = MK_FP(*rmod_envseg - 1, 3);
-    envsiz = *sizptr;
-    envsiz *= 16;
-    printf("rmod_inpbuff at %04X:%04X, env_seg at %04X:0000 (env_size = %u bytes)\r\n", rmod->rmodseg, RMOD_OFFSET_INPBUFF, *rmod_envseg, envsiz);
-  }*/
-
   /* on /P check for the presence of AUTOEXEC.BAT and execute it if found,
    * but skip this check if /D was also passed */
   if ((cfg.flags & (FLAG_PERMANENT | FLAG_SKIP_AUTOEXEC)) == FLAG_PERMANENT) {
@@ -877,14 +869,26 @@ int main(void) {
       /* skip the @ prefix if present, it is no longer useful */
       if (cmdline[0] == '@') cmdline++;
     } else {
+      unsigned char far *rmod_inputbuf = MK_FP(rmod->rmodseg, RMOD_OFFSET_INPUTBUF);
+      unsigned short far *rmod_stacksig = MK_FP(rmod->rmodseg, RMOD_OFFSET_STACKSIG);
+      /* invalidate input history if it appears to be damaged (could occur
+       * because of a stack overflow, for example if some stack-hungry TSR is
+       * being used) */
+      if (*rmod_stacksig != 0xCAFE) {
+        *rmod_stacksig = 0xCAFE;
+        rmod_inputbuf[0] = 128; /* max allowed input length */
+        rmod_inputbuf[1] = 0;
+        rmod_inputbuf[2] = '\r';
+        /* printf("STACK OVERFLOW DETECTED: HISTORY FLUSHED\r\n"); */
+      }
       /* interactive mode: display prompt (if echo enabled) and wait for user
        * command line */
       if (rmod->flags & FLAG_ECHOFLAG) build_and_display_prompt(BUFFER, *rmod_envseg);
       /* collect user input */
-      cmdline_getinput(FP_SEG(rmod->inputbuf), FP_OFF(rmod->inputbuf));
+      cmdline_getinput(rmod->rmodseg, RMOD_OFFSET_INPUTBUF);
       /* copy it to local cmdline */
-      if (rmod->inputbuf[1] != 0) _fmemcpy(cmdline, rmod->inputbuf + 2, rmod->inputbuf[1]);
-      cmdline[(unsigned)(rmod->inputbuf[1])] = 0; /* zero-terminate local buff (oriignal is '\r'-terminated) */
+      if (rmod_inputbuf[1] != 0) _fmemcpy(cmdline, rmod_inputbuf + 2, rmod_inputbuf[1]);
+      cmdline[rmod_inputbuf[1]] = 0; /* zero-terminate local buff (original is '\r'-terminated) */
     }
 
     /* if nothing entered, loop again (but without appending an extra CR/LF) */

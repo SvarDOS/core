@@ -41,7 +41,6 @@ struct batctx {
 };
 
 struct rmod_props {
-  char inputbuf[130];         /* input buffer for INT 21, AH=0x0A */
   unsigned short rmodseg;     /* segment where rmod is loaded */
   unsigned long origparent;   /* original parent (far ptr) of the shell */
   unsigned short origenvseg;  /* original environment segment */
@@ -52,17 +51,19 @@ struct rmod_props {
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
-#define RMOD_OFFSET_COMSPECPTR (0x100 + 0x4A)
-#define RMOD_OFFSET_BOOTDRIVE  (0x100 + 0x4C)
-#define RMOD_OFFSET_LEXITCODE  (0x100 + 0x5B)
-#define RMOD_OFFSET_EXECPARAM  (0x100 + 0x5C)
-#define RMOD_OFFSET_EXECPROG   (0x100 + 0x6A)
-#define RMOD_OFFSET_STDINFILE  (0x100 + 0xEA)
-#define RMOD_OFFSET_STDOUTFILE (0x100 + 0x16A)
-#define RMOD_OFFSET_STDOUTAPP  (0x100 + 0x1EA)
-#define RMOD_OFFSET_STDIN_DEL  (0x100 + 0x1EC)
-#define RMOD_OFFSET_BRKHANDLER (0x100 + 0x1ED)
-#define RMOD_OFFSET_ROUTINE    (0x100 + 0x1EF)
+#define RMOD_OFFSET_INPUTBUF   (0x100 + 0x08)
+#define RMOD_OFFSET_STACKSIG   (0x100 + 0x8A) /* 0xCAFE */
+#define RMOD_OFFSET_COMSPECPTR (0x100 + 0xCE)
+#define RMOD_OFFSET_BOOTDRIVE  (0x100 + 0xD0)
+#define RMOD_OFFSET_LEXITCODE  (0x100 + 0xDF)
+#define RMOD_OFFSET_EXECPARAM  (0x100 + 0xE0)
+#define RMOD_OFFSET_EXECPROG   (0x100 + 0xEE)
+#define RMOD_OFFSET_STDINFILE  (0x100 + 0x16A)
+#define RMOD_OFFSET_STDOUTFILE (0x100 + 0x1EE)
+#define RMOD_OFFSET_STDOUTAPP  (0x100 + 0x26E)
+#define RMOD_OFFSET_STDIN_DEL  (0x100 + 0x270)
+#define RMOD_OFFSET_BRKHANDLER (0x100 + 0x271)
+#define RMOD_OFFSET_ROUTINE    (0x100 + 0x273)
 
 struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len);
 struct rmod_props far *rmod_find(unsigned short rmodcore_len);

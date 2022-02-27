@@ -19,7 +19,19 @@ section .text    ; all goes into code segment
 SIG1 dw 0x1983   ;  +0
 SIG2 dw 0x1985   ;  +2
 SIG3 dw 0x2017   ;  +4
-SIG4 dw 0x2019   ;  +6  this acts also as a guardval to detect stack overflows
+SIG4 dw 0x2019   ;  +6  acts also as a guardval to detect severe stack overflows
+
+; Buffer used to remember previous command, when SvarCOM calls the buffered
+; input service at INT 21h,AH=0x0A.
+; This buffer is right before the stack, so in case of a stack overflow event
+; (for example because of a "too ambitious" TSR) only this buffer is damaged,
+; and can be invalidated without much harm.
+INPUTBUF: times 130 db 0
+
+; This stack sig is a guardian value that is checked by the transient part of
+; SvarCOM to detect possible stack overflows. If a stack overflow occurs, then
+; the INPUTBUFF area above is invalidated and stack signature reverted.
+STACKSIG dw 0xCAFE
 
 ; DOS int 21h functions that I use require at least 40 bytes of stack under
 ; DOS-C (FreeDOS) kernel, so here I reserve 64 bytes juste to be sure
