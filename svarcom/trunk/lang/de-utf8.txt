@@ -1,5 +1,5 @@
 #
-# SvarCOM translation file
+# SvarCOM language file
 #
 # Language...: German
 # Author.....: Robert Riebisch
@@ -61,8 +61,8 @@
 255.32:Freigabeverletzung
 255.33:Sperrverletzung
 255.34:Datenträgerwechsel ungültig
-255.35:Dateisteuerblock (FCB) nicht verfügbar
+255.35:FCB (Dateisteuerblock) nicht verfügbar
 255.36:Freigabepufferüberlauf
-255.37:Nichtübereinstimmung der Codeseite
+255.37:Nichtübereinstimmung der Codeseite / des Zeichensatzes
 255.38:Kann Dateivorgänge nicht abschließen (EOF / keine Eingabe mehr)
 255.39:Unzureichender Datenträgerplatz
