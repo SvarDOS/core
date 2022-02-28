@@ -1,6 +1,6 @@
 /*
- * This file is part of pkginst
- * Copyright (C) 2012-2021 Mateusz Viste
+ * This file is part of pkg (SvarDOS package manager)
+ * Copyright (C) 2012-2022 Mateusz Viste
  *
  * It contains a few helper function...
  */
@@ -96,6 +96,12 @@ char *computelocalpath(char *longfilename, char *respath, const char *dosdir, co
       if (firstsep < 0) firstsep = x;
     }
   }
+  /* if it's a file without any directory, then it goes to C:\ (COMMAND.COM, KERNEL.SYS...) */
+  if (firstsep < 0) {
+    sprintf(respath, "C:\\");
+    return(longfilename);
+  }
+  /* */
   shortfilename = &longfilename[lastsep + 1];
   /* look for possible custom path */
   if (firstsep > 0) {
