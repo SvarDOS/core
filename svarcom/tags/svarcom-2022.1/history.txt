@@ -1,0 +1,36 @@
+
+
+                    === SvarCOM's history / changelog ===
+
+
+=== ver 2022.1 (28.02.2022) ==================================================
+
+ - added GOTO support (jumps to a labelled line within a batch file)
+ - added CALL support (calls batch files from within batch files)
+ - DOS errors are output to stdout, and also to stderr if stdout is redirected
+ - fixed batch processing with /C (was executing only first command)
+ - stack overflow detection degrades gracefully by invalidating command-line
+   history (useful if a stack-hungry TSR overflows the RMOD stack)
+ - multi-lang support relies on SvarLANG.lib instead of its own routines
+ - made all SvarCOM strings localizable
+ - added partial German translations (kindly provided by Robert Riebisch)
+
+
+=== ver 2022.0 (01.02.2022) ==================================================
+
+ - added "global executable links" support (new command: LN)
+ - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
+ - piping support (like dir/b | sort)
+ - DIR: fixed /P pagination in wide mode
+ - DIR: implemented /A
+ - implemented IF command (IF EXIST, IF ERRORLEVEL, IF str==str)
+ - added a break handler (running application can be aborted with CTRL+C)
+ - DOS error messages are output to stderr
+
+
+=== ver 2021.0 (24.11.2021) ==================================================
+
+ - first public release, after roughly a month of work
+
+
+====================================================================== EOF ===

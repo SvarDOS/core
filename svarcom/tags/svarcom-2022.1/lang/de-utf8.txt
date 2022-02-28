@@ -1,0 +1,68 @@
+#
+# SvarCOM language file
+#
+# Language...: German
+# Authors....: Robert Riebisch
+# Last update: 27 Feb 2022
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Ungültige Syntax
+0.2:Ungültiger Schalter
+0.3:Ungültiges Parameterformat
+0.4:Zu viele Parameter
+
+# PAUSE
+15.0:Unterbricht die Ausführung eines Stapelskripts
+15.1:Drücken Sie eine beliebige Taste um fortzufahren...
+
+# SHIFT
+16.0:Ändert die Position der Argumente in einer Stapeldatei:
+16.1:Argument %1 wird zu %0, Argument %2 wird zu %1 usw.
+
+# GOTO
+17.0:Lenkt die Stapelverarbeitung auf eine gekennzeichnete Zeile im Stapelprogramm.
+17.1:GOTO SPRUNGMARKE
+17.2:SPRUNGMARKE gibt eine Zeichenfolge an, die im Stapelprogramm als Sprungmarke verwendet wird.
+17.3:Eine Sprungmarke steht in einer eigenen Zeile und muss mit einem Doppelpunkt eingeleitet werden.
+17.10:Sprungmarke nicht gefunden
+
+# DOS ERRORS
+255.1:Funktionsnummer ungültig
+255.2:Datei nicht gefunden
+255.3:Pfad nicht gefunden
+255.4:Zu viele offene Dateien (keine Handles verfügbar)
+255.5:Zugriff verweigert
+255.6:Ungültiges Handle
+255.7:Speichersteuerblock zerstört
+255.8:Unzureichender Speicher
+255.9:Speicherblockadresse ungültig
+255.10:Umgebung ungültig
+255.11:Format ungültig
+255.12:Zugriffscode ungültig
+255.13:Daten ungültig
+255.15:Ungültiges Laufwerk
+255.16:Es wurde versucht, das aktuelle Verzeichnis zu entfernen
+255.17:Nicht dasselbe Gerät
+255.18:Keine weiteren Dateien
+255.19:Datenträger schreibgeschützt
+255.20:Unbekanntes Gerät
+255.21:Laufwerk nicht bereit
+255.22:Unbekannter Befehl
+255.23:Datenfehler (CRC)
+255.24:Falsche Länge der Anforderungsstruktur
+255.25:Positionierungsfehler
+255.26:Unbekannter Datenträgertyp (Nicht-DOS-Datenträger)
+255.27:Sektor nicht gefunden
+255.28:Drucker ohne Papier
+255.29:Schreibfehler
+255.30:Lesefehler
+255.31:Allgemeiner Fehler
+255.32:Freigabeverletzung
+255.33:Sperrverletzung
+255.34:Datenträgerwechsel ungültig
+255.35:FCB (Dateisteuerblock) nicht verfügbar
+255.36:Freigabepufferüberlauf
+255.37:Nichtübereinstimmung der Codeseite / des Zeichensatzes
+255.38:Kann Dateivorgänge nicht abschließen (EOF / keine Eingabe mehr)
+255.39:Unzureichender Datenträgerplatz
