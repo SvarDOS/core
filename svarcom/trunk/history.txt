@@ -12,6 +12,7 @@
  - multi-lang support relies on SvarLANG.lib instead of its own routines
  - stack overflow detection degrades gracefully by invalidating command-line
    history (useful if a stack-hungry TSR overflows the RMOD stack)
+ - added German translations (kindly provided by Robert Riebisch)
 
 
 === ver 2022.0 (01.02.2022) ==================================================

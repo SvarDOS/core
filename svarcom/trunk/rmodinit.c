@@ -149,9 +149,11 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 
   /* mark the input buffer as empty */
   myptr = MK_FP(rmodseg, RMOD_OFFSET_INPUTBUF);
-  myptr[0] = 128;
-  myptr[1] = 0;
-  myptr[2] = '\r';
+  myptr[0] = 128;  /* max acceptable length */
+  myptr[1] = 0;    /* len of currently stored history string */
+  myptr[2] = '\r'; /* string terminator */
+  myptr[3] = 0xCA; /* signature to detect stack overflow damaging the buffer */
+  myptr[4] = 0xFE; /* 2nd byte of the signature */
 
   /* prepare result (rmod props) */
   res = MK_FP(rmodseg, 0x100 + rmodcore_len);

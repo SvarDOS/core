@@ -52,7 +52,6 @@ struct rmod_props {
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
 #define RMOD_OFFSET_INPUTBUF   (0x100 + 0x08)
-#define RMOD_OFFSET_STACKSIG   (0x100 + 0x8A) /* 0xCAFE */
 #define RMOD_OFFSET_COMSPECPTR (0x100 + 0xCE)
 #define RMOD_OFFSET_BOOTDRIVE  (0x100 + 0xD0)
 #define RMOD_OFFSET_LEXITCODE  (0x100 + 0xDF)

@@ -870,22 +870,25 @@ int main(void) {
       if (cmdline[0] == '@') cmdline++;
     } else {
       unsigned char far *rmod_inputbuf = MK_FP(rmod->rmodseg, RMOD_OFFSET_INPUTBUF);
-      unsigned short far *rmod_stacksig = MK_FP(rmod->rmodseg, RMOD_OFFSET_STACKSIG);
       /* invalidate input history if it appears to be damaged (could occur
        * because of a stack overflow, for example if some stack-hungry TSR is
        * being used) */
-      if (*rmod_stacksig != 0xCAFE) {
-        *rmod_stacksig = 0xCAFE;
-        rmod_inputbuf[0] = 128; /* max allowed input length */
-        rmod_inputbuf[1] = 0;
-        rmod_inputbuf[2] = '\r';
-        /* printf("STACK OVERFLOW DETECTED: HISTORY FLUSHED\r\n"); */
+      if ((rmod_inputbuf[0] != 128) || (rmod_inputbuf[rmod_inputbuf[1] + 2] != '\r') || (rmod_inputbuf[rmod_inputbuf[1] + 3] != 0xCA) || (rmod_inputbuf[rmod_inputbuf[1] + 4] != 0xFE)) {
+        rmod_inputbuf[0] = 128;  /* max allowed input length */
+        rmod_inputbuf[1] = 0;    /* string len stored in buffer */
+        rmod_inputbuf[2] = '\r'; /* string terminator */
+        rmod_inputbuf[3] = 0xCA; /* trailing signature */
+        rmod_inputbuf[4] = 0xFE; /* trailing signature */
+        outputnl("SvarCOM: stack overflow detected, command history flushed (this is not a bug)");
       }
       /* interactive mode: display prompt (if echo enabled) and wait for user
        * command line */
       if (rmod->flags & FLAG_ECHOFLAG) build_and_display_prompt(BUFFER, *rmod_envseg);
       /* collect user input */
       cmdline_getinput(rmod->rmodseg, RMOD_OFFSET_INPUTBUF);
+      /* append stack-overflow detection signature to the end of the input buffer */
+      rmod_inputbuf[rmod_inputbuf[1] + 3] = 0xCA; /* trailing signature */
+      rmod_inputbuf[rmod_inputbuf[1] + 4] = 0xFE; /* trailing signature */
       /* copy it to local cmdline */
       if (rmod_inputbuf[1] != 0) _fmemcpy(cmdline, rmod_inputbuf + 2, rmod_inputbuf[1]);
       cmdline[rmod_inputbuf[1]] = 0; /* zero-terminate local buff (original is '\r'-terminated) */
