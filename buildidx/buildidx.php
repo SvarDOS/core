@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  28 feb 2022: svarcom allowed to have a COMMAND.COM file without subdirectory
   24 feb 2022: added hardcoded hack to translate version 'x.xx' to '0.44' (NESticle)
   23 feb 2022: basic validation of source archives (not empty + matches an existing svp file)
   21 feb 2022: buildidx collects categories looking at the dir layout of each package + improved version string parsing (replaced version_compare call by dos_version_compare)
@@ -35,7 +36,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220224";
+$PVER = "20220228";
 
 
 // computes the BSD sum of a file and returns it
@@ -286,7 +287,7 @@ $pkgcount = 0;
 // load the list of CORE and MSDOS_COMPAT packages
 
 $core_packages_list = load_core_list($repodir);
-$msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice command comp cpidos debug defrag deltree diskcomp diskcopy display edit edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort swsubst tree undelete unformat xcopy');
+$msdos_compat_list = explode(' ', 'append assign attrib chkdsk choice comp cpidos debug defrag deltree diskcomp diskcopy display edit edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort svarcom swsubst tree undelete unformat xcopy');
 
 // do a list of all svp packages with their available versions and descriptions
 
@@ -391,6 +392,10 @@ foreach ($pkgfiles as $fname) {
       if ($f === 'doc/') continue;
       if (str_head_is($f, "nls/{$pkgdir}.")) continue;
       if ($f === 'nls/') continue;
+    }
+    // SVARCOM is allowed to have a root-based COMMAND.COM file
+    if ($pkgnam === 'svarcom') {
+      if ($f === 'command.com') continue;
     }
     // the help package is allowed to put files in... help
     if (($pkgnam == 'help') && (str_head_is($f, 'help/'))) continue;
