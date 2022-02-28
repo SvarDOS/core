@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -138,12 +138,11 @@ static enum cmd_result cmd_date(struct cmd_funcparam *p) {
   unsigned char mo, dy;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays or sets the system date.");
+    nls_outputnl(32,0); /* "Displays or sets the system date."); */
     outputnl("");
-    outputnl("DATE [date]");
+    nls_outputnl(32,1); /* "DATE [date]" */
     outputnl("");
-    outputnl("Type DATE with no parameters to display the current date and a prompt for a");
-    outputnl("new one. Press ENTER to keep the same date.");
+    nls_outputnl(32,2); /* "Type DATE with no parameters to display the (...)" */
     return(CMD_OK);
   }
 
@@ -173,19 +172,19 @@ static enum cmd_result cmd_date(struct cmd_funcparam *p) {
     }
     buff[0] = ' ';
     nls_format_date(buff + 1, year, mo, dy, nls);
-    output("Current date is");
+    nls_output(32,4); /* "Current date is" */
     outputnl(buff);
     year = 0;
   } else { /* parse date if provided */
     if ((cmd_date_parse(p->argv[0], &year, &mo, &dy, nls) != 0) || (cmd_date_set(year, mo, dy) != 0)) {
-      outputnl("Invalid date");
+      nls_outputnl(32,3); /* "Invalid date" */
       year = 0;
     }
   }
 
   /* ask for date if not provided or if input was malformed */
   while (year == 0) {
-    output("Enter new date:");
+    nls_output(32,5); /* "Enter new date:" */
     output(" ");
     /* collect user input into buff */
     _asm {
@@ -219,7 +218,7 @@ static enum cmd_result cmd_date(struct cmd_funcparam *p) {
     }
     if (buff[1] == 0) break; /* empty string = no date change */
     if ((cmd_date_parse(buff + 2, &year, &mo, &dy, nls) == 0) && (cmd_date_set(year, mo, dy) == 0)) break;
-    outputnl("Invalid date");
+    nls_outputnl(32,3); /* "Invalid date" */
   }
 
   return(CMD_OK);

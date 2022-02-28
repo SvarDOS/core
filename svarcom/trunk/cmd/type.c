@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,19 +32,19 @@ static enum cmd_result cmd_type(struct cmd_funcparam *p) {
   unsigned short err = 0;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays the contents of a text file.");
+    nls_outputnl(21,0); /* "Displays the contents of a text file." */
     outputnl("");
-    outputnl("TYPE [drive:][path]filename");
+    nls_outputnl(21,1); /* "TYPE [drive:][path]filename" */
     return(CMD_OK);
   }
 
   if (p->argc == 0) {
-    outputnl("Required parameter missing");
+    nls_outputnl(0,7); /* "Required parameter missing" */
     return(CMD_FAIL);
   }
 
   if (p->argc > 1) {
-    outputnl("Too many parameters");
+    nls_outputnl(0,4); /* "Too many parameters" */
     return(CMD_FAIL);
   }
 

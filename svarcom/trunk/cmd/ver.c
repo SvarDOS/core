@@ -35,7 +35,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
 
   /* help screen */
   if (cmd_ishlp(p)) {
-    outputnl("Displays the DOS version.");
+    nls_outputnl(20,0); /* "Displays the DOS version." */
     outputnl("");
     outputnl("ver [/about]");
 #ifdef VERDBG
@@ -89,9 +89,9 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
 #endif
 
   if ((p->argc == 1) && (imatch(p->argv[0], "/about"))) {
-    outputnl("SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.");
+    nls_outputnl(20,3); /* "SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+." */
     outputnl("");
-    outputnl("This software is distributed under the terms of the MIT license.");
+    nls_outputnl(20,4); /* "This software is distributed under the terms of the MIT license." */
     outputnl("Copyright (C) " COPYRDATE " Mateusz Viste");
     outputnl("");
     outputnl("Program ten dedykuje Milenie i Mojmirowi. Zycze wam, byscie w swoim zyciu");
@@ -101,7 +101,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   }
 
   if (p->argc != 0) {
-    outputnl("Invalid parameter");
+    nls_outputnl(0,6); /* "Invalid parameter" */
     return(CMD_FAIL);
   }
 
@@ -118,9 +118,10 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     pop ax
   }
 
-  sprintf(buff, "DOS kernel version %u.%u", maj, min);
+  sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
 
   outputnl(buff);
-  outputnl("SvarCOM shell ver " PVER);
+  nls_output(20,2); /* "SvarCOM shell ver" */
+  outputnl(" " PVER);
   return(CMD_OK);
 }

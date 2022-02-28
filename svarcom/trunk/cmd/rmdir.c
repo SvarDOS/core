@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -31,25 +31,25 @@ static enum cmd_result cmd_rmdir(struct cmd_funcparam *p) {
   unsigned short err = 0;
 
   if (cmd_ishlp(p)) {
-    outputnl("Removes (deletes) a directory");
+    nls_outputnl(24,0); /* "Removes (deletes) a directory" */
     outputnl("");
-    outputnl("RMDIR [drive:]path");
-    outputnl("RD [drive:]path");
+    nls_outputnl(24,1);/* "RMDIR [drive:]path" */
+    nls_outputnl(24,2);/* "RD [drive:]path" */
     return(CMD_OK);
   }
 
   if (p->argc == 0) {
-    outputnl("Required parameter missing");
+    nls_outputnl(0,7); /* "Required parameter missing" */
     return(CMD_FAIL);
   }
 
   if (p->argc > 1) {
-    outputnl("Too many parameters");
+    nls_outputnl(0,4); /* "Too many parameters" */
     return(CMD_FAIL);
   }
 
   if (p->argv[0][0] == '/') {
-    outputnl("Invalid parameter");
+    nls_outputnl(0,6); /* "Invalid parameter"); */
     return(CMD_FAIL);
   }
 

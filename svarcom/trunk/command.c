@@ -138,7 +138,8 @@ static void parse_argv(struct config *cfg) {
     }
 
     if (*cmdline != '/') {
-      output("Invalid parameter: ");
+      nls_output(0,6); /* "Invalid parameter" */
+      output(": ");
       outputnl(cmdline);
       goto SKIP_TO_NEXT_ARG;
     }
@@ -174,20 +175,21 @@ static void parse_argv(struct config *cfg) {
         break;
 
       case '?':
-        outputnl("Starts the SvarCOM command interpreter");
+        nls_outputnl(1,0); /* "Starts the SvarCOM command interpreter" */
         outputnl("");
-        outputnl("COMMAND /E:nnn [/[C|K] [/P] [/D] command]");
+        nls_outputnl(1,1); /* "COMMAND /E:nnn [/[C|K] [/P] [/D] command]" */
         outputnl("");
-        outputnl("/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)");
-        outputnl("/E:nnn  Sets the environment size to nnn bytes");
-        outputnl("/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT");
-        outputnl("/C      Executes the specified command and returns");
-        outputnl("/K      Executes the specified command and continues running");
+        nls_outputnl(1,2); /* "/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)" */
+        nls_outputnl(1,3); /* "/E:nnn  Sets the environment size to nnn bytes" */
+        nls_outputnl(1,4); /* "/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT" */
+        nls_outputnl(1,5); /* "/C      Executes the specified command and returns" */
+        nls_outputnl(1,6); /* "/K      Executes the specified command and continues running" */
         exit(1);
         break;
 
       default:
-        output("Invalid switch: /");
+        nls_output(0,2); /* invalid switch */
+        output(": /");
         outputnl(cmdline);
         break;
     }
@@ -770,7 +772,7 @@ int main(void) {
     parse_argv(&cfg);
     rmod = rmod_install(cfg.envsiz, BUFFER, BUFFER_len);
     if (rmod == NULL) {
-      outputnl("ERROR: rmod_install() failed");
+      nls_outputnl_err(2,1); /* "FATAL ERROR: rmod_install() failed" */
       return(1);
     }
     /* copy flags to rmod's storage (and enable ECHO) */
@@ -785,7 +787,7 @@ int main(void) {
     if (rmod->flags & FLAG_EXEC_AND_QUIT) sayonara(rmod);
     /* */
     if (rmod->version != BYTE_VERSION) {
-      outputnl("SVARCOM VERSION CHANGED. SYSTEM HALTED. PLEASE REBOOT YOUR COMPUTER.");
+      nls_outputnl_err(2,0);
       _asm {
         HALT:
         hlt
@@ -879,7 +881,7 @@ int main(void) {
         rmod_inputbuf[2] = '\r'; /* string terminator */
         rmod_inputbuf[3] = 0xCA; /* trailing signature */
         rmod_inputbuf[4] = 0xFE; /* trailing signature */
-        outputnl("SvarCOM: stack overflow detected, command history flushed (this is not a bug)");
+        nls_outputnl_err(2,2); /* "stack overflow detected, command history flushed" */
       }
       /* interactive mode: display prompt (if echo enabled) and wait for user
        * command line */
@@ -934,7 +936,7 @@ int main(void) {
       if ((rmod->bat != NULL) && (rmod->bat->nextline == 0)) goto SKIP_NEWLINE;
       /* run_as_external() does not return on success, if I am still alive then
        * external command failed to execute */
-      outputnl("Bad command or file name");
+      nls_outputnl(0,5); /* "Bad command or file name" */
       continue;
     }
 

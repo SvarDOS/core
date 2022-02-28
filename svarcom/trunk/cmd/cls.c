@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -31,7 +31,7 @@ static enum cmd_result cmd_cls(struct cmd_funcparam *p) {
   const char *ansiesc = "\x1B[2J$";
 
   if (cmd_ishlp(p)) {
-    outputnl("Clears the screen");
+    nls_outputnl(10,0); /* "Clears the screen" */
     outputnl("");
     outputnl("CLS");
     return(CMD_OK);

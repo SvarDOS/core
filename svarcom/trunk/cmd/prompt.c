@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,9 +32,9 @@
 static enum cmd_result cmd_prompt(struct cmd_funcparam *p) {
 
   if (cmd_ishlp(p)) {
-    outputnl("Changes the DOS command prompt.");
+    nls_outputnl(33,0); /* "Changes the DOS command prompt." */
     outputnl("");
-    outputnl("PROMPT [new command prompt specification]");
+    nls_outputnl(33,1); /* "PROMPT [new command prompt specification]" */
     return(CMD_OK);
   }
 

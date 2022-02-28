@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -35,19 +35,18 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* use default DTA in PSP */
 
   if (cmd_ishlp(p)) {
-    outputnl("Renames a file or files");
+    nls_outputnl(25,0); /* "Renames a file" */
     outputnl("");
-    outputnl("RENAME [drive:][path]filename1 filename2");
-    outputnl("REN [drive:][path]filename1 filename2");
+    nls_outputnl(25,1); /* "RENAME [drive:][path]filename1 filename2" */
+    nls_outputnl(25,2); /* "REN [drive:][path]filename1 filename2" */
     outputnl("");
-    outputnl("Note that you cannot specify a new drive or path for your destination file.");
-    outputnl("Use MOVE to rename a directory, or to move files from one directory to another.");
+    nls_outputnl(25,3); /* "Note that you cannot specify a new drive or (...)" */
     return(CMD_OK);
   }
 
   /* I expect exactly two arguments */
   if (p->argc != 2) {
-    outputnl("Invalid syntax");
+    nls_outputnl(0,1); /* "Invalid syntax" */
     return(CMD_FAIL);
   }
 
@@ -73,7 +72,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
       case ':':
       case '\\':
       case '/':
-        outputnl("Invalid destination");
+        nls_outputnl(25,4); /* "Invalid destination" */
         return(CMD_FAIL);
     }
     buff1[fnameoffset + i] = p->argv[1][i];

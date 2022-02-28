@@ -10,6 +10,56 @@
 0.2:Invalid switch
 0.3:Invalid parameter format
 0.4:Too many parameters
+0.5:Bad command or file name
+0.6:Invalid parameter
+0.7:Required parameter missing
+
+# SVARCOM HELP SCREEN
+1.0:Starts the SvarCOM command interpreter
+1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] command]
+1.2:/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)
+1.3:/E:nnn  Sets the environment size to nnn bytes
+1.4:/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT
+1.5:/C      Executes the specified command and returns
+1.6:/K      Executes the specified command and continues running
+
+# VARIOUS SVARCOM MESSAGES
+2.0:SVARCOM VERSION CHANGED. SYSTEM HALTED. PLEASE REBOOT YOUR COMPUTER.
+2.1:FATAL ERROR: rmod_install() failed
+2.2:SvarCOM: stack overflow detected, command history flushed (this is not a bug)
+
+# CLS
+10.0:Clears the screen
+
+# CHCP
+11.0:Displays or sets the active code page number.
+11.1:CHCP [nnn]
+11.2:nnn  Specifies a code page number
+11.3:Type CHCP without a parameter to display the active code page number.
+11.4:Invalid code page number
+11.5:NLSFUNC not installed
+11.6:Failed to change code page
+11.7:Active code page:
+
+# CD / CHDIR
+12.0:Displays the name of or changes the current directory.
+12.1:CHDIR [drive:][path]
+12.2:CHDIR[..]
+12.3:CD [drive:][path]
+12.4:CD[..]
+12.5:.. Specifies that you want to change to the parent directory.
+12.6:Type CD drive: to display the current directory in the specified drive.
+12.7:Type CD without parameters to display the current drive and directory.
+
+# CALL
+13.0:Calls one batch program from another
+13.1:CALL [drive:][path]filename [batch-parameters]
+
+# BREAK
+14.0:Sets or clears extended CTRL+C checking
+14.1:Type BREAK without a parameter to display the current BREAK setting.
+14.2:BREAK is off
+14.3:BREAK is on
 
 # PAUSE
 15.0:Suspends the execution of a batch script
@@ -34,6 +84,98 @@
 18.4:command      the command to carry out for each matched file.
 18.5:parameters   parameters or switches for the specified command.
 18.6:To use FOR in a batch program, use %%variable instead of %variable.
+
+# VERIFY
+19.0:Tells DOS whether to verify that files are written correctly to disk.
+19.1:Type VERIFY without a parameter to display its current setting.
+19.2:VERIFY is off
+19.3:VERIFY is on
+19.4:Must specify ON or OFF
+
+# VER
+20.0:Displays the DOS version.
+20.1:DOS kernel version %u.%u
+20.2:SvarCOM shell ver
+20.3:SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.
+20.4:This software is distributed under the terms of the MIT license.
+
+# TYPE
+21.0:Displays the contents of a text file.
+21.1:TYPE [drive:][path]filename
+
+# TIME
+22.0:Displays or sets the system time.
+22.1:TIME [time]
+22.2:Type TIME with no parameters to display the current time and a prompt for a\r\nnew one. Press ENTER to keep the same time.
+22.3:Current time is
+22.4:Invalid time
+22.5:Enter new time:
+
+# SET
+23.0:Displays, sets, or removes DOS environment variables.
+23.1:SET [variable=[string]]
+23.2:variable  Specifies the environment-variable name
+23.3:string    Specifies a series of characters to assign to the variable
+23.4:Type SET without parameters to display the current environment variables.
+23.5:Not enough available space within the environment block
+
+# RD / RMDIR
+24.0:Removes (deletes) a directory
+24.1:RMDIR [drive:]path
+24.2:RD [drive:]path
+
+# REN / RENAME
+25.0:Renames a file
+25.1:RENAME [drive:][path]filename1 filename2
+25.2:REN [drive:][path]filename1 filename2
+25.3:Note that you cannot specify a new drive or path for your destination file.\r\nUse MOVE to rename a directory, or to move files from one directory to another.
+25.4:Invalid destination
+
+# REM
+26.0:Records comments (remarks) in a batch file or CONFIG.SYS
+26.1:REM [comment]
+
+# PATH
+27.0:Displays or sets a search path for executable files.
+27.1:PATH [[drive:]path[;...]]
+27.2:Type PATH ; to clear all search-path settings and direct DOS to search\r\nonly in the current directory.
+27.3:Type PATH without parameters to display the current path.
+27.4:No Path
+
+# MD / MKDIR
+28.0:Creates a directory
+28.1:MKDIR [drive:]path
+28.2:MD [drive:]path
+
+# LN
+29.0:Adds, deletes or displays executable links.
+29.1:LN ADD linkname targetdir
+29.2:LN DEL linkname
+29.3:LN LIST [pattern]
+29.4:No matching executable found in given path.
+29.5:%DOSDIR% not defined
+
+# EXIT
+30.0:Quits the COMMAND.COM program (command interpreter)
+
+# ECHO
+31.0:Displays messages, or turns command-echoing on or off
+31.1:ECHO [message]
+31.2:Type ECHO without parameters to display the current echo setting.
+31.3:ECHO is on
+31.4:ECHO is off
+
+# DATE
+32.0:Displays or sets the system date.
+32.1:DATE [date]
+32.2:Type DATE with no parameters to display the current date and a prompt for a\r\nnew one. Press ENTER to keep the same date.
+32.3:Invalid date
+32.4:Current date is
+32.5:Enter new date:
+
+# PROMPT
+33.0:Changes the DOS command prompt.
+33.1:PROMPT [new command prompt specification]
 
 # DOS ERRORS
 255.1:Function number invalid

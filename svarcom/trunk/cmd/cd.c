@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -40,23 +40,23 @@ static enum cmd_result cmd_cd(struct cmd_funcparam *p) {
 
   /* CD /? */
   if (cmd_ishlp(p)) {
-    outputnl("Displays the name of or changes the current directory.");
+    nls_outputnl(12,0); /* "Displays the name of or changes the current directory." */
     outputnl("");
-    outputnl("CHDIR [drive:][path]");
-    outputnl("CHDIR[..]");
-    outputnl("CD [drive:][path]");
-    outputnl("CD[..]");
+    nls_outputnl(12,1); /* "CHDIR [drive:][path]" */
+    nls_outputnl(12,2); /* "CHDIR[..]" */
+    nls_outputnl(12,3); /* "CD [drive:][path]" */
+    nls_outputnl(12,4); /* "CD[..]" */
     outputnl("");
-    outputnl(".. Specifies that you want to change to the parent directory.");
+    nls_outputnl(12,5); /* ".. Specifies that you want to change to the parent directory." */
     outputnl("");
-    outputnl("Type CD drive: to display the current directory in the specified drive.");
-    outputnl("Type CD without parameters to display the current drive and directory.");
+    nls_outputnl(12,6); /* "Type CD drive: to display the current directory in the specified drive." */
+    nls_outputnl(12,7); /* "Type CD without parameters to display the current drive and directory." */
     return(CMD_OK);
   }
 
   /* one argument max */
   if (p->argc > 1) {
-    outputnl("Too many parameters");
+    nls_outputnl(0,4); /* "Too many parameters" */
     return(CMD_FAIL);
   }
 

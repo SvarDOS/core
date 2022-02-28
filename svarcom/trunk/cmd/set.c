@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -35,14 +35,14 @@ static enum cmd_result cmd_set(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays, sets, or removes DOS environment variables");
+    nls_outputnl(23,0); /* "Displays, sets, or removes DOS environment variables"); */
     outputnl("");
-    outputnl("SET [variable=[string]]");
+    nls_outputnl(23,1); /* "SET [variable=[string]]" */
     outputnl("");
-    outputnl("variable  Specifies the environment-variable name");
-    outputnl("string    Specifies a series of characters to assign to the variable");
+    nls_outputnl(23,2); /* "variable  Specifies the environment-variable name" */
+    nls_outputnl(23,3); /* "string    Specifies a series of characters to assign to the variable" */
     outputnl("");
-    outputnl("Type SET without parameters to display the current environment variables.");
+    nls_outputnl(23,4); /* "Type SET without parameters to display the current environment variables." */
     return(CMD_OK);
   }
 
@@ -87,7 +87,7 @@ static enum cmd_result cmd_set(struct cmd_funcparam *p) {
     i = env_setvar(p->env_seg, buff);
     if (i == ENV_INVSYNT) goto syntax_err;
     if (i == ENV_NOTENOM) {
-      outputnl("Not enough available space within the environment block");
+      nls_outputnl(23,5); /* "Not enough available space within the environment block" */
       return(CMD_FAIL);
     }
   }
@@ -95,6 +95,6 @@ static enum cmd_result cmd_set(struct cmd_funcparam *p) {
 
   syntax_err:
 
-  outputnl("Syntax error");
+  nls_outputnl(0,1); /* "Invalid syntax" */
   return(CMD_FAIL);
 }

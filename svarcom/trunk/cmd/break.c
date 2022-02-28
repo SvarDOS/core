@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,11 +30,11 @@ static enum cmd_result cmd_break(struct cmd_funcparam *p) {
   unsigned char brkflag = 0;
 
   if (cmd_ishlp(p)) {
-    outputnl("Sets or clears extended CTRL+C checking");
+    nls_outputnl(14,0); /* "Sets or clears extended CTRL+C checking" */
     outputnl("");
     outputnl("BREAK [ON | OFF]");
     outputnl("");
-    outputnl("Type BREAK without a parameter to display the current BREAK setting.");
+    nls_outputnl(14,1); /* "Type BREAK without a parameter to display the current BREAK setting." */
     return(CMD_OK);
   }
 
@@ -52,16 +52,16 @@ static enum cmd_result cmd_break(struct cmd_funcparam *p) {
       pop ax
     }
     if (brkflag == 0) {
-      outputnl("BREAK is off");
+      nls_outputnl(14,2); /* "BREAK is off" */
     } else {
-      outputnl("BREAK is on");
+      nls_outputnl(14,3); /* "BREAK is on" */
     }
     return(CMD_OK);
   }
 
   /* too many params? */
   if (p->argc > 1) {
-    outputnl("Too many parameters");
+    nls_outputnl(0,4);
     return(CMD_FAIL);
   }
 
@@ -69,7 +69,7 @@ static enum cmd_result cmd_break(struct cmd_funcparam *p) {
   if (imatch(p->argv[0], "on")) {
     brkflag = 1;
   } else if (!imatch(p->argv[0], "off")) {
-    outputnl("Invalid parameter");
+    nls_outputnl(0,6); /* "Invalid parameter" */
     return(CMD_FAIL);
   }
 

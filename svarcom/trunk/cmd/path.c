@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -33,15 +33,14 @@ static enum cmd_result cmd_path(struct cmd_funcparam *p) {
 
   /* help screen (/?) */
   if (cmd_ishlp(p)) {
-    output("Displays or sets a search path for executable files.\r\n"
-           "\r\n"
-           "PATH [[drive:]path[;...]]\r\n"
-           "PATH ;\r\n"
-           "\r\n"
-           "Type PATH ; to clear all search-path settings and direct DOS to search\r\n"
-           "only in the current directory.\r\n"
-           "\r\n"
-           "Type PATH without parameters to display the current path.\r\n");
+    nls_outputnl(27,0); /* "Displays or sets a search path for executable files." */
+    outputnl("");
+    nls_outputnl(27,1); /* "PATH [[drive:]path[;...]]" */
+    outputnl("PATH ;");
+    outputnl("");
+    nls_outputnl(27,2); /* "Type PATH ; to clear all search-path settings and (...)" */
+    outputnl("");
+    nls_outputnl(27,3); /* "Type PATH without parameters to display the current path." */
     return(CMD_OK);
   }
 
@@ -49,7 +48,7 @@ static enum cmd_result cmd_path(struct cmd_funcparam *p) {
   if (p->argc == 0) {
     char far *curpath = env_lookup(p->env_seg, "PATH");
     if (curpath == NULL) {
-      outputnl("No Path");
+      nls_outputnl(27,4); /* "No Path" */
     } else {
       unsigned short i;
       for (i = 0;; i++) {
@@ -63,7 +62,7 @@ static enum cmd_result cmd_path(struct cmd_funcparam *p) {
 
   /* more than 1 parameter */
   if (p->argc > 1) {
-    outputnl("Too many parameters");
+    nls_outputnl(0,4); /* "Too many parameters" */
     return(CMD_FAIL);
   }
 

@@ -44,7 +44,7 @@ static enum cmd_result cmd_lnadd(char *BUFFER, const char *linkname, const char 
 
   /* does EXENAME in DIRECTORY exist? */
   if (lookup_cmd(buff, linkname, realdirname, &ext) != 0) {
-    outputnl("No matching executable found in given path.");
+    nls_outputnl(29,4); /* "No matching executable found in given path." */
     return(CMD_FAIL);
   }
 
@@ -103,7 +103,7 @@ static enum cmd_result cmd_lndel(char *buff, const char *linkname, unsigned shor
   /* is the argument valid? (must not contain any dot nor backslash) */
   for (i = 0; linkname[i] != 0; i++) {
     if ((linkname[i] == '.') || (linkname[i] == '/') || (linkname[i] == '\\')) {
-      outputnl("Bad link name");
+      nls_outputnl(0,3); /* "Invalid parameter format" */
       return(CMD_OK);
     }
   }
@@ -151,7 +151,7 @@ static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned sho
         case '.':
         case '/':
         case '\\':
-          outputnl("Invalid link pattern");
+          nls_outputnl(0,3); /* "Invalid parameter format" */
           return(CMD_FAIL);
       }
     }
@@ -162,7 +162,7 @@ static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned sho
   /* fetch %DOSDIR% */
   pathlen = env_lookup_valcopy(buff, 128, env_seg, "DOSDIR");
   if (pathlen == 0) {
-    outputnl("%DOSDIR% not defined");
+    nls_outputnl(29,5); /* "%DOSDIR% not defined" */
     return(CMD_FAIL);
   }
 
@@ -231,16 +231,16 @@ static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned sho
 
 static enum cmd_result cmd_ln(struct cmd_funcparam *p) {
   if (cmd_ishlp(p)) {
-    outputnl("Adds, deletes or displays executable links.");
+    nls_outputnl(29,0); /* "Adds, deletes or displays executable links." */
     outputnl("");
-    outputnl("LN ADD linkname targetdir");
-    outputnl("LN DEL linkname");
-    outputnl("LN LIST [pattern]");
+    nls_outputnl(29,1); /* "LN ADD linkname targetdir" */
+    nls_outputnl(29,2); /* "LN DEL linkname" */
+    nls_outputnl(29,3); /* "LN LIST [pattern]" */
     return(CMD_OK);
   }
 
   if (p->argc == 0) {
-    outputnl("Not enough parameters");
+    nls_outputnl(0,7); /* "Required parameter missing */
     return(CMD_OK);
   }
 
@@ -252,6 +252,6 @@ static enum cmd_result cmd_ln(struct cmd_funcparam *p) {
     if (p->argc == 2) return(cmd_lnlist(p->BUFFER, p->argv[1], p->env_seg));
   }
 
-  outputnl("Invalid argument");
+  nls_outputnl(0,6); /* "Invalid parameter" */
   return(CMD_FAIL);
 }

@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -141,12 +141,11 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
   signed char ho = -1, mi = -1, se = -1;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays or sets the system time.");
+    nls_outputnl(22,0); /* "Displays or sets the system time." */
     outputnl("");
-    outputnl("TIME [time]");
+    nls_outputnl(22,1); /* "TIME [time]" */
     outputnl("");
-    outputnl("Type TIME with no parameters to display the current time and a prompt for a");
-    outputnl("new one. Press ENTER to keep the same time.");
+    nls_outputnl(22,2); /* "Type TIME with no parameters to display the current time and (...)" */
     return(CMD_OK);
   }
 
@@ -178,19 +177,19 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
     }
     buff[0] = ' ';
     nls_format_time(buff + 1, ho, mi, se, nls);
-    output("Current time is");
+    nls_output(22,3); /* "Current time is" */
     outputnl(buff);
     ho = -1;
   } else { /* parse time if provided */
     if (cmd_time_parse(p->argv[0], &ho, &mi, &se, nls) != 0) {
-      outputnl("Invalid time");
+      nls_outputnl(22,4); /* "Invalid time" */
       ho = -1;
     }
   }
 
   /* ask for time if not provided or if input was malformed */
   while (ho < 0) {
-    output("Enter new time:");
+    nls_output(22,5); /* "Enter new time:" */
     output(" ");
     /* collect user input into buff */
     _asm {
@@ -224,7 +223,7 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
     }
     if (buff[1] == 0) break; /* empty string = do not change time */
     if (cmd_time_parse(buff + 2, &ho, &mi, &se, nls) == 0) break;
-    outputnl("Invalid time");
+    nls_outputnl(22,4); /* "Invalid time" */
     return(CMD_FAIL);
   }
 

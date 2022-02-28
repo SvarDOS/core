@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,7 +32,7 @@
 static enum cmd_result cmd_exit(struct cmd_funcparam *p) {
   if (cmd_ishlp(p)) {
     outputnl("EXIT\r\n");
-    outputnl("Quits the COMMAND.COM program (command interpreter)");
+    nls_outputnl(30,0); /* "Quits the COMMAND.COM program (command interpreter)" */
   } else {
     sayonara(p->rmod);
   }

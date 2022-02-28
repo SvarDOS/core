@@ -38,6 +38,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "svarlang.lib/svarlang.h"
+
 #include "env.h"
 #include "helpers.h"
 #include "redir.h"

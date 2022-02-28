@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -31,19 +31,19 @@ static enum cmd_result cmd_chcp(struct cmd_funcparam *p) {
   unsigned short errcode = 0;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays or sets the active code page number");
+    nls_outputnl(11,0); /* "Displays or sets the active code page number" */
     outputnl("");
-    outputnl("CHCP [nnn]");
+    nls_outputnl(11,1); /* "CHCP [nnn]" */
     outputnl("");
-    outputnl("nnn  Specifies a code page number");
+    nls_outputnl(11,2); /* "nnn  Specifies a code page number" */
     outputnl("");
-    outputnl("Type CHCP without a parameter to display the active code page number.");
+    nls_outputnl(11,3); /* "Type CHCP without a parameter to display the active code page number." */
     return(CMD_OK);
   }
 
   /* too many parameters */
   if (p->argc > 1) {
-    outputnl("Too many parameters");
+    nls_outputnl(0,4); /* "Too many parameters" */
     return(CMD_FAIL);
   }
 
@@ -51,7 +51,7 @@ static enum cmd_result cmd_chcp(struct cmd_funcparam *p) {
   if (p->argc == 1) {
     unsigned char nlsfuncflag = 0;
     if (atous(&nnn, p->argv[0]) != 0) {
-      outputnl("Invalid code page number");
+      nls_outputnl(11,4); /* "Invalid code page number" */
       return(CMD_FAIL);
     }
     _asm {
@@ -78,9 +78,9 @@ static enum cmd_result cmd_chcp(struct cmd_funcparam *p) {
       pop ax
     }
     if (nlsfuncflag == 0) {
-      outputnl("NLSFUNC not installed");
+      nls_outputnl(11,5); /* "NLSFUNC not installed" */
     } else if (errcode != 0) {
-      outputnl("Failed to change code page");
+      nls_outputnl(11,6); /* "Failed to change code page" */
       return(CMD_FAIL);
     }
 
@@ -103,7 +103,9 @@ static enum cmd_result cmd_chcp(struct cmd_funcparam *p) {
       pop ax
     }
     if (errcode == 0) {
-      sprintf(p->BUFFER, "Active code page: %d", nnn);
+      nls_output(11,7); /* Active code page: */
+      output(" ");
+      sprintf(p->BUFFER, "%u", nnn);
       outputnl(p->BUFFER);
     } else {
       nls_outputnl_doserr(errcode);

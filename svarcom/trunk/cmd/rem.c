@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,9 +30,9 @@ static enum cmd_result cmd_rem(struct cmd_funcparam *p) {
   /* help screen ONLY if /? is the only argument - I do not want to output
    * help for ex. for "REM mouse.com /?" */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    outputnl("Records comments (remarks) in a batch file or CONFIG.SYS");
+    nls_outputnl(26,0); /* "Records comments (remarks) in a batch file or CONFIG.SYS" */
     outputnl("");
-    outputnl("REM [comment]");
+    nls_outputnl(26,1); /* "REM [comment]" */
   }
   return(CMD_OK);
 }

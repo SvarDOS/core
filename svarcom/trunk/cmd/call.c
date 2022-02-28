@@ -33,9 +33,9 @@
 
 static enum cmd_result cmd_call(struct cmd_funcparam *p) {
   if (cmd_ishlp(p)) {
-    outputnl("Calls one batch program from another");
+    nls_outputnl(13,0); /* "Calls one batch program from another" */
     outputnl("");
-    outputnl("CALL [drive:][path]filename [batch-parameters]");
+    nls_outputnl(13,1); /* "CALL [drive:][path]filename [batch-parameters]" */
     return(CMD_OK);
   }
 
