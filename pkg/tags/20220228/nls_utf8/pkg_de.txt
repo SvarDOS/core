@@ -1,0 +1,77 @@
+#
+# PKG language file
+#
+# Language....: German
+# Author......: Jörg Jenderek, Robert Riebisch
+# Last updated: 17 Feb 2022
+#
+
+#### Help ####
+
+1.0:PKG ist der SvarDOS-Paketmanager.
+1.20:Syntax: pkg install paket.svp
+1.21:        pkg update paket.svp
+1.22:        pkg remove paket
+1.23:        pkg listfiles paket
+1.24:        pkg listlocal [Filter]
+1.27:        pkg unzip datei.zip
+1.25:PKG ist unter der MIT-Lizenz veröffentlicht.
+1.26:Er wird mittels %DOSDIR%\\CFG\\PKG.CFG konfiguriert.
+
+### General stuff ####
+
+2.2:%DOSDIR% nicht gesetzt! Sie sollten es auf das SvarDOS-Hauptverzeichnis zeigen lassen.
+2.3:Beispiel: SET DOSDIR=C:\\SVARDOS
+2.14:Arbeitsspeicher erschöpft! (%s)
+
+#### Installing package ####
+
+3.8:FEHLER: Ungültiges ZIP-Archiv! Paket nicht installiert.
+3.9:FEHLER: Paket enthält eine Datei, die bereits lokal existiert:
+3.10:FEHLER: Konnte %s nicht erstellen!
+3.12:FEHLER: Paket enthält nicht die Datei %s! Kein gültiges SvarDOS-Paket.
+3.18:Paket %s ist bereits installiert! Vielleicht möchten Sie die Aktion 'update' verwenden.
+3.19:Paket %s installiert: %d Dateien extrahiert, %d Fehler.
+3.20:FEHLER: Paket enthält eine verschlüsselte Datei:
+3.23:FEHLER: Paket enthält einen ungültigen Dateinamen:
+3.24:FEHLER: Paketname zu lang
+
+#### Removing package ####
+
+4.0:Paket %s ist nicht installiert, daher nicht entfernt.
+4.3:Arbeitsspeicher erschöpft! Konnte das Verzeichnis %s nicht speichern!
+4.4:entferne %s
+4.5:Paket %s wurde entfernt.
+
+#### Searching package ####
+
+5.0:Kein Paket passte zur Suche.
+
+#### Loading configuration ####
+
+7.0:FEHLER: benutzerdefiniertes Verzeichnis '%s' ist doppelt aufgeführt!
+7.1:FEHLER: Konnte Konfigurationsdatei '%s' nicht öffnen!
+7.4:Warnung: Token mit leerem Wert in Zeile #%d
+7.8:Warnung: Unbekanntes Token '%s' in Zeile #%d
+7.11:Warnung: Ungültige 'DIR'-Anweisung in Zeile #%d gefunden
+7.15:FEHLER: benutzerdefiniertes Verzeichnis '%s' ist kein gültiger absoluter Pfad!
+7.16:FEHLER: benutzerdefiniertes Verzeichnis '%s' ist ein reservierter Name!
+
+#### Unziping package ####
+
+8.1:unbekannte ZIP-Signatur: 0x%08lx
+8.2:FEHLER: Paket enthält eine Datei mit nicht unterstützter Komprimierungsmethode (%d):
+8.3:FEHLER: Extrahieren von '%s' nach '%s' fehlgeschlagen!
+
+#### Handling the local list of installed packages ####
+
+9.0:FEHLER: Konnte nicht auf das Verzeichnis %s zugreifen
+9.1:FEHLER: Lokales Paket %s nicht gefunden
+
+#### unzip ####
+
+10.0:OK
+10.1:FEHLER: Öffnen der Archivdatei fehlgeschlagen
+10.2:FEHLER: Ungültiges ZIP-Archiv
+10.3:FEHLER: Datei existiert bereits
+10.4:FEHLER: unzip-Fehler (%d)
