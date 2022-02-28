@@ -40,13 +40,6 @@ void removeDoubleBackslashes(char *str) {
 }
 
 
-/* converts a string to all lowercase */
-void strtolower(char *mystring) {
-  int x;
-  for (x = 0; mystring[x] != 0; x++) mystring[x] = tolower(mystring[x]);
-}
-
-
 /* Find the first occurrence of find in s, ignore case. */
 char *fdnpkg_strcasestr(const char *s, const char *find) {
   char c, sc;

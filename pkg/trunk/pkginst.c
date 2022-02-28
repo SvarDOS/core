@@ -10,7 +10,7 @@
 #include <unistd.h>    /* read() */
 #include <sys/types.h> /* struct utimbuf */
 
-#include "helpers.h"   /* slash2backslash(), strtolower() */
+#include "helpers.h"   /* slash2backslash() */
 #include "fileexst.h"
 #include "kprintf.h"
 #include "libunzip.h"  /* zip_listfiles()... */
@@ -134,7 +134,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
   for (curzipnode = ziplinkedlist; curzipnode != NULL;) {
     /* change all slashes to backslashes, and switch into all-lowercase */
     slash2backslash(curzipnode->filename);
-    strtolower(curzipnode->filename);
+    strlwr(curzipnode->filename);
     /* remove 'directory' ZIP entries to avoid false alerts about directory already existing */
     if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) {
       curzipnode->filename[0] = 0; /* mark it "empty", will be removed in a short moment */
