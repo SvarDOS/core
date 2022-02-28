@@ -1,6 +1,6 @@
 #
 # pkg Makefile -- requires OpenWatcom (wmake)
-# Copyright (C) 2021 Mateusz Viste
+# Copyright (C) 2021-2022 Mateusz Viste
 #
 
 CFLAGS = -0 -mc -os -wx -we -d0 -i=zlib
@@ -10,6 +10,8 @@ LIBS = zlib\zlib_c.lib svarlang.lib\svarlngc.lib
 all: pkg.exe
 
 release: pkg.exe .symbolic
+	IF EXIST pkg.zip DEL pkg.zip
+	IF EXIST pkg.svp DEL pkg.svp
 	mkdir appinfo
 	mkdir bin
 	mkdir nls
