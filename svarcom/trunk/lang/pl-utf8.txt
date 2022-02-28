@@ -11,6 +11,13 @@
 0.3:Nieprawidłowy format parametru
 0.4:Zbyt duża ilość parametrów
 0.5:Złe polecenie lub nazwa pliku
+0.6:Nieprawidłowy parametr
+0.7:Brak wymaganego parametru
+0.8:Nieprawidłowy cel
+
+# the message below MUST be a two-letter upper-case string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:TN
 
 # SVARCOM HELP SCREEN
 1.0:Uruchamia interpreter poleceń SvarCOM
@@ -25,6 +32,9 @@
 2.0:WERSJA SVARCOM ULEGŁA ZMIANIE. SYSTEM ZATRZYMANY. ZRESTARTUJ KOMPUTER.
 2.1:BŁĄD KRYTYCZNY: rmod_install() nie powiodło się
 2.2:SvarCOM: wykryto przepełnienie stosu, usunięto historię poleceń (to nie bug)
+
+# CLS
+10.0:Czyści ekran
 
 # PAUSE
 15.0:Wstrzymuje przetwarzanie pliku wsadowego

@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -45,17 +45,17 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
   /* help screen ONLY if /? is the only argument - I do not want to output
    * help for ex. for "if %1 == /? echo ..." */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    outputnl("Performs conditional processing in batch programs.");
+    nls_outputnl(35,0); /* "Performs conditional processing in batch programs." */
     outputnl("");
-    outputnl("IF [NOT] ERRORLEVEL num command");
-    outputnl("IF [NOT] string1==string2 command");
-    outputnl("IF [NOT] EXIST filename command");
+    nls_outputnl(35,1); /* "IF [NOT] ERRORLEVEL num command" */
+    nls_outputnl(35,2); /* "IF [NOT] string1==string2 command" */
+    nls_outputnl(35,3); /* "IF [NOT] EXIST filename command" */
     outputnl("");
-    outputnl("NOT               command is executed only if condition is NOT met");
-    outputnl("ERRORLEVEL num    condition: last program returned an exit code >= num");
-    outputnl("string1==string2  condition: both strings must be equal");
-    outputnl("EXIST filename    condition: filename exists (wildcards accepted)");
-    outputnl("command           command to carry out if condition is met.");
+    nls_outputnl(35,4); /* "NOT               command is executed only if condition is NOT met" */
+    nls_outputnl(35,5); /* "ERRORLEVEL num    condition: last program returned an exit code >= num" */
+    nls_outputnl(35,6); /* "string1==string2  condition: both strings must be equal" */
+    nls_outputnl(35,7); /* "EXIST filename    condition: filename exists (wildcards accepted)" */
+    nls_outputnl(35,8); /* "command           command to carry out if condition is met" */
     return(CMD_OK);
   }
 
@@ -126,7 +126,7 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
 
   /* invalid syntax */
   SYNTAX_ERR:
-  outputnl("Syntax error");
+  nls_outputnl(0,1); /* "Invalid syntax" */
   return(CMD_FAIL);
 
   /* let's exec command (write it to start of cmdline and parse again) */

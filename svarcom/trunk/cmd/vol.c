@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -53,11 +53,11 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
   }
 
   if (err != 0) {
-    sprintf(buff, "Volume in drive %c has no label", drv + 'A');
+    sprintf(buff, svarlang_str(34,2)/*"Volume in drive %c has no label"*/, drv + 'A');
   } else {
     /* if label > 8 chars then drop the dot (DRIVE_LA.BEL -> DRIVE_LABEL) */
     if (strlen(dta->fname) > 8) memmove(dta->fname + 8, dta->fname + 9, 4);
-    sprintf(buff, "Volume in drive %c is %s", drv + 'A', dta->fname);
+    sprintf(buff, svarlang_str(34,3)/*"Volume in drive %c is %s"*/, drv + 'A', dta->fname);
   }
   outputnl(buff);
 
@@ -87,7 +87,7 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
    06h  11 BYTEs   volume label or "NO NAME    " if none present
    11h   8 BYTEs   filesystem type */
   if ((err == 0) && (buff16[1] | buff16[2])) {
-    sprintf(buff + 64, "Volume Serial Number is %04X-%04X", buff16[2], buff16[1]);
+    sprintf(buff + 64, svarlang_str(34,4)/*"Volume Serial Number is %04X-%04X"*/, buff16[2], buff16[1]);
     outputnl(buff + 64);
   }
 }
@@ -99,23 +99,23 @@ static enum cmd_result cmd_vol(struct cmd_funcparam *p) {
   unsigned short i;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays the disk volume label and serial number, if they exist.");
+    nls_outputnl(34,0); /* "Displays the disk volume label and serial number, if they exist." */
     outputnl("");
-    outputnl("VOL [drive:]");
+    nls_outputnl(34,1); /* "VOL [drive:]" */
     return(CMD_OK);
   }
 
   for (i = 0; i < p->argc; i++) {
     if (p->argv[i][0] == '/') {
-      outputnl("Invalid switch");
+      nls_outputnl(0,2); /* "Invalid switch" */
       return(CMD_FAIL);
     }
     if (drv != 0) {
-      outputnl("Too many parameters");
+      nls_outputnl(0,4); /* "Too many parameters" */
       return(CMD_FAIL);
     }
     if ((p->argv[i][0] == 0) || (p->argv[i][1] != ':') || (p->argv[i][2] != 0)) {
-      outputnl("Invalid parameter format");
+      nls_outputnl(0,3); /* "Invalid parameter format" */
       return(CMD_FAIL);
     }
     drv = p->argv[i][0];
@@ -140,7 +140,7 @@ static enum cmd_result cmd_vol(struct cmd_funcparam *p) {
   if (drv == 0) {
     drv = curdrv;
   } else if (!isdrivevalid(drv)) { /* is specified drive valid? */
-    outputnl("Invalid drive");
+    nls_outputnl(255,15); /* "Invalid drive" */
     return(CMD_FAIL);
   }
 

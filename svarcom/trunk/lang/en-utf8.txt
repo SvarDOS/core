@@ -13,6 +13,11 @@
 0.5:Bad command or file name
 0.6:Invalid parameter
 0.7:Required parameter missing
+0.8:Invalid destination
+
+# the message below MUST be a two-letter upper-case string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:YN
 
 # SVARCOM HELP SCREEN
 1.0:Starts the SvarCOM command interpreter
@@ -129,7 +134,6 @@
 25.1:RENAME [drive:][path]filename1 filename2
 25.2:REN [drive:][path]filename1 filename2
 25.3:Note that you cannot specify a new drive or path for your destination file.\r\nUse MOVE to rename a directory, or to move files from one directory to another.
-25.4:Invalid destination
 
 # REM
 26.0:Records comments (remarks) in a batch file or CONFIG.SYS
@@ -176,6 +180,66 @@
 # PROMPT
 33.0:Changes the DOS command prompt.
 33.1:PROMPT [new command prompt specification]
+
+# VOL
+34.0:Displays the disk volume label and serial number, if they exist.
+34.1:VOL [drive:]
+34.2:Volume in drive %c has no label
+34.3:Volume in drive %c is %s
+34.4:Volume Serial Number is %04X-%04X
+
+# IF
+35.0:Performs conditional processing in batch programs.
+35.1:IF [NOT] ERRORLEVEL num command
+35.2:IF [NOT] string1==string2 command
+35.3:IF [NOT] EXIST filename command
+35.4:NOT               command is executed only if condition is NOT met
+35.5:ERRORLEVEL num    condition: last program returned an exit code >= num
+35.6:string1==string2  condition: both strings must be equal
+35.7:EXIST filename    condition: filename exists (wildcards accepted)
+35.8:command           command to carry out if condition is met
+
+# DEL
+36.0:Deletes one or more files.
+36.1:DEL [drive:][path]filename [/P]
+36.2:ERASE [drive:][path]filename [/P]
+36.3:[drive:][path]filename  Specifies the file(s) to delete.
+36.4:/P  Prompts for confirmation before deleting each file.
+36.5:All files in directory will be deleted!
+36.6:Are you sure (Y/N)?
+36.7:Delete (Y/N)?
+
+# DIR
+37.0:Displays a list of files and subdirectories in a directory.
+37.1:DIR [drive:][path][filename] [/P] [/W] [/A[:]attributes] [/O[[:]sortorder]] [/S] [/B] [/L]
+37.2:/P Pauses after each screenful of information
+37.3:/W Uses wide list format
+37.4:/A Displays files with specified attributes:
+37.5:    D Directories            R Read-only files        H Hidden files
+37.6:    A Ready for archiving    S System files           - prefix meaning "not"
+37.7:/O List files in sorted order:
+37.8:    N by name                S by size                E by extension
+37.9:    D by date                G group dirs first       - prefix to reverse order"
+37.10:/S Displays files in specified directory and all subdirectories
+37.11:/B Uses bare format (no heading information or summary)
+37.12:/L Uses lowercases
+37.20:Directory of %s
+37.21:<DIR>
+37.22:file(s)
+37.23:bytes
+37.24:bytes free
+
+# COPY
+38.0:Copies one or more files to another location.
+38.1:COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]
+38.2:source       Specifies the file or files to be copied
+38.3:/A           Indicates an ASCII text file
+38.4:/B           Indicates a binary file
+38.5:destination  Specifies the directory and/or filename for the new file(s)
+38.6:/V           Verifies that new files are written correctly
+38.7:To append files, specify a single file for destination, but multiple files\r\nfor source (using wildcards or file1+file2+file3 format).
+38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.
+38.9:%u file(s) copied
 
 # DOS ERRORS
 255.1:Function number invalid

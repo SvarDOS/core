@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -185,24 +185,24 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned char format = DIR_OUTPUT_NORM;
 
   if (cmd_ishlp(p)) {
-    outputnl("Displays a list of files and subdirectories in a directory");
+    nls_outputnl(37,0); /* "Displays a list of files and subdirectories in a directory" */
     outputnl("");
-    outputnl("DIR [drive:][path][filename] [/P] [/W] [/A[:]attributes] [/O[[:]sortorder]] [/S] [/B] [/L]");
+    nls_outputnl(37,1); /* "DIR [drive:][path][filename] [/P] [/W] [/A[:]attributes] [/O[[:]sortorder]] [/S] [/B] [/L]" */
     outputnl("");
-    outputnl("/P Pauses after each screenful of information");
-    outputnl("/W Uses wide list format");
+    nls_outputnl(37,2); /* "/P Pauses after each screenful of information" */
+    nls_outputnl(37,3); /* "/W Uses wide list format" */
     outputnl("");
-    outputnl("/A Displays files with specified attributes:");
-    outputnl("    D Directories            R Read-only files        H Hidden files");
-    outputnl("    A Ready for archiving    S System files           - prefix meaning \"not\"");
+    nls_outputnl(37,4); /* "/A Displays files with specified attributes:" */
+    nls_outputnl(37,5); /* "    D Directories            R Read-only files        H Hidden files" */
+    nls_outputnl(37,6); /* "    A Ready for archiving    S System files           - prefix meaning "not"" */
     outputnl("");
-    outputnl("/O List files in sorted order:");
-    outputnl("    N by name                S by size                E by extension");
-    outputnl("    D by date                G group dirs first       - prefix to reverse order");
+    nls_outputnl(37,7); /* "/O List files in sorted order:" */
+    nls_outputnl(37,8); /* "    N by name                S by size                E by extension" */
+    nls_outputnl(37,9); /* "    D by date                G group dirs first       - prefix to reverse order" */
     outputnl("");
-    outputnl("/S Displays files in specified directory and all subdirectories");
-    outputnl("/B Uses bare format (no heading information or summary)");
-    outputnl("/L Uses lowercases");
+    nls_outputnl(37,10); /* "/S Displays files in specified directory and all subdirectories" */
+    nls_outputnl(37,11); /* "/B Uses bare format (no heading information or summary)" */
+    nls_outputnl(37,12); /* "/L Uses lowercases" */
     return(CMD_OK);
   }
 
@@ -312,7 +312,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       drv -= 'A';
     }
     cmd_vol_internal(drv, buff2);
-    sprintf(buff2, "Directory of %s", p->BUFFER);
+    sprintf(buff2, svarlang_str(37,20)/*"Directory of %s"*/, p->BUFFER);
     /* trim at first '?', if any */
     for (i = 0; buff2[i] != 0; i++) if (buff2[i] == '?') buff2[i] = 0;
     outputnl(buff2);
@@ -365,7 +365,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         /* either <DIR> or right aligned 10-chars byte size */
         memset(buff2, ' ', 10);
         if (dta->attr & DOS_ATTR_DIR) {
-          strcpy(buff2 + 10, "<DIR>");
+          strcpy(buff2 + 10, svarlang_str(37,21));
         } else {
           _ultoa(dta->size, buff2 + 10, 10); /* OpenWatcom extension */
         }
@@ -420,13 +420,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* x file(s) */
     memset(buff2, ' ', 13); /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
     i = nls_format_number(buff2 + 13, summary_fcount, nls);
-    alignpos = sprintf(buff2 + 13 + i, " %s ", "file(s)");
+    alignpos = sprintf(buff2 + 13 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
     output(buff2 + i);
     /* xxxx bytes */
     i = nls_format_number(buff2 + 13, summary_totsz, nls);
     output(buff2 + i);
     output(" ");
-    outputnl("bytes");
+    nls_outputnl(37,23); /* "bytes" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
@@ -436,7 +436,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     i = nls_format_number(buff2 + alignpos, summary_totsz, nls);
     output(buff2 + i);
     output(" ");
-    outputnl("bytes free");
+    nls_outputnl(37,24); /* "bytes free" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 

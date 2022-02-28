@@ -7,25 +7,17 @@ SvarCOM is the SvarDOS command line interpreter, known usually under the name
 "COMMAND.COM". It is designed and maintained by Mateusz Viste, and distributed
 under the terms of the MIT license.
 
-The goal is to make SvarCOM the default SvarDOS shell, replacing FreeCOM.
-Why replacing FreeCOM, you ask? See FREECOM.TXT for details.
-
-SvarCOM is a work-in-progress effort. As such, it still lacks a few things:
- - a few internal commands missing: CALL, CTTY, GOTO, LH
- - DIR misses two switches: /S, /O
-
 SvarCOM is minimalist and I'd like to keep it that way. It aims to be
 functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.
 
-As of version 2022.0, SvarCOM's resident footprint is under 2 KiB.
+SvarCOM's resident footprint is under 2 KiB.
 
 Translation strings are stored in the file SVARCOM.LNG, which should be
 placed in a directory pointed at by %NLSPATH% for SvarCOM to be able to output
 messages in non-english languages. SvarCOM's language is controlled by the
-%LANG% environment variable. NOTE: at this time translations aren't available
-yet, with the proof-of-concept exceptions of the 'PAUSE' and 'SHIFT' commands.
+%LANG% environment variable.
 
-Latest version available here: http://svardos.osdn.io/svarcom
+Latest version available here: http://svardos.org/svarcom
 
 
 === INTERNAL COMMANDS ========================================================

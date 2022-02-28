@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -168,20 +168,19 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* use DTA at default location in PSP */
 
   if (cmd_ishlp(p)) {
-    outputnl("Copies one or more files to another location.");
+    nls_outputnl(38,0); /* "Copies one or more files to another location." */
     outputnl("");
-    outputnl("COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]");
+    nls_outputnl(38,1); /* "COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]" */
     outputnl("");
-    outputnl("source       Specifies the file or files to be copied");
-    outputnl("/A           Indicates an ASCII text file");
-    outputnl("/B           Indicates a binary file");
-    outputnl("destination  Specifies the directory and/or filename for the new file(s)");
-    outputnl("/V           Verifies that new files are written correctly");
+    nls_outputnl(38,2); /* "source       Specifies the file or files to be copied" */
+    nls_outputnl(38,3); /* "/A           Indicates an ASCII text file" */
+    nls_outputnl(38,4); /* "/B           Indicates a binary file" */
+    nls_outputnl(38,5); /* "destination  Specifies the directory and/or filename for the new file(s)" */
+    nls_outputnl(38,6); /* "/V           Verifies that new files are written correctly" */
     outputnl("");
-    outputnl("To append files, specify a single file for destination, but multiple files");
-    outputnl("for source (using wildcards or file1+file2+file3 format).");
+    nls_outputnl(38,7); /* "To append files, specify a single file for destination, but multiple (...)" */
     outputnl("");
-    outputnl("NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.");
+    nls_outputnl(38,8); /* "NOTE: /A and /B are no-ops, provided only for compatibility reasons" */
     return(CMD_OK);
   }
 
@@ -206,7 +205,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       } else if (imatch(p->argv[i], "/v")) {
         setup->verifyflag = 1;
       } else {
-        outputnl("Invalid switch");
+        nls_outputnl(0,2); /* "Invalid switch" */
         return(CMD_FAIL);
       }
       continue;
@@ -216,7 +215,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
     if (p->argv[i][0] == '+') {
       /* a plus cannot appear after destination or before first source */
       if ((setup->dst[0] != 0) || (setup->src_count == 0)) {
-        outputnl("Invalid syntax");
+        nls_outputnl(0,1); /* "Invalid syntax" */
         return(CMD_FAIL);
       }
       setup->lastitemwasplus = 1;
@@ -240,11 +239,11 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
     /* must be a dst then */
     if (setup->dst[0] != 0) {
-      outputnl("Invalid syntax");
+      nls_outputnl(0,1); /* "Invalid syntax" */
       return(CMD_FAIL);
     }
     if (file_truename(p->argv[i], setup->dst) != 0) {
-      outputnl("Invalid destination");
+      nls_outputnl(0,8); /* "Invalid destination" */
       return(CMD_FAIL);
     }
     setup->dst_asciimode = setup->last_asciimode;
@@ -266,7 +265,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
   /* must have at least one source */
   if (setup->src_count == 0) {
-    outputnl("Required parameter missing");
+    nls_outputnl(0,7); /* "Required parameter missing" */
     return(CMD_FAIL);
   }
 
@@ -356,7 +355,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
   }
 
-  sprintf(setup->databuf, "%u file(s) copied", copiedcount_out);
+  sprintf(setup->databuf, svarlang_str(38,9)/*"%u file(s) copied"*/, copiedcount_out);
   outputnl(setup->databuf);
 
   return(CMD_OK);

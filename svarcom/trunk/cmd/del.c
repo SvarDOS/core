@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2022 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -38,18 +38,18 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
   char *fname = dta->fname;
 
   if (cmd_ishlp(p)) {
-    outputnl("Deletes one or more files.");
+    nls_outputnl(36,0); /* "Deletes one or more files." */
     outputnl("");
-    outputnl("DEL [drive:][path]filename [/P]");
-    outputnl("ERASE [drive:][path]filename [/P]");
+    nls_outputnl(36,1); /* "DEL [drive:][path]filename [/P]" */
+    nls_outputnl(36,2); /* "ERASE [drive:][path]filename [/P]" */
     outputnl("");
-    outputnl("[drive:][path]filename  Specifies the file(s) to delete.");
-    outputnl("/P  Prompts for confirmation before deleting each file.");
+    nls_outputnl(36,3); /* "[drive:][path]filename  Specifies the file(s) to delete." */
+    nls_outputnl(36,4); /* "/P  Prompts for confirmation before deleting each file." */
     return(CMD_OK);
   }
 
   if (p->argc == 0) {
-    outputnl("Required parameter missing");
+    nls_outputnl(0,7); /* "Required parameter missing" */
     return(CMD_FAIL);
   }
 
@@ -60,13 +60,13 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
       if (imatch(p->argv[i], "/p")) {
         confirmflag = 1;
       } else {
-        output("Invalid switch:");
-        output(" ");
+        nls_output(0,2); /* "Invalid switch" */
+        output(": ");
         outputnl(p->argv[i]);
         return(CMD_FAIL);
       }
     } else if (delspec != NULL) { /* otherwise its a delspec */
-      outputnl("Too many parameters");
+      nls_outputnl(0,4); /* "Too many parameters" */
       return(CMD_FAIL);
     } else {
       delspec = p->argv[i];
@@ -86,8 +86,8 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
   /* is this about deleting all content inside a directory? if no per-file
    * confirmation set, ask for a global confirmation */
   if ((confirmflag == 0) && (imatch(buff + pathlimit, "????????.???"))) {
-    outputnl("All files in directory will be deleted!");
-    if (askchoice("Are you sure (Y/N)?", "YN") != 0) return(CMD_FAIL);
+    nls_outputnl(36,5); /* "All files in directory will be deleted!" */
+    if (askchoice(svarlang_str(36,6)/*"Are you sure (Y/N)?"*/, svarlang_str(0,10)/*"YN"*/) != 0) return(CMD_FAIL);
   }
 
   for (i = 0;; i = 1) {
@@ -113,7 +113,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
     if (confirmflag) {
       output(buff);
       output(" \t");
-      if (askchoice("Delete (Y/N)?", "YN") != 0) continue;
+      if (askchoice(svarlang_str(36,7)/*"Delete (Y/N)?"*/, svarlang_str(0,10)) != 0) continue;
     }
 
     /* del found file */

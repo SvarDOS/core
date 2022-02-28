@@ -72,7 +72,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
       case ':':
       case '\\':
       case '/':
-        nls_outputnl(25,4); /* "Invalid destination" */
+        nls_outputnl(0,8); /* "Invalid destination" */
         return(CMD_FAIL);
     }
     buff1[fnameoffset + i] = p->argv[1][i];
