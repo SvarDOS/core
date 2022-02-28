@@ -87,6 +87,7 @@ release: command.com .SYMBOLIC
 	copy *.txt doc\svarcom\
 	copy svarcom.lsm appinfo\
 	copy svarcom.lng nls\
+	upx -9 --8086 bin\command.com
 	zip -9rkDX -m svarcom.svp appinfo bin doc nls
 	rmdir appinfo
 	rmdir bin
