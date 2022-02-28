@@ -111,7 +111,7 @@ void output_internal(const char *s, unsigned char nl, unsigned char handle) {
 void nls_output_internal(unsigned short id, unsigned char nl, unsigned char handle) {
   const char *NOTFOUND = "NLS_STRING_NOT_FOUND";
   const char *ptr = svarlang_strid(id);
-  if (ptr == NULL) ptr = NOTFOUND;
+  if ((ptr == NULL) || (ptr[0]) == 0) ptr = NOTFOUND;
   output_internal(ptr, nl, handle);
 }
 
