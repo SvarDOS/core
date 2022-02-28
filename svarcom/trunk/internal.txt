@@ -5,12 +5,13 @@
 
 === SWAPPING =================================================================
 
-While conventional RAM is scarce, a command line interpreter must make effort
-to reduce its memory footprint when launching applications. SvarCOM does that
-by installing a small executable module in memory, called RMOD (for Resident
-MODule). SvarCOM pre-sets RMOD so knows how to execute the external program
-and removes itself from memory, letting RMOD do the job. RMOD executes the
-application, waits for it to finish and then calls back SvarCOM.
+Conventional RAM is scarce, that is why a command line interpreter must make
+efforts to reduce its memory footprint when launching applications. SvarCOM
+does that by installing a small executable module in memory, called RMOD (for
+Resident MODule). SvarCOM pre-sets RMOD so it knows how to execute the external
+program and removes itself from memory, letting RMOD do the job. RMOD executes
+the application, waits for it to finish and then calls back SvarCOM. All
+necessary contextual data is kept in a resident, RMOD-owned memory structure.
 
 
 === NLS STRINGS ==============================================================
@@ -20,11 +21,11 @@ precompiled resource file named SVARCOM.LNG. When SvarCOM starts, it looks
 for this file in the %NLSPATH% directory and loads from it the part that
 contains the %LANG% language. All this is done by nls_langreload().
 
-The SVARCOM.LNG file is compiled by a separate tool: TLUMACZ. It takes
-CATS-style language files as input and compiles them into a single SVARCOM.LNG
-resource file. It also produces a DEFAULT.LNG with english strings only, this
-one is embedded into the SvarCOM executable to display english text in case
-SVARCOM.LNG is unavailable.
+The SVARCOM.LNG file is compiled by TLUMACZ (from the SvarLANG.lib suite). It
+takes CATS-style language files as input and compiles them into a single
+SVARCOM.LNG resource file. It also produces a DEFLANG.C file with english
+strings only, this one is embedded into the SvarCOM executable to display
+English text in case SVARCOM.LNG is unavailable.
 
 
 === BATCH FILES SUPPORT ======================================================
@@ -74,6 +75,29 @@ run selected programs from any directory, without the need to copy these
 programs to a directory in %PATH%. Executable links are flat files written in
 %DOSDIR%\LINKS\. Each file there contains the directory where the matching
 program should be looked for.
+
+
+=== STACK-OVERFLOW PROTECTION =================================================
+
+RMOD reserves a 64-bytes memory buffer for its private stack. This is more than
+enough for RMOD itself, as well as for the DOS exec function INT 21h,AX=4B00h.
+
+There may be, however, exotic configurations where this stack is not enough,
+typically if some stack-hungry TSR kicks in while RMOD is being active, or some
+large interrupt handlers are used, etc. In such situation the 64-bytes stack
+could be overflowed. RMOD copes with this by placing the stack right on top of
+its command history buffer, and terminates the history string with a specific
+signature. This way, if a stack overflow occurs and damages the command history
+buffer, SvarCOM is able to easily detect it and invalidates the history buffer,
+causing no risk of system instability. The user is notified about it, and the
+only inconvenience is that he cannot recall the previous command.
+
+Below the input buffer is RMOD's own memory signature, followed by its PSP.
+This means that should the stack overflow become truly severe (more than 192
+bytes and less than 326 bytes), RMOD signature will be overwritten and SvarCOM
+won't be able to locate it, so a new copy of RMOD will be recreated. In case of
+of a stack overflow that tries to use more than 326 bytes of memory, all hope
+is lost and everything becomes possible.
 
 
 ===================================================================== EOF ====

@@ -3,7 +3,7 @@
                     === SvarCOM's history / changelog ===
 
 
-=== ver 2022.1 (xx.xx.xxxx) ==================================================
+=== ver 2022.1 (28.02.2022) ==================================================
 
  - added GOTO support (jumps to a labelled line within a batch file)
  - added CALL support (calls batch files from within batch files)
