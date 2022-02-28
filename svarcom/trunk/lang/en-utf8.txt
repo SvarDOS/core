@@ -15,18 +15,19 @@
 0.7:Required parameter missing
 0.8:Invalid destination
 
-# the message below MUST be a two-letter upper-case string for "Yes/No" keys
+# the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
 0.10:YN
 
 # SVARCOM HELP SCREEN
 1.0:Starts the SvarCOM command interpreter
-1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] command]
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] command]
 1.2:/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)
 1.3:/E:nnn  Sets the environment size to nnn bytes
 1.4:/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT
 1.5:/C      Executes the specified command and returns
 1.6:/K      Executes the specified command and continues running
+1.7:/Y      Executes the batch program step by step (only with /P, /K or /C)
 
 # VARIOUS SVARCOM MESSAGES
 2.0:SVARCOM VERSION CHANGED. SYSTEM HALTED. PLEASE REBOOT YOUR COMPUTER.
@@ -206,8 +207,8 @@
 36.3:[drive:][path]filename  Specifies the file(s) to delete.
 36.4:/P  Prompts for confirmation before deleting each file.
 36.5:All files in directory will be deleted!
-36.6:Are you sure (Y/N)?
-36.7:Delete (Y/N)?
+36.6:Are you sure?
+36.7:Delete?
 
 # DIR
 37.0:Displays a list of files and subdirectories in a directory.

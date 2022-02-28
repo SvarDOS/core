@@ -87,7 +87,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
    * confirmation set, ask for a global confirmation */
   if ((confirmflag == 0) && (imatch(buff + pathlimit, "????????.???"))) {
     nls_outputnl(36,5); /* "All files in directory will be deleted!" */
-    if (askchoice(svarlang_str(36,6)/*"Are you sure (Y/N)?"*/, svarlang_str(0,10)/*"YN"*/) != 0) return(CMD_FAIL);
+    if (askchoice(svarlang_str(36,6)/*"Are you sure?"*/, svarlang_str(0,10)/*"YN"*/) != 0) return(CMD_FAIL);
   }
 
   for (i = 0;; i = 1) {
@@ -113,7 +113,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
     if (confirmflag) {
       output(buff);
       output(" \t");
-      if (askchoice(svarlang_str(36,7)/*"Delete (Y/N)?"*/, svarlang_str(0,10)) != 0) continue;
+      if (askchoice(svarlang_str(36,7)/*"Delete?"*/, svarlang_str(0,10)) != 0) continue;
     }
 
     /* del found file */

@@ -3,6 +3,11 @@
                     === SvarCOM's history / changelog ===
 
 
+=== ver 2022.2 (xx.xx.xxxx) ==================================================
+
+ - step-by-step execution of batch files (/Y)
+
+
 === ver 2022.1 (28.02.2022) ==================================================
 
  - added GOTO support (jumps to a labelled line within a batch file)

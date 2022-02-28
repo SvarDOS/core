@@ -30,12 +30,15 @@
 #define FLAG_ECHOFLAG         4
 #define FLAG_ECHO_BEFORE_BAT  8
 #define FLAG_SKIP_AUTOEXEC   16
+#define FLAG_STEPBYSTEP      32
+
 
 /* batch context structure used to track what batch file is being executed,
  * at what line, arguments, whether or not it has a parent batch... */
 struct batctx {
   char fname[130];            /* truename of batch file being processed */
   char argv[130];             /* args of the batch call (0-separated) */
+  unsigned char flags;        /* used for step-by-step execution */
   unsigned long nextline;     /* offset in file of next bat line to process */
   struct batctx far *parent;  /* parent context if this batch was CALLed */
 };

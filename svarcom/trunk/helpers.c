@@ -199,11 +199,19 @@ unsigned short findnext(struct DTA *dta) {
  * in string. keys in c MUST BE UPPERCASE! */
 unsigned short askchoice(const char *s, const char *c) {
   unsigned short res;
+  char cstr[2] = {0,0};
   char key = 0;
 
   AGAIN:
   output(s);
   output(" ");
+  output("(");
+  for (res = 0; c[res] != 0; res++) {
+    if (res != 0) output("/");
+    cstr[0] = c[res];
+    output(cstr);
+  }
+  output(") ");
 
   _asm {
     push ax

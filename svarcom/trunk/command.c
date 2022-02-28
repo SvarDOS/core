@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <process.h>
+#include "svarlang.lib/svarlang.h"
 
 #include "cmd.h"
 #include "env.h"
@@ -153,8 +153,15 @@ static void parse_argv(struct config *cfg) {
         /* FALLTHRU */
       case 'k': /* /K = execute command and keep running */
       case 'K':
-        cfg->execcmd = cmdline + 1;
-        return;
+        cmdline++;
+        while (*cmdline == ' ') cmdline++;
+        cfg->execcmd = cmdline;
+        break;
+
+      case 'y': /* /Y = execute batch file step-by-step (with /P, /K or /C) */
+      case 'Y':
+        cfg->flags |= FLAG_STEPBYSTEP;
+        break;
 
       case 'd': /* /D = skip autoexec.bat processing */
       case 'D':
@@ -184,6 +191,7 @@ static void parse_argv(struct config *cfg) {
         nls_outputnl(1,4); /* "/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT" */
         nls_outputnl(1,5); /* "/C      Executes the specified command and returns" */
         nls_outputnl(1,6); /* "/K      Executes the specified command and continues running" */
+        nls_outputnl(1,7); /* "/Y      Executes the batch program step by step" */
         exit(1);
         break;
 
@@ -456,6 +464,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
 
     /* fill the newly allocated batctx structure */
     _fstrcpy(newbat->fname, cmdfile); /* truename of the BAT file */
+    newbat->flags = flags & FLAG_STEPBYSTEP;
     /* explode args of the bat file and store them in rmod buff */
     cmd_explode(buff, cmdline, NULL);
     _fmemcpy(newbat->argv, buff, sizeof(newbat->argv));
@@ -836,10 +845,12 @@ int main(void) {
       flags &= ~DELETE_STDIN_FILE;
     }
 
-    /* skip user input if I have a command to exec (/C or /K) */
+    /* skip user input if I have a command to exec (/C or /K or /P) */
     if (cfg.execcmd != NULL) {
       cmdline = cfg.execcmd;
       cfg.execcmd = NULL;
+      /* */
+      if (cfg.flags & FLAG_STEPBYSTEP) flags |= FLAG_STEPBYSTEP;
       goto EXEC_CMDLINE;
     }
 
@@ -862,6 +873,11 @@ int main(void) {
       while (*cmdline == ' ') cmdline++;
       /* skip batch labels */
       if (*cmdline == ':') continue;
+      /* step-by-step execution? */
+      if (rmod->bat->flags & FLAG_STEPBYSTEP) {
+        if (*cmdline == 0) continue; /* skip empty lines */
+        if (askchoice(cmdline, svarlang_str(0,10)) != 0) continue;
+      }
       /* output prompt and command on screen if echo on and command is not
        * inhibiting it with the @ prefix */
       if ((rmod->flags & FLAG_ECHOFLAG) && (cmdline[0] != '@')) {
@@ -920,7 +936,6 @@ int main(void) {
     cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops, flags & DELETE_STDIN_FILE);
     if ((cmdres == CMD_OK) || (cmdres == CMD_FAIL)) {
       /* internal command executed */
-      continue;
     } else if (cmdres == CMD_CHANGED) { /* cmdline changed, needs to be reprocessed */
       goto EXEC_CMDLINE;
     } else if (cmdres == CMD_CHANGED_BY_CALL) { /* cmdline changed *specifically* by CALL */
@@ -930,18 +945,20 @@ int main(void) {
     } else if (cmdres == CMD_NOTFOUND) {
       /* this was not an internal command, try matching an external command */
       run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops, flags);
-      flags &= ~CALL_FLAG; /* reset callflag to make sure it is processed only once */
 
       /* is it a newly launched BAT file? */
       if ((rmod->bat != NULL) && (rmod->bat->nextline == 0)) goto SKIP_NEWLINE;
       /* run_as_external() does not return on success, if I am still alive then
        * external command failed to execute */
       nls_outputnl(0,5); /* "Bad command or file name" */
-      continue;
+    } else {
+      /* I should never ever land here */
+      outputnl("INTERNAL ERR: INVALID CMDRES");
     }
 
-    /* I should never ever land here */
-    outputnl("INTERNAL ERR: INVALID CMDRES");
+    /* reset one-time only flags */
+    flags &= ~CALL_FLAG;
+    flags &= ~FLAG_STEPBYSTEP;
 
     /* repeat unless /C was asked - but always finish running an ongoing batch
      * file (otherwise only first BAT command would be executed with /C) */
