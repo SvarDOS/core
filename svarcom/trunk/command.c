@@ -45,7 +45,7 @@
  * RMOD should not be accessed as its structure might no longer be in sync
  * with what I think it is.
  *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***          */
-#define BYTE_VERSION 3
+#define BYTE_VERSION 4
 
 
 struct config {
@@ -821,6 +821,17 @@ int main(void) {
   }
 
   do {
+    /* am I inside a FOR loop? */
+    if (rmod->forloop) {
+      outputnl("FOR IS NOT IMPLEMENTED YET");
+      /* TODO dta_inited: FindFirst() or FindNext()? */
+      /* TODO read result */
+      /* TODO end of results? move to next pattern */
+      /* free used memory */
+      rmod_ffree(rmod->forloop);
+      rmod->forloop = NULL;
+    }
+
     /* terminate previous command with a CR/LF if ECHO ON (but not during BAT processing) */
     if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->bat == NULL)) outputnl("");
 

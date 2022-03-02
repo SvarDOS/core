@@ -90,6 +90,7 @@
 18.4:command      the command to carry out for each matched file.
 18.5:parameters   parameters or switches for the specified command.
 18.6:To use FOR in a batch program, use %%variable instead of %variable.
+18.7:FOR cannot be nested
 
 # VERIFY
 19.0:Tells DOS whether to verify that files are written correctly to disk.

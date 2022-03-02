@@ -56,6 +56,14 @@
  */
 
 static enum cmd_result cmd_for(struct cmd_funcparam *p) {
+  struct forctx *f = (void *)(p->BUFFER);
+  unsigned short i;
+
+  /* forbid nested FORs */
+  if (p->rmod->forloop) {
+    nls_outputnl(18,7); /* FOR cannot be nested */
+    return(CMD_FAIL);
+  }
 
   /* help screen ONLY if /? is the only argument */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
@@ -72,7 +80,56 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
     return(CMD_OK);
   }
 
-  outputnl("FOR IS NOT IMPLEMENTED YET");
+  /* clear out struct and copy command line to it */
+  bzero(f, sizeof(*f));
+  strcpy(f->cmd, p->cmdline);
+
+  /* locate the %varname */
+  i = p->argoffset;
+  while (f->cmd[i] == ' ') i++;
+  if (f->cmd[i] != '%') goto INVALID_SYNTAX;
+  f->varname = i;
+  /* find the end of varname (space) */
+  while ((f->cmd[i] != ' ') && (f->cmd[i] != 0)) i++;
+  if (f->cmd[i] != ' ') goto INVALID_SYNTAX;
+  f->cmd[i++] = 0; /* terminate varname and move to next field */
+
+  /* look (and skip) the "IN" part */
+  while (f->cmd[i] == ' ') i++;
+  if (((f->cmd[i] & 0xDF) != 'I') && ((f->cmd[i+1] & 0xDF) != 'N') && (f->cmd[i+2] != ' ')) goto INVALID_SYNTAX;
+  i += 3;
+
+  /* look for patterns start */
+  while (f->cmd[i] == ' ') i++;
+  if (f->cmd[i] != '(') goto INVALID_SYNTAX;
+  i++;
+  while (f->cmd[i] == ' ') i++;
+  f->curpat = i;
+  /* look for patterns end */
+  while ((f->cmd[i] != ')') && (f->cmd[i] != 0)) i++;
+  if (f->cmd[i] != ')') goto INVALID_SYNTAX;
+  f->cmd[i++] = 0; /* terminate patterns and move to next field */
+
+  /* look (and skip) the "DO" part */
+  while (f->cmd[i] == ' ') i++;
+  if (((f->cmd[i] & 0xDF) != 'D') && ((f->cmd[i+1] & 0xDF) != 'O') && (f->cmd[i+2] != ' ')) goto INVALID_SYNTAX;
+  i += 3;
+  while (f->cmd[i] == ' ') i++;
+
+  /* rest is the exec string */
+  f->exec = i;
+
+  /* alloc memory for the forctx context and copy f to it */
+  p->rmod->forloop = rmod_fcalloc(sizeof(*f), p->rmod->rmodseg, "SVFORCTX");
+  if (p->rmod->forloop == NULL) {
+    nls_outputnl_doserr(8);
+    return(CMD_FAIL);
+  }
+  _fmemcpy(p->rmod->forloop, f, sizeof(*f));
 
   return(CMD_OK);
+
+  INVALID_SYNTAX:
+  nls_outputnl(0,1); /* "Invalid syntax" */
+  return(CMD_FAIL);
 }

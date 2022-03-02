@@ -25,6 +25,8 @@
 #ifndef RMODINIT_H
 #define RMODINIT_H
 
+#include "helpers.h" /* struct DTA definition */
+
 #define FLAG_EXEC_AND_QUIT    1
 #define FLAG_PERMANENT        2
 #define FLAG_ECHOFLAG         4
@@ -43,6 +45,16 @@ struct batctx {
   struct batctx far *parent;  /* parent context if this batch was CALLed */
 };
 
+/* for context structure used to track the execution of the ongoing FOR loop */
+struct forctx {
+  char cmd[130];              /* copy of the original FOR command */
+  unsigned short varname;     /* cmd offset of the replaceable variable name */
+  unsigned short curpat;      /* cmd offset of currently processed pattern */
+  unsigned short exec;        /* cmd offset of the command to be executed */
+  struct DTA dta;             /* DTA for FindNext on current pattern */
+  unsigned char dta_inited;   /* 0=requires FindFirst 1=FindNext */
+};
+
 struct rmod_props {
   unsigned short rmodseg;     /* segment where rmod is loaded */
   unsigned long origparent;   /* original parent (far ptr) of the shell */
@@ -50,7 +62,8 @@ struct rmod_props {
   unsigned char flags;        /* command line parameters */
   unsigned char version;      /* used to detect mismatch between rmod and SvarCOM */
   char awaitingcmd[130];      /* command to exec next time (if any) */
-  struct batctx far *bat;
+  struct batctx far *bat;     /* linked list of bat contexts, if BAT ongoing */
+  struct forctx far *forloop; /* a single FOR loop structure, if FOR ongoing */
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
