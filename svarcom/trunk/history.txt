@@ -7,6 +7,7 @@
 
  - fixed parsing of /C and /K arguments that were leading to spurious warnings
  - step-by-step execution of batch files (/Y)
+ - fixed %var% matching within batch files to be case-insensitive
 
 
 === ver 2022.1 (28.02.2022) ==================================================
