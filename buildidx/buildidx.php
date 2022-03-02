@@ -10,7 +10,6 @@
 
   requires php-zip
 
-  02 mar 2022: (yet to create) freecom allowed to have a COMMAND.COM file without subdirectory
   28 feb 2022: svarcom allowed to have a COMMAND.COM file without subdirectory
   24 feb 2022: added hardcoded hack to translate version 'x.xx' to '0.44' (NESticle)
   23 feb 2022: basic validation of source archives (not empty + matches an existing svp file)
@@ -37,7 +36,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220302";
+$PVER = "20220228";
 
 
 // computes the BSD sum of a file and returns it
@@ -396,10 +395,6 @@ foreach ($pkgfiles as $fname) {
     }
     // SVARCOM is allowed to have a root-based COMMAND.COM file
     if ($pkgnam === 'svarcom') {
-      if ($f === 'command.com') continue;
-    }
-    // FREECOM is allowed to have a root-based COMMAND.COM file
-    if ($pkgnam === 'freecom') {
       if ($f === 'command.com') continue;
     }
     // the help package is allowed to put files in... help
