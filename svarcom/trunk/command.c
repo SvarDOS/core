@@ -154,9 +154,8 @@ static void parse_argv(struct config *cfg) {
       case 'k': /* /K = execute command and keep running */
       case 'K':
         cmdline++;
-        while (*cmdline == ' ') cmdline++;
         cfg->execcmd = cmdline;
-        break;
+        return; /* further arguments are for the executed program, not for me */
 
       case 'y': /* /Y = execute batch file step-by-step (with /P, /K or /C) */
       case 'Y':
