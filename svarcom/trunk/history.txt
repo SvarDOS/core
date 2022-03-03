@@ -3,11 +3,11 @@
                     === SvarCOM's history / changelog ===
 
 
-=== ver 2022.2 (xx.xx.xxxx) ==================================================
+=== ver 2022.2 (04.03.2022) ==================================================
 
- - added FOR support
+ - added support for the internal FOR command
  - step-by-step execution of batch files (/Y)
- - fixed parsing of /C and /K arguments that were leading to spurious warnings
+ - fixed parsing of /C and /K arguments that was leading to spurious warnings
  - fixed %var% matching within batch files to be case-insensitive
 
 
