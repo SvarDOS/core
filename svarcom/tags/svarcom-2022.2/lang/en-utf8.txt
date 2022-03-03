@@ -1,0 +1,284 @@
+#
+# SvarCOM translation file
+# Lang: ENGLISH
+#
+# Autor: Mateusz Viste
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Invalid syntax
+0.2:Invalid switch
+0.3:Invalid parameter format
+0.4:Too many parameters
+0.5:Bad command or file name
+0.6:Invalid parameter
+0.7:Required parameter missing
+0.8:Invalid destination
+
+# the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:YN
+
+# SVARCOM HELP SCREEN
+1.0:Starts the SvarCOM command interpreter
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] command]
+1.2:/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)
+1.3:/E:nnn  Sets the environment size to nnn bytes
+1.4:/P      Makes the new command interpreter permanent and run AUTOEXEC.BAT
+1.5:/C      Executes the specified command and returns
+1.6:/K      Executes the specified command and continues running
+1.7:/Y      Executes the batch program step by step (only with /P, /K or /C)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:SVARCOM VERSION CHANGED. SYSTEM HALTED. PLEASE REBOOT YOUR COMPUTER.
+2.1:FATAL ERROR: rmod_install() failed
+2.2:SvarCOM: stack overflow detected, command history flushed (this is not a bug)
+
+# CLS
+10.0:Clears the screen
+
+# CHCP
+11.0:Displays or sets the active code page number.
+11.1:CHCP [nnn]
+11.2:nnn  Specifies a code page number
+11.3:Type CHCP without a parameter to display the active code page number.
+11.4:Invalid code page number
+11.5:NLSFUNC not installed
+11.6:Failed to change code page
+11.7:Active code page:
+
+# CD / CHDIR
+12.0:Displays the name of or changes the current directory.
+12.1:CHDIR [drive:][path]
+12.2:CHDIR[..]
+12.3:CD [drive:][path]
+12.4:CD[..]
+12.5:.. Specifies that you want to change to the parent directory.
+12.6:Type CD drive: to display the current directory in the specified drive.
+12.7:Type CD without parameters to display the current drive and directory.
+
+# CALL
+13.0:Calls one batch program from another
+13.1:CALL [drive:][path]filename [batch-parameters]
+
+# BREAK
+14.0:Sets or clears extended CTRL+C checking
+14.1:Type BREAK without a parameter to display the current BREAK setting.
+14.2:BREAK is off
+14.3:BREAK is on
+
+# PAUSE
+15.0:Suspends the execution of a batch script
+15.1:Press any key to continue...
+
+# SHIFT
+16.0:Changes the position of arguments in a batch file:
+16.1:Argument %1 becomes %0, argument %2 becomes %1, etc.
+
+# GOTO
+17.0:Directs batch processing to a labelled line in the batch program.
+17.1:GOTO LABEL
+17.2:LABEL specifies a text string used in the batch program as a label.
+17.3:A label is on a line by itself and must be preceded by a colon.
+17.10:Label not found
+
+# FOR
+18.0:Runs a specified command for each file in a set of files.
+18.1:FOR %variable IN (set) DO command [parameters]
+18.2:%variable    a replaceable parameter name.
+18.3:(set)        a set of one of more space-separated files. Wildcards allowed.
+18.4:command      the command to carry out for each matched file.
+18.5:parameters   parameters or switches for the specified command.
+18.6:To use FOR in a batch program, use %%variable instead of %variable.
+18.7:FOR cannot be nested
+
+# VERIFY
+19.0:Tells DOS whether to verify that files are written correctly to disk.
+19.1:Type VERIFY without a parameter to display its current setting.
+19.2:VERIFY is off
+19.3:VERIFY is on
+19.4:Must specify ON or OFF
+
+# VER
+20.0:Displays the DOS version.
+20.1:DOS kernel version %u.%u
+20.2:SvarCOM shell ver
+20.3:SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.
+20.4:This software is distributed under the terms of the MIT license.
+
+# TYPE
+21.0:Displays the contents of a text file.
+21.1:TYPE [drive:][path]filename
+
+# TIME
+22.0:Displays or sets the system time.
+22.1:TIME [time]
+22.2:Type TIME with no parameters to display the current time and a prompt for a\r\nnew one. Press ENTER to keep the same time.
+22.3:Current time is
+22.4:Invalid time
+22.5:Enter new time:
+
+# SET
+23.0:Displays, sets, or removes DOS environment variables.
+23.1:SET [variable=[string]]
+23.2:variable  Specifies the environment-variable name
+23.3:string    Specifies a series of characters to assign to the variable
+23.4:Type SET without parameters to display the current environment variables.
+23.5:Not enough available space within the environment block
+
+# RD / RMDIR
+24.0:Removes (deletes) a directory
+24.1:RMDIR [drive:]path
+24.2:RD [drive:]path
+
+# REN / RENAME
+25.0:Renames a file
+25.1:RENAME [drive:][path]filename1 filename2
+25.2:REN [drive:][path]filename1 filename2
+25.3:Note that you cannot specify a new drive or path for your destination file.\r\nUse MOVE to rename a directory, or to move files from one directory to another.
+
+# REM
+26.0:Records comments (remarks) in a batch file or CONFIG.SYS
+26.1:REM [comment]
+
+# PATH
+27.0:Displays or sets a search path for executable files.
+27.1:PATH [[drive:]path[;...]]
+27.2:Type PATH ; to clear all search-path settings and direct DOS to search\r\nonly in the current directory.
+27.3:Type PATH without parameters to display the current path.
+27.4:No Path
+
+# MD / MKDIR
+28.0:Creates a directory
+28.1:MKDIR [drive:]path
+28.2:MD [drive:]path
+
+# LN
+29.0:Adds, deletes or displays executable links.
+29.1:LN ADD linkname targetdir
+29.2:LN DEL linkname
+29.3:LN LIST [pattern]
+29.4:No matching executable found in given path.
+29.5:%DOSDIR% not defined
+
+# EXIT
+30.0:Quits the COMMAND.COM program (command interpreter)
+
+# ECHO
+31.0:Displays messages, or turns command-echoing on or off
+31.1:ECHO [message]
+31.2:Type ECHO without parameters to display the current echo setting.
+31.3:ECHO is on
+31.4:ECHO is off
+
+# DATE
+32.0:Displays or sets the system date.
+32.1:DATE [date]
+32.2:Type DATE with no parameters to display the current date and a prompt for a\r\nnew one. Press ENTER to keep the same date.
+32.3:Invalid date
+32.4:Current date is
+32.5:Enter new date:
+
+# PROMPT
+33.0:Changes the DOS command prompt.
+33.1:PROMPT [new command prompt specification]
+
+# VOL
+34.0:Displays the disk volume label and serial number, if they exist.
+34.1:VOL [drive:]
+34.2:Volume in drive %c has no label
+34.3:Volume in drive %c is %s
+34.4:Volume Serial Number is %04X-%04X
+
+# IF
+35.0:Performs conditional processing in batch programs.
+35.1:IF [NOT] ERRORLEVEL num command
+35.2:IF [NOT] string1==string2 command
+35.3:IF [NOT] EXIST filename command
+35.4:NOT               command is executed only if condition is NOT met
+35.5:ERRORLEVEL num    condition: last program returned an exit code >= num
+35.6:string1==string2  condition: both strings must be equal
+35.7:EXIST filename    condition: filename exists (wildcards accepted)
+35.8:command           command to carry out if condition is met
+
+# DEL
+36.0:Deletes one or more files.
+36.1:DEL [drive:][path]filename [/P]
+36.2:ERASE [drive:][path]filename [/P]
+36.3:[drive:][path]filename  Specifies the file(s) to delete.
+36.4:/P  Prompts for confirmation before deleting each file.
+36.5:All files in directory will be deleted!
+36.6:Are you sure?
+36.7:Delete?
+
+# DIR
+37.0:Displays a list of files and subdirectories in a directory.
+37.1:DIR [drive:][path][filename] [/P] [/W] [/A[:]attributes] [/O[[:]sortorder]] [/S] [/B] [/L]
+37.2:/P Pauses after each screenful of information
+37.3:/W Uses wide list format
+37.4:/A Displays files with specified attributes:
+37.5:    D Directories            R Read-only files        H Hidden files
+37.6:    A Ready for archiving    S System files           - prefix meaning "not"
+37.7:/O List files in sorted order:
+37.8:    N by name                S by size                E by extension
+37.9:    D by date                G group dirs first       - prefix to reverse order"
+37.10:/S Displays files in specified directory and all subdirectories
+37.11:/B Uses bare format (no heading information or summary)
+37.12:/L Uses lowercases
+37.20:Directory of %s
+37.21:<DIR>
+37.22:file(s)
+37.23:bytes
+37.24:bytes free
+
+# COPY
+38.0:Copies one or more files to another location.
+38.1:COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]
+38.2:source       Specifies the file or files to be copied
+38.3:/A           Indicates an ASCII text file
+38.4:/B           Indicates a binary file
+38.5:destination  Specifies the directory and/or filename for the new file(s)
+38.6:/V           Verifies that new files are written correctly
+38.7:To append files, specify a single file for destination, but multiple files\r\nfor source (using wildcards or file1+file2+file3 format).
+38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.
+38.9:%u file(s) copied
+
+# DOS ERRORS
+255.1:Function number invalid
+255.2:File not found
+255.3:Path not found
+255.4:Too many open files (no handles available)
+255.5:Access denied
+255.6:Invalid handle
+255.7:Memory control block destroyed
+255.8:Insufficient memory
+255.9:Memory block address invalid
+255.10:Environment invalid
+255.11:Format invalid
+255.12:Access code invalid
+255.13:Data invalid
+255.15:Invalid drive
+255.16:Attempted to remove current directory
+255.17:Not same device
+255.18:No more files
+255.19:Disk write-protected
+255.20:Unknown unit
+255.21:Drive not ready
+255.22:Unknown command
+255.23:Data error (CRC)
+255.24:Bad request structure length
+255.25:Seek error
+255.26:Unknown media type (non-DOS disk)
+255.27:Sector not found
+255.28:Printer out of paper
+255.29:Write fault
+255.30:Read fault
+255.31:General failure
+255.32:Sharing violation
+255.33:Lock violation
+255.34:Disk change invalid
+255.35:FCB unavailable
+255.36:Sharing buffer overflow
+255.37:Code page mismatch
+255.38:Cannot complete file operations (EOF / out of input)
+255.39:Insufficient disk space
