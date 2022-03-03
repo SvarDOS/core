@@ -36,6 +36,7 @@ DEL/ERASE   - deletes one or more files
 DIR         - displays a list of files and subdirectories in a directory
 ECHO        - displays messages, or turns command-echoing on or off
 EXIT        - quits the command.com program (command interpreter)
+FOR         - runs a specified command for each file in a set of files
 GOTO        - directs batch processing to a labelled line in the batch program
 IF          - performs conditional processing in batch programs
 LN          - adds, deletes and displays global executable links

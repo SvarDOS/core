@@ -5,8 +5,9 @@
 
 === ver 2022.2 (xx.xx.xxxx) ==================================================
 
- - fixed parsing of /C and /K arguments that were leading to spurious warnings
+ - added FOR support
  - step-by-step execution of batch files (/Y)
+ - fixed parsing of /C and /K arguments that were leading to spurious warnings
  - fixed %var% matching within batch files to be case-insensitive
 
 

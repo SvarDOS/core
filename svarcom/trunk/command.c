@@ -762,6 +762,87 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
 }
 
 
+/* process the ongoing forloop, returns 0 on success, non-zero otherwise (no
+   more things to process) */
+static int forloop_process(char *res, struct forctx far *forloop) {
+  unsigned short i, t;
+  struct DTA *dta = (void *)0x80; /* default DTA at 80h in PSP */
+
+  TRYAGAIN:
+
+  /* dta_inited: FindFirst() or FindNext()? */
+  if (forloop->dta_inited == 0) {
+
+    /* copy next awaiting pattern to BUFFER */
+    for (i = 0;; i++) {
+      BUFFER[i] = forloop->cmd[forloop->nextpat + i];
+      /* end of patterns list */
+      if (BUFFER[i] == 0) break;
+      /* space found */
+      if (BUFFER[i] == ' ') {
+        BUFFER[i] = 0;
+        break;
+      }
+    }
+
+    if (i == 0) return(-1);
+
+    /* remember position of current pattern */
+    forloop->curpat = forloop->nextpat;
+
+    /* move nextpat forward to next pattern */
+    i += forloop->nextpat;
+    while (forloop->cmd[i] == ' ') i++;
+    forloop->nextpat = i;
+
+    /* FOR in MSDOS 6 includes hidden and system files, but not directories nor volumes */
+    if (findfirst(dta, BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_ARC) != 0) {
+      goto TRYAGAIN;
+    }
+    forloop->dta_inited = 1;
+  } else { /* dta in progress */
+
+    /* copy forloop DTA to my local copy */
+    _fmemcpy(dta, &(forloop->dta), sizeof(*dta));
+
+    /* findnext() call */
+    if (findnext(dta) != 0) {
+      forloop->dta_inited = 0;
+      goto TRYAGAIN;
+    }
+  }
+
+  /* copy updated DTA to rmod */
+  _fmemcpy(&(forloop->dta), dta, sizeof(*dta));
+
+  /* fill res with command, replacing varname by actual filename */
+  /* full filename is to be built with path of curpat and fname from dta */
+  t = 0;
+  i = 0;
+  for (;;) {
+    if ((forloop->cmd[forloop->exec + t] == '%') && (forloop->cmd[forloop->exec + t + 1] == forloop->varname)) {
+      short lastbk = i;
+      char far *c = forloop->cmd + forloop->curpat;
+      for (;;) {
+        res[i] = *c;
+        c++;
+        if (res[i] == '\\') lastbk = i;
+        if ((res[i] == ' ') || (res[i] == 0)) break;
+        i++;
+      }
+      _fstrcpy(res + lastbk, dta->fname);
+      for (i = lastbk; res[i] != 0; i++);
+      t += 2;
+    } else {
+      res[i] = forloop->cmd[forloop->exec + t];
+      t++;
+      if (res[i++] == 0) break;
+    }
+  }
+
+  return(0);
+}
+
 
 int main(void) {
   static struct config cfg;
@@ -821,16 +902,6 @@ int main(void) {
   }
 
   do {
-    /* am I inside a FOR loop? */
-    if (rmod->forloop) {
-      outputnl("FOR IS NOT IMPLEMENTED YET");
-      /* TODO dta_inited: FindFirst() or FindNext()? */
-      /* TODO read result */
-      /* TODO end of results? move to next pattern */
-      /* free used memory */
-      rmod_ffree(rmod->forloop);
-      rmod->forloop = NULL;
-    }
 
     /* terminate previous command with a CR/LF if ECHO ON (but not during BAT processing) */
     if ((rmod->flags & FLAG_ECHOFLAG) && (rmod->bat == NULL)) outputnl("");
@@ -845,6 +916,23 @@ int main(void) {
 
     /* (re)load translation strings if needed */
     nls_langreload(BUFFER, *rmod_envseg);
+
+    /* am I inside a FOR loop? */
+    if (rmod->forloop) {
+      if (forloop_process(cmdlinebuf, rmod->forloop) != 0) {
+        rmod_ffree(rmod->forloop);
+        rmod->forloop = NULL;
+      } else {
+        /* output prompt and command on screen if echo on and command is not
+         * inhibiting it with the @ prefix */
+        if (rmod->flags & FLAG_ECHOFLAG) {
+          build_and_display_prompt(BUFFER, *rmod_envseg);
+          outputnl(cmdline);
+        }
+        /* jump to command processing */
+        goto EXEC_CMDLINE;
+      }
+    }
 
     /* load awaiting command, if any (used to run piped commands) */
     if (rmod->awaitingcmd[0] != 0) {
@@ -973,7 +1061,7 @@ int main(void) {
 
     /* repeat unless /C was asked - but always finish running an ongoing batch
      * file (otherwise only first BAT command would be executed with /C) */
-  } while (((rmod->flags & FLAG_EXEC_AND_QUIT) == 0) || (rmod->bat != NULL));
+  } while (((rmod->flags & FLAG_EXEC_AND_QUIT) == 0) || (rmod->bat != NULL) || (rmod->forloop != NULL));
 
   sayonara(rmod);
   return(0);

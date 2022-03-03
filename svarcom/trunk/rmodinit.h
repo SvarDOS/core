@@ -48,10 +48,11 @@ struct batctx {
 /* for context structure used to track the execution of the ongoing FOR loop */
 struct forctx {
   char cmd[130];              /* copy of the original FOR command */
-  unsigned short varname;     /* cmd offset of the replaceable variable name */
-  unsigned short curpat;      /* cmd offset of currently processed pattern */
-  unsigned short exec;        /* cmd offset of the command to be executed */
   struct DTA dta;             /* DTA for FindNext on current pattern */
+  unsigned short curpat;      /* cmd offset of currently processed pattern */
+  unsigned short nextpat;     /* cmd offset of next pattern to be processed */
+  unsigned short exec;        /* cmd offset of the command to be executed */
+  char varname;               /* single char of variable name */
   unsigned char dta_inited;   /* 0=requires FindFirst 1=FindNext */
 };
 

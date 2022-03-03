@@ -84,15 +84,12 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
   bzero(f, sizeof(*f));
   strcpy(f->cmd, p->cmdline);
 
-  /* locate the %varname */
+  /* locate the %varname (single char) */
   i = p->argoffset;
   while (f->cmd[i] == ' ') i++;
-  if (f->cmd[i] != '%') goto INVALID_SYNTAX;
-  f->varname = i;
-  /* find the end of varname (space) */
-  while ((f->cmd[i] != ' ') && (f->cmd[i] != 0)) i++;
-  if (f->cmd[i] != ' ') goto INVALID_SYNTAX;
-  f->cmd[i++] = 0; /* terminate varname and move to next field */
+  if ((f->cmd[i] != '%') || (f->cmd[i+1] == ' ') || (f->cmd[i+2] != ' ')) goto INVALID_SYNTAX;
+  f->varname = f->cmd[i+1];
+  i += 3;
 
   /* look (and skip) the "IN" part */
   while (f->cmd[i] == ' ') i++;
@@ -104,7 +101,7 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
   if (f->cmd[i] != '(') goto INVALID_SYNTAX;
   i++;
   while (f->cmd[i] == ' ') i++;
-  f->curpat = i;
+  f->nextpat = i;
   /* look for patterns end */
   while ((f->cmd[i] != ')') && (f->cmd[i] != 0)) i++;
   if (f->cmd[i] != ')') goto INVALID_SYNTAX;
