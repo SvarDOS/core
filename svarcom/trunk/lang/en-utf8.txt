@@ -202,7 +202,7 @@
 35.7:EXIST filename    condition: file filename exists (wildcards accepted)
 35.8:command           command to carry out if condition is met
 
-# DEL
+# DEL / ERASE
 36.0:Deletes one or more files.
 36.1:DEL [drive:][path]filename [/P]
 36.2:ERASE [drive:][path]filename [/P]
