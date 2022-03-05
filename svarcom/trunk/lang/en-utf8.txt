@@ -1,8 +1,9 @@
 #
-# SvarCOM translation file
-# Lang: ENGLISH
+# SvarCOM language file
 #
-# Autor: Mateusz Viste
+# Language...: English
+# Authors....: Mateusz Viste, Robert Riebisch
+# Last update: 05 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -85,10 +86,10 @@
 # FOR
 18.0:Runs a specified command for each file in a set of files.
 18.1:FOR %variable IN (set) DO command [parameters]
-18.2:%variable    a replaceable parameter name.
-18.3:(set)        a set of one of more space-separated files. Wildcards allowed.
-18.4:command      the command to carry out for each matched file.
-18.5:parameters   parameters or switches for the specified command.
+18.2:%variable   A replaceable parameter name. (single letter)
+18.3:(set)       A set of one of more space-separated files. Wildcards allowed.
+18.4:command     The command to carry out for each matched file.
+18.5:parameters  Parameters or switches for the specified command.
 18.6:To use FOR in a batch program, use %%variable instead of %variable.
 18.7:FOR cannot be nested
 
@@ -135,7 +136,7 @@
 25.0:Renames a file
 25.1:RENAME [drive:][path]filename1 filename2
 25.2:REN [drive:][path]filename1 filename2
-25.3:Note that you cannot specify a new drive or path for your destination file.\r\nUse MOVE to rename a directory, or to move files from one directory to another.
+25.3:Note that you cannot specify a new drive or path for filename2.\r\nUse MOVE to rename a directory, or to move files from one directory to another.
 
 # REM
 26.0:Records comments (remarks) in a batch file or CONFIG.SYS
@@ -198,7 +199,7 @@
 35.4:NOT               command is executed only if condition is NOT met
 35.5:ERRORLEVEL num    condition: last program returned an exit code >= num
 35.6:string1==string2  condition: both strings must be equal
-35.7:EXIST filename    condition: filename exists (wildcards accepted)
+35.7:EXIST filename    condition: file filename exists (wildcards accepted)
 35.8:command           command to carry out if condition is met
 
 # DEL
@@ -213,7 +214,7 @@
 
 # DIR
 37.0:Displays a list of files and subdirectories in a directory.
-37.1:DIR [drive:][path][filename] [/P] [/W] [/A[:]attributes] [/O[[:]sortorder]] [/S] [/B] [/L]
+37.1:DIR [drive:][path][filename] [/P] [/W] [/A[:]attributes] [/O[[:]sortorder]]\r\n    [/S] [/B] [/L]
 37.2:/P Pauses after each screenful of information
 37.3:/W Uses wide list format
 37.4:/A Displays files with specified attributes:
@@ -221,7 +222,7 @@
 37.6:    A Ready for archiving    S System files           - prefix meaning "not"
 37.7:/O List files in sorted order:
 37.8:    N by name                S by size                E by extension
-37.9:    D by date                G group dirs first       - prefix to reverse order"
+37.9:    D by date                G group dirs first       - prefix to reverse order
 37.10:/S Displays files in specified directory and all subdirectories
 37.11:/B Uses bare format (no heading information or summary)
 37.12:/L Uses lowercases
@@ -240,7 +241,7 @@
 38.5:destination  Specifies the directory and/or filename for the new file(s)
 38.6:/V           Verifies that new files are written correctly
 38.7:To append files, specify a single file for destination, but multiple files\r\nfor source (using wildcards or file1+file2+file3 format).
-38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.
+38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.\r\nCOPY assumes binary always.
 38.9:%u file(s) copied
 
 # DOS ERRORS
