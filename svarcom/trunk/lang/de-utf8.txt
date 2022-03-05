@@ -229,7 +229,7 @@
 37.12:/L Verwendet Kleinschreibung
 37.20:Verzeichnis von %s
 37.21:<DIR>
-37.22:Dateien)
+37.22:Datei(en)
 37.23:Byte
 37.24:Byte frei
 
