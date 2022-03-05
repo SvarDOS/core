@@ -4,7 +4,7 @@
 # Language...........: German
 # Authors............: Robert Riebisch
 # Last update........: 05 Mar 2022
-# In sync with EN rev: 1028
+# In sync with EN rev: 1031
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -203,7 +203,7 @@
 35.7:EXIST Dateiname  Bedingung: Dateiname existiert (Platzhalter erlaubt)
 35.8:Befehl           Auszuführender Befehl, falls die Bedingung erfüllt ist
 
-# DEL
+# DEL / ERASE
 36.0:Löscht eine oder mehrere Dateien.
 36.1:DEL [Laufwerk:][Pfad]Dateiname [/P]
 36.2:ERASE [Laufwerk:][Pfad]Dateiname [/P]
