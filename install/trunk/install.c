@@ -700,9 +700,6 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "REM Uncomment the line below for CDROM support\r\n");
   fprintf(fd, "REM SHSUCDX /d:SVCD0001\r\n");
   fprintf(fd, "\r\n");
-  fprintf(fd, "REM Uncomment the line below for automatic mouse support\r\n");
-  fprintf(fd, "REM CTMOUSE\r\n");
-  fprintf(fd, "\r\n");
   fprintf(fd, "ECHO.\r\n");
   fprintf(fd, "ECHO %s\r\n", svarlang_strid(0x0600)); /* "Welcome to SvarDOS!" */
   fclose(fd);
