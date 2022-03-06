@@ -3,7 +3,7 @@
 
 To be able to use your mouse in your programs, you need a mouse driver.
 SvarDOS has no mouse driver by default, but there's a package for it.
-It's called CTMOUSE. You need to install this package.
+It's called CTMOUSE (CuteMouse). You need to install this package.
 
 %hINSTALLING CTMOUSE
 
