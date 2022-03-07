@@ -1,8 +1,9 @@
 #
 # SvarCOM translation file
-# Lang: French
 #
-# Autor: Berki Yenigün
+# Language.....: French
+# Authors......: Berki Yenigün + fixes and adaptations by Mateusz Viste
+# Last update..: 07 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -32,7 +33,7 @@
 # VARIOUS SVARCOM MESSAGES
 2.0:LA VERSION DE SVARCOM A CHANGÉ. SYSTÈME ARRÊTÉ. REDÉMARREZ VOTRE ORDINATEUR.
 2.1:ERREUR FATALE : rmod_install() a échoué
-2.2:SvarCOM: débordement de pile détecté, historique des commandes effacée (ce n'est pas un bug)
+2.2:SvarCOM: débordem. de pile détecté, historique effacée (ce n'est pas un bug)
 
 # CLS
 10.0:Efface l'écran
@@ -78,19 +79,19 @@
 # GOTO
 17.0:Dirige le traitement batch vers une ligne étiquetée dans le script batch.
 17.1:GOTO LABEL
-17.2:LABEL spécifie une chaîne de texte utilisée dans le script batch comme étiquette.
-17.3:Une étiquette doit être sur une ligne propre et doit être précédée par deux-points.
+17.2:LABEL spécifie une chaîne texte utilisée dans le script batch comme étiquette.
+17.3:Une étiquette est sur une ligne propre et doit être précédée par deux-points.
 17.10:Étiquette introuvable
 
 # FOR
 18.0:Exécute une commande spécifiée pour chaque fichier dans un jeu de fichiers.
 18.1:FOR %variable IN (set) DO commande [paramètres]
 18.2:%variable    un nom de paramètre remplaçable.
-18.3:(set)        un jeu d'un ou plusieurs fichiers séparés par des espaces. Jokers autorisés.
+18.3:(set)        jeu(x) de fichiers séparés par des espaces. Jokers autorisés.
 18.4:commande     la commande à exécuter pour chaque fichier correspondant.
 18.5:paramètres   paramètres ou options pour la commande spécifiée.
-18.6:Pour utiliser FOR dans un programme batch, utilisez %%variable au lieu de %variable.
-18.7:FOR ne peut être imbriqué
+18.6:Pour utiliser FOR dans un programme batch, utilisez %%variable au lieu de\r\n%variable.
+18.7:FOR ne peut pas être imbriqué
 
 # VERIFY
 19.0:Indique à DOS s'il faut vérifier que les fichiers ont été écrits correctement.
@@ -135,7 +136,7 @@
 25.0:Renomme un fichier
 25.1:RENAME [lecteur:][chemin]nomfichier1 nomfichier2
 25.2:REN [lecteur:][chemin]nomfichier1 nomfichier2
-25.3:Notez que vous ne pouvez spécifier un nouveau lecteur ou chemin pour\r\n votre fichier de destination. Utilisez MOVE pour renommer un dossier ou pour déplacer des fichiers d'un répertoire vers un autre.
+25.3:Notez que vous ne pouvez pas spécifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour renommer un dossier ou pour déplacer\r\ndes fichiers d'un répertoire vers un autre.
 
 # REM
 26.0:Enregistre des commentaires (remarques) dans un fichier batch ou CONFIG.SYS
@@ -144,7 +145,7 @@
 # PATH
 27.0:Affiche ou définit un chemin de recherche pour les fichiers exécutables.
 27.1:PATH [[lecteur:]chemin[;...]]
-27.2:Tapez PATH ; pour effacer tous les réglages de chemin de recherche et \r\nindiquer à DOS de ne rechercher que dans le répertoire courant.
+27.2:Tapez PATH ; pour effacer tous les réglages de chemin de recherche et indiquer\r\nà DOS de ne rechercher que dans le répertoire courant.
 27.3:Tapez PATH sans paramètre pour afficher le chemin actuel.
 27.4:Pas de chemin
 
@@ -174,7 +175,7 @@
 # DATE
 32.0:Affiche ou définit la date du système.
 32.1:DATE [date]
-32.2:Tapez DATE sans paramètre pour afficher la date actuelle et une invite pour\r\nune nouvelle. Appuyez sur ENTRÉE pour conserver.
+32.2:Tapez DATE sans paramètre pour afficher la date actuelle et une invite pour\r\nune nouvelle. Appuyez sur ENTRÉE pour conserver la date actuelle.
 32.3:Date invalide
 32.4:La date actuelle est
 32.5:Entrez une nouvelle date :
@@ -213,7 +214,7 @@
 
 # DIR
 37.0:Affiche une liste de fichiers et de sous-répertoires dans un répertoire.
-37.1:DIR [lecteur:][chemin][nomfichier] [/P] [/W] [/A[:]attributs] [/O[[:]ordredetri]] [/S] [/B] [/L]
+37.1:DIR [lecteur:][chemin][nomfichier] [/P] [/W] [/A[:]attributs]\r\n    [/O[[:]ordredetri]] [/S] [/B] [/L]
 37.2:/P Effectue une pause après chaque écran d'information
 37.3:/W Utilise le format de liste large
 37.4:/A Affiche les fichiers avec les attributs spécifiés :
@@ -239,7 +240,7 @@
 38.4:/B           Indique un fichier binaire
 38.5:destination  Spécifie le dossier et/ou nom de fichier pour le nouveau fichier
 38.6:/V           Vérifie que les nouveaux fichiers sont écrits correctement
-38.7:Pour ajouter des fichiers, spécifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant des jokers ou le format fichier1+fichier2+fichier3).
+38.7:Pour concatener des fichiers, spécifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant soit des jokers, soit le format\r\nfichier1+fichier2+fichier3).
 38.8:NOTE : /A et /B sont des no-ops (ignorés), fournis pour la compatibilité.
 38.9:%u fichier(s) copié(s)
 
