@@ -125,7 +125,7 @@ void nls_outputnl_doserr(unsigned short e) {
   /* find string in nls block */
   if (e < 0xff) ptr = svarlang_strid(0xff00 | e);
   /* if not found, use a fallback */
-  if (ptr == NULL) {
+  if ((ptr == NULL) || (ptr[0] == 0)) {
     sprintf(errstr, "DOS ERR %u", e);
     ptr = errstr;
   }

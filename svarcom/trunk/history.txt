@@ -8,6 +8,7 @@
  - fixed stdin redirection handling (was broken since 2022.1)
  - implemented the TRUENAME command
  - ln creates %DOSDIR%\LINKS directory when needed and warns on error
+ - ln add outputs an error message when link already exists
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigün (thraex)
 
