@@ -724,7 +724,7 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
 /* fills fname with the path and filename to the linkfile related to the
  * executable link "linkname". returns 0 on success. */
 int link_computefname(char *fname, const char *linkname, unsigned short env_seg) {
-  unsigned short pathlen;
+  unsigned short pathlen, doserr = 0;
 
   /* fetch %DOSDIR% */
   pathlen = env_lookup_valcopy(fname, 128, env_seg, "DOSDIR");
@@ -736,7 +736,26 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
   /* prep filename: %DOSDIR%\LINKS\PKG.LNK */
   if (fname[pathlen - 1] == '\\') pathlen--;
   pathlen += sprintf(fname + pathlen, "\\LINKS");
-  /* quit early if dir does not exist */
+  /* create \LINKS if not exists */
+  if (file_getattr(fname) < 0) {
+    _asm {
+      push dx
+      mov ah, 0x39
+      mov dx, fname
+      int 0x21
+      jnc DONE
+      mov doserr, ax
+      DONE:
+      pop dx
+    }
+    if (doserr) {
+      output(fname);
+      output(" - ");
+      nls_outputnl(255, doserr);
+      return(-1);
+    }
+  }
+  /* quit early if dir does not exist (or is not a dir) */
   if (file_getattr(fname) != DOS_ATTR_DIR) {
     output(fname);
     output(" - ");
