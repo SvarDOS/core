@@ -5,7 +5,9 @@
 
 === ver 2022.3 (xx.xx.xxxx) ==================================================
 
+ - fixed stdin redirection handling
  - added French translations, kindly contributed by Berki Yenigün (thraex)
+
 
 === ver 2022.2 (04.03.2022) ==================================================
 
