@@ -97,6 +97,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/set.c"
 #include "cmd/shift.c"
 #include "cmd/time.c"
+#include "cmd/truename.c"
 #include "cmd/type.c"
 #include "cmd/ver.c"
 #include "cmd/verify.c"
@@ -141,6 +142,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"SET",     cmd_set},
   {"SHIFT",   cmd_shift},
   {"TIME",    cmd_time},
+  {"TRUENAME",cmd_truename},
   {"TYPE",    cmd_type},
   {"VER",     cmd_ver},
   {"VERIFY",  cmd_verify},

@@ -244,6 +244,10 @@
 38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.\r\nCOPY assumes binary always.
 38.9:%u file(s) copied
 
+# TRUENAME
+39.0:Returns a fully qualified path or filename.
+39.1:TRUENAME [drive:][path]filename
+
 # DOS ERRORS
 255.1:Function number invalid
 255.2:File not found

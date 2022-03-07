@@ -50,6 +50,7 @@ REN/RENAME  - renames a file or files
 SET         - displays, sets or removes DOS environment variables
 SHIFT       - changes the position of arguments in a batch file
 TIME        - displays or sets the system time
+TRUENAME    - returns a fully qualified path or filename
 TYPE        - displays the contents of a text file
 VER         - displays the DOS version
 VERIFY      - tells DOS whether to verify that files are written correctly
