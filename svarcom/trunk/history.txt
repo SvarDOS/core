@@ -6,6 +6,7 @@
 === ver 2022.3 (xx.xx.xxxx) ==================================================
 
  - fixed stdin redirection handling (was broken since 2022.1)
+ - ln warns about non-existing %DOSDIR%\LINKS directory
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigün (thraex)
 

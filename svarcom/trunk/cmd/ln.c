@@ -48,7 +48,7 @@ static enum cmd_result cmd_lnadd(char *BUFFER, const char *linkname, const char 
     return(CMD_FAIL);
   }
 
-  /* open DOSDIR\CFG\LINKS.DB and write realdirname to */
+  /* compute the filename of the link file */
   if (link_computefname(buff, linkname, env_seg) != 0) return(CMD_FAIL);
 
   realdirnamelen = strlen(realdirname);
@@ -159,17 +159,12 @@ static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned sho
     linkname = "*";
   }
 
-  /* fetch %DOSDIR% */
-  pathlen = env_lookup_valcopy(buff, 128, env_seg, "DOSDIR");
-  if (pathlen == 0) {
-    nls_outputnl(29,5); /* "%DOSDIR% not defined" */
-    return(CMD_FAIL);
-  }
-
   /* prep DOSDIR\LINKS\pattern */
-  if (buff[pathlen - 1] == '\\') pathlen--;
-  pathlen += sprintf(buff + pathlen, "\\LINKS\\");
-  sprintf(buff + pathlen, "%s.LNK", linkname);
+  if (link_computefname(buff, linkname, env_seg) != 0) return(CMD_FAIL);
+
+  /* set pathlen to end of path (char after last backslash) */
+  pathlen = 0;
+  for (i = 0; buff[i] != 0; i++) if (buff[i] == '\\') pathlen = i + 1;
 
   if (findfirst(dta, buff, DOS_ATTR_RO | DOS_ATTR_ARC) != 0) return(CMD_OK);
 

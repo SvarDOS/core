@@ -729,13 +729,21 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
   /* fetch %DOSDIR% */
   pathlen = env_lookup_valcopy(fname, 128, env_seg, "DOSDIR");
   if (pathlen == 0) {
-    outputnl("%DOSDIR% not defined");
+    nls_outputnl(29,5); /* "%DOSDIR% not defined" */
     return(-1);
   }
 
   /* prep filename: %DOSDIR%\LINKS\PKG.LNK */
   if (fname[pathlen - 1] == '\\') pathlen--;
-  sprintf(fname + pathlen, "\\LINKS\\%s.LNK", linkname);
+  pathlen += sprintf(fname + pathlen, "\\LINKS");
+  /* quit early if dir does not exist */
+  if (file_getattr(fname) != DOS_ATTR_DIR) {
+    output(fname);
+    output(" - ");
+    nls_outputnl(255,3); /* path not found */
+    return(-1);
+  }
+  sprintf(fname + pathlen, "\\%s.LNK", linkname);
 
   return(0);
 }
