@@ -33,7 +33,8 @@ command.com: rmodcore.h command.obj cmd.obj env.obj redir.obj rmodinit.obj sayon
 	utf8tocp 437 EN-UTF8.TXT > EN.TXT
 	utf8tocp 850 FR-UTF8.TXT > FR.TXT
 	utf8tocp maz PL-UTF8.TXT > PL.TXT
-	..\svarlang.lib\tlumacz en de fr pl
+	utf8tocp 857 TR-UTF8.TXT > TR.TXT
+	..\svarlang.lib\tlumacz en de fr pl tr
 	DEL ??.TXT
 	MOVE /Y OUT.LNG ..\SVARCOM.LNG
 	MOVE /Y DEFLANG.C ..

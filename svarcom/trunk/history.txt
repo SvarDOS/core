@@ -11,6 +11,7 @@
  - ln add outputs an error message when link already exists
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigün (thraex)
+ - added Turkish translations, submitted by Berki Yenigün (thraex)
 
 
 === ver 2022.2 (04.03.2022) ==================================================
