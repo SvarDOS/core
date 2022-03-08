@@ -4,7 +4,7 @@
 # Language...........: German
 # Authors............: Robert Riebisch
 # Last update........: 08 Mar 2022
-# In sync with EN rev: 1046
+# In sync with EN rev: 1051
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -134,10 +134,11 @@
 24.2:RD [Laufwerk:]Pfad
 
 # REN / RENAME
-25.0:Benennt eine Datei um.
+25.0:Benennt eine Datei oder einen Satz von Dateien um.
 25.1:RENAME [Laufwerk:][Pfad]Dateiname1 Dateiname2
 25.2:REN [Laufwerk:][Pfad]Dateiname1 Dateiname2
 25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Dateiname2 angeben.\r\nVerwenden Sie MOVE, um ein Verzeichnis umzubenennen, oder Dateien von einem Verzeichnis in ein anderes zu verschieben.
+25.4:Platzhalter können verwendet werden, um einen Satz von Dateien umzubenennen.
 
 # REM
 26.0:Leitet Kommentare in einer Stapeldatei oder in CONFIG.SYS ein.
@@ -247,7 +248,7 @@
 
 # TRUENAME
 39.0:Gibt einen vollständig qualifizierten Pfad oder Dateinamen zurück.
-39.1:TRUENAME [Laufwerk:][Pfad]Dateiname
+39.1:TRUENAME [[Laufwerk:][Pfad][Dateiname]]
 
 # DOS ERRORS
 255.1:Funktionsnummer ungültig
@@ -288,4 +289,4 @@
 255.37:Nichtübereinstimmung der Codeseite
 255.38:Kann Dateivorgänge nicht abschließen (EOF / keine Eingabe mehr)
 255.39:Unzureichender Datenträgerplatz
-255.80:Datei existiert bereits
+255.80:Datei bereits vorhanden
