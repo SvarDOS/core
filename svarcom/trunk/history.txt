@@ -10,6 +10,7 @@
  - FOR command: patterns without wildcards are processed as messages
  - implemented the TRUENAME command
  - VER command: displays DOS revision and memory area location
+ - REN command: allows renaming directory names
  - ln creates %DOSDIR%\LINKS directory when needed and warns on error
  - ln add outputs an error message when link already exists
  - added Polish translations

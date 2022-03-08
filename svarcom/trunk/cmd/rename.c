@@ -100,7 +100,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
    * location in buff1).
    */
 
-  i = findfirst(dta, src, 0);
+  i = findfirst(dta, src, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_ARC | DOS_ATTR_DIR);
   if (i != 0) nls_outputnl_doserr(i);
 
   while (i == 0) {

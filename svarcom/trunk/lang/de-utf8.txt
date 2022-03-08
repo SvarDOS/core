@@ -133,10 +133,8 @@
 24.2:RD [Laufwerk:]Pfad
 
 # REN / RENAME
-25.0:Benennt eine Datei oder einen Satz von Dateien um.
 25.1:RENAME [Laufwerk:][Pfad]Dateiname1 Dateiname2
 25.2:REN [Laufwerk:][Pfad]Dateiname1 Dateiname2
-25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Dateiname2 angeben.\r\nVerwenden Sie MOVE, um ein Verzeichnis umzubenennen, oder Dateien von einem\r\nVerzeichnis in ein anderes zu verschieben.
 25.4:Platzhalter können verwendet werden, um einen Satz von Dateien umzubenennen.
 
 # REM

@@ -133,10 +133,10 @@
 24.2:RD [lecteur:]chemin
 
 # REN / RENAME
-25.0:Renomme un un plusieurs fichiers
+25.0:Renomme un ou plusieurs fichiers, ou un répertoire.
 25.1:RENAME [lecteur:][chemin]nomfichier1 nomfichier2
 25.2:REN [lecteur:][chemin]nomfichier1 nomfichier2
-25.3:Notez que vous ne pouvez pas spécifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour renommer un dossier ou pour déplacer\r\ndes fichiers d'un répertoire vers un autre.
+25.3:Notez que vous ne pouvez pas spécifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour déplacer des fichiers d'un\r\nrépertoire à un autre.
 
 # REM
 26.0:Enregistre des commentaires (remarques) dans un fichier batch ou CONFIG.SYS

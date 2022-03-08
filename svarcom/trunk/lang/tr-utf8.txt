@@ -132,10 +132,8 @@
 24.2:RD [sürücü:]yol
 
 # REN / RENAME
-25.0:Dosyaları yeniden adlandırır
 25.1:RENAME [sürücü:][yol]dosyaismi1 dosyaismi2
 25.2:REN [sürücü:][yol]dosyaismi1 dosyaismi2
-25.3:dosyaismi2 için yeni bir sürücü veya yol belirtemeyeceğini unutmayın.\r\nBir dizini yeniden adlandırmak için veya bir dizinden diğerine dosya taşımak için MOVE komutunu kullanın.
 
 # REM
 26.0:Toplu iş dosyalarında veya CONFIG.SYS dosyasında yorum (açıklama) kaydeder
