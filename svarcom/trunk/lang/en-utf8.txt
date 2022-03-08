@@ -106,6 +106,11 @@
 20.2:SvarCOM shell ver
 20.3:SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.
 20.4:This software is distributed under the terms of the MIT license.
+20.5:Revision %c
+20.6:DOS is in %s
+20.7:low memory
+20.8:HMA
+20.9:ROM
 
 # TYPE
 21.0:Displays the contents of a text file.

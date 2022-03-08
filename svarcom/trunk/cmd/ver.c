@@ -31,16 +31,17 @@
 
 static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
-  unsigned char maj = 0, min = 0;
+  unsigned char maj = 0, min = 0, rev = 0, verflags = 0;
 
   /* help screen */
   if (cmd_ishlp(p)) {
     nls_outputnl(20,0); /* "Displays the DOS version." */
     outputnl("");
-    outputnl("ver [/about]");
+    output("ver [/about]");
 #ifdef VERDBG
-    outputnl("ver /dbg");
+    output(" [/dbg]");
 #endif
+    outputnl("");
     return(CMD_OK);
   }
 
@@ -100,28 +101,42 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     return(CMD_OK);
   }
 
-  if (p->argc != 0) {
-    nls_outputnl(0,6); /* "Invalid parameter" */
-    return(CMD_FAIL);
-  }
-
   _asm {
     push ax
     push bx
     push cx
-    mov ah, 0x30   /* Get DOS version number */
+    push dx
+
+    mov ax, 0x3306 /* Get true DOS version number */
     int 0x21       /* AL=maj_ver_num  AH=min_ver_num  BX,CX=OEM */
-    mov [maj], al
-    mov [min], ah
+    mov [maj], bl
+    mov [min], bh
+    mov [rev], dl
+    mov [verflags], dh
+
+    pop dx
     pop cx
     pop bx
     pop ax
   }
 
   sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
-
   outputnl(buff);
+
+  sprintf(buff, svarlang_str(20,5), 'A' + rev); /* Revision %c */
+  outputnl(buff);
+
+  {
+    const char *loc = svarlang_str(20,7);        /* low memory */
+    if (verflags & 16) loc = svarlang_str(20,8); /* HMA */
+    if (verflags & 8) loc = svarlang_str(20,9);  /* ROM */
+    sprintf(buff, svarlang_str(20,6), loc);      /* DOS is in %s */
+    outputnl(buff);
+  }
+
+  outputnl("");
   nls_output(20,2); /* "SvarCOM shell ver" */
   outputnl(" " PVER);
+
   return(CMD_OK);
 }
