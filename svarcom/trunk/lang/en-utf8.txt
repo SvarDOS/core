@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 05 Mar 2022
+# Last update: 08 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -247,7 +247,7 @@
 
 # TRUENAME
 39.0:Returns a fully qualified path or filename.
-39.1:TRUENAME [drive:][path]filename
+39.1:TRUENAME [[drive:][path][filename]]
 
 # DOS ERRORS
 255.1:Function number invalid
