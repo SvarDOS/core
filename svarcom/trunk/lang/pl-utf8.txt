@@ -87,7 +87,7 @@
 18.0:Wykonuje określone polecenie na każdym pliku sposród zestawu plików.
 18.1:FOR %zmienna IN (zestaw) DO polecenie [parametry]
 18.2:%zmienna    nazwa zmiennej.
-18.3:(zestaw)    zestaw plików, oddzielone spacjami. Znaki wieloznaczne dozwolone.
+18.3:(zestaw)    Jeden lub więcej wzorów plików lub komunikatów, oddzielone spacją.
 18.4:polecenie   polecenie do wykonania na każdym z pasujących plików.
 18.5:parametry   parametry lub przełączniki dla określonego polecenia.
 18.6:Aby użyć FOR w programie wsadowym, użyj %%zmienna zamiast %zmienna.

@@ -6,7 +6,8 @@
 === ver 2022.3 (xx.xx.xxxx) ==================================================
 
  - fixed stdin redirection handling (was broken since 2022.1)
- - FOR command accepts control characters as pattern delimiters
+ - FOR command: accepts control characters as pattern delimiters
+ - FOR command: patterns without wildcards are processed as messages
  - implemented the TRUENAME command
  - ln creates %DOSDIR%\LINKS directory when needed and warns on error
  - ln add outputs an error message when link already exists

@@ -767,6 +767,7 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
 static int forloop_process(char *res, struct forctx far *forloop) {
   unsigned short i, t;
   struct DTA *dta = (void *)0x80; /* default DTA at 80h in PSP */
+  char *fnameptr = dta->fname;
 
   TRYAGAIN:
 
@@ -810,6 +811,14 @@ static int forloop_process(char *res, struct forctx far *forloop) {
     i += forloop->nextpat;
     forloop->nextpat = i;
 
+    /* if this is a string and not a pattern, skip all the FindFirst business
+     * a file pattern has a wildcard (* or ?), a message doesn't */
+    for (i = 0; (BUFFER[i] != 0) && (BUFFER[i] != '?') && (BUFFER[i] != '*'); i++);
+    if (BUFFER[i] == 0) {
+      fnameptr = BUFFER;
+      goto SKIP_DTA;
+    }
+
     /* FOR in MSDOS 6 includes hidden and system files, but not directories nor volumes */
     if (findfirst(dta, BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_ARC) != 0) {
       goto TRYAGAIN;
@@ -830,6 +839,8 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   /* copy updated DTA to rmod */
   _fmemcpy(&(forloop->dta), dta, sizeof(*dta));
 
+  SKIP_DTA:
+
   /* fill res with command, replacing varname by actual filename */
   /* full filename is to be built with path of curpat and fname from dta */
   t = 0;
@@ -845,7 +856,7 @@ static int forloop_process(char *res, struct forctx far *forloop) {
         if ((res[i] == ' ') || (res[i] == 0)) break;
         i++;
       }
-      _fstrcpy(res + lastbk, dta->fname);
+      strcpy(res + lastbk, fnameptr);
       for (i = lastbk; res[i] != 0; i++);
       t += 2;
     } else {

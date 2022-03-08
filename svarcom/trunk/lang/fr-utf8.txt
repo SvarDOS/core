@@ -87,7 +87,7 @@
 18.0:Exécute une commande spécifiée pour chaque fichier dans un jeu de fichiers.
 18.1:FOR %variable IN (set) DO commande [paramètres]
 18.2:%variable    un nom de paramètre remplaçable.
-18.3:(set)        jeu(x) de fichiers séparés par des espaces. Jokers autorisés.
+18.3:(set)        une ou plusieurs expressions séparés par des espaces.
 18.4:commande     la commande à exécuter pour chaque fichier correspondant.
 18.5:paramètres   paramètres ou options pour la commande spécifiée.
 18.6:Pour utiliser FOR dans un programme batch, utilisez %%variable au lieu de\r\n%variable.

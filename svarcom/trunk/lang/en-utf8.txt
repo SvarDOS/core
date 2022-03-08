@@ -87,7 +87,7 @@
 18.0:Runs a specified command for each file in a set of files.
 18.1:FOR %variable IN (set) DO command [parameters]
 18.2:%variable   A replaceable parameter name. (single letter)
-18.3:(set)       A set of one of more space-separated files. Wildcards allowed.
+18.3:(set)       One of more space-separated patterns or messages.
 18.4:command     The command to carry out for each matched file.
 18.5:parameters  Parameters or switches for the specified command.
 18.6:To use FOR in a batch program, use %%variable instead of %variable.

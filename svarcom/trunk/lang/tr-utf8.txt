@@ -87,7 +87,6 @@
 18.0:Bir dosya dizisinde belirtilen komutu her dosya için çalıştırır.
 18.1:FOR %değişken IN (set) DO komut [parametreler]
 18.2:%değişken   Değiştirilebilir parametre ismi. (tek harf)
-18.3:(set)       Bir veya daha fazla boşlukla ayrılmış dosya adı. Jokerlere izin verilir.
 18.4:komut       Denkleşen her dosya için çalıştırılacak komut.
 18.5:parametreler Belirtilen komut için parametre veya seçenekler.
 18.6:FOR'u bir toplu iş dosyasında kullanmak için, %değişken yerine %%değişken kullanın.
