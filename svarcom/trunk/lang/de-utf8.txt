@@ -115,7 +115,7 @@
 # TIME
 22.0:Zeigt die Systemzeit an oder legt sie fest.
 22.1:TIME [Zeit]
-22.2:Der Befehl TIME ohne Parameter zeigt die aktuelle Zeit an und fragt\r\nnach einer neuen. Drücken Sie die EINGABETASTE, um die alte zu behalten.
+22.2:Der Befehl TIME ohne Parameter zeigt die aktuelle Zeit an und fragt\r\nnach einer neuen. Drücken Sie die EINGABETASTE, um die bisherige zu behalten.
 22.3:Aktuelle Zeit:
 22.4:Ungültige Zeit
 22.5:Geben Sie die neue Zeit ein:
@@ -137,7 +137,7 @@
 25.0:Benennt eine Datei oder einen Satz von Dateien um.
 25.1:RENAME [Laufwerk:][Pfad]Dateiname1 Dateiname2
 25.2:REN [Laufwerk:][Pfad]Dateiname1 Dateiname2
-25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Dateiname2 angeben.\r\nVerwenden Sie MOVE, um ein Verzeichnis umzubenennen, oder Dateien von einem Verzeichnis in ein anderes zu verschieben.
+25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Dateiname2 angeben.\r\nVerwenden Sie MOVE, um ein Verzeichnis umzubenennen, oder Dateien von einem\r\nVerzeichnis in ein anderes zu verschieben.
 25.4:Platzhalter können verwendet werden, um einen Satz von Dateien umzubenennen.
 
 # REM
@@ -177,7 +177,7 @@
 # DATE
 32.0:Zeigt das Systemdatum an oder legt es fest.
 32.1:DATE [Datum]
-32.2:Der Befehl DATE ohne Parameter zeigt das aktuelle Datum an und fragt\r\nnach einem neuen. Drücken Sie die EINGABETASTE, um das alte zu behalten.
+32.2:Der Befehl DATE ohne Parameter zeigt das aktuelle Datum an und fragt\r\nnach einem neuen. Drücken Sie die EINGABETASTE, um das bisherige zu behalten.
 32.3:Ungültiges Datum
 32.4:Aktuelles Datum:
 32.5:Geben Sie das neue Datum ein:
