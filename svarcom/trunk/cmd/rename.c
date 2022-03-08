@@ -35,12 +35,13 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* use default DTA in PSP */
 
   if (cmd_ishlp(p)) {
-    nls_outputnl(25,0); /* "Renames a file" */
+    nls_outputnl(25,0); /* "Renames a file or a set of files" */
     outputnl("");
     nls_outputnl(25,1); /* "RENAME [drive:][path]filename1 filename2" */
     nls_outputnl(25,2); /* "REN [drive:][path]filename1 filename2" */
     outputnl("");
     nls_outputnl(25,3); /* "Note that you cannot specify a new drive or (...)" */
+    nls_outputnl(25,4); /* extra note about usage of wildcards */
     return(CMD_OK);
   }
 

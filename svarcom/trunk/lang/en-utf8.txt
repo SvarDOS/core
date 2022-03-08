@@ -133,10 +133,11 @@
 24.2:RD [drive:]path
 
 # REN / RENAME
-25.0:Renames a file
+25.0:Renames a file or a set of files
 25.1:RENAME [drive:][path]filename1 filename2
 25.2:REN [drive:][path]filename1 filename2
 25.3:Note that you cannot specify a new drive or path for filename2.\r\nUse MOVE to rename a directory, or to move files from one directory to another.
+25.4:Wildcards may be used to rename a set of files.
 
 # REM
 26.0:Records comments (remarks) in a batch file or CONFIG.SYS

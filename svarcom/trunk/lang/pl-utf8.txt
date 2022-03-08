@@ -133,7 +133,7 @@
 24.2:RD [dysk:]ścieżka
 
 # REN / RENAME
-25.0:Zmienia nazwę pliku
+25.0:Zmienia nazwę jednego lub wielu plików
 25.1:RENAME [dysk:][ścieżka]plik1 plik2
 25.2:REN [dysk:][ścieżka]plik1 plik2
 25.3:Uwaga: nie możesz podać nowego dysku lub ścieżki dla pliku2\r\nUżyj MOVE aby zmienić nazwę katalogu, lub przenieść pliki do innego katalogu.

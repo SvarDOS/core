@@ -133,7 +133,7 @@
 24.2:RD [lecteur:]chemin
 
 # REN / RENAME
-25.0:Renomme un fichier
+25.0:Renomme un un plusieurs fichiers
 25.1:RENAME [lecteur:][chemin]nomfichier1 nomfichier2
 25.2:REN [lecteur:][chemin]nomfichier1 nomfichier2
 25.3:Notez que vous ne pouvez pas spécifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour renommer un dossier ou pour déplacer\r\ndes fichiers d'un répertoire vers un autre.
@@ -283,3 +283,4 @@
 255.37:Défaut de correspondance des pages de code
 255.38:Impossible de terminer les opérations de fichier (EOF / entrée terminée)
 255.39:Espace disque insuffisant
+255.80:Ce fichier existe déjà
