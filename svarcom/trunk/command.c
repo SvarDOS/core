@@ -773,16 +773,32 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   /* dta_inited: FindFirst() or FindNext()? */
   if (forloop->dta_inited == 0) {
 
-    /* copy next awaiting pattern to BUFFER */
+    /* copy next awaiting pattern to BUFFER (and skip all delimieters until
+     * next pattern or end of list) */
+    t = 0;
     for (i = 0;; i++) {
       BUFFER[i] = forloop->cmd[forloop->nextpat + i];
-      /* end of patterns list */
-      if (BUFFER[i] == 0) break;
-      /* space found */
-      if (BUFFER[i] == ' ') {
-        BUFFER[i] = 0;
-        break;
+      /* look for a delimiter - the list of valid delimiters has been
+       * researched and kindly shared by Robert Riebisch via the ticket
+       * at https://osdn.net/projects/svardos/ticket/44058 */
+      switch (BUFFER[i]) {
+        case ' ':
+        case '\t':
+        case ';':
+        case ',':
+        case '/':
+        case '=':
+          BUFFER[i] = 0;
+          t = 1;
+          break;
+        case 0: /* end of patterns list */
+          t = 2;
+          break;
+        default: /* quit if I got a pattern already */
+          if (t == 1) t = 2;
+          break;
       }
+      if (t == 2) break;
     }
 
     if (i == 0) return(-1);
@@ -792,7 +808,6 @@ static int forloop_process(char *res, struct forctx far *forloop) {
 
     /* move nextpat forward to next pattern */
     i += forloop->nextpat;
-    while (forloop->cmd[i] == ' ') i++;
     forloop->nextpat = i;
 
     /* FOR in MSDOS 6 includes hidden and system files, but not directories nor volumes */
