@@ -9,6 +9,7 @@
  - implemented the TRUENAME command
  - ln creates %DOSDIR%\LINKS directory when needed and warns on error
  - ln add outputs an error message when link already exists
+ - added Polish translations
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigün (thraex)
  - added Turkish translations, submitted by Berki Yenigün (thraex)
