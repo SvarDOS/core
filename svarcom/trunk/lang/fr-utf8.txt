@@ -107,6 +107,12 @@
 20.3:SvarCOM est un interpréteur pour les noyaux DOS compatibles avec MS-DOS 5+.
 20.4:Ce logiciel est distribué sous les termes de la licence MIT.
 
+20.5:Révision %c
+20.6:DOS est en %s
+20.7:mémoire basse
+20.8:HMA (zone mémoire haute)
+20.9:ROM
+
 # TYPE
 21.0:Affiche le contenu d'un fichier texte.
 21.1:TYPE [lecteur:][chemin]nomfichier
@@ -137,6 +143,7 @@
 25.1:RENAME [lecteur:][chemin]nomfichier1 nomfichier2
 25.2:REN [lecteur:][chemin]nomfichier1 nomfichier2
 25.3:Notez que vous ne pouvez pas spécifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour déplacer des fichiers d'un\r\nrépertoire à un autre.
+25.4:Les jokers peuvent être utilisés pour renommer un jeu de fichiers.
 
 # REM
 26.0:Enregistre des commentaires (remarques) dans un fichier batch ou CONFIG.SYS
@@ -243,6 +250,10 @@
 38.7:Pour concatener des fichiers, spécifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant soit des jokers, soit le format\r\nfichier1+fichier2+fichier3).
 38.8:NOTE : /A et /B sont des no-ops (ignorés), fournis pour la compatibilité.
 38.9:%u fichier(s) copié(s)
+
+# TRUENAME
+39.0:Retourne un chemin ou un nom de fichier pleinement qualifié.
+39.1:TRUENAME [[lecteur:][chemin][nomfichier]]
 
 # DOS ERRORS
 255.1:Numéro de fonction invalide

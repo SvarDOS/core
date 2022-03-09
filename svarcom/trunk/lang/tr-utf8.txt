@@ -87,6 +87,7 @@
 18.0:Bir dosya dizisinde belirtilen komutu her dosya için çalıştırır.
 18.1:FOR %değişken IN (set) DO komut [parametreler]
 18.2:%değişken   Değiştirilebilir parametre ismi. (tek harf)
+18.3:(set)       Boşlukla ayrılmış desen veya mesajlardan biri.
 18.4:komut       Denkleşen her dosya için çalıştırılacak komut.
 18.5:parametreler Belirtilen komut için parametre veya seçenekler.
 18.6:FOR'u bir toplu iş dosyasında kullanmak için, %değişken yerine %%değişken kullanın.
@@ -105,6 +106,11 @@
 20.2:SvarCOM kabuk sürümü
 20.3:SvarCOM, MS-DOS 5+ ile uyumlu DOS çekirdekleri için kabuk yorumlayıcısıdır.
 20.4:Bu yazılım MIT lisansı kapsamında yayınlanmıştır.
+20.5:Gözden geçirme %c
+20.6:DOS şuradadır: %s
+20.7:düşük bellek alanı
+20.8:HMA (Yüksek Bellek Alanı)
+20.9:ROM
 
 # TYPE
 21.0:Metin dosyalarının içeriğini görüntüler.
@@ -132,8 +138,11 @@
 24.2:RD [sürücü:]yol
 
 # REN / RENAME
+25.0:Bir dosyayı, dosya kümelerini veya bir dizini tekrar isimlendirir
 25.1:RENAME [sürücü:][yol]dosyaismi1 dosyaismi2
 25.2:REN [sürücü:][yol]dosyaismi1 dosyaismi2
+25.3:dosyaismi2 için yeni bir sürücü veya yol belirtemeyeceğinizi unutmayın.\r\nBir dizinden başkasına dosya taşımak için MOVE kullanın.
+25.4:Jokerler bir dosya kümesini tekrar isimlendirmek için kullanılabilir.
 
 # REM
 26.0:Toplu iş dosyalarında veya CONFIG.SYS dosyasında yorum (açıklama) kaydeder
@@ -241,6 +250,10 @@
 38.8:NOT: /A ve /B no-op'tur (yok sayılır), sadece uyumluluk amaçlı bulunurlar.\r\nCOPY daima ikili var sayar.
 38.9:%u dosya kopyalandı
 
+# TRUENAME
+39.0:Tam nitelikli bir yol veya dosya adı döndürür.
+39.1:TRUENAME [[sürücü:][yol][dosyaismi]]
+
 # DOS ERRORS
 255.1:Geçersiz işlev sayısı
 255.2:Dosya bulunamadı
@@ -280,3 +293,4 @@
 255.37:Kod sayfası uyuşmazlığı
 255.38:Dosya işlemleri tamamlanamaz (EOF / girdi kalmadı)
 255.39:Yetersiz disk alanı
+255.80:Dosya zaten mevcut
