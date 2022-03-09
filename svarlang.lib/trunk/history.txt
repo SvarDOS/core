@@ -1,3 +1,7 @@
 
+20220309
+- static lib buffer is sized to fit the largest lang block +5% of margin
+  (was: twice the size of the reference language)
+
 20220226
 - replaced fopen() and friends by direct DOS calls (smaller memory footprint)
