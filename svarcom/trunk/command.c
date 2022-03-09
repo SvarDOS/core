@@ -774,7 +774,7 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   /* dta_inited: FindFirst() or FindNext()? */
   if (forloop->dta_inited == 0) {
 
-    /* copy next awaiting pattern to BUFFER (and skip all delimieters until
+    /* copy next awaiting pattern to BUFFER (and skip all delimiters until
      * next pattern or end of list) */
     t = 0;
     for (i = 0;; i++) {
