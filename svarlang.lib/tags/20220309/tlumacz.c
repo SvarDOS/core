@@ -306,7 +306,7 @@ int main(int argc, char **argv) {
     fprintf(fd, "const unsigned short svarlang_memsz = %uu;\r\n", allocsz);
     fprintf(fd, "char svarlang_mem[%u] = {\r\n", allocsz);
     for (i = 0; i < refblocksz; i++) {
-      fprintf(fd, "%u", buff[i]);
+      fprintf(fd, "%u", refblock[i]);
       if (i + 1 < refblocksz) fprintf(fd, ",");
       if ((i & 15) == 15) fprintf(fd, "\r\n");
     }
