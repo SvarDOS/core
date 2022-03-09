@@ -26,7 +26,11 @@ CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
 
 all: command.com
 
-command.com: rmodcore.h command.obj cmd.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+command.com: rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+	# build the final executable
+	*wcl $(LDFLAGS) command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj svarlang.lib\svarlngs.lib
+
+deflang.obj: lang\*.txt
 	# GENERATE CODEPAGE-SPECIFIG VERSIONS OUT OF UTF-8 FILES
 	CD LANG
 	utf8tocp 850 DE-UTF8.TXT > DE.TXT
@@ -39,8 +43,7 @@ command.com: rmodcore.h command.obj cmd.obj env.obj redir.obj rmodinit.obj sayon
 	MOVE /Y OUT.LNG ..\SVARCOM.LNG
 	MOVE /Y DEFLANG.C ..
 	CD ..
-	# build the final executable
-	*wcl $(LDFLAGS) command.obj cmd.obj deflang.c env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj svarlang.lib\svarlngs.lib
+	wcc $(CFLAGS) deflang.c
 
 cmd.obj: cmd.c cmd\*.c
 	wcc $(CFLAGS) cmd.c
