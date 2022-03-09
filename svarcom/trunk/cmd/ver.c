@@ -104,18 +104,16 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   _asm {
     push ax
     push bx
-    push cx
     push dx
 
     mov ax, 0x3306 /* Get true DOS version number */
-    int 0x21       /* AL=maj_ver_num  AH=min_ver_num  BX,CX=OEM */
+    int 0x21       /* BL=maj_ver_num  BH=min_ver_num  DL=revision  DH=kernel_memory_area */
     mov [maj], bl
     mov [min], bh
     mov [rev], dl
     mov [verflags], dh
 
     pop dx
-    pop cx
     pop bx
     pop ax
   }
