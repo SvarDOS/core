@@ -31,7 +31,7 @@
 
 static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
-  unsigned char maj = 0, min = 0, rev = 0, verflags = 0;
+  unsigned char rc = 0, maj = 0, min = 0, rev = 0, verflags = 0;
 
   /* help screen */
   if (cmd_ishlp(p)) {
@@ -105,8 +105,8 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     push ax
     push bx
     push cx
-    mov ah, 0x30   /* Get DOS version number */
-    int 0x21       /* AL=maj_ver_num  AH=min_ver_num  BX,CX=OEM */
+    mov ah, 0x30  /* Get DOS version number (DOS 2+) */
+    int 0x21      /* AL=maj_ver_num  AH=min_ver_num  BX,CX=OEM */
     mov [maj], al
     mov [min], ah
     pop cx
@@ -117,35 +117,37 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
   outputnl(buff);
 
-  if (maj >= 5) {
-    _asm {
-      push ax
-      push bx
-      push dx
-  
-      mov ax, 0x3306 /* Get true DOS version number */
-      int 0x21       /* BL=maj_ver_num  BH=min_ver_num  DL=revision  DH=kernel_memory_area */
-      mov [maj], bl
-      mov [min], bh
-      mov [rev], dl
-      mov [verflags], dh
-  
-      pop dx
-      pop bx
-      pop ax
-    }
-  
+  _asm {
+    push ax
+    push bx
+    push dx
+
+    mov ax, 0x3306 /* Get true DOS version number (DOS 5+) */
+    int 0x21       /* AL=return_code  BL=maj_ver_num  BH=min_ver_num */
+    mov [rc], al   /*   DL=revision  DH=kernel_memory_area */
+    mov [maj], bl
+    mov [min], bh
+    mov [rev], dl
+    mov [verflags], dh
+
+    pop dx
+    pop bx
+    pop ax
+  }
+
+  /* MS-DOS 2-4 return 0xff, DR DOS 5&6 return 0x01 */
+  if ((rc != 255) && (rc != 1)) {
     sprintf(buff, svarlang_str(20,10), maj, min); /* "True version %u.%u" */
     outputnl(buff);
-  
-    sprintf(buff, svarlang_str(20,5), 'A' + rev); /* Revision %c */
+
+    sprintf(buff, svarlang_str(20,5), 'A' + rev); /* "Revision %c" */
     outputnl(buff);
-  
+
     {
-      const char *loc = svarlang_str(20,7);        /* low memory */
-      if (verflags & 16) loc = svarlang_str(20,8); /* HMA */
-      if (verflags & 8) loc = svarlang_str(20,9);  /* ROM */
-      sprintf(buff, svarlang_str(20,6), loc);      /* DOS is in %s */
+      const char *loc = svarlang_str(20,7);        /* "low memory" */
+      if (verflags & 16) loc = svarlang_str(20,8); /* "HMA" */
+      if (verflags & 8) loc = svarlang_str(20,9);  /* "ROM" */
+      sprintf(buff, svarlang_str(20,6), loc);      /* "DOS is in %s" */
       outputnl(buff);
     }
   }
