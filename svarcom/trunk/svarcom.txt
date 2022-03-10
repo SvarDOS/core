@@ -46,7 +46,7 @@ PAUSE       - suspends processing of a batch program
 PROMPT      - changes the DOS command prompt
 RD/RMDIR    - removes (deletes) a directory
 REM         - records comments (remarks) in a batch file or CONFIG.SYS
-REN/RENAME  - renames a file or files
+REN/RENAME  - renames a file, a set of files or a directory
 SET         - displays, sets or removes DOS environment variables
 SHIFT       - changes the position of arguments in a batch file
 TIME        - displays or sets the system time
