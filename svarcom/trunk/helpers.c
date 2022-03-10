@@ -653,6 +653,7 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
   unsigned short lastbslash = 0;
   unsigned short i, len;
   unsigned char explicitpath = 0;
+  const char *exec_ext[] = {"COM", "EXE", "BAT", NULL};
 
   /* does the original fname has an explicit path prefix or explicit ext? */
   *extptr = NULL;
@@ -669,12 +670,18 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
     }
   }
 
+  /* if explicit ext found, make sure it is executable */
+  if (*extptr != NULL) {
+    for (i = 0; exec_ext[i] != NULL; i++) if (imatch(*extptr, exec_ext[i])) break;
+    if (exec_ext[i] == NULL) return(-2); /* bad extension - don't try running it ever */
+  }
+
   /* normalize filename */
   if (file_truename(fname, res) != 0) return(-2);
 
   /* printf("truename: %s\r\n", res); */
 
-  /* figure out where the command starts and if it has an explicit extension */
+  /* figure out where the command starts */
   for (len = 0; res[len] != 0; len++) {
     switch (res[len]) {
       case '?':   /* abort on any wildcard character */
@@ -702,17 +709,27 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
 
   /* if no extension was initially provided, try matching COM, EXE, BAT */
   if (*extptr == NULL) {
-    const char *ext[] = {".COM", ".EXE", ".BAT", NULL};
+    int attr;
     len = strlen(res);
-    for (i = 0; ext[i] != NULL; i++) {
-      strcpy(res + len, ext[i]);
+    res[len++] = '.';
+    for (i = 0; exec_ext[i] != NULL; i++) {
+      strcpy(res + len, exec_ext[i]);
       /* printf("? '%s'\r\n", res); */
-      *extptr = ext[i] + 1;
-      if (file_getattr(res) >= 0) return(0);
+      *extptr = exec_ext[i];
+      attr = file_getattr(res);
+      if (attr < 0) continue; /* file not found */
+      if (attr & DOS_ATTR_DIR) continue; /* this is a directory */
+      if (attr & DOS_ATTR_VOL) continue; /* this is a volume */
+      return(0);
     }
   } else { /* try finding it as-is */
     /* printf("? '%s'\r\n", res); */
-    if (file_getattr(res) >= 0) return(0);
+    int attr = file_getattr(res);
+    if ((attr >= 0) &&  /* file exists */
+        ((attr & DOS_ATTR_DIR) == 0) && /* is not a directory */
+        ((attr & DOS_ATTR_VOL) == 0)) { /* is not a volume */
+      return(0);
+    }
   }
 
   /* not found */
