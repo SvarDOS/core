@@ -81,7 +81,7 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
 
   /* forbid nested FORs */
   if (p->rmod->forloop) {
-    nls_outputnl(18,7); /* FOR cannot be nested */
+    nls_outputnl(18,7); /* "FOR cannot be nested" */
     return(CMD_FAIL);
   }
 
@@ -91,10 +91,10 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
     outputnl("");
     nls_outputnl(18,1); /* "FOR %variable IN (set) DO command [parameters]" */
     outputnl("");
-    nls_outputnl(18,2); /* "%variable    a replaceable parameter name" */
-    nls_outputnl(18,3); /* "(set)        a set of one of more files. Wildcards allowed." */
-    nls_outputnl(18,4); /* "command      the command to carry out for each matched file" */
-    nls_outputnl(18,5); /* "parameters   parameters or switches for the specified command" */
+    nls_outputnl(18,2); /* "%variable   A replaceable parameter name. (single letter)" */
+    nls_outputnl(18,3); /* "((set)       One of more space-separated strings or filename wildcards." */
+    nls_outputnl(18,4); /* "command     The command to carry out for each matched file." */
+    nls_outputnl(18,5); /* "parameters  Parameters or switches for the specified command." */
     outputnl("");
     nls_outputnl(18,6); /* "To use FOR in a batch program, use %%variable instead of %variable" */
     return(CMD_OK);
