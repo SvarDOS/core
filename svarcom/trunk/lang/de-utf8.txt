@@ -3,8 +3,8 @@
 #
 # Language...........: German
 # Authors............: Robert Riebisch
-# Last update........: 08 Mar 2022
-# In sync with EN rev: 1051
+# Last update........: 10 Mar 2022
+# In sync with EN rev: 1073
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -88,6 +88,7 @@
 18.0:Führt einen angegebenen Befehl für jede Datei eines Satzes von Dateien aus.
 18.1:FOR %Variable IN (Satz) DO Befehl [Parameter]
 18.2:%Variable  Ein ersetzbarer Parametername. (Einzelner Buchstabe)
+18.3:(Satz)     Eine oder mehrere durch Leerzeichen getrennte Zeichenfolgen oder\r\n           Platzhalter für Dateinamen.
 18.4:Befehl     Der Befehl, der für jede passende Datei ausgeführt werden soll
 18.5:Parameter  Parameter oder Schalter für den angegebenen Befehl
 18.6:In einem Stapelprogramm verwenden Sie %%Variable statt %Variable für FOR.
@@ -106,6 +107,12 @@
 20.2:SvarCOM-Shell-Version
 20.3:SvarCOM ist ein Shell-Interpreter für DOS-Kernel kompatibel mit MS-DOS 5+.
 20.4:Diese Software wird unter den Bedingungen der MIT-Lizenz verbreitet.
+20.5:Revision %c
+20.6:DOS ist im %s
+20.7:unteren Speicherbereich
+20.8:oberen Speicherbereich (High Memory Area)
+20.9:ROM
+20.10:Wahre Version %u.%u
 
 # TYPE
 21.0:Zeigt den Inhalt einer Textdatei an.
@@ -133,8 +140,10 @@
 24.2:RD [Laufwerk:]Pfad
 
 # REN / RENAME
+25.0:Benennt eine Datei, einen Satz von Dateien oder ein Verzeichnis um.
 25.1:RENAME [Laufwerk:][Pfad]Dateiname1 Dateiname2
 25.2:REN [Laufwerk:][Pfad]Dateiname1 Dateiname2
+25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Dateiname2 angeben.\r\nVerwenden Sie MOVE, um Dateien von einem Verzeichnis in ein anderes\r\nzu verschieben.
 25.4:Platzhalter können verwendet werden, um einen Satz von Dateien umzubenennen.
 
 # REM
