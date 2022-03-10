@@ -132,7 +132,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   output(buff);
   if ((maj != truemaj) || (min != truemin)) {
     output(" (");
-    sprintf(buff, svarlang_str(20,10), maj, min); /* "true ver xx.xx" */
+    sprintf(buff, svarlang_str(20,10), truemaj, truemin); /* "true ver xx.xx" */
     output(")");
   }
   outputnl("");
