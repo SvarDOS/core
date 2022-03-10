@@ -55,6 +55,26 @@
  * initialization. Actual execution happens within command.c.
  */
 
+
+/* normalizing for-loop pattern-list separators.
+ * returns a space char if c is a for-pattern separator, c otherwise */
+static char cmd_for_sepnorm(char c) {
+  /* the list of valid delimiters has been researched and kindly shared by Robert
+   * Riebisch via the ticket at https://osdn.net/projects/svardos/ticket/44058 */
+  switch (c) {
+    case ' ':
+    case '\t':
+    case ';':
+    case ',':
+    case '/':
+    case '=':
+      return(' '); /* normalize FOR-loop separators to a space */
+    default: /* anything else is kept as-is */
+      return(c);
+  }
+}
+
+
 static enum cmd_result cmd_for(struct cmd_funcparam *p) {
   struct forctx *f = (void *)(p->BUFFER);
   unsigned short i;
@@ -100,10 +120,13 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
   while (f->cmd[i] == ' ') i++;
   if (f->cmd[i] != '(') goto INVALID_SYNTAX;
   i++;
-  while (f->cmd[i] == ' ') i++;
+  while (cmd_for_sepnorm(f->cmd[i]) == ' ') i++;
   f->nextpat = i;
-  /* look for patterns end */
-  while ((f->cmd[i] != ')') && (f->cmd[i] != 0)) i++;
+  /* look for patterns end and normalize all separators to a space */
+  while ((f->cmd[i] != ')') && (f->cmd[i] != 0)) {
+    f->cmd[i] = cmd_for_sepnorm(f->cmd[i]);
+    i++;
+  }
   if (f->cmd[i] != ')') goto INVALID_SYNTAX;
   f->cmd[i++] = 0; /* terminate patterns and move to next field */
 

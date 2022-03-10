@@ -768,6 +768,9 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   unsigned short i, t;
   struct DTA *dta = (void *)0x80; /* default DTA at 80h in PSP */
   char *fnameptr = dta->fname;
+  char *pathprefix = BUFFER + 256;
+
+  *pathprefix = 0;
 
   TRYAGAIN:
 
@@ -779,27 +782,17 @@ static int forloop_process(char *res, struct forctx far *forloop) {
     t = 0;
     for (i = 0;; i++) {
       BUFFER[i] = forloop->cmd[forloop->nextpat + i];
-      /* look for a delimiter - the list of valid delimiters has been
-       * researched and kindly shared by Robert Riebisch via the ticket
-       * at https://osdn.net/projects/svardos/ticket/44058 */
-      switch (BUFFER[i]) {
-        case ' ':
-        case '\t':
-        case ';':
-        case ',':
-        case '/':
-        case '=':
-          BUFFER[i] = 0;
-          t = 1;
-          break;
-        case 0: /* end of patterns list */
-          t = 2;
-          break;
-        default: /* quit if I got a pattern already */
-          if (t == 1) t = 2;
-          break;
+      /* is this a delimiter? (all delimiters are already normalized to a space here) */
+      if (BUFFER[i] == ' ') {
+        BUFFER[i] = 0;
+        t = 1;
+      } else if (BUFFER[i] == 0) {
+        /* end of patterns list */
+        break;
+      } else {
+        /* quit if I got a pattern already */
+        if (t == 1) break;
       }
-      if (t == 2) break;
     }
 
     if (i == 0) return(-1);
@@ -839,6 +832,18 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   /* copy updated DTA to rmod */
   _fmemcpy(&(forloop->dta), dta, sizeof(*dta));
 
+  /* prefill pathprefix with the prefix (path) of the files */
+  {
+    short lastbk = -1;
+    char far *c = forloop->cmd + forloop->curpat;
+    for (i = 0;; i++) {
+      pathprefix[i] = c[i];
+      if (pathprefix[i] == '\\') lastbk = i;
+      if ((pathprefix[i] == ' ') || (pathprefix[i] == 0)) break;
+    }
+    pathprefix[lastbk+1] = 0;
+  }
+
   SKIP_DTA:
 
   /* fill res with command, replacing varname by actual filename */
@@ -847,17 +852,9 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   i = 0;
   for (;;) {
     if ((forloop->cmd[forloop->exec + t] == '%') && (forloop->cmd[forloop->exec + t + 1] == forloop->varname)) {
-      short lastbk = i;
-      char far *c = forloop->cmd + forloop->curpat;
-      for (;;) {
-        res[i] = *c;
-        c++;
-        if (res[i] == '\\') lastbk = i;
-        if ((res[i] == ' ') || (res[i] == 0)) break;
-        i++;
-      }
-      strcpy(res + lastbk, fnameptr);
-      for (i = lastbk; res[i] != 0; i++);
+      strcpy(res + i, pathprefix);
+      strcat(res + i, fnameptr);
+      for (; res[i] != 0; i++);
       t += 2;
     } else {
       res[i] = forloop->cmd[forloop->exec + t];
