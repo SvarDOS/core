@@ -88,7 +88,7 @@
 18.0:Führt einen angegebenen Befehl für jede Datei eines Satzes von Dateien aus.
 18.1:FOR %Variable IN (Satz) DO Befehl [Parameter]
 18.2:%Variable  Ein ersetzbarer Parametername. (Einzelner Buchstabe)
-18.3:(Satz)     Eine oder mehrere durch Leerzeichen getrennte Zeichenfolgen oder\r\n           Platzhalter für Dateinamen.
+18.3:(Satz)     Eine oder mehrere durch Leerzeichen getrennte Zeichenfolgen oder\r\n           Platzhalter für Dateinamen
 18.4:Befehl     Der Befehl, der für jede passende Datei ausgeführt werden soll
 18.5:Parameter  Parameter oder Schalter für den angegebenen Befehl
 18.6:In einem Stapelprogramm verwenden Sie %%Variable statt %Variable für FOR.
