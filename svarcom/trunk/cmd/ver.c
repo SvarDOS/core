@@ -104,16 +104,12 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   _asm {
     push ax
     push bx
-    push dx
-
-    mov ax, 0x3306 /* Get true DOS version number */
-    int 0x21       /* BL=maj_ver_num  BH=min_ver_num  DL=revision  DH=kernel_memory_area */
-    mov [maj], bl
-    mov [min], bh
-    mov [rev], dl
-    mov [verflags], dh
-
-    pop dx
+    push cx
+    mov ah, 0x30   /* Get DOS version number */
+    int 0x21       /* AL=maj_ver_num  AH=min_ver_num  BX,CX=OEM */
+    mov [maj], al
+    mov [min], ah
+    pop cx
     pop bx
     pop ax
   }
@@ -121,15 +117,37 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
   outputnl(buff);
 
-  sprintf(buff, svarlang_str(20,5), 'A' + rev); /* Revision %c */
-  outputnl(buff);
-
-  {
-    const char *loc = svarlang_str(20,7);        /* low memory */
-    if (verflags & 16) loc = svarlang_str(20,8); /* HMA */
-    if (verflags & 8) loc = svarlang_str(20,9);  /* ROM */
-    sprintf(buff, svarlang_str(20,6), loc);      /* DOS is in %s */
+  if (maj >= 5) {
+    _asm {
+      push ax
+      push bx
+      push dx
+  
+      mov ax, 0x3306 /* Get true DOS version number */
+      int 0x21       /* BL=maj_ver_num  BH=min_ver_num  DL=revision  DH=kernel_memory_area */
+      mov [maj], bl
+      mov [min], bh
+      mov [rev], dl
+      mov [verflags], dh
+  
+      pop dx
+      pop bx
+      pop ax
+    }
+  
+    sprintf(buff, svarlang_str(20,10), maj, min); /* "True version %u.%u" */
     outputnl(buff);
+  
+    sprintf(buff, svarlang_str(20,5), 'A' + rev); /* Revision %c */
+    outputnl(buff);
+  
+    {
+      const char *loc = svarlang_str(20,7);        /* low memory */
+      if (verflags & 16) loc = svarlang_str(20,8); /* HMA */
+      if (verflags & 8) loc = svarlang_str(20,9);  /* ROM */
+      sprintf(buff, svarlang_str(20,6), loc);      /* DOS is in %s */
+      outputnl(buff);
+    }
   }
 
   outputnl("");

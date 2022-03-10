@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 08 Mar 2022
+# Last update: 10 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -111,6 +111,7 @@
 20.7:low memory
 20.8:HMA
 20.9:ROM
+20.10:True version %u.%u
 
 # TYPE
 21.0:Displays the contents of a text file.
