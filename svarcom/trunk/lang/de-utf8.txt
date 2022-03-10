@@ -112,7 +112,7 @@
 20.7:unteren Speicherbereich
 20.8:oberen Speicherbereich (High Memory Area)
 20.9:ROM
-20.10:Wahre Version %u.%u
+20.10:wahre Version %u.%u
 
 # TYPE
 21.0:Zeigt den Inhalt einer Textdatei an.

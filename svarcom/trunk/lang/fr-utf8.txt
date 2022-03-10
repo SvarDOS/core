@@ -111,7 +111,7 @@
 20.7:mémoire basse
 20.8:HMA (zone mémoire haute)
 20.9:ROM
-20.10:Vraie version %u.%u
+20.10:vraie version %u.%u
 
 # TYPE
 21.0:Affiche le contenu d'un fichier texte.

@@ -111,7 +111,7 @@
 20.7:low memory
 20.8:HMA
 20.9:ROM
-20.10:True version %u.%u
+20.10:true version %u.%u
 
 # TYPE
 21.0:Displays the contents of a text file.
