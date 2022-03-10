@@ -106,12 +106,12 @@
 20.2:Version du shell SvarCOM
 20.3:SvarCOM est un interpréteur pour les noyaux DOS compatibles avec MS-DOS 5+.
 20.4:Ce logiciel est distribué sous les termes de la licence MIT.
-
 20.5:Révision %c
 20.6:DOS est en %s
 20.7:mémoire basse
 20.8:HMA (zone mémoire haute)
 20.9:ROM
+20.10:Vraie version %u.%u
 
 # TYPE
 21.0:Affiche le contenu d'un fichier texte.

@@ -111,6 +111,7 @@
 20.7:düşük bellek alanı
 20.8:HMA (Yüksek Bellek Alanı)
 20.9:ROM
+20.10:Gerçek sürümü %u.%u
 
 # TYPE
 21.0:Metin dosyalarının içeriğini görüntüler.

@@ -111,6 +111,7 @@
 20.7:pamięci konwencjonalnej
 20.8:HMA
 20.9:ROM
+20.10:Prawdziwa wersja %u.%u
 
 # TYPE
 21.0:Wyświetla zawartość pliku tekstowego.
