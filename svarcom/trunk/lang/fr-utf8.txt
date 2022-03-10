@@ -3,7 +3,7 @@
 #
 # Language.....: French
 # Authors......: Berki Yenigün + fixes and adaptations by Mateusz Viste
-# Last update..: 07 Mar 2022
+# Last update..: 10 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -22,7 +22,7 @@
 
 # SVARCOM HELP SCREEN
 1.0:Démarre l'interpréteur de commandes SvarCOM
-1.1:COMMANDE /E:nnn [/P] [/D] [/Y] [/[C|K] commande]
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] commande]
 1.2:/D       Sauter le traitement d'AUTOEXEC.BAT (n'a de sens que avec /P)
 1.3:/E:nnn   Définit la taille de l'environnement sur nnn octets
 1.4:/P       Rend le nouvel interpréteur permanent et exécute AUTOEXEC.BAT
@@ -248,7 +248,7 @@
 38.5:destination  Spécifie le dossier et/ou nom de fichier pour le nouveau fichier
 38.6:/V           Vérifie que les nouveaux fichiers sont écrits correctement
 38.7:Pour concatener des fichiers, spécifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant soit des jokers, soit le format\r\nfichier1+fichier2+fichier3).
-38.8:NOTE : /A et /B sont des no-ops (ignorés), fournis pour la compatibilité.
+38.8:NOTE: /A et /B sont des no-ops (ignorés), fournis pour la compatibilité.\r\nCOPY considère toujours les fichiers comme étant des binaires.
 38.9:%u fichier(s) copié(s)
 
 # TRUENAME
