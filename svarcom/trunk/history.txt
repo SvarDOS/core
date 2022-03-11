@@ -3,17 +3,21 @@
                     === SvarCOM's history / changelog ===
 
 
+ (ticket numbers at https://osdn.net/projects/svardos/ticket/ in [] brackets)
+
+
 === ver 2022.3 (xx.xx.xxxx) ==================================================
 
- - fixed stdin redirection handling (was broken since 2022.1)
- - only COM, EXE and BAT files are allowed for execution
- - FOR command: accepts control characters as pattern delimiters
- - FOR command: patterns without wildcards are processed as messages
- - implemented the TRUENAME command
+ - fixed stdin redirection handling (was broken since 2022.1) [#44027]
+ - only COM, EXE and BAT files are allowed for execution [#44068]
+ - FOR command: accepts control characters as pattern delimiters [#44058]
+ - FOR command: patterns without wildcards are processed as messages [#44058]
+ - implemented the TRUENAME command [#44051]
  - VER command: displays true DOS version, DOS revision, memory area location
- - REN command: allows renaming directory names
- - ln creates %DOSDIR%\LINKS directory when needed and warns on error
- - ln add outputs an error message when link already exists
+   [#44050]
+ - REN command: allows renaming directory names [#44060]
+ - ln creates %DOSDIR%\LINKS directory when needed and warns on error [#44042]
+ - ln add outputs an error message when link already exists [#44043]
  - added Polish translations
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigun (thraex)
@@ -25,7 +29,7 @@
  - added support for the internal FOR command
  - step-by-step execution of batch files (/Y)
  - fixed parsing of /C and /K arguments that was leading to spurious warnings
- - fixed %var% matching within batch files to be case-insensitive
+ - fixed %var% matching within batch files to be case-insensitive [#44000]
 
 
 === ver 2022.1 (28.02.2022) ==================================================
