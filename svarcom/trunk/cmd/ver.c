@@ -116,9 +116,10 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
 
     /* get the "true" DOS version, along with a couple of extra data */
     mov ax, 0x3306 /* Get true DOS version number (DOS 5+) */
+    clc
     int 0x21       /* AL=return_code  BL=maj_ver_num  BH=min_ver_num */
     jnc GOOD       /* DL=revision  DH=kernel_memory_area */
-    mov doserr, ax /* DR-DOS sets CF on this call (according to RBIL) */
+    mov [doserr], ax /* DR-DOS sets CF on this call (according to RBIL) */
     GOOD:
     mov [truemaj], bl
     mov [truemin], bh
@@ -136,6 +137,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   if ((doserr == 0) && ((maj != truemaj) || (min != truemin))) {
     output(" (");
     sprintf(buff, svarlang_str(20,10), truemaj, truemin); /* "true ver xx.xx" */
+    output(buff);
     output(")");
   }
   outputnl("");
