@@ -13,8 +13,8 @@
  - FOR command: accepts control characters as pattern delimiters [#44058]
  - FOR command: patterns without wildcards are processed as messages [#44058]
  - implemented the TRUENAME command [#44051]
- - VER command: displays true DOS version, DOS revision, memory area location
-   [#44050]
+ - DIR command: /a:xxx is supported like an equivalent to /axxx [#44077]
+ - VER command: displays true DOS version, DOS rev, memory location [#44050]
  - REN command: allows renaming directory names [#44060]
  - ln creates %DOSDIR%\LINKS directory when needed and warns on error [#44042]
  - ln add outputs an error message when link already exists [#44043]

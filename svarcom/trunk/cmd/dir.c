@@ -234,6 +234,8 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
               return(CMD_FAIL);
             }
           } else {
+            /* skip colon if present */
+            if (*arg == ':') arg++;
             /* start with "allow everything" */
             attrfilter_may = (DOS_ATTR_ARC | DOS_ATTR_DIR | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_RO);
             if (dir_parse_attr_list(arg, &attrfilter_may, &attrfilter_must) != 0) {
