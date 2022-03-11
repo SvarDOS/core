@@ -22,6 +22,7 @@
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigun (thraex)
  - added Turkish translations, submitted by Berki Yenigun (thraex)
+ - fixed and improved English help screens
 
 
 === ver 2022.2 (04.03.2022) ==================================================
