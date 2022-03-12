@@ -3,8 +3,8 @@
 #
 # Language...........: German
 # Authors............: Robert Riebisch
-# Last update........: 10 Mar 2022
-# In sync with EN rev: 1073
+# Last update........: 12 Mar 2022
+# In sync with EN rev: 1088
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -85,11 +85,11 @@
 17.10:Sprungmarke nicht gefunden
 
 # FOR
-18.0:Führt einen angegebenen Befehl für jede Datei eines Satzes von Dateien aus.
-18.1:FOR %Variable IN (Satz) DO Befehl [Parameter]
-18.2:%Variable  Ein ersetzbarer Parametername. (Einzelner Buchstabe)
-18.3:(Satz)     Eine oder mehrere durch Leerzeichen getrennte Zeichenfolgen oder\r\n           Platzhalter für Dateinamen
-18.4:Befehl     Der Befehl, der für jede passende Datei ausgeführt werden soll
+18.0:Führt einen angegebenen Befehl für jedes Element einer Liste aus.
+18.1:FOR %Variable IN (Liste) DO Befehl [Parameter]
+18.2:%Variable  Einzelner Buchstaben als Variable (a-z oder A-Z)
+18.3:(Liste)    Eine oder mehrere durch Leerzeichen getrennte Zeichenfolgen oder\r\n           Platzhalter für Dateinamen
+18.4:Befehl     Für jedes Element auszuführender Befehl. %Variable erlaubt
 18.5:Parameter  Parameter oder Schalter für den angegebenen Befehl
 18.6:In einem Stapelprogramm verwenden Sie %%Variable statt %Variable für FOR.
 18.7:FOR kann nicht verschachtelt werden
@@ -102,7 +102,7 @@
 19.4:ON oder OFF muß angegeben werden
 
 # VER
-20.0:Zeigt die DOS-Version an.
+20.0:Zeigt die Versionen von DOS-Kernel und SvarCOM-Shell an.
 20.1:DOS-Kernel-Version %u.%u
 20.2:SvarCOM-Shell-Version
 20.3:SvarCOM ist ein Shell-Interpreter für DOS-Kernel kompatibel mit MS-DOS 5+.
@@ -140,14 +140,14 @@
 24.2:RD [Laufwerk:]Pfad
 
 # REN / RENAME
-25.0:Benennt eine Datei, einen Satz von Dateien oder ein Verzeichnis um.
-25.1:RENAME [Laufwerk:][Pfad]Dateiname1 Dateiname2
-25.2:REN [Laufwerk:][Pfad]Dateiname1 Dateiname2
-25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Dateiname2 angeben.\r\nVerwenden Sie MOVE, um Dateien von einem Verzeichnis in ein anderes\r\nzu verschieben.
-25.4:Platzhalter können verwendet werden, um einen Satz von Dateien umzubenennen.
+25.0:Benennt eine oder mehrere Dateien oder Verzeichnisse um.
+25.1:RENAME [Laufwerk:][Pfad]Alter_Name Neuer_Name
+25.2:REN [Laufwerk:][Pfad]Alter_Name Neuer_Name
+25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Neuer_Name angeben.\r\nVerwenden Sie MOVE, um Dateien von einem Verzeichnis in ein anderes\r\nzu verschieben.
+25.4:Platzhalter können verwendet werden, um einen Satz von Dateien oder\r\nVerzeichnissen umzubenennen.
 
 # REM
-26.0:Leitet Kommentare in einer Stapeldatei oder in CONFIG.SYS ein.
+26.0:Leitet Kommentare in einer Stapeldatei ein.
 26.1:REM [Kommentar]
 
 # PATH
