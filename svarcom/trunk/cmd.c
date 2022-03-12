@@ -70,13 +70,13 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
   return(0);
 }
 
-#include "cmd/_notimpl.c"
 #include "cmd/break.c"
 #include "cmd/call.c"
 #include "cmd/cd.c"
 #include "cmd/chcp.c"
 #include "cmd/cls.c"
 #include "cmd/copy.c"
+#include "cmd/ctty.c"
 #include "cmd/date.c"
 #include "cmd/del.c"
 #include "cmd/for.c"
@@ -86,6 +86,7 @@ static int cmd_ishlp(const struct cmd_funcparam *p) {
 #include "cmd/dir.c"
 #include "cmd/echo.c"
 #include "cmd/exit.c"
+#include "cmd/loadhigh.c"
 #include "cmd/ln.c"
 #include "cmd/mkdir.c"
 #include "cmd/path.c"
@@ -116,7 +117,7 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"CHDIR",   cmd_cd},
   {"CLS",     cmd_cls},
   {"COPY",    cmd_copy},
-  {"CTTY",    cmd_notimpl},
+  {"CTTY",    cmd_ctty},
   {"DATE",    cmd_date},
   {"DEL",     cmd_del},
   {"DIR",     cmd_dir},
@@ -126,9 +127,9 @@ const struct CMD_ID INTERNAL_CMDS[] = {
   {"FOR",     cmd_for},
   {"GOTO",    cmd_goto},
   {"IF",      cmd_if},
-  {"LH",      cmd_notimpl},
+  {"LH",      cmd_loadhigh},
   {"LN",      cmd_ln},
-  {"LOADHIGH",cmd_notimpl},
+  {"LOADHIGH",cmd_loadhigh},
   {"MD",      cmd_mkdir},
   {"MKDIR",   cmd_mkdir},
   {"PAUSE",   cmd_pause},

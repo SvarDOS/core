@@ -15,6 +15,7 @@
 0.6:Invalid parameter
 0.7:Required parameter missing
 0.8:Invalid destination
+0.9:This command is not implemented
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
