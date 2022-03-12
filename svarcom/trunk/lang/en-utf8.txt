@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 10 Mar 2022
+# Last update: 12 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -84,11 +84,11 @@
 17.10:Label not found
 
 # FOR
-18.0:Runs a specified command for each member in a set.
-18.1:FOR %variable IN (set) DO command [parameters]
-18.2:%variable   A replaceable parameter name. (single letter)
-18.3:(set)       One or more space-separated strings or filename wildcards.
-18.4:command     The command to carry out for each member.
+18.0:Runs a specified command for each element in a list.
+18.1:FOR %variable IN (list) DO command [parameters]
+18.2:%variable   Single-letter variable (a-z or A-Z).
+18.3:(list)      One or more space-separated strings or filename wildcards.
+18.4:command     The command to carry out for each element. %variable allowed.
 18.5:parameters  Parameters or switches for the specified command.
 18.6:To use FOR in a batch program, use %%variable instead of %variable.
 18.7:FOR cannot be nested
@@ -101,7 +101,7 @@
 19.4:Must specify ON or OFF
 
 # VER
-20.0:Displays the DOS version.
+20.0:Displays the DOS kernel and SvarCOM shell versions.
 20.1:DOS kernel version %u.%u
 20.2:SvarCOM shell ver
 20.3:SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.
