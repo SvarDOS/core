@@ -4,7 +4,7 @@
 # Language...........: German
 # Authors............: Robert Riebisch
 # Last update........: 12 Mar 2022
-# In sync with EN rev: 1088
+# In sync with EN rev: 1090
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -16,6 +16,7 @@
 0.6:Ungültiger Parameter
 0.7:Erforderlicher Parameter fehlt
 0.8:Ungültiges Ziel
+0.9:Dieser Befehl ist nicht implementiert.
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
