@@ -4,7 +4,7 @@
 # Language...........: German
 # Authors............: Robert Riebisch
 # Last update........: 12 Mar 2022
-# In sync with EN rev: 1090
+# In sync with EN rev: 1091
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -145,7 +145,6 @@
 25.1:RENAME [Laufwerk:][Pfad]Alter_Name Neuer_Name
 25.2:REN [Laufwerk:][Pfad]Alter_Name Neuer_Name
 25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Neuer_Name angeben.\r\nVerwenden Sie MOVE, um Dateien von einem Verzeichnis in ein anderes\r\nzu verschieben.
-25.4:Platzhalter können verwendet werden, um einen Satz von Dateien oder\r\nVerzeichnissen umzubenennen.
 
 # REM
 26.0:Leitet Kommentare in einer Stapeldatei ein.

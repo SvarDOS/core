@@ -144,7 +144,6 @@
 25.1:RENAME [drive:][path]oldname newname
 25.2:REN [drive:][path]oldname newname
 25.3:Note that you cannot specify a new drive or path for newname.\r\nUse MOVE to move files from one directory to another.
-25.4:Wildcards may be used to rename a set of files or directories.
 
 # REM
 26.0:Records comments (remarks) in a batch file.

@@ -143,7 +143,6 @@
 25.1:RENAME [sürücü:][yol]dosyaismi1 dosyaismi2
 25.2:REN [sürücü:][yol]dosyaismi1 dosyaismi2
 25.3:dosyaismi2 için yeni bir sürücü veya yol belirtemeyeceğinizi unutmayın.\r\nBir dizinden başkasına dosya taşımak için MOVE kullanın.
-25.4:Jokerler bir dosya kümesini tekrar isimlendirmek için kullanılabilir.
 
 # REM
 26.0:Toplu iş dosyasında yorum (açıklama) kaydeder.

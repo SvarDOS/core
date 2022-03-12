@@ -143,7 +143,6 @@
 25.1:RENAME [lecteur:][chemin]nomfichier1 nomfichier2
 25.2:REN [lecteur:][chemin]nomfichier1 nomfichier2
 25.3:Notez que vous ne pouvez pas spécifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour déplacer des fichiers d'un\r\nrépertoire à un autre.
-25.4:Les jokers peuvent être utilisés pour renommer un jeu de fichiers.
 
 # REM
 26.0:Enregistre des commentaires (remarques) dans un fichier batch.

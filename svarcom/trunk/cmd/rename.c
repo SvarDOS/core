@@ -41,7 +41,6 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
     nls_outputnl(25,2); /* "REN [drive:][path]filename1 filename2" */
     outputnl("");
     nls_outputnl(25,3); /* "Note that you cannot specify a new drive or (...)" */
-    nls_outputnl(25,4); /* extra note about usage of wildcards */
     return(CMD_OK);
   }
 
