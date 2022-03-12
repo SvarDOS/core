@@ -3,7 +3,7 @@
 #
 # Language...: Polish
 # Author.....: Mateusz Viste
-# Last update: 08 Mar 2022
+# Last update: 12 Mar 2022
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -21,7 +21,7 @@
 0.10:TN
 
 # SVARCOM HELP SCREEN
-1.0:Uruchamia interpreter poleceń SvarCOM
+1.0:Uruchamia interpreter poleceń SvarCOM.
 1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] polecenie]
 1.2:/D      Ignoruje AUTOEXEC.BAT (ma sens tylko przy /P)
 1.3:/E:nnn  Ustawia rozmiar środowiska na nnn bajtów
@@ -36,7 +36,7 @@
 2.2:SvarCOM: wykryto przepełnienie stosu, usunięto historię poleceń (to nie bug)
 
 # CLS
-10.0:Czyści ekran
+10.0:Czyści ekran.
 
 # CHCP
 11.0:Wyświetla lub ustawia aktywną stronę kodową.
@@ -59,17 +59,17 @@
 12.7:Wpisz CD bez parametrów aby wyświetlić bieżący dysk i katalog.
 
 # CALL
-13.0:Wywołuje program wsadowy (bat) z innego programu wsadowego
+13.0:Wywołuje program wsadowy (bat) z innego programu wsadowego.
 13.1:CALL [dysk:][ścieżka]nazwapliku [parametry-batch]
 
 # BREAK
-14.0:Włącza lub wyłącza rozszerzone sprawdzanie CTRL+C
+14.0:Włącza lub wyłącza rozszerzone sprawdzanie CTRL+C.
 14.1:Wpisz BREAK bez parametru aby wyświetlić aktualne ustawienie BREAK.
 14.2:BREAK jest wyłączone
 14.3:BREAK jest włączone
 
 # PAUSE
-15.0:Wstrzymuje przetwarzanie pliku wsadowego
+15.0:Wstrzymuje przetwarzanie pliku wsadowego.
 15.1:Naciśnij dowolny klawisz aby kontynuować...
 
 # SHIFT
@@ -134,19 +134,19 @@
 23.5:Brak miejsca w bloku pamięci środowiskowej
 
 # RD / RMDIR
-24.0:Usuwa (kasuje) katalog
+24.0:Usuwa (kasuje) katalog.
 24.1:RMDIR [dysk:]ścieżka
 24.2:RD [dysk:]ścieżka
 
 # REN / RENAME
-25.0:Zmienia nazwę jednego lub wielu plików bądź katalogu
+25.0:Zmienia nazwę jednego lub wielu plików bądź katalogu.
 25.1:RENAME [dysk:][ścieżka]plik1 plik2
 25.2:REN [dysk:][ścieżka]plik1 plik2
 25.3:Uwaga: nie możesz podać nowego dysku lub ścieżki dla pliku2\r\nUżyj MOVE aby przenieść pliki do innego katalogu.
 25.4:Aby zmienić nazwy wielu plików można użyć symboli wieloznacznych.
 
 # REM
-26.0:Pozwala zapisać komentarze (uwagi) w pliku wsadowym lub CONFIG.SYS
+26.0:Pozwala zapisać komentarze (uwagi) w pliku wsadowym.
 26.1:REM [komentarz]
 
 # PATH
@@ -157,7 +157,7 @@
 27.4:Brak ścieżki PATH
 
 # MD / MKDIR
-28.0:Tworzy katalog
+28.0:Tworzy katalog.
 28.1:MKDIR [dysk:]ścieżka
 28.2:MD [dysk:]ścieżka
 
@@ -170,10 +170,10 @@
 29.5:%DOSDIR% nie jest ustawione
 
 # EXIT
-30.0:Kończy program COMMAND.COM (interpreter poleceń)
+30.0:Kończy program COMMAND.COM (interpreter poleceń).
 
 # ECHO
-31.0:Wyświetla komunikaty lub włącza bądź wyłącza wyświetlanie wykonywanych poleceń
+31.0:Wyświetla komunikaty lub włącza bądź wyłącza wyświetlanie wykonywanych poleceń.
 31.1:ECHO [komunikat]
 31.2:Wpisz ECHO bez parametrów, aby wyświetlić bieżące ustawienie echa.
 31.3:ECHO jest włączone
