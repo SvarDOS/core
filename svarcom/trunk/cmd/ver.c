@@ -31,8 +31,7 @@
 
 static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
-  unsigned char maj = 0, min = 0, truemaj = 0, truemin = 0, rev = 0, verflags = 0;
-  unsigned short doserr = 0;
+  unsigned char maj = 0, min = 0, retcode = 0, truemaj = 0, truemin = 0, rev = 0, verflags = 0;
 
   /* help screen */
   if (cmd_ishlp(p)) {
@@ -109,21 +108,18 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     push dx
 
     /* get the "normal" (spoofable) DOS version */
-    mov ah, 0x30  /* Get DOS version number (DOS 2+) */
+    mov ah, 0x30  /* function supported on DOS 2+ */
     int 0x21      /* AL=maj_ver_num  AH=min_ver_num  BX,CX=OEM */
     mov [maj], al
     mov [min], ah
 
     /* get the "true" DOS version, along with a couple of extra data */
-    mov ax, 0x3306 /* Get true DOS version number (DOS 5+) */
-    clc
-    int 0x21       /* AL=return_code  BL=maj_ver_num  BH=min_ver_num */
-    jnc GOOD       /* DL=revision  DH=kernel_memory_area */
-    mov [doserr], ax /* DR-DOS sets CF on this call (according to RBIL) */
-    GOOD:
-    mov [truemaj], bl
+    mov ax, 0x3306     /* function supported on DOS 5+ */
+    int 0x21
+    mov [retcode], al  /* AL=return_code for DOS < 5 */
+    mov [truemaj], bl  /* BL=maj_ver_num  BH=min_ver_num */
     mov [truemin], bh
-    mov [rev], dl
+    mov [rev], dl      /* DL=revision  DH=kernel_memory_area */
     mov [verflags], dh
 
     pop dx
@@ -134,23 +130,29 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
 
   sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
   output(buff);
-  if ((doserr == 0) && ((maj != truemaj) || (min != truemin))) {
-    output(" (");
-    sprintf(buff, svarlang_str(20,10), truemaj, truemin); /* "true ver xx.xx" */
-    output(buff);
-    output(")");
-  }
-  outputnl("");
 
-  sprintf(buff, svarlang_str(20,5), 'A' + rev); /* "Revision %c" */
-  outputnl(buff);
+  /* can we trust in the data returned? */
+  /* DR DOS 5&6 return 0x01, MS-DOS 2-4 return 0xff */
+  /* 'truemaj' is checked to mitigate the conflict from the CBIS redirector */
+  if ((retcode > 1) && (retcode < 255) && (truemaj > 4) && (truemaj < 100)) {
+    if ((maj != truemaj) || (min != truemin)) {
+      output(" (");
+      sprintf(buff, svarlang_str(20,10), truemaj, truemin); /* "true ver xx.xx" */
+      output(buff);
+      output(")");
+    }
+    outputnl("");
 
-  if (doserr == 0) {
-    const char *loc = svarlang_str(20,7);        /* "low memory" */
-    if (verflags & 16) loc = svarlang_str(20,8); /* "HMA" */
-    if (verflags & 8) loc = svarlang_str(20,9);  /* "ROM" */
-    sprintf(buff, svarlang_str(20,6), loc);      /* "DOS is in %s" */
+    sprintf(buff, svarlang_str(20,5), 'A' + rev); /* "Revision %c" */
     outputnl(buff);
+
+    {
+      const char *loc = svarlang_str(20,7);        /* "low memory" */
+      if (verflags & 16) loc = svarlang_str(20,8); /* "HMA" */
+      if (verflags & 8) loc = svarlang_str(20,9);  /* "ROM" */
+      sprintf(buff, svarlang_str(20,6), loc);      /* "DOS is in %s" */
+      outputnl(buff);
+    }
   }
 
   outputnl("");
