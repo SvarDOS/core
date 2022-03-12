@@ -17,8 +17,8 @@
  - VER command: displays true DOS version, DOS rev, memory location [#44050]
  - REN command: allows renaming directory names [#44060]
  - implemented CTTY and LOADHIGH/LH as no-ops (LH loads programs low)
- - ln creates %DOSDIR%\LINKS directory when needed and warns on error [#44042]
- - ln add outputs an error message when link already exists [#44043]
+ - LN creates %DOSDIR%\LINKS directory when needed and warns on error [#44042]
+ - LN ADD outputs an error message when link already exists [#44043]
  - added Polish translations
  - added German translations, courtesy of Robert Riebisch (bttr)
  - added French translations, kindly contributed by Berki Yenigun (thraex)
