@@ -139,7 +139,7 @@
 24.2:RD [drive:]path
 
 # REN / RENAME
-25.0:Renames a file, a set of files or a directory.
+25.0:Renames one or more files or directories.
 25.1:RENAME [drive:][path]oldname newname
 25.2:REN [drive:][path]oldname newname
 25.3:Note that you cannot specify a new drive or path for newname.\r\nUse MOVE to move files from one directory to another.
