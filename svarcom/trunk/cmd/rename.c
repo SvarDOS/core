@@ -35,10 +35,10 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* use default DTA in PSP */
 
   if (cmd_ishlp(p)) {
-    nls_outputnl(25,0); /* "Renames a file or a set of files" */
+    nls_outputnl(25,0); /* "Renames one or more files or directories." */
     outputnl("");
-    nls_outputnl(25,1); /* "RENAME [drive:][path]filename1 filename2" */
-    nls_outputnl(25,2); /* "REN [drive:][path]filename1 filename2" */
+    nls_outputnl(25,1); /* "RENAME [drive:][path]oldname newname" */
+    nls_outputnl(25,2); /* "REN [drive:][path]oldname newname" */
     outputnl("");
     nls_outputnl(25,3); /* "Note that you cannot specify a new drive or (...)" */
     return(CMD_OK);

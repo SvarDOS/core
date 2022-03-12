@@ -87,13 +87,13 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
 
   /* help screen ONLY if /? is the only argument */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    nls_outputnl(18,0); /* "Runs a specified command for each file in a set of files" */
+    nls_outputnl(18,0); /* "Runs a specified command for each element in a list." */
     outputnl("");
-    nls_outputnl(18,1); /* "FOR %variable IN (set) DO command [parameters]" */
+    nls_outputnl(18,1); /* "FOR %variable IN (list) DO command [parameters]" */
     outputnl("");
-    nls_outputnl(18,2); /* "%variable   A replaceable parameter name. (single letter)" */
-    nls_outputnl(18,3); /* "(set)       One of more space-separated strings or filename wildcards." */
-    nls_outputnl(18,4); /* "command     The command to carry out for each matched file." */
+    nls_outputnl(18,2); /* "%variable   Single-letter variable (a-z or A-Z)." */
+    nls_outputnl(18,3); /* "(list)      One or more space-separated strings or filename wildcards." */
+    nls_outputnl(18,4); /* "command     The command to carry out for each element. %variable allowed." */
     nls_outputnl(18,5); /* "parameters  Parameters or switches for the specified command." */
     outputnl("");
     nls_outputnl(18,6); /* "To use FOR in a batch program, use %%variable instead of %variable" */

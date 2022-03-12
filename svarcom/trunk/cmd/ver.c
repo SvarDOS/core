@@ -35,7 +35,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
 
   /* help screen */
   if (cmd_ishlp(p)) {
-    nls_outputnl(20,0); /* "Displays the DOS version." */
+    nls_outputnl(20,0); /* "Displays the DOS kernel and SvarCOM shell versions." */
     outputnl("");
     output("ver [/about]");
 #ifdef VERDBG

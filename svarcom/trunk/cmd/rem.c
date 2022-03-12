@@ -30,7 +30,7 @@ static enum cmd_result cmd_rem(struct cmd_funcparam *p) {
   /* help screen ONLY if /? is the only argument - I do not want to output
    * help for ex. for "REM mouse.com /?" */
   if ((p->argc == 1) && (imatch(p->argv[0], "/?"))) {
-    nls_outputnl(26,0); /* "Records comments (remarks) in a batch file or CONFIG.SYS" */
+    nls_outputnl(26,0); /* "Records comments (remarks) in a batch file." */
     outputnl("");
     nls_outputnl(26,1); /* "REM [comment]" */
   }
