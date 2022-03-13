@@ -21,7 +21,7 @@
 
   <p>For the time being, it is a work-in-progress project that - although functional - is not entirely polished yet and might miss a few bits and pieces. SvarCOM version 2022.0 must be considered a "preview" version. See the documentation included in the zip file for details.</p>
 
-  <p>SvarCOM is minimalist and I'd like to keep it that way. It aims to be functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.</p>
+  <p>SvarCOM is minimalist and I'd like to keep it that way. It aims to be functionally equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.</p>
 
   <p>As of version 2022.0, SvarCOM's resident footprint is under 2 KiB.</p>
 
