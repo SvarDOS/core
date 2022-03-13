@@ -826,6 +826,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
               "DEL C:\\AUTOEXEC.BAT\r\n"
               "COPY AUTOEXEC.BAT C:\\\r\n"
               "DEL AUTOEXEC.BAT\r\n"
+              "SET COMSPEC=C:\\COMMAND.COM\r\n"
               "DEL \\CMD.COM\r\n");
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
