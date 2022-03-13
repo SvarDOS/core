@@ -670,12 +670,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
               "LASTDRIVE=Z\r\n"
               "FILES=50\r\n");
   fprintf(fd, "DEVICE=C:\\SVARDOS\\BIN\\HIMEMX.EXE\r\n");
-  if (strcmp(locales->lang, "EN") == 0) {
-    strcpy(buff, "COMMAND");
-  } else {
-    snprintf(buff, sizeof(buff), "CMD-%s", locales->lang);
-  }
-  fprintf(fd, "SHELLHIGH=C:\\SVARDOS\\BIN\\%s.COM /E:512 /P\r\n", buff);
+  fprintf(fd, "SHELL=C:\\COMMAND.COM /E:512 /P\r\n");
   fprintf(fd, "REM COUNTRY=001,%u,C:\\SVARDOS\\CFG\\COUNTRY.SYS\r\n", locales->codepage);
   fprintf(fd, "REM DEVICE=C:\\DRIVERS\\UDVD2\\UDVD2.SYS /D:SVCD0001 /H\r\n");
   fclose(fd);
@@ -691,8 +686,6 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
   fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n");
   fprintf(fd, "PROMPT $P$G\r\n");
-  fprintf(fd, "ALIAS REBOOT=FDAPM COLDBOOT\r\n");
-  fprintf(fd, "ALIAS HALT=FDAPM POWEROFF\r\n");
   fprintf(fd, "FDAPM APMDOS\r\n");
   fprintf(fd, "\r\n");
   genlocalesconf(fd, locales);
@@ -788,6 +781,11 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\nECHO INSTALLING SVARDOS BUILD %s\r\n", buildstring);
 
+  /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
+  fprintf(fd, "COPY \\COMMAND.COM \\CMD.COM\r\n");
+  fprintf(fd, "SET COMSPEC=%c:\\CMD.COM\r\n", targetdrv);
+  fprintf(fd, "DEL \\COMMAND.COM\r\n");
+
   /* copy packages */
   pkgptr = pkglist;
   for (i = 0;; i++) {
@@ -827,7 +825,8 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
               "DEL CONFIG.SYS\r\n"
               "DEL C:\\AUTOEXEC.BAT\r\n"
               "COPY AUTOEXEC.BAT C:\\\r\n"
-              "DEL AUTOEXEC.BAT\r\n");
+              "DEL AUTOEXEC.BAT\r\n"
+              "DEL \\CMD.COM\r\n");
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
               "ECHO ");
