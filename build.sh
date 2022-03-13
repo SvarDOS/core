@@ -151,7 +151,7 @@ echo
 # in lowercase (-L) to avoid any case mismatching later in the build process
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
 unzip -CLj "$REPOROOT/core/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/command.svp" bin/command.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOT/core/svarcom.svp" command.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOT/core/display.svp" bin/display.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOT/core/edit.svp" bin/edit.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOT/core/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
@@ -219,13 +219,8 @@ rm "$FLOPROOT"/install.lng
 rm "$FLOPROOT"/display.exe
 rm "$FLOPROOT"/mode.com
 rm "$FLOPROOT"/edit.*
-# another hack: the COMMAND.SVP package must be stripped from any cmd-?? files
-# otherwise it does not fit on a 360K floppy
-zip -d "$CDROOT/command.svp" 'BIN/CMD-??.COM'
 #
 prep_flop 40 2  9  360 "$PUBDIR"
-# now put back the original command.svp package (ISO CD still needs to be built)
-cp "$REPOROOT/core/command.svp" "$CDROOT/"
 
 
 echo
@@ -251,23 +246,32 @@ for p in $COREPKGS ; do
 done
 echo 'ECHO my_ip = dhcp >> %DOSDIR%\CFG\WATTCP.CFG' >> "$DOSEMUDIR/install.bat"
 echo 'del pkg.exe' >> "$DOSEMUDIR/install.bat"
-echo 'ECHO SHELLHIGH=C:\SVARDOS\BIN\COMMAND.COM /P >> C:\CONFIG.SYS' >> "$DOSEMUDIR/install.bat"
+echo 'DEL C:\CONFIG.SYS' >> "$DOSEMUDIR/install.bat"
+echo 'COPY C:\CONFIG.NEW C:\CONFIG.SYS' >> "$DOSEMUDIR/install.bat"
+echo 'DEL C:\CONFIG.NEW' >> "$DOSEMUDIR/install.bat"
+echo 'SET COMSPEC=C:\COMMAND.COM' >> "$DOSEMUDIR/install.bat"
+echo 'DEL C:\CMD.COM' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO.' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
-echo 'ECHO  SVARDOS SETUP COMPLETED ' >> "$DOSEMUDIR/install.bat"
+echo 'ECHO  SVARDOS SETUP COMPLETED' >> "$DOSEMUDIR/install.bat"
+echo 'ECHO   PLEASE RESTART DOSEMU' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO.' >> "$DOSEMUDIR/install.bat"
 unzip -Cj "$REPOROOT/core/kernel.svp" bin/kernel.sys -d "$DOSEMUDIR/"
-unzip -Cj "$REPOROOT/core/command.svp" bin/command.com -d "$DOSEMUDIR/"
+unzip -CLj "$REPOROOT/core/svarcom.svp" command.com -d "$DOSEMUDIR/"
+mv "$DOSEMUDIR/command.com" "$DOSEMUDIR/cmd.com"
 unzip -Cj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$DOSEMUDIR/"
 # CONFIG.SYS
-echo 'FILES=50' >> "$DOSEMUDIR/config.sys"
+echo 'FILES=25' >> "$DOSEMUDIR/config.sys"
 echo 'DOS=HIGH,UMB' >> "$DOSEMUDIR/config.sys"
 echo 'DOSDATA=UMB' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICE=D:\dosemu\emufs.sys' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICE=D:\dosemu\umb.sys' >> "$DOSEMUDIR/config.sys"
 echo 'DEVICEHIGH=D:\dosemu\ems.sys' >> "$DOSEMUDIR/config.sys"
 echo 'INSTALL=D:\dosemu\emufs.com' >> "$DOSEMUDIR/config.sys"
+cp "$DOSEMUDIR/config.sys" "$DOSEMUDIR/config.new"
+echo 'SHELL=C:\CMD.COM /P' >> "$DOSEMUDIR/config.sys"
+echo 'SHELL=C:\COMMAND.COM /P' >> "$DOSEMUDIR/config.new"
 # AUTOEXEC.BAT
 echo "@ECHO OFF" >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET DOSDIR=C:\SVARDOS' >> "$DOSEMUDIR/autoexec.bat"
@@ -276,13 +280,17 @@ echo 'SET DIRCMD=/p/ogne' >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET TEMP=C:\TEMP' >> "$DOSEMUDIR/autoexec.bat"
 echo 'PATH %DOSDIR%\BIN' >> "$DOSEMUDIR/autoexec.bat"
 echo "" >> "$DOSEMUDIR/autoexec.bat"
+echo 'IF NOT EXIST INSTALL.BAT GOTO NORMBOOT' >> "$DOSEMUDIR/autoexec.bat"
 echo "REM *** this is a one-time setup script used only during first initialization ***" >> "$DOSEMUDIR/autoexec.bat"
-echo 'IF EXIST INSTALL.BAT CALL INSTALL.BAT' >> "$DOSEMUDIR/autoexec.bat"
-echo 'IF EXIST INSTALL.BAT DEL INSTALL.BAT' >> "$DOSEMUDIR/autoexec.bat"
+echo 'CALL INSTALL.BAT' >> "$DOSEMUDIR/autoexec.bat"
+echo 'DEL INSTALL.BAT' >> "$DOSEMUDIR/autoexec.bat"
+echo 'GOTO ENDOFFILE' >> "$DOSEMUDIR/autoexec.bat"
 echo "" >> "$DOSEMUDIR/autoexec.bat"
+echo ":NORMBOOT" >> "$DOSEMUDIR/autoexec.bat"
 echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
 echo "ECHO Welcome to SvarDOS (powered by DOSEMU)! Type HELP if you are lost." >> "$DOSEMUDIR/autoexec.bat"
 echo "ECHO." >> "$DOSEMUDIR/autoexec.bat"
+echo ":ENDOFFILE" >> "$DOSEMUDIR/autoexec.bat"
 rm -f "$PUBDIR/svardos-dosemu.zip"
 zip -rm9jk "$PUBDIR/svardos-$CURDATE-dosemu.zip" "$DOSEMUDIR"
 rmdir "$DOSEMUDIR"
