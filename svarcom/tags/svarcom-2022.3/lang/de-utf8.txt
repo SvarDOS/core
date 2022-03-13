@@ -1,0 +1,298 @@
+#
+# SvarCOM language file
+#
+# Language...........: German
+# Authors............: Robert Riebisch
+# Last update........: 12 Mar 2022
+# In sync with EN rev: 1095
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Ungültige Syntax
+0.2:Ungültiger Schalter
+0.3:Ungültiges Parameterformat
+0.4:Zu viele Parameter
+0.5:Befehl oder Dateiname nicht gefunden
+0.6:Ungültiger Parameter
+0.7:Erforderlicher Parameter fehlt
+0.8:Ungültiges Ziel
+0.9:Dieser Befehl ist nicht implementiert.
+
+# the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:JN
+
+# SVARCOM HELP SCREEN
+1.0:Startet den SvarCOM-Befehlsinterpreter.
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] Befehl]
+1.2:/D      Überspringt die Abarbeitung von AUTOEXEC.BAT (nur sinnvoll mit /P)
+1.3:/E:nnn  Legt die Umgebungsgröße auf nnn Byte fest
+1.4:/P      Macht den neuen Befehlsinterpreter permanent und startet AUTOEXEC.BAT
+1.5:/C      Führt den angegebenen Befehl aus und kehrt dann zurück
+1.6:/K      Führt den angegebenen Befehl aus und läuft dann weiter
+1.7:/Y      Führt das Stapelprogramm schrittweise aus (nur mit /P, /K oder /C)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:SVARCOM-VERSION VERÄNDERT. SYSTEM ANGEHALTEN. STARTEN SIE DEN COMPUTER NEU.
+2.1:SCHWERWIEGENDER FEHLER: rmod_install() fehlgeschlagen
+2.2:SvarCOM: Stacküberlauf bemerkt, Befehlsverlauf geleert (Das ist kein Fehler.)
+
+# CLS
+10.0:Löscht den Bildschirminhalt.
+
+# CHCP
+11.0:Zeigt die Nummer der aktiven Codeseite an oder legt letztere fest.
+11.1:CHCP [nnn]
+11.2:nnn  Gibt die Nummer einer Codeseite an
+11.3:Der Befehl CHCP ohne Parameter zeigt die Nummer der aktuellen Codeseite an.
+11.4:Ungültige Codeseitennummer
+11.5:NLSFUNC nicht installiert
+11.6:Ändern der Codeseite fehlgeschlagen
+11.7:Aktive Codeseite:
+
+# CD / CHDIR
+12.0:Zeigt den Namen des aktuellen Verzeichnisses an oder wechselt es.
+12.1:CHDIR [Laufwerk:][Pfad]
+12.2:CHDIR[..]
+12.3:CD [Laufwerk:][Pfad]
+12.4:CD[..]
+12.5:.. Gibt an, dass Sie ins übergeordnete Verzeichnis wechseln wollen.
+12.6:CD Laufwerk: zeigt das aktuelle Verzeichnis auf dem angegebenen Laufwerk an.
+12.7:Der Befehl CD ohne Parameter zeigt das aktuelle Laufwerk und Verzeichnis an.
+
+# CALL
+13.0:Ruft ein Stapelprogramm von einem anderen aus auf.
+13.1:CALL [Laufwerk:][Pfad]Dateiname [Parameter]
+
+# BREAK
+14.0:Schaltet erweiterte Prüfung für STRG+C ein (ON) oder aus (OFF).
+14.1:Der Befehl BREAK ohne Parameter zeigt die aktuelle Einstellung von BREAK an.
+14.2:BREAK ist ausgeschaltet (OFF)
+14.3:BREAK ist eingeschaltet (ON)
+
+# PAUSE
+15.0:Pausiert die Ausführung eines Stapelskripts.
+15.1:Drücken Sie eine beliebige Taste, um fortzusetzen.
+
+# SHIFT
+16.0:Ändert die Position der Argumente in einer Stapeldatei:
+16.1:Argument %1 wird zu %0, Argument %2 wird zu %1 usw.
+
+# GOTO
+17.0:Lenkt die Stapelverarbeitung zu einer Sprungmarke im Stapelprogramm.
+17.1:GOTO MARKE
+17.2:MARKE gibt eine Zeichenfolge an, die im Stapelprogramm als Sprungmarke\r\nverwendet wird.
+17.3:Eine Sprungmarke steht in einer eigenen Zeile und muss mit einem Doppelpunkt\r\neingeleitet werden.
+17.10:Sprungmarke nicht gefunden
+
+# FOR
+18.0:Führt einen angegebenen Befehl für jedes Element einer Liste aus.
+18.1:FOR %Variable IN (Liste) DO Befehl [Parameter]
+18.2:%Variable  Einzelner Buchstaben als Variable (a-z oder A-Z)
+18.3:(Liste)    Eine oder mehrere durch Leerzeichen getrennte Zeichenfolgen oder\r\n           Platzhalter für Dateinamen
+18.4:Befehl     Für jedes Element auszuführender Befehl. %Variable erlaubt
+18.5:Parameter  Parameter oder Schalter für den angegebenen Befehl
+18.6:In einem Stapelprogramm verwenden Sie %%Variable statt %Variable für FOR.
+18.7:FOR kann nicht verschachtelt werden
+
+# VERIFY
+19.0:Teilt DOS mit, ob es überprüfen soll, dass Dateien korrekt auf Datenträger\r\n geschrieben werden.
+19.1:Der Befehl VERIFY ohne Parameter zeigt die aktuelle Einstellung von VERIFY an.
+19.2:VERIFY ist ausgeschaltet (OFF)
+19.3:VERIFY ist eingeschaltet (ON)
+19.4:ON oder OFF muß angegeben werden
+
+# VER
+20.0:Zeigt die Versionen von DOS-Kernel und SvarCOM-Shell an.
+20.1:DOS-Kernel-Version %u.%u
+20.2:SvarCOM-Shell-Version
+20.3:SvarCOM ist ein Shell-Interpreter für DOS-Kernel kompatibel mit MS-DOS 5+.
+20.4:Diese Software wird unter den Bedingungen der MIT-Lizenz verbreitet.
+20.5:Revision %c
+20.6:DOS ist im %s
+20.7:unteren Speicherbereich
+20.8:oberen Speicherbereich (High Memory Area)
+20.9:ROM
+20.10:wahre Version %u.%u
+
+# TYPE
+21.0:Zeigt den Inhalt einer Textdatei an.
+21.1:TYPE [Laufwerk:][Pfad]Dateiname
+
+# TIME
+22.0:Zeigt die Systemzeit an oder legt sie fest.
+22.1:TIME [Zeit]
+22.2:Der Befehl TIME ohne Parameter zeigt die aktuelle Zeit an und fragt\r\nnach einer neuen. Drücken Sie die EINGABETASTE, um die bisherige zu behalten.
+22.3:Aktuelle Zeit:
+22.4:Ungültige Zeit
+22.5:Geben Sie die neue Zeit ein:
+
+# SET
+23.0:Zeigt DOS-Umgebungsvariablen an, legt sie fest oder entfernt sie.
+23.1:SET [Variable=[Zeichenfolge]]
+23.2:Variable      Gibt den Namen der Umgebungsvariable an
+23.3:Zeichenfolge  Eine Zeichenfolge, die der Variablen zugewiesen werden soll
+23.4:Der Befehl SET ohne Parameter zeigt die aktuellen Umgebungsvariablen an.
+23.5:Nicht genügend Platz innerhalb des Umgebungsblocks verfügbar
+
+# RD / RMDIR
+24.0:Entfernt (löscht) ein Verzeichnis.
+24.1:RMDIR [Laufwerk:]Pfad
+24.2:RD [Laufwerk:]Pfad
+
+# REN / RENAME
+25.0:Benennt eine oder mehrere Dateien oder Verzeichnisse um.
+25.1:RENAME [Laufwerk:][Pfad]Alter_Name Neuer_Name
+25.2:REN [Laufwerk:][Pfad]Alter_Name Neuer_Name
+25.3:Beachten Sie, Sie können keinen neuen Laufwerkspfad für Neuer_Name angeben.\r\nVerwenden Sie MOVE, um Dateien von einem Verzeichnis in ein anderes\r\nzu verschieben.
+
+# REM
+26.0:Leitet Kommentare in einer Stapeldatei ein.
+26.1:REM [Kommentar]
+
+# PATH
+27.0:Zeigt den Suchpfad für ausführbare Dateien an oder legt ihn fest.
+27.1:PATH [[Laufwerk:]Pfad[;...]]
+27.2:Geben Sie "PATH ;" ein, um alle Suchpfadeinstellungen zu löschen und DOS\r\nanzuweisen, nur im aktuellen Verzeichnis zu suchen.
+27.3:Der Befehl PATH ohne Parameter zeigt den aktuellen Suchpfad an.
+27.4:Kein Pfad
+
+# MD / MKDIR
+28.0:Erstellt ein Verzeichnis.
+28.1:MKDIR [Laufwerk:]Pfad
+28.2:MD [Laufwerk:]Pfad
+
+# LN
+29.0:Fügt Verknüpfungen für ausführbare Dateien hinzu, löscht oder zeigt sie an.
+29.1:LN ADD Verknüpfungsname Zielverzeichnis
+29.2:LN DEL Verknüpfungsname
+29.3:LN LIST [Muster]
+29.4:Keine passende ausführbare Datei in angegebenem Pfad gefunden.
+29.5:%DOSDIR% nicht definiert
+
+# EXIT
+30.0:Verlässt das COMMAND.COM-Programm (Befehlsinterpreter).
+
+# ECHO
+31.0:Zeigt Meldungen an oder schaltet die Befehlsanzeige ein (ON) oder aus (OFF).
+31.1:ECHO [Meldung]
+31.2:ECHO ohne Parameter zeigt die aktuelle Einstellung der Befehlsanzeige an.
+31.3:ECHO ist eingeschaltet (ON)
+31.4:ECHO ist ausgeschaltet (OFF)
+
+# DATE
+32.0:Zeigt das Systemdatum an oder legt es fest.
+32.1:DATE [Datum]
+32.2:Der Befehl DATE ohne Parameter zeigt das aktuelle Datum an und fragt\r\nnach einem neuen. Drücken Sie die EINGABETASTE, um das bisherige zu behalten.
+32.3:Ungültiges Datum
+32.4:Aktuelles Datum:
+32.5:Geben Sie das neue Datum ein:
+
+# PROMPT
+33.0:Ändert die DOS-Eingabeaufforderung.
+33.1:PROMPT [neue Eingabeaufforderungspezifikation]
+
+# VOL
+34.0:Zeigt die Datenträgerbezeichnung und -seriennummer an, falls vorhanden.
+34.1:VOL [Laufwerk:]
+34.2:Datenträger in Laufwerk %c hat keine Bezeichnung
+34.3:Datenträger in Laufwerk %c ist %s
+34.4:Datenträgerseriennummer: %04X-%04X
+
+# IF
+35.0:Führt eine bedingte Verarbeitung in Batchprogrammen durch.
+35.1:IF [NOT] ERRORLEVEL Zahl Befehl
+35.2:IF [NOT] Zeichenfolge1==Zeichenfolge2 Befehl
+35.3:IF [NOT] EXIST Dateiname Befehl
+35.4:NOT              Den Befehl nur ausführen, falls Bedingung NICHT erfüllt ist
+35.5:ERRORLEVEL Zahl  Bedingung: Letztes Programm hatte einen Rückgabewert >= Zahl
+35.6:Zeichenfolge1==Zeichenfolge2\r\n                 Bedingung: Beide Zeichenfolgen müssen gleich sein
+35.7:EXIST Dateiname  Bedingung: Dateiname existiert (Platzhalter erlaubt)
+35.8:Befehl           Auszuführender Befehl, falls die Bedingung erfüllt ist
+
+# DEL / ERASE
+36.0:Löscht eine oder mehrere Dateien.
+36.1:DEL [Laufwerk:][Pfad]Dateiname [/P]
+36.2:ERASE [Laufwerk:][Pfad]Dateiname [/P]
+36.3:[Laufwerk:][Pfad]Dateiname  Gibt die zu löschende(n) Datei(en) an.
+36.4:/P  Fordert vor dem Löschen jeder Datei zur Bestätigung auf.
+36.5:Alle Dateien im Verzeichnis werden gelöscht!
+36.6:Sind Sie sicher?
+36.7:Löschen?
+
+# DIR
+37.0:Zeigt eine Liste von Dateien und Unterverzeichnissen eines Verzeichnisses an.
+37.1:DIR [Laufwerk:][Pfad][Dateiname] [/P] [/W] [/A[:]Attribute] [/O[[:]Sortierung]]\r\n    [/S] [/B] [/L]
+37.2:/P Pausiert nach jeder Bildschirmseite
+37.3:/W Verwendet breites Listenformat
+37.4:/A Zeigt Dateien mit angegebenen Attributen an:
+37.5:    D Verzeichnisse    R Schreibgeschützte Dateien    H Versteckte Dateien
+37.6:    S Systemdateien    A Zu archivierende Dateien     - davor = "nicht"
+37.7:/O Listet Dateien aufsteigend sortiert auf:
+37.8:    N Name             S Größe                        E Erweiterung
+37.9:    D Datum            G Verzeichnisse zuerst         - davor = absteigend
+37.10:/S Zeigt Dateien im angegebenen Verzeichnis und allen Unterverzeichnissen
+37.11:/B Verwendet knappes Format (kein Vorspann und keine Zusammenfassung)
+37.12:/L Verwendet Kleinschreibung
+37.20:Verzeichnis von %s
+37.21:<DIR>
+37.22:Datei(en)
+37.23:Byte
+37.24:Byte frei
+
+# COPY
+38.0:Kopiert eine oder mehrere Dateien an eine andere Stelle.
+38.1:COPY [/A|/B] Quelle [/A|/B] [+Quelle [/A|/B] [+...]] [Ziel [/A|/B]] [/V]
+38.2:Quelle  Gibt die zu kopierende(n) Datei(en) an
+38.3:/A      Weist auf eine ASCII-Textdatei hin
+38.4:/B      Weist auf eine Binärdatei hin
+38.5:Ziel    Bezeichnet das Verzeichnis und/oder Dateiname der neuen Datei(en)
+38.6:/V      Überprüft, dass neue Dateien korrekt geschrieben werden
+38.7:Um Dateien aneinanderzuhängen, geben Sie eine einzelne Datei als Ziel an, aber\r\nmehrere Dateien als Quelle (per Platzhalter oder Format Datei1+Datei2+Datei3).
+38.8:HINWEIS: /A und /B sind ohne Wirkung. Sie werden nur aus Gründen der\r\nKompatibilität angeboten. COPY nimmt immer binär an.
+38.9:%u Datei(en) kopiert
+
+# TRUENAME
+39.0:Gibt einen vollständig qualifizierten Pfad oder Dateinamen zurück.
+39.1:TRUENAME [[Laufwerk:][Pfad][Dateiname]]
+
+# DOS ERRORS
+255.1:Funktionsnummer ungültig
+255.2:Datei nicht gefunden
+255.3:Pfad nicht gefunden
+255.4:Zu viele offene Dateien (keine Handles verfügbar)
+255.5:Zugriff verweigert
+255.6:Ungültiges Handle
+255.7:Speichersteuerblock zerstört
+255.8:Unzureichender Speicher
+255.9:Speicherblockadresse ungültig
+255.10:Umgebung ungültig
+255.11:Format ungültig
+255.12:Zugriffscode ungültig
+255.13:Daten ungültig
+255.15:Ungültiges Laufwerk
+255.16:Es wurde versucht, das aktuelle Verzeichnis zu entfernen
+255.17:Nicht dasselbe Gerät
+255.18:Keine weiteren Dateien
+255.19:Datenträger schreibgeschützt
+255.20:Unbekanntes Gerät
+255.21:Laufwerk nicht bereit
+255.22:Unbekannter Befehl
+255.23:Datenfehler (CRC)
+255.24:Falsche Länge der Anforderungsstruktur
+255.25:Positionierungsfehler
+255.26:Unbekannter Datenträgertyp (Nicht-DOS-Datenträger)
+255.27:Sektor nicht gefunden
+255.28:Drucker ohne Papier
+255.29:Schreibfehler
+255.30:Lesefehler
+255.31:Allgemeiner Fehler
+255.32:Freigabeverletzung
+255.33:Sperrverletzung
+255.34:Datenträgerwechsel ungültig
+255.35:FCB nicht verfügbar
+255.36:Freigabepufferüberlauf
+255.37:Nichtübereinstimmung der Codeseite
+255.38:Kann Dateivorgänge nicht abschließen (EOF / keine Eingabe mehr)
+255.39:Unzureichender Datenträgerplatz
+255.80:Datei bereits vorhanden
