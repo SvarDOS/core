@@ -139,9 +139,15 @@ int main(int argc, char **argv) {
   svarlang_autoload("pkg"); /* NLS init */
 
   action = parsearg(argc, argv);
-  if (action == ACTION_HELP) {
-    showhelp();
-    goto GAMEOVER;
+  switch (action) {
+    case ACTION_HELP:
+      res = showhelp();
+      goto GAMEOVER;
+      break;
+    case ACTION_UNZIP:
+      res = unzip(argv[2]);
+      goto GAMEOVER;
+      break;
   }
 
   /* read the DOSDIR environment variable */
@@ -168,9 +174,6 @@ int main(int argc, char **argv) {
       break;
     case ACTION_LISTLOCAL:
       res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
-      break;
-    case ACTION_UNZIP:
-      res = unzip(argv[2]);
       break;
     default:
       res = showhelp();
