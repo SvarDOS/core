@@ -6,7 +6,7 @@
  (ticket numbers at https://osdn.net/projects/svardos/ticket/ in [] brackets)
 
 
-=== ver 2022.3 (xx.xx.xxxx) ==================================================
+=== ver 2022.3 (13.03.2022) ==================================================
 
  - fixed stdin redirection handling (was broken since 2022.1) [#44027]
  - only COM, EXE and BAT files are allowed for execution [#44068]
@@ -14,7 +14,8 @@
  - FOR command: patterns without wildcards are processed as messages [#44058]
  - implemented the TRUENAME command [#44051]
  - DIR command: /a:xxx is supported like an equivalent to /axxx [#44077]
- - VER command: displays true DOS version, DOS rev, memory location [#44050]
+ - VER command: displays DOS memory location (low, HMA, ROM...) [#44050]
+ - VER command: displays true DOS version and DOS rev (bttr) [#44050]
  - REN command: allows renaming directory names [#44060]
  - implemented CTTY and LOADHIGH/LH as no-ops (LH loads programs low)
  - LN creates %DOSDIR%\LINKS directory when needed and warns on error [#44042]
