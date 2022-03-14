@@ -29,8 +29,8 @@
 3.8:ERROR: Invalid zip archive! Package not installed.
 3.9:ERROR: Package contains a file that already exists locally:
 3.10:ERROR: Could not create %s!
-3.12:ERROR: Package does not contain the %s file! Not a valid SvarDOS package.
-3.18:Package %s is already installed! You might want to use the 'update' action.
+3.12:ERROR: Invalid SvarDOS package! Does not contain the %s file.
+3.18:Package %s already installed! You may want to use the 'update' action.
 3.19:Package %s installed: %d files extracted, %d errors.
 3.20:ERROR: Package contains an encrypted file:
 3.23:ERROR: Package contains an invalid filename:
