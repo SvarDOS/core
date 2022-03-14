@@ -35,6 +35,7 @@
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1440k.zip">SvarDOS install on 1.44M floppy disks</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1200k.zip">SvarDOS install on 1.2M floppy disks</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-720k.zip">SvarDOS install on 720K floppy disks</a></li>
+      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-360k.zip">SvarDOS install on 360K floppy disks</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-usb.zip">SvarDOS install on a bootable USB image</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
     </ul>
