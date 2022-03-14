@@ -41,6 +41,17 @@ SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
 Read svarlang.h for more information about available functions.
 
 
+### DIRTY STRINGS ###
+
+In the CATS-style source translation, lines may be prefixed with a '?' sign:
+
+?1.1:Hello, World!
+
+Such string is used by tlumacz like any other, but it is also reported on the
+command-line with a warning about the line being "dirty" (that is, requiring
+to be reviewed by a translator).
+
+
 ### ENVIRONMENT ###
 
 The program translation file should be named "PROGNAME.LNG", where PROGNAME

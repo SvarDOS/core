@@ -66,11 +66,14 @@ static unsigned short readl(char *dst, size_t dstsz, FILE *fd) {
 }
 
 
-/* parse a line in format "1.50:somestring". fills id and returns a pointer to
+/* parse a line in format "[?]1.50:somestring". fills id and returns a pointer to
  * the actual string part on success, or NULL on error */
-static char *parseline(unsigned short *id, char *s) {
+static const char *parseline(unsigned short *id, const char *s) {
   int i;
   int dotpos = 0, colpos = 0, gotdigits = 0;
+
+  /* strings prefixed by '?' are flagged as "dirty": ignore this flag here */
+  if (*s == '?') s++;
 
   /* I must have a . and a : in the first 9 bytes */
   for (i = 0;; i++) {
@@ -131,7 +134,7 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
   FILE *fd;
   char fname[] = "XX.TXT";
   static char linebuf[8192];
-  char *ptr;
+  const char *ptr;
   unsigned short id, linecount;
 
   bitmap_init(b);
@@ -160,6 +163,11 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
       puts(linebuf);
       len = 0;
       break;
+    }
+
+    /* warn about dirty lines */
+    if (linebuf[0] == '?') {
+      printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\r\n", fname, linecount, id >> 8, id & 0xff);
     }
 
     /* write string into block (II LL S) */
