@@ -83,14 +83,26 @@ function prep_flop {
 
   # now populate the floppies
   curdisk=1
-  for p in $ALLPKGS ; do
-    # if copy fails, then probably the floppy is full - try again after
-    # creating an additional floppy image
-    if ! mcopy -mi "$WORKDIR/disk$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
+  LIST=$ALLPKGS
+
+  while [ ! -z "$LIST" ] ; do
+
+    unset PENDING
+    for p in $LIST ; do
+      # if copy fails, then probably the floppy is full - try other packages
+      # but remember all that fails so they will be retried on a new floppy
+      if ! mcopy -mi "$WORKDIR/disk$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
+        PENDING="$PENDING $p"
+      fi
+    done
+
+    LIST="$PENDING"
+    # if there are any pending items, then create a new floppy and try pushing pending packages to it
+    if [ ! -z "$PENDING" ] ; then
       curdisk=$((curdisk+1))
       mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$WORKDIR/disk$curdisk.img"
-      mcopy -mi "$WORKDIR/disk$curdisk.img" "$CDROOT/$p.svp" ::/
     fi
+
   done
 
   # add a short readme
