@@ -37,7 +37,7 @@
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Instalacja pakietu %d/%d: %s
-4.1:*** WŁÓŻ DYSK ZAWIERAJĄCY POTRZEBNY PLIK I NACIŚNIJ DOWOLNY KLAWISZ ***
+4.1:*** WŁÓŻ NASTĘPNĄ DYSKIETKĘ I NACIŚNIJ DOWOLNY KLAWISZ ***
 
 ### END SCREEN ###
 5.0:Twój komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napędu.

@@ -36,6 +36,7 @@
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Installation du paquet %d/%d: %s
+4.1:*** INSEREZ LA DISQUETTE SUIVANTE ET APPUYEZ SUR UNE TOUCHE ***
 
 ### END SCREEN ###
 5.0:Votre ordinateur va maintenant redémarrer.\nVeuillez enlever le disque d'installation de votre lecteur.

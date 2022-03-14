@@ -750,14 +750,16 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     input_getkey();
     return(-1);
   }
-  pkglistflen = fread(pkglist, 1, sizeof(pkglist), fd);
+  pkglistflen = fread(pkglist, 1, sizeof(pkglist) - 2, fd);
   fclose(fd);
-  if (pkglistflen == sizeof(pkglist)) {
+  if (pkglistflen == sizeof(pkglist) - 2) {
     video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST TOO LARGE", -1);
     input_getkey();
     return(-1);
   }
-  pkglist[pkglistflen] = 0xff; /* mark the end of list */
+  /* mark the end of list */
+  pkglist[pkglistflen] = 0;
+  pkglist[pkglistflen + 1] = 0xff;
   /* replace all \r and \n chars by 0 bytes, and count the number of packages */
   pkglistlen = 0;
   for (i = 0; i < pkglistflen; i++) {
@@ -787,25 +789,37 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   fprintf(fd, "DEL \\COMMAND.COM\r\n");
 
   /* copy packages */
-  pkgptr = pkglist;
   for (i = 0;; i++) {
+    RETRY_ENTIRE_LIST:
+
     /* move forward to nearest entry or end of list */
-    while (*pkgptr == 0) pkgptr++;
-    if (*pkgptr == 0xff) break;
+    for (pkgptr = pkglist; *pkgptr == 0; pkgptr++);
+    if (*pkgptr == 0xff) break; /* end of list: means all packages have been processed */
+
+    /* is this package present on the floppy disk? */
+    TRY_NEXTPKG:
+    sprintf(buff, "%s.svp", pkgptr);
+    if (fileexists(buff) != 0) {
+      while (*pkgptr != 0) pkgptr++;
+      while (*pkgptr == 0) pkgptr++;
+      /* end of list? ask for next floppy, there's nothing interesting left on this one */
+      if (*pkgptr == 0xff) {
+        putstringnls(12, 1, COLOR_BODY[mono], 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
+        input_getkey();
+        video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
+        goto RETRY_ENTIRE_LIST;
+      }
+      goto TRY_NEXTPKG;
+    }
+
     /* install the package */
     snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Installing package %d/%d: %s" */
     strcat(buff, "       ");
     video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
-    /* wait for new diskette if package not found */
-    snprintf(buff, sizeof(buff), "%c:\\%s.svp", srcdrv, pkgptr);
-    while (fileexists(buff) != 0) {
-      putstringnls(12, 1, COLOR_BODY[mono], 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
-      input_getkey();
-      video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
-    }
-    /* proceed with package copy (buff contains the src filename already) */
-    snprintf(buff + 32, sizeof(buff) - 32, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
-    if (fcopy(buff + 32, buff, buff, sizeof(buff)) != 0) {
+
+    /* proceed with package copy */
+    sprintf(buff, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
+    if (fcopy(buff, buff + 7, buff, sizeof(buff)) != 0) {
       video_putstring(10, 30, COLOR_BODY[mono], "READ ERROR", -1);
       input_getkey();
       fclose(fd);
@@ -813,9 +827,11 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     }
     /* write install instruction to post-install script */
     fprintf(fd, "pkg install %s.svp\r\ndel %s.svp\r\n", pkgptr, pkgptr);
-    /* jump to next entry or end of list */
-    while ((*pkgptr != 0) && (*pkgptr != 0xff)) pkgptr++;
-    if (*pkgptr == 0xff) break;
+    /* jump to next entry or end of list and zero out the pkg name in the process */
+    while ((*pkgptr != 0) && (*pkgptr != 0xff)) {
+      *pkgptr = 0;
+      pkgptr++;
+    }
   }
   /* set up locales so the "installation over" message is nicely displayed */
   genlocalesconf(fd, locales);

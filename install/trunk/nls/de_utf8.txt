@@ -37,7 +37,7 @@
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Installiere Paket %d von %d: %s
-4.1:*** LEGEN SIE DEN DATENTRÄGER, DER DIE BENÖTIGTE DATEI ENTHÄLT, EIN UND DRÜCKEN SIE EINE BELIEBIGE TASTE ***
+?4.1:*** LEGEN SIE DEN DATENTRÄGER, DER DIE BENÖTIGTE DATEI ENTHÄLT, EIN UND DRÜCKEN SIE EINE BELIEBIGE TASTE ***
 
 ### END SCREEN ###
 5.0:Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie den Installationsdatenträger.

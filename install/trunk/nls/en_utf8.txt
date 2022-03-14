@@ -37,7 +37,7 @@
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Installing package %d/%d: %s
-4.1:*** INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY ***
+4.1:*** INSERT THE NEXT FLOPPY DISK AND PRESS ANY KEY ***
 
 ### END SCREEN ###
 5.0:Your computer will reboot now.\nPlease remove the installation disk from your drive.
