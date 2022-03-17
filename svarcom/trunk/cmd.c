@@ -49,6 +49,7 @@
 #include "cmd.h"
 
 
+/* struct used to pass all necessary information to the sub-commands */
 struct cmd_funcparam {
   int argc;                 /* number of arguments */
   const char *argv[128];    /* pointers to each argument */
@@ -61,7 +62,10 @@ struct cmd_funcparam {
   char BUFFER[1];           /* a buffer for whatever is needed (must be last) */
 };
 
-/* scans argv for the presence of a "/?" parameter. returns 1 if found, 0 otherwise */
+
+/* scans argv for the presence of a "/?" parameter.
+ * returns 1 if found, 0 otherwise
+ * this is used by most sub-commands to detect /? invocations */
 static int cmd_ishlp(const struct cmd_funcparam *p) {
   int i;
   for (i = 0; i < p->argc; i++) {
