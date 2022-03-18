@@ -40,7 +40,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220219"
+#define PVER "20220318"
 #define PDATE "2021-2022"
 
 #define HOSTADDR "svardos.org"
@@ -413,19 +413,32 @@ static int fexists(const char *fname) {
 int main(int argc, char **argv) {
   unsigned short bsum = 0;
   long flen;
+  size_t membufsz = 5000;
   int ispost; /* is the request a POST? */
 
   struct {
-    unsigned char buffer[5000];
     char ipaddr[64];
     char url[64];
     char outfname[16];
+    unsigned char buffer[1];
   } *mem;
 
   svarlang_autoload("PKGNET");
 
+  /* look for PKGNETBUFSZ env var to size up the buffer (default=5000 bytes) */
+  {
+    const char *ptr = getenv("PKGNETBUFSZ");
+    if (ptr != NULL) {
+      long newsz = atol(ptr);
+      if ((newsz > 0) && (newsz < 65500)) {
+        membufsz = newsz;
+        printf("WILL USE CUSTOM RECV BUFF SIZE = %u\r\n", membufsz);
+      }
+    }
+  }
+
   /* allocate memory */
-  mem = malloc(sizeof(*mem));
+  mem = malloc(sizeof(*mem) + membufsz);
   if (mem == NULL) {
     putsnls(9, 9); /* "ERROR: out of memory" */
     return(1);
@@ -454,7 +467,7 @@ int main(int argc, char **argv) {
     return(1);
   }
 
-  flen = htget(mem->ipaddr, mem->url, mem->outfname, &bsum, ispost, mem->buffer, sizeof(mem->buffer));
+  flen = htget(mem->ipaddr, mem->url, mem->outfname, &bsum, ispost, mem->buffer, membufsz);
   if (flen < 1) return(1);
 
   if (mem->outfname[0] != 0) {
