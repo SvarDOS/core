@@ -27,8 +27,6 @@
  * 32K = 98 KiB/s
  * 60K = 98 KiB/s
  */
-#define TCPBUFF_SIZE (16 * 1024)
-
 
 struct net_tcpsocket {
   tcp_Socket *sock;
@@ -64,15 +62,18 @@ int net_init(void) {
 }
 
 
-struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port) {
-  struct net_tcpsocket *resultsock, *resizsock;
+struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port, unsigned short buffsz) {
+  struct net_tcpsocket *resultsock;
   unsigned long ipaddr;
 
   /* convert ip to value */
   ipaddr = _inet_addr(ipstr);
   if (ipaddr == 0) return(NULL);
 
-  resultsock = calloc(sizeof(struct net_tcpsocket), 1);
+  /* ignore buffsz smaller than 2K (wattcp already has a 2K buffer) */
+  if (buffsz <= 2048) buffsz = 0;
+
+  resultsock = calloc(sizeof(struct net_tcpsocket) + buffsz, 1);
   if (resultsock == NULL) return(NULL);
   resultsock->sock = &(resultsock->_sock);
 
@@ -82,14 +83,10 @@ struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port) {
     return(NULL);
   }
 
-  /* set user-managed buffer if possible (watt32's default is only 2K)
+  /* set user-managed buffer if requested (watt32's default is only 2K)
    * this must be set AFTER tcp_open(), since the latter rewrites the tcp
    * rx buffer */
-  resizsock = realloc(resultsock, sizeof(struct net_tcpsocket) + TCPBUFF_SIZE);
-  if (resizsock != NULL) {
-    resultsock = resizsock;
-    sock_setbuf(resultsock->sock, resultsock->tcpbuff, TCPBUFF_SIZE);
-  }
+  if (buffsz > 0) sock_setbuf(resultsock->sock, resultsock->tcpbuff, buffsz);
 
   return(resultsock);
 }

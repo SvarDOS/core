@@ -18,8 +18,9 @@ int net_init(void);
 
 /* initiates a connection to an IP host and returns a socket pointer (or NULL
  * on error) - note that connection is NOT established at this point!
- * use net_isconnected() to know when the connection is connected. */
-struct net_tcpsocket *net_connect(const char *ip, unsigned short port);
+ * use net_isconnected() to know when the connection is connected.
+ * buffsz is the size of the TCP buffer that will be allocated by net_connect. */
+struct net_tcpsocket *net_connect(const char *ip, unsigned short port, unsigned short buffsz);
 
 /* checks whether or not a socket is connected. returns:
  *  0 = not connected,

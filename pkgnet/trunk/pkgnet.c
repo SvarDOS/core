@@ -246,7 +246,7 @@ static unsigned short checkupdata(char *buff) {
  * is ispost is non-zero, then the request is a POST and its body data is
  * obtained through repeated calls to checkupdata()
  * returns the length of data obtained, or neg value on error */
-static long htget(const char *ipaddr, const char *url, const char *outfname, unsigned short *bsum, int ispost, unsigned char *buffer, size_t buffersz) {
+static long htget(const char *ipaddr, const char *url, const char *outfname, unsigned short *bsum, int ispost, unsigned char *buffer, size_t buffersz, unsigned short tcpbuflen) {
   struct net_tcpsocket *sock;
   time_t lastactivity, lastprogressoutput = 0;
   int httpcode = -1, ischunked = 0;
@@ -260,7 +260,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   buffersz -= sizeof(*unchstate);
   memset(unchstate, 0, sizeof(*unchstate));
 
-  sock = net_connect(ipaddr, 80);
+  sock = net_connect(ipaddr, 80, tcpbuflen);
   if (sock == NULL) {
     printf(svarlang_strid(0x0902), HOSTADDR); /* "ERROR: failed to connect to " HOSTADDR */
     puts("");
@@ -413,14 +413,14 @@ static int fexists(const char *fname) {
 int main(int argc, char **argv) {
   unsigned short bsum = 0;
   long flen;
-  size_t membufsz = 5000;
+  unsigned short tcpbufsz = (16 * 1024);
   int ispost; /* is the request a POST? */
 
   struct {
+    unsigned char buffer[5000];
     char ipaddr[64];
     char url[64];
     char outfname[16];
-    unsigned char buffer[1];
   } *mem;
 
   svarlang_autoload("PKGNET");
@@ -430,15 +430,15 @@ int main(int argc, char **argv) {
     const char *ptr = getenv("PKGNETBUFSZ");
     if (ptr != NULL) {
       long newsz = atol(ptr);
-      if ((newsz > 0) && (newsz < 65500)) {
-        membufsz = newsz;
-        printf("WILL USE CUSTOM RECV BUFF SIZE = %u\r\n", membufsz);
+      if ((newsz >= 0) && (newsz < 65500)) {
+        tcpbufsz = newsz;
+        printf("WILL USE CUSTOM TCP BUFF SIZE = %u\r\n", tcpbufsz);
       }
     }
   }
 
   /* allocate memory */
-  mem = malloc(sizeof(*mem) + membufsz);
+  mem = malloc(sizeof(*mem));
   if (mem == NULL) {
     putsnls(9, 9); /* "ERROR: out of memory" */
     return(1);
@@ -467,7 +467,7 @@ int main(int argc, char **argv) {
     return(1);
   }
 
-  flen = htget(mem->ipaddr, mem->url, mem->outfname, &bsum, ispost, mem->buffer, membufsz);
+  flen = htget(mem->ipaddr, mem->url, mem->outfname, &bsum, ispost, mem->buffer, sizeof(mem->buffer), tcpbufsz);
   if (flen < 1) return(1);
 
   if (mem->outfname[0] != 0) {
