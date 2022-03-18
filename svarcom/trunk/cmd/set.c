@@ -60,18 +60,42 @@ static enum cmd_result cmd_set(struct cmd_funcparam *p) {
     }
   } else { /* set variable (do not rely on argv, SET has its own rules...) */
     const char far *ptr;
-    unsigned short i;
-    /* locate the first space */
-    for (ptr = p->cmdline; *ptr != ' '; ptr++);
-    /* now locate the first non-space: that's where the variable name begins */
-    for (; *ptr == ' '; ptr++);
-    /* copy variable to buff and switch it upercase */
+    unsigned short i, errcode = 0;
+
+    /* locate the first space or tab */
+    for (ptr = p->cmdline; ((*ptr != ' ') && (*ptr != '\t')); ptr++);
+
+    /* now locate the first non-space/non-tab: that's where the variable name begins */
+    for (; ((*ptr == ' ') || (*ptr == '\t')); ptr++);
+
+    /* copy variable name to buff */
     i = 0;
     for (; *ptr != '='; ptr++) {
       if (*ptr == 0) goto syntax_err;
-      buff[i] = *ptr;
-      if ((buff[i] >= 'a') && (buff[i] <= 'z')) buff[i] -= ('a' - 'A');
-      i++;
+      buff[i++] = *ptr;
+    }
+
+    /* make variable name all caps */
+    _asm {
+      push ax
+      push cx
+      push dx
+
+      mov ax, 0x6521 /* country-dependent capitalize string (DOS 4+) */
+      mov cx, [i]    /* CX=length of string */
+      mov dx, buff   /* DS:DX->string to capitalize */
+      int 0x21
+      jnc DONE
+      mov [errcode], ax
+      DONE:
+
+      pop dx
+      pop cx
+      pop ax
+    }
+    if (errcode != 0) {
+      nls_outputnl_doserr(errcode);
+      return(CMD_FAIL);
     }
 
     /* copy value now */
