@@ -1,6 +1,6 @@
 /*
  * This file is part of the pkgnet package - the SvarDOS package manager.
- * Copyright (C) Mateusz Viste 2013-2021
+ * Copyright (C) Mateusz Viste 2013-2022
  *
  * Provides all network functions used by pkgnet, wrapped around the
  * Watt-32 TCP/IP stack.
@@ -29,8 +29,7 @@
  */
 
 struct net_tcpsocket {
-  tcp_Socket *sock;
-  tcp_Socket _sock; /* watt32 socket */
+  tcp_Socket sock; /* watt32 socket */
   char tcpbuff[1];
 };
 
@@ -75,10 +74,9 @@ struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port, unsign
 
   resultsock = calloc(sizeof(struct net_tcpsocket) + buffsz, 1);
   if (resultsock == NULL) return(NULL);
-  resultsock->sock = &(resultsock->_sock);
 
-  if (!tcp_open(resultsock->sock, 0, ipaddr, port, NULL)) {
-    sock_abort(resultsock->sock);
+  if (!tcp_open(&(resultsock->sock), 0, ipaddr, port, NULL)) {
+    sock_abort(&(resultsock->sock));
     free(resultsock);
     return(NULL);
   }
@@ -86,15 +84,15 @@ struct net_tcpsocket *net_connect(const char *ipstr, unsigned short port, unsign
   /* set user-managed buffer if requested (watt32's default is only 2K)
    * this must be set AFTER tcp_open(), since the latter rewrites the tcp
    * rx buffer */
-  if (buffsz > 0) sock_setbuf(resultsock->sock, resultsock->tcpbuff, buffsz);
+  if (buffsz > 0) sock_setbuf(&(resultsock->sock), resultsock->tcpbuff, buffsz);
 
   return(resultsock);
 }
 
 
 int net_isconnected(struct net_tcpsocket *s) {
-  if (tcp_tick(s->sock) == 0) return(-1);
-  if (sock_established(s->sock) == 0) return(0);
+  if (tcp_tick(&(s->sock)) == 0) return(-1);
+  if (sock_established(&(s->sock)) == 0) return(0);
   return(1);
 }
 
@@ -103,9 +101,9 @@ int net_isconnected(struct net_tcpsocket *s) {
    Returns the number of bytes sent on success, and < 0 otherwise */
 int net_send(struct net_tcpsocket *socket, const void *line, long len) {
   /* call this to let Watt-32 handle its internal stuff */
-  if (tcp_tick(socket->sock) == 0) return(-1);
+  if (tcp_tick(&(socket->sock)) == 0) return(-1);
   /* send bytes */
-  return(sock_write(socket->sock, line, len));
+  return(sock_write(&(socket->sock), line, len));
 }
 
 
@@ -113,8 +111,8 @@ int net_send(struct net_tcpsocket *socket, const void *line, long len) {
 Returns the amount of data read (in bytes) on success, or a negative value otherwise. The error code can be translated into a human error message via libtcp_strerr(). */
 int net_recv(struct net_tcpsocket *socket, void *buff, long maxlen) {
   /* call this to let WatTCP handle its internal stuff */
-  if (tcp_tick(socket->sock) == 0) return(-1);
-  return(sock_fastread(socket->sock, buff, maxlen));
+  if (tcp_tick(&(socket->sock)) == 0) return(-1);
+  return(sock_fastread(&(socket->sock), buff, maxlen));
 }
 
 
@@ -123,7 +121,7 @@ void net_close(struct net_tcpsocket *socket) {
   /* I could use sock_close() and sock_wait_closed() if I'd want to be
    * friendly, but it's much easier on the tcp stack to send a single RST and
    * forget about the connection (esp. if the peer is misbehaving) */
-  sock_abort(socket->sock);
+  sock_abort(&(socket->sock));
   free(socket);
 }
 

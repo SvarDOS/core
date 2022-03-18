@@ -1,6 +1,6 @@
 /*
  * This file is part of the pkgnet package - the SvarDOS package manager.
- * Copyright (C) Mateusz Viste 2013-2021
+ * Copyright (C) Mateusz Viste 2013-2022
  */
 
 
