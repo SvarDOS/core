@@ -182,6 +182,9 @@ unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, unsi
  * returns length of result */
 unsigned short nls_format_number(char *s, unsigned long num, const struct nls_patterns *p);
 
+/* capitalize an ASCIZ string following country-dependent rules */
+void nls_strtoup(char *buff);
+
 /* reload nls ressources from svarcom.lng into langblock */
 void nls_langreload(char *buff, unsigned short env);
 

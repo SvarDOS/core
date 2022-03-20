@@ -621,6 +621,31 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 }
 
 
+/* capitalize an ASCIZ string following country-dependent rules */
+void nls_strtoup(char *buff) {
+  unsigned short errcode = 0;
+  /* requires DOS 4+ */
+  _asm {
+    push ax
+    push dx
+
+    mov ax, 0x6522 /* country-dependent capitalize string (DOS 4+) */
+    mov dx, buff   /* DS:DX -> string to capitalize */
+    int 0x21
+    jnc DONE
+
+    mov errcode, ax /* set errcode on failure */
+    DONE:
+
+    pop dx
+    pop ax
+  }
+
+  /* rely on OpenWatcom's strupr() if DOS has no NLS support */
+  if (errcode != 0) strupr(buff);
+}
+
+
 /* reload nls ressources from svarcom.lng into svarlang_mem */
 void nls_langreload(char *buff, unsigned short env) {
   const char far *nlspath;
