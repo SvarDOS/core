@@ -716,7 +716,7 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
         const char far *ptr;
         res[reslen] = 0;
         reslen = lastperc;
-        strupr(res + reslen); /* turn varname uppercase before lookup */
+        nls_strtoup(res + reslen); /* turn varname uppercase before lookup */
         ptr = env_lookup_val(envseg, res + reslen);
         if (ptr != NULL) {
           while ((*ptr != 0) && (reslen < ressz)) {
