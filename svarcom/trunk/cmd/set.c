@@ -62,11 +62,12 @@ static enum cmd_result cmd_set(struct cmd_funcparam *p) {
     const char far *ptr;
     unsigned short i;
 
-    /* locate the first space or tab */
-    for (ptr = p->cmdline; ((*ptr != ' ') && (*ptr != '\t')); ptr++);
+    /* locate the first space (note that cmdline separators should be sanitized
+     * to space only by now) */
+    for (ptr = p->cmdline; *ptr != ' '; ptr++);
 
-    /* now locate the first non-space/non-tab: that's where the variable name begins */
-    for (; ((*ptr == ' ') || (*ptr == '\t')); ptr++);
+    /* now locate the first non-space: that's where the variable name begins */
+    for (; *ptr == ' '; ptr++);
 
     /* copy variable name to buff */
     i = 0;

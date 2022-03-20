@@ -9,7 +9,7 @@
 === ver 2022.4 (xx.xx.202x) ==================================================
 
  - SET command: fixed upcasing of variable names with high-ASCII chars (bttr)
- - SET command: accepts tab character between SET and variable name (bttr)
+ - tabs are accepted as command-line separators
 
 
 === ver 2022.3 (13.03.2022) ==================================================

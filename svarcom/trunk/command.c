@@ -1043,6 +1043,14 @@ int main(void) {
     /* move pointer forward to skip over any leading spaces */
     while (*cmdline == ' ') cmdline++;
 
+    /* sanitize separators into spaces */
+    for (i = 0; cmdline[i] != 0; i++) {
+      switch (cmdline[i]) {
+        case '\t':
+          cmdline[i] = ' ';
+      }
+    }
+
     /* update rmod's ptr to COMPSPEC so it is always up to date */
     rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
