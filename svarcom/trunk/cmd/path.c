@@ -82,6 +82,7 @@ static enum cmd_result cmd_path(struct cmd_funcparam *p) {
       buff[i + 5] = p->argv[0][i];
       if (buff[i + 5] == 0) break;
     }
+    nls_strtoup(buff); /* upcase path, ref: https://osdn.net/projects/svardos/ticket/44146 */
     env_setvar(p->env_seg, buff);
   }
 

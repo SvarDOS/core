@@ -9,6 +9,7 @@
 === ver 2022.4 (xx.xx.202x) ==================================================
 
  - SET command: fixed upcasing of variable names with high-ASCII chars (bttr)
+ - PATH command: path is always upcased
  - tabs are accepted as command-line separators
 
 
