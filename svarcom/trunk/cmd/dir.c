@@ -164,7 +164,8 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
   unsigned short i;
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
-  unsigned short wcols = screen_getwidth() / WCOLWIDTH; /* number of columns in wide mode */
+  unsigned short screenw = screen_getwidth();
+  unsigned short wcols = screenw / WCOLWIDTH; /* number of columns in wide mode */
   unsigned char wcolcount;
   struct nls_patterns *nls = (void *)(p->BUFFER + (p->BUFFERSZ / 2));
   char *buff2 = p->BUFFER + (p->BUFFERSZ / 2) + sizeof(*nls);
@@ -208,6 +209,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   i = nls_getpatterns(nls);
   if (i != 0) nls_outputnl_doserr(i);
+
+  /* disable usage of thousands separator on narrow screens */
+  if (screenw < 80) nls->thousep[0] = 0;
 
   /* parse command line */
   for (i = 0; i < p->argc; i++) {
@@ -375,7 +379,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         /* two spaces and NLS DATE */
         buff2[0] = ' ';
         buff2[1] = ' ';
-        nls_format_date(buff2 + 2, dta->date_yr + 1980, dta->date_mo, dta->date_dy, nls);
+        if (screenw >= 80) {
+          nls_format_date(buff2 + 2, dta->date_yr + 1980, dta->date_mo, dta->date_dy, nls);
+        } else {
+          nls_format_date(buff2 + 2, (dta->date_yr + 80) % 100, dta->date_mo, dta->date_dy, nls);
+        }
         output(buff2);
 
         /* one space and NLS TIME */
@@ -419,24 +427,26 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* print out summary (unless bare output mode) */
   if (format != DIR_OUTPUT_BARE) {
     unsigned short alignpos;
+    unsigned char uint32maxlen = 13; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
+    if (screenw < 80) uint32maxlen = 10;
     /* x file(s) */
-    memset(buff2, ' ', 13); /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
-    i = nls_format_number(buff2 + 13, summary_fcount, nls);
-    alignpos = sprintf(buff2 + 13 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
+    memset(buff2, ' ', uint32maxlen);
+    i = nls_format_number(buff2 + uint32maxlen, summary_fcount, nls);
+    alignpos = sprintf(buff2 + uint32maxlen + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
     output(buff2 + i);
     /* xxxx bytes */
-    i = nls_format_number(buff2 + 13, summary_totsz, nls);
-    output(buff2 + i);
+    i = nls_format_number(buff2 + uint32maxlen, summary_totsz, nls);
+    output(buff2 + i + 1);
     output(" ");
     nls_outputnl(37,23); /* "bytes" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) nls_outputnl_doserr(i);
-    alignpos += 13 + 13;
+    alignpos += uint32maxlen * 2;
     memset(buff2, ' ', alignpos); /* align the freebytes value to same column as totbytes */
     i = nls_format_number(buff2 + alignpos, summary_totsz, nls);
-    output(buff2 + i);
+    output(buff2 + i + 1);
     output(" ");
     nls_outputnl(37,24); /* "bytes free" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);

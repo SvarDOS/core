@@ -10,6 +10,7 @@
 
  - SET command: fixed upcasing of variable names with high-ASCII chars (bttr)
  - PATH command: path is always upcased
+ - DIR command: output adapted to 40-columns screen modes
  - tabs are accepted as command-line separators
 
 
