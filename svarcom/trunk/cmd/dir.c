@@ -373,7 +373,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         if (dta->attr & DOS_ATTR_DIR) {
           strcpy(buff2 + 10, svarlang_str(37,21));
         } else {
-          _ultoa(dta->size, buff2 + 10, 10); /* OpenWatcom extension */
+          nls_format_number(buff2 + 10, dta->size, nls);
         }
         output(buff2 + strlen(buff2) - 10);
         /* two spaces and NLS DATE */
