@@ -1,5 +1,5 @@
 
-%hVernetzung
+                               %h*** NETZWERK ***
 
 Um eine Netzwerkverbindung zu ermöglichen, müssen Sie zunächst wissen, welche
 Art von Netzwerkadapter Sie haben, und einen geeigneten Pakettreiber für ihn
@@ -33,21 +33,34 @@ einige Grundkenntnisse über die Funktionsweise von Linux):
 VirtualBox ist in der Lage, eine AMD-PC-NET-Netzwerkkarte zu emulieren (Sie
 müssen dies in der Konfiguration Ihrer VM sicherstellen, VirtualBox nennt es
 "PCnet-FAST III" und es sollte auf "NAT" eingestellt sein). Dann müssen Sie in
-SvarDOS das Paket pcntpk.zip installieren - Sie brauchen es nicht einmal
-herunterzuladen, es ist bereits auf dem Installationsdatenträger vorhanden,
-also sollte es so einfach sein:
+SvarDOS das Paket pcntpk.svp installieren - Sie brauchen es aber nicht einmal
+herunterzuladen, es ist bereits auf dem Installationsabbild vorhanden.
 
-pkg install a:\pcntpk.zip
+1a) Wenn bei Ihnen SvarDOS-Diskettenabbilder vorhanden sind, sollte es so
+    einfach sein:
 
-Laden Sie ihn schließlich als solchen:
+pkg install a:\pcntpk.svp
 
-C:\DRIVERS\PCNTPK\PCNTPK INT=0x60
+Fahren Sie mit Schritt 2 fort.
+
+1b) Wenn Sie stattdessen das ISO-Abbild verwenden wollen, booten Sie vom
+    virtuellen CD-ROM-Laufwerk und drücken ESC, um den SvarDOS installer zu
+    verlassen. Dann geben Sie ein:
+
+set dosdir=C:\SVARDOS
+pkg install pcntpk.svp
+
+Booten Sie Ihre SvarDOS-VM von Festplatte.
+
+2) Laden Sie den Pakettreiber schließlich wie folgt:
+
+c:\drivers\pcntpk\pcntpk int=0x60
 
 ...und das war's. Von nun an sollten Sie in der Lage sein, die verfügbaren
 Online-Pakete zu durchsuchen und zusätzliche Software zu installieren, z. B.:
 
 pkgnet pull gopherus
-pkg install gopherus.zip
+pkg install gopherus.svp
 
 (gopherus ist ein Gopher-Browser.)
 
