@@ -1,5 +1,5 @@
 
-%hNetworking
+                              %h*** NETWORKING ***
 
 For enabling network connectivity you first need to know what kind of network
 adapter you have, and obtain a suitable packet driver for it. The "crynwr"
@@ -30,21 +30,34 @@ basic understanding of how Linux works):
 
 VirtualBox is able to emulate an AMD PC-NET NIC (you need to make sure of that
 in the configuration of your VM, VirtualBox calls it "PCnet-FAST III" and it
-should be set to "NAT"). Then, in SvarDOS you have to install the pcntpk.zip
+should be set to "NAT"). Then, in SvarDOS you have to install the pcntpk.svp
 package - you don't even need to download it, it's already present on the
-installation image so it should be as simple as that:
+installation image.
 
-pkg install a:\pcntpk.zip
+1a) If you installed from floppy images in virtual drive A:, it should be as
+    simple as that:
 
-Finally, load it as such:
+pkg install a:\pcntpk.svp
 
-C:\DRIVERS\PCNTPK\PCNTPK INT=0x60
+Proceed with step 2.
+
+1b) If you installed from the ISO image, boot from virtual CD-ROM again and
+    press ESC to leave the SvarDOS installer. Then type:
+
+set dosdir=C:\SVARDOS
+pkg install pcntpk.svp
+
+Reboot your SvarDOS VM from hard disk.
+
+2) Finally, load the packet driver as such:
+
+c:\drivers\pcntpk\pcntpk int=0x60
 
 ...and that's it. From now on, you should be able to search through the
 available online packages and install extra software, for example:
 
 pkgnet pull gopherus
-pkg install gopherus.zip
+pkg install gopherus.svp
 
 (gopherus is a gopher browser)
 
