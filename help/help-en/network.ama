@@ -34,15 +34,14 @@ should be set to "NAT"). Then, in SvarDOS you have to install the pcntpk.svp
 package - you don't even need to download it, it's already present on the
 installation image.
 
-1a) If you installed from floppy images in virtual drive A:, it should be as
-    simple as that:
+1a) If you have SvarDOS floppy images present, it should be as simple as that:
 
 pkg install a:\pcntpk.svp
 
 Proceed with step 2.
 
-1b) If you installed from the ISO image, boot from virtual CD-ROM again and
-    press ESC to leave the SvarDOS installer. Then type:
+1b) If you want to use the ISO image instead, boot from the virtual CD-ROM
+    drive and press ESC to leave the SvarDOS installer. Then type:
 
 set dosdir=C:\SVARDOS
 pkg install pcntpk.svp
