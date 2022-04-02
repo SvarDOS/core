@@ -32,7 +32,7 @@ But if you prefer CTMOUSE messages in your own language, check if CTMOUSE is
 available in that language by looking at the CTM-*.EXE files in the
 C:\DRIVERS\CTMOUSE\CTMOUSE\ directory.
 
-BR means Brazilian Portugese, DE stands for Deutsch (German), and so on.
+BR means Brazilian Portuguese, DE stands for Deutsch (German), and so on.
 If you managed to find your language supported by CTMOUSE, then add this line
 to your C:\AUTOEXEC.BAT.
 
