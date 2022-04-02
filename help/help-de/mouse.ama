@@ -1,0 +1,77 @@
+
+                          %h*** MAUSUNTERSTöTZUNG ***
+
+Um Ihre Maus in Ihren Programmen verwenden zu kînnen, benîtigen Sie einen
+Maustreiber. SvarDOS hat standardmÑ·ig keinen Maustreiber, aber es gibt ein
+Paket dafÅr. Es hei·t CTMOUSE (CuteMouse). Sie mÅssen dieses Paket
+installieren.
+
+%hCTMOUSE INSTALLIEREN
+
+Wenn Ihr SvarDOS-System mit dem Internet verbunden ist, kînnen Sie einfach
+Folgendes eingeben:
+
+ pkgnet pull ctmouse
+ pkg install ctmouse.svp
+
+Andernfalls mÅssen Sie "ctmouse.svp" auf einem anderen Computer herunterladen
+und Ihrer SvarDOS-Installation z. B. per Diskette oder USB-Laufwerk zufÅhren.
+
+Geben Sie dann ein:
+
+ pkg install [<Pfad_zu>]ctmouse.svp
+
+%hCTMOUSE LADEN
+
+Wenn Sie Ihnen die Sprache egal ist, in der CTMOUSE Meldungen anzeigt, dann
+fÅgen Sie einfach diese Zeile zu Ihrer C:\AUTOEXEC.BAT hinzu. Meldungen werden
+dann auf Englisch angezeigt.
+
+ C:\DRIVERS\CTMOUSE\CTMOUSE.EXE
+
+Das ist alles! Starten Sie nun Ihr System neu, um den Treiber zu laden.
+
+Wenn Sie jedoch CTMOUSE-Meldungen in Ihrer eigenen Sprache bevorzugen, prÅfen
+Sie, ob CTMOUSE in dieser Sprache verfÅgbar ist, indem Sie sich die
+CTM-*.EXE-Dateien im Verzeichnis C:\DRIVERS\CTMOUSE\CTMOUSE\ ansehen.
+
+BR bedeutet brasilianisches Portugiesisch, DE steht fÅr Deutsch und so weiter.
+Wenn Sie Ihre von CTMOUSE unterstÅtzte Sprache gefunden haben, fÅgen Sie diese
+Zeile zu Ihrer C:\AUTOEXEC.BAT hinzu.
+
+ C:\DRIVERS\CTMOUSE\CTMOUSE\CTM-xx.EXE
+
+(Wobei xx fÅr Ihren Sprachcode steht.)
+
+%hAUTOMATISCHE SPRACHANPASSUNG
+
+Damit sich CTMOUSE-Meldungen automatisch an die Sprache Ihres SvarDOS-Systems
+anpassen, fÅgen Sie die folgenden Zeilen in Ihre C:\AUTOEXEC.BAT nach der
+Zeile SET LANG=xx ein.
+
+ SET CTM_BASEPATH=C:\DRIVERS\CTMOUSE
+ SET CTM_FULLPATH=%%CTM_BASEPATH%%\CTMOUSE\CTM-%%LANG%%.EXE
+ IF NOT EXIST %%CTM_FULLPATH%% SET CTM_FULLPATH=%%CTM_BASEPATH%%\CTMOUSE.EXE
+ %%CTM_FULLPATH%%
+ SET CTM_BASEPATH=
+ SET CTM_FULLPATH=
+
+Dadurch sucht Ihr SvarDOS zuerst nach der Åbersetzten CTMOUSE-Version. Wenn
+diese nicht vorhanden ist, dann greift es auf Englisch zurÅck.
+
+%hSVARDOS-SYSTEME MIT MEHREREN KONFIGURATION
+
+Wenn Sie sich entschieden haben, mehrere Konfigurationen in Ihrer CONFIG.SYS/
+AUTOEXEC.BAT zu haben, wÅrden Sie die Zeilen aus dem Abschnitt AUTOMATISCHE
+SPRACHANPASSUNG in einer Stapeldatei speichern, z. B. C:\BATCH\LOAD-CTM.BAT.
+FÅgen Sie als erste Zeile noch ein @ECHO OFF hinzu.
+
+Dann kînnen Sie die nÑchste Zeile in Ihre AUTOEXEC.BAT-Datei einfÅgen, wo
+immer es nîtig ist.
+
+ CALL C:\BATCH\LOAD-CTM.BAT
+
+Siehe auch:
+ * %lpkg.ama:SvarDOS-Paketverwaltung
+ * %lnetwork.ama:Verwendung im Netzwerk
+ * C:\DRIVERS\CTMOUSE\DOC\CTMOUSE.TXT
