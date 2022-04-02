@@ -1,21 +1,21 @@
 
-                          %h*** MAUSUNTERSTöTZUNG ***
+                          %h*** MAUSUNTERST√úTZUNG ***
 
-Um Ihre Maus in Ihren Programmen verwenden zu kînnen, benîtigen Sie einen
-Maustreiber. SvarDOS hat standardmÑ·ig keinen Maustreiber, aber es gibt ein
-Paket dafÅr. Es hei·t CTMOUSE (CuteMouse). Sie mÅssen dieses Paket
+Um Ihre Maus in Ihren Programmen verwenden zu k√∂nnen, ben√∂tigen Sie einen
+Maustreiber. SvarDOS hat standardm√§√üig keinen Maustreiber, aber es gibt ein
+Paket daf√ºr. Es hei√üt CTMOUSE (CuteMouse). Sie m√ºssen dieses Paket
 installieren.
 
 %hCTMOUSE INSTALLIEREN
 
-Wenn Ihr SvarDOS-System mit dem Internet verbunden ist, kînnen Sie einfach
+Wenn Ihr SvarDOS-System mit dem Internet verbunden ist, k√∂nnen Sie einfach
 Folgendes eingeben:
 
  pkgnet pull ctmouse
  pkg install ctmouse.svp
 
-Andernfalls mÅssen Sie "ctmouse.svp" auf einem anderen Computer herunterladen
-und Ihrer SvarDOS-Installation z. B. per Diskette oder USB-Laufwerk zufÅhren.
+Andernfalls m√ºssen Sie "ctmouse.svp" auf einem anderen Computer herunterladen
+und Ihrer SvarDOS-Installation z. B. per Diskette oder USB-Laufwerk zuf√ºhren.
 
 Geben Sie dann ein:
 
@@ -24,29 +24,29 @@ Geben Sie dann ein:
 %hCTMOUSE LADEN
 
 Wenn Sie Ihnen die Sprache egal ist, in der CTMOUSE Meldungen anzeigt, dann
-fÅgen Sie einfach diese Zeile zu Ihrer C:\AUTOEXEC.BAT hinzu. Meldungen werden
+f√ºgen Sie einfach diese Zeile zu Ihrer C:\AUTOEXEC.BAT hinzu. Meldungen werden
 dann auf Englisch angezeigt.
 
  C:\DRIVERS\CTMOUSE\CTMOUSE.EXE
 
 Das ist alles! Starten Sie nun Ihr System neu, um den Treiber zu laden.
 
-Wenn Sie jedoch CTMOUSE-Meldungen in Ihrer eigenen Sprache bevorzugen, prÅfen
-Sie, ob CTMOUSE in dieser Sprache verfÅgbar ist, indem Sie sich die
+Wenn Sie jedoch CTMOUSE-Meldungen in Ihrer eigenen Sprache bevorzugen, pr√ºfen
+Sie, ob CTMOUSE in dieser Sprache verf√ºgbar ist, indem Sie sich die
 CTM-*.EXE-Dateien im Verzeichnis C:\DRIVERS\CTMOUSE\CTMOUSE\ ansehen.
 
-BR bedeutet brasilianisches Portugiesisch, DE steht fÅr Deutsch und so weiter.
-Wenn Sie Ihre von CTMOUSE unterstÅtzte Sprache gefunden haben, fÅgen Sie diese
+BR bedeutet brasilianisches Portugiesisch, DE steht f√ºr Deutsch und so weiter.
+Wenn Sie Ihre von CTMOUSE unterst√ºtzte Sprache gefunden haben, f√ºgen Sie diese
 Zeile zu Ihrer C:\AUTOEXEC.BAT hinzu.
 
  C:\DRIVERS\CTMOUSE\CTMOUSE\CTM-xx.EXE
 
-(Wobei xx fÅr Ihren Sprachcode steht.)
+(Wobei xx f√ºr Ihren Sprachcode steht.)
 
 %hAUTOMATISCHE SPRACHANPASSUNG
 
 Damit sich CTMOUSE-Meldungen automatisch an die Sprache Ihres SvarDOS-Systems
-anpassen, fÅgen Sie die folgenden Zeilen in Ihre C:\AUTOEXEC.BAT nach der
+anpassen, f√ºgen Sie die folgenden Zeilen in Ihre C:\AUTOEXEC.BAT nach der
 Zeile SET LANG=xx ein.
 
  SET CTM_BASEPATH=C:\DRIVERS\CTMOUSE
@@ -56,18 +56,18 @@ Zeile SET LANG=xx ein.
  SET CTM_BASEPATH=
  SET CTM_FULLPATH=
 
-Dadurch sucht Ihr SvarDOS zuerst nach der Åbersetzten CTMOUSE-Version. Wenn
-diese nicht vorhanden ist, dann greift es auf Englisch zurÅck.
+Dadurch sucht Ihr SvarDOS zuerst nach der √ºbersetzten CTMOUSE-Version. Wenn
+diese nicht vorhanden ist, dann greift es auf Englisch zur√ºck.
 
 %hSVARDOS-SYSTEME MIT MEHREREN KONFIGURATION
 
 Wenn Sie sich entschieden haben, mehrere Konfigurationen in Ihrer CONFIG.SYS/
-AUTOEXEC.BAT zu haben, wÅrden Sie die Zeilen aus dem Abschnitt AUTOMATISCHE
+AUTOEXEC.BAT zu haben, w√ºrden Sie die Zeilen aus dem Abschnitt AUTOMATISCHE
 SPRACHANPASSUNG in einer Stapeldatei speichern, z. B. C:\BATCH\LOAD-CTM.BAT.
-FÅgen Sie als erste Zeile noch ein @ECHO OFF hinzu.
+F√ºgen Sie als erste Zeile noch ein @ECHO OFF hinzu.
 
-Dann kînnen Sie die nÑchste Zeile in Ihre AUTOEXEC.BAT-Datei einfÅgen, wo
-immer es nîtig ist.
+Dann k√∂nnen Sie die n√§chste Zeile in Ihre AUTOEXEC.BAT-Datei einf√ºgen, wo
+immer es n√∂tig ist.
 
  CALL C:\BATCH\LOAD-CTM.BAT
 
