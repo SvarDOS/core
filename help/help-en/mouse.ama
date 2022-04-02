@@ -58,10 +58,10 @@ If that does not exist, then it falls back to English.
 %hMULTI-CONFIG SVARDOS SYSTEMS
 
 If you decided to have multiple configurations in your CONFIG.SYS/AUTOEXEC.BAT
-you would save the lines from LANGUAGE-AWARE AUTO-SETUP to a batch file, e.g.,
-C:\BATCH\LOAD-CTM.BAT. Add an @ECHO OFF as the first line.
+you would save the lines from paragraph LANGUAGE-AWARE AUTO-SETUP to a batch
+file, e.g., C:\BATCH\LOAD-CTM.BAT. Add an @ECHO OFF as the first line.
 
-Then you can spread the next line to your AUTOEXEC.BAT file, whereever needed.
+Then you can spread the next line to your AUTOEXEC.BAT file, wherever needed.
 
  CALL C:\BATCH\LOAD-CTM.BAT
 
