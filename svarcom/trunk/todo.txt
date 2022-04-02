@@ -7,19 +7,12 @@ This is a loose list of things that I'd like to implement within SvarCOM.
 
 === HIGH PRIORITY ============================================================
 
-int 24h handler (abort, retry, fail, ignore)
-IF EXIST on an empty drive should not lead to the 'Abort, Retry, Fail' prompt
-CTRL+C should allow to abort a BAT file running in an infinite loop
-LOADHIGH/LH
+(moved to OSDN tickets at <https://osdn.net/projects/svardos/ticket/>)
 
 
 === MEDIUM PRIORITY ==========================================================
 
-provide unopened FCBs to launched applications
-if translations reloading fails, do not retry after every command
-DIR /O
-DIR /S (must use multiple DTAs recursively)
-prompt $t, $d, $v
+(moved to OSDN tickets at <https://osdn.net/projects/svardos/ticket/>)
 
 
 === NICE TO HAVE =============================================================
