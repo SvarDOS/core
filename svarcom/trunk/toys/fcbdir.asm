@@ -15,6 +15,14 @@
 CPU 8086
 org 0x100
 
+; print whatever drive/filename is set at 0x5C (1st unopened FCB in the PSP)
+mov dx, PARAM
+mov ah, 0x09
+int 0x21
+
+mov bx, 0x5C
+call PRINTDTA
+
 ; FindFirst_FCB applied to PSP:5C (1st unopened FCB)
 mov dx, 0x5C
 mov ah, 0x11
@@ -26,6 +34,7 @@ jne GAMEOVER
 NEXT:
 
 ; print filename in DTA
+mov bx, 0x80
 call PRINTDTA
 
 ; FindNext_FCB on PSP until nothing left
@@ -39,22 +48,25 @@ GAMEOVER:
 
 int 0x20
 
+PARAM:
+db "PARAMETER = $";
 
 
-; ****** print the filename present in the DTA (DTA is assumed at 0x80) ******
+; ****** print the filename present in the DTA (DTA is at [BX]) ******
 PRINTDTA:
 ; print drive in the DTA
 mov ah, 0x02
-mov dl, [0x80]
-add dl, 'A'
+mov dl, [bx]
+add dl, '@'
 int 0x21
 mov dl, ':'
 int 0x21
 ; print filename/extension (in FCB format)
 mov ah, 0x40    ; write to file
-mov bx, 1       ; output to stdout
 mov cx, 11      ; 11 bytes (8+3)
-mov dx, 0x81    ; filename field at the default DTA location
+mov dx, bx      ; filename field at the default DTA location
+inc dx
+mov bx, 1       ; output to stdout
 int 0x21
 ; print a trailing CR/LF
 mov ah, 0x02    ; display character in DL
