@@ -324,6 +324,56 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
 }
 
 
+static void dos_fname2fcb(char far *fcb, const char *cmd) {
+  unsigned short fcb_seg, fcb_off;
+  fcb_seg = FP_SEG(fcb);
+  fcb_off = FP_OFF(fcb);
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+    push es
+    push si
+
+    mov ax, 0x2900   /* DOS 1+ - parse filename into FCB (DS:SI=fname, ES:DI=FCB) */
+    mov si, cmd
+    mov es, fcb_seg
+    mov di, fcb_off
+    int 0x21
+
+    pop si
+    pop es
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+}
+
+
+/* parses cmdtail and fills fcb1 and fcb2 with first and second arguments,
+ * respectively. an FCB is 12 bytes long:
+ * drive (0=default, 1=A, 2=B, etc)
+ * fname (8 chars, blank-padded)
+ * fext (3 chars, blank-padded) */
+static void cmdtail_to_fcb(char far *fcb1, char far *fcb2, const char *cmdtail) {
+
+  /* skip any leading spaces */
+  while (*cmdtail == ' ') cmdtail++;
+
+  /* convert first arg */
+  dos_fname2fcb(fcb1, cmdtail);
+
+  /* skip to next arg */
+  while ((*cmdtail != ' ') && (*cmdtail != 0)) cmdtail++;
+  while (*cmdtail == ' ') cmdtail++;
+
+  /* convert second arg */
+  dos_fname2fcb(fcb2, cmdtail);
+}
+
+
 /* a few internal flags */
 #define DELETE_STDIN_FILE 1
 #define CALL_FLAG         2
@@ -508,8 +558,17 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
 
   ExecParam->envseg = envseg;
   ExecParam->cmdtail = (unsigned long)MK_FP(rmod->rmodseg, 0x80); /* farptr, must be in PSP format (lenbyte args \r) */
-  ExecParam->fcb1 = 0; /* TODO farptr */
-  ExecParam->fcb2 = 0; /* TODO farptr */
+  /* far pointers to unopened FCB entries (stored in RMOD's own PSP) */
+  {
+    char far *farptr;
+    /* prep the unopened FCBs */
+    farptr = MK_FP(rmod->rmodseg, 0x5C);
+    _fmemset(farptr, 0, 36); /* first FCB is 16 bytes long, second is 20 bytes long */
+    cmdtail_to_fcb(farptr, farptr + 16, cmdtail);
+    /* set (far) pointers in the ExecParam block */
+    ExecParam->fcb1 = (unsigned long)MK_FP(rmod->rmodseg, 0x5C);
+    ExecParam->fcb2 = (unsigned long)MK_FP(rmod->rmodseg, 0x6C);
+  }
   exit(0); /* let rmod do the job now */
 }
 
