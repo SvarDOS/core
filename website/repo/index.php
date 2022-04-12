@@ -108,9 +108,14 @@ if ($a != 'checkup') {
     echo "ERROR: no package specified\r\n";
     exit(0);
   }
-  $pv = explode('-', strtolower($_GET['p']));
-  $p = $pv[0];
-  if (!empty($pv[1])) $v = $pv[1];
+  // pull and pullsrc actions accept pkg-ver strings
+  if ($a == 'pull' || $a == 'pullsrc') {
+    $pv = explode('-', strtolower($_GET['p']));
+    $p = $pv[0];
+    if (!empty($pv[1])) $v = $pv[1];
+  } else {
+    $p = strtolower($_GET['p']);
+  }
 }
 
 
