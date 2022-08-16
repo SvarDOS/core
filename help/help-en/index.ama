@@ -7,6 +7,7 @@ us on the SvarDOS %lcontact.ama:mailing list%t!)
 
 === Chapters =================================================================
 
+ * %lnls.ama:Internationalization and NLS overview
  * %lpkg.ama:Packages management (install/remove/update software)
  * %lnetwork.ama:Networking
  * %lmouse.ama:Mouse support
