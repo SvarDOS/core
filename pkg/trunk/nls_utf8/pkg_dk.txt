@@ -30,7 +30,7 @@
 3.10:Fejl: Kan ikke oprette %s!
 3.12:Fejl: Pakken indeholder ikke filen %s! Er ikke en gyldig SvarDOS pakke.
 3.18:Pakke %s er installeret allerede! Benyt 'update' handlingen i stedet.
-3.19:Pakke %s installeret: %d filer udpakket, %d fejl.
+3.19:Pakke %s installeret: %ld filer udpakket, %ld fejl.
 3.20:Fejl: Pakken indeholder en krypteret fil:
 3.23:ERROR: Package contains an invalid filename:
 3.24:ERROR: package name too long

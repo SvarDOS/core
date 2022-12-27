@@ -31,7 +31,7 @@
 3.10:FEHLER: Konnte %s nicht erstellen!
 3.12:FEHLER: Paket enthält nicht die Datei %s! Kein gültiges SvarDOS-Paket.
 3.18:Paket %s ist bereits installiert! Vielleicht möchten Sie die Aktion 'update' verwenden.
-3.19:Paket %s installiert: %d Dateien extrahiert, %d Fehler.
+3.19:Paket %s installiert: %ld Dateien extrahiert, %ld Fehler.
 3.20:FEHLER: Paket enthält eine verschlüsselte Datei:
 3.23:FEHLER: Paket enthält einen ungültigen Dateinamen:
 3.24:FEHLER: Paketname zu lang
