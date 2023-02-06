@@ -5,6 +5,9 @@ const char *kblayouts[] = {
   "English (UK)\0uk\0\1\265\0\1\0\0",
   /****** HY ******/
   "Armenian\0hy\0\3\203\6\3\0\0",
+  /****** BR ******/
+  "Brazilian\0br\0\3\122\1\1\0\0",
+  "Brazilian (US layout)\0br274\0\3\122\1\1\0\0",
   /****** BG ******/
   "Bulgarian\0bg\0\3\150\3\2\0\0",
   /****** FR ******/

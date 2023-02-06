@@ -3,7 +3,7 @@
  * contains the list of all supported keyboard layouts, along with a way to
  * select sets of keyboard layouts that apply to only a specific region.
  *
- * Copyright (C) 2016 Mateusz Viste
+ * Copyright (C) 2016-2023 Mateusz Viste
  */
 
 /* the kblayouts list is a NULL-terminated array that contains entries in the
@@ -86,6 +86,10 @@ int main(void) {
 
   /* Armenian */
   addnew("HY", "Armenian", "hy", 899, 6, 3, 0);
+
+  /* Brazilian */
+  addnew("BR", "Brazilian", "br", 850, 1, 1, 0);
+  addnew("BR", "Brazilian (US layout)", "br274", 850, 1, 1, 0);
 
   /* Bulgarian */
   addnew("BG", "Bulgarian", "bg", 872, 3, 2, 0);

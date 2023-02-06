@@ -19,6 +19,7 @@ int24hdl.obj: int24hdl.asm
 deflang.c:
 	cd nls
 	utf8tocp 437 en_utf8.txt > en.txt
+	utf8tocp 850 br_utf8.txt > br.txt
 	utf8tocp 858 de_utf8.txt > de.txt
 	utf8tocp 858 fr_utf8.txt > fr.txt
 	utf8tocp 858 it_utf8.txt > it.txt
@@ -27,7 +28,7 @@ deflang.c:
 	utf8tocp 852 si_utf8.txt > si.txt
 	utf8tocp 858 sv_utf8.txt > sv.txt
 	utf8tocp 857 tr_utf8.txt > tr.txt
-	..\svarlang.lib\tlumacz en de fr it pl ru si sv tr
+	..\svarlang.lib\tlumacz en br de fr it pl ru si sv tr
 	if exist ..\deflang.c del ..\deflang.c
 	if exist ..\install.lng del ..\install.lng
 	move deflang.c ..

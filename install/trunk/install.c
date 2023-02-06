@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2022 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2023 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -266,6 +266,7 @@ static int selectlang(struct slocales *locales) {
   const char *msg;
   const char *langlist[] = {
     "English",
+    "Brazilian",
     "French",
     "German",
     "Italian",
@@ -294,36 +295,41 @@ static int selectlang(struct slocales *locales) {
       locales->keyblen = OFFLEN_FR;
       break;
     case 2:
+      strcpy(locales->lang, "BR");
+      locales->keyboff = OFFLOC_BR;
+      locales->keyblen = OFFLEN_BR;
+      break;
+    case 3:
       strcpy(locales->lang, "DE");
       locales->keyboff = OFFLOC_DE;
       locales->keyblen = OFFLEN_DE;
       break;
-    case 3:
+    case 4:
       strcpy(locales->lang, "IT");
       locales->keyboff = OFFLOC_IT;
       locales->keyblen = OFFLEN_IT;
       break;
-    case 4:
+    case 5:
       strcpy(locales->lang, "PL");
       locales->keyboff = OFFLOC_PL;
       locales->keyblen = OFFLEN_PL;
       break;
-    case 5:
+    case 6:
       strcpy(locales->lang, "RU");
       locales->keyboff = OFFLOC_RU;
       locales->keyblen = OFFLEN_RU;
       break;
-    case 6:
+    case 7:
       strcpy(locales->lang, "SI");
       locales->keyboff = OFFLOC_SI;
       locales->keyblen = OFFLEN_SI;
       break;
-    case 7:
+    case 8:
       strcpy(locales->lang, "SV");
       locales->keyboff = OFFLOC_SV;
       locales->keyblen = OFFLEN_SV;
       break;
-    case 8:
+    case 9:
       strcpy(locales->lang, "TR");
       locales->keyboff = OFFLOC_TR;
       locales->keyblen = OFFLEN_TR;
