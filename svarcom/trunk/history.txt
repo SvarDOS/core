@@ -6,6 +6,12 @@
  (ticket numbers at https://osdn.net/projects/svardos/ticket/ in [] brackets)
 
 
+=== ver 2023.0 (06.02.2023) ==================================================
+
+ - added a dummy INT 0x2E handler
+ - added BR translations (courtesy of Luzemario Dantes)
+
+
 === ver 2022.4 (12.04.2022) ==================================================
 
  - SET command: fixed upcasing of var names with high-ASCII chars [#44145]

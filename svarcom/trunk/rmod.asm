@@ -36,14 +36,14 @@ STACKPTR dw 0
 
 ; offset of the COMSPEC variable in the environment block, 0 means "use
 ; boot drive". this value is patched by the transient part of COMMAND.COM
-COMSPECPTR dw 0  ; +4Ah
+COMSPECPTR dw 0  ; +CEh
 
 ; fallback COMSPEC string used if no COMPSEC is present in the environment
 ; drive. drive is patched by the transient part of COMMAND.COM
-COMSPECBOOT db "@:\COMMAND.COM", 0 ; +4Ch
+COMSPECBOOT db "@:\COMMAND.COM", 0 ; +D0h
 
 ; exit code of last application
-LEXCODE  db 0    ; +5Bh
+LEXCODE  db 0    ; +DFh
 
 ; ExecParamRec used by INT 21h, AX=4b00 (load and execute program), 14 bytes:
 ;  offset  size  content
@@ -51,16 +51,16 @@ LEXCODE  db 0    ; +5Bh
 ;     +2     4   address of command line to place at PSP:0080
 ;     +6     4   address of an FCB to be placed at PSP:005c
 ;    +0Ah    4   address of an FCB to be placed at PSP:006c
-EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +5Ch
+EXEC_PARAM_REC db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   ; +E0h
 
 ; Program to execute, preset by SvarCOM (128 bytes, ASCIIZ)
-EXECPROG: times 128 db 0                                     ; +6Ah
+EXECPROG: times 128 db 0                                     ; +EEh
 
 ; File where stdin and stdout should be redirected (0 = no redirection)
-REDIR_INFIL:     times 128 db 0     ; +EAh
-REDIR_OUTFIL:    times 128 db 0     ; +16Ah
-REDIR_OUTAPPEND: dw 0               ; +1EAh
-REDIR_DEL_STDIN: db 0               ; +1ECh  indicates that the stdin file
+REDIR_INFIL:     times 128 db 0     ; +16Eh
+REDIR_OUTFIL:    times 128 db 0     ; +1EEh
+REDIR_OUTAPPEND: dw 0               ; +26Eh
+REDIR_DEL_STDIN: db 0               ; +270h  indicates that the stdin file
                                     ;        should be deleted (pipes). This
                                     ;        MUST contain the 1st char of
                                     ;        REDIR_INFIL!
@@ -69,12 +69,16 @@ REDIR_DEL_STDIN: db 0               ; +1ECh  indicates that the stdin file
 ; According to the TechHelp! Manual: "If you want to abort (exit to the parent
 ; process), then set the carry flag and return via a FAR RET. This causes DOS
 ; to perform normal cleanup and exit to the parent." (otherwise use iret)
-BREAK_HANDLER:            ; +1EDh
+BREAK_HANDLER:            ; +271h
 stc
 retf
 
+; INT 0x2E handler
+INT2E:
+xor ax, ax
+iret
 
-skipsig:                  ; +1EFh
+skipsig:                  ; +276h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -83,9 +87,14 @@ mov es, ax
 mov ss, ax
 mov sp, STACKPTR
 
-; set up myself as break handler
+; set up myself as break handler (int 0x23)
 mov ax, 0x2523  ; set int vector 23h
 mov dx, BREAK_HANDLER
+int 0x21
+
+; set up myself as int 0x2E handler ("pass command to shell")
+mov ax, 0x252E
+mov dx, INT2E ; TODO do something meaningful instead of a no-op
 int 0x21
 
 ; revert stdin/stdout redirections (if any) to their initial state

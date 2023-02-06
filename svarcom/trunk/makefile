@@ -33,12 +33,13 @@ command.com: rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodin
 deflang.obj: lang\*.txt
 	# GENERATE CODEPAGE-SPECIFIG VERSIONS OUT OF UTF-8 FILES
 	CD LANG
+	utf8tocp 850 BR-UTF8.TXT > BR.TXT
 	utf8tocp 850 DE-UTF8.TXT > DE.TXT
 	utf8tocp 437 EN-UTF8.TXT > EN.TXT
 	utf8tocp 850 FR-UTF8.TXT > FR.TXT
 	utf8tocp maz PL-UTF8.TXT > PL.TXT
 	utf8tocp 857 TR-UTF8.TXT > TR.TXT
-	..\svarlang.lib\tlumacz en de fr pl tr
+	..\svarlang.lib\tlumacz en br de fr pl tr
 	DEL ??.TXT
 	MOVE /Y OUT.LNG ..\SVARCOM.LNG
 	MOVE /Y DEFLANG.C ..
