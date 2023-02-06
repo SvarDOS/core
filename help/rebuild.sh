@@ -23,6 +23,12 @@ utf8tocp -d 858 help-de/unicode.map
 ambpack cc help-de help-de.amb
 rm help-de/unicode.map
 
+# BR
+echo "SISTEMA DE AJUDA DO SVARDOS ver $VER" > help-br/title
+utf8tocp -d 858 help-br/unicode.map
+ambpack cc help-br help-br.amb
+rm help-br/unicode.map
+
 mkdir bin
 mkdir help
 mkdir appinfo

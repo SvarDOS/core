@@ -1,0 +1,16 @@
+
+%hLicença do SvarDOS
+
+O SvarDOS é uma distribuição DOS feita de muitos pedaços de software, por isso
+uma única licença dificilmente pode ser aplicada a tudo. Contudo, o sistema CORE
+(que é o instalador do SvarDOS, imagens bootáveis e todos os pacotes CORE) é
+cuidadosamente montado com software livre, ou seja, concede 3 liberades
+básicas do FOSS: liberdade para usar, modificar e redistribuir. Isso inclui, mas
+não necessariamente é limitado a, software liberado sobre as seguintes licenças:
+GNU GPLv2, GNU GPLv3, BSD, MIT, EUPL e Domínio Público.
+
+Note que, enquanto o acima se aplica ao núcleo da distribuição SvarDOS, não
+cobre todos os pacotes extra. Pacotes de software adicionais podem ou não ser
+FOSS, eles são garantidos ser somente "grátis para uso não comercial".
+
+Leia mais: %lpkgrules.ama:Regras de inclusão de pacotes

@@ -1,0 +1,53 @@
+
+        %h*** Porque eu usaria o SvarDOS ao invés do FreeDOS? ***
+
+O projeto FreeDOS é um sistema operacional livre, de código aberto que objetiva
+ser 100%% compatível com o MS-DOS. E ele é incrível. Assim, porque eu usaria o 
+SvarDOS no lugar?
+
+%hLongos ciclos de releases
+
+O projeto FreeDOS começou em 29/06/1994. A Versão 1.0 veio em torno de 2006.
+A Versão 1.1 foi liberada em 2012, e a versão 1.2 seguiu em Dezembro de 2016.
+A Version 1.3 foi anunciada para Dezembro 2021. Isso se traduz aproximadamente
+em um ciclo de 5 anos. Reconhecidamente, a cena do DOS não é tão ativa quanto
+já foi, mas mesmo assim, muitas coisas acontecem em menos de poucos anos. A 
+abordagem centrada em versão também requer que os usuários façam atualizações
+completas de sistema sempre que isso ocorrer.
+
+O SvarDOS é muito diferente nesse respeito: não há versões.
+Sempre que um novo programa é incluído ou atualizado na distribuição, se torna 
+imediatamente disponível através do repositório do SvarDOS e pode ser baixado
+através do website do SvarDOS ou pela ferramenta pkgnet. Sistemas já instalados
+podem ser facilmente mantidos atualizados usndo o gerenciador de pacotes da
+distribuição.
+
+%hRestrições de netureza legal
+
+O projeto FreeDOS imita um sistema operacional proprietário, com todas as suas 
+APIs e peculiaridades. Por essa razão, o projeto sempre tem de ser extremamente
+cuidadoso sobre o que pode e não pode ser incluído na distribuição FreeDOS.
+Como resultado, somente software livre pode seguir seu caminho na distribuição
+oficial. Enquanto essa abordagem cuidadosa e sã e legalmente segura, está longe
+de ser prática para os usuários. Permitir exclusivamente software livre
+significa que um grande número de programas, ferramentas e jogos são deixados
+para trás. Por exemplo, ferramentas "freeware" (que são grátis mas o código
+fonte não é incluído) não entram. Mesmo programas open-source podem ser
+rejeitados, se eles não especificam claramente que obedecem uma licença aprovada
+pela OSI.
+
+O SvarDOS, por outro lado, é mais liberal sobre a inclusão de pacotes. 
+Basicamente, qualquer coisa que é objetivamente útil, de qualidade razoável,
+livre/grátis e pode ser legalmente distribuído na forma de um pacote, pode ser
+incluída no SvarDOS. A única exceção é para o sistema "core" (por ex. o próprio 
+sistema operacional), que deve ser baseado exlusivamente em software free/libre.
+Leia mais sobre %lpkgrules.ama:Regras de inclusão de pacotes do SvarDOS%t.
+
+%hFreeDOS incluído!
+
+Deve ser notado que apesar dos objetivos do SvarDOS e FreeDOS serem levemente 
+diferentes, o SvarDOS não existiria sem o FreeDOS. Na verdade, o SvarDOS usa o
+excelente FreeDOS kernel, assim como poucos outros utilitários emprestados do 
+ecossitema do FreeDOS.
+
+Leia também: %lhistory.ama:Origens do SvarDOS

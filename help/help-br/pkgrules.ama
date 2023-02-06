@@ -1,0 +1,48 @@
+
+                     %h*** Regras de inlusão de pacotes ***
+
+O SvarDOS é uma distribuição DOS que vem cheia de pacotes de terceiros.
+Com o tempo, os pacotes são atualizados e novos pacotes são adicionados.
+Contudo, o SvarDOS não é um CD de distribuilçao de shareware, nem é uma produção
+de "warez" de qualquer tipo. Cada software que é distribuído no SvarDOS deve
+estar de acordo com algumas regras de bom senso, como listado abaixo.
+
+%hUtilidade Objetiva
+
+O software distribuído deve ser útil. Não há sentido em distribuir centenas de
+programas de "Hello World" por exemplo. O software deve ser usável como um 
+produto finalizado e conter alguns recursos que demosntrem que são procurados por
+pelo menos um subconjunto da base de usuários. Jogos são considerados úteis,
+desde que eles preencham seu objetivo de fornecer distração.
+
+%hQualidade razoável
+
+O programa empacotado deve exibir traços de qualidade razoável. Isso signidica
+que ele deve ter um comportamento determinístico, e ser livre de efeitos 
+colaterais indesejados ao computador do usuário (não travar, congelar, resultar
+em perda inesperada de dados, etc). Ele deve também instruções claras e não 
+ambíguas para o usuário, sobre como o programa foi pensado para ser usado.
+
+%hGrátis (sem custos)
+
+O programa deve ser gratiuito - isto é, disponível sem custo financeiro. Ele não
+tem que obedecer uma licença aporvada pela OSI ou ser open-source (mesmo isso
+sendo o ideal), mas pelo menos deve ser livre para uso pessoal, não-comercial.
+Isso inclui "Freeware", "postcardware", etc. "Shareware" também é aceitável,
+desde que a versão shareware do programa preencha as condições de utilidade, 
+qualidade e permita distribuição reempacotada.
+
+%hDistribuição permitida
+
+O programa deve permitir a distribuição sem restrições, e não vedar ser
+redistribuído em uma forma reempacotada.
+
+%!EXCEÇÕES NO CORE
+
+Enquanto as regras acima são válidas para todos os pacotes de terceiros que
+podem ser distribuídos com o SvarDOS, não se aplicam aos pacotes "CORE" que
+contém o próprio sistema operacional. O SvarDOS sendo um sistema operacional
+livre (como em "libre"), todos os pacotes CORE devem obedecer a uma licença do
+tipo livre - seja ela GPL, BSD, MIT, domílio público, ou qualquer outra que
+permita distribuição irrestrita, forneça código fonte e possibilite realizar
+modificações livremente.
