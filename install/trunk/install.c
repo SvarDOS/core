@@ -290,14 +290,14 @@ static int selectlang(struct slocales *locales) {
   memset(locales, 0, sizeof(struct slocales));
   switch (choice) {
     case 1:
-      strcpy(locales->lang, "FR");
-      locales->keyboff = OFFLOC_FR;
-      locales->keyblen = OFFLEN_FR;
-      break;
-    case 2:
       strcpy(locales->lang, "BR");
       locales->keyboff = OFFLOC_BR;
       locales->keyblen = OFFLEN_BR;
+      break;
+    case 2:
+      strcpy(locales->lang, "FR");
+      locales->keyboff = OFFLOC_FR;
+      locales->keyblen = OFFLEN_FR;
       break;
     case 3:
       strcpy(locales->lang, "DE");
