@@ -1,0 +1,60 @@
+#
+# SvarCOM translation file
+# Lang: Brazilian Portuguese
+#
+# Translator: Luzemário Dantas
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Sintaxe Inválida
+0.2:Opção onválida
+0.3:Formato de parâmetro inválido
+0.4:Excesso de parâmetros
+
+# PAUSE
+15.0:Suspende a executção de um arquivo de comandos em lote
+15.1:Pressione qualquer tecla para continuar...
+
+# SHIFT
+16.0:Desloca a posição dos argumentos em um arquivo de comandos em lote:
+16.1:Argumento %1 se torna %0, argumento %2 se torna %1, etc.
+
+# DOS ERRORS
+255.1:Número de função inválida
+255.2:Arquivo não encontrado
+255.3:Caminho não encontrado
+255.4:Excesso de arquivos abertos (sem manipuladores disponíveis)
+255.5:Acesso negado
+255.6:Manipulador inválido
+255.7:Bloco de Controle de Memória destruído
+255.8:Memória insuficiente
+255.9:Endereço de bloco de memória inválido
+255.10:Ambiente inválido
+255.11:Formato invalid
+255.12:Access code inválido
+255.13:Dados inválidos
+255.15:Drive inválido
+255.16:Tentativa de remover o diretório atual
+255.17:Não é o mesmo dispositivo
+255.18:Não há mais arquivos
+255.19:Disco protegido contra gravação
+255.20:Unidade desconhecida
+255.21:Drive não pronto
+255.22:Comando desconhecido
+255.23:Erro de dados (CRC)
+255.24:Tamanho da estrutura de solicitação errado
+255.25:Erro de busca
+255.26:Tipo de mídia desconhecido (disco não-DOS)
+255.27:Setor não encontrado
+255.28:Impressora sem papel
+255.29:Falha de gravação
+255.30:Falha de leitura
+255.31:Falha geral
+255.32:Volação de compartilhamento
+255.33:Violação de bloqueio
+255.34:Mudança de disco inválida
+255.35:FCB indisponível
+255.36:Overflow no buffer de compartilhamento
+255.37:Página de código errada
+255.38:Impossível completar operações de arquivo (EOF / fora da entrada)
+255.39:Espaço em disco insuficiente

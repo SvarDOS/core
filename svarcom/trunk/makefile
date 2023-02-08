@@ -39,7 +39,7 @@ deflang.obj: lang\*.txt
 	utf8tocp 850 FR-UTF8.TXT > FR.TXT
 	utf8tocp maz PL-UTF8.TXT > PL.TXT
 	utf8tocp 857 TR-UTF8.TXT > TR.TXT
-	..\svarlang.lib\tlumacz en br de fr pl tr
+	..\svarlang.lib\tlumacz en br de fr pl tr > tlumacz.log
 	DEL ??.TXT
 	MOVE /Y OUT.LNG ..\SVARCOM.LNG
 	MOVE /Y DEFLANG.C ..
