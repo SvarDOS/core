@@ -1,0 +1,48 @@
+#
+# PKGNET TRANSLATION FILE
+#
+# LANG  : Brazilian Portuguese
+# AUTHOR: Luzemário Dantas
+#
+
+###############################################################################
+# HELP SCREEN                                                                 #
+###############################################################################
+
+1.0:O pkgnet é o programa que baixa os pacotes do SvarDOS.
+1.1:uso:    pkgnet search <termo>
+1.2:        pkgnet pull <pacote>
+1.3:        pkgnet pull <pacote>-<versão>
+1.4:        pkgnet pullsrc <pacote>
+1.5:        pkgnet pullsrc <pacote>-<versão>
+1.6:        pkgnet checkup
+1.7:ações:
+1.8:search   - pede ao repositório remoto a lista de pacotes especificada
+1.9:pull     - faz o download do pacote no diretório atual
+1.11:checkup  - lista atualizações disponíveis para seu sistema
+
+
+###############################################################################
+# OPERATIONS                                                                  #
+###############################################################################
+
+2.0:Baixado %ld KiB em %s (BSUM: %04X)
+
+
+###############################################################################
+# ERROR MESSAGES                                                              #
+###############################################################################
+
+9.0:ERRO: variável %DOSDIR% não está configurada
+9.1:ERRO: Impossível acessar o diretório de pacotes %DOSDIR%\\packages
+9.2:ERRO: Falha na conexão a %s
+9.3:ERRO: Falha ao enviar requisição HTTP para o servidor remoto
+9.4:ERRO: Falha no envio de dados POST para o servidor remoto
+9.5:ERRO: Erro de comunicação TCP #%d
+9.6:ERRO: Falha na criação do arquivo %s
+9.7:ERRO: Falha ao gravar dados no arquivo %s após %ld bytes
+9.8:ERRO: timeout esperando por dados
+9.9:ERRO: sem memória
+9.10:ERRO: arquivo %s já existe
+9.11:ERRO: inicialização do subsistema de rede falhou
+9.12:ERRO: falha na resolução do DNS
