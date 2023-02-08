@@ -1,0 +1,68 @@
+#
+# FDNPKG language file
+#
+# Language..: Turkish
+# Translator: anonymous
+#
+
+#### Help ####
+
+1.0:Bu, SvarDOS için ağ tabanlı bir paket yöneticisidir.
+1.20:Usage: pkg install package.svp
+1.21:       pkg update package.svp
+1.22:       pkg remove package
+1.23:       pkg listfiles package
+1.24:       pkg listlocal [filter]
+1.27:       pkg unzip file.zip
+1.25:PKG is published under the MIT license.
+1.26:It is configured through %DOSDIR%\\CFG\\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% ayarlanmamış! Onun SvarDOS ana dizinine işaret etmesi gerekir.
+2.3:Örnek: SET DOSDIR=C:\\SVARDOS
+2.14:Bellek yetersiz! (%s)
+
+#### Installing package ####
+
+3.8:HATA: Geçersiz zip arşivi! Paket kurulmadı.
+3.9:HATA: Paket zaten yerel olarak mevcut olan bir dosya içeriyor:
+3.10:HATA: %s oluşturulamadı %s!
+3.12:HATA: Paket %s dosyasını içermiyor! Geçerli bir SvarDOS paketi değil.
+3.18:%s paketi zaten kuruludur! Güncelleme eylemini yapabilirsiniz.
+3.19:%s paketi kuruldu: %ld dosya çıkarıldı, %ld hata.
+3.20:HATA: paket şifreli bir dosya içermektedir:
+3.23:HATA: paket geçersiz bir dosya ismi içermektedir:
+3.24:HATA: package name too long
+
+#### Removing package ####
+
+4.0:%s paketi kurulu değildir, dolayısıyla kaldırılmamıştır.
+4.3:Yetersiz bellek! %s dizini kaydedilemedi!
+4.4:%s kaldırılıyor
+4.5:%s paketi kaldırıldı.
+
+#### Searching package ####
+
+5.0:Hiçbir paket aramayla eşleşmedi.
+
+#### Loading configuration ####
+
+7.0:HATA: '%s' deposu iki kez listelenmiş!
+7.1:HATA: '%s' yapılandırma dosyası açılamadı!
+7.4:İkaz: #%d satırında boş değerli bir belirteç
+7.8:İkaz: #%d satırında bilinmeyen '%s' belirteci
+7.11:İkaz: #%d satırında  geçersiz 'DIR' yönergesi bulundu
+7.15:HATA: özel dizin '%s' geçerli bir mutlak yol değildir!
+7.16:HATA: özel dizin '%s' ayrılmış bir isimdir!
+
+#### Unziping package ####
+
+8.1:bilinmeyen zip imzası: 0x%08lx
+8.2:HATA: Paket desteklenmeyen metotla sıkıştırılmış dosya içeriyor (%d):
+8.3:'%s' unsurunun to '%s' konumuna çıkarılması sırasında hata!
+
+#### Handling the local list of installed packages ####
+
+9.0:Hata: %s dizinine erişilemedi.
+9.1:Hata: %s yerel paketi bulunamadı.

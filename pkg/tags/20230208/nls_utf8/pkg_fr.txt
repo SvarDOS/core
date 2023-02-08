@@ -1,0 +1,76 @@
+#
+# FDNPKG language file
+#
+# Language..: French
+# Translator: anonymous
+#
+
+#### Help ####
+
+1.0:PKG est le gestionnaire de paquets de SvarDOS.
+1.20:Usage: pkg install package.svp
+1.21:       pkg update package.svp
+1.22:       pkg remove package
+1.23:       pkg listfiles package
+1.24:       pkg listlocal [filter]
+1.27:       pkg unzip fichier.zip
+1.25:PKG est publié sous license MIT.
+1.26:Cet outil est configurable via %DOSDIR%\\CFG\\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% non défini! Faites-le pointer vers le répertoire principal de SvarDOS.
+2.3:Exemple : SET DOSDIR=C:\\SVARDOS
+2.14:Mémoire insuffisante! (%s)
+
+#### Installing package ####
+
+3.8:ERREUR: archive zip invalide! Le paquet n'a pas été installé.
+3.9:ERREUR: le paquet contient un fichier qui existe déjà localement:
+3.10:ERREUR: impossible de créer %s!
+3.12:ERREUR: le paquet ne contient pas de fichier %s! Ce n'est pas un paquet SvarDOS valide.
+3.18:Le paquet %s est déjà installé! Utilisez plutôt l'action "update".
+3.19:Le paquet %s a été installé: %ld fichiers extraits, %ld erreurs.
+3.20:ERREUR: le paquet contient un fichier crypté:
+3.23:ERREUR: le paquet contient un nom de fichier invalide:
+3.24:ERREUR: nom du paquet trop long
+
+#### Removing package ####
+
+4.0:Le paquet %s n'est pas installé, il n'a donc pas été supprimé.
+4.3:Mémoire insuffisante! Impossible de mémoriser le répertoire %s!
+4.4:effacement en cours: %s
+4.5:Le paquet %s a été supprimé.
+
+#### Searching package ####
+
+5.0:Aucun paquet ne correspond à la recherche.
+
+#### Loading configuration ####
+
+7.0:ERREUR: le répertoire personalisé "%s" est listé deux fois!
+7.1:ERREUR: échec de l'ouverture du fichier de configuration "%s"!
+7.4:Attention: jeton avec une valeur vide sur la ligne #%d
+7.8:Attention: jeton "%s" inconnu à la ligne #%d
+7.11:Attention: directive "DIR" invalide trouvée à la ligne #%d
+7.15:ERREUR: le répertoire personnalisé "%s" n'est pas un chemin absolu valide!
+7.16:ERREUR: le répertoire personnalisé "%s" est un nom réservé!
+
+#### Unziping package ####
+
+8.1:signature zip inconnue: 0x%08lx
+8.2:ERREUR: le paquet utilise une méthode de compression non supportée (%d):
+8.3:ERREUR: échec lors de l'extraction de "%s" vers "%s"!
+
+#### Handling the local list of installed packages ####
+
+9.0:ERREUR: échec de l'accès au répertoire "%s"
+9.1:ERREUR: le paquet local  %s n'a pas été trouvé
+
+#### unzip ####
+
+10.0:OK
+10.1:ERREUR: Échec d'ouverture du fichier d'archive
+10.2:ERREUR: Archive ZIP invalide
+10.3:ERREUR: Fichier déjà existant
+10.4:ERREUR: Échec de unzip (%d)
