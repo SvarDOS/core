@@ -1,5 +1,8 @@
 localcfg history file
 
+* localcfg ver 20230208
+ - added BR translations, courtesy of Luzemario Dantes
+
 * localcfg ver 20220203
  - NLS (translations) support through the SvarLANG library
  - memory usage optimizations

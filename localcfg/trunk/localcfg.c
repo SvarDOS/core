@@ -1,7 +1,7 @@
 /*
  * Locales configuration for SvarDOS
  *
- * Copyright (C) Mateusz Viste 2015-2022
+ * Copyright (C) Mateusz Viste 2015-2023
  *
  * MIT license
  *
@@ -28,12 +28,12 @@
 #include <stdlib.h> /* atoi() */
 #include <string.h> /* strchr */
 
-#include "svarlang.lib/svarlang.h"
+#include "svarlang.h"
 
 #include "country.h"
 
-#define PVER "20220203"
-#define PDATE "2015-2022"
+#define PVER "20230208"
+#define PDATE "2015-2023"
 
 
 enum NLS_STRINGS {
