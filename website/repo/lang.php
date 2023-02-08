@@ -36,7 +36,7 @@ $MSG['NO_MATCHING_PKG']['de'] = 'Kein passendes Paket gefunden';
 $MSG['NO_MATCHING_PKG']['pl'] = 'Nie znaleziono żadnego pasującego pakietu';
 
 $MSG['PKG_NOT_FOUND']['en'] = 'ERROR: package not found on server';
-$MSG['PKG_NOT_FOUND']['br'] = 'ERRO: pcote não encontrado no servidor';
+$MSG['PKG_NOT_FOUND']['br'] = 'ERRO: pacote não encontrado no servidor';
 $MSG['PKG_NOT_FOUND']['de'] = 'FEHLER: Paket nicht auf dem Server gefunden';
 $MSG['PKG_NOT_FOUND']['pl'] = 'BŁĄD: Nie znaleziono pakietu na serwerze';
 
