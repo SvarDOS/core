@@ -15,6 +15,10 @@ $MSG = array();
 $CP_UTF['en'] = array();
 $CP_ENC['en'] = array();
 
+// BR (cp850)
+$CP_UTF['br'] = array('ã',   'á',   'ç',   'í',   'Í',   'õ');
+$CP_ENC['br'] = array("\xc6","\xa0","\x87","\xa1","\xd6","\xe4");
+
 // DE (cp437, cp850, cp858 have all the same layout for these)
 $CP_UTF['de'] = array('ä',   'ö',   'ü',   'Ä',   'Ö',   'Ü',   'ß');
 $CP_ENC['de'] = array("\x84","\x94","\x81","\x8e","\x99","\x9a","\xe1");
@@ -27,46 +31,57 @@ $CP_ENC['pl'] = array("\x8f","\x95","\x90","\x9c","\xa5","\xa3","\x98","\xa1","\
 // *** MESSAGES ***************************************************************
 
 $MSG['NO_MATCHING_PKG']['en'] = 'No matching package found';
+$MSG['NO_MATCHING_PKG']['br'] = 'Nenhum pacote correspondente encontrado';
 $MSG['NO_MATCHING_PKG']['de'] = 'Kein passendes Paket gefunden';
 $MSG['NO_MATCHING_PKG']['pl'] = 'Nie znaleziono żadnego pasującego pakietu';
 
 $MSG['PKG_NOT_FOUND']['en'] = 'ERROR: package not found on server';
+$MSG['PKG_NOT_FOUND']['br'] = 'ERRO: pcote não encontrado no servidor';
 $MSG['PKG_NOT_FOUND']['de'] = 'FEHLER: Paket nicht auf dem Server gefunden';
 $MSG['PKG_NOT_FOUND']['pl'] = 'BŁĄD: Nie znaleziono pakietu na serwerze';
 
 $MSG['PKG_NO_SRC']['en'] = 'ERROR: no sources available for this package';
+$MSG['PKG_NO_SRC']['br'] = 'ERRO: não há fontes disponíveis para este pacote';
 $MSG['PKG_NO_SRC']['de'] = 'FEHLER: keine Quelltexte verfügbar für dieses Paket';
 $MSG['PKG_NO_SRC']['pl'] = 'BŁĄD: brak źródeł dla tego pakietu';
 
 $MSG['VER']['en'] = 'ver:';
+$MSG['VER']['br'] = 'ver:';
 $MSG['VER']['de'] = 'Ver:';
 $MSG['VER']['pl'] = 'wer:';
 
 $MSG['SIZE']['en'] = 'size:';
+$MSG['SIZE']['br'] = 'tamanho:';
 $MSG['SIZE']['de'] = 'Größe:';
 $MSG['SIZE']['pl'] = 'rozmiar:';
 
 $MSG['ALT_VERS']['en'] = 'alt versions:';
+$MSG['ALT_VERS']['br'] = 'versões alternativas:';
 $MSG['ALT_VERS']['de'] = 'alt. Versionen:';
 $MSG['ALT_VERS']['pl'] = 'alt. wersje:';
 
 $MSG['PACKAGE']['en'] = 'PACKAGE';
+$MSG['PACKAGE']['br'] = 'PACOTE';
 $MSG['PACKAGE']['de'] = 'PAKET';
 $MSG['PACKAGE']['pl'] = 'PAKIET';
 
 $MSG['INSTALLED']['en'] = 'INSTALLED (LOCAL)';
+$MSG['INSTALLED']['br'] = 'INSTALADO (LOCAL)';
 $MSG['INSTALLED']['de'] = 'INSTALLIERT (LOKAL)';
 $MSG['INSTALLED']['pl'] = 'ZAINSTALOWANY (LOKALNY)';
 
 $MSG['AVAILABLE']['en'] = 'AVAILABLE (REMOTE)';
+$MSG['AVAILABLE']['br'] = 'DISPONÍVEL (REMOTO)';
 $MSG['AVAILABLE']['de'] = 'VERFÜGBAR (ONLINE)';
 $MSG['AVAILABLE']['pl'] = 'DOSTĘPNY (ZDALNY)';
 
 $MSG['NO_UPDATES']['en'] = 'no available updates';
+$MSG['NO_UPDATES']['br'] = 'não há atualizações disponíveis';
 $MSG['NO_UPDATES']['de'] = 'keine Aktualisierungen verfügbar';
 $MSG['NO_UPDATES']['pl'] = 'brak dostępnych aktualizacji';
 
 $MSG['FOUND_DIFFER']['en'] = 'found differing packages:';
+$MSG['FOUND_DIFFER']['br'] = 'encontrados pacotes diferentes:';
 $MSG['FOUND_DIFFER']['de'] = 'abweichende Pakete gefunden:';
 $MSG['FOUND_DIFFER']['pl'] = 'znalezionych różnic w pakietach:';
 
