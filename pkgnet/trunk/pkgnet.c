@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2022 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2023 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -40,8 +40,8 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20220318"
-#define PDATE "2021-2022"
+#define PVER "20230208"
+#define PDATE "2021-2023"
 
 #define HOSTADDR "svardos.org"
 
