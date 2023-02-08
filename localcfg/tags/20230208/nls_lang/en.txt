@@ -1,0 +1,56 @@
+#
+# LOCALCFG language file
+#
+# Language...: English
+# Authors....: Mateusz Viste, Robert Riebisch
+# Last update: 27 Feb 2022
+#
+
+### HELP SCREEN ###########################################################
+
+0.0:version
+0.1:creates or edits COUNTRY.SYS local preferences
+0.2:usage: localcfg [drive:][path][COUNTRY.SYS] [options]
+0.3:options:
+
+0.10:/country:XX set the country code to XX (1=USA, 33=France, 48=Poland, etc)
+0.11:/cp:XXX     adapts country data for codepage XXX (example: '437')
+0.12:/decim:X    reconfigures the decimal symbol to be 'X'
+0.13:/thous:X    reconfigures the thousands symbol to be 'X'
+0.14:/datesep:X  sets the date separator to 'X' (for example '/')
+0.15:/datefmt:X  sets the date format, can be: MDY, DMY or YMD
+0.16:/timesep:X  sets the time separator to 'X' (for example ':')
+0.17:/timefmt:X  sets the time format: 0=12h with AM/PM or 1=24h
+0.18:/curr:XXX   sets the currency to XXX (a string of 1 to 4 characters)
+0.19:/currpos:X  sets the currency symbol position to X, where X is either
+0.20:            0=currency precedes the value, 1=currency follows the value and
+0.21:            2=currency replaces the decimal sign
+0.22:/currspc:X  space between the currency and the value (0=no, 1=yes)
+0.23:/currprec:X currency's precision (number of decimal digits, 0..9)
+0.24:/yesno:XY   sets the 'Yes/No' letter to XY (default: YN)
+
+0.50:If COUNTRY.SYS location is not provided, then localcfg tries loading it
+0.51:from %DOSDIR%\CFG\COUNTRY.SYS
+
+
+### INFO SCREEN ###########################################################
+
+7.0:Country code.......:
+7.1:Codepage...........:
+7.2:Decimal separator..:
+7.3:Thousands separator:
+7.4:Date format........:
+7.5:Time format........:
+7.6:Yes/No characters..:
+7.7:Currency example...:
+
+7.9:Make sure that your CONFIG.SYS contains this directive:
+
+### ERROR MESSAGES ########################################################
+
+9.0:ERROR: file path can be provided only once
+9.1:ERROR: bad path to file
+9.2:ERROR: failed to read the file
+9.3:ERROR: invalid parameter syntax
+9.4:ERROR: the file is not a valid COUNTRY.SYS
+9.5:ERROR: the file has not been created with LOCALCFG
