@@ -1,0 +1,85 @@
+%hInternationalization and NLS overview
+
+SvarDOS is a multi-language system, meaning that it can be set to operate in a
+variety of languages. This process comes in several distinct steps, all of
+which are preset inside AUTOEXEC.BAT by the SvarDOS installer during the
+installation of your system.
+
+This article aims at explaining the basics to provide the user with enough
+knowledge to configure his system in the most common situations. For detailed
+information about advanced settings please consult the documentation of each
+of the mentioned programs.
+
+
+%hOutputting message in your language
+
+The majority of CORE SvarDOS programs are able to output their messages in
+different languages. To know which language should be used, they look for two
+environment variables:
+
+LANG - the language to output messages in
+NLSPATH - provides the path where all language files are stored
+
+Example:
+
+SET LANG=FR
+SET NLSPATH=%DOSDIR%\NLS
+
+
+%hSetting up your video adapter to a suitable codepage
+
+Many languages come with glyphs specific to their alphabet. That is why
+codepages have been designed - a codepage is a set of glyphs that are adapted
+to display one or more languages. The default codepage hardcoded into most
+video adapters is the 437 codepage, known as "US ASCII". Using this codepage
+requires no configuration, but outputting messages in a non-English language
+might require using a different codepage. Loading a user codepage requires an
+EGA or VGA card. Older cards (MDA, CGA, Hercules...) had a single codepage
+hardwired in their memory.
+
+Setting up a custom (non-437) codepage on your system requires the DISPLAY
+driver to be loaded. This driver is a TSR that makes sure to refresh the
+custom codepage whenever the video adapter reverts to its default one
+(typically after every video mode change).
+
+To load the DISPLAY driver, use this command:
+
+DISPLAY CON=(EGA,,1)
+
+Once DISPLAY is loaded, you may configure your video adapter with the codepage
+of your choice using the two commands below:
+
+MODE CON CP PREP=((CODEPAGE) PATH-TO-THE-CPI-DEFINITION)
+MODE CON CP SEL=CODEPAGE
+
+...where "CODEPAGE" is the identifier of your codepage, like 850, 991, etc and
+"PATH-TO-CPI-DEFINITION" is the full path to the CPI or CPX file that contains
+the definition of glyphs for the given codepage.
+
+Working example for the Polish language:
+
+MODE CON CP PREP=((991) C:\SVARDOS\CPI\EGA10.CPX)
+MODE CON CP SEL=991
+
+You may see the full list of available CPX files and the exact codepages that
+each of them contain here: %lnls-cpx.ama:List of CPX files and their codepages%t.
+
+
+%hKeyboard layout
+
+Displaying country-specific glyphs is one thing, but typing them is another.
+To set up the keyboard layout suitable to your country, use the "KEYB" TSR.
+
+Example: KEYB PL
+
+
+%hNLS settings
+
+A language is not only different words and glyphs, it is also different
+conventions for things like paper sizes, currency, units of measurement,
+battery sizes, time format, and many other.
+
+DOS NLS support addresses a few of these variations through a standard,
+system-wide NLS API. In SvarDOS, this API can be configured through the
+LOCALCFG tool that generates a SYS file suitable for being loaded via a
+COUNTRY directive in CONFIG.SYS.
