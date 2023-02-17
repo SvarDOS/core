@@ -213,6 +213,10 @@ zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
 echo
 echo "### Creating floppy images"
 echo
+echo "You might notice a lot of DISK FULL warnings below. Do not worry, these"
+echo "are expected and are perfectly normal. It is a side effect of trying to"
+echo "fit as many packages as possible on the floppy sets."
+echo
 
 # build the boot (CD) floppy image
 export MTOOLS_NO_VFAT=1
