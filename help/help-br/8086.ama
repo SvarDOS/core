@@ -61,8 +61,8 @@ notas:
 		funcionou.
 03) Substituído arquivo BSUM E20D. Usado UPX com opção "--8086".
 04) pce-ibmpc: operação indefinida [C1 e1] -> Necessário uma full rebuild.
-05) Substituído arquivo BSUM F098. Não há opção "-1" para o TC++. Usado UPX com
-    opção "--8086".
+05) Substituído arquivo BSUM F098. Não há opção "-1" para o TC++. Usado UPX
+		com opção "--8086".
 06) Sai com: "At least a 80386 is required."
 07) pce-ibmpc: reporta 1,024K de memória convencional, mas 0K livre.
 08) Sai com: "Must have at least a 386."
