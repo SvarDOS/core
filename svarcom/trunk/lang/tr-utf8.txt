@@ -15,6 +15,7 @@
 0.6:Geçersiz parametre
 0.7:Gerekli parametre eksik
 0.8:Geçersiz hedef
+?0.9:Bu komut mevcut değil
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
