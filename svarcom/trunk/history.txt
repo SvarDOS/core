@@ -6,6 +6,11 @@
  (ticket numbers at https://osdn.net/projects/svardos/ticket/ in [] brackets)
 
 
+=== ver 2023.1 (17.02.2023) ==================================================
+
+ - improved BR translations (courtesy of Luzemario Dantes)
+
+
 === ver 2023.0 (06.02.2023) ==================================================
 
  - added a dummy INT 0x2E handler
