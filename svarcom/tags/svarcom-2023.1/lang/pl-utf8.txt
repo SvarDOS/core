@@ -1,0 +1,297 @@
+#
+# SvarCOM translation file
+#
+# Language...: Polish
+# Author.....: Mateusz Viste
+# Last update: 17 Feb 2023
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Nieprawidłowa składnia
+0.2:Nieprawidłowy przełącznik
+0.3:Nieprawidłowy format parametru
+0.4:Zbyt duża ilość parametrów
+0.5:Złe polecenie lub nazwa pliku
+0.6:Nieprawidłowy parametr
+0.7:Brak wymaganego parametru
+0.8:Nieprawidłowy cel
+0.9:To polecenie nie jest dostępne
+
+# the message below MUST be a two-letter upper-case string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:TN
+
+# SVARCOM HELP SCREEN
+1.0:Uruchamia interpreter poleceń SvarCOM.
+1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] polecenie]
+1.2:/D      Ignoruje AUTOEXEC.BAT (ma sens tylko przy /P)
+1.3:/E:nnn  Ustawia rozmiar środowiska na nnn bajtów
+1.4:/P      Ustala nowy interpreter poleceń i wykonuje AUTOEXEC.BAT
+1.5:/C      Wykonuje podane polecenie i kończy się
+1.6:/K      Wykonuje podane polecenie i działa dalej
+1.7:/Y      Wykonuje program wsadowy krok po kroku (tylko z /P, /K lub /C)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:WERSJA SVARCOM ULEGŁA ZMIANIE. SYSTEM ZATRZYMANY. ZRESTARTUJ KOMPUTER.
+2.1:BŁĄD KRYTYCZNY: rmod_install() nie powiodło się
+2.2:SvarCOM: wykryto przepełnienie stosu, usunięto historię poleceń (to nie bug)
+
+# CLS
+10.0:Czyści ekran.
+
+# CHCP
+11.0:Wyświetla lub ustawia aktywną stronę kodową.
+11.1:CHCP [nnn]
+11.2:nnn  Numer strony kodowej
+11.3:Uruchom CHCP bez parametrów aby wyświetlić numer bieżącej strony kodowej.
+11.4:Nieprawidłowy numer strony kodowej
+11.5:NLSFUNC nie jest zainstalowany
+11.6:Nie zdołano zmienić strony kodowej
+11.7:Aktualna strona kodowa:
+
+# CD / CHDIR
+12.0:Wyświetla lub zmienia bieżący katalog.
+12.1:CHDIR [dysk:][ścieżka]
+12.2:CHDIR[..]
+12.3:CD [dysk:][ścieżka]
+12.4:CD[..]
+12.5:.. Wskazuje, że chcesz przejść do katalogu nadrzędnego.
+12.6:Wpisz CD dysk: to display the current directory in the specified drive.
+12.7:Wpisz CD bez parametrów aby wyświetlić bieżący dysk i katalog.
+
+# CALL
+13.0:Wywołuje program wsadowy (bat) z innego programu wsadowego.
+13.1:CALL [dysk:][ścieżka]nazwapliku [parametry-batch]
+
+# BREAK
+14.0:Włącza lub wyłącza rozszerzone sprawdzanie CTRL+C.
+14.1:Wpisz BREAK bez parametru aby wyświetlić aktualne ustawienie BREAK.
+14.2:BREAK jest wyłączone
+14.3:BREAK jest włączone
+
+# PAUSE
+15.0:Wstrzymuje przetwarzanie pliku wsadowego.
+15.1:Naciśnij dowolny klawisz aby kontynuować...
+
+# SHIFT
+16.0:Zmienia pozycję argumentów w pliku wsadowym:
+16.1:Argument %1 staje się %0, argument %2 staje się %1, itd.
+
+# GOTO
+17.0:Kieruje przetwarzanie programu wsadowego do wiersza o określonej etykiecie.
+17.1:GOTO ETYKIETA
+17.2:ETYKIETA to ciąg znaków wykorzystany przez program wsadowy jako etykieta.
+17.3:Etykieta znajduje się w osobnym wierszu i jest poprzedzona dwukropkiem.
+17.10:Nie znaleziono etykiety
+
+# FOR
+18.0:Wykonuje określone polecenie na każdym pliku sposród zestawu plików.
+18.1:FOR %zmienna IN (zestaw) DO polecenie [parametry]
+18.2:%zmienna    nazwa zmiennej.
+18.3:(zestaw)    Jeden lub więcej wzorów plików lub komunikatów, oddzielone spacją.
+18.4:polecenie   polecenie do wykonania na każdym z pasujących plików.
+18.5:parametry   parametry lub przełączniki dla określonego polecenia.
+18.6:Aby użyć FOR w programie wsadowym, użyj %%zmienna zamiast %zmienna.
+18.7:FOR nie może być zagnieżdżone
+
+# VERIFY
+19.0:Włącza lub wyłącza sprawdzanie poprawności zapisu plików przez DOS.
+19.1:Wpisz VERIFY bez parametru aby wyświetlić aktualne ustawienie.
+19.2:VERIFY jest wyłączone
+19.3:VERIFY jest włączone
+19.4:Należy podać ON lub OFF
+
+# VER
+20.0:Wyświetla wersję DOS.
+20.1:Wersja jądra DOS %u.%u
+20.2:Wersja powłoki SvarCOM
+20.3:SvarCOM jest interpreterem poleceń dla systemów DOS kompatybilnych z MS-DOS 5+.
+20.4:To oprogramowanie jest udostępniane na zasadach licencji MIT.
+20.5:Rewizja %c
+20.6:DOS jest w %s
+20.7:pamięci konwencjonalnej
+20.8:HMA
+20.9:ROM
+20.10:prawdziwa wersja %u.%u
+
+# TYPE
+21.0:Wyświetla zawartość pliku tekstowego.
+21.1:TYPE [dysk:][ścieżka]nazwapliku
+
+# TIME
+22.0:Wyświetla lub ustawia czas systemowy.
+22.1:TIME [czas]
+22.2:Wpisz TIME bez parametrów aby wyświetlić aktualną godzinę, wraz z zapytaniem\r\no podanie nowej. Wciśnij ENTER aby zachować bieżącą godzinę.
+22.3:Aktualna godzina to
+22.4:Nieprawidłowy czas
+22.5:Podaj nową godzinę:
+
+# SET
+23.0:Wyświetla, ustawia lub usuwa zmienną środowiskową DOS.
+23.1:SET [zmienna=[ciąg znaków]]
+23.2:zmienna   Nazwa zmiennej środowiskowej
+23.3:ciąg zn.  Ciąg znaków przypisany do zmiennej
+23.4:Wpisz SET bez parametrów aby wyświetlić obecne zmienne środowiskowe.
+23.5:Brak miejsca w bloku pamięci środowiskowej
+
+# RD / RMDIR
+24.0:Usuwa (kasuje) katalog.
+24.1:RMDIR [dysk:]ścieżka
+24.2:RD [dysk:]ścieżka
+
+# REN / RENAME
+25.0:Zmienia nazwę jednego lub wielu plików bądź katalogu.
+25.1:RENAME [dysk:][ścieżka]plik1 plik2
+25.2:REN [dysk:][ścieżka]plik1 plik2
+25.3:Uwaga: nie możesz podać nowego dysku lub ścieżki dla pliku2\r\nUżyj MOVE aby przenieść pliki do innego katalogu.
+
+# REM
+26.0:Pozwala zapisać komentarze (uwagi) w pliku wsadowym.
+26.1:REM [komentarz]
+
+# PATH
+27.0:Wyświetla lub ustawia ścieżkę wyszukiwania plików wykonywalnych.
+27.1:PATH [[dysk:]ścieżka[;...]]
+27.2:Wpisz PATH ; aby wyczyścić ustawienia ścieżek wyszukiwania. DOS będzie\r\nwówczas przeszukiwał wyłącznie bieżący katalog.
+27.3:Wpisz PATH bez parametrów, aby wyświetlić bieżącą ścieżkę.
+27.4:Brak ścieżki PATH
+
+# MD / MKDIR
+28.0:Tworzy katalog.
+28.1:MKDIR [dysk:]ścieżka
+28.2:MD [dysk:]ścieżka
+
+# LN
+29.0:Dodaje, usuwa lub wyświetla wykonywalne linki.
+29.1:LN ADD nazwalinku katalogdocelowy
+29.2:LN DEL nazwalinku
+29.3:LN LIST [wzór]
+29.4:Nie znaleziono pasującego pliku wykonywalnego w podanej ścieżce.
+29.5:%DOSDIR% nie jest ustawione
+
+# EXIT
+30.0:Kończy program COMMAND.COM (interpreter poleceń).
+
+# ECHO
+31.0:Wyświetla komunikaty lub włącza bądź wyłącza wyświetlanie wykonywanych poleceń.
+31.1:ECHO [komunikat]
+31.2:Wpisz ECHO bez parametrów, aby wyświetlić bieżące ustawienie echa.
+31.3:ECHO jest włączone
+31.4:ECHO jest wyłączone
+
+# DATE
+32.0:Wyświetla lub ustawia datę systemową.
+32.1:DATE [data]
+32.2:Wpisz DATE bez parametrów, aby wyświetlić bieżącą datę i zapytanie o nową datę.\r\nNaciśnij ENTER, aby zachować tę samą datę.
+32.3:Nieprawidłowa data
+32.4:Aktualna data to
+32.5:Podaj nową datę:
+
+# PROMPT
+33.0:Zmienia znak zachęty poleceń systemu DOS.
+33.1:PROMPT [specyfikacja nowego znaku zachęty poleceń]
+
+# VOL
+34.0:Wyświetla etykietę woluminu dysku i numer seryjny, jeśli istnieją.
+34.1:VOL [dysk:]
+34.2:Wolumin w napędzie %c nie ma etykiety
+34.3:Wolumin w napędzie %c to %s
+34.4:Numer seryjny woluminu to %04X-%04X
+
+# IF
+35.0:Wykonuje przetwarzanie warunkowe w programach wsadowych.
+35.1:IF [NOT] ERRORLEVEL n polecenie
+35.2:IF [NOT] ciąg1=ciąg2 polecenie
+35.3:IF [NOT] EXIST nazwapliku
+35.4:NOT               wykonaj polecenie tylko jeśli warunek NIE jest spełniony
+35.5:ERRORLEVEL n      warunek: ostatni program zwrócił kod zakończenia >= n
+35.6:ciąg1==ciąg2      warunek: ciągi muszą być takie same
+35.7:EXIST nazwapliku  warunek: plik istnieje (dozwolone symbole wieloznaczne)
+35.8:polecenie         polecenie do wykonania, jeśli warunek jest spełniony
+
+# DEL / ERASE
+36.0:Usuwa jeden lub więcej plików.
+36.1:DEL [dysk:][ścieżka]nazwapliku [/P]
+36.2:ERASE [dysk:][ścieżka]nazwapliku [/P]
+36.3:[dyske:][ścieżka]nazwapliku  Określa plik(i) do skasowania.
+36.4:/P  Prosi o potwierdzenie przed usunięciem każdego pliku.
+36.5:Wszystkie pliki w katalogu zostaną usunięte!
+36.6:Czy na pewno?
+36.7:Usunąć?
+
+# DIR
+37.0:Wyświetla listę plików i podkatalogów w katalogu.
+37.1:DIR [dysk:][ścieżka][nazwapliku] [/P] [/W] [/A[:]atrybuty] [/O[:]sortowanie]]\r\n    [/S] [/B] [/L]
+37.2:/P Zatrzymuje się po każdej informacji na ekranie
+37.3:/W Używa formatu szerokiej listy
+37.4:/A Wyświetla pliki z określonymi atrybutami:
+37.5:    D Katalogi                R Pliki tylko do odczytu   H Pliki ukryte
+37.6:    A Pliki do archiwizacji   S Pliki systemowe          - przedrostek negujący
+37.7:/O Listuje pliki w posortowanej kolejności:
+37.8:    N według nazwy   S według rozmiaru     E według rozszerzenia
+37.9:    D według daty    G najpierw katalogi   - przedrostek odwracający kolejność
+37.10:/S Wyświetla pliki w podanym katalogu i wszystkich podkatalogach
+37.11:/B Używa uproszczonego formatu (bez nagłówka i podsumowania)
+37.12:/L Używa małych liter
+37.20:Katalog %s
+37.21:<KAT>
+37.22:plik(i)
+37.23:bajty
+37.24:bajty wolne
+
+# COPY
+38.0:Kopiuje jeden lub więcej plików do innej lokalizacji.
+38.1:COPY [/A|/B] źródło [/A|/B] [+źródło [/A|/B] [+...]] [cel [/A|/B]] [/V]
+38.2:źródło     Określa plik lub pliki, które mają być skopiowane
+38.3:/A         Wskazuje plik tekstowy ASCII
+38.4:/B         Wskazuje plik binarny
+38.5:cel        Określa katalog i/lub nazwę nowego pliku(ów)
+38.6:/V         Sprawdza, czy nowe pliki zostały poprawnie zapisane
+38.7:Aby połączać pliki, należy podać pojedynczy plik jako cel, ale wiele plików\r\nźródłowych (używając symboli wieloznacznych lub formatu plik1+plik2+plik3).
+38.8:UWAGA: /A i /B są ignorowane, podane tylko ze względu na kompatybilność.\r\nCOPY zakłada zawsze binaria.
+38.9:skopiowano %u plik(i)
+
+# TRUENAME
+39.0:Zwraca w pełni kwalifikowaną ścieżkę lub nazwę pliku.
+39.1:TRUENAME [dysk:][ścieżka]nazwapliku
+
+# DOS ERRORS
+255.1:Błędny numer funkcji
+255.2:Nie znaleziono pliku
+255.3:Nie znaleziono ścieżki
+255.4:Zbyt wiele otwartych plików (brak dostępnych uchwytów)
+255.5:Brak dostępu
+255.6:Nieprawidłowy uchwyt
+255.7:Zniszczony blok kontroli pamięci
+255.8:Niewystarczająca pamięć
+255.9:Nieprawidłowy adres bloku pamięci
+255.10:Nieprawidłowe środowisko
+255.11:Nieprawidłowy format
+255.12:Nieprawidłowy kod dostepu
+255.13:Nieprawidłowe dane
+255.15:Nieprawidłowy napęd
+255.16:Dokonano próby usunięcia bieżącego katalogu
+255.17:Nie to samo urządzenie
+255.18:Brak dalszych plików
+255.19:Dysk chroniony przed zapisem
+255.20:Nieznana jednostka
+255.21:Napęd nie jest gotowy
+255.22:Nieznane polecenie
+255.23:Błąd danych (CRC)
+255.24:Nieprawidłowa długość struktury zapytania
+255.25:Błąd wyszukiwania
+255.26:Nieznany typ nośnika (dysk niezgodny z DOS)
+255.27:Nie znaleziono sektora
+255.28:Brak papieru w drukarce
+255.29:Błąd zapisu
+255.30:Błąd odczytu
+255.31:Ogólna awaria
+255.32:Naruszenie zasad współdzielenia
+255.33:Naruszenie blokady
+255.34:Nieprawidłowa zmiana dysku
+255.35:Niedostępne FCB
+255.36:Przepełnienie bufora udostępniania
+255.37:Niezgodność strony kodowej
+255.38:Nie można ukończyć operacji na pliku (EOF / brak danych wejściowych)
+255.39:Za mało miejsca na dysku
+255.80:Plik już istnieje
