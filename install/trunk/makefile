@@ -28,7 +28,7 @@ deflang.c:
 	utf8tocp 852 si_utf8.txt > si.txt
 	utf8tocp 858 sv_utf8.txt > sv.txt
 	utf8tocp 857 tr_utf8.txt > tr.txt
-	..\svarlang.lib\tlumacz en br de fr it pl ru si sv tr
+	..\svarlang.lib\tlumacz en br de fr it pl ru si sv tr > tlumacz.log
 	if exist ..\deflang.c del ..\deflang.c
 	if exist ..\install.lng del ..\install.lng
 	move deflang.c ..
