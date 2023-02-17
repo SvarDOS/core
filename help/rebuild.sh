@@ -2,8 +2,8 @@
 #
 # builds AMB-based help files for each available language
 # this is a Linux shell script that requires following tools to be in path:
-#  - ambpack
-#  - utf8tocp
+#  - ambpack - http://amb.osdn.io/
+#  - utf8tocp - https://utf8tocp.sourceforge.io/
 #  - zip
 #
 
