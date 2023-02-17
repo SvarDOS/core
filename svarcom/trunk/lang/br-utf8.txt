@@ -3,7 +3,7 @@
 #
 # Language...: Portuguese Brazil
 # Authors....: Luzemário Dantas
-# Last update: 16 Feb 2023
+# Last update: 17 Feb 2023
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -26,15 +26,13 @@
 1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] commando]
 1.2:/D      Pula o processamento do AUTOEXEC.BAT (faz sentido só com /P)
 1.3:/E:nnn  define o tamanho do ambiente para nnn bytes
-1.4:/P      Torna o novo interpretador de comandos permanente e roda o
-AUTOEXEC.BAT
+1.4:/P      Torna o novo interpretador de comandos permanente e roda o AUTOEXEC.BAT
 1.5:/C      Executa o comando especificado e retorna
 1.6:/K      Executa o comando especificado e continua rodando
 1.7:/Y      Executa o programa em lote passo a passo (só com /P, /K or /C)
 
 # VARIOUS SVARCOM MESSAGES
-2.0:A VERSÃO DO SVARCOM MUDOU. SISTEMA INTERROMPIDO. POR FAVOR REINICIE SEU
-COMPUTADOR.
+2.0:A VERSÃO DO SVARCOM MUDOU. SISTEMA INTERROMPIDO. POR FAVOR REINICIE SEU COMPUTADOR.
 2.1:ERRO FATAL: rmod_install() falhou
 2.2:SvarCOM: estouro de pilha detectado, histórico de comandos esvaziado (isso\r\nnão é um bug)
 
@@ -106,7 +104,7 @@ COMPUTADOR.
 # VER
 20.0:Mostra as versões do kernel do DOS e do shell SvarCOM.
 20.1:Versão do kernel DOS %u.%u
-20.2:Shell SvarCOM ver 
+20.2:Shell SvarCOM ver
 20.3:O SvarCOM é um interpretador shell para kernels do DOS compatível com\r\nMS-DOS 5+.
 20.4:Este software é distribuído nos termos da licença MIT.
 20.5:Revisão %c
@@ -145,8 +143,7 @@ COMPUTADOR.
 25.0:Renomeia um ou mais arquivos ou diretórios.
 25.1:RENAME [drive:][caminho]nomevelho nomenovo
 25.2:REN [drive:][caminho]nomevelho nomenovo
-25.3:Note que você não pode especificar um novo drive ou caminho para nomenovo.
-Use MOVE para mover arquivos de um diretório para outro.
+25.3:Note que você não pode especificar um novo drive ou caminho para nomenovo.\r\nUse MOVE para mover arquivos de um diretório para outro.
 
 # REM
 26.0:Salva comentários (lembretes) em um arquivo de comandos em lote.
@@ -224,8 +221,7 @@ Use MOVE para mover arquivos de um diretório para outro.
 
 # DIR
 37.0:Mostra uma lista de arquivos e subdiretórios em um diretório.
-37.1:DIR [drive:][caminho][arquivo] [/P] [/W] [/A[:]atributos] [/O[[:]ordem]]
-    [/S] [/B] [/L]
+37.1:DIR [drive:][caminho][arquivo] [/P] [/W] [/A[:]atributos] [/O[[:]ordem]]\r\n    [/S] [/B] [/L]
 37.2:/P Pausa após cada preenchimento da tela
 37.3:/W Usa formato de lista longo
 37.4:/A Mostra arquivos com atributos específicos:
