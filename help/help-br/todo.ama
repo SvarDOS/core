@@ -1,5 +1,5 @@
 
-%hLista de itens a fazer do SvarDOS
+%hLista de itens a fazer (TO-DO list) do SvarDOS
 
 * Subistituir o editor padrão (edit do FreeDOS) com uma alternativa menor (?)
 que é:
@@ -7,22 +7,22 @@ que é:
   - relativamemte simples: sem necessidade de recursos de edição de texto
   	avançados, só o suficiente para confortavelmente editar aquivos de
   	configuração pequenos (<64K)
-  - compatível com 8086 e temha requerimentos de memória modestos
+  - compatível com 8086 e tenha requerimentos de memória modestos
   - multi-linguagem (biblioteca kitten)
-  - capaz de (limitado) copiar/colar entre dois arquivos
+  - capaz de copiar/colar (limitado) entre dois arquivos
 
 * trocar o FreeCOM por SvarCOM
 
 * melhorar o instalador, assim o usuário pode escolher o disco de destino.
 
 * ajustes do COUNTRY devem ser configuráveis pelo localcfg (e o usuário deve 
-	poder conseguir definir preferências locais através de um assistente fácil de
-	usar no momento da instalação).
+	poder conseguir definir preferências locais através de um assistente fácil
+	de usar no momento da instalação).
 
-* suporte de rede fora da caixa (out-of-the box):
- - requer entregar montes de packet drivers com o SvarDOS... O CRYNWR deve ser
- 	parte do conjunto de instalação? Ou somente os drivers selecionados, mais
- 	populares? Ou talvez isso possa ser provido como um disco flexível 
+* suporte de rede fora da caixa (out-of-the-box):
+ - requer entregar montes de drivers de pacotes com o SvarDOS... O CRYNWR deve
+ 	ser parte do conjunto de instalação? Ou somente os drivers selecionados,
+ 	mais populares? Ou talvez isso possa ser provido como um disco flexível 
  	"suplemental"?
  - o usuário deve ser perguntado pelo modelo de sua placa de rede no momento da
  	instalação
@@ -32,8 +32,9 @@ que é:
 	invés de fazer uma chamada de sistema para o FDISK
   
 * help - escrever conteúdo mais útil!
-  - comandos básicos do DOS (diretórios, copiar/renomear/deletar arquivos, etc)
-  - arquivos de configuração comuns (autoexec, config.sys, pkg.cfg, wattcp.cfg)
+  - comandos básicos do DOS (diretórios, copiar/renomear/apagar arquivos, etc)
+  - arquivos de configuração comuns (autoexec.bat, config.sys, pkg.cfg,
+  wattcp.cfg)
   - guia de configuração de rede
   - básico de gerenciamento de memória
   - ...
@@ -54,6 +55,6 @@ que é:
 * possivelmente um monte de outras coisas
 
 
-                        =============================
+                        ==================================
                           %hQuer ajudar? %lcontact.ama:Entre em contato!
-                        =============================
+                        ==================================

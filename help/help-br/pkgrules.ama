@@ -3,15 +3,16 @@
 
 O SvarDOS é uma distribuição DOS que vem cheia de pacotes de terceiros.
 Com o tempo, os pacotes são atualizados e novos pacotes são adicionados.
-Contudo, o SvarDOS não é um CD de distribuilçao de shareware, nem é uma produção
-de "warez" de qualquer tipo. Cada software que é distribuído no SvarDOS deve
-estar de acordo com algumas regras de bom senso, como listado abaixo.
+Contudo, o SvarDOS não é um CD de distribuilçao de shareware, nem é uma
+produção de "warez" de qualquer tipo. Cada software que é distribuído no
+SvarDOS deve estar de acordo com algumas regras de bom senso, como listado
+abaixo.
 
 %hUtilidade Objetiva
 
 O software distribuído deve ser útil. Não há sentido em distribuir centenas de
-programas de "Hello World" por exemplo. O software deve ser usável como um 
-produto finalizado e conter alguns recursos que demosntrem que são procurados por
+programas de "Hello World" por exemplo. O software deve ser passível de uso
+como um produto finalizado, e conter alguns recursos que sejam desejáveis por
 pelo menos um subconjunto da base de usuários. Jogos são considerados úteis,
 desde que eles preencham seu objetivo de fornecer distração.
 
@@ -19,18 +20,18 @@ desde que eles preencham seu objetivo de fornecer distração.
 
 O programa empacotado deve exibir traços de qualidade razoável. Isso signidica
 que ele deve ter um comportamento determinístico, e ser livre de efeitos 
-colaterais indesejados ao computador do usuário (não travar, congelar, resultar
-em perda inesperada de dados, etc). Ele deve também instruções claras e não 
-ambíguas para o usuário, sobre como o programa foi pensado para ser usado.
+colaterais indesejados ao computador do usuário (não travar, reiniciar,
+resultar em perda inesperada de dados, etc). Ele deve também instruções claras
+e não ambíguas ao usuário, sobre como o programa foi pensado para ser usado.
 
 %hGrátis (sem custos)
 
-O programa deve ser gratiuito - isto é, disponível sem custo financeiro. Ele não
-tem que obedecer uma licença aporvada pela OSI ou ser open-source (mesmo isso
-sendo o ideal), mas pelo menos deve ser livre para uso pessoal, não-comercial.
-Isso inclui "Freeware", "postcardware", etc. "Shareware" também é aceitável,
-desde que a versão shareware do programa preencha as condições de utilidade, 
-qualidade e permita distribuição reempacotada.
+O programa deve ser gratiuito - isto é, disponível sem custo financeiro. Ele
+não tem de obedecer uma licença aporvada pela OSI ou ser open-source (mesmo
+isso sendo o ideal), mas pelo menos, deve ser livre para uso pessoal, não
+comercial. Isso inclui "Freeware", "postcardware", etc. "Shareware" também é
+aceitável, desde que a versão shareware do programa preencha as condições de
+utilidade, qualidade e permita distribuição reempacotada.
 
 %hDistribuição permitida
 

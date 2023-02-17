@@ -2,15 +2,17 @@
 %hGerenciamento de pacotes do SvarDOS
 
 Para instalar ou remover software no seu sistema SvarDOS, use o comando "pkg".
-pkg é um gerenciador de pacotes que permite instalar software novo dos pacotes 
-SvarDOS e remover software existente do sistema. Para aprender exatamente sobre
+
+pkg é um gerenciador de pacotes que permite instalar novo software dos pacotes 
+SvarDOS, e remover software existente do sistema. Para aprender mais sobre
 seu uso, digite pkg /? na linha de comando do shell do SvarDOS.
 
-Você pode obter muitos pacotes SvarDOS da página web do SvarDOS, em
+Você pode obter muitos pacotes SvarDOS na página web do SvarDOS, em
 <http://svardos.osdn.io>. Se seu sistema SvarDOS estiver conectado à internet,
-então você também poderá usar o comando "pkgnet". pkgnet é uma ferramenta de 
-rede que torna fácil pesquisar por pacotes SvarDOS no repositório e baixá-los
-diretamente. Digite pkgnet /? na linha de comando do shell do SvarDOS para
+você também poderá usar o comando "pkgnet". pkgnet é uma ferramenta de rede
+que facilita pesquisar pacotes SvarDOS no repositório e baixá-los diretamente.
+
+Digite pkgnet /? na linha de comando do shell do SvarDOS para
 aprender sobre o uso exato do pkgnet.
 
 Veja também:

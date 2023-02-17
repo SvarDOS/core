@@ -1,25 +1,26 @@
 
-Arquivos de pacote proveem uma forma fácil de gerenciar software no SvarDOS.
-Esses pacotes devem aderir a uma convenção estrita, assim podem ser manipulados
+Arquivos de pacote fornecem uma forma fácil de gerenciar software no SvarDOS.
+Os pacotes devem aderir a uma convenção estrita, assim podem ser manipulados
 corretamente pelo gerenciador de pacotes do SvarDOS.
 
 
 %hNomes de arquivo de pacotes
 
-Os nomes dos pacotes devem seguir algumas regras básicas. Devem ser de no máximo
-8 tetras de tamanho (mas não devem ser muito curtos também, pois um pacote com 1
-ou 2 letras no nome pode ser confuso), e não deve ser composto por caracters que
-não sejam a-b, 0-9 e '_'. Isso é para compatibilidade com o padrão de nomes de
-arquivo curtos (8+3) e sistemas de arquivo ISO 9660 (usados em CDROMs). O nome
-de arquivo do pacote sempre é seguido da extensão .SVP ("SvarDOS Package").
+Os nomes dos pacotes devem seguir algumas regras básicas. Devem ser de no
+máximo 8 caracteres alfanuméricos (mas também não devem ser muito curtos, pois
+um pacote com 1 ou 2 letras no nome pode ser confuso), e deve ser composto
+pelos caracteres a-b, 0-9 e '_'. Isso é devido a compatibilidade com o padrão
+de nomes de arquivo curtos (8+3) e sistemas de arquivo ISO 9660 (usados em
+CDROMs). O nome de arquivo do pacote sempre é seguido da extensão .SVP 
+("SvarDOS Package").
 
 
 %hArquivos de pacote
 
 O SvarDOS usa arquivos ZIP como formato de arquivo de pacote. Esse formato foi
-escolhido porque arquivos ZIP no DOS se tornaram de fato a maneira padrão para
-distribuir coleções de arquivos. Além disso, o formato de arquivo ZIP é bem
-documentado, bem suportado e em domínio público.
+escolhido porque os arquivos ZIP no DOS se tornaram de fato a maneira padrão
+para distribuir coleções de arquivos. Além disso, o formato de arquivo ZIP é
+bem documentado, bem suportado e em domínio público.
 
 Abaixo está a linha de comando recomendada que pode ser usada para criar um
 pacote para um programa chamado EXEMPLO usando info-zip:
@@ -34,10 +35,10 @@ Se você estiver usando o 7za (7-ZIP) para cirar seus pacotes, então use isso:
 %hEstrutura de diretórios dos pacotes
 
 A estrutura de diretórios de um pacote depende do tipo do pacote.
-Para os pacotes "core", nós temos isso:
+Para os pacotes "core", nós temos:
 
   APPINFO            Ponha o arquivo LSM do programa aqui
-  BIN                Binários, tais como aquivos exe e com
+  BIN                Binários, tais como aquivos EXE e COM
   DOC\PKGNAME        Documentação do pacote
   HELP               Usado SOMENTE pelo pacote "help"
   NLS\PKGNAME        Traduções (arquivos de linguagem NLS) do pacote
@@ -53,7 +54,7 @@ seguinte estrutura:
 
 Note o diretório PROGS acima. Essa é a categoria ao qual o pacote pertence.
 O instalador de pacotes pode mudar esse diretório no momento da instalação,
-dependendo das preferências do usuário. Categorias possíveis são listadas
+dependendo das preferências do usuário. As Categorias possíveis são listadas
 abaixo:
 
 Categoria | Descrição
@@ -70,7 +71,7 @@ pacotes CORE.
 
 Cada pacote DEVE conter um arquivo LSM em seu diretório "APPINFO". Esse arquivo
 LSM é um arquivo de texto que contém informação básica sobre o pacote. Seu
-formato é muito simples, deve conter pelo menos duas linhas:
+formato é muito simples, contendo pelo menos duas linhas:
 
   version: x.y.z
   description: descrição do pacote
@@ -82,25 +83,24 @@ SvarDOS.
 %hVersões dos pacotes
 
 A vesão presente no arquivo LSM foi pensada para refletir a versão do software
-empacotado, mas pode acontecer de um pacote precisar ser mudado para corrigir
-um problema estritamente relacionado ao pacote em si (por emeplo, um arquivo de
-documentação esquecido ou uma recompilação do binário usando um melhor jogo de
-opções...). Em tais casos, a versão do software não muda, mas a versão do pacote
-em sí precisa mudar, assim os usuários saberão que alguma coisa mudou. É aí onde
-as "Revisões do SvarDOS" entram. Um string de versão é basicamente o formato
-abaixo:
+empacotado, mas pode ocorrer de um pacote precisar ser mudado, para corrigir
+um problema estritamente relacionado ao pacote em si (por emeplo, um arquivo
+de documentação esquecido ou uma recompilação do binário usando um melhor jogo
+de opções...). Em tais casos, a versão do software não muda, mas a versão do
+pacote em sí precisa mudar, assim os usuários saberão que alguma coisa mudou.
+É aí onde as "Revisões do SvarDOS" entram. Um string de versão é basicamente o
+formato abaixo:
 
   UPSTREAM_VER[+SVARREV]
 
 UPSTREAM_VER é o exato string de versão informado pelo software. Ele pode ser
 qualquer coisa. Essa versão original (upstream) pode ser opcionalmente seguida
-por um sinal de mais "+" e a revisão do SvarDOS. No evento da versão upstream já
-conter um sinal de mais, a versão da revisão do SvarDOS é delimitada com um til
-"~".
+por um sinal de mais "+" e a revisão do SvarDOS. Se a versão upstream já tiver
+um sinal de mais, a versão da revisão do SvarDOS é delimitada com um til "~".
 
-A revisão do SvarDOS começa com 0 e incrementa por 1 cada vez que a dada revisão 
-upstream é reempacotada. A revisão SvarDOS reinicia sempre que a versão upstream
-mudar. A revisão SvarDOS com 0 é sempre oculta.
+A revisão do SvarDOS começa com 0 e incrementa em 1 por cada vez que a revisão 
+upstream é reempacotada. A revisão SvarDOS reinicia sempre que a versão
+upstream mudar. A revisão SvarDOS com 0 é sempre oculta.
 
 Exemplos:
 
@@ -108,7 +108,7 @@ FDISK 1.54      <- versão empacotada originalmente
 FDISK 1.54+1    <- o pacote mudou, mas não a versão upstream
 FDISK 1.55      <- a versão upstream incrementou, a rev do SvarDOS reinicia
 FDISK 1.55+1    <- nova versão do pacote, mas ainda contém FDISK 1.55
-FDISK 1.55+2    <- outra nova versão do pacote, etc
+FDISK 1.55+2    <- outra nova versão do pacote, etc.
 
 O string de versão inteiro de um pacote nunca deve exceder 16 caracteres.
 
@@ -117,9 +117,9 @@ O string de versão inteiro de um pacote nunca deve exceder 16 caracteres.
 
 Quando um software empacotado tiver arquivos de código fonte disponíveis, é 
 recomendado também arquivá-los. Nesse efeito, ponha os fontes num arquivo ZIP
-que tenha o mesmo nome do pacote, mas com uma extensão *.ZIP (em oposição a 
+que tenha o mesmo nome do pacote, mas com uma extensão *.ZIP (em oposição à 
 extensão *.SVP própria do pacote). O resultado é que o software empacotado
-seria distribuído com dois arquivos. Exemplo para o FDISK:
+será distribuído com dois arquivos. Exemplo para o FDISK:
 
 FDISK.SVP       <- binários (arquivo ZIP seguindo a estrutura SVP)
 FDISK.ZIP       <- fontes (arquivo ZIP não estruturado, livre)

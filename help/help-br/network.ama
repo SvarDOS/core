@@ -1,17 +1,18 @@
 
 %hRede
-Para ativar a conectividade de rede é necessário primeiro saber que tipo de
+Para ativar a conectividade de rede, é necessário primeiro saber que tipo de
 adaptador você tem, e obter um driver de pacotes (packet driver) adequado para 
-ele. O pacote "crynwr" contém montes de packet drivers para uma variaedade de
-adaptadores de rede. Também há um packet driver para placas Intel Pro no pacote
-e1000pkt, e um driver para placas AMD PC-NET no pacote pcntpk.
+ele. O pacote "crynwr" contém montes de drivers de pacotes para uma variaedade
+de adaptadores de rede. Também há um driver de pacotes para placas Intel Pro
+no pacote e1000pkt, e outro para placas AMD PC-NET no pacote pcntpk.
 
-Você precisa obter o packet driver para sua placa na máquina, e carregá-lo.
-Então, deve ser capaz de acessar a internet e pegar tudo mais que precisar 
-usando wget, htget, gopherus e outras aplicações habilitadas para rede.
+Você precisa obter o driver de pacotes adequado para sua placa na máquina, e
+depois carregá-lo. Assim, deverá ser possível acessar a internet e pegar tudo
+mais que precisar usando wget, htget, gopherus e outras aplicações habilitadas
+para rede.
 
-Note que packet drivers são em sua maioria para disponíveis para interfaces
-legadas. Se você tiver uma placa moderna, poderá não haver um packet driver
+Note que drivers de pacotes estão disponíveis em sua maioria para interfaces
+legadas. Se você tiver uma placa moderna, poderá não haver driver de pacotes
 disponível para ela.
 
 %hCOMPARTILHAMENTO DE ARQUIVOS
@@ -20,34 +21,33 @@ Talvez esses links possam fornecer algumas direções:
 <http://wiki.freedos.org/wiki/index.php/Networking_FreeDOS_-_MS_Client>
 <https://www.lazybrowndog.net/freedos/virtualbox/?page_id=374>
 
-Também há EtherDFS, que é uma solução muito leve e fácil para compartilhamenteo
+Também há EtherDFS, que é uma solução muito leve e fácil para compartilhamento
 entre DOS e Linux (mas requer um PC com Linux e algum entrendimento básico de
 como Linux funciona):
 <http://etherdfs.sourceforge.net/>
 
 %hVIRTUALBOX - DRIVER DE PACOTES
 
-O VirtualBox é capaz de emular uma placa de rede AMD PC-NET (você deve se
-certificar disso na configuração da sua VM, o VirtualBox chama de "PCnet-FAST
-III" e ela deve ser ajustada para "NAT"). Então, no SvarDOS você tem de instalar
-o pacote pcntpk.zip - não é necessário baixar, ele já está presente na imagem de
-instalação. Então deve ser simples assim:
+O VirtualBox é capaz de emular uma placa de rede AMD PC-NET (certifique-se
+disso na configuração da sua VM. O VirtualBox chama essa placa de "PCnet-FAST
+III" e ela deve ser ajustada para "NAT"). No SvarDOS, você deve instalar o
+pacote pcntpk.zip. Não é necessário baixar, ele já está presente na imagem de
+instalação. Deve ser simples assim:
 
 pkg install a:\pcntpk.zip
 
-Finalmente, carregue-o:
+Depois, carregue o driver para a memória:
 
 C:\DRIVERS\PCNTPK\PCNTPK INT=0x60
 
-...e está pronto. Daqui por diante, você deve conseguir pesquisar nos pacotes
-disponíveis online e isntalar software extra, por exemplo:
+...e está pronto. Daqui por diante, você deve conseguir pesquisar os pacotes
+disponíveis online e instalar software extra, por exemplo:
 
 pkgnet pull gopherus
 pkg install gopherus.zip
 
 (gopherus é um navegador gopher)
 
-Para pesquisar pela lista de pacotes disponíveis no repositório online, use
-isso:
+Para pesquisar a lista de pacotes disponíveis no repositório online, use:
 
 pkgnet search seu_termo_de_pesquisa
