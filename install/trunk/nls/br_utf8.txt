@@ -20,10 +20,10 @@
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Bem Vindo ao SvarDOS
 1.1:Por favor selecione seu idioma preferido da lista abaixo:
-1.5:O SvarDOS suporta differentes layouts de teclado. Escolha o layout de teclado preferido.
+1.5:O SvarDOS suporta diferentes layouts de teclado. Escolha o layout de teclado preferido.
 
 ### WELCOME SCREEN ###
-2.0:Você está pronto para instalar o SvarDOS: um sistema operacional livre, gratuito, compatível com sistema operacional MS-DOS, baseado no FreeDOS. O SvarDOS vem com uma variedade de aplicações de terceiros.\n\nALERTA: Se seu PC tem outro sistema operaçional instalado, esse sisitema pode não ser mais capaz de dar boot quando o SvarDOS for instalado.
+2.0:Você está pronto para instalar o SvarDOS: um sistema operacional livre, gratuito, compatível com sistema operacional MS-DOS, baseado no FreeDOS. O SvarDOS vem com uma variedade de aplicações de terceiros.\n\nALERTA: Se seu PC tem outro sistema operaçional instalado, esse sistema pode não ser mais capaz de dar boot quando o SvarDOS for instalado.
 
 ### DISK SETUP ###
 3.0:ERRO: Drive %c: não pode ser encontrado. Talvez seu disco rígido precise ser particionado primeiro. Por favor crie pelo menos uma partição primária no seu disco rígido, assim o SvarDOS pode ser instalado nele. Note, o SvarDOS requer pelo menos %d MiB de epaço em disco disponível.\n\nVocê pode usar a ferramenta de particionamento FDISK para criar a partição necessária manualmente, ou pode deixar o instalador particionar automaticamente. Você também pode abortar a instalação para usar o gerenciador de partições de sua escolha.
