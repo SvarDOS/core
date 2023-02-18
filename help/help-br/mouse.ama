@@ -1,49 +1,53 @@
 
-                            %h*** MOUSE SUPPORT ***
+                            %h*** SUPORTE A MOUSE ***
 
-To be able to use your mouse in your programs, you need a mouse driver.
-SvarDOS has no mouse driver by default, but there's a package for it.
-It's called CTMOUSE (CuteMouse). You need to install this package.
+Para usar o mouse em seus programas, é necessário um controlador (driver) para
+o mouse.
+O SvarDOS não tem um controlador de mouse por padrão, mas há um pacote para
+isso. Ele se chama CTMOUSE (CuteMouse). É necessário instalar esse pacote.
 
-%hINSTALLING CTMOUSE
+%hINSTALANDO O CTMOUSE
 
-If your SvarDOS system is connected to the internet, you can just type:
+Se o seu sistema SvarDOS estiver conectado a internet, só é preciso digitar:
 
  pkgnet pull ctmouse
  pkg install ctmouse.svp
 
-Otherwise you need to download 'ctmouse.svp' an another computer and supply it
-to your SvarDOS installation by, e.g., floppy disk or USB drive.
+Caso contrário, é necessário fazer o download do pacote 'ctmouse.svp' em outro
+computador e copiá-lo para sua instalação do SvarDOS usando por exemplo, um
+disquete ou dispositivo USB.
 
-Then type:
+Então digite:
 
- pkg install [<path to>]ctmouse.svp
+ pkg install [<caminho para>]ctmouse.svp
 
-%hLOADING CTMOUSE
+%hCARREGANDO O CTMOUSE
 
-If you don't care about the language CTMOUSE displays messages, then just add
-this line to your C:\AUTOEXEC.BAT. Messages will then be displayed in English.
+Se você não se importar com o idioma com que o CTMOUSE mostra as mensagens,
+adicione essa linha ao seu C:\AUTOEXEC.BAT. As mensagens serão mostradas em
+Inglês.
 
  C:\DRIVERS\CTMOUSE\CTMOUSE.EXE
 
-That's it! Now reboot your system to get the driver loaded.
+E pronto! Agora reinicie seu sistema para que o controlador carregue.
 
-But if you prefer CTMOUSE messages in your own language, check if CTMOUSE is
-available in that language by looking at the CTM-*.EXE files in the
-C:\DRIVERS\CTMOUSE\CTMOUSE\ directory.
+Mas se você prefere as mensgens do CTMOUSE em seu próprio idioma, verifique se
+o CTMOUSE está disponível no idioma vendo os arquivos CTM-*.EXE no diretório 
+C:\DRIVERS\CTMOUSE\CTMOUSE\
 
-BR means Brazilian Portuguese, DE stands for Deutsch (German), and so on.
-If you managed to find your language supported by CTMOUSE, then add this line
-to your C:\AUTOEXEC.BAT.
+BR significa Português do Brasil, DE significa Alemão, e assim por diante.
+Se você confirmar que seu idioma é suportado pelo CTMOUSE, então adicione essa
+linha ao seu C:\AUTOEXEC.BAT.
 
  C:\DRIVERS\CTMOUSE\CTMOUSE\CTM-xx.EXE
 
-(Where xx stands for your language code.)
+(Onde xx é o código de linguagem do seu idioma).
 
-%hLANGUAGE-AWARE AUTO-SETUP
+%hCONFIGURAÇÃO AUTOMÁTICA CONFORME IDIOMA
 
-To let CTMOUSE messages adapt to your SvarDOS system's language automatically,
-add the following lines to your C:\AUTOEXEC.BAT after the SET LANG=xx line.
+Para fazer as mensagens do CTMOUSE se adaptarem ao idioma do sistema SvarDOS
+automaticamente, adicione a seguintes linhas ao seu C:\AUTOEXEC.BAT, após a 
+linha SET LANG=xx.
 
  SET CTM_BASEPATH=C:\DRIVERS\CTMOUSE
  SET CTM_FULLPATH=%%CTM_BASEPATH%%\CTMOUSE\CTM-%%LANG%%.EXE
@@ -52,20 +56,22 @@ add the following lines to your C:\AUTOEXEC.BAT after the SET LANG=xx line.
  SET CTM_BASEPATH=
  SET CTM_FULLPATH=
 
-This will make your SvarDOS look for the translated CTMOUSE version first.
-If that does not exist, then it falls back to English.
+Isso fará o SvarDOS procurar a versão traduzida do CTMOUSE primeiro.
+Se ela não existir, ele voltará a usar o Inglês.
 
-%hMULTI-CONFIG SVARDOS SYSTEMS
+%hSISTEMAS SVARDOS MULTICONFIGURAÇÃO
 
-If you decided to have multiple configurations in your CONFIG.SYS/AUTOEXEC.BAT
-you would save the lines from paragraph LANGUAGE-AWARE AUTO-SETUP to a batch
-file, e.g., C:\BATCH\LOAD-CTM.BAT. Add an @ECHO OFF as the first line.
+Se você decidir ter múltiplas configurações em seus arquivos CONFIG.SYS e
+AUTOEXEC.BAT, salve as linhas do parágrafo CONFIGURAÇÃO AUTOMÁTICA CONFORME
+IDIOMA para um arquivo de comandos em lote (arquivo batch) como por exemplo,
+C:\BATCH\LOAD-CTM.BAT. Adicione um @ECHO OFF na primeira linha.
 
-Then you can spread the next line to your AUTOEXEC.BAT file, wherever needed.
+Assim, você poderá inserir a próxima linha no seu arquivo AUTOEXEC.BAT file,
+onde for necessário.
 
  CALL C:\BATCH\LOAD-CTM.BAT
 
-See also:
- * %lpkg.ama:SvarDOS packages management
- * %lnetwork.ama:Networking
+Veja também:
+ * %lpkg.ama:Gerenciamento de pacotes do SvarDOS
+ * %lnetwork.ama:Rede
  * C:\DRIVERS\CTMOUSE\DOC\CTMOUSE.TXT
