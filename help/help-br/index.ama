@@ -1,14 +1,16 @@
 
                             %h*** AJUDA DO SVARDOS ***
 
-Essa documentação de ajuda é uma coisa do tipo work-in-progress. Por enquanto,
-somente fornece conteúdo muito limitado. (gostaria de ajudar a fazê-la? 
-entre em contato conosco na %lcontact.ama:mailing list do SvarDOS%t!)
+Essa documentação de ajuda é um trabalho em andamento. Por enquanto somente
+fornece conteúdo bastante limitado. (gostaria de ajudar a fazê-la? 
+entre em contato conosco na %lcontact.ama:Lista de e-mail do SvarDOS%t!)
 
 === Capítulos ================================================================
 
+ * %lnls.ama:Visão Geral de Internacionalização e NLS
  * %lpkg.ama:Gerenciamento de pacotes (instalar/remover/atualizar software)
  * %lnetwork.ama:Rede
+ * %lmouse.ama:Suporte a mouse
 
  * %lfreedos.ama:SvarDOS vs FreeDOS: qual é a história?
  * %ltodo.ama:A lista "TODO" do projeto

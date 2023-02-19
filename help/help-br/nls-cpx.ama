@@ -1,126 +1,128 @@
-%hList of CPX files and their codepages
+%hLista dos arquivos CPX e suas páginas de código
 
 EGA.CPX
  437 - US
  850 - Latin-1
- 858 - Latin-1 with Euro instead of the dotless "i"
- 852 - Latin-2 (Eastern European)
- 853 - Latin-3 (Southern European)
- 857 - Latin-5 (Turkish)
+ 858 - Latin-1 com Euro ao invés do "i" sem ponto
+ 852 - Latin-2 (Leste Europeu)
+ 853 - Latin-3 (Sul da Europa)
+ 857 - Latin-5 (Turco)
 
 EGA2.CPX
- 859 - Latin-9 (= cp858 plus full french and estonian)
- 775 - Latin-7 (Baltic)
-1116 - Estonian
-1117 - Latvian
-1118 - Lithuanian (identical to CP 774)
-1119 - Lithuanian and Russian (identical to CP 772)
+ 859 - Latin-9 (= cp858 mais Francês completo e Estoniano)
+ 775 - Latin-7 (Báltico)
+1116 - Estoniano
+1117 - Letão
+1118 - Lituano (idêntico a CP 774)
+1119 - Lituano e Russo (idêntico a CP 772)
 
 EGA3.CPX
- 771 - Lithuanian and Russian (KBL)
- 772 - Lithuanian and Russian (identical to IBM CP 1119)
- 855 - Cyrillic-1
- 872 - Cyrillic-1 with Euro sign instead of the international currency sign
- 866 - Cyrillic-2 (Russian)
- 808 - Cyrillic-2 with Euro sign instead of the international currency sign
+ 771 - Lituano e Russo (KBL)
+ 772 - Lituano e Russo (idêntico a IBM CP 1119)
+ 855 - Cirílico-1
+ 872 - Cirílico-1 com símbolo do Euro invés de símbolo de moeda internacional
+ 866 - Cirílico-2 (Russo)
+ 808 - Cirílico-2 com símbolo do Euro invés de símbolo de moeda internacional
 
 EGA4.CPX
-61282 - Latvian and Russian ("RusLat")
-30010 - Cyrillic Gagauz and Moldovan
- 1125 - Cyrillic Ukrainian
-  848 - Cyrillic Ukrainian with Euro sign instead of international currency
- 1131 - Cyrillic Belarusian
-  849 - Cyrillic Belarusian with Euro sign instead of international currency
+61282 - Letão e Russo ("RusLat")
+30010 - Cirílico Gagauz e Moldavo
+ 1125 - Cirílico Ucraniano
+  848 - Cirílico Ucraniano com símbolo do Euro invés de símbolo de moeda 
+internacional
+ 1131 - Cirílico Belarusian
+  849 - Cirílico Belarusian com símbolo do Euro invés de símbolo de moeda 
+internacional
 
 EGA5.CPX
- 737 - Greek-2
- 851 - Greek (old codepage)
- 869 - Greek
- 858 - Multilingual Latin-1 with Euro
- 113 - Yugoslavian
- 852 - Latin-2 (Eastern European)
+ 737 - Grego-2
+ 851 - Grego (página de código antiga)
+ 869 - Grego
+ 858 - Multilingual Latin-1 com Euro
+ 113 - Iugoslavo
+ 852 - Latin-2 (Leste Europeu)
 
 EGA6.CPX
-59829 - Georgian
-60853 - Georgian with capital letters
-30008 - Cyrillic Abkhaz and Ossetian
-  899 - Armenian
-60258 - Azeri (Latin) and Russian
-58210 - Cyrillic Azeri
+59829 - Georgiano
+60853 - Georgiano com maiúsculas
+30008 - Cirílico Abkhaz e Ossetiano
+  899 - Armênio
+60258 - Azeri (Latino) e Russo
+58210 - Cirílico Azeri
 
 EGA7.CPX
-30011 - Cyrillic Russian Southern District
-30013 - Cyrillic Volga District - Turkic languages
-30014 - Cyrillic Volga District - Finno-ugric languages
-30017 - Cyrillic Northwestern District
-30018 - Tatar (Latin) and Russian
-30019 - Chechen (Latin) and Russian
+30011 - Cirílico Russo Distrito do Sul
+30013 - Cirílico Distrito Volga - Linguas Turcas
+30014 - Cirílico Distrito Volga - Finno-ugric languages
+30017 - Cirílico Northwestern District
+30018 - Tártaro (Latino) e Russo
+30019 - Checheno (Latino) e Russo
 
 EGA8.CPX
- 770 - Baltic
- 773 - Latin-7 (Baltic - old standard)
- 774 - Lithuanian
- 775 - Latin-7 (Baltic)
- 777 - Accented Lithuanian
- 778 - Accented Lithuanian
+ 770 - Báltico
+ 773 - Latin-7 (Báltic - sotaque antigo)
+ 774 - Lituano
+ 775 - Latin-7 (Báltico)
+ 777 - Lituano acentuado
+ 778 - Lituano acentuado
 
 EGA9.CPX
- 858 - Latin-1 with Euro
+ 858 - Latin-1 com Euro
  860 - Portugal
- 861 - Icelandic
- 863 - Canadian French
- 865 - Nordic
- 867 - Czech Kamenicky
+ 861 - Iceléico
+ 863 - Francês do Canadá
+ 865 - Nórdico
+ 867 - Tcheco Kamenicky
 
 EGA10.CPX
-  667 - Polish
-  668 - Polish (polish letters on cp852 codepoints)
-  790 - Polish Mazovia
-  991 - Polish Mazovia with Zloty sign
+  667 - Polonês
+  668 - Polonês (letras Polonesas em pontos de código cp852)
+  790 - Polonês Mazóvia
+  991 - Polonês Mazóvia com sinal Zloty
   852 - Latin-2
-57781 - Hungarian
+57781 - Húngaro
 
 EGA11.CPX
-  858 - Latin-1 with Euro
+  858 - Latin-1 com Euro
 30000 - Saami
-30001 - Celtic
-30004 - Greenlandic
-30007 - Latin
+30001 - Céltico
+30004 - Greenleico
+30007 - Latino
 30009 - Romani
 
 EGA12.CPX
-  858 - Latin-1 with Euro instead of the small dotless "i"
-  852 - Latin-2 (Eastern European)
+  858 - Latin-1 com Euro ao invés do "i" sem ponto
+  852 - Latin-2 (Leste Europeu)
 58335 - Kashubian
-30003 - Latin American
-30029 - Mexican
-30030 - Mexican II
+30003 - Latino Americano
+30029 - Mexicano
+30030 - Mexicano II
 
 EGA13.CPX
-  852 - Latin-2 (Eastern European)
-  895 - Czech Kamenicky (identical to CP 867)
-58152 - Cyrillic Kazakh with Euro
-59234 - Cyrillic Tatar
-62306 - Cyrillic Uzbek
-30002 - Cyrillic Tajik
+  852 - Latin-2 (Leste Europeu)
+  895 - Tcheco Kamenicky (idêntico a CP 867)
+58152 - Cirílico Cazaque com Euro
+59234 - Cirílico Tártaro
+62306 - Cirílico Uzebeque
+30002 - Cirílico Tadjique
 
 EGA14.CPX
-30006 - Vietnamese
-30012 - Cyrillic Russian Siberian and Far Eastern Districts
-30015 - Cyrillic Khanty
-30016 - Cyrillic Mansi
-30020 - Low saxon and frisian
+30006 - Vietnamita
+30012 - Cirílico Russo Siberiano e Distritos distantes do Leste
+30015 - Cirílico Khanty
+30016 - Cirílico Mansi
+30020 - Baixo Saxão e Frísio
 30021 - Oceania
 
 EGA15.CPX
-30023 - Southern Africa
-30024 - Northern and Eastern Africa
-30025 - Western Africa
-30026 - Central Africa
-30027 - Beninese
-30028 - Nigerien
+30023 - África do Sul
+30024 - África do Norte e do Leste
+30025 - África Oeste
+30026 - África Central
+30027 - Beninense
+30028 - Nigeriano
 
 EGA16.CPX
-  858 - Latin-1 with Euro instead of the small dotless "i"
-30005 - Nigerian
-30022 - Canadian First Nations
+  858 - Latin-1 com Euro ao invés do "i" sem ponto
+30005 - Nigeriano
+30022 - Primeiras Nações Canadenses

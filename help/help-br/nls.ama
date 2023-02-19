@@ -1,85 +1,87 @@
-%hInternationalization and NLS overview
+%hVisão Geral de Internacionalização e Suporte a Linguagem Nacional - NLS
 
-SvarDOS is a multi-language system, meaning that it can be set to operate in a
-variety of languages. This process comes in several distinct steps, all of
-which are preset inside AUTOEXEC.BAT by the SvarDOS installer during the
-installation of your system.
+O SvarDOS é um sistema multilinguagem. Isso quer dizer que ele pode ser
+configurado para operar em uma variedade de idiomas. Esse processo ocorre em
+diversos passos distintos. Todos são préconfigurados dentro do AUTOEXEC.BAT
+pelo instalador do SvarDOS durante a instalação do sistema.
 
-This article aims at explaining the basics to provide the user with enough
-knowledge to configure his system in the most common situations. For detailed
-information about advanced settings please consult the documentation of each
-of the mentioned programs.
+Esse artigo pretende explicar o básico, de forma a prover o usuário com
+conhecimento suficiente para configurar seu sistema nas situações mais comuns.
+Para informação detalhada sobre configurações avançadas, por favor consulte a
+documentação de cada um dos programas mencionados.
 
+%hExibindo mensagem em seu idioma
 
-%hOutputting message in your language
+A maioria dos programas CORE do SvarDOS são capazes de exibir suas mensagens
+em diferentes idiomas. Para saber qual idioma deve ser usado, eles olham duas
+variáveis de ambiente:
 
-The majority of CORE SvarDOS programs are able to output their messages in
-different languages. To know which language should be used, they look for two
-environment variables:
+LANG - o idioma para exibir as mensagens
+NLSPATH - fornece o caminho onde todos os arquivos de idioma são armazemanados
 
-LANG - the language to output messages in
-NLSPATH - provides the path where all language files are stored
-
-Example:
+Exemplo:
 
 SET LANG=FR
 SET NLSPATH=%DOSDIR%\NLS
 
 
-%hSetting up your video adapter to a suitable codepage
+%hConfigurando seu adaptador de vídeo para uma página de código adequada
 
-Many languages come with glyphs specific to their alphabet. That is why
-codepages have been designed - a codepage is a set of glyphs that are adapted
-to display one or more languages. The default codepage hardcoded into most
-video adapters is the 437 codepage, known as "US ASCII". Using this codepage
-requires no configuration, but outputting messages in a non-English language
-might require using a different codepage. Loading a user codepage requires an
-EGA or VGA card. Older cards (MDA, CGA, Hercules...) had a single codepage
-hardwired in their memory.
+Muitos idiomas vem com glifos específicos do seu alfabeto. E é para isso que
+as páginas de código foram projetadas - Uma página de código é um conjunto de
+glifos que são adaptados para serem exibidos em um ou mais idiomas. A página
+de código padrão gravada no hardware da maioria dos adaptadores de vídeo é a
+página 437, conhecida como "US ASCII". Para usar essa página de código, não é
+necessário configuração, mas exibir mensagens em idiomes diferentes do Inglês
+pode requerer o uso de uma paǵina de código deferente. A carga de uma página
+de código personalizada requer uma placa EGA ou VGA. Placas mais antigas (MDA,
+CGA, Hercules...) tem uma única página de código definida na ROM.
 
-Setting up a custom (non-437) codepage on your system requires the DISPLAY
-driver to be loaded. This driver is a TSR that makes sure to refresh the
-custom codepage whenever the video adapter reverts to its default one
-(typically after every video mode change).
+Configurar uma página de código personalizada (diferente da 437) no sistema
+requer que o controlador (driver) DISPLAY seja carregado. Esse controlador é
+um TSR (programa do tipo Termina e Fica Residente) que se certifica de
+atualizar a página de código personalizada sempre que o adaptador de vídeo
+retorna ao padrão (tipicamente após cada mudança no modo de vídeo).
 
-To load the DISPLAY driver, use this command:
+Para carregar o controlador DISPLAY, use esse comando:
 
 DISPLAY CON=(EGA,,1)
 
-Once DISPLAY is loaded, you may configure your video adapter with the codepage
-of your choice using the two commands below:
+Depois que o DISPLAY for carregado, você pode configurar seu adaptador de
+vídeo com a página de código de sua escolha usando os dois comandos abaixo:
 
-MODE CON CP PREP=((CODEPAGE) PATH-TO-THE-CPI-DEFINITION)
+MODE CON CP PREP=((CODEPAGE) CAMINHO-DA-DEFINIÇÃO-CPI)
 MODE CON CP SEL=CODEPAGE
 
-...where "CODEPAGE" is the identifier of your codepage, like 850, 991, etc and
-"PATH-TO-CPI-DEFINITION" is the full path to the CPI or CPX file that contains
-the definition of glyphs for the given codepage.
+...onde "CODEPAGE" é o identificador da sua página de código, como 850, 991,
+etc. e "CAMINHO-DA-DEFINIÇÃO-CPI" é o caminho completo para o arquivo CPI ou
+CPX que contém a definição dos glifos da página de código informada.
 
-Working example for the Polish language:
+Exemplo funcional para o idioma Polonês:
 
 MODE CON CP PREP=((991) C:\SVARDOS\CPI\EGA10.CPX)
 MODE CON CP SEL=991
 
-You may see the full list of available CPX files and the exact codepages that
-each of them contain here: %lnls-cpx.ama:List of CPX files and their codepages%t.
+Você pode ver a lista completa dos arquivos CPX disponíveis e as páginas de
+código exatas que cada um deles contém aqui: %lnls-cpx.ama:Lista dos aquivos
+CPX e suas páginas de código%t.
 
 
-%hKeyboard layout
+%hLayout de teclado
 
-Displaying country-specific glyphs is one thing, but typing them is another.
-To set up the keyboard layout suitable to your country, use the "KEYB" TSR.
+Mostrar glifos específicos de país é uma coisa, mas digitá-los é outra.
+Para configurar o layout de teclado adequado ao seu país, use o TSR "KEYB".
 
-Example: KEYB PL
+Exemplo: KEYB PL
 
 
-%hNLS settings
+%hConfigurações NLS
 
-A language is not only different words and glyphs, it is also different
-conventions for things like paper sizes, currency, units of measurement,
-battery sizes, time format, and many other.
+Uma linguagem não é só diferente em palavras e glifos, mas diferente também em
+convenções para coisas como tamanhos de papel, moeda, unidades de medida,
+tamanho de baterias, formato de hora, e muitas outras.
 
-DOS NLS support addresses a few of these variations through a standard,
-system-wide NLS API. In SvarDOS, this API can be configured through the
-LOCALCFG tool that generates a SYS file suitable for being loaded via a
-COUNTRY directive in CONFIG.SYS.
+O suporte NLS do DOS enredeça algumas dessas varações através de uma API
+padrão, à nível de sistema. No SvarDOS, essa API pode ser configurada através
+da ferramenta LOCALCFG que gera um arquivo SYS adequado para ser carregado por
+uma diretiva COUNTRY no CONFIG.SYS.
