@@ -4,7 +4,7 @@
 Essa página mostra o status de compatibilidade com 8086 para cada pacote 
 "CORE" do SvarDOS.
 
-%bPACOTE     VERSÃO   EXECUTÁVEL BSUM  8086 ok?*   Checado em
+%bPACOTE       VERSÃO   EXECUTÁVEL BSUM  8086 ok?*   Checado em
 amb        20201223      amb.com A11A     sim      2022-01-30
 attrib          2.1   attrib.com 2C15     sim      2022-01-30
 chkdsk   0.9.2 beta   chkdsk.exe E2A9     sim      2022-01-30
@@ -58,11 +58,11 @@ notas:
 01) Também contém versões traduzidas de cmd-de.com (Alemão) para cmd-tr.com
     (Turco)
 02) pce-ibmpc: operação indefinida [C1 04] -> Descompactar com UPX
-		funcionou.
+    funcionou.
 03) Substituído arquivo BSUM E20D. Usado UPX com opção "--8086".
 04) pce-ibmpc: operação indefinida [C1 e1] -> Necessário uma full rebuild.
 05) Substituído arquivo BSUM F098. Não há opção "-1" para o TC++. Usado UPX
-		com opção "--8086".
+    com opção "--8086".
 06) Sai com: "At least a 80386 is required."
 07) pce-ibmpc: reporta 1,024K de memória convencional, mas 0K livre.
 08) Sai com: "Must have at least a 386."
