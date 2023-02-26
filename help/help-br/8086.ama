@@ -48,11 +48,11 @@ tree          3.7.2     tree.com 2370     sim      2022-01-30
 (pcntpk)      03.10   pcntpk.com 38C7     sim      2022-01-30  **
 (udvd2)   30-Apr-13    udvd2.sys D3AB     sim      2022-01-30  09)
 
-* Executável faz seu trabalho normal ou sai com uma mensagem amigável sobre 
-	a CPU não suportada.
+* Executável faz seu trabalho normal ou sai com uma mensagem amigável sobre
+  a CPU não suportada.
 
-** Pacotes em parênteses não são pacotes "CORE", mas existem na mídia de 
-	 instalação de qualquer forma.
+** Pacotes em parênteses não são pacotes "CORE", mas existem na mídia de
+   instalação de qualquer forma.
 
 notas:
 01) Também contém versões traduzidas de cmd-de.com (Alemão) para cmd-tr.com
