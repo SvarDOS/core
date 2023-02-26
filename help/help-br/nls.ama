@@ -33,7 +33,7 @@ glifos que são adaptados para serem exibidos em um ou mais idiomas. A página
 de código padrão gravada no hardware da maioria dos adaptadores de vídeo é a
 página 437, conhecida como "US ASCII". Para usar essa página de código, não é
 necessário configuração, mas exibir mensagens em idiomes diferentes do Inglês
-pode requerer o uso de uma paǵina de código deferente. A carga de uma página
+pode requerer o uso de uma página de código deferente. A carga de uma página
 de código personalizada requer uma placa EGA ou VGA. Placas mais antigas (MDA,
 CGA, Hercules...) tem uma única página de código definida na ROM.
 
