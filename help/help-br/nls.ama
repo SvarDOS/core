@@ -2,18 +2,18 @@
 
 O SvarDOS é um sistema multilinguagem. Isso quer dizer que ele pode ser
 configurado para operar em uma variedade de idiomas. Esse processo ocorre em
-diversos passos distintos. Todos são préconfigurados dentro do AUTOEXEC.BAT
-pelo instalador do SvarDOS durante a instalação do sistema.
+diversos passos distintos. Todos são pré-configurados dentro do AUTOEXEC.BAT
+pelo instalador do SvarDOS, durante a instalação do sistema.
 
 Esse artigo pretende explicar o básico, de forma a prover o usuário com
 conhecimento suficiente para configurar seu sistema nas situações mais comuns.
-Para informação detalhada sobre configurações avançadas, por favor consulte a
+Para informação detalhada sobre configurações avançadas, favor consultar a
 documentação de cada um dos programas mencionados.
 
-%hExibindo mensagem em seu idioma
+%hExibindo mensagens em seu idioma
 
-A maioria dos programas CORE do SvarDOS são capazes de exibir suas mensagens
-em diferentes idiomas. Para saber qual idioma deve ser usado, eles olham duas
+A maioria dos programas CORE do SvarDOS são capazes de exibir mensagens em
+diferentes idiomas. Para saber qual idioma deve ser usado, eles verificam duas
 variáveis de ambiente:
 
 LANG - o idioma para exibir as mensagens
@@ -21,8 +21,8 @@ NLSPATH - fornece o caminho onde todos os arquivos de idioma são armazemanados
 
 Exemplo:
 
-SET LANG=FR
-SET NLSPATH=%DOSDIR%\NLS
+SET LANG=BR
+SET NLSPATH=%%DOSDIR%%\NLS
 
 
 %hConfigurando seu adaptador de vídeo para uma página de código adequada
@@ -32,16 +32,17 @@ as páginas de código foram projetadas - Uma página de código é um conjunto 
 glifos que são adaptados para serem exibidos em um ou mais idiomas. A página
 de código padrão gravada no hardware da maioria dos adaptadores de vídeo é a
 página 437, conhecida como "US ASCII". Para usar essa página de código, não é
-necessário configuração, mas exibir mensagens em idiomes diferentes do Inglês
+necessário configuração, mas exibir mensagens em idiomas diferentes do Inglês
 pode requerer o uso de uma página de código deferente. A carga de uma página
 de código personalizada requer uma placa EGA ou VGA. Placas mais antigas (MDA,
-CGA, Hercules...) tem uma única página de código definida na ROM.
+CGA, Hercules...) tem uma única página de código definida de forma permanente
+na ROM do adaptador.
 
 Configurar uma página de código personalizada (diferente da 437) no sistema
-requer que o controlador (driver) DISPLAY seja carregado. Esse controlador é
-um TSR (programa do tipo Termina e Fica Residente) que se certifica de
-atualizar a página de código personalizada sempre que o adaptador de vídeo
-retorna ao padrão (tipicamente após cada mudança no modo de vídeo).
+requer que o controlador DISPLAY seja carregado. Esse controlador é um TSR
+(programa do tipo Termina e Fica Residente) que se certifica de atualizar a
+página de código personalizada sempre que o adaptador de vídeo retorna ao
+padrão (tipicamente após cada mudança no modo de vídeo).
 
 Para carregar o controlador DISPLAY, use esse comando:
 
