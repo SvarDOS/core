@@ -1,0 +1,263 @@
+a.minibb {
+  text-decoration: none;
+}
+
+p.minibb-errstr {
+  color: #f11;
+  text-align: center;
+  font-size: 1.6em;
+  margin-bottom: 4em;
+  margin-top: 2em;
+}
+
+div.minibb-toolbar {
+  display: flex;
+  width: 100%;
+  background: none;
+  margin: 1.5em 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-bottom: 1px #999 dotted;
+  justify-content: flex-end;
+}
+
+div.minibb-toolbar a {
+  color: #11f;
+  text-decoration: none;
+  border-radius: 0.3em;
+  padding: 0.1em 0.5em;
+}
+
+div.minibb-toolbar a:hover {
+  color: #000;
+  background: #def;
+}
+
+div.minibb-toolbar form {
+  margin-bottom: 1px;
+  border: none;
+}
+
+div.minibb-toolbar form input {
+  border-radius: 0.2em;
+  border: 1px #888 solid;
+  font-size: 0.7em;
+  width: 9em;
+}
+
+a.minibb-threaditem {
+  display: block;
+  background: #f9f9f9;
+  width: 100%;
+  margin: 0.4em 0;
+  box-sizing: border-box;
+  padding: 0.25em 0.5em;
+  border: #eee;
+  border-radius: 0.3em;
+  text-decoration: none;
+}
+
+a.minibb-threaditem:hover {
+  background: #fe9;
+}
+
+a.minibb-threaditem h2 {
+  color: #000;
+  font-size: 1em;
+  font-weight: bold;
+  margin: 0 0 0.2em 0;
+  line-height: 1em;
+  text-align: left;
+  background: none;
+}
+
+a.minibb-threaditem p {
+  font-weight: normal;
+  margin: 0;
+  line-height: 1em;
+  font-size: 0.85em;
+  color: #555;
+}
+
+h2.minibb-threadtitle {
+  font-weight: bold;
+  font-size: 1.6em;
+  background: #eee;
+  color: #000;
+  border-radius: 0.3em;
+  border: 1px #ddd solid;
+  margin: 0.5em 0;
+  padding: 0 0.25em;
+}
+
+div.minibb-trip {
+  font-size: 0.6em;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: bold;
+  white-space: pre-line;
+  text-indent: 0;
+  line-height: 0.8em;
+  border: 1px #eee solid;
+  border-radius: 0.3em;
+  padding: 0.3em;
+  margin: 0 0 auto 0.2em;
+  background: #fff;
+  color: #111;
+}
+
+div.minibb-post {
+  margin: 0 0 1em 0;
+  padding: 0;
+  background: #fefefe;
+  border: 1px #777 solid;
+  border-radius: 0.3em;
+}
+
+div.minibb-postheader {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 0.5em 0.5em;
+  background: #ddd;
+  color: #111;
+}
+
+div.minibb-postauthor {
+  overflow-wrap: anywhere;
+}
+
+div.minibb-postbody {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  width: 100%;
+  padding: 0.7em 0.5em;
+  box-sizing: border-box;
+  line-height: 1.5;
+  color: #000;
+}
+
+div.minibb-postbody img {
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0.5em 0;
+  border: 1px #666 solid;
+  border-radius: 0.25em;
+}
+
+div.minibb-postbody blockquote {
+  font-style: italic;
+  opacity: 0.6;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+div.minibb-formbtns {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: center;
+  margin: 1em 0;
+}
+
+form.minibb {
+  width: 100%;
+  margin: 0;
+  padding: 0.5em;
+  border: 1px #bbb solid;
+  border-radius: 0.3em;
+  box-sizing: border-box;
+  background: #f7f7f7;
+}
+
+form.minibb div.minibb-formlabelgroup {
+  margin: 0.5em 0.6em 0.5em 0;
+  width: 24em;
+  max-width: 100%;
+}
+
+form.minibb div.minibb-formlabelgroup p {
+  text-indent: 0;
+  font-family: sans-serif;
+  font-size: 0.8em;
+  color: #555;
+  margin: 0;
+  line-height: 0.8em;
+}
+
+form.minibb div.minibb-formfields {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+form.minibb input, form.minibb textarea {
+  margin: 0.4em 0;
+  border: 1px #ddd solid;
+  border-radius: 0.3em;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+div.minibb-formbtns a, div.minibb-formbtns input {
+  color: #11d;
+  margin: 0 1em;
+  padding: 0.2em 0.5em;
+  border: 1px #ddd solid;
+  border-radius: 0.3em;
+  text-decoration: none;
+  line-height: 1em;
+  background: #fbfbfb;
+  font-size: 1em;
+  font-family: sans-serif;
+  box-sizing: border-box;
+  width: auto;
+}
+
+form.minibb textarea {
+  width: 100%;
+  box-sizing: border-box;
+  height: 20em;
+  resize: vertical;
+}
+
+div.minibb-formbtns a:hover, div.minibb-formbtns input:hover {
+  background: #fe9;
+}
+
+div.minibb-formcaptcha {
+  width: 100%;
+  text-align: center;
+  color: #333;
+  font-size: 0.85em;
+  margin: 0.5em auto 0 auto;
+}
+
+div.minibb-formcaptcha input {
+  width: auto;
+  margin: 0 0 0 0.5em;
+}
+
+a.minibb-searchresult {
+  text-decoration: none;
+  color: inherit;
+}
+
+a.minibb-searchresult div {
+  border: 1px #bbb solid;
+  margin-bottom: 1.4em;
+  padding: 0.2em 0.5em;
+  border-radius: 0.2em;
+}
+
+a.minibb-searchresult div p {
+  font-size: 0.9em;
+  opacity: 0.7;
+  text-indent: 0;
+  margin: 0;
+}
+
+a.minibb-searchresult div h1 {
+  text-align: left;
+  margin: 0 0 0.5em 0;
+  font-weight: bold;
+  font-size: 1.1em;
+  text-indent: 0;
+}
