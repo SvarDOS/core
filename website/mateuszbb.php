@@ -97,6 +97,8 @@ function getpreflang() {
 
 function mateuszbb_rss() {
   global $DATADIR;
+  global $RSS_TITLE;
+
   $db = new SQLite3($DATADIR . 'mateuszbb.sqlite3', SQLITE3_OPEN_READONLY);
   if (! $db) {
     echo "SQL ERROR: ACCESS DENIED\n";
@@ -113,22 +115,28 @@ function mateuszbb_rss() {
   echo '<?xml version="1.0" encoding="utf-8" ?>' . "\n";
   echo '<rss version="2.0">' . "\n";
   echo "<channel>\n";
-  echo "<title>Forum Ul Warré</title>\n";
-  echo "<link>https://ulwarre.pl/forum/</link>\n";
-  echo "<description>Forum na temat ula ojca Warré</description>\n";
+  echo "<title>" . htmlspecialchars($RSS_TITLE, ENT_XML1) . "</title>\n";
+  echo "<link>" . selfurl(). "</link>\n";
 
   while ($row = $sqlres->fetchArray()) {
     $rawtitle = file_get_contents($DATADIR . 'threads/' . $row['thread'] . '/title.txt');
     if (empty($rawtitle)) continue;
     $title = htmlspecialchars($rawtitle, ENT_XML1, 'UTF-8');
     $author = htmlspecialchars($row['author'], ENT_XML1, 'UTF-8');
-    $link = "https://ulwarre.pl/forum/{$row['thread']}#{$row['msgid']}";
+    if ($NICE_URLS) {
+      $link = selfurl();
+      if (substr($link, -1) !== '/') $link .= '/';
+      $link .= "{$row['thread']}";
+    } else {
+      $link = selfurl('thread=' . $row['thread']);
+    }
+    $link .= '#' . $row['msgid'];
     echo "<item>\n";
-    echo "<title>{$author} napisał(a) wiadomość w wątku '{$title}'</title>\n";
-    echo "<link>{$link}</link>\n";
-    echo "<description>{$author} napisał(a) wiadomość w wątku '{$title}'</description>\n";
+    echo "<title>{$author} @ '{$title}'</title>\n";
+    echo "<link>" . htmlspecialchars($link, ENT_XML1) . "</link>\n";
+    echo "<description>{$author} @ '{$title}'</description>\n";
     echo "<pubDate>" . date('r', $row['msgid']) . "</pubDate>\n";
-    echo "<guid>{$link}</guid>\n";
+    echo "<guid>" . htmlspecialchars($link, ENT_XML1) . "</guid>\n";
     echo "</item>\n";
   }
   $db->close();
