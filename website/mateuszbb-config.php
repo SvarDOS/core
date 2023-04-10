@@ -23,11 +23,6 @@ $SEARCH_API_URL = 'https://www.googleapis.com/customsearch/v1/siterestrict?key=A
 
 $RSS_TITLE = 'SvarDOS community forum';
 
-function selfurl($params = '') {
-  $r = 'http://svardos.org/?p=forum';
-  if (!empty($params)) $r .= '&' . $params;
-  return($r);
-}
-
+$SELFURL = 'http://svardos.org/?p=forum';
 
 ?>

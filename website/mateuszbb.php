@@ -112,6 +112,21 @@ function data_dluga($timestamp) {
 }
 
 
+function selfurl($params = '') {
+  global $SELFURL;
+  $r = $SELFURL;
+  if (!empty($params)) {
+    if (strrchr($SELFURL, '?')) {
+      $r .= '&';
+    } else {
+      $r .= '?';
+    }
+    $r .= $params;
+  }
+  return($r);
+}
+
+
 // returns an array with the list of languages requested by the browser, in
 // the order of preference
 function getpreflang() {
