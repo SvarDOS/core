@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <title>SvarDOS</title>
     <meta name="keywords" content="svardos,svarog386,freedos">
