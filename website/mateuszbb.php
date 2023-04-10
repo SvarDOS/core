@@ -504,7 +504,7 @@ if ((empty($action)) && ($thread < 0) && ($archiveyear <= 0)) {
 // wyświetl archiwum
 if ($archiveyear > 0) {
   echo '<div class="minibb-toolbar" id="title"><a href="' . selfurl() . '">' . $STR[$LANG]['backtocur'] . '</a></div>' . "\n";
-  echo "<h1>" . $STR[$LANG]['archives'] . " {$archiveyear}</h1>\n";
+  echo '<h2 class="minibb-threadtitle">' . $STR[$LANG]['archives'] . " {$archiveyear}</h2>\n";
   $threads = scandir($DATADIR . 'threads/', SCANDIR_SORT_ASCENDING);
   foreach ($threads as $t) {
     if (!preg_match('/^[0-9][0-9]*$/', $t)) continue; // skip anything that is not a thread id
