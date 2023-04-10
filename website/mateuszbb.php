@@ -45,6 +45,7 @@ $STR['en']['captcha'][3]  = 'check the LAST box';
 $STR['en']['captcha'][4]  = 'check the FIRST and LAST boxes';
 $STR['en']['captcha'][5]  = 'check the TWO LAST boxes';
 
+// PL translations by Mateusz Viste
 $STR['pl']['opnewthread'] = 'stwórz nowy wątek';
 $STR['pl']['newthread']   = 'Nowy wątek';
 $STR['pl']['latestentry'] = 'ostatni wpis:';
@@ -72,6 +73,35 @@ $STR['pl']['captcha'][2]  = 'zaznacz ŚRODKOWE pole';
 $STR['pl']['captcha'][3]  = 'zaznacz OSTATNIE pole';
 $STR['pl']['captcha'][4]  = 'zaznacz PIERWSZE i OSTATNIE pole';
 $STR['pl']['captcha'][5]  = 'zaznacz DWA OSTATNIE pola';
+
+// pt-BR translations courtesty of Luzemário Dantas
+$STR['pt']['opnewthread'] = 'abrir novo tópico';
+$STR['pt']['newthread']   = 'Novo tópico';
+$STR['pt']['latestentry'] = 'entrada mais recente:';
+$STR['pt']['searchterm']  = 'termo pesquisado:';
+$STR['pt']['noresults']   = 'Sem resultados';
+$STR['pt']['reply']       = 'responder';
+$STR['pt']['jumptoend']   = 'ir para o final';
+$STR['pt']['listthreads'] = 'lista de tópicos';
+$STR['pt']['author']      = 'autor:';
+$STR['pt']['address']     = 'endereço:';
+$STR['pt']['date']        = 'data:';
+$STR['pt']['nameornick']  = 'seu nome ou apelido';
+$STR['pt']['threadsubj']  = 'assunto';
+$STR['pt']['yourmsg']     = 'Sua mensagem';
+$STR['pt']['cancel']      = 'cancelar';
+$STR['pt']['send']        = 'enviar';
+$STR['pt']['archives']    = 'arquivos';
+$STR['pt']['backtocur']   = 'voltar ao tópico atuai';
+$STR['pt']['search']      = 'pesquisar';
+$STR['pt']['password']    = 'senha';
+$STR['pt']['optional']    = 'opcional';
+$STR['pt']['passhelp']    = 'Fornecer uma senha aqui vai gerar uma assinatura digital única na sua mensagem.';
+$STR['pt']['captcha'][1]  = 'marque a PRIMEIRA caixa';
+$STR['pt']['captcha'][2]  = 'marque a caixa do MEIO';
+$STR['pt']['captcha'][3]  = 'marque a ÚLTIMA caixa';
+$STR['pt']['captcha'][4]  = 'marque a PRIMEIRA e ÚLTIMA caixas';
+$STR['pt']['captcha'][5]  = 'marque as DUAS ÚLTIMAS caixas';
 
 // *****************************************************************
 
