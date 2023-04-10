@@ -19,10 +19,12 @@ $INITYEAR = 2023;
 // parametr solny dla funkcji crypt() - istotne tylko przy generowaniu tripkodów
 $TRIP_SALT = trim(file_get_contents($DATADIR . 'tripsalt.txt'));
 
-$SEARCH_API_URL = '';
+$SEARCH_API_URL = 'https://www.googleapis.com/customsearch/v1/siterestrict?key=AIzaSyCxLEZe7_LdeOBtPzs4LEbwXmr1bGERfDE&cx=8928515a857418bb5&q=';
+
+$RSS_TITLE = 'SvarDOS community forum';
 
 function selfurl($params = '') {
-  $r = '?p=forum';
+  $r = 'http://svardos.org/?p=forum';
   if (!empty($params)) $r .= '&' . $params;
   return($r);
 }
