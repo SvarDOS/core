@@ -41,7 +41,7 @@
 
 ### END SCREEN ###
 5.0:Seu computador irá reiniciar agora.\nPor favor remova o disco de instalação do drive.
-5.1:A instalação do SvarDOS terminou. Por favor reinicie seu computador agora.
+5.1:A instalação do SvarDOS terminou. Por favor reinicie seu computador\nagora.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Bem vindo ao SvarDOS! Digite 'HELP' se precisar de ajuda.
