@@ -21,6 +21,7 @@ div.minibb-toolbar {
   box-sizing: border-box;
   border-bottom: 1px #999 dotted;
   justify-content: flex-end;
+  flex-wrap: wrap-reverse;
 }
 
 div.minibb-toolbar a {
@@ -28,6 +29,7 @@ div.minibb-toolbar a {
   text-decoration: none;
   border-radius: 0.3em;
   padding: 0.1em 0.5em;
+  white-space: nowrap;
 }
 
 div.minibb-toolbar a:hover {
@@ -84,12 +86,12 @@ a.minibb-threaditem p {
 h2.minibb-threadtitle {
   font-weight: bold;
   font-size: 1.6em;
-  background: #eee;
+  background: #eda;
   color: #000;
   border-radius: 0.3em;
   border: 1px #ddd solid;
   margin: 0.5em 0;
-  padding: 0 0.25em;
+  padding: 0.3em 0.5em;
 }
 
 div.minibb-trip {
@@ -99,19 +101,19 @@ div.minibb-trip {
   white-space: pre-line;
   text-indent: 0;
   line-height: 0.8em;
-  border: 1px #eee solid;
+  border: 1px #999 solid;
   border-radius: 0.3em;
   padding: 0.3em;
   margin: 0 0 auto 0.2em;
-  background: #fff;
+  background: #ffc;
   color: #111;
 }
 
 div.minibb-post {
   margin: 0 0 1em 0;
   padding: 0;
-  background: #fefefe;
-  border: 1px #777 solid;
+  background: #fff;
+  border: 1px #888 solid;
   border-radius: 0.3em;
 }
 
@@ -120,8 +122,8 @@ div.minibb-postheader {
   flex-wrap: nowrap;
   justify-content: space-between;
   padding: 0.5em 0.5em;
-  background: #ddd;
-  color: #111;
+  background: #eda;
+  color: #000;
 }
 
 div.minibb-postauthor {
@@ -151,6 +153,33 @@ div.minibb-postbody blockquote {
   opacity: 0.6;
   font-size: 0.9em;
   margin: 0;
+}
+
+div.minibb-postbody form.editbtn {
+  float: right;
+  margin-left: 0.5em;
+  position: relative; /* mandatory for z-index to work */
+  z-index: 10; /* without this the form is not clickable when next to a blockquote */
+}
+
+div.minibb-postbody form.editbtn input {
+  background-color: #fe0;
+  color: #000;
+  padding: 0.2em;
+  border-radius: 0.25em;
+}
+
+div.minibb-postbody form.editbtn input:hover {
+  background-color: #ff0;
+}
+
+p.minibb-islockedmsg {
+  text-align: center;
+  text-indent: 0;
+  border: 1px #999 solid;
+  border-radius: 0.3em;
+  font-size: 0.9em;
+  color: #666;
 }
 
 div.minibb-formbtns {
@@ -196,6 +225,7 @@ form.minibb input, form.minibb textarea {
   border-radius: 0.3em;
   box-sizing: border-box;
   width: 100%;
+  font-family: inherit;
 }
 
 div.minibb-formbtns a, div.minibb-formbtns input {
@@ -235,6 +265,14 @@ div.minibb-formcaptcha {
 div.minibb-formcaptcha input {
   width: auto;
   margin: 0 0 0 0.5em;
+}
+
+div.minibb-formcaptcha span.minibb-cboxgroup {
+  white-space: nowrap;
+}
+
+div.minibb-formcaptcha span.minibb-cboxgroup input {
+  margin-left: 1em;
 }
 
 a.minibb-searchresult {
