@@ -528,7 +528,7 @@ static int preparedrive(char sourcedrv) {
       snprintf(buff, sizeof(buff), svarlang_strid(0x0300), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: could not be found. Note, that SvarDOS requires at least %d MiB of available disk space */
       switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY[mono], buff), -1, 5, list, -1)) {
         case 0:
-          sprintf(buff, "FDISK /AUTO %d", driveid);
+          sprintf(buff, "FDISK /PRI:MAX %d", driveid);
           system(buff);
           break;
         case 1:
@@ -544,7 +544,7 @@ static int preparedrive(char sourcedrv) {
       }
       /* write a temporary MBR which only skips the drive (in case BIOS would
        * try to boot off the not-yet-ready C: disk) */
-      sprintf(buff, "FDISK /AMBR %d", driveid);
+      sprintf(buff, "FDISK /LOADIPL %d", driveid);
       system(buff); /* writes BOOT.MBR into actual MBR */
       newscreen(2);
       putstringnls(10, 10, COLOR_BODY[mono], 3, 1); /* "Your computer will reboot now." */
