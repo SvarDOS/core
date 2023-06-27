@@ -2,12 +2,12 @@
 
               SVARLANG.LIB - THE SVARDOS TRANSLATION C LIBRARY
 
-                   Copyright (C) 2021-2022 Mateusz Viste
+                   Copyright (C) 2021-2023 Mateusz Viste
 
 
 
-SvarLANG is a library and tooling for enabling SvarDOS applications to easily
-support multiple languages.
+SvarLANG is a library and toolset for enabling SvarDOS applications to easily
+support multiple languages. It is part of the SvarDOS project.
 
 
 ### PREPARING TRANSLATION FILES ###
@@ -39,6 +39,12 @@ SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
   puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
 
 Read svarlang.h for more information about available functions.
+
+
+### ESCAPED CHARACTERS ###
+
+Translation strings may contain some escaped characters. At this time only the
+following escaped characters are supported: \r \n \t and \\
 
 
 ### DIRTY STRINGS ###
