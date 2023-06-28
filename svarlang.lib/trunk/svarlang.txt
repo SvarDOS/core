@@ -46,7 +46,7 @@ Read svarlang.h for more information about available functions.
 ### ESCAPED CHARACTERS ###
 
 Translation strings may contain some escaped characters. At this time only the
-following escaped characters are supported: \r \n \t and \\
+following escaped characters are supported: \e \r \n \t and \\
 
 
 ### DIRTY STRINGS ###

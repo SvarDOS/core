@@ -1,4 +1,8 @@
 
+20230628
+- added support for \e sequences in translation strings
+- implemented svarlang_getver()
+
 20220314
 - added support for flagging strings as being "dirty", eg: ?1.1:Hello, World
 

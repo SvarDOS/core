@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "version.h"
+#include "svarlang.h"
 
 
 struct bitmap {
@@ -113,6 +113,9 @@ static unsigned short unesc_string(char *linebuff) {
     strcpy(linebuff + i, linebuff + i + 1);
     if (linebuff[i] == 0) break;
     switch (linebuff[i]) {
+      case 'e':
+        linebuff[i] = 0x1B; /* ESC code, using hex because '\e' is not ANSI C */
+        break;
       case 'n':
         linebuff[i] = '\n';
         break;
