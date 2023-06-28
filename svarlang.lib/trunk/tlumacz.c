@@ -259,7 +259,7 @@ int main(int argc, char **argv) {
 
   fd = fopen("out.lng", "wb");
   if (fd == NULL) {
-    puts("ERR: failed to open or create SVARCOM.LNG");
+    puts("ERR: failed to open or create OUT.LNG");
     return(1);
   }
 
