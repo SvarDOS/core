@@ -2,19 +2,19 @@
 
                                 SVN QUICKSTART
 
-                [authored by Mateusz Viste, the 29th July 2023]
+                [authored by Mateusz Viste, the 29th June 2023]
 
 
 === INTRO =====================================================================
 
 This document is aimed at people that are committing changes to the SvarDOS
-svn repository: developers, packagers, translators...
+svn repository: developers, packagers, writers, translators...
 
 If you are reading this, then you probably received a write access to the
 SvarDOS svn server at svn.svardos.org, ie. a login and password.
 
 Subversion isn't hugely popular these days, hence people are less and less
-comfortable with it. But worry not - subversion is extremely straightforward!
+comfortable with it. But worry not - it's extremely straightforward!
 
 Here you will learn the few most basic operations that will allow you to
 interact with svn right away.
