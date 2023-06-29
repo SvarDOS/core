@@ -2,7 +2,7 @@
 # localcfg Makefile for OpenWatcom
 #
 
-SVARLANGVER=20220314
+SVARLANGVER=20230629
 
 all: localcfg.com
 
@@ -15,10 +15,12 @@ deflang.c: nls_lang\*.txt
 	cd nls_lang
 	utf8tocp 850 br_utf8.txt > br.txt
 	utf8tocp 850 de_utf8.txt > de.txt
+	utf8tocp 850 fr_utf8.txt > fr.txt
 	utf8tocp maz pl_utf8.txt > pl.txt
-	..\svarlang.lib\tags\$SVARLANGVER\tlumacz en br de pl > tlumacz.log
-	move out.lng ..\localcfg.lng
-	move deflang.c ..\
+	utf8tocp 857 tr_utf8.txt > tr.txt
+	..\svarlang.lib\tags\$SVARLANGVER\tlumacz en br de fr pl tr > tlumacz.log
+	move /y out.lng ..\localcfg.lng
+	move /y deflang.c ..\
 	cd ..
 
 clean: .SYMBOLIC
