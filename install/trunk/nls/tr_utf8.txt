@@ -1,13 +1,13 @@
 #
 # This is a localization file for the SvarDOS INSTALL program
 #
-# Language..: Turkish
-# Translator: anonymous
+# Language...: Turkish
+# Translators: Thraex (2016), Berki Yenigün (2023)
 #
 
 ### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
 0.0:SVARDOS KURULUMU
-0.1:SvarDOS'yı kur
+0.1:SvarDOS'ı kur
 0.2:DOS'a çık
 0.3:Disk bölümünü otomatik olarak oluştur
 0.4:FDISK disk bölümü oluşturma aracını çalıştır
@@ -17,21 +17,21 @@
 0.11:Yukarı/Aşağı = Unsur seç | Enter = Seçimi doğrula | ESC = Dos'a çık
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
-1.0:SvarDOS'ya hoş geldiniz
+1.0:SvarDOS'a hoş geldiniz
 1.1:Dilinizi aşağıdaki listeden seçiniz:
 1.5:SvarDOS değişik ülkelerde kullanılan klavye düzenlerini destekler. İstediğiniz klavye düzenini seçiniz.
 
 ### WELCOME SCREEN ###
-2.0:FreeDOS çekirdeğine dayalı, ücretsiz ve MS-DOS uyumlu bir işletim sistemi olan SvarDOS'yı kurmak üzeresiniz. SvarDOS çeşitli üçüncü parti uygulamaları sunar.\n\nİKAZ: Eğer PC'nizde başka bir işletim sistemi kuruluysa, bu sistem SvarDOS kurulduktan sonra başlamayabilir.
+2.0:FreeDOS çekirdeğine dayalı, ücretsiz ve MS-DOS uyumlu bir işletim sistemi olan SvarDOS'ı kurmak üzeresiniz. SvarDOS çeşitli üçüncü parti uygulamaları sunar.\n\nİKAZ: Eğer PC'nizde başka bir işletim sistemi kuruluysa, bu sistem SvarDOS kurulduktan sonra başlamayabilir.
 
 ### DISK SETUP ###
-3.0:HATA: %c: sürücüsü bulunamadı. Belki sabit diskinizde önce bölüm oluşturmanız gerekmektedir. Lütfen sabit diskinizde en az bir bölüm oluşturun ki SvarDOS o bölüme kurulabilsin. SvarDOS'nın en az %d MiB disk alanına ihtiyaç duyduğunu unutmayın.\n\nGerekli bölümü elle oluşturmak için FDISK bölüm oluşturma aracını kullanabilir ya da kurulumun diskinizde otomatik olarak bölüm oluşturmasına izin verebilirsiniz. Başka bir bölüm yöneticisi kullanmak için kurulumu iptal de edebilirsiniz.
+3.0:HATA: %c: sürücüsü bulunamadı. Belki sabit diskinizde önce bölüm oluşturmanız gerekmektedir. Lütfen sabit diskinizde en az bir bölüm oluşturun ki SvarDOS o bölüme kurulabilsin. SvarDOS'ın en az %d MiB disk alanına ihtiyaç duyduğunu unutmayın.\n\nGerekli bölümü elle oluşturmak için FDISK bölüm oluşturma aracını kullanabilir ya da kurulumun diskinizde otomatik olarak bölüm oluşturmasına izin verebilirsiniz. Başka bir bölüm yöneticisi kullanmak için kurulumu iptal de edebilirsiniz.
 3.1:Bilgisayarınız şimdi yeniden başlayacaktır.
 3.2:HATA: %c: sürücüsü çıkarılabilir bir cihazdır. Kurulum iptal edilmiştir.
 3.3:HATA: %c: biçimlendirilmemiş gözükmektedir.
 3.4:HATA: %c: sürücüsü yeteri kadar büyük değildir! SvarDOS en az %d MiB boyutunda bir diske ihtiyaç duyar.
 3.5:HATA: %c: sürücüsü boş değildir. SvarDOS, boş bir diske kurulmalıdır.\n\nDiski boşaltmak için şimdi biçimlendirebilirsiniz. Bununla beraber, bunun diskinizdeki TÜM GÜNCEL VERİLERİ SİLECEĞİNİ unutmayınız.
-3.6:SvarDOS'nın %c: sürücüsüne kurulumu başlamak üzeredir.
+3.6:SvarDOS'ın %c: sürücüsüne kurulumu başlamak üzeredir.
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
@@ -39,7 +39,7 @@
 
 ### END SCREEN ###
 5.0:Bilgisayarınız şimdi yeniden başlayacaktır.\nLütfen kurulum diskini sürücünüzden çıkarın.
-5.1:SvarDOS (build %s) kurulumu sona ermiştir. Restart your computer now.
+5.1:SvarDOS (derleme %s) kurulumu sona ermiştir. Bilgisayarınızı şimdi tekrar başlatın.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
-6.0:SvarDOS'ya hoş geldiniz! Yardıma ihtiyacınız varsa 'HELP' yazınız.
+6.0:SvarDOS'a hoş geldiniz! Yardıma ihtiyacınız varsa 'HELP' yazınız.
