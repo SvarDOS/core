@@ -1,0 +1,56 @@
+#
+# LOCALCFG language file
+#
+# Language...: French
+# Authors....: Berki Yenigün
+# Last update: 29 Jun 2023
+#
+
+### HELP SCREEN ###########################################################
+
+0.0:version
+0.1:crée ou édite les préférences locales de COUNTRY.SYS
+0.2:utilisation : localcfg [lecteur:][chemin][COUNTRY.SYS] [options]
+0.3:options :
+
+0.10:/country:XX définir le code de pays en XX (1=USA, 33=France, etc)
+0.11:/cp:XXX     adapter les données de pays pour la page de code XXX (ex : 850)
+0.12:/decim:X    reconfigurer le symbole décimal en 'X'
+0.13:/thous:X    reconfigurer le symbole des milliers en 'X'
+0.14:/datesep:X  définir le séparateur de date en  'X' (par exemple '/')
+0.15:/datefmt:X  définir le format de la date, peut être : MDY, DMY or YMD
+0.16:/timesep:X  définir le séparateur de temps en 'X' (par exemple ':')
+0.17:/timefmt:X  définir le format de l'horloge : 0=12h avec AM/PM ou 1=24h
+0.18:/curr:XXX   définir la devise en XXX (une chaîne de 1 à 4 caractères)
+0.19:/currpos:X  définir la position du symbole de devise sur X, où X est soit
+0.20:            0=la devise précède la valeur, 1=la devise suit la valeur et
+0.21:            2=la devise remplace le signe décimal
+0.22:/currspc:X  espace entre la devise et la valeur (0=non, 1=oui)
+0.23:/currprec:X la précision de la devise (nombre des chiffres décimaux, 0..9)
+0.24:/yesno:XY   définir la lettre 'Oui/Non' en XY (par défaut: YN)
+
+0.50:Si l'emplacement de COUNTRY.SYS n'est pas fourni, localcfg essayera de le
+0.51:charger depuis %DOSDIR%\CFG\COUNTRY.SYS
+
+
+### INFO SCREEN ###########################################################
+
+7.0:Code de pays............:
+7.1:Page de code............:
+7.2:Séparateur décimal......:
+7.3:Séparateur des milliers.:
+7.4:Format de la date.......:
+7.5:Format de l'heure.......:
+7.6:Caractères Oui/Non......:
+7.7:Exemple de devise.......:
+
+7.9:Assurez-vous que votre CONFIG.SYS contient cette directive :
+
+### ERROR MESSAGES ########################################################
+
+9.0:ERREUR : le chemin du fichier ne peut être fourni qu'une seule fois
+9.1:ERREUR : mauvais chemin vers le fichier
+9.2:ERREUR : échec de la lecture du fichier
+9.3:ERREUR : syntaxe de paramètre invalide
+9.4:ERREUR : le fichier n'est pas un COUNTRY.SYS valide
+9.5:ERREUR : le fichier n'a pas été créé avec LOCALCFG
