@@ -1,0 +1,149 @@
+
+
+                                SVN QUICKSTART
+
+                [authored by Mateusz Viste, the 29th July 2023]
+
+
+=== INTRO =====================================================================
+
+This document is aimed at people that are committing changes to the SvarDOS
+svn repository: developers, packagers, translators...
+
+If you are reading this, then you probably received a write access to the
+SvarDOS svn server at svn.svardos.org, ie. a login and password.
+
+Subversion isn't hugely popular these days, hence people are less and less
+comfortable with it. But worry not - subversion is extremely straightforward!
+
+Here you will learn the few most basic operations that will allow you to
+interact with svn right away.
+
+
+=== REPOSITORY CHECKOUT =======================================================
+
+This is one time action that you need to perform so your svn client pulls the
+current state of the SvarDOS repository to your disk. It's called a "checkout":
+
+  svn co svn://your.username@svn.svardos.org/svardos
+
+This will create a "svardos" directory on your disk. All further actions will
+be always performed from within this directory.
+
+
+=== PERIODIC UPDATES ==========================================================
+
+The repository changes with time, so you need to make sure that your local copy
+is always up to date. To do so, you only need to execute a single command from
+time to time. We call it an "update":
+
+  svn up
+
+
+=== ADD NEW FILES OR DIRECTORIES ==============================================
+
+If you need to create a new subdirectory somewhere in the repo, you can either
+ask your svn client to do it, or do it yourself and then ask your svn client to
+track it.
+
+Option 1:
+  svn mkdir newdir
+
+Option 2:
+  mkdir newdir
+  svn add newdir
+
+If you creates a new file (new translation, new package, new code file...), you
+need to tell svn about it so it starts to version it:
+
+  svn add newfile.txt
+
+Once done, you should review your changes and commit them (we will talk about
+it below).
+
+
+=== DELETE A FILE OR DIRECTORY ================================================
+
+Deleting a file or directory via svn is as simple as this:
+
+  svn del file_to_dele.txt
+  svn del dir_to_delete
+
+And of course, you need to commit the changes to apply them on the server.
+
+
+=== REVIEWING YOUR CHANGES BEFORE COMMIT ======================================
+
+You have done some changes on your local data, and are ready to push them to
+the server? Thath's great, but I encourage you to review your changes one last
+time, asking svn to list them.
+
+1. Display the list of changed files or directories:
+
+  svn st
+
+2. Display the difference between your local files and the server's content:
+
+  svn diff
+
+
+Both these operations will show you the state compared to the last known
+content of the server. To make sure nothing changed on the server in the mean
+time, you should update your local copy (svn up) beforehand.
+
+
+=== UNDOING (REVERTING) LOCAL CHANGES =========================================
+
+You made some huge mistake and would like to erase your local changes to revert
+back to the last known server's state? Easy:
+
+  svn revert file_or_dir_to_revert
+
+It is worth mentionning that this works even if you deleted your local copy of
+the file or dir.
+
+
+=== COMMIT ====================================================================
+
+Finally, you made your changes, reviewed them, made sure your local files are
+up to date, and are ready to push things to the server. Awesome. To push all
+your changes at once, do a general commit:
+
+  svn commit -m "short description of the changes"
+
+If you prefer to push your changed files in separate commits for a better
+visibility, then that' s no problem either:
+
+  svn commit -m "fixed bug #123" changed_file.c
+  svn commit -m "improved polish translations" pl.txt
+  svn commit -m "updated FDISK to ver 1.3.7" fdisk-1.3.7.svp fdisk-1.3.7.zip
+
+
+=== WHY SVN? ==================================================================
+
+Nowadays most project rely on git for their versioning. Many people think
+that's because of some technical superiority of git. I think that's rather a
+bandwagon trend.
+
+Of course I have nothing against git. It is a very impressive technology and an
+outstanding solution to the specific problem it was designed for: enabling
+collaboration of huge, unorganized teams on a complex code base while having no
+centralized authority. But when it comes to more limited projects, it is my
+opinion that git is an unnecessary complication that presents no added value
+over svn, while having a number of downsides:
+ - lack of a centrally managed repository,
+ - lack of monotonically increasing revisions,
+ - non-obvious usage,
+ - poor storage of binary files,
+ - inefficient client-side storage (stores the entire history)
+ - ...
+
+Subversion, on the other hand, is simpler due to its centralized nature.
+Syncing (updating) local files is both faster and leaner than with git, because
+svn cares only about the latest available revision, it does not keep the entire
+project's history on the client side. In a word - it's simpler, and I am always
+in favor of technical simplicity as long as it does not come with significant
+limitations.
+
+
+======================================================================= EOF ===
