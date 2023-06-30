@@ -1,6 +1,6 @@
 localcfg history file
 
-* localcfg ver xxxxxxxx
+* localcfg ver 20230630
  - added TR and FR translations, both kindly contributed by Berki Yenigun
 
 * localcfg ver 20230208
