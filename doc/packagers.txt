@@ -32,9 +32,9 @@ do is for you to pull the SvarDOS subversion tree. You must have obtained
 credentials to svn access already. To fetch the SvarDOS package repository
 to your local disk, use such svn checkout:
 
-$ svn co svn://YOURLOGIN@svn.svardos.org/svardos/packages svardos-packages
+$ svn co svn://YOURLOGIN@svn.svardos.org/svardos-pkgs
 
-It is a one time only action that should create a "svardos-packages" directory
+It is a one time only action that should create a "svardos-pkgs" directory
 on your disk. Inside you will find all SvarDOS packages.
 
 
@@ -45,7 +45,7 @@ in it. Great! To upload it to the SvarDOS online repo, copy your new package
 to your local svardos-packages directory. Then, instruct svn to add the new
 file(s) to the repo:
 
-$ cd svardos-packages
+$ cd svardos-pkgs
 $ svn add package-ver.svp
 $ svn add package-ver.zip   <-- optional, only if package has available sources
 
@@ -93,7 +93,7 @@ they proved to be harmful in some way, or if their licensing is not compatible
 with SvarDOS distribution, etc. Removing a package means deleting it from the
 svn repository and commiting the change. Example:
 
-$ cd svardos-packages
+$ cd svardos-pkgs
 $ svn del package.svp
 $ svn del package.zip       <-- only if zip with sources exists
 $ svn commit -m 'removed package PACKAGE_NAME because (reason here)'
