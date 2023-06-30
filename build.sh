@@ -2,7 +2,7 @@
 #
 # SvarDOS build script
 # http://svardos.org
-# Copyright (C) 2016-2022 Mateusz Viste
+# Copyright (C) 2016-2023 Mateusz Viste
 #
 # This script builds floppy and CD images. It should be executed each time that
 # a CORE package has been modified or the build script changed. This is usually
@@ -14,6 +14,7 @@
 ### parameters block starts here ############################################
 
 REPOROOT=`realpath ./packages`
+REPOROOTCORE=`realpath ./packages-core`
 CUSTFILES=`realpath ./files`
 
 GENISOIMAGE=''    # can be mkisofs, genisoimage or empty for autodetection
@@ -59,7 +60,7 @@ set -e
 
 
 # list of packages to be part of CORE (always installed)
-COREPKGS=`ls -1 'packages/core' | grep -o '^[a-z]*'`
+COREPKGS=`ls -1 'packages-core' | grep -o '^[a-z]*'`
 
 # list of packages to be part of EXTRA (only sometimes installed, typically drivers)
 EXTRAPKGS="pcntpk udvd2"
@@ -145,7 +146,7 @@ mkdir "$FLOPROOT"
 
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
-  cp "$REPOROOT/core/$pkg.svp" "$CDROOT/"
+  cp "$REPOROOTCORE/$pkg.svp" "$CDROOT/"
   echo "$pkg" >> "$FLOPROOT/install.lst"
 done
 
@@ -162,18 +163,18 @@ echo
 # prepare the content of the boot (install) floppy, unzipping everything
 # in lowercase (-L) to avoid any case mismatching later in the build process
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/svarcom.svp" command.com -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/display.svp" bin/display.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/edit.svp" bin/edit.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/fdisk.svp" bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/format.svp" bin/format.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/mem.svp" bin/mem.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/mode.svp" bin/mode.com -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/more.svp" bin/more.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/svarcom.svp" command.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/display.svp" bin/display.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/edit.svp" bin/edit.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/fdisk.svp" bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/format.svp" bin/format.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/mem.svp" bin/mem.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/mode.svp" bin/mode.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/more.svp" bin/more.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 
 # generate a simple autoexec.bat file
 echo '@ECHO OFF' > "$FLOPROOT/autoexec.bat"
@@ -273,10 +274,10 @@ echo 'ECHO  SVARDOS SETUP COMPLETED' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO   PLEASE RESTART DOSEMU' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO -------------------------' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO.' >> "$DOSEMUDIR/install.bat"
-unzip -Cj "$REPOROOT/core/kernel.svp" bin/kernel.sys -d "$DOSEMUDIR/"
-unzip -CLj "$REPOROOT/core/svarcom.svp" command.com -d "$DOSEMUDIR/"
+unzip -Cj "$REPOROOTCORE/kernel.svp" bin/kernel.sys -d "$DOSEMUDIR/"
+unzip -CLj "$REPOROOTCORE/svarcom.svp" command.com -d "$DOSEMUDIR/"
 mv "$DOSEMUDIR/command.com" "$DOSEMUDIR/cmd.com"
-unzip -Cj "$REPOROOT/core/pkg.svp" bin/pkg.exe -d "$DOSEMUDIR/"
+unzip -Cj "$REPOROOTCORE/pkg.svp" bin/pkg.exe -d "$DOSEMUDIR/"
 # CONFIG.SYS
 echo 'FILES=25' >> "$DOSEMUDIR/config.sys"
 echo 'DOS=HIGH,UMB' >> "$DOSEMUDIR/config.sys"
