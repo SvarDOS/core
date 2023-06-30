@@ -16,8 +16,10 @@ SvarDOS svn server at svn.svardos.org, ie. a login and password.
 Subversion isn't hugely popular these days, hence people are less and less
 comfortable with it. But worry not - it's extremely straightforward!
 
-Here you will learn the few most basic operations that will allow you to
-interact with svn right away.
+This is obviously not meant to be a complete manual of svn. Here you will learn
+the few most basic operations that will allow you to interact with svn right
+away. In case of more in-depth details about Subversion usage I recommend
+consulting the excellent SVN book at https://svnbook.red-bean.com/.
 
 
 === REPOSITORY CHECKOUT =======================================================
@@ -40,7 +42,7 @@ time to time. We call it an "update":
   svn up
 
 
-=== ADD NEW FILES OR DIRECTORIES ==============================================
+=== CREATE A NEW DIRECTORY ====================================================
 
 If you need to create a new subdirectory somewhere in the repo, you can either
 ask your svn client to do it, or do it yourself and then ask your svn client to
@@ -53,13 +55,13 @@ Option 2:
   mkdir newdir
   svn add newdir
 
+
+=== ADD A NEW FILE TO THE REPOSITORY ==========================================
+
 If you creates a new file (new translation, new package, new code file...), you
 need to tell svn about it so it starts to version it:
 
   svn add newfile.txt
-
-Once done, you should review your changes and commit them (we will talk about
-it below).
 
 
 === DELETE A FILE OR DIRECTORY ================================================
