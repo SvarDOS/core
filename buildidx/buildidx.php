@@ -1,7 +1,7 @@
 <?php /*
 
   SvarDOS repo index builder
-  Copyright (C) Mateusz Viste 2012-2022
+  Copyright (C) Mateusz Viste 2012-2023
 
   buildidx computes an index json file for the SvarDOS repository.
   it must be executed pointing to a directory that stores packages (*.svp)
@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  30 jun 2023: adapted for new CORE packages location (../packages-core)
   28 feb 2022: svarcom allowed to have a COMMAND.COM file without subdirectory
   24 feb 2022: added hardcoded hack to translate version 'x.xx' to '0.44' (NESticle)
   23 feb 2022: basic validation of source archives (not empty + matches an existing svp file)
@@ -36,7 +37,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20220228";
+$PVER = "20230630";
 
 
 // computes the BSD sum of a file and returns it
@@ -258,10 +259,10 @@ function str_head_is($haystack, $needle) {
 
 
 // returns an array that contains CORE packages (populated from the core subdirectory in pkgdir)
-function load_core_list($repodir) {
+function load_core_list($repodir_core) {
   $res = array();
 
-  foreach (scandir($repodir . '/core/') as $f) {
+  foreach (scandir($repodir_core) as $f) {
     if (!preg_match('/\.svp$/', $f)) continue;
     $res[] = explode('.', $f)[0];
   }
@@ -286,7 +287,7 @@ $pkgcount = 0;
 
 // load the list of CORE and MSDOS_COMPAT packages
 
-$core_packages_list = load_core_list($repodir);
+$core_packages_list = load_core_list($repodir . '/../packages-core/');
 $msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice comp cpidos debug defrag deltree diskcomp diskcopy display edit edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort svarcom swsubst tree undelete unformat xcopy');
 
 // do a list of all svp packages with their available versions and descriptions
@@ -307,7 +308,7 @@ foreach ($pkgfiles as $fname) {
 
   // skip (and warn about) non-svp
   if (!preg_match('/\.svp$/', $fname)) {
-    $okfiles = array('.', '..', '_cats.json', '_index.json', '_buildidx.log', 'core');
+    $okfiles = array('.', '..', '_cats.json', '_index.json', '_buildidx.log');
     if (array_search($fname, $okfiles) !== false) continue;
     echo "WARNING: wild file '{$fname} (this is either an useless file that should be removed, or a misnamed package or source archive)'\n";
     continue;
