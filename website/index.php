@@ -7,8 +7,15 @@
                     'help' => 'Help',
                     'forum' => 'Forum');
 
+  /* pages available through ?p=xxx but not listed in main menu */
+  $hidden_pages = array('files');
+
   $p = '';
-  if ((! empty($_GET['p'])) && (!empty($chapters[$_GET['p']]))) $p = $_GET['p'];
+  /* validate that ?p=xxx targets a valid subpage */
+  if (! empty($_GET['p'])) {
+    if (!empty($chapters[$_GET['p']]))) $p = $_GET['p'];
+    if (in_array($_GET['p'], $hidden_pages, true)) $p = $_GET['p'];
+  }
 
   if (empty($p)) {
     echo '<title>SvarDOS</title>';
