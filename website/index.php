@@ -13,7 +13,7 @@
   $p = '';
   /* validate that ?p=xxx targets a valid subpage */
   if (! empty($_GET['p'])) {
-    if (!empty($chapters[$_GET['p']]))) $p = $_GET['p'];
+    if (!empty($chapters[$_GET['p']])) $p = $_GET['p'];
     if (in_array($_GET['p'], $hidden_pages, true)) $p = $_GET['p'];
   }
 
