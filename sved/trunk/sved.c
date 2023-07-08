@@ -137,9 +137,27 @@ static void cursor_up(struct linedb *db, unsigned char *cursorposy) {
 
 static void cursor_eol(struct linedb *db, unsigned char *cursorposx, unsigned char screenw) {
   /* adjust xoffset to make sure eol is visible on screen */
-  if (db->xoffset >= db->cursor->len) db->xoffset = db->cursor->len - 1;
+  if (db->xoffset > db->cursor->len) db->xoffset = db->cursor->len - 1;
   if (db->xoffset + screenw - 1 <= db->cursor->len) db->xoffset = db->cursor->len - screenw + 2;
   *cursorposx = db->cursor->len - db->xoffset;
+}
+
+
+static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned char screenh) {
+  if (db->cursor->next != NULL) {
+    db->cursor = db->cursor->next;
+    if (*cursorposy < screenh - 2) {
+      *cursorposy += 1;
+    } else {
+      db->topscreen = db->topscreen->next;
+    }
+  }
+}
+
+
+static void cursor_home(struct linedb *db, unsigned char *cursorposx) {
+  *cursorposx = 0;
+  db->xoffset = 0;
 }
 
 
@@ -193,14 +211,7 @@ int main(int argc, char **argv) {
 
     k = keyb_getkey();
     if (k == 0x150) { /* down */
-      if (db.cursor->next != NULL) {
-        db.cursor = db.cursor->next;
-        if (cursorposy < screenh - 2) {
-          cursorposy++;
-        } else {
-          db.topscreen = db.topscreen->next;
-        }
-      }
+      cursor_down(&db, &cursorposy, screenh);
 
     } else if (k == 0x148) { /* up */
       cursor_up(&db, &cursorposy);
@@ -212,6 +223,9 @@ int main(int argc, char **argv) {
         } else {
           db.xoffset++;
         }
+      } else {
+        cursor_down(&db, &cursorposy, screenh);
+        cursor_home(&db, &cursorposx);
       }
 
     } else if (k == 0x14B) { /* left */
@@ -219,7 +233,7 @@ int main(int argc, char **argv) {
         cursorposx--;
       } else if (db.xoffset > 0) {
         db.xoffset--;
-      } else {
+      } else if (db.cursor->prev != NULL) { /* jump to end of line above */
         cursor_up(&db, &cursorposy);
         cursor_eol(&db, &cursorposx, screenw);
       }
