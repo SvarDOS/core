@@ -135,42 +135,20 @@ static void FJUMP(unsigned short handle, unsigned short bytes) {
 }
 
 
-int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
+int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
   unsigned short fd;
-  char buff[128];
+  char hdr[4];
   unsigned short buff16[2];
-  unsigned short i;
-
-  if (lang == NULL) return(-1);
-  if (nlspath == NULL) nlspath = ""; /* nlspath can be NULL, treat is as empty */
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */
 
-  TRYNEXTPATH:
-
-  /* skip any leading ';' separators */
-  while (*nlspath == ';') nlspath++;
-
-  /* copy nlspath to buff and remember len */
-  for (i = 0; (nlspath[i] != 0) && (nlspath[i] != ';'); i++) buff[i] = nlspath[i];
-  nlspath += i;
-
-  /* add a trailing backslash if there is none (non-empty paths empty) */
-  if ((i > 0) && (buff[i - 1] != '\\')) buff[i++] = '\\';
-
-  strcpy(buff + i, progname);
-  strcat(buff + i, ".lng");
-
-  fd = FOPEN(buff);
-  if (fd == 0xffff) { /* failed to open file - either abort or try next path */
-    if (*nlspath == 0) return(-2);
-    goto TRYNEXTPATH;
-  }
+  fd = FOPEN(fname);
+  if (fd == 0xffff) return(-1);
 
   /* read hdr, should be "SvL\33" */
-  if ((FREAD(fd, buff, 4) != 4) || (memcmp(buff, "SvL\33", 4) != 0)) {
+  if ((FREAD(fd, hdr, 4) != 4) || (memcmp(hdr, "SvL\33", 4) != 0)) {
     FCLOSE(fd);
     return(-3);
   }

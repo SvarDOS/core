@@ -37,7 +37,7 @@ TLUMACZ computes two files:
 Then, DEFLANG.C must be compiled and linked to your program along with
 SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
 
-  svarlang_load("myprogram", "pl", "."); /* load .\myprogram.lng */
+  svarlang_load("myprogram.lng", "pl");  /* load PL lang from myprogram.lng */
   puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
 
 Read svarlang.h for more information about available functions.

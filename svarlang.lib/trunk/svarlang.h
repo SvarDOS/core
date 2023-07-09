@@ -26,34 +26,33 @@
 #define SVARLANG_H
 
 /* library version */
-#define SVARLANGVER "20230630"
+#define SVARLANGVER "20230709"
 
 /* returns a pointer to a string with the SvarLANG's library version,
  * independently of the SVARLANGVER string above. */
 const char *svarlang_getver(void);
 
-/* loads translations for program progname, language lang, in paths.
+/* loads lang translations from file fname.
  *
  * only the two first letters of the lang strings are meaningful and they are
  * case insensitive.
  *
- * paths can be either a directory path (like "C:\DATA") or a list of paths
- * separated by a semicolon (example: "C:\DATA;.\LANGS;."). It may also be
- * NULL, in which case only the current directory will be searched.
- *
- * a typical call would be this: svarlang_load("myprog", "PL", NULL);
+ * a typical call would be: svarlang_load("myprog.lng", "PL");
  *
  * this function returns 0 on success, non-zero otherwise. It is still possible
  * to call svarlang_strid() after a load failure, the previously loaded
  * language will be used then, or the default language if no loading has been
  * done yet. */
-int svarlang_load(const char *progname, const char *lang, const char *paths);
+int svarlang_load(const char *fname, const char *lang);
 
 
-/* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH.
+/* this relies on getenv() to pull LANG and NLSPATH variables and looks
+ * for a translation file named "%NLSPATH%\progname.lng".
  * this call should be used only by "CORE" SvarDOS programs. */
-int svarlang_autoload(const char *progname);
+int svarlang_autoload_nlspath(const char *progname);
 
+/* alias to svarlang_autoload_nlspath() */
+int svarlang_autoload(const char *progname);
 
 /* Returns a pointer to the string "id". Does not require svalang_load() to be
  * executed, but then it will only return the reference language strings.
