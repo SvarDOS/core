@@ -53,7 +53,7 @@ int svarlang_autoload_exepath(const char *selfexe, const char *lang);
 
 /* this relies on getenv() to pull LANG and NLSPATH variables and looks
  * for a translation file named "%NLSPATH%\progname.lng".
- * this call should be used only by "CORE" SvarDOS programs. */
+ * this call should be used only by "CORE" SvarDOS / FreeDOS programs. */
 int svarlang_autoload_nlspath(const char *progname);
 
 /* Returns a pointer to the string "id". Does not require svalang_load() to be

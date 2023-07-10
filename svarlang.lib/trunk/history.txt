@@ -1,4 +1,5 @@
 xxxxxxxx
+- dropped svarlang_autoload() (replaced by more specialized functions below)
 - added svarlang_autoload_exepath() and svarlang_autoload_nlspath()
 - svarlang_load() simplified so it takes the target filename as an argument
 
