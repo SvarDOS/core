@@ -22,7 +22,24 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+/* if WITHSTDIO is enabled, then remap file operations to use the standard
+ * stdio amenities */
+#ifdef WITHSTDIO
+
+#include <stdio.h>   /* FILE, fopen(), fseek(), etc */
+typedef FILE* FHANDLE;
+#define FOPEN(x) fopen(x, "rb")
+#define FCLOSE(x) fclose(x)
+#define FSEEK(f,b) fseek(f,b,SEEK_CUR)
+#define FREAD(f,t,b) fread(t, 1, b, f)
+
+#else
+
 #include <i86.h>
+typedef unsigned short FHANDLE;
+
+#endif
+
 #include <stdlib.h>  /* NULL */
 #include <string.h>  /* memcmp(), strcpy() */
 
@@ -44,11 +61,14 @@ const char *svarlang_strid(unsigned short id) {
   }
 }
 
-
+/* routines below are simplified (dos-based) versions of the libc FILE-related
+ * functions. Using them avoids a dependency on FILE, hence makes the binary
+ * smaller if the application does not need to pull fopen() and friends */
+#ifndef WITHSTDIO
 static unsigned short FOPEN(const char *s) {
   unsigned short fname_seg = FP_SEG(s);
   unsigned short fname_off = FP_OFF(s);
-  unsigned short res = 0xffff;
+  unsigned short res = 0; /* fd 0 is already used by stdout so it's a good error value */
   _asm {
     push dx
     push ds
@@ -116,7 +136,7 @@ static unsigned short FREAD(unsigned short handle, void *buff, unsigned short by
 }
 
 
-static void FJUMP(unsigned short handle, unsigned short bytes) {
+static void FSEEK(unsigned short handle, unsigned short bytes) {
   _asm {
     push bx
     push cx
@@ -133,19 +153,19 @@ static void FJUMP(unsigned short handle, unsigned short bytes) {
     pop bx
   }
 }
-
+#endif
 
 int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
-  unsigned short fd;
   char hdr[4];
   unsigned short buff16[2];
+  FHANDLE fd;
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */
 
   fd = FOPEN(fname);
-  if (fd == 0xffff) return(-1);
+  if (!fd) return(-1);
 
   /* read hdr, should be "SvL\33" */
   if ((FREAD(fd, hdr, 4) != 4) || (memcmp(hdr, "SvL\33", 4) != 0)) {
@@ -158,7 +178,7 @@ int svarlang_load(const char *fname, const char *lang) {
 
     /* is it the lang I am looking for? */
     if (buff16[0] != langid) { /* skip to next lang */
-      FJUMP(fd, buff16[1]);
+      FSEEK(fd, buff16[1]);
       continue;
     }
 

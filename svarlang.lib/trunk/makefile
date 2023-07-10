@@ -5,9 +5,14 @@
 
 all: svarlngs.lib svarlngc.lib svarlngm.lib svarlngl.lib tlumacz.exe
 
-CFLAGS=-0 -wx -we -ox
+CFLAGS = -0 -wx -we -ox
 
-ALLFILES=auto_exe.c auto_nls.c svarlang.c version.c
+# uncomment this if you prefer that SvarLANG uses fopen() etc to handle files
+# instead of direct DOS calls. this might make the final program slightly
+# larger if it does not use FILE accesses already.
+#CFLAGS += -DWITHSTDIO
+
+ALLFILES = auto_exe.c auto_nls.c svarlang.c version.c
 
 svarlngs.lib: $(ALLFILES)
 	wcc $(CFLAGS) -ms auto_exe.c
