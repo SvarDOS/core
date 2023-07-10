@@ -22,56 +22,41 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h> /* _psp */
-#include <string.h> /* _fmemcpy() */
-#include <i86.h>    /* MK_FP() */
+#include <stdlib.h> /* NULL */
+#include <stdio.h>
 
 #include "svarlang.h"
 
-int svarlang_autoload_exepath(const char *lang) {
-  unsigned short far *psp_envseg = MK_FP(_psp, 0x2c); /* pointer to my env segment field in the PSP */
-  char far *myenv = MK_FP(*psp_envseg, 0);
-  unsigned short len;
-  char orig_ext[3];
+int svarlang_autoload_exepath(const char *selfexe, const char *lang) {
+  unsigned short selflen;
+  char self_ext_backup[3];
+  char *self_ext_ptr;
   int res;
 
-  /* who am i? look into my own environment, at the end of it should be my EXEPATH string */
-  while (*myenv != 0) {
-    /* consume a NULL-terminated string */
-    while (*myenv != 0) myenv++;
-    /* move to next string */
-    myenv++;
-  }
-  myenv++; /* skip the nul terminator */
+  /* validate selfexe: must be at least 5 bytes long and 4th char from end must
+   * be a dot (like "a.exe" or "c:\b.com" or "..\..\test\run.exe") */
+  if (selfexe == NULL) return(-1);
+  for (selflen = 0; selfexe[selflen] != 0; selflen++);
+  if ((selflen < 5) || (selfexe[selflen - 4] != '.')) return(-2);
 
-  /* check next word, if 1 then EXEPATH follows */
-  if (*myenv != 1) return(-1);
-  myenv++;
-  if (*myenv != 0) return(-1);
-  myenv++;
-
-  /* myenv contains my full name, find end of string now */
-  for (len = 0; myenv[len] != 0; len++);
-
-  /* must be at least 5 bytes long and 4th char from end must be a dot (like "a.exe") */
-  if ((len < 5) || (myenv[len - 4] != '.')) return(-1);
+  self_ext_ptr = (char *)selfexe + selflen - 3; /* disregard CONST (I revert original content later, so the caller won't notice */
 
   /* copy extension to buffer and replace it with "lng" */
-  orig_ext[0] = myenv[len - 3];
-  orig_ext[1] = myenv[len - 2];
-  orig_ext[2] = myenv[len - 1];
+  self_ext_backup[0] = self_ext_ptr[0];
+  self_ext_backup[1] = self_ext_ptr[1];
+  self_ext_backup[2] = self_ext_ptr[2];
 
-  myenv[len - 3] = 'L';
-  myenv[len - 2] = 'N';
-  myenv[len - 1] = 'G';
+  self_ext_ptr[0] = 'L';
+  self_ext_ptr[1] = 'N';
+  self_ext_ptr[2] = 'G';
 
   /* try loading it now */
-  res = svarlang_load(myenv, lang); /* TODO FIXME myenv is a far pointer, while svarlang_load() in small or medium memory models expects a near ptr */
+  res = svarlang_load(selfexe, lang);
 
   /* restore the original filename and quit */
-  myenv[len - 3] = orig_ext[0];
-  myenv[len - 2] = orig_ext[1];
-  myenv[len - 1] = orig_ext[2];
+  self_ext_ptr[0] = self_ext_backup[0];
+  self_ext_ptr[1] = self_ext_backup[1];
+  self_ext_ptr[2] = self_ext_backup[2];
 
   return(res);
 }

@@ -46,8 +46,10 @@ const char *svarlang_getver(void);
 int svarlang_load(const char *fname, const char *lang);
 
 /* tries loading lang strings from a file located in the executable's
- * directory that is named like the executable but with an *.LNG extension */
-int svarlang_autoload_exepath(const char *lang);
+ * directory that is named like the executable but with an *.LNG extension.
+ * selfexe should point to the executable's full filename path (either relative
+ * or absolute). You may want to pass argv[0] or __argv[0] there. */
+int svarlang_autoload_exepath(const char *selfexe, const char *lang);
 
 /* this relies on getenv() to pull LANG and NLSPATH variables and looks
  * for a translation file named "%NLSPATH%\progname.lng".
