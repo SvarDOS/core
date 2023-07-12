@@ -5,13 +5,14 @@
 
 CC = wcc
 CFLAGS = -0 -mc -os -wx -we -d0 -I=mdr\inc
+CFLAGS += -s
 LDFLAGS = -lr -fm=sved.map -fe=sved.exe
-LDLIBS = svarlang.lib\20230630\svarlngc.lib mdr\mdrc2023.lib
+LDLIBS = svarlang\svarlngc.lib mdr\mdrc2023.lib
 
 all: sved.exe
 
-sved.exe: sved.obj
-	wcl sved.obj $(LDLIBS) $(LDFLAGS)
+sved.exe: sved.obj deflang.obj
+	wcl $(LDLIBS) sved.obj deflang.obj $(LDFLAGS)
 
 .c.obj: .autodepend
 	$(CC) $(CFLAGS) $*.C

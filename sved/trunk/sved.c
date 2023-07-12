@@ -1,11 +1,14 @@
 /* */
 
-#include <stdio.h>
+#include <dos.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "mdr\cout.h"
 #include "mdr\keyb.h"
+
+#include "svarlang\svarlang.h"
 
 #define COL_TXT        0
 #define COL_STATUSBAR1 1
@@ -70,7 +73,7 @@ void load_colorscheme(void) {
 }
 
 
-void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname) {
+static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname) {
   unsigned char i;
   const char *s = "HELP";
   unsigned char helpcol = screenw - (strlen(s) + 4);
@@ -93,41 +96,58 @@ void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname) {
 }
 
 
-void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh) {
+static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto) {
   unsigned char y = 0;
   unsigned char len;
   struct line *l;
 
+  /* DEBUG TODO FIXME */
+  static char m = 'a';
+  m++;
+  if (m > 'z') m = 'a';
+
   for (l = db->topscreen; l != NULL; l = l->next) {
+
+    /* skip lines that do not to be refreshed */
+    if ((y < uidirtyfrom) || (y > uidirtyto)) continue;
+
     if (db->xoffset < l->len) {
       len = mdr_cout_str(y, 0, l->payload + db->xoffset, scheme[COL_TXT], screenw - 1);
     } else {
       len = 0;
     }
     while (len < screenw - 1) mdr_cout_char(y, len++, ' ', scheme[COL_TXT]);
+
+    /* FIXME DEBUG */
+    mdr_cout_char(y, 0, m, scheme[COL_STATUSBAR1]);
+
     if (y == screenh - 2) break;
     y++;
   }
 }
 
 
-static void check_cursor_not_after_eol(struct linedb *db, unsigned char *cursorpos) {
+static void check_cursor_not_after_eol(struct linedb *db, unsigned char *cursorpos, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->xoffset + *cursorpos <= db->cursor->len) return;
 
   if (db->cursor->len < db->xoffset) {
     *cursorpos = 0;
     db->xoffset = db->cursor->len;
+    *uidirtyfrom = 0;
+    *uidirtyto = 0xff;
   } else {
     *cursorpos = db->cursor->len - db->xoffset;
   }
 }
 
 
-static void cursor_up(struct linedb *db, unsigned char *cursorposy) {
+static void cursor_up(struct linedb *db, unsigned char *cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->cursor->prev != NULL) {
     db->cursor = db->cursor->prev;
     if (*cursorposy == 0) {
       db->topscreen = db->cursor;
+      *uidirtyfrom = 0;
+      *uidirtyto = 0xff;
     } else {
       *cursorposy -= 1;
     }
@@ -135,41 +155,59 @@ static void cursor_up(struct linedb *db, unsigned char *cursorposy) {
 }
 
 
-static void cursor_eol(struct linedb *db, unsigned char *cursorposx, unsigned char screenw) {
+static void cursor_eol(struct linedb *db, unsigned char *cursorposx, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   /* adjust xoffset to make sure eol is visible on screen */
-  if (db->xoffset > db->cursor->len) db->xoffset = db->cursor->len - 1;
-  if (db->xoffset + screenw - 1 <= db->cursor->len) db->xoffset = db->cursor->len - screenw + 2;
+  if (db->xoffset > db->cursor->len) {
+    db->xoffset = db->cursor->len - 1;
+    *uidirtyfrom = 0;
+    *uidirtyto = 0xff;
+  }
+
+  if (db->xoffset + screenw - 1 <= db->cursor->len) {
+    db->xoffset = db->cursor->len - screenw + 2;
+    *uidirtyfrom = 0;
+    *uidirtyto = 0xff;
+  }
   *cursorposx = db->cursor->len - db->xoffset;
 }
 
 
-static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned char screenh) {
+static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->cursor->next != NULL) {
     db->cursor = db->cursor->next;
     if (*cursorposy < screenh - 2) {
       *cursorposy += 1;
     } else {
       db->topscreen = db->topscreen->next;
+      *uidirtyfrom = 0;
+      *uidirtyto = 0xff;
     }
   }
 }
 
 
-static void cursor_home(struct linedb *db, unsigned char *cursorposx) {
+static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   *cursorposx = 0;
-  db->xoffset = 0;
+  if (db->xoffset != 0) {
+    db->xoffset = 0;
+    *uidirtyfrom = 0;
+    *uidirtyto = 0xff;
+  }
 }
 
 
 int main(int argc, char **argv) {
-  FILE *fd;
+  int fd;
   const char *fname = NULL;
   char buff[1024];
   struct linedb db;
   unsigned char screenw = 0, screenh = 0;
   unsigned char cursorposx = 0, cursorposy = 0;
+  unsigned char uidirtyfrom = 0, uidirtyto = 0xff; /* make sure to redraw entire UI at first run */
 
   bzero(&db, sizeof(db));
+
+  svarlang_autoload_nlspath("sved");
 
   if ((argc != 2) || (argv[1][0] == '/')) {
     mdr_coutraw_puts("usage: sved file.txt");
@@ -178,23 +216,41 @@ int main(int argc, char **argv) {
 
   fname = argv[1];
 
-  printf("Loading %s...", fname);
   mdr_coutraw_puts("");
 
-  fd = fopen(fname, "rb");
-  if (fd == NULL) {
-    printf("ERROR: failed to open file %s", fname);
-    mdr_coutraw_puts("");
+  if (_dos_open(fname, O_RDONLY, &fd) != 0) {
+    mdr_coutraw_puts("Failed to open file:");
+    mdr_coutraw_puts(fname);
     return(1);
   }
 
-  while (fgets(buff, sizeof(buff), fd) != NULL) {
-    line_add(&db, buff);
+  /* load file */
+  {
+    unsigned int prevlen = 0, len, llen;
+
+    do {
+      if (_dos_read(fd, buff + prevlen, sizeof(buff) - prevlen, &len) != 0) break;
+      len += prevlen;
+
+      /* look for nearest \n and replace with 0*/
+      for (llen = 0; buff[llen] != '\n'; llen++) {
+        if (llen == sizeof(buff)) break;
+      }
+      buff[llen] = 0;
+      if ((llen > 0) && (buff[llen - 1])) buff[llen - 1] = 0; /* trim \r if line ending is cr/lf */
+      line_add(&db, buff);
+
+      len -= llen + 1;
+      memmove(buff, buff + llen + 1, len);
+      prevlen = len;
+    } while (len > 0);
+
   }
+
   /* add an empty line at end if not present already */
   if (db.cursor->len != 0) line_add(&db, "");
 
-  fclose(fd);
+  _dos_close(fd);
 
   if (mdr_cout_init(&screenw, &screenh)) load_colorscheme();
   ui_basic(screenw, screenh, fname);
@@ -204,17 +260,21 @@ int main(int argc, char **argv) {
   for (;;) {
     int k;
 
-    check_cursor_not_after_eol(&db, &cursorposx);
+    check_cursor_not_after_eol(&db, &cursorposx, &uidirtyfrom, &uidirtyto);
     mdr_cout_locate(cursorposy, cursorposx);
 
-    ui_refresh(&db, screenw, screenh);
+    if (uidirtyfrom != 0xff) {
+      ui_refresh(&db, screenw, screenh, uidirtyfrom, uidirtyto);
+      uidirtyfrom = 0xff;
+    }
 
     k = keyb_getkey();
+
     if (k == 0x150) { /* down */
-      cursor_down(&db, &cursorposy, screenh);
+      cursor_down(&db, &cursorposy, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x148) { /* up */
-      cursor_up(&db, &cursorposy);
+      cursor_up(&db, &cursorposy, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x14D) { /* right */
       if (db.cursor->len > db.xoffset + cursorposx) {
@@ -222,10 +282,12 @@ int main(int argc, char **argv) {
           cursorposx++;
         } else {
           db.xoffset++;
+          uidirtyfrom = 0;
+          uidirtyto = 0xff;
         }
       } else {
-        cursor_down(&db, &cursorposy, screenh);
-        cursor_home(&db, &cursorposx);
+        cursor_down(&db, &cursorposy, screenh, &uidirtyfrom, &uidirtyto);
+        cursor_home(&db, &cursorposx, &uidirtyfrom, &uidirtyto);
       }
 
     } else if (k == 0x14B) { /* left */
@@ -233,16 +295,36 @@ int main(int argc, char **argv) {
         cursorposx--;
       } else if (db.xoffset > 0) {
         db.xoffset--;
+        uidirtyfrom = 0;
+        uidirtyto = 0xff;
       } else if (db.cursor->prev != NULL) { /* jump to end of line above */
-        cursor_up(&db, &cursorposy);
-        cursor_eol(&db, &cursorposx, screenw);
+        cursor_up(&db, &cursorposy, &uidirtyfrom, &uidirtyto);
+        cursor_eol(&db, &cursorposx, screenw, &uidirtyfrom, &uidirtyto);
       }
+
+    } else if (k == 0x149) { /* pgup */
+      // TODO
+
+    } else if (k == 0x151) { /* pgdown */
+      // TODO
+
+    } else if (k == 0x147) { /* home */
+       cursor_home(&db, &cursorposx, &uidirtyfrom, &uidirtyto);
+
+    } else if (k == 0x14F) { /* end */
+       cursor_eol(&db, &cursorposx, screenw, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x1B) { /* ESC */
       break;
 
-    } else {
-      printf("UNHANDLED KEY 0x%02X", k);
+    } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
+      char buff[4];
+      const char *HEX = "0123456789ABCDEF";
+      buff[0] = HEX[(k >> 8) & 15];
+      buff[1] = HEX[(k >> 4) & 15];
+      buff[2] = HEX[k & 15];
+      mdr_cout_str(screenh - 1, 0, "UNHANDLED KEY: 0x", scheme[COL_STATUSBAR1], 17);
+      mdr_cout_str(screenh - 1, 17, buff, scheme[COL_STATUSBAR1], 3);
       keyb_getkey();
       break;
     }
