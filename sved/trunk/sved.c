@@ -57,6 +57,7 @@ struct linedb {
 };
 
 
+
 void line_add(struct linedb *db, const char *line) {
   unsigned short slen = strlen(line);
   struct line *l;
@@ -76,7 +77,7 @@ void line_add(struct linedb *db, const char *line) {
     l->next->prev = l;
   }
   db->cursor = l;
-  memcpy(l->payload, line, slen);
+  memmove(l->payload, line, slen);
   l->len = slen;
 }
 
