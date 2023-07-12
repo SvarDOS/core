@@ -57,8 +57,8 @@ struct linedb {
 };
 
 
-
-void line_add(struct linedb *db, const char *line) {
+/* returns non-zero on error */
+int line_add(struct linedb *db, const char *line) {
   unsigned short slen = strlen(line);
   struct line *l;
 
@@ -69,7 +69,9 @@ void line_add(struct linedb *db, const char *line) {
     slen--;
   }
 
-  l =  calloc(1, sizeof(struct line) + slen + 1);
+  l = calloc(1, sizeof(struct line) + slen + 1);
+  if (l == NULL) return(-1);
+
   l->prev = db->cursor;
   if (db->cursor) {
     l->next = db->cursor->next;
@@ -79,6 +81,8 @@ void line_add(struct linedb *db, const char *line) {
   db->cursor = l;
   memmove(l->payload, line, slen);
   l->len = slen;
+
+  return(0);
 }
 
 
@@ -227,8 +231,6 @@ static char *parseargv(void) {
   unsigned char count = 0;
   char *argv[4];
 
-  mdr_coutraw_puts(tail);
-
   while (count < 4) {
     /* jump to nearest arg */
     while (*tail == ' ') {
@@ -254,10 +256,50 @@ static char *parseargv(void) {
 }
 
 
-int main(void) {
-  int fd;
-  const char *fname;
+static int loadfile(struct linedb *db, const char *fname) {
   char buff[1024];
+  unsigned int prevlen = 0, len, llen;
+  int fd;
+  int r = 0;
+
+  if (_dos_open(fname, O_RDONLY, &fd) != 0) {
+    mdr_coutraw_puts("Failed to open file:");
+    mdr_coutraw_puts(fname);
+    return(-1);
+  }
+
+  do {
+    if (_dos_read(fd, buff + prevlen, sizeof(buff) - prevlen, &len) == 0) {
+      len += prevlen;
+    } else {
+      len = prevlen;
+    }
+
+    /* look for nearest \n and replace with 0*/
+    for (llen = 0; buff[llen] != '\n'; llen++) {
+      if (llen == sizeof(buff)) break;
+    }
+    buff[llen] = 0;
+    if ((llen > 0) && (buff[llen - 1])) buff[llen - 1] = 0; /* trim \r if line ending is cr/lf */
+    if (line_add(db, buff) != 0) {
+      mdr_coutraw_puts("out of memory");
+      r = -1;
+      break;
+    }
+
+    len -= llen + 1;
+    memmove(buff, buff + llen + 1, len);
+    prevlen = len;
+  } while (len > 0);
+
+  _dos_close(fd);
+
+  return(r);
+}
+
+
+int main(void) {
+  const char *fname;
   struct linedb db;
   unsigned char screenw = 0, screenh = 0;
   unsigned char cursorposx = 0, cursorposy = 0;
@@ -274,41 +316,11 @@ int main(void) {
     return(0);
   }
 
-  mdr_coutraw_puts("");
-
-  if (_dos_open(fname, O_RDONLY, &fd) != 0) {
-    mdr_coutraw_puts("Failed to open file:");
-    mdr_coutraw_puts(fname);
-    return(1);
-  }
-
   /* load file */
-  {
-    unsigned int prevlen = 0, len, llen;
-
-    do {
-      if (_dos_read(fd, buff + prevlen, sizeof(buff) - prevlen, &len) != 0) break;
-      len += prevlen;
-
-      /* look for nearest \n and replace with 0*/
-      for (llen = 0; buff[llen] != '\n'; llen++) {
-        if (llen == sizeof(buff)) break;
-      }
-      buff[llen] = 0;
-      if ((llen > 0) && (buff[llen - 1])) buff[llen - 1] = 0; /* trim \r if line ending is cr/lf */
-      line_add(&db, buff);
-
-      len -= llen + 1;
-      memmove(buff, buff + llen + 1, len);
-      prevlen = len;
-    } while (len > 0);
-
-  }
+  if (loadfile(&db, fname) != 0) return(1);
 
   /* add an empty line at end if not present already */
   if (db.cursor->len != 0) line_add(&db, "");
-
-  _dos_close(fd);
 
   if (mdr_cout_init(&screenw, &screenh)) load_colorscheme();
   ui_basic(screenw, screenh, fname);
