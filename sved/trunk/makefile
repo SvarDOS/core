@@ -19,4 +19,4 @@ sved.com: sved.obj deflang.obj
 
 clean: .symbolic
 	del *.obj
-	del sved.exe
+	del sved.com

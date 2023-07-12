@@ -220,9 +220,43 @@ static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned c
 }
 
 
-int main(int argc, char **argv) {
+/* a custom argv-parsing routine that looks directly inside the PSP, avoids the need
+ * of argc and argv, saves some 330 bytes of binary size */
+static char *parseargv(void) {
+  char *tail = (void *)0x81; /* THIS WORKS ONLY IN SMALL MEMORY MODEL */
+  unsigned char count = 0;
+  char *argv[4];
+
+  mdr_coutraw_puts(tail);
+
+  while (count < 4) {
+    /* jump to nearest arg */
+    while (*tail == ' ') {
+      *tail = 0;
+      tail++;
+    }
+
+    if (*tail == '\r') {
+      *tail = 0;
+      break;
+    }
+
+    argv[count++] = tail;
+
+    /* jump to next delimiter */
+    while ((*tail != ' ') && (*tail != '\r')) tail++;
+  }
+
+  /* check args now */
+  if (count != 1) return(NULL);
+
+  return(argv[0]);
+}
+
+
+int main(void) {
   int fd;
-  const char *fname = NULL;
+  const char *fname;
   char buff[1024];
   struct linedb db;
   unsigned char screenw = 0, screenh = 0;
@@ -233,12 +267,12 @@ int main(int argc, char **argv) {
 
   svarlang_autoload_nlspath("sved");
 
-  if ((argc != 2) || (argv[1][0] == '/')) {
+  fname = parseargv();
+
+  if (fname == NULL) {
     mdr_coutraw_puts("usage: sved file.txt");
     return(0);
   }
-
-  fname = argv[1];
 
   mdr_coutraw_puts("");
 
