@@ -59,9 +59,12 @@ struct linedb {
 
 
 /* returns non-zero on error */
-int line_add(struct linedb *db, const char *line) {
-  unsigned short slen = strlen(line);
+static int line_add(struct linedb *db, const char far *line) {
+  unsigned short slen;
   struct line far *l;
+
+  /* slen = strlen(line) (but for far pointer) */
+  for (slen = 0; line[slen] != 0; slen++);
 
   /* trim out CR/LF line endings */
   if ((slen >= 2) && (line[slen - 2] == '\r')) {
@@ -87,14 +90,14 @@ int line_add(struct linedb *db, const char *line) {
 }
 
 
-void db_rewind(struct linedb *db) {
+static void db_rewind(struct linedb *db) {
   if (db->cursor == NULL) return;
   while (db->cursor->prev) db->cursor = db->cursor->prev;
   db->topscreen = db->cursor;
 }
 
 
-void load_colorscheme(void) {
+static void load_colorscheme(void) {
   scheme[COL_TXT] = 0x17;
   scheme[COL_STATUSBAR1] = 0x70;
   scheme[COL_STATUSBAR2] = 0x78;
@@ -136,10 +139,11 @@ static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned 
   if (m > 'z') m = 'a';
 #endif
 
-  for (l = db->topscreen; l != NULL; l = l->next) {
+  for (l = db->topscreen; l != NULL; l = l->next, y++) {
 
     /* skip lines that do not to be refreshed */
-    if ((y < uidirtyfrom) || (y > uidirtyto)) continue;
+    if (y < uidirtyfrom) continue;
+    if (y > uidirtyto) break;
 
     if (db->xoffset < l->len) {
       for (len = 0; l->payload[len] != 0; len++) mdr_cout_char(y, len, l->payload[len], scheme[COL_TXT]);
@@ -153,7 +157,6 @@ static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned 
 #endif
 
     if (y == screenh - 2) break;
-    y++;
   }
 }
 
@@ -389,6 +392,26 @@ int main(void) {
 
     } else if (k == 0x1B) { /* ESC */
       break;
+
+    } else if (k == 0x0D) { /* ENTER */
+      /* add a new line */
+      if (line_add(&db, db.cursor->payload + db.xoffset + cursorposx) == 0) {
+        /* trim the line above */
+        db.cursor->prev->len = db.xoffset + cursorposx;
+        db.cursor->prev->payload[db.cursor->prev->len] = 0;
+        /* move cursor to the (new) line below */
+        cursorposx = 0;
+        if (cursorposy < screenh - 2) {
+          uidirtyfrom = cursorposy;
+          cursorposy++;
+        } else {
+          db.topscreen = db.topscreen->next;
+          uidirtyfrom = 0;
+        }
+        uidirtyto = 0xff;
+      } else {
+        /* ERROR: OUT OF MEMORY */
+      }
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
