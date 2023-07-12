@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <malloc.h>   /* _fcalloc() */
 
 #include "mdr\cout.h"
 #include "mdr\keyb.h"
@@ -44,15 +45,15 @@ static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70};
 
 
 struct line {
-  struct line *prev;
-  struct line *next;
+  struct line far *prev;
+  struct line far *next;
   unsigned short len;
   char payload[1];
 };
 
 struct linedb {
-  struct line *topscreen;
-  struct line *cursor;
+  struct line far *topscreen;
+  struct line far *cursor;
   unsigned short xoffset;
 };
 
@@ -60,7 +61,7 @@ struct linedb {
 /* returns non-zero on error */
 int line_add(struct linedb *db, const char *line) {
   unsigned short slen = strlen(line);
-  struct line *l;
+  struct line far *l;
 
   /* trim out CR/LF line endings */
   if ((slen >= 2) && (line[slen - 2] == '\r')) {
@@ -69,7 +70,7 @@ int line_add(struct linedb *db, const char *line) {
     slen--;
   }
 
-  l = calloc(1, sizeof(struct line) + slen + 1);
+  l = _fcalloc(1, sizeof(struct line) + slen + 1);
   if (l == NULL) return(-1);
 
   l->prev = db->cursor;
@@ -79,7 +80,7 @@ int line_add(struct linedb *db, const char *line) {
     l->next->prev = l;
   }
   db->cursor = l;
-  memmove(l->payload, line, slen);
+  _fmemcpy(l->payload, line, slen);
   l->len = slen;
 
   return(0);
@@ -127,12 +128,13 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const char *f
 static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto) {
   unsigned char y = 0;
   unsigned char len;
-  struct line *l;
+  struct line far *l;
 
-  /* DEBUG TODO FIXME */
+#ifdef DBG_REFRESH
   static char m = 'a';
   m++;
   if (m > 'z') m = 'a';
+#endif
 
   for (l = db->topscreen; l != NULL; l = l->next) {
 
@@ -140,14 +142,15 @@ static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned 
     if ((y < uidirtyfrom) || (y > uidirtyto)) continue;
 
     if (db->xoffset < l->len) {
-      len = mdr_cout_str(y, 0, l->payload + db->xoffset, scheme[COL_TXT], screenw - 1);
+      for (len = 0; l->payload[len] != 0; len++) mdr_cout_char(y, len, l->payload[len], scheme[COL_TXT]);
     } else {
       len = 0;
     }
     while (len < screenw - 1) mdr_cout_char(y, len++, ' ', scheme[COL_TXT]);
 
-    /* FIXME DEBUG */
+#ifdef DBG_REFRESH
     mdr_cout_char(y, 0, m, scheme[COL_STATUSBAR1]);
+#endif
 
     if (y == screenh - 2) break;
     y++;
