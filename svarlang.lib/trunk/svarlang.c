@@ -48,17 +48,26 @@ typedef unsigned short FHANDLE;
 
 /* supplied through DEFLANG.C */
 extern char svarlang_mem[];
+extern unsigned short svarlang_dict[];
 extern const unsigned short svarlang_memsz;
-
+extern const unsigned short svarlang_string_count;
 
 const char *svarlang_strid(unsigned short id) {
-  const char *ptr = svarlang_mem;
-  /* find the string id in langblock memory */
-  for (;;) {
-    if (((unsigned short *)ptr)[0] == id) return(ptr + 4);
-    if (((unsigned short *)ptr)[1] == 0) return(ptr + 2); /* end of strings - return an empty string */
-    ptr += ((unsigned short *)ptr)[1] + 4;
-  }
+   size_t left = 0, right = svarlang_string_count - 1, x;
+   unsigned short v;
+
+   if (svarlang_string_count == 0) return "";
+
+   while (left <= right ) {
+      x = left + ( (right - left ) >> 2 );
+      v = svarlang_dict[x * 2];
+      if ( id == v )  {
+        return svarlang_mem + svarlang_dict[x * 2 + 1];
+      }
+      else if ( id > v ) left = x + 1;
+      else right = x - 1;
+   }
+   return "";
 }
 
 /* routines below are simplified (dos-based) versions of the libc FILE-related
@@ -157,9 +166,10 @@ static void FSEEK(unsigned short handle, unsigned short bytes) {
 
 int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
-  char hdr[4];
+  char hdr[5];
   unsigned short buff16[2];
   FHANDLE fd;
+  unsigned short string_count;
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */
@@ -167,17 +177,24 @@ int svarlang_load(const char *fname, const char *lang) {
   fd = FOPEN(fname);
   if (!fd) return(-1);
 
-  /* read hdr, should be "SvL\33" */
-  if ((FREAD(fd, hdr, 4) != 4) || (memcmp(hdr, "SvL\33", 4) != 0)) {
+  /* read hdr, should be "SvL1\x1a" */
+  if ((FREAD(fd, hdr, 5) != 5) || (memcmp(hdr, "SvL1\x1a", 5) != 0)) {
     FCLOSE(fd);
     return(-3);
   }
 
-  /* read next lang id in file */
+  /* read string count */
+  if ((FREAD(fd, &string_count, 2) != 2) || (string_count != svarlang_string_count)) {
+    FCLOSE(fd);
+    return(-6);
+  }
+
+  /* read next lang id and string table size in file */
   while (FREAD(fd, buff16, 4) == 4) {
 
     /* is it the lang I am looking for? */
     if (buff16[0] != langid) { /* skip to next lang */
+      FSEEK(fd, svarlang_string_count * 4);
       FSEEK(fd, buff16[1]);
       continue;
     }
@@ -188,8 +205,12 @@ int svarlang_load(const char *fname, const char *lang) {
       return(-4);
     }
 
-    /* load strings */
-    if (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1]) break;
+    /* load dictionary & strings */
+    if ((FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) ||
+       (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
+      FCLOSE(fd);
+      return -7;
+    }
     FCLOSE(fd);
     return(0);
   }
