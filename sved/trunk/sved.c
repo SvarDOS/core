@@ -230,6 +230,34 @@ static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned c
 }
 
 
+static void del(struct linedb *db, unsigned char cursorposx, unsigned char cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+  if (cursorposx + db->xoffset < db->cursor->len) {
+    _fmemmove(db->cursor->payload + cursorposx + db->xoffset, db->cursor->payload + cursorposx + db->xoffset + 1, db->cursor->len - cursorposx - db->xoffset);
+    db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
+    *uidirtyfrom = cursorposy;
+    *uidirtyto = cursorposy;
+  } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
+    struct line far *nextline = db->cursor->next;
+    if (db->cursor->next->len > 0) {
+      void far *newptr = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + db->cursor->next->len + 1);
+      if (newptr != NULL) {
+        db->cursor = newptr;
+        _fmemcpy(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
+        db->cursor->len += db->cursor->next->len;
+        /* update db->topscreen if needed */
+        if (cursorposy == 0) db->topscreen = db->cursor;
+      }
+    }
+    db->cursor->next = db->cursor->next->next;
+    db->cursor->next->prev = db->cursor;
+    if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor; /* in case realloc changed my pointer */
+    _ffree(nextline);
+    *uidirtyfrom = cursorposy;
+    *uidirtyto = 0xff;
+  }
+}
+
+
 /* a custom argv-parsing routine that looks directly inside the PSP, avoids the need
  * of argc and argv, saves some 330 bytes of binary size */
 static char *parseargv(void) {
@@ -412,6 +440,9 @@ int main(void) {
       } else {
         /* ERROR: OUT OF MEMORY */
       }
+
+    } else if (k == 0x153) {  /* DEL */
+      del(&db, cursorposx, cursorposy, &uidirtyfrom, &uidirtyto);
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
