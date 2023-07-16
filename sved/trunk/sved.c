@@ -107,7 +107,7 @@ static void load_colorscheme(void) {
 
 static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname) {
   unsigned char i;
-  const char *s = "HELP";
+  const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
 
   /* clear screen */
@@ -220,6 +220,20 @@ static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned c
 }
 
 
+static void cursor_left(struct linedb *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+  if (*cursorposx > 0) {
+    *cursorposx -= 1;
+  } else if (db->xoffset > 0) {
+    db->xoffset -= 1;
+    *uidirtyfrom = 0;
+    *uidirtyto = 0xff;
+  } else if (db->cursor->prev != NULL) { /* jump to end of line above */
+    cursor_up(db, cursorposy, uidirtyfrom, uidirtyto);
+    cursor_eol(db, cursorposx, screenw, uidirtyfrom, uidirtyto);
+  }
+}
+
+
 static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   *cursorposx = 0;
   if (db->xoffset != 0) {
@@ -255,6 +269,16 @@ static void del(struct linedb *db, unsigned char cursorposx, unsigned char curso
     *uidirtyfrom = cursorposy;
     *uidirtyto = 0xff;
   }
+}
+
+
+static void bkspc(struct linedb *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+
+  /* backspace is basically "left + del", not applicable only if cursor is on 1st byte of the file */
+  if ((*cursorposx == 0) && (db->xoffset == 0) && (db->cursor->prev == NULL)) return;
+
+  cursor_left(db, cursorposx, cursorposy, screenw, uidirtyfrom, uidirtyto);
+  del(db, *cursorposx, *cursorposy, uidirtyfrom, uidirtyto);
 }
 
 
@@ -346,7 +370,7 @@ int main(void) {
   fname = parseargv();
 
   if (fname == NULL) {
-    mdr_coutraw_puts("usage: sved file.txt");
+    mdr_coutraw_puts(svarlang_str(1,0)); /* usage: sved file.txt */
     return(0);
   }
 
@@ -395,16 +419,7 @@ int main(void) {
       }
 
     } else if (k == 0x14B) { /* left */
-      if (cursorposx > 0) {
-        cursorposx--;
-      } else if (db.xoffset > 0) {
-        db.xoffset--;
-        uidirtyfrom = 0;
-        uidirtyto = 0xff;
-      } else if (db.cursor->prev != NULL) { /* jump to end of line above */
-        cursor_up(&db, &cursorposy, &uidirtyfrom, &uidirtyto);
-        cursor_eol(&db, &cursorposx, screenw, &uidirtyfrom, &uidirtyto);
-      }
+      cursor_left(&db, &cursorposx, &cursorposy, screenw, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x149) { /* pgup */
       // TODO
@@ -443,6 +458,9 @@ int main(void) {
 
     } else if (k == 0x153) {  /* DEL */
       del(&db, cursorposx, cursorposy, &uidirtyfrom, &uidirtyto);
+
+    } else if (k == 0x008) { /* BKSPC */
+      bkspc(&db, &cursorposx, &cursorposy, screenw, &uidirtyfrom, &uidirtyto);
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
