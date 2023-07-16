@@ -22,9 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <string.h>
-
+#include <stdlib.h>  /* getenv(), NULL */
 #include "svarlang.h"
 
 
@@ -32,11 +30,11 @@ int svarlang_autoload_nlspath(const char *progname) {
   const char *lang;
   const char *nlspath;
   char buff[128];
-  unsigned short i;
+  unsigned short i, ii;
 
   /* read and validate LANG */
   lang = getenv("LANG");
-  if ((lang == NULL) || (lang[0] == 0) || (lang[1] == 0)) return(-1);
+  if ((lang == NULL) || (lang[0] == 0)) return(-1);
 
   /* read and validate NLSPATH */
   nlspath = getenv("NLSPATH");
@@ -57,8 +55,13 @@ int svarlang_autoload_nlspath(const char *progname) {
     /* add a trailing backslash if there is none (non-empty paths empty) */
     if ((i > 0) && (buff[i - 1] != '\\')) buff[i++] = '\\';
 
-    strcpy(buff + i, progname);
-    strcat(buff + i, ".lng");
+    /* append progname + ".LNG" to the path */
+    for (ii = 0; progname[ii] != 0; ii++) buff[i++] = progname[ii];
+    buff[i++] = '.';
+    buff[i++] = 'L';
+    buff[i++] = 'N';
+    buff[i++] = 'G';
+    buff[i] = 0;
 
     if (svarlang_load(buff, lang) == 0) return(0);
   }
