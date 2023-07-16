@@ -1,0 +1,14 @@
+# SVED IN ENGLISH
+
+###############
+# MAIN SCREEN #
+###############
+
+0.0:HELP
+
+
+###############
+# HELP SCREEN #
+###############
+
+1.0:usage: sved file.txt

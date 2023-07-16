@@ -1,0 +1,15 @@
+# SVED IN POLISH
+# translated from English by Mateusz Viste
+
+###############
+# MAIN SCREEN #
+###############
+
+0.0:POMOC
+
+
+###############
+# HELP SCREEN #
+###############
+
+1.0:skladnia: sved plik.txt
