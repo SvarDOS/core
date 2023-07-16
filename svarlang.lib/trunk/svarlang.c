@@ -70,6 +70,7 @@ const char *svarlang_strid(unsigned short id) {
    return "";
 }
 
+
 /* routines below are simplified (dos-based) versions of the libc FILE-related
  * functions. Using them avoids a dependency on FILE, hence makes the binary
  * smaller if the application does not need to pull fopen() and friends */
@@ -164,9 +165,10 @@ static void FSEEK(unsigned short handle, unsigned short bytes) {
 }
 #endif
 
+
 int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
-  char hdr[5];
+  unsigned long hdr;
   unsigned short buff16[2];
   FHANDLE fd;
   unsigned short string_count;
@@ -177,8 +179,8 @@ int svarlang_load(const char *fname, const char *lang) {
   fd = FOPEN(fname);
   if (!fd) return(-1);
 
-  /* read hdr, should be "SvL1\x1a" */
-  if ((FREAD(fd, hdr, 5) != 5) || (memcmp(hdr, "SvL1\x1a", 5) != 0)) {
+  /* read hdr, should be "SvL\x1a" */
+  if ((FREAD(fd, &hdr, 4) != 4) || (hdr != 0x1a4c7653L)) { /* 0x1a4c7653 = 'SvL\x1a' */
     FCLOSE(fd);
     return(-3);
   }

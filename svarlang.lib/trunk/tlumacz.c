@@ -16,7 +16,7 @@
 #include "svarlang.h"
 
 #define STRINGS_CAP 65000   /* string storage size in characters */
-#define DICT_CAP    10000   /* dictionary size in elements */ 
+#define DICT_CAP    10000   /* dictionary size in elements */
 
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
@@ -198,7 +198,7 @@ static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s)
       l->dict_cap < (l->num_strings + 1) * sizeof(dict_entry_t)) {
     return 0;
   }
-  
+
   /* find dictionary insert position, search backwards in assumption
      that in translation files, strings are generally ordered ascending */
   for (cursor = l->num_strings; cursor > 0 && l->dict[cursor-1].id > id; cursor--);
@@ -294,7 +294,7 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
           maxid_line = linecount;
         }
         else {
-          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);          
+          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);
         }
       }
       else {
@@ -302,7 +302,7 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
       }
     }
     else {
-      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);      
+      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);
     }
   }
 
@@ -328,7 +328,7 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
 
 static int svl_write_header(unsigned short num_strings, FILE *fd)
 {
-  return (fwrite("SvL1\x1a", 1, 5, fd) == 5) &&
+  return (fwrite("SvL\x1a", 1, 4, fd) == 4) &&
           (fwrite(&num_strings, 1, 2, fd) == 2);
 }
 
@@ -457,7 +457,7 @@ int main(int argc, char **argv) {
         break;
       }
     }
-    
+
     /* write lang ID to file, followed string table size, and then
        the dictionary and string table for current language */
     if (!svl_write_lang(lang, fd)) {
