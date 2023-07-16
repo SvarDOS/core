@@ -35,7 +35,7 @@ typedef FILE* FHANDLE;
 
 #else
 
-#include <i86.h>
+#include <i86.h>  /* FP_SEG, FP_OFF */
 typedef unsigned short FHANDLE;
 
 #endif
@@ -214,7 +214,7 @@ int svarlang_load(const char *fname, const char *lang) {
     if ((FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) ||
        (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
       FCLOSE(fd);
-      return -7;
+      return(-7);
     }
     FCLOSE(fd);
     return(0);
