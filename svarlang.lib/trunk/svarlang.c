@@ -41,8 +41,6 @@ typedef unsigned short FHANDLE;
 #endif
 
 
-#include <string.h>  /* strcpy() */
-
 #include "svarlang.h"
 
 
@@ -54,13 +52,13 @@ extern const unsigned short svarlang_string_count;
 
 
 const char *svarlang_strid(unsigned short id) {
-  size_t left = 0, right = svarlang_string_count - 1, x;
+  unsigned short left = 0, right = svarlang_string_count - 1, x;
   unsigned short v;
 
   if (svarlang_string_count == 0) return("");
 
   while (left <= right) {
-    x = left + ( (right - left ) >> 2 );
+    x = left + ((right - left ) >> 2);
     v = svarlang_dict[x * 2];
 
     if (id == v) return(svarlang_mem + svarlang_dict[x * 2 + 1]);
