@@ -40,8 +40,8 @@ typedef unsigned short FHANDLE;
 
 #endif
 
-#include <stdlib.h>  /* NULL */
-#include <string.h>  /* memcmp(), strcpy() */
+
+#include <string.h>  /* strcpy() */
 
 #include "svarlang.h"
 
@@ -52,22 +52,27 @@ extern unsigned short svarlang_dict[];
 extern const unsigned short svarlang_memsz;
 extern const unsigned short svarlang_string_count;
 
+
 const char *svarlang_strid(unsigned short id) {
-   size_t left = 0, right = svarlang_string_count - 1, x;
-   unsigned short v;
+  size_t left = 0, right = svarlang_string_count - 1, x;
+  unsigned short v;
 
-   if (svarlang_string_count == 0) return "";
+  if (svarlang_string_count == 0) return("");
 
-   while (left <= right ) {
-      x = left + ( (right - left ) >> 2 );
-      v = svarlang_dict[x * 2];
-      if ( id == v )  {
-        return svarlang_mem + svarlang_dict[x * 2 + 1];
-      }
-      else if ( id > v ) left = x + 1;
-      else right = x - 1;
-   }
-   return "";
+  while (left <= right) {
+    x = left + ( (right - left ) >> 2 );
+    v = svarlang_dict[x * 2];
+
+    if (id == v) return(svarlang_mem + svarlang_dict[x * 2 + 1]);
+
+    if (id > v) {
+      left = x + 1;
+    } else {
+      right = x - 1;
+    }
+  }
+
+  return("");
 }
 
 
