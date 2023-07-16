@@ -101,36 +101,36 @@ static unsigned short unesc_string(char *linebuff) {
 }
 
 #pragma pack(1)
-typedef struct dict_entry {
+struct dict_entry {
   unsigned short id;
   unsigned short offset;
-} dict_entry_t;
+};
 #pragma pack()
 
-typedef struct svl_lang {
+struct svl_lang {
   char id[2];
   unsigned short num_strings;
 
-  dict_entry_t *dict;
+  struct dict_entry *dict;
   size_t dict_cap;
 
   char *strings;
   char *strings_end;
   size_t strings_cap;
 
-} svl_lang_t;
+};
 
 
-static svl_lang_t *svl_lang_new(const char langid[2], size_t dict_cap, size_t strings_cap) {
-  svl_lang_t *l;
+static struct svl_lang *svl_lang_new(const char langid[2], size_t dict_cap, size_t strings_cap) {
+  struct svl_lang *l;
 
-  l = malloc(sizeof(svl_lang_t));
+  l = malloc(sizeof(struct svl_lang));
   if (!l) return(NULL);
 
   l->id[0] = (char)toupper(langid[0]);
   l->id[1] = (char)toupper(langid[1]);
 
-  l->dict = malloc(dict_cap * sizeof(dict_entry_t));
+  l->dict = malloc(dict_cap * sizeof(struct dict_entry));
   if (!l->dict) return(NULL);
 
   l->dict_cap = dict_cap;
@@ -148,7 +148,7 @@ static svl_lang_t *svl_lang_new(const char langid[2], size_t dict_cap, size_t st
 
 
 /* compacts the dict and string buffer */
-static void svl_compact_lang(svl_lang_t *l) {
+static void svl_compact_lang(struct svl_lang *l) {
   size_t bytes;
   bytes = l->strings_end - l->strings;
   if (bytes < l->strings_cap) {
@@ -157,11 +157,11 @@ static void svl_compact_lang(svl_lang_t *l) {
     l->strings_cap = bytes;
   }
   l->dict_cap = l->num_strings;
-  l->dict = realloc(l->dict, l->dict_cap * sizeof(dict_entry_t));
+  l->dict = realloc(l->dict, l->dict_cap * sizeof(struct dict_entry));
 }
 
 
-static void svl_lang_free(svl_lang_t *l) {
+static void svl_lang_free(struct svl_lang *l) {
   l->num_strings = 0;
   if (l->dict) {
     free(l->dict);
@@ -176,21 +176,21 @@ static void svl_lang_free(svl_lang_t *l) {
 }
 
 
-static size_t svl_strings_bytes(const svl_lang_t *l) {
+static size_t svl_strings_bytes(const struct svl_lang *l) {
   return(l->strings_end - l->strings);
 }
 
 
-static size_t svl_dict_bytes(const svl_lang_t *l) {
-  return(l->num_strings * sizeof(dict_entry_t));
+static size_t svl_dict_bytes(const struct svl_lang *l) {
+  return(l->num_strings * sizeof(struct dict_entry));
 }
 
 
-static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s) {
+static int svl_add_str(struct svl_lang *l, unsigned short id, const char *s) {
   size_t len = strlen(s) + 1;
   size_t cursor;
 
-  if ((l->strings_cap < svl_strings_bytes(l) + len) || (l->dict_cap < (l->num_strings + 1) * sizeof(dict_entry_t))) {
+  if ((l->strings_cap < svl_strings_bytes(l) + len) || (l->dict_cap < (l->num_strings + 1) * sizeof(struct dict_entry))) {
     return(0);
   }
 
@@ -198,7 +198,7 @@ static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s) {
      that in translation files, strings are generally ordered ascending */
   for (cursor = l->num_strings; cursor > 0 && l->dict[cursor-1].id > id; cursor--);
 
-  memmove(&(l->dict[cursor+1]), &(l->dict[cursor]), sizeof(dict_entry_t)*(l->num_strings - cursor));
+  memmove(&(l->dict[cursor+1]), &(l->dict[cursor]), sizeof(struct dict_entry) * (l->num_strings - cursor));
   l->dict[cursor].id = id;
   l->dict[cursor].offset = l->strings_end - l->strings;
 
@@ -210,7 +210,7 @@ static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s) {
 }
 
 
-static int svl_find(const svl_lang_t *l, unsigned short id) {
+static int svl_find(const struct svl_lang *l, unsigned short id) {
   size_t left = 0, right = l->num_strings - 1, x;
   unsigned short v;
 
@@ -219,9 +219,9 @@ static int svl_find(const svl_lang_t *l, unsigned short id) {
   while (left <= right ) {
     x = left + ( (right - left ) >> 2 );
     v = l->dict[x].id;
-    if ( id == v ) {
-      return(1);
-    } else if (id > v) {
+    if ( id == v ) return(1); /* found! */
+
+    if (id > v) {
       left = x + 1;
     } else {
       right = x - 1;
@@ -233,7 +233,7 @@ static int svl_find(const svl_lang_t *l, unsigned short id) {
 
 /* opens a CATS-style file and compiles it into a ressources lang block
  * returns 0 on error, or the size of the generated data block otherwise */
-static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
+static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lang *refl) {
   unsigned short linelen;
   FILE *fd;
   char fname[] = "xx.txt";
@@ -327,7 +327,7 @@ static int svl_write_header(unsigned short num_strings, FILE *fd) {
 }
 
 
-static int svl_write_lang(const svl_lang_t *l, FILE *fd) {
+static int svl_write_lang(const struct svl_lang *l, FILE *fd) {
   unsigned short strings_bytes = svl_strings_bytes(l);
 
   return((fwrite(&l->id, 1, 2, fd) == 2) &&
@@ -337,7 +337,7 @@ static int svl_write_lang(const svl_lang_t *l, FILE *fd) {
 }
 
 
-static int svl_write_c_source(const svl_lang_t *l, const char *fn, unsigned short biggest_langsz) {
+static int svl_write_c_source(const struct svl_lang *l, const char *fn, unsigned short biggest_langsz) {
   FILE *fd;
   int i;
   unsigned short strings_bytes = svl_strings_bytes(l);
@@ -394,7 +394,7 @@ int main(int argc, char **argv) {
   int ecode = 0;
   int i;
   unsigned short biggest_langsz = 0;
-  svl_lang_t *lang, *reflang = NULL;
+  struct svl_lang *lang, *reflang = NULL;
 
   if (argc < 2) {
     puts("tlumacz ver " SVARLANGVER " - this tool is part of the SvarLANG project.");
