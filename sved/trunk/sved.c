@@ -30,6 +30,7 @@
 #include <malloc.h>   /* _fcalloc() */
 
 #include "mdr\cout.h"
+#include "mdr\dos.h"
 #include "mdr\keyb.h"
 
 #include "svarlang\svarlang.h"
@@ -365,7 +366,10 @@ int main(void) {
 
   bzero(&db, sizeof(db));
 
-  svarlang_autoload_nlspath("sved");
+  {
+    char nlspath[128], lang[8];
+    svarlang_autoload_pathlist("sved", mdr_dos_getenv(nlspath, "NLSPATH", sizeof(nlspath)), mdr_dos_getenv(lang, "LANG", sizeof(lang)));
+  }
 
   fname = parseargv();
 
