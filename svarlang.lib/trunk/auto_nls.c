@@ -22,35 +22,27 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h>  /* getenv(), NULL */
 #include "svarlang.h"
 
 
-int svarlang_autoload_nlspath(const char *progname) {
-  const char *lang;
-  const char *nlspath;
+int svarlang_autoload_pathlist(const char *progname, const char *pathlist, const char *lang) {
   char buff[128];
   unsigned short i, ii;
 
-  /* read and validate LANG */
-  lang = getenv("LANG");
-  if ((lang == NULL) || (lang[0] == 0)) return(-1);
-
-  /* read and validate NLSPATH */
-  nlspath = getenv("NLSPATH");
-  if (nlspath == NULL) return(-2);
+  /* read and validate LANG and pathlist */
+  if ((!lang) || (lang[0] == 0) || (!pathlist)) return(-1);
 
   /* look into every path in NLSPATH */
-  while (*nlspath != 0) {
+  while (*pathlist != 0) {
 
     /* skip any leading ';' separators */
-    while (*nlspath == ';') nlspath++;
+    while (*pathlist == ';') pathlist++;
 
-    if (*nlspath == 0) return(-3);
+    if (*pathlist == 0) return(-3);
 
     /* copy nlspath to buff and remember len */
-    for (i = 0; (nlspath[i] != 0) && (nlspath[i] != ';'); i++) buff[i] = nlspath[i];
-    nlspath += i;
+    for (i = 0; (pathlist[i] != 0) && (pathlist[i] != ';'); i++) buff[i] = pathlist[i];
+    pathlist += i;
 
     /* add a trailing backslash if there is none (non-empty paths empty) */
     if ((i > 0) && (buff[i - 1] != '\\')) buff[i++] = '\\';
