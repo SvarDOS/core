@@ -129,6 +129,28 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const char *f
 }
 
 
+static void ui_help(unsigned char screenw) {
+#define MAXLINLEN 35
+  unsigned short i, x, offset;
+  offset = (screenw - MAXLINLEN + 1) >> 1;
+  mdr_cout_cursor_hide();
+  for (i = 2; i <= 12; i++) {
+    for (x = offset - 2; x < offset + MAXLINLEN; x++) mdr_cout_char(i, x, ' ', scheme[COL_STATUSBAR1]);
+  }
+
+  mdr_cout_str(3, offset, svarlang_str(0, 0), scheme[COL_STATUSBAR1], MAXLINLEN);
+  for (i = 0; i <= 2; i++) {
+    mdr_cout_str(5 + i, offset, svarlang_str(8, i), scheme[COL_STATUSBAR1], MAXLINLEN);
+  }
+  mdr_cout_str(9, offset, svarlang_str(8, 10), scheme[COL_STATUSBAR1], MAXLINLEN);
+  mdr_cout_str(11, offset, svarlang_str(8, 11), scheme[COL_STATUSBAR1], MAXLINLEN);
+
+  keyb_getkey();
+  mdr_cout_cursor_show();
+#undef MAXLINLEN
+}
+
+
 static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto) {
   unsigned char y = 0;
   unsigned char len;
@@ -487,6 +509,11 @@ int main(void) {
         db.cursor->payload[off] = k;
         cursor_right(&db, &cursorposx, &cursorposy, screenw, screenh, &uidirtyfrom, &uidirtyto);
       }
+
+    } else if (k == 0x13b) { /* F1 */
+      ui_help(screenw);
+      uidirtyfrom = 0;
+      uidirtyto = 0xff;
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
