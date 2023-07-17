@@ -245,6 +245,22 @@ static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned c
 }
 
 
+static void cursor_right(struct linedb *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+  if (db->cursor->len > db->xoffset + *cursorposx) {
+    if (*cursorposx < screenw - 2) {
+      *cursorposx += 1;
+    } else {
+      db->xoffset += 1;
+      *uidirtyfrom = 0;
+      *uidirtyto = 0xff;
+    }
+  } else {
+    cursor_down(db, cursorposy, screenh, uidirtyfrom, uidirtyto);
+    cursor_home(db, cursorposx, uidirtyfrom, uidirtyto);
+  }
+}
+
+
 static void del(struct linedb *db, unsigned char cursorposx, unsigned char cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (cursorposx + db->xoffset < db->cursor->len) {
     _fmemmove(db->cursor->payload + cursorposx + db->xoffset, db->cursor->payload + cursorposx + db->xoffset + 1, db->cursor->len - cursorposx - db->xoffset);
@@ -409,18 +425,7 @@ int main(void) {
       cursor_up(&db, &cursorposy, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x14D) { /* right */
-      if (db.cursor->len > db.xoffset + cursorposx) {
-        if (cursorposx < screenw - 2) {
-          cursorposx++;
-        } else {
-          db.xoffset++;
-          uidirtyfrom = 0;
-          uidirtyto = 0xff;
-        }
-      } else {
-        cursor_down(&db, &cursorposy, screenh, &uidirtyfrom, &uidirtyto);
-        cursor_home(&db, &cursorposx, &uidirtyfrom, &uidirtyto);
-      }
+      cursor_right(&db, &cursorposx, &cursorposy, screenw, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x14B) { /* left */
       cursor_left(&db, &cursorposx, &cursorposy, screenw, &uidirtyfrom, &uidirtyto);
@@ -465,6 +470,23 @@ int main(void) {
 
     } else if (k == 0x008) { /* BKSPC */
       bkspc(&db, &cursorposx, &cursorposy, screenw, &uidirtyfrom, &uidirtyto);
+
+    } else if ((k >= 0x20) && (k <= 0xff)) { /* "normal" character */
+      struct line far *n;
+      n = _frealloc(db.cursor, sizeof(struct line) + db.cursor->len);
+      if (n != NULL) {
+        unsigned short off = db.xoffset + cursorposx;
+        if (n->prev) n->prev->next = n;
+        if (n->next) n->next->prev = n;
+        if (db.topscreen == db.cursor) db.topscreen = n;
+        db.cursor = n;
+        _fmemmove(db.cursor->payload + off + 1, db.cursor->payload + off, db.cursor->len - off + 1);
+        db.cursor->len += 1;
+        uidirtyfrom = cursorposy;
+        uidirtyto = cursorposy;
+        db.cursor->payload[off] = k;
+        cursor_right(&db, &cursorposx, &cursorposy, screenw, screenh, &uidirtyfrom, &uidirtyto);
+      }
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
