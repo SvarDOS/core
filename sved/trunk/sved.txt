@@ -4,17 +4,18 @@
                        Copyright (C) 2023 Mateusz Viste
 
 
-Sved is the editor that comes with SvarDOS. You will may find that it lacks
-many amenities. Sved is NOT meant to be a full-featured text editor. It is
-designed to allow for basic editing of configuration files, nothing else. On
-the pro side Sved has a low memory footprint and is only a couple of kilobytes
-long which makes it a good fit on bootdisks or systems with limited ressources.
+Sved is the editor that comes with SvarDOS. Sved is not meant to be a
+full-featured text editor, it is designed to allow for basic editing of
+configuration files, nothing more. On the pro side Sved has a low memory
+footprint and is only a couple of kilobytes big, which makes it a good fit on
+bootdisks or systems with limited ressources.
 
-- runs comfortably on a 8086-class PC with 256 KiB of RAM
-- supports color and monochrome video modes
-- multilingual UI
-- low disk footprint (8 KiB)
-- handles files larger than 64 KiB
+ - runs comfortably on a 8086-class PC with 256 KiB of RAM
+ - supports color and monochrome video modes
+ - supports extended text modes like 80x43, 80x50...
+ - multilingual UI (uses the svarlang library)
+ - low disk footprint (8 KiB)
+ - handles files larger than 64 KiB
 
 Sved is released under the terms of the MIT license.
 
