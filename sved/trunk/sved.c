@@ -53,7 +53,6 @@ struct line {
 };
 
 struct linedb {
-  struct line far *topscreen;
   struct line far *cursor;
   unsigned short xoffset;
 };
@@ -94,7 +93,6 @@ static int line_add(struct linedb *db, const char far *line) {
 static void db_rewind(struct linedb *db) {
   if (db->cursor == NULL) return;
   while (db->cursor->prev) db->cursor = db->cursor->prev;
-  db->topscreen = db->cursor;
 }
 
 
@@ -151,10 +149,9 @@ static void ui_help(unsigned char screenw) {
 }
 
 
-static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto) {
-  unsigned char y = 0;
+static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto, unsigned char y) {
   unsigned char len;
-  struct line far *l;
+  const struct line far *l;
 
 #ifdef DBG_REFRESH
   static char m = 'a';
@@ -162,9 +159,13 @@ static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned 
   if (m > 'z') m = 'a';
 #endif
 
-  for (l = db->topscreen; l != NULL; l = l->next, y++) {
+  /* rewind cursor line to first line that needs redrawing */
+  for (l = db->cursor; y > uidirtyfrom; y--) l = l->prev;
 
-    /* skip lines that do not to be refreshed */
+  /* iterate over lines and redraw whatever needs to be redrawn */
+  for (; l != NULL; l = l->next, y++) {
+
+    /* skip lines that do not need to be refreshed */
     if (y < uidirtyfrom) continue;
     if (y > uidirtyto) break;
 
@@ -181,6 +182,7 @@ static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned 
 
     if (y == screenh - 2) break;
   }
+
 }
 
 
@@ -202,7 +204,6 @@ static void cursor_up(struct linedb *db, unsigned char *cursorposy, unsigned cha
   if (db->cursor->prev != NULL) {
     db->cursor = db->cursor->prev;
     if (*cursorposy == 0) {
-      db->topscreen = db->cursor;
       *uidirtyfrom = 0;
       *uidirtyto = 0xff;
     } else {
@@ -235,7 +236,6 @@ static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned c
     if (*cursorposy < screenh - 2) {
       *cursorposy += 1;
     } else {
-      db->topscreen = db->topscreen->next;
       *uidirtyfrom = 0;
       *uidirtyto = 0xff;
     }
@@ -297,8 +297,6 @@ static void del(struct linedb *db, unsigned char cursorposx, unsigned char curso
         db->cursor = newptr;
         _fmemcpy(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
         db->cursor->len += db->cursor->next->len;
-        /* update db->topscreen if needed */
-        if (cursorposy == 0) db->topscreen = db->cursor;
       }
     }
     db->cursor->next = db->cursor->next->next;
@@ -434,7 +432,7 @@ int main(void) {
     mdr_cout_locate(cursorposy, cursorposx);
 
     if (uidirtyfrom != 0xff) {
-      ui_refresh(&db, screenw, screenh, uidirtyfrom, uidirtyto);
+      ui_refresh(&db, screenw, screenh, uidirtyfrom, uidirtyto, cursorposy);
       uidirtyfrom = 0xff;
     }
 
@@ -479,7 +477,6 @@ int main(void) {
           uidirtyfrom = cursorposy;
           cursorposy++;
         } else {
-          db.topscreen = db.topscreen->next;
           uidirtyfrom = 0;
         }
         uidirtyto = 0xff;
@@ -500,7 +497,6 @@ int main(void) {
         unsigned short off = db.xoffset + cursorposx;
         if (n->prev) n->prev->next = n;
         if (n->next) n->next->prev = n;
-        if (db.topscreen == db.cursor) db.topscreen = n;
         db.cursor = n;
         _fmemmove(db.cursor->payload + off + 1, db.cursor->payload + off, db.cursor->len - off + 1);
         db.cursor->len += 1;
