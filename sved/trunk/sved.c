@@ -393,6 +393,28 @@ static int loadfile(struct linedb *db, const char *fname) {
 }
 
 
+static int savefile(const struct linedb *db, const char *fname) {
+  int fd;
+  const struct line far *l;
+  unsigned bytes;
+  if (_dos_open(fname, O_WRONLY, &fd) != 0) {
+    return(-1);
+  }
+
+  l = db->cursor;
+  while (l->prev) l = l->prev;
+
+  while (l) {
+    _dos_write(fd, l->payload, l->len, &bytes);
+    _dos_write(fd, "\r\n", 2, &bytes);
+    l = l->next;
+  }
+
+  _dos_close(fd);
+  return(0);
+}
+
+
 int main(void) {
   const char *fname;
   struct linedb db;
@@ -510,6 +532,9 @@ int main(void) {
       ui_help(screenw);
       uidirtyfrom = 0;
       uidirtyto = 0xff;
+
+    } else if (k == 0x13f) { /* F5 */
+      savefile(&db, fname);
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
