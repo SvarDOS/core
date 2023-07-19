@@ -29,6 +29,7 @@
 #include <string.h>
 #include <malloc.h>   /* _fcalloc() */
 
+#include "mdr\bios.h"
 #include "mdr\cout.h"
 #include "mdr\dos.h"
 #include "mdr\keyb.h"
@@ -127,13 +128,26 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const char *f
 }
 
 
+static void ui_msg(const char *msg, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+  unsigned short x, y, msglen, i;
+  msglen = strlen(msg);
+  y = (screenh - 4) >> 1;
+  x = (screenw - msglen - 4) >> 1;
+  for (i = y+2; i >= y; i--) mdr_cout_char_rep(i, x, ' ', scheme[COL_STATUSBAR1], msglen + 2);
+  mdr_cout_str(y+1, x+1, msg, scheme[COL_STATUSBAR1], msglen);
+
+  if (*uidirtyfrom > y) *uidirtyfrom = y;
+  if (*uidirtyto < y+2) *uidirtyto = y+2;
+}
+
+
 static void ui_help(unsigned char screenw) {
 #define MAXLINLEN 35
-  unsigned short i, x, offset;
+  unsigned short i, offset;
   offset = (screenw - MAXLINLEN + 1) >> 1;
   mdr_cout_cursor_hide();
   for (i = 2; i <= 12; i++) {
-    for (x = offset - 2; x < offset + MAXLINLEN; x++) mdr_cout_char(i, x, ' ', scheme[COL_STATUSBAR1]);
+    mdr_cout_char_rep(i, offset - 2, ' ', scheme[COL_STATUSBAR1], MAXLINLEN);
   }
 
   mdr_cout_str(3, offset, svarlang_str(0, 0), scheme[COL_STATUSBAR1], MAXLINLEN);
@@ -534,7 +548,11 @@ int main(void) {
       uidirtyto = 0xff;
 
     } else if (k == 0x13f) { /* F5 */
-      savefile(&db, fname);
+      const char *m[] = {"SAVED", "SAVING FILE FAILED"};
+      int i;
+      i = !!savefile(&db, fname);
+      ui_msg(m[i], screenw, screenh, &uidirtyfrom, &uidirtyto);
+      mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
