@@ -56,6 +56,7 @@ struct line {
 struct linedb {
   struct line far *cursor;
   unsigned short xoffset;
+  char lfonly; /* set if line endings are LF (CR/LF otherwise) */
 };
 
 
@@ -105,7 +106,7 @@ static void load_colorscheme(void) {
 }
 
 
-static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname) {
+static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname, const struct linedb *db) {
   unsigned char i;
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
@@ -113,11 +114,19 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const char *f
   /* clear screen */
   mdr_cout_cls(scheme[COL_TXT]);
 
-  /* status bar */
-  for (i = 0; i < helpcol; i++) {
-    mdr_cout_char(screenh - 1, i, *fname, scheme[COL_STATUSBAR1]);
-    if (*fname != 0) fname++;
+  /* fill status bar with background */
+  mdr_cout_char_rep(screenh - 1, 0, ' ', scheme[COL_STATUSBAR1], screenw);
+
+  /* filename */
+  mdr_cout_str(screenh - 1, 0, fname, scheme[COL_STATUSBAR1], screenw);
+
+  /* eol type */
+  if (db->lfonly) {
+    mdr_cout_str(screenh - 1, helpcol - 3, "LF", scheme[COL_STATUSBAR1], 5);
+  } else {
+    mdr_cout_str(screenh - 1, helpcol - 5, "CRLF", scheme[COL_STATUSBAR1], 5);
   }
+
   mdr_cout_str(screenh - 1, helpcol, " F1=", scheme[COL_STATUSBAR2], 40);
   mdr_cout_str(screenh - 1, helpcol + 4, s, scheme[COL_STATUSBAR2], 40);
 
@@ -377,6 +386,8 @@ static int loadfile(struct linedb *db, const char *fname) {
     return(-1);
   }
 
+  db->lfonly = 1;
+
   do {
     if (_dos_read(fd, buff + prevlen, sizeof(buff) - prevlen, &len) == 0) {
       len += prevlen;
@@ -389,7 +400,10 @@ static int loadfile(struct linedb *db, const char *fname) {
       if (llen == sizeof(buff)) break;
     }
     buff[llen] = 0;
-    if ((llen > 0) && (buff[llen - 1])) buff[llen - 1] = 0; /* trim \r if line ending is cr/lf */
+    if ((llen > 0) && (buff[llen - 1] == '\r')) {
+      buff[llen - 1] = 0; /* trim \r if line ending is cr/lf */
+      db->lfonly = 0;
+    }
     if (line_add(db, buff) != 0) {
       mdr_coutraw_puts("out of memory");
       r = -1;
@@ -411,6 +425,9 @@ static int savefile(const struct linedb *db, const char *fname) {
   int fd;
   const struct line far *l;
   unsigned bytes;
+  unsigned char eollen;
+  unsigned char eolbuf[2];
+
   if (_dos_open(fname, O_WRONLY, &fd) != 0) {
     return(-1);
   }
@@ -418,9 +435,19 @@ static int savefile(const struct linedb *db, const char *fname) {
   l = db->cursor;
   while (l->prev) l = l->prev;
 
+  /* preset line terminators */
+  if (db->lfonly) {
+    eolbuf[0] = '\n';
+    eollen = 1;
+  } else {
+    eolbuf[0] = '\r';
+    eolbuf[1] = '\n';
+    eollen = 2;
+  }
+
   while (l) {
     _dos_write(fd, l->payload, l->len, &bytes);
-    _dos_write(fd, "\r\n", 2, &bytes);
+    _dos_write(fd, eolbuf, eollen, &bytes);
     l = l->next;
   }
 
@@ -457,7 +484,7 @@ int main(void) {
   if (db.cursor->len != 0) line_add(&db, "");
 
   if (mdr_cout_init(&screenw, &screenh)) load_colorscheme();
-  ui_basic(screenw, screenh, fname);
+  ui_basic(screenw, screenh, fname, &db);
 
   db_rewind(&db);
 
