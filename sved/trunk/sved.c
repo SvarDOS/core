@@ -111,9 +111,6 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const char *f
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
 
-  /* clear screen */
-  mdr_cout_cls(scheme[COL_TXT]);
-
   /* fill status bar with background */
   mdr_cout_char_rep(screenh - 1, 0, ' ', scheme[COL_STATUSBAR1], screenw);
 
@@ -580,6 +577,10 @@ int main(void) {
       i = !!savefile(&db, fname);
       ui_msg(m[i], screenw, screenh, &uidirtyfrom, &uidirtyto);
       mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
+
+    } else if (k == 0x144) { /* F10 */
+      db.lfonly ^= 1;
+      ui_basic(screenw, screenh, fname, &db);
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
