@@ -172,7 +172,7 @@ static void ui_help(unsigned char screenw) {
 
 
 static void ui_refresh(const struct file *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto) {
-  unsigned char len;
+  unsigned char x;
   const struct line far *l;
   unsigned char y = db->cursorposy;
 
@@ -192,12 +192,19 @@ static void ui_refresh(const struct file *db, unsigned char screenw, unsigned ch
     if (y < uidirtyfrom) continue;
     if (y > uidirtyto) break;
 
+    x = 0;
     if (db->xoffset < l->len) {
-      for (len = 0; l->payload[len] != 0; len++) mdr_cout_char(y, len, l->payload[len], scheme[COL_TXT]);
-    } else {
-      len = 0;
+      unsigned char i, limit;
+      if (l->len - db->xoffset < screenw) {
+        limit = l->len;
+      } else {
+        limit = db->xoffset + screenw - 1;
+      }
+      for (i = db->xoffset; i < limit; i++) mdr_cout_char(y, x++, l->payload[i], scheme[COL_TXT]);
     }
-    while (len < screenw - 1) mdr_cout_char(y, len++, ' ', scheme[COL_TXT]);
+
+    /* write empty spaces until end of line */
+    if (x < screenw - 1) mdr_cout_char_rep(y, x, ' ', scheme[COL_TXT], screenw - 1 - x);
 
 #ifdef DBG_REFRESH
     mdr_cout_char(y, 0, m, scheme[COL_STATUSBAR1]);
@@ -206,6 +213,9 @@ static void ui_refresh(const struct file *db, unsigned char screenw, unsigned ch
     if (y == screenh - 2) break;
   }
 
+  while (y < screenh - 1) {
+    mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
+  }
 }
 
 
