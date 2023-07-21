@@ -456,6 +456,27 @@ static int savefile(const struct file *db, const char *fname) {
 }
 
 
+static void insert_in_line(struct file *db, const char *databuf, unsigned short len, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+  struct line far *n;
+  n = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + len);
+  if (n != NULL) {
+    unsigned short off = db->xoffset + db->cursorposx;
+    if (n->prev) n->prev->next = n;
+    if (n->next) n->next->prev = n;
+    db->cursor = n;
+    _fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
+    db->cursor->len += len;
+    *uidirtyfrom = db->cursorposy;
+    *uidirtyto = db->cursorposy;
+    while (len--) {
+      db->cursor->payload[off++] = *databuf;
+      databuf++;
+      cursor_right(db, screenw, screenh, uidirtyfrom, uidirtyto);
+    }
+  }
+}
+
+
 int main(void) {
   const char *fname;
   struct file db;
@@ -553,20 +574,12 @@ int main(void) {
       bkspc(&db, screenw, &uidirtyfrom, &uidirtyto);
 
     } else if ((k >= 0x20) && (k <= 0xff)) { /* "normal" character */
-      struct line far *n;
-      n = _frealloc(db.cursor, sizeof(struct line) + db.cursor->len);
-      if (n != NULL) {
-        unsigned short off = db.xoffset + db.cursorposx;
-        if (n->prev) n->prev->next = n;
-        if (n->next) n->next->prev = n;
-        db.cursor = n;
-        _fmemmove(db.cursor->payload + off + 1, db.cursor->payload + off, db.cursor->len - off + 1);
-        db.cursor->len += 1;
-        uidirtyfrom = db.cursorposy;
-        uidirtyto = db.cursorposy;
-        db.cursor->payload[off] = k;
-        cursor_right(&db, screenw, screenh, &uidirtyfrom, &uidirtyto);
-      }
+      char c = k;
+      insert_in_line(&db, &c, 1, screenw, screenh, &uidirtyfrom, &uidirtyto);
+
+    } else if (k == 0x009) { /* TAB */
+      const char *tab = "        ";
+      insert_in_line(&db, tab, 8, screenw, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x13b) { /* F1 */
       ui_help(screenw);
