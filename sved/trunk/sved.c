@@ -53,7 +53,7 @@ struct line {
   char payload[1];
 };
 
-struct linedb {
+struct file {
   struct line far *cursor;
   unsigned short xoffset;
   char lfonly; /* set if line endings are LF (CR/LF otherwise) */
@@ -61,7 +61,7 @@ struct linedb {
 
 
 /* returns non-zero on error */
-static int line_add(struct linedb *db, const char far *line) {
+static int line_add(struct file *db, const char far *line) {
   unsigned short slen;
   struct line far *l;
 
@@ -92,7 +92,7 @@ static int line_add(struct linedb *db, const char far *line) {
 }
 
 
-static void db_rewind(struct linedb *db) {
+static void db_rewind(struct file *db) {
   if (db->cursor == NULL) return;
   while (db->cursor->prev) db->cursor = db->cursor->prev;
 }
@@ -106,7 +106,7 @@ static void load_colorscheme(void) {
 }
 
 
-static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname, const struct linedb *db) {
+static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname, const struct file *db) {
   unsigned char i;
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
@@ -169,7 +169,7 @@ static void ui_help(unsigned char screenw) {
 }
 
 
-static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto, unsigned char y) {
+static void ui_refresh(const struct file *db, unsigned char screenw, unsigned char screenh, unsigned char uidirtyfrom, unsigned char uidirtyto, unsigned char y) {
   unsigned char len;
   const struct line far *l;
 
@@ -206,7 +206,7 @@ static void ui_refresh(const struct linedb *db, unsigned char screenw, unsigned 
 }
 
 
-static void check_cursor_not_after_eol(struct linedb *db, unsigned char *cursorpos, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void check_cursor_not_after_eol(struct file *db, unsigned char *cursorpos, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->xoffset + *cursorpos <= db->cursor->len) return;
 
   if (db->cursor->len < db->xoffset) {
@@ -220,7 +220,7 @@ static void check_cursor_not_after_eol(struct linedb *db, unsigned char *cursorp
 }
 
 
-static void cursor_up(struct linedb *db, unsigned char *cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_up(struct file *db, unsigned char *cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->cursor->prev != NULL) {
     db->cursor = db->cursor->prev;
     if (*cursorposy == 0) {
@@ -233,7 +233,7 @@ static void cursor_up(struct linedb *db, unsigned char *cursorposy, unsigned cha
 }
 
 
-static void cursor_eol(struct linedb *db, unsigned char *cursorposx, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_eol(struct file *db, unsigned char *cursorposx, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   /* adjust xoffset to make sure eol is visible on screen */
   if (db->xoffset > db->cursor->len) {
     db->xoffset = db->cursor->len - 1;
@@ -250,7 +250,7 @@ static void cursor_eol(struct linedb *db, unsigned char *cursorposx, unsigned ch
 }
 
 
-static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_down(struct file *db, unsigned char *cursorposy, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->cursor->next != NULL) {
     db->cursor = db->cursor->next;
     if (*cursorposy < screenh - 2) {
@@ -263,7 +263,7 @@ static void cursor_down(struct linedb *db, unsigned char *cursorposy, unsigned c
 }
 
 
-static void cursor_left(struct linedb *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_left(struct file *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (*cursorposx > 0) {
     *cursorposx -= 1;
   } else if (db->xoffset > 0) {
@@ -277,7 +277,7 @@ static void cursor_left(struct linedb *db, unsigned char *cursorposx, unsigned c
 }
 
 
-static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_home(struct file *db, unsigned char *cursorposx, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   *cursorposx = 0;
   if (db->xoffset != 0) {
     db->xoffset = 0;
@@ -287,7 +287,7 @@ static void cursor_home(struct linedb *db, unsigned char *cursorposx, unsigned c
 }
 
 
-static void cursor_right(struct linedb *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_right(struct file *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (db->cursor->len > db->xoffset + *cursorposx) {
     if (*cursorposx < screenw - 2) {
       *cursorposx += 1;
@@ -303,7 +303,7 @@ static void cursor_right(struct linedb *db, unsigned char *cursorposx, unsigned 
 }
 
 
-static void del(struct linedb *db, unsigned char cursorposx, unsigned char cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void del(struct file *db, unsigned char cursorposx, unsigned char cursorposy, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
   if (cursorposx + db->xoffset < db->cursor->len) {
     _fmemmove(db->cursor->payload + cursorposx + db->xoffset, db->cursor->payload + cursorposx + db->xoffset + 1, db->cursor->len - cursorposx - db->xoffset);
     db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
@@ -329,7 +329,7 @@ static void del(struct linedb *db, unsigned char cursorposx, unsigned char curso
 }
 
 
-static void bkspc(struct linedb *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void bkspc(struct file *db, unsigned char *cursorposx, unsigned char *cursorposy, unsigned char screenw, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
 
   /* backspace is basically "left + del", not applicable only if cursor is on 1st byte of the file */
   if ((*cursorposx == 0) && (db->xoffset == 0) && (db->cursor->prev == NULL)) return;
@@ -371,7 +371,7 @@ static char *parseargv(void) {
 }
 
 
-static int loadfile(struct linedb *db, const char *fname) {
+static int loadfile(struct file *db, const char *fname) {
   char buff[1024];
   unsigned int prevlen = 0, len, llen;
   int fd;
@@ -418,7 +418,7 @@ static int loadfile(struct linedb *db, const char *fname) {
 }
 
 
-static int savefile(const struct linedb *db, const char *fname) {
+static int savefile(const struct file *db, const char *fname) {
   int fd;
   const struct line far *l;
   unsigned bytes;
@@ -455,7 +455,7 @@ static int savefile(const struct linedb *db, const char *fname) {
 
 int main(void) {
   const char *fname;
-  struct linedb db;
+  struct file db;
   unsigned char screenw = 0, screenh = 0;
   unsigned char cursorposx = 0, cursorposy = 0;
   unsigned char uidirtyfrom = 0, uidirtyto = 0xff; /* make sure to redraw entire UI at first run */
