@@ -54,11 +54,13 @@ struct line {
 };
 
 struct file {
+  int fd;
   struct line far *cursor;
   unsigned short xoffset;
   unsigned char cursorposx;
   unsigned char cursorposy;
   char lfonly; /* set if line endings are LF (CR/LF otherwise) */
+  char fname[1]; /* dynamically sized */
 };
 
 
@@ -108,7 +110,7 @@ static void load_colorscheme(void) {
 }
 
 
-static void ui_basic(unsigned char screenw, unsigned char screenh, const char *fname, const struct file *db) {
+static void ui_basic(unsigned char screenw, unsigned char screenh, const struct file *db) {
   unsigned char i;
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
@@ -117,7 +119,7 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const char *f
   mdr_cout_char_rep(screenh - 1, 0, ' ', scheme[COL_STATUSBAR1], screenw);
 
   /* filename */
-  mdr_cout_str(screenh - 1, 0, fname, scheme[COL_STATUSBAR1], screenw);
+  mdr_cout_str(screenh - 1, 0, db->fname, scheme[COL_STATUSBAR1], screenw);
 
   /* eol type */
   if (db->lfonly) {
@@ -387,17 +389,25 @@ static char *parseargv(void) {
 }
 
 
-static int loadfile(struct file *db, const char *fname) {
+static struct file *loadfile(const char *fname) {
   char buff[1024];
   unsigned int prevlen = 0, len, llen;
   int fd;
-  int r = 0;
+  struct file *db;
 
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
     mdr_coutraw_puts("Failed to open file:");
     mdr_coutraw_puts(fname);
-    return(-1);
+    return(NULL);
   }
+
+  len = strlen(fname) + 1;
+  db = calloc(1, sizeof(struct file) + len);
+  if (db == NULL) {
+    _dos_close(fd);
+    return(NULL);
+  }
+  memcpy(db->fname, fname, len);
 
   db->lfonly = 1;
 
@@ -410,7 +420,9 @@ static int loadfile(struct file *db, const char *fname) {
 
     /* look for nearest \n and replace with 0*/
     for (llen = 0; buff[llen] != '\n'; llen++) {
-      if (llen == sizeof(buff)) break;
+      if (llen == sizeof(buff)) { /* TODO line too long: handle it in some classy way */
+        break;
+      }
     }
     buff[llen] = 0;
     if ((llen > 0) && (buff[llen - 1] == '\r')) {
@@ -419,7 +431,8 @@ static int loadfile(struct file *db, const char *fname) {
     }
     if (line_add(db, buff) != 0) {
       mdr_coutraw_puts("out of memory");
-      r = -1;
+      free(db);
+      db = NULL;
       break;
     }
 
@@ -430,18 +443,24 @@ static int loadfile(struct file *db, const char *fname) {
 
   _dos_close(fd);
 
-  return(r);
+  /* add an empty line at end if not present already, also rewind cursor to top of file */
+  if (db != NULL) {
+    if (db->cursor->len != 0) line_add(db, "");
+    db_rewind(db);
+  }
+
+  return(db);
 }
 
 
-static int savefile(const struct file *db, const char *fname) {
+static int savefile(const struct file *db) {
   int fd;
   const struct line far *l;
   unsigned bytes;
   unsigned char eollen;
   unsigned char eolbuf[2];
 
-  if (_dos_open(fname, O_WRONLY, &fd) != 0) {
+  if (_dos_open(db->fname, O_WRONLY, &fd) != 0) {
     return(-1);
   }
 
@@ -492,11 +511,9 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
 
 int main(void) {
   const char *fname;
-  struct file db;
+  struct file *db;
   unsigned char screenw = 0, screenh = 0;
   unsigned char uidirtyfrom = 0, uidirtyto = 0xff; /* make sure to redraw entire UI at first run */
-
-  bzero(&db, sizeof(db));
 
   {
     char nlspath[128], lang[8];
@@ -511,40 +528,36 @@ int main(void) {
   }
 
   /* load file */
-  if (loadfile(&db, fname) != 0) return(1);
-
-  /* add an empty line at end if not present already */
-  if (db.cursor->len != 0) line_add(&db, "");
+  db = loadfile(fname);
+  if (db == NULL) return(1);
 
   if (mdr_cout_init(&screenw, &screenh)) load_colorscheme();
-  ui_basic(screenw, screenh, fname, &db);
-
-  db_rewind(&db);
+  ui_basic(screenw, screenh, db);
 
   for (;;) {
     int k;
 
-    check_cursor_not_after_eol(&db, &uidirtyfrom, &uidirtyto);
-    mdr_cout_locate(db.cursorposy, db.cursorposx);
+    check_cursor_not_after_eol(db, &uidirtyfrom, &uidirtyto);
+    mdr_cout_locate(db->cursorposy, db->cursorposx);
 
     if (uidirtyfrom != 0xff) {
-      ui_refresh(&db, screenw, screenh, uidirtyfrom, uidirtyto);
+      ui_refresh(db, screenw, screenh, uidirtyfrom, uidirtyto);
       uidirtyfrom = 0xff;
     }
 
     k = keyb_getkey();
 
     if (k == 0x150) { /* down */
-      cursor_down(&db, screenh, &uidirtyfrom, &uidirtyto);
+      cursor_down(db, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x148) { /* up */
-      cursor_up(&db, &uidirtyfrom, &uidirtyto);
+      cursor_up(db, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x14D) { /* right */
-      cursor_right(&db, screenw, screenh, &uidirtyfrom, &uidirtyto);
+      cursor_right(db, screenw, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x14B) { /* left */
-      cursor_left(&db, screenw, &uidirtyfrom, &uidirtyto);
+      cursor_left(db, screenw, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x149) { /* pgup */
       // TODO
@@ -553,25 +566,25 @@ int main(void) {
       // TODO
 
     } else if (k == 0x147) { /* home */
-       cursor_home(&db, &uidirtyfrom, &uidirtyto);
+       cursor_home(db, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x14F) { /* end */
-       cursor_eol(&db, screenw, &uidirtyfrom, &uidirtyto);
+       cursor_eol(db, screenw, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x1B) { /* ESC */
       break;
 
     } else if (k == 0x0D) { /* ENTER */
       /* add a new line */
-      if (line_add(&db, db.cursor->payload + db.xoffset + db.cursorposx) == 0) {
+      if (line_add(db, db->cursor->payload + db->xoffset + db->cursorposx) == 0) {
         /* trim the line above */
-        db.cursor->prev->len = db.xoffset + db.cursorposx;
-        db.cursor->prev->payload[db.cursor->prev->len] = 0;
+        db->cursor->prev->len = db->xoffset + db->cursorposx;
+        db->cursor->prev->payload[db->cursor->prev->len] = 0;
         /* move cursor to the (new) line below */
-        db.cursorposx = 0;
-        if (db.cursorposy < screenh - 2) {
-          uidirtyfrom = db.cursorposy;
-          db.cursorposy++;
+        db->cursorposx = 0;
+        if (db->cursorposy < screenh - 2) {
+          uidirtyfrom = db->cursorposy;
+          db->cursorposy++;
         } else {
           uidirtyfrom = 0;
         }
@@ -581,18 +594,18 @@ int main(void) {
       }
 
     } else if (k == 0x153) {  /* DEL */
-      del(&db, &uidirtyfrom, &uidirtyto);
+      del(db, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x008) { /* BKSPC */
-      bkspc(&db, screenw, &uidirtyfrom, &uidirtyto);
+      bkspc(db, screenw, &uidirtyfrom, &uidirtyto);
 
     } else if ((k >= 0x20) && (k <= 0xff)) { /* "normal" character */
       char c = k;
-      insert_in_line(&db, &c, 1, screenw, screenh, &uidirtyfrom, &uidirtyto);
+      insert_in_line(db, &c, 1, screenw, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x009) { /* TAB */
       const char *tab = "        ";
-      insert_in_line(&db, tab, 8, screenw, screenh, &uidirtyfrom, &uidirtyto);
+      insert_in_line(db, tab, 8, screenw, screenh, &uidirtyfrom, &uidirtyto);
 
     } else if (k == 0x13b) { /* F1 */
       ui_help(screenw);
@@ -602,13 +615,13 @@ int main(void) {
     } else if (k == 0x13f) { /* F5 */
       const char *m[] = {"SAVED", "SAVING FILE FAILED"};
       int i;
-      i = !!savefile(&db, fname);
+      i = !!savefile(db);
       ui_msg(m[i], screenw, screenh, &uidirtyfrom, &uidirtyto);
       mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
 
     } else if (k == 0x144) { /* F10 */
-      db.lfonly ^= 1;
-      ui_basic(screenw, screenh, fname, &db);
+      db->lfonly ^= 1;
+      ui_basic(screenw, screenh, db);
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
@@ -625,7 +638,7 @@ int main(void) {
 
   mdr_cout_close();
 
-  /* TODO free memory */
+  /* no need to free memory, DOS will do it for me */
 
   return(0);
 }
