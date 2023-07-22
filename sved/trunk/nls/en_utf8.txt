@@ -5,7 +5,9 @@
 ###############
 
 0.0:HELP
-0.1:*NEW FILE*
+0.1:NEW FILE
+0.2:SAVED
+0.3:SAVING FAILED
 
 ################
 # USAGE SCREEN #

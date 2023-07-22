@@ -40,8 +40,10 @@
 #define COL_STATUSBAR1 1
 #define COL_STATUSBAR2 2
 #define COL_SCROLLBAR  3
+#define COL_MSG        4
+#define COL_ERR        5
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
-static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70};
+static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70, 0x70, 0x70};
 
 #define SCROLL_CURSOR 0xB1
 
@@ -107,6 +109,8 @@ static void load_colorscheme(void) {
   scheme[COL_STATUSBAR1] = 0x70;
   scheme[COL_STATUSBAR2] = 0x78;
   scheme[COL_SCROLLBAR] = 0x70;
+  scheme[COL_MSG] = 0x2f;
+  scheme[COL_ERR] = 0x4f;
 }
 
 
@@ -142,13 +146,13 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const struct 
 }
 
 
-static void ui_msg(const char *msg, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void ui_msg(const char *msg, unsigned char screenw, unsigned char screenh, unsigned char *uidirtyfrom, unsigned char *uidirtyto, unsigned char attr) {
   unsigned short x, y, msglen, i;
   msglen = strlen(msg);
   y = (screenh - 4) >> 1;
   x = (screenw - msglen - 4) >> 1;
-  for (i = y+2; i >= y; i--) mdr_cout_char_rep(i, x, ' ', scheme[COL_STATUSBAR1], msglen + 2);
-  mdr_cout_str(y+1, x+1, msg, scheme[COL_STATUSBAR1], msglen);
+  for (i = y+2; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
+  mdr_cout_str(y+1, x+1, msg, attr, msglen);
 
   if (*uidirtyfrom > y) *uidirtyfrom = y;
   if (*uidirtyto < y+2) *uidirtyto = y+2;
@@ -619,11 +623,13 @@ int main(void) {
       uidirtyto = 0xff;
 
     } else if (k == 0x13f) { /* F5 */
-      const char *m[] = {"SAVED", "SAVING FILE FAILED"};
-      int i;
-      i = !!savefile(db);
-      ui_msg(m[i], screenw, screenh, &uidirtyfrom, &uidirtyto);
-      mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
+      if (savefile(db) == 0) {
+        ui_msg(svarlang_str(0, 2), screenw, screenh, &uidirtyfrom, &uidirtyto, scheme[COL_MSG]);
+        mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
+      } else {
+        ui_msg(svarlang_str(0, 3), screenw, screenh, &uidirtyfrom, &uidirtyto, scheme[COL_ERR]);
+        mdr_bios_tickswait(36); /* 2s */
+      }
 
     } else if (k == 0x144) { /* F10 */
       db->lfonly ^= 1;
