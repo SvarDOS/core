@@ -119,7 +119,11 @@ static void ui_basic(unsigned char screenw, unsigned char screenh, const struct 
   mdr_cout_char_rep(screenh - 1, 0, ' ', scheme[COL_STATUSBAR1], screenw);
 
   /* filename */
-  mdr_cout_str(screenh - 1, 0, db->fname, scheme[COL_STATUSBAR1], screenw);
+  if (db->fname[0] == 0) {
+    mdr_cout_str(screenh - 1, 0, svarlang_str(0, 1), scheme[COL_STATUSBAR1], screenw);
+  } else {
+    mdr_cout_str(screenh - 1, 0, db->fname, scheme[COL_STATUSBAR1], screenw);
+  }
 
   /* eol type */
   if (db->lfonly) {
@@ -383,7 +387,7 @@ static char *parseargv(void) {
   }
 
   /* check args now */
-  if (count != 1) return(NULL);
+  if (count == 0) return("");
 
   return(argv[0]);
 }
@@ -395,19 +399,19 @@ static struct file *loadfile(const char *fname) {
   int fd;
   struct file *db;
 
+  len = strlen(fname) + 1;
+  db = calloc(1, sizeof(struct file) + len);
+  if (db == NULL) return(NULL);
+  memcpy(db->fname, fname, len);
+
+  if (*fname == 0) goto SKIPLOADING;
+
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
     mdr_coutraw_puts("Failed to open file:");
     mdr_coutraw_puts(fname);
+    free(db);
     return(NULL);
   }
-
-  len = strlen(fname) + 1;
-  db = calloc(1, sizeof(struct file) + len);
-  if (db == NULL) {
-    _dos_close(fd);
-    return(NULL);
-  }
-  memcpy(db->fname, fname, len);
 
   db->lfonly = 1;
 
@@ -443,9 +447,11 @@ static struct file *loadfile(const char *fname) {
 
   _dos_close(fd);
 
+  SKIPLOADING:
+
   /* add an empty line at end if not present already, also rewind cursor to top of file */
   if (db != NULL) {
-    if (db->cursor->len != 0) line_add(db, "");
+    if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, "");
     db_rewind(db);
   }
 
