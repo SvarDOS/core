@@ -213,8 +213,11 @@ static void ui_refresh(const struct file *db, unsigned char screenw, unsigned ch
     if (y == screenh - 2) break;
   }
 
-  while (y < screenh - 1) {
-    mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
+  /* fill all lines below if empty (and they need to be redrawn) */
+  if (l == NULL) {
+    while ((y < screenh - 1) && (y < uidirtyto)) {
+      mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
+    }
   }
 }
 
