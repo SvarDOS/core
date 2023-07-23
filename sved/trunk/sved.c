@@ -181,18 +181,20 @@ static void ui_msg(const char *msg, unsigned char screenw, unsigned char screenh
 static void ui_help(unsigned char screenw) {
 #define MAXLINLEN 35
   unsigned short i, offset;
-  offset = (screenw - MAXLINLEN + 1) >> 1;
+  offset = (screenw - MAXLINLEN + 2) >> 1;
   mdr_cout_cursor_hide();
-  for (i = 2; i <= 12; i++) {
-    mdr_cout_char_rep(i, offset - 2, ' ', scheme[COL_STATUSBAR1], MAXLINLEN);
+  for (i = 2; i <= 15; i++) {
+    mdr_cout_char_rep(i, offset - 2, ' ', scheme[COL_STATUSBAR1], MAXLINLEN + 2);
   }
 
   mdr_cout_str(3, offset, svarlang_str(0, 0), scheme[COL_STATUSBAR1], MAXLINLEN);
-  for (i = 0; i <= 2; i++) {
+  for (i = 0; i <= 4; i++) {
     mdr_cout_str(5 + i, offset, svarlang_str(8, i), scheme[COL_STATUSBAR1], MAXLINLEN);
   }
-  mdr_cout_str(9, offset, svarlang_str(8, 10), scheme[COL_STATUSBAR1], MAXLINLEN);
-  mdr_cout_str(11, offset, svarlang_str(8, 11), scheme[COL_STATUSBAR1], MAXLINLEN);
+  mdr_cout_str(5 + 1 + i, offset, svarlang_str(8, 10), scheme[COL_STATUSBAR1], MAXLINLEN);
+
+  /* Press any key */
+  mdr_cout_str(14, offset, svarlang_str(8, 11), scheme[COL_STATUSBAR1], MAXLINLEN);
 
   keyb_getkey();
   mdr_cout_cursor_show();
@@ -695,6 +697,38 @@ int main(void) {
     } else if (k == 0x144) { /* F10 */
       db->lfonly ^= 1;
       ui_basic(screenw, screenh, db);
+
+    } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
+      /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */
+      for (;;) {
+        if (db->xoffset + db->cursorposx == db->cursor->len) break;
+        if (db->cursor->payload[db->xoffset + db->cursorposx] == ' ') break;
+        cursor_right(db, screenw, screenh, &uidirtyfrom, &uidirtyto);
+      }
+      /* now skip to next non-space or end of file */
+      for (;;) {
+        cursor_right(db, screenw, screenh, &uidirtyfrom, &uidirtyto);
+        if (db->cursor->payload[db->xoffset + db->cursorposx] != ' ') break;
+        if ((db->cursor->next == NULL) && (db->cursorposx + db->xoffset == db->cursor->len)) break;
+      }
+
+    } else if (k == 0x173) { /* CTRL+ArrLeft - jump to prev word */
+      cursor_left(db, screenw, &uidirtyfrom, &uidirtyto);
+      /* if currently cursor is on a space, then fast-forward to nearest non-space or start of line */
+      for (;;) {
+        if ((db->xoffset == 0) && (db->cursorposx == 0)) break;
+        if (db->cursor->payload[db->xoffset + db->cursorposx] != ' ') break;
+        cursor_left(db, screenw, &uidirtyfrom, &uidirtyto);
+      }
+      /* now skip to next space or start of file */
+      for (;;) {
+        cursor_left(db, screenw, &uidirtyfrom, &uidirtyto);
+        if (db->cursor->payload[db->xoffset + db->cursorposx] == ' ') {
+          cursor_right(db, screenw, screenh, &uidirtyfrom, &uidirtyto);
+          break;
+        }
+        if ((db->cursorposx == 0) && (db->xoffset == 0)) break;
+      }
 
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];

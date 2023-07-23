@@ -23,5 +23,7 @@
 8.0:F5  = save file
 8.1:F6  = save as...
 8.2:F10 = change line endings
+8.3:CTRL+Right = jump to next word
+8.4:CTRL+Left  = jump to prev word
 8.10:ESC = quit
 8.11:Press any key
