@@ -426,8 +426,12 @@ static struct file *loadfile(const char *fname) {
       len = prevlen;
     }
 
-    /* look for nearest \n and replace with 0*/
+    /* look for nearest \n and replace with 0, also expand tabs */
     for (llen = 0; buff[llen] != '\n'; llen++) {
+      if (buff[llen] == '\t') {
+        unsigned char c;
+        for (c = 0; c < 8; c++) buff[llen++] = ' ';
+      }
       if (llen == sizeof(buff)) { /* TODO line too long: handle it in some classy way */
         break;
       }
