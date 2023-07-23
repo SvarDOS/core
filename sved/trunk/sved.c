@@ -43,7 +43,7 @@
 #define COL_MSG        4
 #define COL_ERR        5
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
-static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70, 0x70, 0x70};
+static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70, 0x70, 0xf0};
 
 #define SCROLL_CURSOR 0xB1
 
@@ -66,7 +66,8 @@ struct file {
 };
 
 
-/* returns non-zero on error */
+/* adds a new line at cursor position into file linked list and dvance cursor
+ * returns non-zero on error */
 static int line_add(struct file *db, const char far *line) {
   unsigned short slen;
   struct line far *l;
@@ -98,6 +99,24 @@ static int line_add(struct file *db, const char far *line) {
 }
 
 
+/* append a nul-terminated string to line at cursor position */
+static int line_append(struct file *f, const char far *buf, unsigned short len) {
+  struct line far *n;
+  if (sizeof(struct line) + f->cursor->len + len < len) return(-1); /* overflow check */
+  n = _frealloc(f->cursor, sizeof(struct line) + f->cursor->len + len);
+  if (n == NULL) return(-1);
+  f->cursor = n;
+  _fmemcpy(f->cursor->payload + f->cursor->len, buf, len);
+  f->cursor->len += len;
+
+  /* rewire the linked list */
+  if (f->cursor->next) f->cursor->next->prev = f->cursor;
+  if (f->cursor->prev) f->cursor->prev->next = f->cursor;
+
+  return(0);
+}
+
+
 static void db_rewind(struct file *db) {
   if (db->cursor == NULL) return;
   while (db->cursor->prev) db->cursor = db->cursor->prev;
@@ -109,7 +128,7 @@ static void load_colorscheme(void) {
   scheme[COL_STATUSBAR1] = 0x70;
   scheme[COL_STATUSBAR2] = 0x78;
   scheme[COL_SCROLLBAR] = 0x70;
-  scheme[COL_MSG] = 0x2f;
+  scheme[COL_MSG] = 0xf0;
   scheme[COL_ERR] = 0x4f;
 }
 
@@ -398,9 +417,11 @@ static char *parseargv(void) {
 
 
 static struct file *loadfile(const char *fname) {
-  char buff[1024];
-  unsigned int prevlen = 0, len, llen;
+  char buff[512]; /* read one entire sector at a time (faster) */
+  char *buffptr;
+  unsigned int len, llen;
   int fd;
+  unsigned char eolfound;
   struct file *db;
 
   len = strlen(fname) + 1;
@@ -419,39 +440,70 @@ static struct file *loadfile(const char *fname) {
 
   db->lfonly = 1;
 
-  do {
-    if (_dos_read(fd, buff + prevlen, sizeof(buff) - prevlen, &len) == 0) {
-      len += prevlen;
-    } else {
-      len = prevlen;
-    }
+  /* start by adding an empty line */
+  if (line_add(db, "") != 0) {
+    /* TODO ERROR HANDLING */
+  }
 
-    /* look for nearest \n and replace with 0, also expand tabs */
-    for (llen = 0; buff[llen] != '\n'; llen++) {
-      if (buff[llen] == '\t') {
-        unsigned char c;
-        for (c = 0; c < 8; c++) buff[llen++] = ' ';
+  for (eolfound = 0;;) {
+    unsigned short consumedbytes;
+
+    if ((_dos_read(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
+    buffptr = buff;
+
+    FINDLINE:
+
+    /* look for nearest \n */
+    for (consumedbytes = 0;; consumedbytes++) {
+      if (consumedbytes == len) {
+        llen = consumedbytes;
+        break;
       }
-      if (llen == sizeof(buff)) { /* TODO line too long: handle it in some classy way */
+      if (buffptr[consumedbytes] == '\r') {
+        llen = consumedbytes;
+        consumedbytes++;
+        db->lfonly = 0;
+        break;
+      }
+      if (buffptr[consumedbytes] == '\n') {
+        eolfound = 1;
+        llen = consumedbytes;
+        consumedbytes++;
         break;
       }
     }
-    buff[llen] = 0;
-    if ((llen > 0) && (buff[llen - 1] == '\r')) {
-      buff[llen - 1] = 0; /* trim \r if line ending is cr/lf */
-      db->lfonly = 0;
-    }
-    if (line_add(db, buff) != 0) {
+
+    /* consumedbytes is the amount of bytes processed from buffptr,
+     * llen is the length of line's payload (without its line terminator) */
+
+    /* append content, if line is non-empty */
+    if ((llen > 0) && (line_append(db, buffptr, llen) != 0)) {
       mdr_coutraw_puts("out of memory");
       free(db);
       db = NULL;
       break;
     }
 
-    len -= llen + 1;
-    memmove(buff, buff + llen + 1, len);
-    prevlen = len;
-  } while (len > 0);
+    /* add a new line if necessary */
+    if (eolfound) {
+      if (line_add(db, "") != 0) {
+      /* TODO ERROR HANDLING */
+        mdr_coutraw_puts("out of memory");
+        free(db);
+        db = NULL;
+        break;
+      }
+      eolfound = 0;
+    }
+
+    /* anything left? process the buffer leftover again */
+    if (consumedbytes < len) {
+      len -= consumedbytes;
+      buffptr += consumedbytes;
+      goto FINDLINE;
+    }
+
+  }
 
   _dos_close(fd);
 
@@ -492,7 +544,12 @@ static int savefile(const struct file *db) {
   }
 
   while (l) {
-    _dos_write(fd, l->payload, l->len, &bytes);
+    /* do not write the last empty line, it is only useful for edition */
+    if (l->len != 0) {
+      _dos_write(fd, l->payload, l->len, &bytes);
+    } else if (l->next == NULL) {
+      break;
+    }
     _dos_write(fd, eolbuf, eollen, &bytes);
     l = l->next;
   }

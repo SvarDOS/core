@@ -13,9 +13,10 @@ bootdisks or systems with limited ressources.
  - runs comfortably on a 8086-class PC with 256 KiB of RAM
  - supports color and monochrome video modes
  - supports extended text modes like 80x43, 80x50...
- - multilingual UI (uses the svarlang library)
+ - multilingual UI
  - low disk footprint (8 KiB)
  - handles files larger than 64 KiB
+ - no limit on line lengths
 
 Sved is released under the terms of the MIT license.
 
