@@ -52,14 +52,10 @@ static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70, 0x70, 0xf0};
 
 static unsigned char screenw, screenh;
 
-//static union {
 static struct {
     unsigned char from;
     unsigned char to;
-//  };
-//  unsigned short fromto;
 } uidirty = {0, 0xff}; /* make sure to redraw entire UI at first run */
-//} uidirty = {0xff, 0};
 
 #define SCROLL_CURSOR 0xB1
 
@@ -76,6 +72,8 @@ struct file {
   unsigned short xoffset;
   unsigned char cursorposx;
   unsigned char cursorposy;
+  unsigned short totlines;
+  unsigned short curline;
   char lfonly; /* set if line endings are LF (CR/LF otherwise) */
   char fname[1]; /* dynamically sized */
 };
@@ -85,23 +83,12 @@ struct file {
  * functions                                                                 *
  *****************************************************************************/
 
-/* adds a new line at cursor position into file linked list and dvance cursor
+/* adds a new line at cursor position into file linked list and advance cursor
  * returns non-zero on error */
-static int line_add(struct file *db, const char far *line) {
-  unsigned short slen;
+static int line_add(struct file *db, const char far *line, unsigned short slen) {
   struct line far *l;
 
-  /* slen = strlen(line) (but for far pointer) */
-  for (slen = 0; line[slen] != 0; slen++);
-
-  /* trim out CR/LF line endings */
-  if ((slen >= 2) && (line[slen - 2] == '\r')) {
-    slen -= 2;
-  } else if ((slen >= 1) && (line[slen - 1] == '\n')) {
-    slen--;
-  }
-
-  l = _fcalloc(1, sizeof(struct line) + slen + 1);
+  l = _fcalloc(1, sizeof(struct line) + slen);
   if (l == NULL) return(-1);
 
   l->prev = db->cursor;
@@ -113,6 +100,9 @@ static int line_add(struct file *db, const char far *line) {
   db->cursor = l;
   _fmemcpy(l->payload, line, slen);
   l->len = slen;
+
+  db->totlines += 1;
+  db->curline += 1;
 
   return(0);
 }
@@ -139,6 +129,7 @@ static int line_append(struct file *f, const char far *buf, unsigned short len) 
 static void db_rewind(struct file *db) {
   if (db->cursor == NULL) return;
   while (db->cursor->prev) db->cursor = db->cursor->prev;
+  db->curline = 0;
 }
 
 
@@ -153,7 +144,6 @@ static void load_colorscheme(void) {
 
 
 static void ui_basic(const struct file *db) {
-  unsigned char i;
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
 
@@ -176,11 +166,6 @@ static void ui_basic(const struct file *db) {
 
   mdr_cout_str(screenh - 1, helpcol, " F1=", scheme[COL_STATUSBAR2], 40);
   mdr_cout_str(screenh - 1, helpcol + 4, s, scheme[COL_STATUSBAR2], 40);
-
-  /* scroll bar */
-  for (i = 0; i < (screenh - 1); i++) {
-    mdr_cout_char(i, screenw - 1, SCROLL_CURSOR, scheme[COL_SCROLLBAR]);
-  }
 }
 
 
@@ -269,6 +254,25 @@ static void ui_refresh(const struct file *db) {
       mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
     }
   }
+
+  /* scroll bar */
+  for (y = 0; y < (screenh - 1); y++) {
+    mdr_cout_char(y, screenw - 1, SCROLL_CURSOR, scheme[COL_SCROLLBAR]);
+  }
+
+  /* scroll cursor */
+  if (db->totlines >= screenh) {
+    unsigned short topline = db->curline - db->cursorposy;
+    unsigned short col;
+    unsigned short totlines = db->totlines - screenh + 1;
+    if (db->totlines - screenh > screenh) {
+      col = topline / (totlines / (screenh - 1));
+    } else {
+      col = topline * (screenh - 1) / totlines;
+    }
+    if (col >= screenh - 1) col = screenh - 2;
+    mdr_cout_char(col, screenw - 1, ' ', scheme[COL_SCROLLBAR]);
+  }
 }
 
 
@@ -288,6 +292,7 @@ static void check_cursor_not_after_eol(struct file *db) {
 
 static void cursor_up(struct file *db) {
   if (db->cursor->prev != NULL) {
+    db->curline -= 1;
     db->cursor = db->cursor->prev;
     if (db->cursorposy == 0) {
       uidirty.from = 0;
@@ -318,6 +323,7 @@ static void cursor_eol(struct file *db) {
 
 static void cursor_down(struct file *db) {
   if (db->cursor->next != NULL) {
+    db->curline += 1;
     db->cursor = db->cursor->next;
     if (db->cursorposy < screenh - 2) {
       db->cursorposy += 1;
@@ -391,6 +397,7 @@ static void del(struct file *db) {
     _ffree(nextline);
     uidirty.from = db->cursorposy;
     uidirty.to = 0xff;
+    db->totlines -= 1;
   }
 }
 
@@ -462,7 +469,7 @@ static struct file *loadfile(const char *fname) {
   db->lfonly = 1;
 
   /* start by adding an empty line */
-  if (line_add(db, "") != 0) {
+  if (line_add(db, NULL, 0) != 0) {
     /* TODO ERROR HANDLING */
   }
 
@@ -507,7 +514,7 @@ static struct file *loadfile(const char *fname) {
 
     /* add a new line if necessary */
     if (eolfound) {
-      if (line_add(db, "") != 0) {
+      if (line_add(db, NULL, 0) != 0) {
       /* TODO ERROR HANDLING */
         mdr_coutraw_puts("out of memory");
         free(db);
@@ -532,7 +539,7 @@ static struct file *loadfile(const char *fname) {
 
   /* add an empty line at end if not present already, also rewind cursor to top of file */
   if (db != NULL) {
-    if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, "");
+    if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, NULL, 0);
     db_rewind(db);
   }
 
@@ -634,6 +641,22 @@ int main(void) {
       ui_refresh(db);
       uidirty.from = 0xff;
     }
+#ifdef DBG_LINENUM
+      {
+        char ddd[10];
+        db->curline += 1;
+        ddd[0] = '0' + db->curline / 100;
+        ddd[1] = '0' + (db->curline % 100) / 10;
+        ddd[2] = '0' + (db->curline % 10);
+        db->curline -= 1;
+        ddd[3] = '/';
+        ddd[4] = '0' + db->totlines / 100;
+        ddd[5] = '0' + (db->totlines % 100) / 10;
+        ddd[6] = '0' + (db->totlines % 10);
+        ddd[7] = 0;
+        mdr_cout_str(screenh - 1, 40, ddd, scheme[COL_STATUSBAR1], sizeof(ddd));
+      }
+#endif
 
     k = keyb_getkey();
 
@@ -665,20 +688,18 @@ int main(void) {
       break;
 
     } else if (k == 0x0D) { /* ENTER */
+      unsigned short off = db->xoffset + db->cursorposx;
       /* add a new line */
-      if (line_add(db, db->cursor->payload + db->xoffset + db->cursorposx) == 0) {
+      if (line_add(db, db->cursor->payload + off, db->cursor->len - off) == 0) {
+        db->cursor = db->cursor->prev; /* back to original line */
+        db->curline -= 1;
         /* trim the line above */
-        db->cursor->prev->len = db->xoffset + db->cursorposx;
-        db->cursor->prev->payload[db->cursor->prev->len] = 0;
+        db->cursor->len = off;
         /* move cursor to the (new) line below */
-        db->cursorposx = 0;
-        if (db->cursorposy < screenh - 2) {
-          uidirty.from = db->cursorposy;
-          db->cursorposy++;
-        } else {
-          uidirty.from = 0;
-        }
+        uidirty.from = db->cursorposy;
         uidirty.to = 0xff;
+        cursor_down(db);
+        cursor_home(db);
       } else {
         /* ERROR: OUT OF MEMORY */
       }
