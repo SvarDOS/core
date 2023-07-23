@@ -49,7 +49,17 @@
 
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
 static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70, 0x70, 0xf0};
+
 static unsigned char screenw, screenh;
+
+//static union {
+static struct {
+    unsigned char from;
+    unsigned char to;
+//  };
+//  unsigned short fromto;
+} uidirty = {0, 0xff}; /* make sure to redraw entire UI at first run */
+//} uidirty = {0xff, 0};
 
 #define SCROLL_CURSOR 0xB1
 
@@ -174,7 +184,7 @@ static void ui_basic(const struct file *db) {
 }
 
 
-static void ui_msg(const char *msg, unsigned char *uidirtyfrom, unsigned char *uidirtyto, unsigned char attr) {
+static void ui_msg(const char *msg, unsigned char attr) {
   unsigned short x, y, msglen, i;
   msglen = strlen(msg);
   y = (screenh - 4) >> 1;
@@ -182,8 +192,8 @@ static void ui_msg(const char *msg, unsigned char *uidirtyfrom, unsigned char *u
   for (i = y+2; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
   mdr_cout_str(y+1, x+1, msg, attr, msglen);
 
-  if (*uidirtyfrom > y) *uidirtyfrom = y;
-  if (*uidirtyto < y+2) *uidirtyto = y+2;
+  if (uidirty.from > y) uidirty.from = y;
+  if (uidirty.to < y+2) uidirty.to = y+2;
 }
 
 
@@ -211,7 +221,7 @@ static void ui_help(void) {
 }
 
 
-static void ui_refresh(const struct file *db, unsigned char uidirtyfrom, unsigned char uidirtyto) {
+static void ui_refresh(const struct file *db) {
   unsigned char x;
   const struct line far *l;
   unsigned char y = db->cursorposy;
@@ -223,14 +233,14 @@ static void ui_refresh(const struct file *db, unsigned char uidirtyfrom, unsigne
 #endif
 
   /* rewind cursor line to first line that needs redrawing */
-  for (l = db->cursor; y > uidirtyfrom; y--) l = l->prev;
+  for (l = db->cursor; y > uidirty.from; y--) l = l->prev;
 
   /* iterate over lines and redraw whatever needs to be redrawn */
   for (; l != NULL; l = l->next, y++) {
 
     /* skip lines that do not need to be refreshed */
-    if (y < uidirtyfrom) continue;
-    if (y > uidirtyto) break;
+    if (y < uidirty.from) continue;
+    if (y > uidirty.to) break;
 
     x = 0;
     if (db->xoffset < l->len) {
@@ -255,33 +265,33 @@ static void ui_refresh(const struct file *db, unsigned char uidirtyfrom, unsigne
 
   /* fill all lines below if empty (and they need to be redrawn) */
   if (l == NULL) {
-    while ((y < screenh - 1) && (y < uidirtyto)) {
+    while ((y < screenh - 1) && (y < uidirty.to)) {
       mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
     }
   }
 }
 
 
-static void check_cursor_not_after_eol(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void check_cursor_not_after_eol(struct file *db) {
   if (db->xoffset + db->cursorposx <= db->cursor->len) return;
 
   if (db->cursor->len < db->xoffset) {
     db->cursorposx = 0;
     db->xoffset = db->cursor->len;
-    *uidirtyfrom = 0;
-    *uidirtyto = 0xff;
+    uidirty.from = 0;
+    uidirty.to = 0xff;
   } else {
     db->cursorposx = db->cursor->len - db->xoffset;
   }
 }
 
 
-static void cursor_up(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_up(struct file *db) {
   if (db->cursor->prev != NULL) {
     db->cursor = db->cursor->prev;
     if (db->cursorposy == 0) {
-      *uidirtyfrom = 0;
-      *uidirtyto = 0xff;
+      uidirty.from = 0;
+      uidirty.to = 0xff;
     } else {
       db->cursorposy -= 1;
     }
@@ -289,82 +299,82 @@ static void cursor_up(struct file *db, unsigned char *uidirtyfrom, unsigned char
 }
 
 
-static void cursor_eol(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_eol(struct file *db) {
   /* adjust xoffset to make sure eol is visible on screen */
   if (db->xoffset > db->cursor->len) {
     db->xoffset = db->cursor->len - 1;
-    *uidirtyfrom = 0;
-    *uidirtyto = 0xff;
+    uidirty.from = 0;
+    uidirty.to = 0xff;
   }
 
   if (db->xoffset + screenw - 1 <= db->cursor->len) {
     db->xoffset = db->cursor->len - screenw + 2;
-    *uidirtyfrom = 0;
-    *uidirtyto = 0xff;
+    uidirty.from = 0;
+    uidirty.to = 0xff;
   }
   db->cursorposx = db->cursor->len - db->xoffset;
 }
 
 
-static void cursor_down(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_down(struct file *db) {
   if (db->cursor->next != NULL) {
     db->cursor = db->cursor->next;
     if (db->cursorposy < screenh - 2) {
       db->cursorposy += 1;
     } else {
-      *uidirtyfrom = 0;
-      *uidirtyto = 0xff;
+      uidirty.from = 0;
+      uidirty.to = 0xff;
     }
   }
 }
 
 
-static void cursor_left(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_left(struct file *db) {
   if (db->cursorposx > 0) {
     db->cursorposx -= 1;
   } else if (db->xoffset > 0) {
     db->xoffset -= 1;
-    *uidirtyfrom = 0;
-    *uidirtyto = 0xff;
+    uidirty.from = 0;
+    uidirty.to = 0xff;
   } else if (db->cursor->prev != NULL) { /* jump to end of line above */
-    cursor_up(db, uidirtyfrom, uidirtyto);
-    cursor_eol(db, uidirtyfrom, uidirtyto);
+    cursor_up(db);
+    cursor_eol(db);
   }
 }
 
 
-static void cursor_home(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_home(struct file *db) {
   db->cursorposx = 0;
   if (db->xoffset != 0) {
     db->xoffset = 0;
-    *uidirtyfrom = 0;
-    *uidirtyto = 0xff;
+    uidirty.from = 0;
+    uidirty.to = 0xff;
   }
 }
 
 
-static void cursor_right(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void cursor_right(struct file *db) {
   if (db->cursor->len > db->xoffset + db->cursorposx) {
     if (db->cursorposx < screenw - 2) {
       db->cursorposx += 1;
     } else {
       db->xoffset += 1;
-      *uidirtyfrom = 0;
-      *uidirtyto = 0xff;
+      uidirty.from = 0;
+      uidirty.to = 0xff;
     }
   } else {
-    cursor_down(db, uidirtyfrom, uidirtyto);
-    cursor_home(db, uidirtyfrom, uidirtyto);
+    cursor_down(db);
+    cursor_home(db);
   }
 }
 
 
-static void del(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void del(struct file *db) {
   if (db->cursorposx + db->xoffset < db->cursor->len) {
     _fmemmove(db->cursor->payload + db->cursorposx + db->xoffset, db->cursor->payload + db->cursorposx + db->xoffset + 1, db->cursor->len - db->cursorposx - db->xoffset);
     db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
-    *uidirtyfrom = db->cursorposy;
-    *uidirtyto = db->cursorposy;
+    uidirty.from = db->cursorposy;
+    uidirty.to = db->cursorposy;
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
@@ -379,19 +389,19 @@ static void del(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidi
     db->cursor->next->prev = db->cursor;
     if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor; /* in case realloc changed my pointer */
     _ffree(nextline);
-    *uidirtyfrom = db->cursorposy;
-    *uidirtyto = 0xff;
+    uidirty.from = db->cursorposy;
+    uidirty.to = 0xff;
   }
 }
 
 
-static void bkspc(struct file *db, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void bkspc(struct file *db) {
 
   /* backspace is basically "left + del", not applicable only if cursor is on 1st byte of the file */
   if ((db->cursorposx == 0) && (db->xoffset == 0) && (db->cursor->prev == NULL)) return;
 
-  cursor_left(db, uidirtyfrom, uidirtyto);
-  del(db, uidirtyfrom, uidirtyto);
+  cursor_left(db);
+  del(db);
 }
 
 
@@ -570,7 +580,7 @@ static int savefile(const struct file *db) {
 }
 
 
-static void insert_in_line(struct file *db, const char *databuf, unsigned short len, unsigned char *uidirtyfrom, unsigned char *uidirtyto) {
+static void insert_in_line(struct file *db, const char *databuf, unsigned short len) {
   struct line far *n;
   n = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + len);
   if (n != NULL) {
@@ -580,12 +590,12 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
     db->cursor = n;
     _fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
     db->cursor->len += len;
-    *uidirtyfrom = db->cursorposy;
-    *uidirtyto = db->cursorposy;
+    uidirty.from = db->cursorposy;
+    uidirty.to = db->cursorposy;
     while (len--) {
       db->cursor->payload[off++] = *databuf;
       databuf++;
-      cursor_right(db, uidirtyfrom, uidirtyto);
+      cursor_right(db);
     }
   }
 }
@@ -594,7 +604,6 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
 int main(void) {
   const char *fname;
   struct file *db;
-  unsigned char uidirtyfrom = 0, uidirtyto = 0xff; /* make sure to redraw entire UI at first run */
 
   {
     char nlspath[128], lang[8];
@@ -618,27 +627,27 @@ int main(void) {
   for (;;) {
     int k;
 
-    check_cursor_not_after_eol(db, &uidirtyfrom, &uidirtyto);
+    check_cursor_not_after_eol(db);
     mdr_cout_locate(db->cursorposy, db->cursorposx);
 
-    if (uidirtyfrom != 0xff) {
-      ui_refresh(db, uidirtyfrom, uidirtyto);
-      uidirtyfrom = 0xff;
+    if (uidirty.from != 0xff) {
+      ui_refresh(db);
+      uidirty.from = 0xff;
     }
 
     k = keyb_getkey();
 
     if (k == 0x150) { /* down */
-      cursor_down(db, &uidirtyfrom, &uidirtyto);
+      cursor_down(db);
 
     } else if (k == 0x148) { /* up */
-      cursor_up(db, &uidirtyfrom, &uidirtyto);
+      cursor_up(db);
 
     } else if (k == 0x14D) { /* right */
-      cursor_right(db, &uidirtyfrom, &uidirtyto);
+      cursor_right(db);
 
     } else if (k == 0x14B) { /* left */
-      cursor_left(db, &uidirtyfrom, &uidirtyto);
+      cursor_left(db);
 
     } else if (k == 0x149) { /* pgup */
       // TODO
@@ -647,10 +656,10 @@ int main(void) {
       // TODO
 
     } else if (k == 0x147) { /* home */
-       cursor_home(db, &uidirtyfrom, &uidirtyto);
+       cursor_home(db);
 
     } else if (k == 0x14F) { /* end */
-       cursor_eol(db, &uidirtyfrom, &uidirtyto);
+       cursor_eol(db);
 
     } else if (k == 0x1B) { /* ESC */
       break;
@@ -664,41 +673,41 @@ int main(void) {
         /* move cursor to the (new) line below */
         db->cursorposx = 0;
         if (db->cursorposy < screenh - 2) {
-          uidirtyfrom = db->cursorposy;
+          uidirty.from = db->cursorposy;
           db->cursorposy++;
         } else {
-          uidirtyfrom = 0;
+          uidirty.from = 0;
         }
-        uidirtyto = 0xff;
+        uidirty.to = 0xff;
       } else {
         /* ERROR: OUT OF MEMORY */
       }
 
     } else if (k == 0x153) {  /* DEL */
-      del(db, &uidirtyfrom, &uidirtyto);
+      del(db);
 
     } else if (k == 0x008) { /* BKSPC */
-      bkspc(db, &uidirtyfrom, &uidirtyto);
+      bkspc(db);
 
     } else if ((k >= 0x20) && (k <= 0xff)) { /* "normal" character */
       char c = k;
-      insert_in_line(db, &c, 1, &uidirtyfrom, &uidirtyto);
+      insert_in_line(db, &c, 1);
 
     } else if (k == 0x009) { /* TAB */
       const char *tab = "        ";
-      insert_in_line(db, tab, 8, &uidirtyfrom, &uidirtyto);
+      insert_in_line(db, tab, 8);
 
     } else if (k == 0x13b) { /* F1 */
       ui_help();
-      uidirtyfrom = 0;
-      uidirtyto = 0xff;
+      uidirty.from = 0;
+      uidirty.to = 0xff;
 
     } else if (k == 0x13f) { /* F5 */
       if (savefile(db) == 0) {
-        ui_msg(svarlang_str(0, 2), &uidirtyfrom, &uidirtyto, scheme[COL_MSG]);
+        ui_msg(svarlang_str(0, 2), scheme[COL_MSG]);
         mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
       } else {
-        ui_msg(svarlang_str(0, 3), &uidirtyfrom, &uidirtyto, scheme[COL_ERR]);
+        ui_msg(svarlang_str(0, 3), scheme[COL_ERR]);
         mdr_bios_tickswait(36); /* 2s */
       }
 
@@ -711,28 +720,28 @@ int main(void) {
       for (;;) {
         if (db->xoffset + db->cursorposx == db->cursor->len) break;
         if (db->cursor->payload[db->xoffset + db->cursorposx] == ' ') break;
-        cursor_right(db, &uidirtyfrom, &uidirtyto);
+        cursor_right(db);
       }
       /* now skip to next non-space or end of file */
       for (;;) {
-        cursor_right(db, &uidirtyfrom, &uidirtyto);
+        cursor_right(db);
         if (db->cursor->payload[db->xoffset + db->cursorposx] != ' ') break;
         if ((db->cursor->next == NULL) && (db->cursorposx + db->xoffset == db->cursor->len)) break;
       }
 
     } else if (k == 0x173) { /* CTRL+ArrLeft - jump to prev word */
-      cursor_left(db, &uidirtyfrom, &uidirtyto);
+      cursor_left(db);
       /* if currently cursor is on a space, then fast-forward to nearest non-space or start of line */
       for (;;) {
         if ((db->xoffset == 0) && (db->cursorposx == 0)) break;
         if (db->cursor->payload[db->xoffset + db->cursorposx] != ' ') break;
-        cursor_left(db, &uidirtyfrom, &uidirtyto);
+        cursor_left(db);
       }
       /* now skip to next space or start of file */
       for (;;) {
-        cursor_left(db, &uidirtyfrom, &uidirtyto);
+        cursor_left(db);
         if (db->cursor->payload[db->xoffset + db->cursorposx] == ' ') {
-          cursor_right(db, &uidirtyfrom, &uidirtyto);
+          cursor_right(db);
           break;
         }
         if ((db->cursorposx == 0) && (db->xoffset == 0)) break;
