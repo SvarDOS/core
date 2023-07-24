@@ -5,30 +5,42 @@
 
 
 Sved is the editor that comes with SvarDOS. Sved is not meant to be a
-full-featured text editor, it is designed to allow for basic editing of
-configuration files, nothing more. On the pro side Sved has a low memory
-footprint and is only a couple of kilobytes big, which makes it a good fit on
-bootdisks or systems with limited ressources.
+full-featured text editor, it is designed for basic editing of configuration
+files and not much more. On the pro side Sved has a low memory footprint and
+is only a couple of kilobytes big, which makes it a good fit on bootdisks or
+systems with extremely limited ressources.
 
  - runs comfortably on a 8086-class PC with 256 KiB of RAM
  - supports color and monochrome video modes
  - supports extended text modes like 80x43, 80x50...
  - multilingual UI
  - low disk footprint (8 KiB)
- - handles files larger than 64 KiB
+ - loads files larger than 64 KiB
  - no limit on line lengths
+ - handles CR/LF and LF line endings (+can convert between the two)
+
+What Sved does NOT have:
+
+ - stylish pull-down menus
+ - mouse support
+ - an integrated file browser
+ - multiple files interface
+ - copy/paste support
+ - undo
+ - search
+ - ...
 
 Sved is released under the terms of the MIT license.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
