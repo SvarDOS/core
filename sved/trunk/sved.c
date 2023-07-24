@@ -170,16 +170,26 @@ static void ui_basic(const struct file *db) {
 }
 
 
-static void ui_msg(const char *msg, unsigned char attr) {
+static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
   unsigned short x, y, msglen, i;
-  msglen = strlen(msg);
-  y = (screenh - 4) >> 1;
+  unsigned char msg2flag = 0;
+
+  msglen = strlen(msg1);
+  if (msg2) {
+    msg2flag = 1;
+    i = strlen(msg2);
+    if (i > msglen) msglen = i;
+  }
+
+  y = (screenh - 6) >> 1;
   x = (screenw - msglen - 4) >> 1;
-  for (i = y+2; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
-  mdr_cout_str(y+1, x+1, msg, attr, msglen);
+  for (i = y+2+msg2flag; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
+  x++;
+  mdr_cout_str(y+1, x, msg1, attr, msglen);
+  if (msg2) mdr_cout_str(y+2, x, msg2, attr, msglen);
 
   if (uidirty.from > y) uidirty.from = y;
-  if (uidirty.to < y+3) uidirty.to = y+3;
+  if (uidirty.to < y+4) uidirty.to = y+4;
 }
 
 
@@ -697,7 +707,10 @@ int main(void) {
        cursor_eol(db);
 
     } else if (k == 0x1B) { /* ESC */
-      break;
+      if (db->modflag == 0) break;
+      /* if file has been modified then ask for confirmation */
+      ui_msg(svarlang_str(0,4), svarlang_str(0,5), scheme[COL_MSG]);
+      if (keyb_getkey() == '\r') break;
 
     } else if (k == 0x0D) { /* ENTER */
       unsigned short off = db->xoffset + db->cursorposx;
@@ -739,10 +752,10 @@ int main(void) {
     } else if (k == 0x13f) { /* F5 */
       if (savefile(db) == 0) {
         db->modflag = 0;
-        ui_msg(svarlang_str(0, 2), scheme[COL_MSG]);
+        ui_msg(svarlang_str(0, 2), NULL, scheme[COL_MSG]);
         mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
       } else {
-        ui_msg(svarlang_str(0, 3), scheme[COL_ERR]);
+        ui_msg(svarlang_str(0, 3), NULL, scheme[COL_ERR]);
         mdr_bios_tickswait(36); /* 2s */
       }
 
