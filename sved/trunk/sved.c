@@ -43,12 +43,13 @@
 #define COL_TXT        0
 #define COL_STATUSBAR1 1
 #define COL_STATUSBAR2 2
-#define COL_SCROLLBAR  3
-#define COL_MSG        4
-#define COL_ERR        5
+#define COL_STATUSBAR3 3
+#define COL_SCROLLBAR  4
+#define COL_MSG        5
+#define COL_ERR        6
 
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
-static unsigned char scheme[] = {0x07, 0x70, 0x70, 0x70, 0x70, 0xf0};
+static unsigned char scheme[] = {0x07, 0x70, 0x70, 0xf0, 0x70, 0x70, 0xf0};
 
 static unsigned char screenw, screenh;
 
@@ -76,7 +77,7 @@ struct file {
   unsigned short curline;
   char lfonly;   /* set if line endings are LF (CR/LF otherwise) */
   char modflag;  /* non-zero if file has been modified since last save */
-  char fname[1]; /* dynamically sized */
+  char fname[128];
 };
 
 
@@ -109,6 +110,45 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
 }
 
 
+static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
+  unsigned char len = 0, y, x;
+  int k;
+
+  if (maxlen == 0) return;
+  maxlen--; /* make room for the nul terminator */
+
+  y = screenh - 1;
+
+  /* print query string */
+  x = mdr_cout_str(y, 0, query, scheme[COL_STATUSBAR3], 40);
+  mdr_cout_char_rep(y, x++, ' ', scheme[COL_STATUSBAR3], screenw - x);
+
+  for (;;) {
+    mdr_cout_locate(y, x + len);
+    k = keyb_getkey();
+
+    if (k == 0x1b) return; /* ESC */
+
+    if (k == '\r') {
+      s[len] = 0;
+      return;
+    }
+
+    if ((k == 0x08) && (len > 0)) { /* BKSPC */
+      len--;
+      mdr_cout_char(y, x + len, ' ', scheme[COL_STATUSBAR3]);
+      continue;
+    }
+
+    if ((k <= 0xff) && (k >= ' ') && (len < maxlen)) {
+      mdr_cout_char(y, x + len, k, scheme[COL_STATUSBAR3]);
+      s[len++] = k;
+    }
+
+  }
+}
+
+
 /* append a nul-terminated string to line at cursor position */
 static int line_append(struct file *f, const char far *buf, unsigned short len) {
   struct line far *n;
@@ -138,6 +178,7 @@ static void load_colorscheme(void) {
   scheme[COL_TXT] = 0x17;
   scheme[COL_STATUSBAR1] = 0x70;
   scheme[COL_STATUSBAR2] = 0x78;
+  scheme[COL_STATUSBAR3] = 0xf0;
   scheme[COL_SCROLLBAR] = 0x70;
   scheme[COL_MSG] = 0xf0;
   scheme[COL_ERR] = 0x4f;
@@ -473,7 +514,7 @@ static struct file *loadfile(const char *fname) {
   struct file *db;
 
   len = strlen(fname) + 1;
-  db = calloc(1, sizeof(struct file) + len);
+  db = calloc(1, sizeof(struct file));
   if (db == NULL) return(NULL);
   memcpy(db->fname, fname, len);
 
@@ -567,15 +608,19 @@ static struct file *loadfile(const char *fname) {
 }
 
 
-static int savefile(const struct file *db) {
+static int savefile(const struct file *db, const char *newfname) {
   int fd;
   const struct line far *l;
   unsigned bytes;
   unsigned char eollen;
   unsigned char eolbuf[2];
+  int errflag = 0;
 
-  if (_dos_open(db->fname, O_WRONLY, &fd) != 0) {
-    return(-1);
+  /* either create a new file if newfname provided, or... */
+  if (newfname) {
+    if (_dos_creatnew(newfname, _A_NORMAL, &fd) != 0) return(-1);
+  } else { /* ...open db->fname */
+    if (_dos_open(db->fname, O_WRONLY, &fd) != 0) return(-1);
   }
 
   l = db->cursor;
@@ -594,17 +639,17 @@ static int savefile(const struct file *db) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      _dos_write(fd, l->payload, l->len, &bytes);
+      errflag |= _dos_write(fd, l->payload, l->len, &bytes);
     } else if (l->next == NULL) {
       break;
     }
-    _dos_write(fd, eolbuf, eollen, &bytes);
+    errflag |= _dos_write(fd, eolbuf, eollen, &bytes);
     l = l->next;
   }
 
-  _dos_close(fd);
+  errflag |= _dos_close(fd);
 
-  return(0);
+  return(errflag);
 }
 
 
@@ -749,8 +794,20 @@ int main(void) {
       uidirty.from = 0;
       uidirty.to = 0xff;
 
-    } else if (k == 0x13f) { /* F5 */
-      if (savefile(db) == 0) {
+    } else if ((k == 0x13f) || (k == 0x140)) { /* F5 or F6 */
+      int saveres;
+
+      if ((k == 0x140) || (db->fname[0] == 0)) { /* save as... */
+        char fname[25];
+        ui_getstring(svarlang_str(0,6), fname, sizeof(fname));
+        if (*fname == 0) continue;
+        saveres = savefile(db, fname);
+        if (saveres == 0) memcpy(db->fname, fname, sizeof(fname));
+      } else {
+        saveres = savefile(db, NULL);
+      }
+
+      if (saveres == 0) {
         db->modflag = 0;
         ui_msg(svarlang_str(0, 2), NULL, scheme[COL_MSG]);
         mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
@@ -758,6 +815,9 @@ int main(void) {
         ui_msg(svarlang_str(0, 3), NULL, scheme[COL_ERR]);
         mdr_bios_tickswait(36); /* 2s */
       }
+
+      ui_basic(db);
+      ui_refresh(db);
 
     } else if (k == 0x144) { /* F10 */
       db->modflag = 1;

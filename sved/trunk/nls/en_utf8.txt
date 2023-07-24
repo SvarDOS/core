@@ -10,6 +10,7 @@
 0.3:SAVING FAILED
 0.4:Unsaved changes will be lost.
 0.5:Press ENTER to confirm.
+0.6:Save as:
 
 ################
 # USAGE SCREEN #
