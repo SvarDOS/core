@@ -74,7 +74,8 @@ struct file {
   unsigned char cursorposy;
   unsigned short totlines;
   unsigned short curline;
-  char lfonly; /* set if line endings are LF (CR/LF otherwise) */
+  char lfonly;   /* set if line endings are LF (CR/LF otherwise) */
+  char modflag;  /* non-zero if file has been modified since last save */
   char fname[1]; /* dynamically sized */
 };
 
@@ -147,21 +148,21 @@ static void ui_basic(const struct file *db) {
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
 
-  /* fill status bar with background */
-  mdr_cout_char_rep(screenh - 1, 0, ' ', scheme[COL_STATUSBAR1], screenw);
+  /* fill status bar with background (without modflag as it is refreshed by ui_refresh) */
+  mdr_cout_char_rep(screenh - 1, 1, ' ', scheme[COL_STATUSBAR1], screenw - 1);
 
   /* filename */
-  if (db->fname[0] == 0) {
-    mdr_cout_str(screenh - 1, 0, svarlang_str(0, 1), scheme[COL_STATUSBAR1], screenw);
-  } else {
-    mdr_cout_str(screenh - 1, 0, db->fname, scheme[COL_STATUSBAR1], screenw);
+  {
+    const char *fn = db->fname;
+    if (*fn == 0) fn = svarlang_str(0, 1);
+    mdr_cout_str(screenh - 1, 1, fn, scheme[COL_STATUSBAR1], screenw);
   }
 
   /* eol type */
-  if (db->lfonly) {
-    mdr_cout_str(screenh - 1, helpcol - 3, "LF", scheme[COL_STATUSBAR1], 5);
-  } else {
-    mdr_cout_str(screenh - 1, helpcol - 5, "CRLF", scheme[COL_STATUSBAR1], 5);
+  {
+    const char *eoltype = "CRLF";
+    if (db->lfonly) eoltype = "LF";
+    mdr_cout_str(screenh - 1, helpcol - 5, eoltype, scheme[COL_STATUSBAR1], 5);
   }
 
   mdr_cout_str(screenh - 1, helpcol, " F1=", scheme[COL_STATUSBAR2], 40);
@@ -178,7 +179,7 @@ static void ui_msg(const char *msg, unsigned char attr) {
   mdr_cout_str(y+1, x+1, msg, attr, msglen);
 
   if (uidirty.from > y) uidirty.from = y;
-  if (uidirty.to < y+2) uidirty.to = y+2;
+  if (uidirty.to < y+3) uidirty.to = y+3;
 }
 
 
@@ -253,6 +254,13 @@ static void ui_refresh(const struct file *db) {
     while ((y < screenh - 1) && (y < uidirty.to)) {
       mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
     }
+  }
+
+  /* "file changed" flag */
+  {
+    char flg = ' ';
+    if (db->modflag) flg = '*';
+    mdr_cout_char(screenh - 1, 0, flg, scheme[COL_STATUSBAR1]);
   }
 
   /* scroll bar */
@@ -381,6 +389,7 @@ static void del(struct file *db) {
     db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
     uidirty.from = db->cursorposy;
     uidirty.to = db->cursorposy;
+    db->modflag = 1;
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
@@ -398,6 +407,7 @@ static void del(struct file *db) {
     uidirty.from = db->cursorposy;
     uidirty.to = 0xff;
     db->totlines -= 1;
+    db->modflag = 1;
   }
 }
 
@@ -583,6 +593,7 @@ static int savefile(const struct file *db) {
   }
 
   _dos_close(fd);
+
   return(0);
 }
 
@@ -592,6 +603,7 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
   n = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + len);
   if (n != NULL) {
     unsigned short off = db->xoffset + db->cursorposx;
+    db->modflag = 1;
     if (n->prev) n->prev->next = n;
     if (n->next) n->next->prev = n;
     db->cursor = n;
@@ -691,6 +703,7 @@ int main(void) {
       unsigned short off = db->xoffset + db->cursorposx;
       /* add a new line */
       if (line_add(db, db->cursor->payload + off, db->cursor->len - off) == 0) {
+        db->modflag = 1;
         db->cursor = db->cursor->prev; /* back to original line */
         db->curline -= 1;
         /* trim the line above */
@@ -725,6 +738,7 @@ int main(void) {
 
     } else if (k == 0x13f) { /* F5 */
       if (savefile(db) == 0) {
+        db->modflag = 0;
         ui_msg(svarlang_str(0, 2), scheme[COL_MSG]);
         mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
       } else {
@@ -733,6 +747,7 @@ int main(void) {
       }
 
     } else if (k == 0x144) { /* F10 */
+      db->modflag = 1;
       db->lfonly ^= 1;
       ui_basic(db);
 
