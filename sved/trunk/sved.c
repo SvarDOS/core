@@ -40,16 +40,16 @@
 /*****************************************************************************
  * global variables and definitions                                          *
  *****************************************************************************/
-#define COL_TXT        0
-#define COL_STATUSBAR1 1
-#define COL_STATUSBAR2 2
-#define COL_STATUSBAR3 3
-#define COL_SCROLLBAR  4
-#define COL_MSG        5
-#define COL_ERR        6
 
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
-static unsigned char scheme[] = {0x07, 0x70, 0x70, 0xf0, 0x70, 0x70, 0xf0};
+// 11 524
+static unsigned char SCHEME_TEXT   = 0x07,
+                     SCHEME_STBAR1 = 0x70,
+                     SCHEME_STBAR2 = 0x70,
+                     SCHEME_STBAR3 = 0xf0,
+                     SCHEME_SCROLL = 0x70,
+                     SCHEME_MSG    = 0x70,
+                     SCHEME_ERR    = 0xf0;
 
 static unsigned char screenw, screenh;
 
@@ -120,8 +120,8 @@ static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
   y = screenh - 1;
 
   /* print query string */
-  x = mdr_cout_str(y, 0, query, scheme[COL_STATUSBAR3], 40);
-  mdr_cout_char_rep(y, x++, ' ', scheme[COL_STATUSBAR3], screenw - x);
+  x = mdr_cout_str(y, 0, query, SCHEME_STBAR3, 40);
+  mdr_cout_char_rep(y, x++, ' ', SCHEME_STBAR3, screenw - x);
 
   for (;;) {
     mdr_cout_locate(y, x + len);
@@ -136,12 +136,12 @@ static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
 
     if ((k == 0x08) && (len > 0)) { /* BKSPC */
       len--;
-      mdr_cout_char(y, x + len, ' ', scheme[COL_STATUSBAR3]);
+      mdr_cout_char(y, x + len, ' ', SCHEME_STBAR3);
       continue;
     }
 
     if ((k <= 0xff) && (k >= ' ') && (len < maxlen)) {
-      mdr_cout_char(y, x + len, k, scheme[COL_STATUSBAR3]);
+      mdr_cout_char(y, x + len, k, SCHEME_STBAR3);
       s[len++] = k;
     }
 
@@ -174,40 +174,29 @@ static void db_rewind(struct file *db) {
 }
 
 
-static void load_colorscheme(void) {
-  scheme[COL_TXT] = 0x17;
-  scheme[COL_STATUSBAR1] = 0x70;
-  scheme[COL_STATUSBAR2] = 0x78;
-  scheme[COL_STATUSBAR3] = 0xf0;
-  scheme[COL_SCROLLBAR] = 0x70;
-  scheme[COL_MSG] = 0xf0;
-  scheme[COL_ERR] = 0x4f;
-}
-
-
 static void ui_basic(const struct file *db) {
   const char *s = svarlang_strid(0); /* HELP */
   unsigned char helpcol = screenw - (strlen(s) + 4);
 
   /* fill status bar with background (without modflag as it is refreshed by ui_refresh) */
-  mdr_cout_char_rep(screenh - 1, 1, ' ', scheme[COL_STATUSBAR1], screenw - 1);
+  mdr_cout_char_rep(screenh - 1, 1, ' ', SCHEME_STBAR1, screenw - 1);
 
   /* filename */
   {
     const char *fn = db->fname;
     if (*fn == 0) fn = svarlang_str(0, 1);
-    mdr_cout_str(screenh - 1, 1, fn, scheme[COL_STATUSBAR1], screenw);
+    mdr_cout_str(screenh - 1, 1, fn, SCHEME_STBAR1, screenw);
   }
 
   /* eol type */
   {
     const char *eoltype = "CRLF";
     if (db->lfonly) eoltype = "LF";
-    mdr_cout_str(screenh - 1, helpcol - 5, eoltype, scheme[COL_STATUSBAR1], 5);
+    mdr_cout_str(screenh - 1, helpcol - 5, eoltype, SCHEME_STBAR1, 5);
   }
 
-  mdr_cout_str(screenh - 1, helpcol, " F1=", scheme[COL_STATUSBAR2], 40);
-  mdr_cout_str(screenh - 1, helpcol + 4, s, scheme[COL_STATUSBAR2], 40);
+  mdr_cout_str(screenh - 1, helpcol, " F1=", SCHEME_STBAR2, 40);
+  mdr_cout_str(screenh - 1, helpcol + 4, s, SCHEME_STBAR2, 40);
 }
 
 
@@ -240,17 +229,17 @@ static void ui_help(void) {
   offset = (screenw - MAXLINLEN + 2) >> 1;
   mdr_cout_cursor_hide();
   for (i = 2; i <= 15; i++) {
-    mdr_cout_char_rep(i, offset - 2, ' ', scheme[COL_STATUSBAR1], MAXLINLEN + 2);
+    mdr_cout_char_rep(i, offset - 2, ' ', SCHEME_STBAR1, MAXLINLEN + 2);
   }
 
-  mdr_cout_str(3, offset, svarlang_str(0, 0), scheme[COL_STATUSBAR1], MAXLINLEN);
+  mdr_cout_str(3, offset, svarlang_str(0, 0), SCHEME_STBAR1, MAXLINLEN);
   for (i = 0; i <= 4; i++) {
-    mdr_cout_str(5 + i, offset, svarlang_str(8, i), scheme[COL_STATUSBAR1], MAXLINLEN);
+    mdr_cout_str(5 + i, offset, svarlang_str(8, i), SCHEME_STBAR1, MAXLINLEN);
   }
-  mdr_cout_str(5 + 1 + i, offset, svarlang_str(8, 10), scheme[COL_STATUSBAR1], MAXLINLEN);
+  mdr_cout_str(5 + 1 + i, offset, svarlang_str(8, 10), SCHEME_STBAR1, MAXLINLEN);
 
   /* Press any key */
-  mdr_cout_str(14, offset, svarlang_str(8, 11), scheme[COL_STATUSBAR1], MAXLINLEN);
+  mdr_cout_str(14, offset, svarlang_str(8, 11), SCHEME_STBAR1, MAXLINLEN);
 
   keyb_getkey();
   mdr_cout_cursor_show();
@@ -287,14 +276,14 @@ static void ui_refresh(const struct file *db) {
       } else {
         limit = db->xoffset + screenw - 1;
       }
-      for (i = db->xoffset; i < limit; i++) mdr_cout_char(y, x++, l->payload[i], scheme[COL_TXT]);
+      for (i = db->xoffset; i < limit; i++) mdr_cout_char(y, x++, l->payload[i], SCHEME_TEXT);
     }
 
     /* write empty spaces until end of line */
-    if (x < screenw - 1) mdr_cout_char_rep(y, x, ' ', scheme[COL_TXT], screenw - 1 - x);
+    if (x < screenw - 1) mdr_cout_char_rep(y, x, ' ', SCHEME_TEXT, screenw - 1 - x);
 
 #ifdef DBG_REFRESH
-    mdr_cout_char(y, 0, m, scheme[COL_STATUSBAR1]);
+    mdr_cout_char(y, 0, m, SCHEME_STBAR1);
 #endif
 
     if (y == screenh - 2) break;
@@ -303,7 +292,7 @@ static void ui_refresh(const struct file *db) {
   /* fill all lines below if empty (and they need to be redrawn) */
   if (l == NULL) {
     while ((y < screenh - 1) && (y < uidirty.to)) {
-      mdr_cout_char_rep(y++, 0, ' ', scheme[COL_TXT], screenw - 1);
+      mdr_cout_char_rep(y++, 0, ' ', SCHEME_TEXT, screenw - 1);
     }
   }
 
@@ -311,12 +300,12 @@ static void ui_refresh(const struct file *db) {
   {
     char flg = ' ';
     if (db->modflag) flg = '*';
-    mdr_cout_char(screenh - 1, 0, flg, scheme[COL_STATUSBAR1]);
+    mdr_cout_char(screenh - 1, 0, flg, SCHEME_STBAR1);
   }
 
   /* scroll bar */
   for (y = 0; y < (screenh - 1); y++) {
-    mdr_cout_char(y, screenw - 1, SCROLL_CURSOR, scheme[COL_SCROLLBAR]);
+    mdr_cout_char(y, screenw - 1, SCROLL_CURSOR, SCHEME_SCROLL);
   }
 
   /* scroll cursor */
@@ -330,7 +319,7 @@ static void ui_refresh(const struct file *db) {
       col = topline * (screenh - 1) / totlines;
     }
     if (col >= screenh - 1) col = screenh - 2;
-    mdr_cout_char(col, screenw - 1, ' ', scheme[COL_SCROLLBAR]);
+    mdr_cout_char(col, screenw - 1, ' ', SCHEME_SCROLL);
   }
 }
 
@@ -695,7 +684,16 @@ int main(void) {
   db = loadfile(fname);
   if (db == NULL) return(1);
 
-  if (mdr_cout_init(&screenw, &screenh)) load_colorscheme();
+  if (mdr_cout_init(&screenw, &screenh)) {
+    /* load color scheme if mdr_cout_init returns a color flag */
+    SCHEME_TEXT = 0x17;
+    SCHEME_STBAR1 = 0x70;
+    SCHEME_STBAR2 = 0x78;
+    SCHEME_STBAR3 = 0xf0;
+    SCHEME_SCROLL = 0x70;
+    SCHEME_MSG = 0xf0;
+    SCHEME_ERR = 0x4f;
+  }
   ui_basic(db);
 
   for (;;) {
@@ -721,7 +719,7 @@ int main(void) {
         ddd[5] = '0' + (db->totlines % 100) / 10;
         ddd[6] = '0' + (db->totlines % 10);
         ddd[7] = 0;
-        mdr_cout_str(screenh - 1, 40, ddd, scheme[COL_STATUSBAR1], sizeof(ddd));
+        mdr_cout_str(screenh - 1, 40, ddd, SCHEME_STBAR1, sizeof(ddd));
       }
 #endif
 
@@ -754,7 +752,7 @@ int main(void) {
     } else if (k == 0x1B) { /* ESC */
       if (db->modflag == 0) break;
       /* if file has been modified then ask for confirmation */
-      ui_msg(svarlang_str(0,4), svarlang_str(0,5), scheme[COL_MSG]);
+      ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
       if (keyb_getkey() == '\r') break;
 
     } else if (k == 0x0D) { /* ENTER */
@@ -809,10 +807,10 @@ int main(void) {
 
       if (saveres == 0) {
         db->modflag = 0;
-        ui_msg(svarlang_str(0, 2), NULL, scheme[COL_MSG]);
+        ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
         mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
       } else {
-        ui_msg(svarlang_str(0, 3), NULL, scheme[COL_ERR]);
+        ui_msg(svarlang_str(0, 3), NULL, SCHEME_ERR);
         mdr_bios_tickswait(36); /* 2s */
       }
 
@@ -856,16 +854,18 @@ int main(void) {
         if ((db->cursorposx == 0) && (db->xoffset == 0)) break;
       }
 
+#ifdef DBG_UNHKEYS
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
       const char *HEX = "0123456789ABCDEF";
       buff[0] = HEX[(k >> 8) & 15];
       buff[1] = HEX[(k >> 4) & 15];
       buff[2] = HEX[k & 15];
-      mdr_cout_str(screenh - 1, 0, "UNHANDLED KEY: 0x", scheme[COL_STATUSBAR1], 17);
-      mdr_cout_str(screenh - 1, 17, buff, scheme[COL_STATUSBAR1], 3);
+      mdr_cout_str(screenh - 1, 0, "UNHANDLED KEY: 0x", SCHEME_STBAR1, 17);
+      mdr_cout_str(screenh - 1, 17, buff, SCHEME_STBAR1, 3);
       keyb_getkey();
       break;
+#endif
     }
   }
 
