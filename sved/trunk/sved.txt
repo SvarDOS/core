@@ -1,7 +1,6 @@
 
-                           Sved, the SvarDOS editor
 
-                       Copyright (C) 2023 Mateusz Viste
+                           Sved, the SvarDOS editor
 
 
 Sved is the editor that comes with SvarDOS. Sved is not meant to be a
@@ -31,6 +30,8 @@ What Sved does NOT have:
  - ...
 
 Sved is released under the terms of the MIT license.
+
+Copyright (C) 2023 Mateusz Viste
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -23,8 +23,8 @@
  * IN THE SOFTWARE.
  */
 
-#include <dos.h>
-#include <fcntl.h>
+#include <dos.h>      /* _dos_open(), _dos_read(), _dos_close(), ... */
+#include <fcntl.h>    /* O_RDONLY, O_WRONLY */
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>   /* _fcalloc() */
