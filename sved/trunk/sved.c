@@ -96,18 +96,24 @@ static void line_free(struct line far *ptr) {
 }
 
 
-static struct line far *line_resize(struct line far *ptr, unsigned short newsiz) {
+static signed char curline_resize(struct file far *db, unsigned short newsiz) {
   unsigned int maxavail;
   struct line far *newptr;
 
   /* try resizing the block (faster) */
-  if (_dos_setblock((sizeof(struct line) + newsiz) / 16 + 1, FP_SEG(ptr), &maxavail) == 0) return(ptr);
+  if (_dos_setblock((sizeof(struct line) + newsiz) / 16 + 1, FP_SEG(db->cursor), &maxavail) == 0) return(0);
 
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
-  if (newptr == NULL) return(NULL);
-  _fmemmove(newptr, ptr, sizeof(struct line) + ptr->len);
-  return(newptr);
+  if (newptr == NULL) return(-1);
+  _fmemmove(newptr, db->cursor, sizeof(struct line) + db->cursor->len);
+
+  /* rewire the linked list */
+  db->cursor = newptr;
+  if (newptr->next) newptr->next->prev = newptr;
+  if (newptr->prev) newptr->prev->next = newptr;
+
+  return(0);
 }
 
 
@@ -177,17 +183,10 @@ static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
 
 /* append a nul-terminated string to line at cursor position */
 static int line_append(struct file *f, const char far *buf, unsigned short len) {
-  struct line far *n;
   if (sizeof(struct line) + f->cursor->len + len < len) return(-1); /* overflow check */
-  n = line_resize(f->cursor, f->cursor->len + len);
-  if (n == NULL) return(-1);
-  f->cursor = n;
+  if (curline_resize(f, f->cursor->len + len) != 0) return(-1);
   _fmemmove(f->cursor->payload + f->cursor->len, buf, len);
   f->cursor->len += len;
-
-  /* rewire the linked list */
-  if (f->cursor->next) f->cursor->next->prev = f->cursor;
-  if (f->cursor->prev) f->cursor->prev->next = f->cursor;
 
   return(0);
 }
@@ -455,16 +454,15 @@ static void del(struct file *db) {
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
-      void far *newptr = line_resize(db->cursor, db->cursor->len + db->cursor->next->len + 1);
-      if (newptr != NULL) {
-        db->cursor = newptr;
+      if (curline_resize(db, db->cursor->len + db->cursor->next->len + 1) == 0) {
         _fmemmove(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
         db->cursor->len += db->cursor->next->len;
       }
     }
+
     db->cursor->next = db->cursor->next->next;
     db->cursor->next->prev = db->cursor;
-    if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor; /* in case realloc changed my pointer */
+
     line_free(nextline);
     uidirty.from = db->cursorposy;
     uidirty.to = 0xff;
@@ -660,14 +658,9 @@ static int savefile(const struct file *db, const char *newfname) {
 
 
 static void insert_in_line(struct file *db, const char *databuf, unsigned short len) {
-  struct line far *n;
-  n = line_resize(db->cursor, db->cursor->len + len);
-  if (n != NULL) {
+  if (curline_resize(db, db->cursor->len + len) == 0) {
     unsigned short off = db->xoffset + db->cursorposx;
     db->modflag = 1;
-    if (n->prev) n->prev->next = n;
-    if (n->next) n->next->prev = n;
-    db->cursor = n;
     _fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
     db->cursor->len += len;
     uidirty.from = db->cursorposy;
