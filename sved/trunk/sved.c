@@ -175,7 +175,7 @@ static void db_rewind(struct file *db) {
 
 static void ui_basic(const struct file *db) {
   const char *s = svarlang_strid(0); /* HELP */
-  unsigned char helpcol = screenw - (strlen(s) + 4);
+  unsigned char helpcol = screenw - strlen(s);
 
   /* fill status bar with background (without modflag as it is refreshed by ui_refresh) */
   mdr_cout_char_rep(screenh - 1, 1, ' ', SCHEME_STBAR1, screenw - 1);
@@ -191,11 +191,10 @@ static void ui_basic(const struct file *db) {
   {
     const char *eoltype = "CRLF";
     if (db->lfonly) eoltype = "LF";
-    mdr_cout_str(screenh - 1, helpcol - 5, eoltype, SCHEME_STBAR1, 5);
+    mdr_cout_str(screenh - 1, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
   }
 
-  mdr_cout_str(screenh - 1, helpcol, " F1=", SCHEME_STBAR2, 40);
-  mdr_cout_str(screenh - 1, helpcol + 4, s, SCHEME_STBAR2, 40);
+  mdr_cout_str(screenh - 1, helpcol, s, SCHEME_STBAR2, 40);
 }
 
 
@@ -226,19 +225,18 @@ static void ui_help(void) {
 #define MAXLINLEN 35
   unsigned short i, offset;
   offset = (screenw - MAXLINLEN + 2) >> 1;
+
   mdr_cout_cursor_hide();
-  for (i = 2; i <= 15; i++) {
+  for (i = 2; i < 18; i++) {
     mdr_cout_char_rep(i, offset - 2, ' ', SCHEME_STBAR1, MAXLINLEN + 2);
   }
 
-  mdr_cout_str(3, offset, svarlang_str(0, 0), SCHEME_STBAR1, MAXLINLEN);
-  for (i = 0; i <= 4; i++) {
-    mdr_cout_str(5 + i, offset, svarlang_str(8, i), SCHEME_STBAR1, MAXLINLEN);
+  for (i = 0; i < 20; i++) {
+    const char *s = svarlang_str(8, i);
+    if (s[0] == 0) break;
+    if (s[0] == '.') continue;
+    mdr_cout_str(3 + i, offset, s, SCHEME_STBAR1, MAXLINLEN);
   }
-  mdr_cout_str(5 + 1 + i, offset, svarlang_str(8, 10), SCHEME_STBAR1, MAXLINLEN);
-
-  /* Press any key */
-  mdr_cout_str(14, offset, svarlang_str(8, 11), SCHEME_STBAR1, MAXLINLEN);
 
   keyb_getkey();
   mdr_cout_cursor_show();

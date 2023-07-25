@@ -4,7 +4,7 @@
 # MAIN SCREEN #
 ###############
 
-0.0:HELP
+0.0:F1=HELP
 0.1:NEW FILE
 0.2:SAVED
 0.3:SAVING FAILED
@@ -12,21 +12,29 @@
 0.5:Press ENTER to confirm.
 0.6:Save as:
 
+
 ################
 # USAGE SCREEN #
 ################
 
-1.0:usage: sved file.txt
+1.0:usage: sved [file.txt]
 
 
 ###############
 # HELP SCREEN #
 ###############
 
-8.0:F5  = save file
-8.1:F6  = save as...
-8.2:F10 = change line endings
-8.3:CTRL+Right = jump to next word
-8.4:CTRL+Left  = jump to prev word
-8.10:ESC = quit
-8.11:Press any key
+8.0:F2  New file
+8.1:F3  Open file
+8.2:F5  Save
+8.3:F6  Save as...
+8.4:F10 Change line endings
+8.5:ESC Quit
+8.6:.
+8.7:Navigation:
+8.8:.
+8.9:Up/Down/Left/Right/PgUp/PgDown
+8.10:CTRL+Right  Jump to next word
+8.11:CTRL+Left   Jump to prev word
+8.12:.
+8.13:Press any key
