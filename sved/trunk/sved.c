@@ -223,23 +223,21 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
 
 static void ui_help(void) {
 #define MAXLINLEN 35
-  unsigned short i, offset;
+  unsigned char i, offset;
   offset = (screenw - MAXLINLEN + 2) >> 1;
 
-  mdr_cout_cursor_hide();
   for (i = 2; i < 18; i++) {
     mdr_cout_char_rep(i, offset - 2, ' ', SCHEME_STBAR1, MAXLINLEN + 2);
   }
 
   for (i = 0; i < 20; i++) {
-    const char *s = svarlang_str(8, i);
+    const char *s = svarlang_strid(i);
     if (s[0] == 0) break;
     if (s[0] == '.') continue;
-    mdr_cout_str(3 + i, offset, s, SCHEME_STBAR1, MAXLINLEN);
+    mdr_cout_locate(3 + i, offset + mdr_cout_str(3 + i, offset, s, SCHEME_STBAR1, MAXLINLEN));
   }
 
   keyb_getkey();
-  mdr_cout_cursor_show();
 #undef MAXLINLEN
 }
 
