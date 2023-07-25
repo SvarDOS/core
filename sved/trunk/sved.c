@@ -27,7 +27,6 @@
 #include <fcntl.h>    /* O_RDONLY, O_WRONLY */
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>   /* _fcalloc() */
 
 #include "mdr\bios.h"
 #include "mdr\cout.h"
@@ -84,12 +83,40 @@ struct file {
  * functions                                                                 *
  *****************************************************************************/
 
+static struct line far *line_calloc(unsigned short siz) {
+  unsigned int seg;
+  if (_dos_allocmem((sizeof(struct line) + siz) / 16 + 1, &seg) != 0) return(NULL);
+  _fmemset(MK_FP(seg, 0), 0, siz);
+  return(MK_FP(seg, 0));
+}
+
+
+static void line_free(struct line far *ptr) {
+  _dos_freemem(FP_SEG(ptr));
+}
+
+
+static struct line far *line_resize(struct line far *ptr, unsigned short newsiz) {
+  unsigned int maxavail;
+  struct line far *newptr;
+
+  /* try resizing the block (faster) */
+  if (_dos_setblock((sizeof(struct line) + newsiz) / 16 + 1, FP_SEG(ptr), &maxavail) == 0) return(ptr);
+
+  /* create a new block and copy data over */
+  newptr = line_calloc(newsiz);
+  if (newptr == NULL) return(NULL);
+  _fmemmove(newptr, ptr, sizeof(struct line) + ptr->len);
+  return(newptr);
+}
+
+
 /* adds a new line at cursor position into file linked list and advance cursor
  * returns non-zero on error */
 static int line_add(struct file *db, const char far *line, unsigned short slen) {
   struct line far *l;
 
-  l = _fcalloc(1, sizeof(struct line) + slen);
+  l = line_calloc(slen);
   if (l == NULL) return(-1);
 
   l->prev = db->cursor;
@@ -152,7 +179,7 @@ static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
 static int line_append(struct file *f, const char far *buf, unsigned short len) {
   struct line far *n;
   if (sizeof(struct line) + f->cursor->len + len < len) return(-1); /* overflow check */
-  n = _frealloc(f->cursor, sizeof(struct line) + f->cursor->len + len);
+  n = line_resize(f->cursor, f->cursor->len + len);
   if (n == NULL) return(-1);
   f->cursor = n;
   _fmemmove(f->cursor->payload + f->cursor->len, buf, len);
@@ -428,7 +455,7 @@ static void del(struct file *db) {
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
-      void far *newptr = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + db->cursor->next->len + 1);
+      void far *newptr = line_resize(db->cursor, db->cursor->len + db->cursor->next->len + 1);
       if (newptr != NULL) {
         db->cursor = newptr;
         _fmemmove(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
@@ -438,7 +465,7 @@ static void del(struct file *db) {
     db->cursor->next = db->cursor->next->next;
     db->cursor->next->prev = db->cursor;
     if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor; /* in case realloc changed my pointer */
-    _ffree(nextline);
+    line_free(nextline);
     uidirty.from = db->cursorposy;
     uidirty.to = 0xff;
     db->totlines -= 1;
@@ -495,19 +522,16 @@ static struct file *loadfile(const char *fname) {
   unsigned int len, llen;
   int fd;
   unsigned char eolfound;
-  struct file *db;
+  static struct file db[1];
 
-  len = strlen(fname) + 1;
-  db = calloc(1, sizeof(struct file));
-  if (db == NULL) return(NULL);
-  memcpy(db->fname, fname, len);
+  bzero(db, sizeof(db));
+  memcpy(db->fname, fname, strlen(fname));
 
   if (*fname == 0) goto SKIPLOADING;
 
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
     mdr_coutraw_puts("Failed to open file:");
     mdr_coutraw_puts(fname);
-    free(db);
     return(NULL);
   }
 
@@ -552,9 +576,7 @@ static struct file *loadfile(const char *fname) {
     /* append content, if line is non-empty */
     if ((llen > 0) && (line_append(db, buffptr, llen) != 0)) {
       mdr_coutraw_puts("out of memory");
-      free(db);
-      db = NULL;
-      break;
+      goto IOERR;
     }
 
     /* add a new line if necessary */
@@ -562,9 +584,7 @@ static struct file *loadfile(const char *fname) {
       if (line_add(db, NULL, 0) != 0) {
       /* TODO ERROR HANDLING */
         mdr_coutraw_puts("out of memory");
-        free(db);
-        db = NULL;
-        break;
+        goto IOERR;
       }
       eolfound = 0;
     }
@@ -583,12 +603,14 @@ static struct file *loadfile(const char *fname) {
   SKIPLOADING:
 
   /* add an empty line at end if not present already, also rewind cursor to top of file */
-  if (db != NULL) {
-    if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, NULL, 0);
-    db_rewind(db);
-  }
+  if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, NULL, 0);
+  db_rewind(db);
 
   return(db);
+
+  IOERR:
+  _dos_close(fd);
+  return(NULL);
 }
 
 
@@ -639,7 +661,7 @@ static int savefile(const struct file *db, const char *newfname) {
 
 static void insert_in_line(struct file *db, const char *databuf, unsigned short len) {
   struct line far *n;
-  n = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + len);
+  n = line_resize(db->cursor, db->cursor->len + len);
   if (n != NULL) {
     unsigned short off = db->xoffset + db->cursorposx;
     db->modflag = 1;

@@ -13,6 +13,7 @@ all: sved.com
 
 sved.com: sved.obj deflang.obj
 	wcl $(LDLIBS) sved.obj deflang.obj $(LDFLAGS)
+	upx -9 --8086 sved.com
 
 .c.obj: .autodepend
 	$(CC) $(CFLAGS) $*.C
