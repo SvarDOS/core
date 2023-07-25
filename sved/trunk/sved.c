@@ -99,7 +99,7 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
     l->next->prev = l;
   }
   db->cursor = l;
-  _fmemcpy(l->payload, line, slen);
+  _fmemmove(l->payload, line, slen);
   l->len = slen;
 
   db->totlines += 1;
@@ -155,7 +155,7 @@ static int line_append(struct file *f, const char far *buf, unsigned short len) 
   n = _frealloc(f->cursor, sizeof(struct line) + f->cursor->len + len);
   if (n == NULL) return(-1);
   f->cursor = n;
-  _fmemcpy(f->cursor->payload + f->cursor->len, buf, len);
+  _fmemmove(f->cursor->payload + f->cursor->len, buf, len);
   f->cursor->len += len;
 
   /* rewire the linked list */
@@ -231,7 +231,7 @@ static void ui_help(void) {
   }
 
   for (i = 0; i < 20; i++) {
-    const char *s = svarlang_strid(i);
+    const char *s = svarlang_str(8, i);
     if (s[0] == 0) break;
     if (s[0] == '.') continue;
     mdr_cout_locate(3 + i, offset + mdr_cout_str(3 + i, offset, s, SCHEME_STBAR1, MAXLINLEN));
@@ -431,7 +431,7 @@ static void del(struct file *db) {
       void far *newptr = _frealloc(db->cursor, sizeof(struct line) + db->cursor->len + db->cursor->next->len + 1);
       if (newptr != NULL) {
         db->cursor = newptr;
-        _fmemcpy(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
+        _fmemmove(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
         db->cursor->len += db->cursor->next->len;
       }
     }
