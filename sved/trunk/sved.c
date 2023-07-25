@@ -42,7 +42,6 @@
  *****************************************************************************/
 
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
-// 11 524
 static unsigned char SCHEME_TEXT   = 0x07,
                      SCHEME_STBAR1 = 0x70,
                      SCHEME_STBAR2 = 0x70,
@@ -738,10 +737,37 @@ int main(void) {
       cursor_left(db);
 
     } else if (k == 0x149) { /* pgup */
-      // TODO
+      unsigned char dist = db->cursorposy + screenh - 1;
+      while ((dist != 0) && (db->cursor->prev != NULL)) {
+        db->cursor = db->cursor->prev;
+        dist--;
+      }
+      if (dist != 0) {
+        db->cursorposy = 0;
+        db->cursorposx = 0;
+      } else {
+        dist = db->cursorposy;
+        while ((dist--) && (db->cursor->next)) db->cursor = db->cursor->next;
+      }
+      uidirty.from = 0;
+      uidirty.to = 0xff;
 
     } else if (k == 0x151) { /* pgdown */
-      // TODO
+      unsigned char dist = screenh + screenh - db->cursorposy - 3;
+      while ((dist != 0) && (db->cursor->next != NULL)) {
+        db->cursor = db->cursor->next;
+        dist--;
+      }
+      if (dist != 0) {
+        db->cursorposy = screenh - 2;
+        if (db->totlines <= db->cursorposy) db->cursorposy = db->totlines - 1;
+        db->cursorposx = 0;
+      } else {
+        dist = screenh - 2 - db->cursorposy;
+        while ((dist--) && (db->cursor->prev)) db->cursor = db->cursor->prev;
+      }
+      uidirty.from = 0;
+      uidirty.to = 0xff;
 
     } else if (k == 0x147) { /* home */
        cursor_home(db);
