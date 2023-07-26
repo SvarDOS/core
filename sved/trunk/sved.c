@@ -66,11 +66,10 @@ struct line {
 };
 
 struct file {
-  int fd;
   struct line far *cursor;
   unsigned short xoffset;
-  unsigned char cursorposx;
-  unsigned char cursorposy;
+  unsigned short cursorposx;
+  unsigned short cursorposy;
   unsigned short totlines;
   unsigned short curline;
   char lfonly;   /* set if line endings are LF (CR/LF otherwise) */
@@ -98,7 +97,7 @@ static void line_free(struct line far *ptr) {
 }
 
 
-static signed char curline_resize(struct file far *db, unsigned short newsiz) {
+static int curline_resize(struct file far *db, unsigned short newsiz) {
   unsigned int maxavail;
   struct line far *newptr;
 
@@ -146,8 +145,9 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
 }
 
 
-static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
-  unsigned char len = 0, y, x;
+static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
+  unsigned short len = 0;
+  unsigned char y, x;
   int k;
 
   if (maxlen == 0) return;
@@ -207,7 +207,7 @@ static void db_rewind(struct file *db) {
 
 static void ui_basic(const struct file *db) {
   const char *s = svarlang_strid(0); /* HELP */
-  unsigned char helpcol = screenw - strlen(s);
+  unsigned short helpcol = screenw - strlen(s);
 
   /* fill status bar with background (without modflag as it is refreshed by ui_refresh) */
   mdr_cout_char_rep(screenh - 1, 1, ' ', SCHEME_STBAR1, screenw - 1);
@@ -265,7 +265,7 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
 }
 
 
-static void ui_help(void) { /* 8706 -> 6277 */
+static void ui_help(void) {
 #define MAXLINLEN 39
   unsigned short i, offset;
   offset = (screenw - MAXLINLEN) >> 1;
@@ -501,7 +501,7 @@ static void bkspc(struct file *db) {
  * of argc and argv, saves some 330 bytes of binary size */
 static char *parseargv(void) {
   char *tail = (void *)0x81; /* THIS WORKS ONLY IN SMALL MEMORY MODEL */
-  unsigned char count = 0;
+  unsigned short count = 0;
   char *argv[4];
 
   while (count < 4) {
@@ -697,10 +697,6 @@ static void clear_file(struct file *db) {
 
   /* zero out the struct */
   bzero(db, sizeof(struct file));
-
-  /* add a single empty line and rewind */
-  line_add(db, NULL, 0);
-  db_rewind(db);
 }
 
 
@@ -876,8 +872,7 @@ void main(void) {
       insert_in_line(db, &c, 1);
 
     } else if (k == 0x009) { /* TAB */
-      const char *tab = "        ";
-      insert_in_line(db, tab, 8);
+      insert_in_line(db, "        ", 8);
 
     } else if (k == 0x13b) { /* F1 */
       ui_help();
@@ -885,7 +880,11 @@ void main(void) {
       uidirty.to = 0xff;
 
     } else if (k == 0x13c) { /* F2 (new file) */
-      if (ui_confirm_if_unsaved(db) == 0) clear_file(db);
+      if (ui_confirm_if_unsaved(db) == 0) {
+        clear_file(db);
+        /* add a single empty line */
+        line_add(db, NULL, 0);
+      }
       uidirty.from = 0;
       uidirty.to = 0xff;
       uidirty.statusbar = 1;
