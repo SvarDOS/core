@@ -726,7 +726,7 @@ void main(void) {
 
   fname = parseargv();
 
-  if (fname == NULL) {
+  if ((fname == NULL) || (*fname == '/')) {
     mdr_coutraw_puts(svarlang_str(1,0)); /* usage: sved file.txt */
     return;
   }
