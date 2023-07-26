@@ -265,20 +265,17 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
 }
 
 
-static void ui_help(void) {
-#define MAXLINLEN 35
-  unsigned char i, offset;
-  offset = (screenw - MAXLINLEN + 2) >> 1;
+static void ui_help(void) { /* 8706 -> 6277 */
+#define MAXLINLEN 39
+  unsigned short i, offset;
+  offset = (screenw - MAXLINLEN) >> 1;
 
-  for (i = 2; i < 18; i++) {
-    mdr_cout_char_rep(i, offset - 2, ' ', SCHEME_STBAR1, MAXLINLEN + 2);
-  }
-
-  for (i = 0; i < 20; i++) {
+  for (i = 3; i < 25; i++) {
     const char *s = svarlang_str(8, i);
     if (s[0] == 0) break;
+    mdr_cout_char_rep(i, offset, ' ', SCHEME_STBAR1, MAXLINLEN);
     if (s[0] == '.') continue;
-    mdr_cout_locate(3 + i, offset + mdr_cout_str(3 + i, offset, s, SCHEME_STBAR1, MAXLINLEN));
+    mdr_cout_locate(i, offset + 2 + mdr_cout_str(i, offset + 2, s, SCHEME_STBAR1, MAXLINLEN - 2));
   }
 
   keyb_getkey();
@@ -719,7 +716,9 @@ static void recompute_curline(struct file *db) {
 }
 
 
-int main(void) {
+/* main returns nothing, ie. sved always exits with a zero exit code
+ * (this saves 20 bytes of executable footprint) */
+void main(void) {
   static struct file dbarr[1];
   const char *fname;
   struct file *db = dbarr;
@@ -733,7 +732,7 @@ int main(void) {
 
   if (fname == NULL) {
     mdr_coutraw_puts(svarlang_str(1,0)); /* usage: sved file.txt */
-    return(0);
+    return;
   }
 
   /* load file */
@@ -741,10 +740,10 @@ int main(void) {
     unsigned char err = loadfile(db, fname);
     if (err == 1) {
       mdr_coutraw_puts(svarlang_str(0,11)); /* file not found */
-      return(1);
+      return;
     } else if (err != 0) {
       mdr_coutraw_puts(svarlang_str(0,10)); /* ERROR */
-      return(1);
+      return;
     }
   }
 
@@ -998,5 +997,5 @@ int main(void) {
 
   /* no need to free memory, DOS will do it for me */
 
-  return(0);
+  return;
 }
