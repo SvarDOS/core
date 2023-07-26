@@ -54,7 +54,8 @@ static unsigned char screenw, screenh;
 static struct {
     unsigned char from;
     unsigned char to;
-} uidirty = {0, 0xff}; /* make sure to redraw entire UI at first run */
+    unsigned char statusbar;
+} uidirty = {0, 0xff, 1}; /* make sure to redraw entire UI at first run */
 
 #define SCROLL_CURSOR 0xB1
 
@@ -84,9 +85,11 @@ struct file {
  *****************************************************************************/
 
 static struct line far *line_calloc(unsigned short siz) {
+  struct line far *res;
   unsigned int seg;
   if (_dos_allocmem((sizeof(struct line) + siz + 15) / 16, &seg) != 0) return(NULL);
-  _fmemset(MK_FP(seg, 0), 0, siz);
+  res = MK_FP(seg, 0);
+  _fmemset(res, 0, sizeof(struct line) + siz);
   return(MK_FP(seg, 0));
 }
 
@@ -132,8 +135,10 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
     l->next->prev = l;
   }
   db->cursor = l;
-  _fmemmove(l->payload, line, slen);
-  l->len = slen;
+  if (slen > 0) {
+    _fmemmove(l->payload, line, slen);
+    l->len = slen;
+  }
 
   db->totlines += 1;
   db->curline += 1;
@@ -244,6 +249,17 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
 
   if (uidirty.from > y) uidirty.from = y;
   if (uidirty.to < y+4) uidirty.to = y+4;
+}
+
+
+static unsigned char ui_confirm_if_unsaved(struct file *db) {
+  if (db->modflag == 0) return(0);
+
+  /* if file has been modified then ask for confirmation */
+  ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
+  if (keyb_getkey() == '\r') return(0);
+
+  return(1);
 }
 
 
@@ -674,6 +690,26 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
 }
 
 
+static void clear_file(struct file *db) {
+
+  /* free the entire linked list of lines */
+  db_rewind(db);
+  while (db->cursor) {
+    struct line far *victim;
+    victim = db->cursor;
+    db->cursor = db->cursor->next;
+    line_free(victim);
+  }
+
+  /* zero out the struct */
+  bzero(db, sizeof(struct file));
+
+  /* add a single empty line and rewind */
+  line_add(db, NULL, 0);
+  db_rewind(db);
+}
+
+
 int main(void) {
   const char *fname;
   struct file *db;
@@ -704,7 +740,6 @@ int main(void) {
     SCHEME_MSG = 0xf0;
     SCHEME_ERR = 0x4f;
   }
-  ui_basic(db);
 
   for (;;) {
     int k;
@@ -715,6 +750,10 @@ int main(void) {
     if (uidirty.from != 0xff) {
       ui_refresh(db);
       uidirty.from = 0xff;
+    }
+    if (uidirty.statusbar) {
+      ui_basic(db);
+      uidirty.statusbar = 0;
     }
 #ifdef DBG_LINENUM
       {
@@ -787,10 +826,7 @@ int main(void) {
        cursor_eol(db);
 
     } else if (k == 0x1B) { /* ESC */
-      if (db->modflag == 0) break;
-      /* if file has been modified then ask for confirmation */
-      ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
-      if (keyb_getkey() == '\r') break;
+      if (ui_confirm_if_unsaved(db) == 0) break;
 
     } else if (k == 0x0D) { /* ENTER */
       unsigned short off = db->xoffset + db->cursorposx;
@@ -829,6 +865,12 @@ int main(void) {
       uidirty.from = 0;
       uidirty.to = 0xff;
 
+    } else if (k == 0x13c) { /* F2 (new file) */
+      if (ui_confirm_if_unsaved(db) == 0) clear_file(db);
+      uidirty.from = 0;
+      uidirty.to = 0xff;
+      uidirty.statusbar = 1;
+
     } else if ((k == 0x13f) || (k == 0x140)) { /* F5 or F6 */
       int saveres;
 
@@ -851,13 +893,13 @@ int main(void) {
         mdr_bios_tickswait(36); /* 2s */
       }
 
-      ui_basic(db);
       ui_refresh(db);
+      uidirty.statusbar = 1;
 
     } else if (k == 0x144) { /* F10 */
       db->modflag = 1;
       db->lfonly ^= 1;
-      ui_basic(db);
+      uidirty.statusbar = 1;
 
     } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
       /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */
