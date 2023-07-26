@@ -13,6 +13,8 @@
 0.6:Save as:
 0.7:Load:
 0.8:Press ESC to cancel.
+0.10:ERROR
+0.11:FILE NOT FOUND
 
 
 ################

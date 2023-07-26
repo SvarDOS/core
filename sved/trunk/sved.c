@@ -25,7 +25,6 @@
 
 #include <dos.h>      /* _dos_open(), _dos_read(), _dos_close(), ... */
 #include <fcntl.h>    /* O_RDONLY, O_WRONLY */
-#include <stdlib.h>
 #include <string.h>
 
 #include "mdr\bios.h"
@@ -533,13 +532,13 @@ static char *parseargv(void) {
 }
 
 
-static struct file *loadfile(const char *fname) {
+/* returns 0 on success, 1 on file not found, 2 on other error */
+static unsigned char loadfile(struct file *db, const char *fname) {
   char buff[512]; /* read one entire sector at a time (faster) */
   char *buffptr;
   unsigned int len, llen;
   int fd;
   unsigned char eolfound;
-  static struct file db[1];
 
   bzero(db, sizeof(db));
   memcpy(db->fname, fname, strlen(fname));
@@ -547,9 +546,7 @@ static struct file *loadfile(const char *fname) {
   if (*fname == 0) goto SKIPLOADING;
 
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
-    mdr_coutraw_puts("Failed to open file:");
-    mdr_coutraw_puts(fname);
-    return(NULL);
+    return(1);
   }
 
   db->lfonly = 1;
@@ -592,15 +589,12 @@ static struct file *loadfile(const char *fname) {
 
     /* append content, if line is non-empty */
     if ((llen > 0) && (line_append(db, buffptr, llen) != 0)) {
-      mdr_coutraw_puts("out of memory");
       goto IOERR;
     }
 
     /* add a new line if necessary */
     if (eolfound) {
       if (line_add(db, NULL, 0) != 0) {
-      /* TODO ERROR HANDLING */
-        mdr_coutraw_puts("out of memory");
         goto IOERR;
       }
       eolfound = 0;
@@ -623,11 +617,11 @@ static struct file *loadfile(const char *fname) {
   if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, NULL, 0);
   db_rewind(db);
 
-  return(db);
+  return(0);
 
   IOERR:
   _dos_close(fd);
-  return(NULL);
+  return(2);
 }
 
 
@@ -726,8 +720,9 @@ static void recompute_curline(struct file *db) {
 
 
 int main(void) {
+  static struct file dbarr[1];
   const char *fname;
-  struct file *db;
+  struct file *db = dbarr;
 
   {
     char nlspath[128], lang[8];
@@ -742,8 +737,16 @@ int main(void) {
   }
 
   /* load file */
-  db = loadfile(fname);
-  if (db == NULL) return(1);
+  {
+    unsigned char err = loadfile(db, fname);
+    if (err == 1) {
+      mdr_coutraw_puts(svarlang_str(0,11)); /* file not found */
+      return(1);
+    } else if (err != 0) {
+      mdr_coutraw_puts(svarlang_str(0,10)); /* ERROR */
+      return(1);
+    }
+  }
 
   if (mdr_cout_init(&screenw, &screenh)) {
     /* load color scheme if mdr_cout_init returns a color flag */
@@ -897,8 +900,18 @@ int main(void) {
       /* ask for filename */
       ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
       if (fname[0] != 0) {
+        unsigned char err;
         clear_file(db);
-        db = loadfile(fname);
+        err = loadfile(db, fname);
+        if (err != 0) {
+          if (err == 1) {
+            ui_msg(svarlang_str(0,11), NULL, SCHEME_ERR); /* file not found */
+          } else {
+            ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
+          }
+          mdr_bios_tickswait(44); /* 3s */
+          clear_file(db);
+        }
       }
       uidirty.from = 0;
       uidirty.to = 0xff;
