@@ -495,12 +495,12 @@ static void bkspc(struct file *db) {
 
 /* a custom argv-parsing routine that looks directly inside the PSP, avoids the need
  * of argc and argv, saves some 330 bytes of binary size */
-static char *parseargv(void) {
+static const char *parseargv(void) {
   char *tail = (void *)0x81; /* THIS WORKS ONLY IN SMALL MEMORY MODEL */
   unsigned short count = 0;
-  char *argv[4];
+  char *argv[2];
 
-  while (count < 4) {
+  while (count < 2) {
     /* jump to nearest arg */
     while (*tail == ' ') {
       *tail = 0;
@@ -520,8 +520,9 @@ static char *parseargv(void) {
 
   /* check args now */
   if (count == 0) return("");
+  if (count == 1) return(argv[0]);
 
-  return(argv[0]);
+  return(NULL);
 }
 
 
