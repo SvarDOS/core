@@ -3,10 +3,10 @@
                            Sved, the SvarDOS editor
 
 
-Sved is the editor that comes with SvarDOS. Sved is not meant to be a
+Sved is the default editor that comes with SvarDOS. Sved is not meant to be a
 full-featured text editor, it is designed for basic editing of configuration
-files and not much more. On the pro side Sved has a low memory footprint and
-is only a couple of kilobytes big, which makes it a good fit on bootdisks or
+files and such. On the pro side, Sved has a very low memory footprint and
+is only a couple of kilobytes big, which makes it a good fit for bootdisks or
 systems with extremely limited ressources.
 
  - runs comfortably on a 8086-class PC with 256 KiB of RAM
@@ -22,7 +22,7 @@ What Sved does NOT have:
 
  - stylish pull-down menus
  - mouse support
- - an integrated file browser
+ - any integrated file browser
  - multiple files interface
  - copy/paste support
  - undo
