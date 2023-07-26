@@ -11,6 +11,8 @@
 0.4:Unsaved changes will be lost.
 0.5:Press ENTER to confirm.
 0.6:Save as:
+0.7:Load:
+0.8:Press ESC to cancel.
 
 
 ################

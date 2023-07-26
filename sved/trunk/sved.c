@@ -164,25 +164,27 @@ static void ui_getstring(const char *query, char *s, unsigned char maxlen) {
     mdr_cout_locate(y, x + len);
     k = keyb_getkey();
 
-    if (k == 0x1b) return; /* ESC */
-
-    if (k == '\r') {
-      s[len] = 0;
-      return;
+    switch (k) {
+      case 0x1b: /* ESC */
+        s[0] = 0;
+        return;
+      case '\r':
+        s[len] = 0;
+        return;
+      case 0x08: /* BKSPC */
+        if (len > 0) {
+          len--;
+          mdr_cout_char(y, x + len, ' ', SCHEME_STBAR3);
+        }
+        break;
+      default:
+        if ((k <= 0xff) && (k >= ' ') && (len < maxlen)) {
+          mdr_cout_char(y, x + len, k, SCHEME_STBAR3);
+          s[len++] = k;
+        }
     }
-
-    if ((k == 0x08) && (len > 0)) { /* BKSPC */
-      len--;
-      mdr_cout_char(y, x + len, ' ', SCHEME_STBAR3);
-      continue;
-    }
-
-    if ((k <= 0xff) && (k >= ' ') && (len < maxlen)) {
-      mdr_cout_char(y, x + len, k, SCHEME_STBAR3);
-      s[len++] = k;
-    }
-
   }
+
 }
 
 
@@ -244,6 +246,7 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
   x = (screenw - msglen - 4) >> 1;
   for (i = y+2+msg2flag; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
   x++;
+
   mdr_cout_str(y+1, x, msg1, attr, msglen);
   if (msg2) mdr_cout_str(y+2, x, msg2, attr, msglen);
 
@@ -881,6 +884,22 @@ int main(void) {
 
     } else if (k == 0x13c) { /* F2 (new file) */
       if (ui_confirm_if_unsaved(db) == 0) clear_file(db);
+      uidirty.from = 0;
+      uidirty.to = 0xff;
+      uidirty.statusbar = 1;
+
+    } else if (k == 0x13d) { /* F3 (load file) */
+      char fname[25];
+
+      /* display a warning if unsaved changes are pending */
+      if (db->modflag != 0) ui_msg(svarlang_str(0,4), svarlang_str(0,8), SCHEME_MSG);
+
+      /* ask for filename */
+      ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
+      if (fname[0] != 0) {
+        clear_file(db);
+        db = loadfile(fname);
+      }
       uidirty.from = 0;
       uidirty.to = 0xff;
       uidirty.statusbar = 1;
