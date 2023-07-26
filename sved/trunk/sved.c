@@ -710,6 +710,18 @@ static void clear_file(struct file *db) {
 }
 
 
+/* recompute db->curline by counting nodes in linked list */
+static void recompute_curline(struct file *db) {
+  const struct line far *l = db->cursor;
+
+  db->curline = 0;
+  while (l->prev != NULL) {
+    db->curline += 1;
+    l = l->prev;
+  }
+}
+
+
 int main(void) {
   const char *fname;
   struct file *db;
@@ -801,6 +813,7 @@ int main(void) {
       }
       uidirty.from = 0;
       uidirty.to = 0xff;
+      recompute_curline(db);
 
     } else if (k == 0x151) { /* pgdown */
       unsigned char dist = screenh + screenh - db->cursorposy - 3;
@@ -818,6 +831,7 @@ int main(void) {
       }
       uidirty.from = 0;
       uidirty.to = 0xff;
+      recompute_curline(db);
 
     } else if (k == 0x147) { /* home */
        cursor_home(db);
@@ -834,10 +848,10 @@ int main(void) {
       if (line_add(db, db->cursor->payload + off, db->cursor->len - off) == 0) {
         db->modflag = 1;
         db->cursor = db->cursor->prev; /* back to original line */
-        db->curline -= 1;
         /* trim the line above */
         db->cursor->len = off;
         /* move cursor to the (new) line below */
+        db->curline -= 1;
         uidirty.from = db->cursorposy;
         uidirty.to = 0xff;
         cursor_down(db);
