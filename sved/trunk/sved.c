@@ -333,11 +333,7 @@ static void ui_refresh(const struct file *db) {
   }
 
   /* "file changed" flag */
-  {
-    char flg = ' ';
-    if (db->modflag) flg = '*';
-    mdr_cout_char(screenh - 1, 0, flg, SCHEME_STBAR1);
-  }
+  mdr_cout_char(screenh - 1, 0, db->modflag, SCHEME_STBAR1);
 
   /* scroll bar */
   for (y = 0; y < (screenh - 1); y++) {
@@ -465,7 +461,7 @@ static void del(struct file *db) {
     db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
     uidirty.from = db->cursorposy;
     uidirty.to = db->cursorposy;
-    db->modflag = 1;
+    db->modflag = '*';
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
@@ -482,7 +478,7 @@ static void del(struct file *db) {
     uidirty.from = db->cursorposy;
     uidirty.to = 0xff;
     db->totlines -= 1;
-    db->modflag = 1;
+    db->modflag = '*';
   }
 }
 
@@ -670,7 +666,7 @@ static int savefile(const struct file *db, const char *newfname) {
 static void insert_in_line(struct file *db, const char *databuf, unsigned short len) {
   if (curline_resize(db, db->cursor->len + len) == 0) {
     unsigned short off = db->xoffset + db->cursorposx;
-    db->modflag = 1;
+    db->modflag = '*';
     _fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
     db->cursor->len += len;
     uidirty.from = db->cursorposy;
@@ -847,7 +843,7 @@ void main(void) {
       unsigned short off = db->xoffset + db->cursorposx;
       /* add a new line */
       if (line_add(db, db->cursor->payload + off, db->cursor->len - off) == 0) {
-        db->modflag = 1;
+        db->modflag = '*';
         db->cursor = db->cursor->prev; /* back to original line */
         /* trim the line above */
         db->cursor->len = off;
@@ -941,7 +937,7 @@ void main(void) {
       uidirty.statusbar = 1;
 
     } else if (k == 0x144) { /* F10 */
-      db->modflag = 1;
+      db->modflag = '*';
       db->lfonly ^= 1;
       uidirty.statusbar = 1;
 
