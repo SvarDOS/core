@@ -85,7 +85,7 @@ struct file {
 
 static struct line far *line_calloc(unsigned short siz) {
   unsigned int seg;
-  if (_dos_allocmem((sizeof(struct line) + siz) / 16 + 1, &seg) != 0) return(NULL);
+  if (_dos_allocmem((sizeof(struct line) + siz + 15) / 16, &seg) != 0) return(NULL);
   _fmemset(MK_FP(seg, 0), 0, siz);
   return(MK_FP(seg, 0));
 }
@@ -100,8 +100,8 @@ static signed char curline_resize(struct file far *db, unsigned short newsiz) {
   unsigned int maxavail;
   struct line far *newptr;
 
-  /* try resizing the block (faster) */
-  if (_dos_setblock((sizeof(struct line) + newsiz) / 16 + 1, FP_SEG(db->cursor), &maxavail) == 0) return(0);
+  /* try resizing the block (much faster) */
+  if (_dos_setblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor), &maxavail) == 0) return(0);
 
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
