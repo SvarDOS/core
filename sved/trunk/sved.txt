@@ -18,6 +18,7 @@ systems with extremely limited ressources.
  - low disk footprint (8 KiB)
  - loads files larger than 64 KiB
  - no limit on line lengths
+ - can load up to 10 files simulteanously
  - handles CR/LF and LF line endings (+can convert between the two)
 
 What Sved does NOT have:
@@ -41,6 +42,9 @@ Jumping to previous or next word is possible with the CTRL+LEFT and CTRL+RIGHT
 combinations.
 
 Program's menu is accessible under the ESC key.
+
+Sved can load up to 10 files simulteanously. To switch from one file to
+another use the F1..F10 function keys (F1 = slot 1, F2 = slot 2, etc).
 
 
 ### LICENSE ##################################################################

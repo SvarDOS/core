@@ -77,6 +77,7 @@ struct file {
   unsigned short curline;
   char lfonly;   /* set if line endings are LF (CR/LF otherwise) */
   char modflag;  /* non-zero if file has been modified since last save */
+  char modflagprev;
   char fname[128];
 };
 
@@ -208,18 +209,29 @@ static void db_rewind(struct file *db) {
 }
 
 
-static void ui_basic(const struct file *db) {
+static void ui_basic(const struct file *db, unsigned short slotnum) {
   const char *s = svarlang_strid(0); /* HELP */
   unsigned short helpcol = screenw - strlen(s);
 
-  /* fill status bar with background (without modflag as it is refreshed by ui_refresh) */
-  mdr_cout_char_rep(screenh - 1, 1, ' ', SCHEME_STBAR1, screenw - 1);
+  /* slot number */
+  {
+    char slot[4] = "#00";
+    slotnum++;
+    slot[1] += (slotnum / 10);
+    slot[2] += (slotnum % 10);
+    mdr_cout_str(screenh - 1, 0, slot, SCHEME_STBAR2, 3);
+  }
+
+  /* fill rest of status bar with background */
+  mdr_cout_char_rep(screenh - 1, 3, ' ', SCHEME_STBAR1, screenw - 1);
 
   /* filename */
   {
     const char *fn = db->fname;
+    unsigned short x;
     if (*fn == 0) fn = svarlang_str(0, 1);
-    mdr_cout_str(screenh - 1, 1, fn, SCHEME_STBAR1, screenw);
+    x = mdr_cout_str(screenh - 1, 4, fn, SCHEME_STBAR1, screenw);
+    if (db->modflag) mdr_cout_char(screenh - 1, 5 + x, '*', SCHEME_STBAR1);
   }
 
   /* eol type */
@@ -258,13 +270,18 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
 
 
 static unsigned char ui_confirm_if_unsaved(struct file *db) {
+  unsigned char r = 0;
   if (db->modflag == 0) return(0);
+
+  mdr_cout_cursor_hide();
 
   /* if file has been modified then ask for confirmation */
   ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
-  if (keyb_getkey() == '\r') return(0);
+  if (keyb_getkey() != '\r') r = 1;
 
-  return(1);
+  mdr_cout_cursor_show();
+
+  return(r);
 }
 
 
@@ -316,9 +333,6 @@ static void ui_refresh(const struct file *db) {
       mdr_cout_char_rep(y++, 0, ' ', SCHEME_TEXT, screenw - 1);
     }
   }
-
-  /* "file changed" flag */
-  mdr_cout_char(screenh - 1, 0, db->modflag, SCHEME_STBAR1);
 
   /* scroll bar */
   for (y = 0; y < (screenh - 1); y++) {
@@ -519,10 +533,21 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   int fd;
   unsigned char eolfound;
 
-  bzero(db, sizeof(db));
-  memcpy(db->fname, fname, strlen(fname));
+  /* free the entire linked list of lines */
+  db_rewind(db);
+  while (db->cursor) {
+    struct line far *victim;
+    victim = db->cursor;
+    db->cursor = db->cursor->next;
+    line_free(victim);
+  }
+
+  /* zero out the struct */
+  bzero(db, sizeof(struct file));
 
   if (*fname == 0) goto SKIPLOADING;
+
+  memcpy(db->fname, fname, strlen(fname));
 
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
     return(1);
@@ -666,22 +691,6 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
 }
 
 
-static void clear_file(struct file *db) {
-
-  /* free the entire linked list of lines */
-  db_rewind(db);
-  while (db->cursor) {
-    struct line far *victim;
-    victim = db->cursor;
-    db->cursor = db->cursor->next;
-    line_free(victim);
-  }
-
-  /* zero out the struct */
-  bzero(db, sizeof(struct file));
-}
-
-
 /* recompute db->curline by counting nodes in linked list */
 static void recompute_curline(struct file *db) {
   const struct line far *l = db->cursor;
@@ -696,10 +705,10 @@ static void recompute_curline(struct file *db) {
 
 enum MENU_ACTION {
   MENU_NONE = 0,
-  MENU_NEW = 1,
-  MENU_OPEN = 2,
-  MENU_SAVE = 3,
-  MENU_SAVEAS = 4,
+  MENU_OPEN = 1,
+  MENU_SAVE = 2,
+  MENU_SAVEAS = 3,
+  MENU_CLOSE = 4,
   MENU_CHGEOL = 5,
   MENU_QUIT = 6
 };
@@ -712,12 +721,12 @@ static enum MENU_ACTION ui_menu(void) {
 
   /* find out the longest string */
   slen = 0;
-  for (i = MENU_NEW; i <= MENU_QUIT; i++) {
+  for (i = MENU_OPEN; i <= MENU_QUIT; i++) {
     x = strlen(svarlang_str(8, i));
     if (x > slen) slen = x;
   }
 
-  curchoice = MENU_NEW;
+  curchoice = MENU_OPEN;
   for (;;) {
     /* render menu */
     for (i = MENU_NONE; i <= MENU_QUIT + 1; i++) {
@@ -739,13 +748,13 @@ static enum MENU_ACTION ui_menu(void) {
       case '\r': return(curchoice); /* ENTER */
       case 0x150: /* down */
         if (curchoice == MENU_QUIT) {
-          curchoice = MENU_NEW;
+          curchoice = MENU_OPEN;
         } else {
           curchoice++;
         }
         break;
       case 0x148: /* up */
-        if (curchoice == MENU_NEW) {
+        if (curchoice == MENU_OPEN) {
           curchoice = MENU_QUIT;
         } else {
           curchoice--;
@@ -757,12 +766,25 @@ static enum MENU_ACTION ui_menu(void) {
 }
 
 
+static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
+  uidirty.from = 0;
+  uidirty.to = 0xff;
+  uidirty.statusbar = 1;
+
+  dbarr = &(dbarr[curfile]);
+  ui_basic(dbarr, curfile);
+  ui_refresh(dbarr);
+  return(dbarr);
+}
+
+
 /* main returns nothing, ie. sved always exits with a zero exit code
  * (this saves 20 bytes of executable footprint) */
 void main(void) {
-  static struct file dbarr[12];
+  static struct file dbarr[10];
   const char *fname;
-  struct file *db = dbarr;
+  unsigned short curfile;
+  struct file *db = dbarr; /* visible file is the first slot by default */
 
   {
     char nlspath[128], lang[8];
@@ -776,8 +798,14 @@ void main(void) {
     return;
   }
 
-  /* load file */
-  {
+  /* preload all slots with empty files */
+  for (curfile = 9;; curfile--) {
+    loadfile(&(dbarr[curfile]), "");
+    if (curfile == 0) break;
+  }
+
+  /* load file, if any given */
+  if (*fname != 0) {
     unsigned char err = loadfile(db, fname);
     if (err == 1) {
       mdr_coutraw_puts(svarlang_str(0,11)); /* file not found */
@@ -812,9 +840,10 @@ void main(void) {
       ui_refresh(db);
       uidirty.from = 0xff;
     }
-    if (uidirty.statusbar) {
-      ui_basic(db);
+    if ((uidirty.statusbar != 0) || (db->modflagprev != db->modflag)) {
+      ui_basic(db, curfile);
       uidirty.statusbar = 0;
+      db->modflagprev = db->modflag;
     }
 #ifdef DBG_LINENUM
       {
@@ -898,15 +927,6 @@ void main(void) {
         case MENU_NONE:
           break;
 
-        case MENU_NEW:
-          if (ui_confirm_if_unsaved(db) == 0) {
-            clear_file(db);
-            /* add a single empty line */
-            line_add(db, NULL, 0);
-          }
-          uidirty.statusbar = 1;
-          break;
-
         case MENU_OPEN:
           /* display a warning if unsaved changes are pending */
           if (db->modflag != 0) ui_msg(svarlang_str(0,4), svarlang_str(0,8), SCHEME_MSG);
@@ -915,7 +935,6 @@ void main(void) {
           ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
           if (fname[0] != 0) {
             unsigned char err;
-            clear_file(db);
             err = loadfile(db, fname);
             if (err != 0) {
               if (err == 1) {
@@ -924,7 +943,7 @@ void main(void) {
                 ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
               }
               mdr_bios_tickswait(44); /* 3s */
-              clear_file(db);
+              loadfile(db, "");
             }
           }
           break;
@@ -952,13 +971,28 @@ void main(void) {
           }
           break;
 
+        case MENU_CLOSE:
+          if (ui_confirm_if_unsaved(db) == 0) {
+            loadfile(db, "");
+          }
+          uidirty.from = 0;
+          uidirty.to = 0xff;
+          uidirty.statusbar = 1;
+          break;
+
         case MENU_CHGEOL:
           db->modflag = '*';
           db->lfonly ^= 1;
           break;
 
         case MENU_QUIT:
-          if (ui_confirm_if_unsaved(db) == 0) quitnow = 1;
+          quitnow = 1;
+          for (curfile = 0; curfile < 10; curfile++) {
+            if (dbarr[curfile].modflag) {
+              db = select_slot(dbarr, curfile);
+              if (ui_confirm_if_unsaved(db) != 0) quitnow = 0;
+            }
+          }
           break;
       }
 
@@ -995,9 +1029,9 @@ void main(void) {
     } else if (k == 0x009) { /* TAB */
       insert_in_line(db, "        ", 8);
 
-    } else if ((k >= 0x13b) && (k <= 0x146)) { /* F1..F12 */
-      uidirty.from = 0;
-      uidirty.to = 0xff;
+    } else if ((k >= 0x13b) && (k <= 0x144)) { /* F1..F10 */
+      curfile = k - 0x13b;
+      db = select_slot(dbarr, curfile);
 
     } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
       /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */
