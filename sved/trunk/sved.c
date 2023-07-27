@@ -41,6 +41,9 @@
 
 /* preload the mono scheme (to be overloaded at runtime if color adapter present) */
 static unsigned char SCHEME_TEXT   = 0x07,
+                     SCHEME_MENU   = 0x70,
+                     SCHEME_MENU_CUR= 0x0f,
+                     SCHEME_MENU_SEL= 0x00,
                      SCHEME_STBAR1 = 0x70,
                      SCHEME_STBAR2 = 0x70,
                      SCHEME_STBAR3 = 0xf0,
@@ -262,24 +265,6 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
   if (keyb_getkey() == '\r') return(0);
 
   return(1);
-}
-
-
-static void ui_help(void) {
-#define MAXLINLEN 39
-  unsigned short i, offset;
-  offset = (screenw - MAXLINLEN) >> 1;
-
-  for (i = 3; i < 25; i++) {
-    const char *s = svarlang_str(8, i);
-    if (s[0] == 0) break;
-    mdr_cout_char_rep(i, offset, ' ', SCHEME_STBAR1, MAXLINLEN);
-    if (s[0] == '.') continue;
-    mdr_cout_locate(i, offset + 2 + mdr_cout_str(i, offset + 2, s, SCHEME_STBAR1, MAXLINLEN - 2));
-  }
-
-  keyb_getkey();
-#undef MAXLINLEN
 }
 
 
@@ -709,10 +694,73 @@ static void recompute_curline(struct file *db) {
 }
 
 
+enum MENU_ACTION {
+  MENU_NONE = 0,
+  MENU_NEW = 1,
+  MENU_OPEN = 2,
+  MENU_SAVE = 3,
+  MENU_SAVEAS = 4,
+  MENU_CHGEOL = 5,
+  MENU_QUIT = 6
+};
+
+static enum MENU_ACTION ui_menu(void) {
+  unsigned short i, curchoice, attr, x, slen;
+  uidirty.from = 0;
+  uidirty.to = 0xff;
+  uidirty.statusbar = 1;
+
+  /* find out the longest string */
+  slen = 0;
+  for (i = MENU_NEW; i <= MENU_QUIT; i++) {
+    x = strlen(svarlang_str(8, i));
+    if (x > slen) slen = x;
+  }
+
+  curchoice = MENU_NEW;
+  for (;;) {
+    /* render menu */
+    for (i = MENU_NONE; i <= MENU_QUIT + 1; i++) {
+      mdr_cout_char_rep(i, 0, ' ', SCHEME_MENU, slen+4);
+      if (i == curchoice) {
+        attr = SCHEME_MENU_CUR;
+        mdr_cout_char(i, 1, '>', SCHEME_MENU_SEL);
+      } else {
+        attr = SCHEME_MENU;
+      }
+      x = mdr_cout_str(i, 2, svarlang_str(8, i), attr, slen);
+      if (i == curchoice) {
+        mdr_cout_char_rep(i, x + 2, ' ', SCHEME_MENU_SEL, slen - x + 1);
+        mdr_cout_locate(i, x + 2);
+      }
+    }
+    /* wait for key */
+    switch (keyb_getkey()) {
+      case '\r': return(curchoice); /* ENTER */
+      case 0x150: /* down */
+        if (curchoice == MENU_QUIT) {
+          curchoice = MENU_NEW;
+        } else {
+          curchoice++;
+        }
+        break;
+      case 0x148: /* up */
+        if (curchoice == MENU_NEW) {
+          curchoice = MENU_QUIT;
+        } else {
+          curchoice--;
+        }
+        break;
+      default: return(MENU_NONE);
+    }
+  }
+}
+
+
 /* main returns nothing, ie. sved always exits with a zero exit code
  * (this saves 20 bytes of executable footprint) */
 void main(void) {
-  static struct file dbarr[1];
+  static struct file dbarr[12];
   const char *fname;
   struct file *db = dbarr;
 
@@ -743,6 +791,9 @@ void main(void) {
   if (mdr_cout_init(&screenw, &screenh)) {
     /* load color scheme if mdr_cout_init returns a color flag */
     SCHEME_TEXT = 0x17;
+    SCHEME_MENU = 0x70;
+    SCHEME_MENU_CUR = 0x2f;
+    SCHEME_MENU_SEL = 0x22;
     SCHEME_STBAR1 = 0x70;
     SCHEME_STBAR2 = 0x78;
     SCHEME_STBAR3 = 0xf0;
@@ -838,7 +889,80 @@ void main(void) {
        cursor_eol(db);
 
     } else if (k == 0x1B) { /* ESC */
-      if (ui_confirm_if_unsaved(db) == 0) break;
+      int quitnow = 0;
+      char fname[25];
+      int saveflag = 0;
+
+      switch (ui_menu()) {
+
+        case MENU_NONE:
+          break;
+
+        case MENU_NEW:
+          if (ui_confirm_if_unsaved(db) == 0) {
+            clear_file(db);
+            /* add a single empty line */
+            line_add(db, NULL, 0);
+          }
+          uidirty.statusbar = 1;
+          break;
+
+        case MENU_OPEN:
+          /* display a warning if unsaved changes are pending */
+          if (db->modflag != 0) ui_msg(svarlang_str(0,4), svarlang_str(0,8), SCHEME_MSG);
+
+          /* ask for filename */
+          ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
+          if (fname[0] != 0) {
+            unsigned char err;
+            clear_file(db);
+            err = loadfile(db, fname);
+            if (err != 0) {
+              if (err == 1) {
+                ui_msg(svarlang_str(0,11), NULL, SCHEME_ERR); /* file not found */
+              } else {
+                ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
+              }
+              mdr_bios_tickswait(44); /* 3s */
+              clear_file(db);
+            }
+          }
+          break;
+
+        case MENU_SAVEAS:
+          saveflag = 1;
+          /* FALLTHRU */
+        case MENU_SAVE:
+          if ((saveflag != 0) || (db->fname[0] == 0)) { /* save as... */
+            ui_getstring(svarlang_str(0,6), fname, sizeof(fname));
+            if (*fname == 0) break;
+            saveflag = savefile(db, fname);
+            if (saveflag == 0) memcpy(db->fname, fname, sizeof(fname));
+          } else {
+            saveflag = savefile(db, NULL);
+          }
+
+          if (saveflag == 0) {
+            db->modflag = 0;
+            ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
+            mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
+          } else {
+            ui_msg(svarlang_str(0, 3), NULL, SCHEME_ERR);
+            mdr_bios_tickswait(36); /* 2s */
+          }
+          break;
+
+        case MENU_CHGEOL:
+          db->modflag = '*';
+          db->lfonly ^= 1;
+          break;
+
+        case MENU_QUIT:
+          if (ui_confirm_if_unsaved(db) == 0) quitnow = 1;
+          break;
+      }
+
+      if (quitnow) break;
 
     } else if (k == 0x0D) { /* ENTER */
       unsigned short off = db->xoffset + db->cursorposx;
@@ -871,78 +995,9 @@ void main(void) {
     } else if (k == 0x009) { /* TAB */
       insert_in_line(db, "        ", 8);
 
-    } else if (k == 0x13b) { /* F1 */
-      ui_help();
+    } else if ((k >= 0x13b) && (k <= 0x146)) { /* F1..F12 */
       uidirty.from = 0;
       uidirty.to = 0xff;
-
-    } else if (k == 0x13c) { /* F2 (new file) */
-      if (ui_confirm_if_unsaved(db) == 0) {
-        clear_file(db);
-        /* add a single empty line */
-        line_add(db, NULL, 0);
-      }
-      uidirty.from = 0;
-      uidirty.to = 0xff;
-      uidirty.statusbar = 1;
-
-    } else if (k == 0x13d) { /* F3 (load file) */
-      char fname[25];
-
-      /* display a warning if unsaved changes are pending */
-      if (db->modflag != 0) ui_msg(svarlang_str(0,4), svarlang_str(0,8), SCHEME_MSG);
-
-      /* ask for filename */
-      ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
-      if (fname[0] != 0) {
-        unsigned char err;
-        clear_file(db);
-        err = loadfile(db, fname);
-        if (err != 0) {
-          if (err == 1) {
-            ui_msg(svarlang_str(0,11), NULL, SCHEME_ERR); /* file not found */
-          } else {
-            ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
-          }
-          mdr_bios_tickswait(44); /* 3s */
-          clear_file(db);
-        }
-      }
-      uidirty.from = 0;
-      uidirty.to = 0xff;
-      uidirty.statusbar = 1;
-
-    } else if ((k == 0x13f) || (k == 0x140)) { /* F5 or F6 */
-      int saveres;
-
-      if ((k == 0x140) || (db->fname[0] == 0)) { /* save as... */
-        char fname[25];
-        ui_getstring(svarlang_str(0,6), fname, sizeof(fname));
-        if (*fname == 0) continue;
-        saveres = savefile(db, fname);
-        if (saveres == 0) memcpy(db->fname, fname, sizeof(fname));
-      } else {
-        saveres = savefile(db, NULL);
-      }
-
-      if (saveres == 0) {
-        db->modflag = 0;
-        ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
-        mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
-      } else {
-        ui_msg(svarlang_str(0, 3), NULL, SCHEME_ERR);
-        mdr_bios_tickswait(36); /* 2s */
-      }
-
-      ui_refresh(db);
-      uidirty.statusbar = 1;
-
-    } else if (k == 0x144) { /* F10 */
-      db->modflag = '*';
-      db->lfonly ^= 1;
-      uidirty.statusbar = 1;
-      uidirty.from = 0;
-      uidirty.to = 0;
 
     } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
       /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */

@@ -1,7 +1,9 @@
 
 
-                           Sved, the SvarDOS editor
+                           SVED, THE SVARDOS EDITOR
 
+
+### WHAT IS IT ###############################################################
 
 Sved is the default editor that comes with SvarDOS. Sved is not meant to be a
 full-featured text editor, it is designed for basic editing of configuration
@@ -20,14 +22,28 @@ systems with extremely limited ressources.
 
 What Sved does NOT have:
 
- - stylish pull-down menus
  - mouse support
  - any integrated file browser
- - multiple files interface
  - copy/paste support
  - undo
  - search
  - ...
+
+
+### USAGE AND KEY BINDINGS ###################################################
+
+Navigation within the text file is achieved through the usual, standard keys:
+ - up, down, right and left arrows
+ - PageUp / PageDown
+ - Home / End
+
+Jumping to previous or next word is possible with the CTRL+LEFT and CTRL+RIGHT
+combinations.
+
+Program's menu is accessible under the ESC key.
+
+
+### LICENSE ##################################################################
 
 Sved is released under the terms of the MIT license.
 
@@ -50,3 +66,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+###################################################################### EOF ###

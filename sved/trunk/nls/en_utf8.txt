@@ -4,7 +4,7 @@
 # MAIN SCREEN #
 ###############
 
-0.0:F1=HELP
+0.0:ESC=MENU
 0.1:NEW FILE
 0.2:SAVED
 0.3:SAVING FAILED
@@ -28,18 +28,9 @@
 # HELP SCREEN #
 ###############
 
-8.3:.
-8.4:F2  New file
-8.5:F3  Open file
-8.6:F5  Save
-8.7:F6  Save as...
-8.8:F10 Change line endings
-8.9:ESC Quit
-8.10:.
-8.11:Navigation:
-8.12:.
-8.13:CTRL+Right  Jump to next word
-8.14:CTRL+Left   Jump to prev word
-8.15:.
-8.16:Press any key
-8.17:.
+8.1:New file
+8.2:Open file
+8.3:Save
+8.4:Save as...
+8.5:Change line endings
+8.6:Quit
