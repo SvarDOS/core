@@ -222,7 +222,7 @@ static void ui_basic(const struct file *db) {
   /* eol type */
   {
     const char *eoltype = "CRLF";
-    if (db->lfonly) eoltype = "LF";
+    if (db->lfonly) eoltype += 2;
     mdr_cout_str(screenh - 1, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
   }
 
@@ -941,6 +941,8 @@ void main(void) {
       db->modflag = '*';
       db->lfonly ^= 1;
       uidirty.statusbar = 1;
+      uidirty.from = 0;
+      uidirty.to = 0;
 
     } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
       /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */
