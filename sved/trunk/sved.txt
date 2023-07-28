@@ -24,7 +24,7 @@ systems with extremely limited ressources.
 What Sved does NOT have:
 
  - mouse support
- - any integrated file browser
+ - an integrated file browser
  - copy/paste support
  - undo
  - search

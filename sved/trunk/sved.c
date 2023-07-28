@@ -35,6 +35,9 @@
 #include "svarlang\svarlang.h"
 
 
+#define PVER "2023.0"
+#define PDATE "2023"
+
 /*****************************************************************************
  * global variables and definitions                                          *
  *****************************************************************************/
@@ -210,7 +213,7 @@ static void db_rewind(struct file *db) {
 
 
 static void ui_basic(const struct file *db, unsigned short slotnum) {
-  const char *s = svarlang_strid(0); /* HELP */
+  const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
 
   /* slot number */
@@ -492,39 +495,6 @@ static void bkspc(struct file *db) {
 }
 
 
-/* a custom argv-parsing routine that looks directly inside the PSP, avoids the need
- * of argc and argv, saves some 330 bytes of binary size */
-static const char *parseargv(void) {
-  char *tail = (void *)0x81; /* THIS WORKS ONLY IN SMALL MEMORY MODEL */
-  unsigned short count = 0;
-  char *argv[2];
-
-  while (count < 2) {
-    /* jump to nearest arg */
-    while (*tail == ' ') {
-      *tail = 0;
-      tail++;
-    }
-
-    if (*tail == '\r') {
-      *tail = 0;
-      break;
-    }
-
-    argv[count++] = tail;
-
-    /* jump to next delimiter */
-    while ((*tail != ' ') && (*tail != '\r')) tail++;
-  }
-
-  /* check args now */
-  if (count == 0) return("");
-  if (count == 1) return(argv[0]);
-
-  return(NULL);
-}
-
-
 /* returns 0 on success, 1 on file not found, 2 on other error */
 static unsigned char loadfile(struct file *db, const char *fname) {
   char buff[512]; /* read one entire sector at a time (faster) */
@@ -626,6 +596,72 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   IOERR:
   _dos_close(fd);
   return(2);
+}
+
+
+/* a custom argv-parsing routine that looks directly inside the PSP, avoids the need
+ * of argc and argv, saves some 330 bytes of binary size
+ * returns non-zero on error */
+static int parseargv(struct file *dbarr) {
+  char *tail = (void *)0x81; /* THIS WORKS ONLY IN SMALL MEMORY MODEL */
+  unsigned short count = 0;
+  char *arg;
+  unsigned short lastarg = 0;
+  unsigned short err;
+
+  while (!lastarg) {
+    /* jump to nearest arg */
+    while (*tail == ' ') {
+      *tail = 0;
+      tail++;
+    }
+
+    if (*tail == '\r') {
+      *tail = 0;
+      break;
+    }
+
+    arg = tail;
+
+    /* jump to next delimiter */
+    while ((*tail != ' ') && (*tail != '\r')) tail++;
+
+    /* if \r then remember this is the last arg */
+    if (*tail == '\r') lastarg = 1;
+
+    *tail = 0;
+    tail++;
+
+    /* look at the arg now */
+    if (*arg == '/') {
+      mdr_coutraw_puts("Sved ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
+      mdr_coutraw_puts("");
+      mdr_coutraw_puts(svarlang_str(1,0)); /* usage: sved file.txt */
+      return(-1);
+    }
+
+    /* looks to be a filename */
+    if (count == 10) {
+      mdr_coutraw_puts(svarlang_str(0,12));
+      return(-1); /* too many files */
+    }
+
+    /* try loading it */
+    mdr_coutraw_puts(arg);
+    err = loadfile(&(dbarr[count]), arg);
+    if (err) {
+      if (err == 1) { /* file not found */
+        err = 11;
+      } else { /* general error */
+        err = 10;
+      }
+      mdr_coutraw_puts(svarlang_str(0,err));
+      return(-1);
+    }
+    count++;
+  }
+
+  return(0);
 }
 
 
@@ -782,7 +818,6 @@ static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
  * (this saves 20 bytes of executable footprint) */
 void main(void) {
   static struct file dbarr[10];
-  const char *fname;
   unsigned short curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
 
@@ -791,30 +826,14 @@ void main(void) {
     svarlang_autoload_pathlist("sved", mdr_dos_getenv(nlspath, "NLSPATH", sizeof(nlspath)), mdr_dos_getenv(lang, "LANG", sizeof(lang)));
   }
 
-  fname = parseargv();
-
-  if ((fname == NULL) || (*fname == '/')) {
-    mdr_coutraw_puts(svarlang_str(1,0)); /* usage: sved file.txt */
-    return;
-  }
-
   /* preload all slots with empty files */
   for (curfile = 9;; curfile--) {
     loadfile(&(dbarr[curfile]), "");
     if (curfile == 0) break;
   }
 
-  /* load file, if any given */
-  if (*fname != 0) {
-    unsigned char err = loadfile(db, fname);
-    if (err == 1) {
-      mdr_coutraw_puts(svarlang_str(0,11)); /* file not found */
-      return;
-    } else if (err != 0) {
-      mdr_coutraw_puts(svarlang_str(0,10)); /* ERROR */
-      return;
-    }
-  }
+  /* parse argv (and load files, if any passed on) */
+  if (parseargv(dbarr) != 0) return;
 
   if (mdr_cout_init(&screenw, &screenh)) {
     /* load color scheme if mdr_cout_init returns a color flag */

@@ -15,18 +15,18 @@
 0.8:Press ESC to cancel.
 0.10:ERROR
 0.11:FILE NOT FOUND
-
+0.12:Too many files
 
 ################
 # USAGE SCREEN #
 ################
 
-1.0:usage: sved [file.txt]
+1.0:usage: sved [file1.txt] [...] [file10.txt]
 
 
-###############
-# HELP SCREEN #
-###############
+########
+# MENU #
+########
 
 8.1:Open file
 8.2:Save
