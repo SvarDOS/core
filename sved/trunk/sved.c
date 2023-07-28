@@ -450,7 +450,7 @@ static void cursor_right(struct file *db) {
       uidirty.from = 0;
       uidirty.to = 0xff;
     }
-  } else {
+  } else if (db->cursor->next != NULL) { /* jump to start of next line */
     cursor_down(db);
     cursor_home(db);
   }
