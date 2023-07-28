@@ -48,11 +48,11 @@ static unsigned char SCHEME_TEXT   = 0x07,
                      SCHEME_MENU_CUR= 0x0f,
                      SCHEME_MENU_SEL= 0x00,
                      SCHEME_STBAR1 = 0x70,
-                     SCHEME_STBAR2 = 0x70,
-                     SCHEME_STBAR3 = 0xf0,
+                     SCHEME_STBAR2 = 0x70, /* greyed out information */
+                     SCHEME_STBAR3 = 0x70, /* query */
                      SCHEME_SCROLL = 0x70,
                      SCHEME_MSG    = 0x70,
-                     SCHEME_ERR    = 0xf0;
+                     SCHEME_ERR    = 0x70;
 
 static unsigned char screenw, screenh;
 
@@ -843,9 +843,9 @@ void main(void) {
     SCHEME_MENU_SEL = 0x22;
     SCHEME_STBAR1 = 0x70;
     SCHEME_STBAR2 = 0x78;
-    SCHEME_STBAR3 = 0xf0;
+    SCHEME_STBAR3 = 0x70;
     SCHEME_SCROLL = 0x70;
-    SCHEME_MSG = 0xf0;
+    SCHEME_MSG = 0x8f;
     SCHEME_ERR = 0x4f;
   }
 
