@@ -47,6 +47,10 @@ char *mdr_dos_getenv(char *result, const char *varname, unsigned short reslimit)
  * always terminated with a backslash separator, unless it is an empty string */
 unsigned char mdr_dos_exepath(char *path);
 
+/* returns a far pointer to the full path and filename of the running program.
+ * returns NULL on error. */
+const char far *mdr_dos_selfexe(void);
+
 /* converts a "DOS format" 16-bit packed date into a standard (time_t)
  * unix timestamp. A DOS date is a 16-bit value:
  * YYYYYYYM MMMDDDDD

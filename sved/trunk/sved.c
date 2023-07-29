@@ -836,8 +836,16 @@ void main(void) {
   struct file *db = dbarr; /* visible file is the first slot by default */
 
   {
-    char nlspath[128], lang[8];
-    svarlang_autoload_pathlist("sved", mdr_dos_getenv(nlspath, "NLSPATH", sizeof(nlspath)), mdr_dos_getenv(lang, "LANG", sizeof(lang)));
+    unsigned short i = 0;
+    const char far *selfptr;
+    char self[128], lang[8];
+    selfptr = mdr_dos_selfexe();
+    if (selfptr != NULL) {
+      do {
+        self[i] = selfptr[i];
+      } while (self[i++] != 0);
+      svarlang_autoload_exepath(self, mdr_dos_getenv(lang, "LANG", sizeof(lang)));
+    }
   }
 
   /* preload all slots with empty files */
