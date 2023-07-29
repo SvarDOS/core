@@ -866,6 +866,13 @@ void main(void) {
   for (;;) {
     int k;
 
+    /* add an extra empty line if cursor is on last line and this line is not empty */
+    if ((db->cursor->next == NULL) && (db->cursor->len != 0)) {
+      if (line_add(db, NULL, 0) == 0) {
+        db->cursor = db->cursor->prev; /* line_add() changes the cursor pointer */
+      }
+    }
+
     check_cursor_not_after_eol(db);
     mdr_cout_locate(db->cursorposy, db->cursorposx);
 
