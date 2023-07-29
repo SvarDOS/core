@@ -1,15 +1,41 @@
-# SVED IN POLISH
-# translated from English by Mateusz Viste
+#############################################################################
+# SVED IN POLISH                                                            #
+# translated from English by Mateusz Viste                                  #
+#############################################################################
+
 
 ###############
 # MAIN SCREEN #
 ###############
 
-0.0:POMOC
-0.1:*NOWY PLIK*
+0.0:ESC=MENU
+0.1:BEZ NAZWY
+0.2:ZAPISANO
+0.3:ZAPIS NIE POWIÓDŁ SIĘ
+0.4:Niezapisane zmiany zostaną utracone.
+0.5:Wciśnij ENTER by potwierdzić.
+0.6:Zapisz jako:
+0.7:Otwórz:
+0.8:Wciśnij ESC by anulować.
+0.10:BŁĄD
+0.11:NIE ZNALEZIONO PLIKU
+0.12:Zbyt duża ilość plików
 
-###############
-# HELP SCREEN #
-###############
 
-1.0:skladnia: sved plik.txt
+################
+# USAGE SCREEN #
+################
+
+1.0:składnia: sved [plik1.txt] [plik2.txt] ... [plik10.txt]
+
+
+########
+# MENU #
+########
+
+8.0:Otwórz plik
+8.1:Zapisz
+8.2:Zapisz jako...
+8.3:Zamknij plik
+8.4:Zmień EOL
+8.5:Wyjdź

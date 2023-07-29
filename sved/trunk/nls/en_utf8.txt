@@ -1,11 +1,14 @@
-# SVED IN ENGLISH
+#############################################################################
+# SVED IN ENGLISH                                                           #
+#############################################################################
+
 
 ###############
 # MAIN SCREEN #
 ###############
 
 0.0:ESC=MENU
-0.1:NEW FILE
+0.1:UNNAMED FILE
 0.2:SAVED
 0.3:SAVING FAILED
 0.4:Unsaved changes will be lost.
@@ -17,11 +20,12 @@
 0.11:FILE NOT FOUND
 0.12:Too many files
 
+
 ################
 # USAGE SCREEN #
 ################
 
-1.0:usage: sved [file1.txt] [...] [file10.txt]
+1.0:usage: sved [file1.txt] [file2.txt] ... [file10.txt]
 
 
 ########
@@ -31,6 +35,6 @@
 8.0:Open file
 8.1:Save
 8.2:Save as...
-8.3:Close
+8.3:Close file
 8.4:Change EOL
 8.5:Quit
