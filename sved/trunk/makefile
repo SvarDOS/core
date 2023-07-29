@@ -18,6 +18,22 @@ edit.com: sved.obj deflang.obj
 .c.obj: .autodepend
 	$(CC) $(CFLAGS) $*.C
 
+pkg: edit.com .symbolic
+	mkdir bin
+	mkdir appinfo
+	mkdir doc
+	mkdir doc\sved
+	copy edit.com bin
+	copy edit.lng bin
+	copy sved.txt doc\sved
+	echo version: 2023.0 > appinfo\sved.lsm
+	echo description: SvarDOS text editor >> appinfo\sved.lsm
+	zip -9rkDX -m sved.zip bin appinfo doc
+	rmdir doc\sved
+	rmdir doc
+	rmdir bin
+	rmdir appinfo
+
 clean: .symbolic
 	del *.obj
 	del edit.com
