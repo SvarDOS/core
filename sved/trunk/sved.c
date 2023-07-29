@@ -538,8 +538,14 @@ static int loadfile(struct file *db, const char *fname) {
 
     FINDLINE:
 
-    /* look for nearest \n */
+    /* look for nearest \n (also expand tabs) */
     for (consumedbytes = 0;; consumedbytes++) {
+
+      if (buffptr[consumedbytes] == '\t') {
+        llen = consumedbytes;
+        break;
+      }
+
       if (consumedbytes == len) {
         llen = consumedbytes;
         break;
@@ -572,6 +578,14 @@ static int loadfile(struct file *db, const char *fname) {
         goto IOERR;
       }
       eolfound = 0;
+    }
+
+    /* append 8 spaces if tab char found */
+    if ((consumedbytes < len) && (buffptr[consumedbytes] == '\t')) {
+      consumedbytes++;
+      if (line_append(db, "        ", 8) != 0) {
+        goto IOERR;
+      }
     }
 
     /* anything left? process the buffer leftover again */
