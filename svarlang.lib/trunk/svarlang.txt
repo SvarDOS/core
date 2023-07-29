@@ -35,10 +35,16 @@ TLUMACZ computes two files:
  * DEFLANG.C - the default translations that will be embedded into the program
 
 Then, DEFLANG.C must be compiled and linked to your program along with
-SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
+SVARLNGx.LIB. From there you will be able to use SvarLANG calls, like this
+very basic example:
 
   svarlang_load("myprogram.lng", "pl");  /* load PL lang from myprogram.lng */
   puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
+
+A more practical, real-world example would probably be this one:
+
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));
+  puts(svarlang_str(2, 0));
 
 Read svarlang.h for more information about available functions.
 
@@ -64,8 +70,7 @@ to be reviewed by a translator).
 
 The program translation file should be named "PROGNAME.LNG", where PROGNAME
 is the program's name. This file should be placed in a well-known location,
-typically the program's own directory. An exception are SvarDOS "CORE" programs
-that store their translation files in a directory pointed out by %NLSPATH%.
+typically the program's own directory.
 
 The %LANG% environment variable usually defines what language should be loaded,
 albeit the program can just as well provide its own controls for language
