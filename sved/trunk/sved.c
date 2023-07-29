@@ -754,13 +754,13 @@ static void recompute_curline(struct file *db) {
 
 
 enum MENU_ACTION {
-  MENU_NONE = 0,
-  MENU_OPEN = 1,
-  MENU_SAVE = 2,
-  MENU_SAVEAS = 3,
-  MENU_CLOSE = 4,
-  MENU_CHGEOL = 5,
-  MENU_QUIT = 6
+  MENU_OPEN   = 0,
+  MENU_SAVE   = 1,
+  MENU_SAVEAS = 2,
+  MENU_CLOSE  = 3,
+  MENU_CHGEOL = 4,
+  MENU_QUIT   = 5,
+  MENU_NONE   = 0xff
 };
 
 static enum MENU_ACTION ui_menu(void) {
@@ -779,18 +779,18 @@ static enum MENU_ACTION ui_menu(void) {
   curchoice = MENU_OPEN;
   for (;;) {
     /* render menu */
-    for (i = MENU_NONE; i <= MENU_QUIT + 1; i++) {
-      mdr_cout_char_rep(i, 0, ' ', SCHEME_MENU, slen+4);
+    for (i = MENU_OPEN; i <= MENU_QUIT + 1; i++) {
+      mdr_cout_char_rep(i, 0, ' ', SCHEME_MENU, slen+3);
       if (i == curchoice) {
         attr = SCHEME_MENU_CUR;
-        mdr_cout_char(i, 1, '>', SCHEME_MENU_SEL);
+        mdr_cout_char(i, 0, '>', SCHEME_MENU_SEL);
       } else {
         attr = SCHEME_MENU;
       }
-      x = mdr_cout_str(i, 2, svarlang_str(8, i), attr, slen);
+      x = mdr_cout_str(i, 1, svarlang_str(8, i), attr, slen);
       if (i == curchoice) {
-        mdr_cout_char_rep(i, x + 2, ' ', SCHEME_MENU_SEL, slen - x + 1);
-        mdr_cout_locate(i, x + 2);
+        mdr_cout_char_rep(i, x + 1, ' ', SCHEME_MENU_SEL, slen - x + 1);
+        mdr_cout_locate(i, x + 1);
       }
     }
     /* wait for key */
