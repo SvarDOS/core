@@ -8,9 +8,9 @@ all: $(ALLBIN)
 
 CFLAGS = -0 -wx -we -os -s
 
-# uncomment this if you prefer that SvarLANG uses fopen() etc to handle files
-# instead of direct DOS calls. this might make the final program slightly
-# larger if it does not use FILE accesses already.
+# uncomment this if you prefer SvarLANG to use fopen() and friends to handle
+# file access instead of raw DOS calls. this might make the program larger if
+# it does not use FILE already, but it allows for 100% ANSI C compliancy.
 #CFLAGS += -DWITHSTDIO
 
 ALLFILES = auto_exe.c auto_nls.c svarlang.c version.c
