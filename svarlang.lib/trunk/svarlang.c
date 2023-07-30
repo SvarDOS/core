@@ -190,32 +190,34 @@ int svarlang_load(const char *fname, const char *lang) {
     return(-2);
   }
 
-  /* read next lang id and string table size in file */
-  while (FREAD(fd, buff16, 4) == 4) {
+  for (;;) {
+    /* read next lang id and string table size in file */
+    if (FREAD(fd, buff16, 4) != 4) {
+      FCLOSE(fd);
+      return(-3);
+    }
 
     /* is it the lang I am looking for? */
-    if (buff16[0] != langid) { /* skip to next lang */
-      FSEEK(fd, svarlang_string_count * 4);
-      FSEEK(fd, buff16[1]);
-      continue;
-    }
+    if (buff16[0] == langid) break;
 
-    /* found - but do I have enough memory space? */
-    if (buff16[1] >= svarlang_memsz) {
-      FCLOSE(fd);
-      return(-4);
-    }
+    /* skip to next lang */
+    FSEEK(fd, svarlang_string_count * 4);
+    FSEEK(fd, buff16[1]);
+  }
 
-    /* load dictionary & strings */
-    if ((FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) ||
-       (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
-      FCLOSE(fd);
-      return(-7);
-    }
+  /* found - but do I have enough memory space? */
+  if (buff16[1] >= svarlang_memsz) {
     FCLOSE(fd);
-    return(0);
+    return(-4);
+  }
+
+  /* load dictionary & strings */
+  if ((FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) ||
+     (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
+    FCLOSE(fd);
+    return(-5);
   }
 
   FCLOSE(fd);
-  return(-5);
+  return(0);
 }
