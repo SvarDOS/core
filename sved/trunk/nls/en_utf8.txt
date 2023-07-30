@@ -8,7 +8,7 @@
 ###############
 
 0.0:ESC=MENU
-0.1:UNNAMED FILE
+0.1:UNTITLED
 0.2:SAVED
 0.3:SAVING FAILED
 0.4:Unsaved changes will be lost.
