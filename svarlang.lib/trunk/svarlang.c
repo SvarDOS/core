@@ -171,10 +171,12 @@ static void FSEEK(unsigned short handle, unsigned short bytes) {
 
 int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
-  unsigned long hdr;
   unsigned short buff16[2];
   FHANDLE fd;
-  unsigned short string_count;
+  struct {
+    unsigned long sig;
+    unsigned short string_count;
+  } hdr;
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */
@@ -182,16 +184,10 @@ int svarlang_load(const char *fname, const char *lang) {
   fd = FOPEN(fname);
   if (!fd) return(-1);
 
-  /* read hdr, should be "SvL\x1a" */
-  if ((FREAD(fd, &hdr, 4) != 4) || (hdr != 0x1a4c7653L)) { /* 0x1a4c7653 = 'SvL\x1a' */
+  /* read hdr, sig should be "SvL\x1a" (0x1a4c7653) */
+  if ((FREAD(fd, &hdr, 6) != 6) || (hdr.sig != 0x1a4c7653L) || (hdr.string_count != svarlang_string_count)) {
     FCLOSE(fd);
-    return(-3);
-  }
-
-  /* read string count */
-  if ((FREAD(fd, &string_count, 2) != 2) || (string_count != svarlang_string_count)) {
-    FCLOSE(fd);
-    return(-6);
+    return(-2);
   }
 
   /* read next lang id and string table size in file */
