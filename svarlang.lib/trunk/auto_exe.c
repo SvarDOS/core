@@ -22,9 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h> /* NULL */
-#include <stdio.h>
-
 #include "svarlang.h"
 
 int svarlang_autoload_exepath(const char *selfexe, const char *lang) {
@@ -35,7 +32,7 @@ int svarlang_autoload_exepath(const char *selfexe, const char *lang) {
 
   /* validate selfexe: must be at least 5 bytes long and 4th char from end must
    * be a dot (like "a.exe" or "c:\b.com" or "..\..\test\run.exe") */
-  if (selfexe == NULL) return(-200);
+  if (!selfexe) return(-200);
   for (selflen = 0; selfexe[selflen] != 0; selflen++);
   if ((selflen < 5) || (selfexe[selflen - 4] != '.')) return(-200);
 
