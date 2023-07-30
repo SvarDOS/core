@@ -657,7 +657,11 @@ static int parseargv(struct file *dbarr) {
           i = 0;
         }
       }
-      mdr_coutraw_puts("sved ver " PVER " copyright (C) " PDATE " Mateusz Viste");
+      mdr_coutraw_str(svarlang_str(1,3));
+      mdr_coutraw_str(" [");
+      mdr_coutraw_str(svarlang_str(1,4));
+      mdr_coutraw_puts(" " PVER "]");
+      mdr_coutraw_puts("Copyright (C) " PDATE " Mateusz Viste");
       mdr_coutraw_crlf();
       mdr_coutraw_str(svarlang_str(1,0)); /* usage: */
       mdr_coutraw_char(' ');
