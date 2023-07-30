@@ -200,22 +200,17 @@ int svarlang_load(const char *fname, const char *lang) {
     /* is it the lang I am looking for? */
     if (buff16[0] == langid) break;
 
-    /* skip to next lang */
+    /* skip to next lang (in two steps to avoid a potential uint16 overflow) */
     FSEEK(fd, svarlang_string_count * 4);
     FSEEK(fd, buff16[1]);
   }
 
-  /* found - but do I have enough memory space? */
-  if (buff16[1] >= svarlang_memsz) {
+  /* load dictionary & strings, but only if I have enough memory space */
+  if ((buff16[1] >= svarlang_memsz)
+   || (FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4)
+   || (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
     FCLOSE(fd);
     return(-4);
-  }
-
-  /* load dictionary & strings */
-  if ((FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) ||
-     (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
-    FCLOSE(fd);
-    return(-5);
   }
 
   FCLOSE(fd);
