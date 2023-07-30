@@ -105,13 +105,9 @@ static unsigned short FOPEN(const char *s) {
 
 static void FCLOSE(unsigned short handle) {
   _asm {
-    push bx
-
     mov ah, 0x3e
     mov bx, handle
     int 0x21
-
-    pop bx
   }
 }
 
@@ -151,19 +147,11 @@ static unsigned short FREAD(unsigned short handle, void *buff, unsigned short by
 
 static void FSEEK(unsigned short handle, unsigned short bytes) {
   _asm {
-    push bx
-    push cx
-    push dx
-
     mov ax, 0x4201  /* move file pointer from cur pos + CX:DX */
     mov bx, handle
     xor cx, cx
     mov dx, bytes
     int 0x21
-
-    pop dx
-    pop cx
-    pop bx
   }
 }
 #endif
