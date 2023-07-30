@@ -1,0 +1,3 @@
+NOTICE: this is a slightly modified version of MDR, ie. it is not the vanilla
+        2023 version. I've added the function mdr_dos_selfexe(), which will be
+        part of the MDR 2024 release.
