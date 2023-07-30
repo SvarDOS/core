@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>SvarCOM</title>
+    <title>SvarLANG</title>
     <meta name="author" content="Mateusz Viste">
     <meta name="robots" content="index, follow">
     <meta charset="UTF-8">
