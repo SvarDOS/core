@@ -62,10 +62,22 @@ void mdr_cout_cls(unsigned char colattr);
 
 void mdr_cout_getconprops(unsigned char *termwidth, unsigned char *termheight, unsigned char *colorflag);
 
-/* functions below do not need mdr_cout_init() initialization, they may be
- * used to display characters or nul-terminated strings to console right away
- * as they use DOS services */
+
+/*****************************************************************************
+ * functions below do not need mdr_cout_init() initialization, they can be   *
+ * used to output data to console right away, as they use DOS services.      *
+ *****************************************************************************/
+
+/* output a single character to console */
 void mdr_coutraw_char(char c);
+
+/* output a nul-terminated string */
+void mdr_coutraw_str(const char *s);
+
+/* same as above, but followed with a CR/LF line terminator */
 void mdr_coutraw_puts(const char *s);
+
+/* outputs a DOS-style (CR/LF) newline to console */
+void mdr_coutraw_crlf(void);
 
 #endif
