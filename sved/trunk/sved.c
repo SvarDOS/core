@@ -648,9 +648,25 @@ static int parseargv(struct file *dbarr) {
 
     /* look at the arg now */
     if (*arg == '/') {
-      mdr_coutraw_puts("Sved ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
-      mdr_coutraw_puts("");
-      mdr_coutraw_puts(svarlang_str(1,0)); /* usage: sved file.txt */
+      const char far *self = mdr_dos_selfexe();
+      unsigned short i;
+      if (self == NULL) self = "sved";
+      for (i = 0; self[i] != 0; i++) {
+        if (self[i] == '\\') {
+          self += i + 1;
+          i = 0;
+        }
+      }
+      mdr_coutraw_puts("sved ver " PVER " copyright (C) " PDATE " Mateusz Viste");
+      mdr_coutraw_crlf();
+      mdr_coutraw_str(svarlang_str(1,0)); /* usage: */
+      mdr_coutraw_char(' ');
+      while (*self != 0) {
+        mdr_coutraw_char(*self);
+        self++;
+      }
+      mdr_coutraw_char(' ');
+      mdr_coutraw_puts(svarlang_str(1,1)); /* args syntax */
       return(-1);
     }
 
@@ -661,6 +677,8 @@ static int parseargv(struct file *dbarr) {
     }
 
     /* try loading it */
+    mdr_coutraw_str(svarlang_str(1,2));
+    mdr_coutraw_char(' ');
     mdr_coutraw_puts(arg);
     err = loadfile(&(dbarr[count]), arg);
     if (err) {

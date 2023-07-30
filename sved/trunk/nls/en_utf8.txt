@@ -21,11 +21,13 @@
 0.12:Too many files
 
 
-################
-# USAGE SCREEN #
-################
+####################
+# CONSOLE MESSAGES #
+####################
 
-1.0:usage: sved [file1.txt] [file2.txt] ... [file10.txt]
+1.0:usage:
+1.1:[file1.txt] [file2.txt] ... [file10.txt]
+1.2:Loading
 
 
 ########
