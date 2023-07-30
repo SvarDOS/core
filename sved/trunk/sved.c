@@ -879,13 +879,13 @@ void main(void) {
     /* load color scheme if mdr_cout_init returns a color flag */
     SCHEME_TEXT = 0x17;
     SCHEME_MENU = 0x70;
-    SCHEME_MENU_CUR = 0x2f;
-    SCHEME_MENU_SEL = 0x22;
+    SCHEME_MENU_CUR = 0x6f;
+    SCHEME_MENU_SEL = 0x66;
     SCHEME_STBAR1 = 0x70;
     SCHEME_STBAR2 = 0x78;
     SCHEME_STBAR3 = 0x70;
     SCHEME_SCROLL = 0x70;
-    SCHEME_MSG = 0x8f;
+    SCHEME_MSG = 0x6f;
     SCHEME_ERR = 0x4f;
   }
 
