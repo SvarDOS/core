@@ -173,6 +173,7 @@ int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
   unsigned short buff16[2];
   FHANDLE fd;
+  signed char exitcode = 0;
   struct {
     unsigned long sig;
     unsigned short string_count;
@@ -186,15 +187,15 @@ int svarlang_load(const char *fname, const char *lang) {
 
   /* read hdr, sig should be "SvL\x1a" (0x1a4c7653) */
   if ((FREAD(fd, &hdr, 6) != 6) || (hdr.sig != 0x1a4c7653L) || (hdr.string_count != svarlang_string_count)) {
-    FCLOSE(fd);
-    return(-2);
+    exitcode = -2;
+    goto FCLOSE_AND_EXIT;
   }
 
   for (;;) {
     /* read next lang id and string table size in file */
     if (FREAD(fd, buff16, 4) != 4) {
-      FCLOSE(fd);
-      return(-3);
+      exitcode = -3;
+      goto FCLOSE_AND_EXIT;
     }
 
     /* is it the lang I am looking for? */
@@ -209,10 +210,11 @@ int svarlang_load(const char *fname, const char *lang) {
   if ((buff16[1] >= svarlang_memsz)
    || (FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4)
    || (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
-    FCLOSE(fd);
-    return(-4);
+    exitcode = -4;
   }
 
+  FCLOSE_AND_EXIT:
+
   FCLOSE(fd);
-  return(0);
+  return(exitcode);
 }
