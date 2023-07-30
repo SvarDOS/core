@@ -6,7 +6,7 @@
 ALLBIN = svarlngs.lib svarlngc.lib svarlngm.lib svarlngl.lib tlumacz.exe
 all: $(ALLBIN)
 
-CFLAGS = -0 -wx -we -ox
+CFLAGS = -0 -wx -we -os -s
 
 # uncomment this if you prefer that SvarLANG uses fopen() etc to handle files
 # instead of direct DOS calls. this might make the final program slightly
