@@ -3,7 +3,8 @@
 # Copyright (C) 2021-2023 Mateusz Viste
 #
 
-all: svarlngs.lib svarlngc.lib svarlngm.lib svarlngl.lib tlumacz.exe
+ALLBIN = svarlngs.lib svarlngc.lib svarlngm.lib svarlngl.lib tlumacz.exe
+all: $(ALLBIN)
 
 CFLAGS = -0 -wx -we -ox
 
@@ -46,6 +47,11 @@ svarlngl.lib: $(ALLFILES)
 	if exist svarlngl.lib del svarlngl.lib
 	wlib -n svarlngl.lib +auto_exe.obj +auto_nls.obj +svarlang.obj +version.obj
 
+release: $(ALLBIN) .symbolic
+	if exist svarlang.zip del svarlang.zip
+	if exist svrl_src.zip del svrl_src.zip
+	zip -9rkDX svarlang.zip *.lib *.h *.txt tlumacz.exe
+	zip -9rkDX svrl_src.zip *.c *.txt *.h makefile
 
 tlumacz.exe: tlumacz.c
 	wcl -0 -y -cc -wx -mc -lr -we -ox tlumacz.c
@@ -55,3 +61,4 @@ clean: .symbolic
 	del *.exe
 	del *.obj
 	del *.lib
+	del *.zip
