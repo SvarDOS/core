@@ -293,6 +293,9 @@ static void ui_refresh(const struct file *db) {
   const struct line far *l;
   unsigned char y = db->cursorposy;
 
+  /* quit early if nothing to refresh */
+  if (uidirty.from == 0xff) return;
+
 #ifdef DBG_REFRESH
   static char m = 'a';
   m++;
@@ -355,6 +358,9 @@ static void ui_refresh(const struct file *db) {
     if (col >= screenh - 1) col = screenh - 2;
     mdr_cout_char(col, screenw - 1, ' ', SCHEME_SCROLL);
   }
+
+  /* clear out the dirty flag */
+  uidirty.from = 0xff;
 }
 
 
@@ -887,7 +893,7 @@ void main(void) {
     SCHEME_MENU_SEL = 0x66;
     SCHEME_STBAR1 = 0x70;
     SCHEME_STBAR2 = 0x78;
-    SCHEME_STBAR3 = 0x70;
+    SCHEME_STBAR3 = 0x3f;
     SCHEME_SCROLL = 0x70;
     SCHEME_MSG = 0x6f;
     SCHEME_ERR = 0x4f;
@@ -906,10 +912,8 @@ void main(void) {
     check_cursor_not_after_eol(db);
     mdr_cout_locate(db->cursorposy, db->cursorposx);
 
-    if (uidirty.from != 0xff) {
-      ui_refresh(db);
-      uidirty.from = 0xff;
-    }
+    ui_refresh(db);
+
     if ((uidirty.statusbar != 0) || (db->modflagprev != db->modflag)) {
       ui_basic(db, curfile);
       uidirty.statusbar = 0;
@@ -991,8 +995,13 @@ void main(void) {
       int quitnow = 0;
       char fname[25];
       int saveflag = 0;
+      unsigned short ui_action;
 
-      switch (ui_menu()) {
+      /* collect the exact menu action and clear the screen */
+      ui_action = ui_menu();
+      ui_refresh(db);
+
+      switch (ui_action) {
 
         case MENU_NONE:
           break;
