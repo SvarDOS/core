@@ -37,9 +37,9 @@
 # MENU #
 ########
 
-8.0:Otwórz plik
-8.1:Zapisz
-8.2:Zapisz jako...
-8.3:Zamknij plik
-8.4:Zmień EOL
-8.5:Wyjdź
+8.1:Otwórz plik
+8.2:Zapisz
+8.3:Zapisz jako...
+8.4:Zamknij plik
+8.5:Zmień EOL
+8.6:Wyjdź

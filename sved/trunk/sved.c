@@ -228,13 +228,13 @@ static void ui_basic(const struct file *db, unsigned short slotnum) {
   /* fill rest of status bar with background */
   mdr_cout_char_rep(screenh - 1, 3, ' ', SCHEME_STBAR1, screenw - 1);
 
-  /* filename */
+  /* filename and modflag */
   {
     const char *fn = db->fname;
     unsigned short x;
     if (*fn == 0) fn = svarlang_str(0, 1);
     x = mdr_cout_str(screenh - 1, 4, fn, SCHEME_STBAR1, screenw);
-    if (db->modflag) mdr_cout_char(screenh - 1, 5 + x, '*', SCHEME_STBAR1);
+    if (db->modflag) mdr_cout_char(screenh - 1, 5 + x, '!', SCHEME_STBAR2);
   }
 
   /* eol type */
@@ -469,7 +469,7 @@ static void del(struct file *db) {
     db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
     uidirty.from = db->cursorposy;
     uidirty.to = db->cursorposy;
-    db->modflag = '*';
+    db->modflag = 1;
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
@@ -486,7 +486,7 @@ static void del(struct file *db) {
     uidirty.from = db->cursorposy;
     uidirty.to = 0xff;
     db->totlines -= 1;
-    db->modflag = '*';
+    db->modflag = 1;
   }
 }
 
@@ -755,7 +755,7 @@ static int savefile(const struct file *db, const char *newfname) {
 static void insert_in_line(struct file *db, const char *databuf, unsigned short len) {
   if (curline_resize(db, db->cursor->len + len) == 0) {
     unsigned short off = db->xoffset + db->cursorposx;
-    db->modflag = '*';
+    db->modflag = 1;
     _fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
     db->cursor->len += len;
     uidirty.from = db->cursorposy;
@@ -782,17 +782,18 @@ static void recompute_curline(struct file *db) {
 
 
 enum MENU_ACTION {
-  MENU_OPEN   = 0,
-  MENU_SAVE   = 1,
-  MENU_SAVEAS = 2,
-  MENU_CLOSE  = 3,
-  MENU_CHGEOL = 4,
-  MENU_QUIT   = 5,
-  MENU_NONE   = 0xff
+  MENU_NONE   = 0,
+  MENU_OPEN   = 1,
+  MENU_SAVE   = 2,
+  MENU_SAVEAS = 3,
+  MENU_CLOSE  = 4,
+  MENU_CHGEOL = 5,
+  MENU_QUIT   = 6,
 };
 
 static enum MENU_ACTION ui_menu(void) {
   unsigned short i, curchoice, attr, x, slen;
+  unsigned short xorigin, yorigin;
   uidirty.from = 0;
   uidirty.to = 0xff;
   uidirty.statusbar = 1;
@@ -804,21 +805,25 @@ static enum MENU_ACTION ui_menu(void) {
     if (x > slen) slen = x;
   }
 
+  /* calculate where to draw the menu on screen */
+  xorigin = (screenw - (slen + 5)) / 2;
+  yorigin = (screenh - (MENU_QUIT - MENU_OPEN + 5)) / 2;
+
   curchoice = MENU_OPEN;
   for (;;) {
     /* render menu */
-    for (i = MENU_OPEN; i <= MENU_QUIT + 1; i++) {
-      mdr_cout_char_rep(i, 0, ' ', SCHEME_MENU, slen+3);
+    for (i = MENU_NONE; i <= MENU_QUIT + 1; i++) {
+      mdr_cout_char_rep(yorigin + i, xorigin, ' ', SCHEME_MENU, slen+4);
       if (i == curchoice) {
         attr = SCHEME_MENU_CUR;
-        mdr_cout_char(i, 0, '>', SCHEME_MENU_SEL);
+        mdr_cout_char(yorigin + i, xorigin + 1, '>', SCHEME_MENU_SEL);
       } else {
         attr = SCHEME_MENU;
       }
-      x = mdr_cout_str(i, 1, svarlang_str(8, i), attr, slen);
+      x = mdr_cout_str(yorigin + i, xorigin + 2, svarlang_str(8, i), attr, slen);
       if (i == curchoice) {
-        mdr_cout_char_rep(i, x + 1, ' ', SCHEME_MENU_SEL, slen - x + 1);
-        mdr_cout_locate(i, x + 1);
+        mdr_cout_char_rep(yorigin + i, xorigin + x + 2, ' ', SCHEME_MENU_SEL, slen - x + 1);
+        mdr_cout_locate(yorigin + i, xorigin + x + 2);
       }
     }
     /* wait for key */
@@ -995,7 +1000,7 @@ void main(void) {
       int quitnow = 0;
       char fname[25];
       int saveflag = 0;
-      unsigned short ui_action;
+      enum MENU_ACTION ui_action;
 
       /* collect the exact menu action and clear the screen */
       ui_action = ui_menu();
@@ -1025,6 +1030,9 @@ void main(void) {
               loadfile(db, "");
             }
           }
+          uidirty.from = 0;
+          uidirty.to = 0xff;
+          uidirty.statusbar = 1;
           break;
 
         case MENU_SAVEAS:
@@ -1060,7 +1068,7 @@ void main(void) {
           break;
 
         case MENU_CHGEOL:
-          db->modflag = '*';
+          db->modflag = 1;
           db->lfonly ^= 1;
           break;
 
@@ -1081,7 +1089,7 @@ void main(void) {
       unsigned short off = db->xoffset + db->cursorposx;
       /* add a new line */
       if (line_add(db, db->cursor->payload + off, db->cursor->len - off) == 0) {
-        db->modflag = '*';
+        db->modflag = 1;
         db->cursor = db->cursor->prev; /* back to original line */
         /* trim the line above */
         db->cursor->len = off;

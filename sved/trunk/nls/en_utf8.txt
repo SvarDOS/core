@@ -36,9 +36,9 @@
 # MENU #
 ########
 
-8.0:Open file
-8.1:Save
-8.2:Save as...
-8.3:Close file
-8.4:Change EOL
-8.5:Quit
+8.1:Open file
+8.2:Save
+8.3:Save as...
+8.4:Close file
+8.5:Change EOL
+8.6:Quit
