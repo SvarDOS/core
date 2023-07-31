@@ -215,6 +215,7 @@ static void db_rewind(struct file *db) {
 static void ui_basic(const struct file *db, unsigned short slotnum) {
   const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
+  unsigned short maxfnlen = helpcol - 14;
 
   /* slot number */
   {
@@ -230,10 +231,17 @@ static void ui_basic(const struct file *db, unsigned short slotnum) {
 
   /* filename and modflag */
   {
-    const char *fn = db->fname;
+    const char *fn;
     unsigned short x;
-    if (*fn == 0) fn = svarlang_str(0, 1);
-    x = mdr_cout_str(screenh - 1, 4, fn, SCHEME_STBAR1, screenw);
+    if (db->fname[0] == 0) {
+      fn = svarlang_str(0, 1); /* "UNTITLED" */
+    } else {
+      /* display filename up to maxfnlen chars */
+      fn = db->fname;
+      x = strlen(fn);
+      if (x > maxfnlen) fn += x - maxfnlen;
+    }
+    x = mdr_cout_str(screenh - 1, 4, fn, SCHEME_STBAR1, maxfnlen);
     if (db->modflag) mdr_cout_char(screenh - 1, 5 + x, '!', SCHEME_STBAR2);
   }
 
@@ -998,7 +1006,7 @@ void main(void) {
 
     } else if (k == 0x1B) { /* ESC */
       int quitnow = 0;
-      char fname[25];
+      char fname[64];
       int saveflag = 0;
       enum MENU_ACTION ui_action;
 
