@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap');
+
+h1 {
+  font-size: 1.35em;
+  margin: 0 auto;
+  text-align: center;
+  font-weight: 600;
+}
+
+p.copyr {
+  font-size: 1.00em;
+  margin: 0 auto 4.5em auto;
+  color: #999;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin: 1.75em 0 0 0;
+  text-align: left;
+}
+
+p {
+  font-size: 1.00em;
+  margin: 0.5em 0 0 0;
+  text-align: justify;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  background-color: #ccc;
+}
+
+body {
+  font-size: 1.15em;
+  background-color: #fff;
+  font-family: "Noto Sans JP", sans-serif;
+  margin: 0 auto;
+  padding: 3em 0.5em 0.5em 0.5em;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 60em;
+  border: 1px #999 solid;
+  border-top: 0;
+}
+
+a:link { /* unvisited link */
+  color: #008; text-decoration: none;
+}
+
+a:visited { /* visited link */
+  color: #008; text-decoration: none;
+}
+
+a:hover { /* mouse over link */
+  color: #00F; text-decoration: none;
+}
+
+a:active { /* selected link */
+  color: #008; text-decoration: none;
+}
+
+a.mateusz {
+  color: inherit; text-decoration: none;
+}
+
+table {
+  margin: 1em 0;
+  border-spacing: 0;
+  border-collapse: collapse;
+  text-align: left;
+  border: 1px #aaa solid;
+  border-radius: 0.5em;
+}
+
+table tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+
+table tr td {
+  padding: 0.1em 0.5em;
+}
+
+table tr td.siz {
+  text-align: right;
+  color: #555;
+}
