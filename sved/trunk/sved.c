@@ -802,9 +802,6 @@ enum MENU_ACTION {
 static enum MENU_ACTION ui_menu(void) {
   unsigned short i, curchoice, attr, x, slen;
   unsigned short xorigin, yorigin;
-  uidirty.from = 0;
-  uidirty.to = 0xff;
-  uidirty.statusbar = 1;
 
   /* find out the longest string */
   slen = 0;
@@ -815,7 +812,15 @@ static enum MENU_ACTION ui_menu(void) {
 
   /* calculate where to draw the menu on screen */
   xorigin = (screenw - (slen + 5)) / 2;
-  yorigin = (screenh - (MENU_QUIT - MENU_OPEN + 5)) / 2;
+  yorigin = (screenh - (MENU_QUIT - MENU_OPEN + 6)) / 2;
+
+  /* */
+  uidirty.from = yorigin;
+  uidirty.to = 0xff;
+  uidirty.statusbar = 1;
+
+  /* hide the cursor */
+  mdr_cout_cursor_hide();
 
   curchoice = MENU_OPEN;
   for (;;) {
@@ -831,12 +836,10 @@ static enum MENU_ACTION ui_menu(void) {
       x = mdr_cout_str(yorigin + i, xorigin + 2, svarlang_str(8, i), attr, slen);
       if (i == curchoice) {
         mdr_cout_char_rep(yorigin + i, xorigin + x + 2, ' ', SCHEME_MENU_SEL, slen - x + 1);
-        mdr_cout_locate(yorigin + i, xorigin + x + 2);
       }
     }
     /* wait for key */
     switch (keyb_getkey()) {
-      case '\r': return(curchoice); /* ENTER */
       case 0x150: /* down */
         if (curchoice == MENU_QUIT) {
           curchoice = MENU_OPEN;
@@ -851,7 +854,12 @@ static enum MENU_ACTION ui_menu(void) {
           curchoice--;
         }
         break;
-      default: return(MENU_NONE);
+      default:
+        curchoice = MENU_NONE;
+        /* FALLTHRU */
+      case '\r': /* ENTER */
+        mdr_cout_cursor_show();
+        return(curchoice);
     }
   }
 }
@@ -1056,6 +1064,8 @@ void main(void) {
             saveflag = savefile(db, NULL);
           }
 
+          mdr_cout_cursor_hide();
+
           if (saveflag == 0) {
             db->modflag = 0;
             ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
@@ -1064,6 +1074,7 @@ void main(void) {
             ui_msg(svarlang_str(0, 3), NULL, SCHEME_ERR);
             mdr_bios_tickswait(36); /* 2s */
           }
+          mdr_cout_cursor_show();
           break;
 
         case MENU_CLOSE:
