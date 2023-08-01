@@ -13,7 +13,7 @@
   <h1><?php echo $PROJNAME; ?></h1>
   <p class="copyr"><?php echo $SHORT ?></p>
 
-  <p><?php echo $LONG; ?></p>
+  <?php echo $LONGHTML; ?>
 
   <h2>DOWNLOAD</h2>
 
@@ -22,7 +22,6 @@
     $flist = scandir("./", SCANDIR_SORT_DESCENDING);
     foreach ($flist as $f) {
       if (strpos($f, '.zip') == false) continue;
-      if (!stristr($f, 'svarcom')) continue;
       $fsz = intval(filesize($f) / 1024);
       echo "<tr><td><a href=\"{$f}\">{$f}</a></td><td class=\"siz\"> {$fsz} KiB</td></tr>\n";
     }
