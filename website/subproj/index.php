@@ -19,13 +19,15 @@
 
   <table>
   <?php
+    $fcount = 0;
     $flist = scandir("./", SCANDIR_SORT_DESCENDING);
     foreach ($flist as $f) {
       if (strpos($f, '.zip') == false) continue;
       $fsz = intval(filesize($f) / 1024);
       echo "<tr><td><a href=\"{$f}\">{$f}</a></td><td class=\"siz\"> {$fsz} KiB</td></tr>\n";
+      $fcount++;
     }
-    if (empty($flist)) echo "<tr><td>NO ZIP FILES AVAILABLE</td></tr>";
+    if ($fcount == 0) echo "<tr><td>NO ZIP FILES AVAILABLE</td></tr>";
   ?>
   </table>
 
