@@ -48,15 +48,16 @@ another use the F1..F10 function keys (F1 = slot 1, F2 = slot 2, etc).
 
 ### MULTILINGUAL SUPPORT #####################################################
 
-The EDIT.LNG file contains non-english strings. It should be placed in the
-same directory where the program's executable resides. The UI language is
+The LNG file contains non-english strings. It should be placed in the same
+directory where the program's executable resides. The UI language is
 controlled by the LANG environment variable, for example SET LANG=PL would
 make it display polish strings.
 
-If you rename the EDIT.COM executable, then you need to rename the EDIT.LNG
-file accordingly.
+If you rename the SVED.COM executable (for example to EDIT.COM), then you need
+to rename the LNG file accordingly (for example to EDIT.LNG).
 
-You can safely delete the EDIT.LNG file if you do not need non-english UI.
+You can safely delete the LNG file if you do not need non-english UI and wish
+to free some disk space.
 
 
 ### LICENSE ##################################################################

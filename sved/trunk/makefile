@@ -1,5 +1,5 @@
 #
-# sved Makefile -- requires OpenWatcom (wmake)
+# sved Makefile -- requires Open Watcom 1.9 (wmake)
 # Copyright (C) 2023 Mateusz Viste
 #
 # usage:
