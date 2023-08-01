@@ -701,12 +701,19 @@ static int parseargv(struct file *dbarr) {
     err = loadfile(&(dbarr[count]), arg);
     if (err) {
       if (err == 1) { /* file not found */
-        err = 11;
+        if ((count == 0) && (lastarg != 0)) { /* a 'file not found' is fine if only one file was given */
+          memcpy(dbarr[count].fname, arg, strlen(arg) + 1);
+          err = 0;
+        } else {
+          err = 11;
+        }
       } else { /* general error */
         err = 10;
       }
-      mdr_coutraw_puts(svarlang_str(0,err));
-      return(-1);
+      if (err) {
+        mdr_coutraw_puts(svarlang_str(0,err));
+        return(-1);
+      }
     }
     count++;
   }
