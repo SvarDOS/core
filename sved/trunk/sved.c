@@ -30,7 +30,6 @@
 #include "mdr\bios.h"
 #include "mdr\cout.h"
 #include "mdr\dos.h"
-#include "mdr\keyb.h"
 
 #include "svarlang\svarlang.h"
 
@@ -168,7 +167,7 @@ static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
 
   for (;;) {
     mdr_cout_locate(y, x + len);
-    k = keyb_getkey();
+    k = mdr_dos_getkey2();
 
     switch (k) {
       case 0x1b: /* ESC */
@@ -288,7 +287,7 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
 
   /* if file has been modified then ask for confirmation */
   ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
-  if (keyb_getkey() != '\r') r = 1;
+  if (mdr_dos_getkey2() != '\r') r = 1;
 
   mdr_cout_cursor_show();
 
@@ -846,7 +845,7 @@ static enum MENU_ACTION ui_menu(void) {
       }
     }
     /* wait for key */
-    switch (keyb_getkey()) {
+    switch (mdr_dos_getkey2()) {
       case 0x150: /* down */
         if (curchoice == MENU_QUIT) {
           curchoice = MENU_OPEN;
@@ -890,6 +889,7 @@ void main(void) {
   static struct file dbarr[10];
   unsigned short curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
+  struct line far *clipboard = NULL;
 
   {
     unsigned short i = 0;
@@ -926,6 +926,9 @@ void main(void) {
     SCHEME_MSG = 0x6f;
     SCHEME_ERR = 0x4f;
   }
+
+  /* disable CTRL+C handling, user needs it for copy/paste operations */
+  mdr_dos_ctrlc_disable();
 
   for (;;) {
     int k;
@@ -964,7 +967,7 @@ void main(void) {
       }
 #endif
 
-    k = keyb_getkey();
+    k = mdr_dos_getkey2();
 
     if (k == 0x150) { /* down */
       cursor_down(db);
@@ -1178,6 +1181,63 @@ void main(void) {
         if ((db->cursorposx == 0) && (db->xoffset == 0)) break;
       }
 
+    } else if ((k == 0x003) || (k == 0x018)) { /* CTRL+C or CTRL+X */
+      /* free clipboard if anything in it */
+      if (clipboard != NULL) line_free(clipboard);
+
+      /* copy cursor line to clipboard */
+      clipboard = line_calloc(db->cursor->len);
+      if (clipboard == NULL) {
+        ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
+        mdr_bios_tickswait(18); /* 1s */
+      } else {
+        mdr_cout_char_rep(db->cursorposy, 0, ' ', ((SCHEME_TEXT >> 4) | (SCHEME_TEXT << 4)) & 0xff, screenw - 1);
+        uidirty.from = db->cursorposy;
+        uidirty.to = db->cursorposy;
+        if (db->cursor->len != 0) {
+          _fmemmove(clipboard->payload, db->cursor->payload, db->cursor->len);
+          clipboard->len = db->cursor->len;
+        }
+        mdr_bios_tickswait(2); /* ca 100ms */
+
+        /* if this is about cutting the line (CTRL+X) then delete cur line */
+        if ((k == 0x018) && ((db->cursor->next != NULL) || (db->cursor->prev != NULL))) {
+          if (db->cursor->next) db->cursor->next->prev = db->cursor->prev;
+          if (db->cursor->prev) db->cursor->prev->next = db->cursor->next;
+          clipboard->prev = db->cursor;
+          if (db->cursor->next) {
+            db->cursor = db->cursor->next;
+          } else {
+            cursor_up(db);
+          }
+          line_free(clipboard->prev);
+          uidirty.from = 0;
+          uidirty.to = 0xff;
+        }
+      }
+
+    } else if (k == 0x016) { /* CTRL+V */
+      if (clipboard != NULL) {
+        if (line_add(db, clipboard->payload, clipboard->len) != 0) {
+          ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
+          mdr_bios_tickswait(18); /* 1s */
+        } else {
+          /* rewire the linked list so the new line is on top of the previous one */
+          clipboard->prev = db->cursor->prev;
+          /* remove prev node from list */
+          db->cursor->prev = db->cursor->prev->prev;
+          if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor;
+          /* insert the node after cursor now */
+          clipboard->prev->next = db->cursor->next;
+          if (db->cursor->next != NULL) db->cursor->next->prev = clipboard->prev;
+          clipboard->prev->prev = db->cursor;
+          db->cursor->next = clipboard->prev;
+          cursor_down(db);
+        }
+      }
+      uidirty.from = 0;
+      uidirty.to = 0xff;
+
 #ifdef DBG_UNHKEYS
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
       char buff[4];
@@ -1187,7 +1247,7 @@ void main(void) {
       buff[2] = HEX[k & 15];
       mdr_cout_str(screenh - 1, 0, "UNHANDLED KEY: 0x", SCHEME_STBAR1, 17);
       mdr_cout_str(screenh - 1, 17, buff, SCHEME_STBAR1, 3);
-      keyb_getkey();
+      mdr_dos_getkey2();
       break;
 #endif
     }

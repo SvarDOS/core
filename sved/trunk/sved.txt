@@ -37,13 +37,17 @@ Navigation within the text file is achieved through the usual, standard keys:
  - PageUp / PageDown
  - Home / End
 
-Jumping to previous or next word is possible with the CTRL+LEFT and CTRL+RIGHT
-combinations.
+On top of these, the following key bindings are available:
 
-Program's menu is accessible under the ESC key.
+ESC        = access the program's menu
+CTRL+RIGHT = jump to next word
+CTRL+LEFT  = jump to previous word
+CTRL+C     = copy the current line to clipboard
+CTRL+X     = cut the current line and move it to clipboard
+CTRL+V     = paste the clipboard content to current location
 
 SVED can load up to 10 files simultaneously. To switch from one file to
-another use the F1..F10 function keys (F1 = slot 1, F2 = slot 2, etc).
+another use the F1..F10 function keys (F1 = file 1, F2 = file 2, etc).
 
 
 ### MULTILINGUAL SUPPORT #####################################################
