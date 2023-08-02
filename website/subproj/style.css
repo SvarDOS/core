@@ -46,6 +46,15 @@ body {
   border-top: 0;
 }
 
+p.partofsvardos {
+  text-align: right;
+  font-size: 0.85em;
+  font-style: italic;
+  position: relative;
+  top: -3em;
+  opacity: 0.8;
+}
+
 a:link { /* unvisited link */
   color: #008; text-decoration: none;
 }

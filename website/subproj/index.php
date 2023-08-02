@@ -10,6 +10,8 @@
   </head>
   <body>
 
+  <p class="partofsvardos"><?php echo $PROJNAME; ?> is part of the <a href="/">SvarDOS project</a></p>
+
   <h1><?php echo $PROJNAME; ?></h1>
   <p class="copyr"><?php echo $SHORT ?></p>
 
