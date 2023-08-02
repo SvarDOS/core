@@ -21,7 +21,7 @@
 
     <h2>Community and help</h2>
 
-    <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? Come visit the <a href="?p=forum">SvarDOS community forum</a>. You may also wish to take a look at the project's <a href="https://osdn.net/projects/svardos/ticket/">ticket list</a>.</p>
+    <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? Come visit the <a href="?p=forum">SvarDOS community forum</a>. You may also wish to take a look at the project's <a href="https://github.com/SvarDOS/bugz/issues">ticket list</a>.</p>
 
     <?php // the "default" build proposed on the main page is read from default_build.txt
     $lastver = trim(file_get_contents('default_build.txt'));
