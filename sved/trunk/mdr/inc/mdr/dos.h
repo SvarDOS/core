@@ -4,7 +4,7 @@
  * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2022 Mateusz Viste
+ * Copyright (C) 2014-2023 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -50,6 +50,24 @@ unsigned char mdr_dos_exepath(char *path);
 /* returns a far pointer to the full path and filename of the running program.
  * returns NULL on error. */
 const char far *mdr_dos_selfexe(void);
+
+/* waits for a keypress and returns it
+ * extended keys are returned ORed with 0x100 (example: PGUP is 0x149) */
+int mdr_dos_getkey(void);
+
+/* Same as mdr_dos_getkey(), but this call cannot be aborted by CTRL+C */
+int mdr_dos_getkey2(void);
+
+/* flush the keyboard buffer */
+void mdr_dos_flushkeyb(void);
+
+/* poll stdin status, returns 0 if no character is pending in the keyboard
+ * buffer, non-zero otherwise */
+int mdr_dos_keypending(void);
+
+/* disables the CTRL+C handler for the running program - in other words,
+ * after this call DOS will no longer abort the program on CTRL+C */
+void mdr_dos_ctrlc_disable(void);
 
 /* converts a "DOS format" 16-bit packed date into a standard (time_t)
  * unix timestamp. A DOS date is a 16-bit value:
