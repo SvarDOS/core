@@ -217,17 +217,20 @@ static void ui_basic(const struct file *db, unsigned short slotnum) {
   unsigned short helpcol = screenw - strlen(s);
   unsigned short maxfnlen = helpcol - 14;
 
-  /* slot number */
+  /* slot number (guaranteed to be 0-9) */
   {
     char slot[4] = "#00";
-    slotnum++;
-    slot[1] += (slotnum / 10);
-    slot[2] += (slotnum % 10);
+    if (slotnum == 9) {
+      slot[1] = '1';
+    } else {
+      slotnum++;
+      slot[2] += slotnum;
+    }
     mdr_cout_str(screenh - 1, 0, slot, SCHEME_STBAR2, 3);
   }
 
   /* fill rest of status bar with background */
-  mdr_cout_char_rep(screenh - 1, 3, ' ', SCHEME_STBAR1, screenw - 1);
+  mdr_cout_char_rep(screenh - 1, 3, ' ', SCHEME_STBAR1, helpcol - 3);
 
   /* filename and modflag */
   {
