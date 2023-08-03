@@ -65,9 +65,9 @@ static struct {
 #define SCROLL_CURSOR 0xB1
 
 struct line {
-  struct line far *prev;
-  struct line far *next;
   unsigned short len;
+  struct line far *next;
+  struct line far *prev;
   char payload[1];
 };
 
