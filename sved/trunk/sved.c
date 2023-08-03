@@ -848,14 +848,11 @@ static enum MENU_ACTION ui_menu(void) {
       mdr_cout_char_rep(yorigin + i, xorigin, ' ', SCHEME_MENU, slen+4);
       if (i == curchoice) {
         attr = SCHEME_MENU_CUR;
-        mdr_cout_char(yorigin + i, xorigin + 1, '>', SCHEME_MENU_SEL);
+        mdr_cout_char_rep(yorigin + i, xorigin + 1, ' ', SCHEME_MENU_SEL, slen + 2);
       } else {
         attr = SCHEME_MENU;
       }
       x = mdr_cout_str(yorigin + i, xorigin + 2, svarlang_str(8, i), attr, slen);
-      if (i == curchoice) {
-        mdr_cout_char_rep(yorigin + i, xorigin + x + 2, ' ', SCHEME_MENU_SEL, slen - x + 1);
-      }
     }
     /* wait for key */
     switch (mdr_dos_getkey2()) {
@@ -890,6 +887,8 @@ static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
   uidirty.statusbar = 1;
 
   dbarr = &(dbarr[curfile]);
+  /* force redraw now, because the main() routine might not if this is exit
+   * time and we want to show the user which file has unsaved changes */
   ui_basic(dbarr, curfile);
   ui_refresh(dbarr);
   return(dbarr);
