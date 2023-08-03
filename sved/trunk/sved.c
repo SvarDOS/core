@@ -737,7 +737,7 @@ static int parseargv(struct file *dbarr) {
 static int savefile(const struct file *db, const char *newfname) {
   int fd;
   const struct line far *l;
-  unsigned bytes;
+  unsigned int bytes;
   unsigned char eollen;
   unsigned char eolbuf[2];
   int errflag = 0;
