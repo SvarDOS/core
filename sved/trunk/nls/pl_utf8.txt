@@ -11,7 +11,6 @@
 0.0:ESC=MENU
 0.1:BEZ NAZWY
 0.2:ZAPISANO
-0.3:ZAPIS NIE POWIÓDŁ SIĘ
 0.4:Niezapisane zmiany zostaną utracone.
 0.5:Wciśnij ENTER by potwierdzić.
 0.6:Zapisz jako:

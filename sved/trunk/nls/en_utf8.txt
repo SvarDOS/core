@@ -10,7 +10,6 @@
 0.0:ESC=MENU
 0.1:UNTITLED
 0.2:SAVED
-0.3:SAVING FAILED
 0.4:Unsaved changes will be lost.
 0.5:Press ENTER to confirm.
 0.6:Save as:

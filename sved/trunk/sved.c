@@ -1103,7 +1103,7 @@ void main(void) {
             ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
             mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
           } else {
-            ui_msg(svarlang_str(0, 3), NULL, SCHEME_ERR);
+            ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR);
             mdr_bios_tickswait(36); /* 2s */
           }
           mdr_cout_cursor_show();
