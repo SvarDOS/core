@@ -903,6 +903,7 @@ void main(void) {
   unsigned short curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
   struct line far *clipboard = NULL;
+  unsigned char original_breakflag;
 
   {
     unsigned short i = 0;
@@ -940,8 +941,10 @@ void main(void) {
     SCHEME_ERR = 0x4f;
   }
 
-  /* disable CTRL+C handling, user needs it for copy/paste operations */
-  mdr_dos_ctrlc_disable();
+  /* instruct DOS to stop detecting CTRL+C because user needs it for
+   * copy/paste operations. also remember the original status of the BREAK
+   * flag so I can restore it as it was before quitting. */
+  original_breakflag = mdr_dos_ctrlc_disable();
 
   for (;;) {
     int k;
@@ -1273,6 +1276,9 @@ void main(void) {
   }
 
   mdr_cout_close();
+
+  /* restore the DOS BREAK flag if it was originally set */
+  if (original_breakflag != 0) mdr_dos_ctrlc_enable();
 
   /* no need to free memory, DOS will do it for me */
 
