@@ -529,7 +529,7 @@ static int loadfile(struct file *db, const char *fname) {
   /* zero out the struct */
   bzero(db, sizeof(struct file));
 
-  if (*fname == 0) goto SKIPLOADING;
+  if (fname == NULL) goto SKIPLOADING;
 
   memcpy(db->fname, fname, strlen(fname));
 
@@ -815,7 +815,7 @@ enum MENU_ACTION {
   MENU_SAVEAS = 3,
   MENU_CLOSE  = 4,
   MENU_CHGEOL = 5,
-  MENU_QUIT   = 6,
+  MENU_QUIT   = 6
 };
 
 static enum MENU_ACTION ui_menu(void) {
@@ -904,7 +904,7 @@ void main(void) {
   struct line far *clipboard = NULL;
   unsigned char original_breakflag;
 
-  {
+  { /* load NLS resource */
     unsigned short i = 0;
     const char far *selfptr;
     char self[128], lang[8];
@@ -919,7 +919,7 @@ void main(void) {
 
   /* preload all slots with empty files */
   for (curfile = 9;; curfile--) {
-    loadfile(&(dbarr[curfile]), "");
+    loadfile(&(dbarr[curfile]), NULL);
     if (curfile == 0) break;
   }
 
@@ -1068,7 +1068,7 @@ void main(void) {
                 ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
               }
               mdr_bios_tickswait(44); /* 3s */
-              loadfile(db, "");
+              loadfile(db, NULL);
             }
           }
           uidirty.from = 0;
@@ -1104,7 +1104,7 @@ void main(void) {
 
         case MENU_CLOSE:
           if (ui_confirm_if_unsaved(db) == 0) {
-            loadfile(db, "");
+            loadfile(db, NULL);
           }
           uidirty.from = 0;
           uidirty.to = 0xff;
