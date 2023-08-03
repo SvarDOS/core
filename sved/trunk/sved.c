@@ -500,9 +500,8 @@ static void del(struct file *db) {
 
 
 static void bkspc(struct file *db) {
-
   /* backspace is basically "left + del", not applicable only if cursor is on 1st byte of the file */
-  if ((db->cursorposx == 0) && (db->xoffset == 0) && (db->cursor->prev == NULL)) return;
+  if ((db->cursorposx + db->xoffset == 0) && (db->cursor->prev == NULL)) return;
 
   cursor_left(db);
   del(db);
