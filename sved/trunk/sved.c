@@ -387,15 +387,16 @@ static void check_cursor_not_after_eol(struct file *db) {
 
 
 static void cursor_up(struct file *db) {
-  if (db->cursor->prev != NULL) {
-    db->curline -= 1;
-    db->cursor = db->cursor->prev;
-    if (db->cursorposy == 0) {
-      uidirty.from = 0;
-      uidirty.to = 0xff;
-    } else {
-      db->cursorposy -= 1;
-    }
+
+  if (db->cursor->prev == NULL) return;
+
+  db->curline -= 1;
+  db->cursor = db->cursor->prev;
+  if (db->cursorposy == 0) {
+    uidirty.from = 0;
+    uidirty.to = 0xff;
+  } else {
+    db->cursorposy -= 1;
   }
 }
 
@@ -418,15 +419,16 @@ static void cursor_eol(struct file *db) {
 
 
 static void cursor_down(struct file *db) {
-  if (db->cursor->next != NULL) {
-    db->curline += 1;
-    db->cursor = db->cursor->next;
-    if (db->cursorposy < screenh - 2) {
-      db->cursorposy += 1;
-    } else {
-      uidirty.from = 0;
-      uidirty.to = 0xff;
-    }
+
+  if (db->cursor->next == NULL) return;
+
+  db->curline += 1;
+  db->cursor = db->cursor->next;
+  if (db->cursorposy < screenh - 2) {
+    db->cursorposy += 1;
+  } else {
+    uidirty.from = 0;
+    uidirty.to = 0xff;
   }
 }
 
