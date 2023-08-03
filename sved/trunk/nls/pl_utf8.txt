@@ -19,7 +19,7 @@
 0.8:Wciśnij ESC by anulować.
 0.10:BŁĄD
 0.11:NIE ZNALEZIONO PLIKU
-0.12:Zbyt duża ilość plików
+0.12:Za duża ilość plików
 
 
 ################
@@ -27,7 +27,7 @@
 ################
 
 1.0:składnia:
-1.1:[plik1.txt] ... [plik10.txt]
+1.1:[/m] [/t] [plik1.txt] ... [plik10.txt]
 1.2:Ładowanie
 1.3:Sved, edytor systemu SvarDOS
 1.4:wersja

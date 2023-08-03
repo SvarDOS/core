@@ -586,7 +586,7 @@ static int loadfile(struct file *db, const char *fname) {
       goto IOERR;
     }
 
-    /* add a new line if necessary */
+    /* allocate the next line if current line ended */
     if (eolfound) {
       if (line_add(db, NULL, 0) != 0) {
         goto IOERR;
@@ -678,9 +678,9 @@ static int parseargv(struct file *dbarr) {
             i = 0;
           }
         }
-        mdr_coutraw_str(svarlang_str(1,3));
+        mdr_coutraw_str(svarlang_str(1,3)); /* Sved, the SvarDOS editor */
         mdr_coutraw_str(" [");
-        mdr_coutraw_str(svarlang_str(1,4));
+        mdr_coutraw_str(svarlang_str(1,4)); /* ver */
         mdr_coutraw_puts(" " PVER "]");
         mdr_coutraw_puts("Copyright (C) " PDATE " Mateusz Viste");
         mdr_coutraw_crlf();
