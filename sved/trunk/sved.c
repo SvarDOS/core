@@ -53,7 +53,7 @@ static unsigned char SCHEME_TEXT   = 0x07,
                      SCHEME_MSG    = 0x70,
                      SCHEME_ERR    = 0x70;
 
-static unsigned char screenw, screenh;
+static unsigned char screenw, screenh, screenlastrow, screenlastcol;
 static unsigned char glob_monomode, glob_tablessmode;
 
 static struct {
@@ -160,7 +160,7 @@ static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
   if (maxlen == 0) return;
   maxlen--; /* make room for the nul terminator */
 
-  y = screenh - 1;
+  y = screenlastrow;
 
   /* print query string */
   x = mdr_cout_str(y, 0, query, SCHEME_STBAR3, 40);
@@ -196,12 +196,15 @@ static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
 
 /* append a nul-terminated string to line at cursor position */
 static int line_append(struct file *f, const char far *buf, unsigned short len) {
-  if (sizeof(struct line) + f->cursor->len + len < len) return(-1); /* overflow check */
-  if (curline_resize(f, f->cursor->len + len) != 0) return(-1);
+  if (sizeof(struct line) + f->cursor->len + len < len) goto ERR; /* overflow check */
+  if (curline_resize(f, f->cursor->len + len) != 0) goto ERR;
+
   _fmemmove(f->cursor->payload + f->cursor->len, buf, len);
   f->cursor->len += len;
 
   return(0);
+  ERR:
+  return(-1);
 }
 
 
@@ -226,11 +229,11 @@ static void ui_basic(const struct file *db, unsigned char slotnum) {
       slotnum++;
       slot[2] += slotnum;
     }
-    mdr_cout_str(screenh - 1, 0, slot, SCHEME_STBAR2, 3);
+    mdr_cout_str(screenlastrow, 0, slot, SCHEME_STBAR2, 3);
   }
 
   /* fill rest of status bar with background */
-  mdr_cout_char_rep(screenh - 1, 3, ' ', SCHEME_STBAR1, helpcol - 3);
+  mdr_cout_char_rep(screenlastrow, 3, ' ', SCHEME_STBAR1, helpcol - 3);
 
   /* filename and modflag */
   {
@@ -244,18 +247,18 @@ static void ui_basic(const struct file *db, unsigned char slotnum) {
       x = strlen(fn);
       if (x > maxfnlen) fn += x - maxfnlen;
     }
-    x = mdr_cout_str(screenh - 1, 4, fn, SCHEME_STBAR1, maxfnlen);
-    if (db->modflag) mdr_cout_char(screenh - 1, 5 + x, '!', SCHEME_STBAR2);
+    x = mdr_cout_str(screenlastrow, 4, fn, SCHEME_STBAR1, maxfnlen);
+    if (db->modflag) mdr_cout_char(screenlastrow, 5 + x, '!', SCHEME_STBAR2);
   }
 
   /* eol type */
   {
     const char *eoltype = "CRLF";
     if (db->lfonly) eoltype += 2;
-    mdr_cout_str(screenh - 1, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
+    mdr_cout_str(screenlastrow, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
   }
 
-  mdr_cout_str(screenh - 1, helpcol, s, SCHEME_STBAR2, 40);
+  mdr_cout_str(screenlastrow, helpcol, s, SCHEME_STBAR2, 40);
 }
 
 
@@ -329,13 +332,13 @@ static void ui_refresh(const struct file *db) {
       if (l->len - db->xoffset < screenw) {
         limit = l->len;
       } else {
-        limit = db->xoffset + screenw - 1;
+        limit = db->xoffset + screenlastcol;
       }
       for (i = db->xoffset; i < limit; i++) mdr_cout_char(y, x++, l->payload[i], SCHEME_TEXT);
     }
 
     /* write empty spaces until end of line */
-    if (x < screenw - 1) mdr_cout_char_rep(y, x, ' ', SCHEME_TEXT, screenw - 1 - x);
+    if (x < screenlastcol) mdr_cout_char_rep(y, x, ' ', SCHEME_TEXT, screenlastcol - x);
 
 #ifdef DBG_REFRESH
     mdr_cout_char(y, 0, m, SCHEME_STBAR1);
@@ -346,14 +349,14 @@ static void ui_refresh(const struct file *db) {
 
   /* fill all lines below if empty (and they need to be redrawn) */
   if (l == NULL) {
-    while ((y < screenh - 1) && (y < uidirty.to)) {
-      mdr_cout_char_rep(y++, 0, ' ', SCHEME_TEXT, screenw - 1);
+    while ((y < screenlastrow) && (y < uidirty.to)) {
+      mdr_cout_char_rep(y++, 0, ' ', SCHEME_TEXT, screenlastcol);
     }
   }
 
   /* scroll bar */
-  for (y = 0; y < (screenh - 1); y++) {
-    mdr_cout_char(y, screenw - 1, SCROLL_CURSOR, SCHEME_SCROLL);
+  for (y = 0; y < screenlastrow; y++) {
+    mdr_cout_char(y, screenlastcol, SCROLL_CURSOR, SCHEME_SCROLL);
   }
 
   /* scroll cursor */
@@ -362,12 +365,12 @@ static void ui_refresh(const struct file *db) {
     unsigned short col;
     unsigned short totlines = db->totlines - screenh + 1;
     if (db->totlines - screenh > screenh) {
-      col = topline / (totlines / (screenh - 1));
+      col = topline / (totlines / screenlastrow);
     } else {
-      col = topline * (screenh - 1) / totlines;
+      col = topline * screenlastrow / totlines;
     }
-    if (col >= screenh - 1) col = screenh - 2;
-    mdr_cout_char(col, screenw - 1, ' ', SCHEME_SCROLL);
+    if (col >= screenlastrow) col = screenh - 2;
+    mdr_cout_char(col, screenlastcol, ' ', SCHEME_SCROLL);
   }
 
   /* clear out the dirty flag */
@@ -412,7 +415,7 @@ static void cursor_eol(struct file *db) {
     uidirty.to = 0xff;
   }
 
-  if (db->xoffset + screenw - 1 <= db->cursor->len) {
+  if (db->xoffset + screenlastcol <= db->cursor->len) {
     db->xoffset = db->cursor->len - screenw + 2;
     uidirty.from = 0;
     uidirty.to = 0xff;
@@ -943,6 +946,8 @@ void main(void) {
     SCHEME_MSG = 0x6f;
     SCHEME_ERR = 0x4f;
   }
+  screenlastrow = screenh - 1;
+  screenlastcol = screenw - 1;
 
   /* instruct DOS to stop detecting CTRL+C because user needs it for
    * copy/paste operations. also remember the original status of the BREAK
@@ -1139,10 +1144,10 @@ void main(void) {
       if (line_add(db, db->cursor->payload + off, db->cursor->len - off) == 0) {
         db->modflag = 1;
         db->cursor = db->cursor->prev; /* back to original line */
+        db->curline -= 1;
         /* trim the line above */
         db->cursor->len = off;
         /* move cursor to the (new) line below */
-        db->curline -= 1;
         uidirty.from = db->cursorposy;
         uidirty.to = 0xff;
         cursor_down(db);
@@ -1214,7 +1219,7 @@ void main(void) {
         ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
         mdr_bios_tickswait(18); /* 1s */
       } else {
-        mdr_cout_char_rep(db->cursorposy, 0, ' ', ((SCHEME_TEXT >> 4) | (SCHEME_TEXT << 4)) & 0xff, screenw - 1);
+        mdr_cout_char_rep(db->cursorposy, 0, ' ', ((SCHEME_TEXT >> 4) | (SCHEME_TEXT << 4)) & 0xff, screenlastcol);
         uidirty.from = db->cursorposy;
         uidirty.to = db->cursorposy;
         if (db->cursor->len != 0) {
