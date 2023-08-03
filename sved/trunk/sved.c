@@ -54,6 +54,7 @@ static unsigned char SCHEME_TEXT   = 0x07,
                      SCHEME_ERR    = 0x70;
 
 static unsigned char screenw, screenh;
+static unsigned char glob_monomode, glob_tablessmode;
 
 static struct {
     unsigned char from;
@@ -279,7 +280,7 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
 }
 
 
-static unsigned char ui_confirm_if_unsaved(struct file *db) {
+static unsigned char ui_confirm_if_unsaved(const struct file *db) {
   unsigned char r = 0;
   if (db->modflag == 0) return(0);
 
@@ -594,7 +595,7 @@ static int loadfile(struct file *db, const char *fname) {
     }
 
     /* append 8 spaces if tab char found */
-    if ((consumedbytes < len) && (buffptr[consumedbytes] == '\t')) {
+    if ((consumedbytes < len) && (buffptr[consumedbytes] == '\t') && (glob_tablessmode == 0)) {
       consumedbytes++;
       if (line_append(db, "        ", 8) != 0) {
         goto IOERR;
@@ -661,30 +662,42 @@ static int parseargv(struct file *dbarr) {
 
     /* look at the arg now */
     if (*arg == '/') {
-      const char far *self = mdr_dos_selfexe();
-      unsigned short i;
-      if (self == NULL) self = "sved";
-      for (i = 0; self[i] != 0; i++) {
-        if (self[i] == '\\') {
-          self += i + 1;
-          i = 0;
+      if (arg[1] == 't') { /* /t = do not expand tabs */
+        glob_tablessmode = 1;
+
+      } else if (arg[1] == 'm') { /* /m = force mono mode */
+        glob_monomode = 1;
+
+      } else {  /* help screen */
+        const char far *self = mdr_dos_selfexe();
+        unsigned short i;
+        if (self == NULL) self = "sved";
+        for (i = 0; self[i] != 0; i++) {
+          if (self[i] == '\\') {
+            self += i + 1;
+            i = 0;
+          }
         }
+        mdr_coutraw_str(svarlang_str(1,3));
+        mdr_coutraw_str(" [");
+        mdr_coutraw_str(svarlang_str(1,4));
+        mdr_coutraw_puts(" " PVER "]");
+        mdr_coutraw_puts("Copyright (C) " PDATE " Mateusz Viste");
+        mdr_coutraw_crlf();
+        mdr_coutraw_str(svarlang_str(1,0)); /* usage: */
+        mdr_coutraw_char(' ');
+        while (*self != 0) {
+          mdr_coutraw_char(*self);
+          self++;
+        }
+        mdr_coutraw_char(' ');
+        mdr_coutraw_puts(svarlang_str(1,1)); /* args syntax */
+        mdr_coutraw_crlf();
+        mdr_coutraw_puts(svarlang_str(1,10)); /* /m */
+        mdr_coutraw_puts(svarlang_str(1,11)); /* /t */
+        return(-1);
       }
-      mdr_coutraw_str(svarlang_str(1,3));
-      mdr_coutraw_str(" [");
-      mdr_coutraw_str(svarlang_str(1,4));
-      mdr_coutraw_puts(" " PVER "]");
-      mdr_coutraw_puts("Copyright (C) " PDATE " Mateusz Viste");
-      mdr_coutraw_crlf();
-      mdr_coutraw_str(svarlang_str(1,0)); /* usage: */
-      mdr_coutraw_char(' ');
-      while (*self != 0) {
-        mdr_coutraw_char(*self);
-        self++;
-      }
-      mdr_coutraw_char(' ');
-      mdr_coutraw_puts(svarlang_str(1,1)); /* args syntax */
-      return(-1);
+      continue;
     }
 
     /* looks to be a filename */
@@ -913,7 +926,7 @@ void main(void) {
   /* parse argv (and load files, if any passed on) */
   if (parseargv(dbarr) != 0) return;
 
-  if (mdr_cout_init(&screenw, &screenh)) {
+  if ((mdr_cout_init(&screenw, &screenh) != 0) && (glob_monomode == 0)) {
     /* load color scheme if mdr_cout_init returns a color flag */
     SCHEME_TEXT = 0x17;
     SCHEME_MENU = 0x70;
@@ -1143,7 +1156,11 @@ void main(void) {
       insert_in_line(db, &c, 1);
 
     } else if (k == 0x009) { /* TAB */
-      insert_in_line(db, "        ", 8);
+      if (glob_tablessmode == 0) {
+        insert_in_line(db, "        ", 8);
+      } else {
+        insert_in_line(db, "\t", 1);
+      }
 
     } else if ((k >= 0x13b) && (k <= 0x144)) { /* F1..F10 */
       curfile = k - 0x13b;
@@ -1213,6 +1230,7 @@ void main(void) {
           line_free(clipboard->prev);
           uidirty.from = 0;
           uidirty.to = 0xff;
+          recompute_curline(db);
         }
       }
 
@@ -1237,6 +1255,7 @@ void main(void) {
       }
       uidirty.from = 0;
       uidirty.to = 0xff;
+      recompute_curline(db);
 
 #ifdef DBG_UNHKEYS
     } else { /* UNHANDLED KEY - TODO IGNORE THIS IN PRODUCTION RELEASE */
