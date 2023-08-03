@@ -264,7 +264,7 @@ static void ui_basic(const struct file *db, unsigned char slotnum) {
 
 static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
   unsigned short x, y, msglen, i;
-  unsigned char msg2flag = 0;
+  unsigned short msg2flag = 0;
 
   msglen = strlen(msg1);
   if (msg2) {
@@ -393,7 +393,6 @@ static void check_cursor_not_after_eol(struct file *db) {
 
 
 static void cursor_up(struct file *db) {
-
   if (db->cursor->prev == NULL) return;
 
   db->curline -= 1;
@@ -425,7 +424,6 @@ static void cursor_eol(struct file *db) {
 
 
 static void cursor_down(struct file *db) {
-
   if (db->cursor->next == NULL) return;
 
   db->curline += 1;
