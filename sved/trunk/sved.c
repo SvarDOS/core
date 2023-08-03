@@ -1231,6 +1231,7 @@ void main(void) {
             cursor_up(db);
           }
           line_free(clipboard->prev);
+          db->totlines -= 1;
           uidirty.from = 0;
           uidirty.to = 0xff;
           recompute_curline(db);
