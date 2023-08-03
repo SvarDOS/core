@@ -702,8 +702,8 @@ static int parseargv(struct file *dbarr) {
 
     /* looks to be a filename */
     if (count == 10) {
-      mdr_coutraw_puts(svarlang_str(0,12));
-      return(-1); /* too many files */
+      mdr_coutraw_puts(svarlang_str(0,12)); /* too many files */
+      return(-1);
     }
 
     /* try loading it */
@@ -1236,24 +1236,22 @@ void main(void) {
         }
       }
 
-    } else if (k == 0x016) { /* CTRL+V */
-      if (clipboard != NULL) {
-        if (line_add(db, clipboard->payload, clipboard->len) != 0) {
-          ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
-          mdr_bios_tickswait(18); /* 1s */
-        } else {
-          /* rewire the linked list so the new line is on top of the previous one */
-          clipboard->prev = db->cursor->prev;
-          /* remove prev node from list */
-          db->cursor->prev = db->cursor->prev->prev;
-          if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor;
-          /* insert the node after cursor now */
-          clipboard->prev->next = db->cursor->next;
-          if (db->cursor->next != NULL) db->cursor->next->prev = clipboard->prev;
-          clipboard->prev->prev = db->cursor;
-          db->cursor->next = clipboard->prev;
-          cursor_down(db);
-        }
+    } else if ((k == 0x016) && (clipboard != NULL)) { /* CTRL+V */
+      if (line_add(db, clipboard->payload, clipboard->len) != 0) {
+        ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
+        mdr_bios_tickswait(18); /* 1s */
+      } else {
+        /* rewire the linked list so the new line is on top of the previous one */
+        clipboard->prev = db->cursor->prev;
+        /* remove prev node from list */
+        db->cursor->prev = db->cursor->prev->prev;
+        if (db->cursor->prev != NULL) db->cursor->prev->next = db->cursor;
+        /* insert the node after cursor now */
+        clipboard->prev->next = db->cursor->next;
+        if (db->cursor->next != NULL) db->cursor->next->prev = clipboard->prev;
+        clipboard->prev->prev = db->cursor;
+        db->cursor->next = clipboard->prev;
+        cursor_down(db);
       }
       uidirty.from = 0;
       uidirty.to = 0xff;
