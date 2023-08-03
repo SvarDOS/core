@@ -212,7 +212,7 @@ static void db_rewind(struct file *db) {
 }
 
 
-static void ui_basic(const struct file *db, unsigned short slotnum) {
+static void ui_basic(const struct file *db, unsigned char slotnum) {
   const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
   unsigned short maxfnlen = helpcol - 14;
@@ -885,7 +885,7 @@ static enum MENU_ACTION ui_menu(void) {
 }
 
 
-static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
+static struct file *select_slot(struct file *dbarr, unsigned char curfile) {
   uidirty.from = 0;
   uidirty.to = 0xff;
   uidirty.statusbar = 1;
@@ -903,7 +903,7 @@ static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
  * (this saves 20 bytes of executable footprint) */
 void main(void) {
   static struct file dbarr[10];
-  unsigned short curfile;
+  unsigned char curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
   struct line far *clipboard = NULL;
   unsigned char original_breakflag;
