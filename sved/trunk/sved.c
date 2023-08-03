@@ -852,7 +852,7 @@ static enum MENU_ACTION ui_menu(void) {
       } else {
         attr = SCHEME_MENU;
       }
-      x = mdr_cout_str(yorigin + i, xorigin + 2, svarlang_str(8, i), attr, slen);
+      mdr_cout_str(yorigin + i, xorigin + 2, svarlang_str(8, i), attr, slen);
     }
     /* wait for key */
     switch (mdr_dos_getkey2()) {
