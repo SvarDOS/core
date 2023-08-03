@@ -65,9 +65,26 @@ void mdr_dos_flushkeyb(void);
  * buffer, non-zero otherwise */
 int mdr_dos_keypending(void);
 
-/* disables the CTRL+C handler for the running program - in other words,
- * after this call DOS will no longer abort the program on CTRL+C */
-void mdr_dos_ctrlc_disable(void);
+/* sets up the CTRL+C handler for the running program to a no-op - in other
+ * words, after this call DOS will no longer abort the program on CTRL+C.
+ * this is only valid for the duration of the program because DOS will restore
+ * the original handler after the program exits.
+ *
+ * an alternative is mdr_dos_ctrlc_off(), but this does not inhibit the
+ * handler, it sets DOS to not react to CTRL+C in the first place, and this
+ * setting stays active after the program quits so the program should remember
+ * to restore the original setting before quitting. */
+void mdr_dos_ctrlc_inhibit(void);
+
+/* sets the DOS BREAK control OFF, ie. instructs DOS not to check for CTRL+C
+ * during most input operations. returns the previous state of the break
+ * control flag (0=disabled 1=enabled). this changes a global DOS flag that can
+ * be checked on command line with the "BREAK" command, so the program should
+ * take care to restore the initial setting before quitting. */
+unsigned char mdr_dos_ctrlc_disable(void);
+
+/* sets the DOS BREAK control ON. see mdr_dos_ctrlc_disable() for details. */
+void mdr_dos_ctrlc_enable(void);
 
 /* converts a "DOS format" 16-bit packed date into a standard (time_t)
  * unix timestamp. A DOS date is a 16-bit value:
