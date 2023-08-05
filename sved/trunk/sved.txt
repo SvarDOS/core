@@ -14,11 +14,11 @@ it a good fit for bootdisks and systems with extremely limited resources.
  - autodetects color and monochrome video modes
  - supports extended text modes like 80x43, 80x50...
  - multilingual UI
- - takes only 7 KiB of disk footprint
+ - only 7 KiB of disk footprint
  - loads files larger than 64 KiB
- - no limit on line lengths
+ - no line length limit
  - can load up to 10 files simulteanously
- - handles CR/LF and LF line endings and can convert between the two
+ - handles CR/LF and LF line endings and can convert between them
 
 What SVED does NOT have:
 
