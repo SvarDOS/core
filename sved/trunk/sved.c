@@ -956,6 +956,7 @@ void main(void) {
     if ((db->cursor->next == NULL) && (db->cursor->len != 0)) {
       if (line_add(db, NULL, 0) == 0) {
         db->cursor = db->cursor->prev; /* line_add() changes the cursor pointer */
+        db->curline -= 1;
       }
     }
 
