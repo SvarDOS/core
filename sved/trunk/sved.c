@@ -263,20 +263,18 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
   {
     unsigned short x;
     unsigned char count = 0;
-    unsigned short coloffset = 9;
+    unsigned short col = helpcol - 9;
 
-    x = 1 + db->totlines;
+    x = db->totlines;
     AGAIN:
     do {
-      mdr_cout_char(screenlastrow, helpcol - coloffset, '0' + (x % 10), SCHEME_STBAR1);
+      mdr_cout_char(screenlastrow, col--, '0' + (x % 10), SCHEME_STBAR1);
       x /= 10;
-      coloffset++;
     } while (x);
     /* redo same exercise, but printing the current line now */
     if (count == 0) {
       count = 1;
-      mdr_cout_char(screenlastrow, helpcol - coloffset, '/', SCHEME_STBAR1);
-      coloffset++;
+      mdr_cout_char(screenlastrow, col--, '/', SCHEME_STBAR1);
       x = 1 + db->curline;
       goto AGAIN;
     }
