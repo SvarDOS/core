@@ -28,9 +28,9 @@ sved.svp: sved.com
 	mkdir appinfo
 	mkdir doc
 	mkdir doc\sved
-	copy sved.com bin\edit.com
-	copy sved.lng bin\edit.lng
-	copy sved.txt doc\sved\
+	copy sved.com bin
+	copy sved.lng bin
+	copy sved.txt doc\sved
 	echo version: 2023.0 > appinfo\sved.lsm
 	echo description: SvarDOS text editor >> appinfo\sved.lsm
 	zip -9rkDX -m sved.svp bin appinfo doc
