@@ -12,7 +12,7 @@ it a good fit for bootdisks and systems with extremely limited resources.
 
  - runs comfortably on a 8086-class PC with 256 KiB of RAM
  - autodetects color and monochrome video modes
- - supports extended text modes like 80x43, 80x50...
+ - supports unusual text modes like 80x43, 80x50, 40x25...
  - multilingual UI
  - only 7 KiB of disk footprint
  - loads files larger than 64 KiB

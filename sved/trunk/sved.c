@@ -219,7 +219,7 @@ static void db_rewind(struct file *db) {
 static void ui_statusbar(const struct file *db, unsigned char slotnum) {
   const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
-  unsigned short maxfnlen = helpcol - 14;
+  unsigned short col;
 
   /* slot number (guaranteed to be 0-9) */
   {
@@ -236,34 +236,18 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
   /* fill rest of status bar with background */
   mdr_cout_char_rep(screenlastrow, 3, ' ', SCHEME_STBAR1, helpcol - 3);
 
-  /* filename and modflag */
-  {
-    const char *fn;
-    unsigned short x;
-    if (db->fname[0] == 0) {
-      fn = svarlang_str(0, 1); /* "UNTITLED" */
-    } else {
-      /* display filename up to maxfnlen chars */
-      fn = db->fname;
-      x = strlen(fn);
-      if (x > maxfnlen) fn += x - maxfnlen;
-    }
-    x = mdr_cout_str(screenlastrow, 4, fn, SCHEME_STBAR1, maxfnlen);
-    if (db->modflag) mdr_cout_char(screenlastrow, 5 + x, '!', SCHEME_STBAR2);
-  }
-
   /* eol type */
   {
     const char *eoltype = "CRLF";
     if (db->lfonly) eoltype += 2;
-    mdr_cout_str(screenlastrow, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
+    mdr_cout_str(screenlastrow, helpcol - 5, eoltype, SCHEME_STBAR1, 5);
   }
 
   /* line numbers */
   {
     unsigned short x;
     unsigned char count = 0;
-    unsigned short col = helpcol - 9;
+    col = helpcol - 7;
 
     x = db->totlines;
     AGAIN:
@@ -278,7 +262,23 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
       x = 1 + db->curline;
       goto AGAIN;
     }
+  }
 
+  /* filename and modflag */
+  {
+    const char *fn;
+    unsigned short x;
+    unsigned short maxfnlen = col - 6;
+    if (db->fname[0] == 0) {
+      fn = svarlang_str(0, 1); /* "UNTITLED" */
+    } else {
+      /* display filename up to maxfnlen chars */
+      fn = db->fname;
+      x = strlen(fn);
+      if (x > maxfnlen) fn += x - maxfnlen;
+    }
+    x = mdr_cout_str(screenlastrow, 4, fn, SCHEME_STBAR1, maxfnlen);
+    if (db->modflag) mdr_cout_char(screenlastrow, 5 + x, '!', SCHEME_STBAR2);
   }
 
   mdr_cout_str(screenlastrow, helpcol, s, SCHEME_STBAR2, 40);
