@@ -259,15 +259,28 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
     mdr_cout_str(screenlastrow, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
   }
 
-  /* line number */
+  /* line numbers */
   {
-    unsigned short x = 1 + db->curline;
+    unsigned short x;
+    unsigned char count = 0;
     unsigned short coloffset = 9;
+
+    x = 1 + db->totlines;
+    AGAIN:
     do {
       mdr_cout_char(screenlastrow, helpcol - coloffset, '0' + (x % 10), SCHEME_STBAR1);
       x /= 10;
       coloffset++;
     } while (x);
+    /* redo same exercise, but printing the current line now */
+    if (count == 0) {
+      count = 1;
+      mdr_cout_char(screenlastrow, helpcol - coloffset, '/', SCHEME_STBAR1);
+      coloffset++;
+      x = 1 + db->curline;
+      goto AGAIN;
+    }
+
   }
 
   mdr_cout_str(screenlastrow, helpcol, s, SCHEME_STBAR2, 40);
