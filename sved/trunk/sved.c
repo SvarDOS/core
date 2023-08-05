@@ -215,7 +215,7 @@ static void db_rewind(struct file *db) {
 }
 
 
-static void ui_basic(const struct file *db, unsigned char slotnum) {
+static void ui_statusbar(const struct file *db, unsigned char slotnum) {
   const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
   unsigned short maxfnlen = helpcol - 14;
@@ -879,7 +879,7 @@ static struct file *select_slot(struct file *dbarr, unsigned char curfile) {
   dbarr = &(dbarr[curfile]);
   /* force redraw now, because the main() routine might not if this is exit
    * time and we want to show the user which file has unsaved changes */
-  ui_basic(dbarr, curfile);
+  ui_statusbar(dbarr, curfile);
   ui_refresh(dbarr);
   return(dbarr);
 }
@@ -953,7 +953,7 @@ void main(void) {
     ui_refresh(db);
 
     if ((uidirty.statusbar != 0) || (db->modflagprev != db->modflag)) {
-      ui_basic(db, curfile);
+      ui_statusbar(db, curfile);
       uidirty.statusbar = 0;
       db->modflagprev = db->modflag;
     }
