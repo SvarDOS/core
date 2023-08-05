@@ -674,28 +674,13 @@ static int parseargv(struct file *dbarr) {
         glob_monomode = 1;
 
       } else {  /* help screen */
-        const char far *self = mdr_dos_selfexe();
-        unsigned short i;
-        if (self == NULL) self = "sved";
-        for (i = 0; self[i] != 0; i++) {
-          if (self[i] == '\\') {
-            self += i + 1;
-            i = 0;
-          }
-        }
         mdr_coutraw_str(svarlang_str(1,3)); /* Sved, the SvarDOS editor */
         mdr_coutraw_str(" [");
         mdr_coutraw_str(svarlang_str(1,4)); /* ver */
         mdr_coutraw_puts(" " PVER "]");
         mdr_coutraw_puts("Copyright (C) " PDATE " Mateusz Viste");
         mdr_coutraw_crlf();
-        mdr_coutraw_str(svarlang_str(1,0)); /* usage: */
-        mdr_coutraw_char(' ');
-        while (*self != 0) {
-          mdr_coutraw_char(*self);
-          self++;
-        }
-        mdr_coutraw_char(' ');
+        mdr_coutraw_str("sved [/m] [/t] ");
         mdr_coutraw_puts(svarlang_str(1,1)); /* args syntax */
         mdr_coutraw_crlf();
         mdr_coutraw_puts(svarlang_str(1,10)); /* /m */
