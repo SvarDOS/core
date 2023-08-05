@@ -78,6 +78,7 @@ struct file {
   unsigned short cursorposy;
   unsigned short totlines;
   unsigned short curline;
+  unsigned short curline_prev;
   char lfonly;   /* set if line endings are LF (CR/LF otherwise) */
   char modflag;  /* non-zero if file has been modified since last save */
   char modflagprev;
@@ -256,6 +257,17 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
     const char *eoltype = "CRLF";
     if (db->lfonly) eoltype += 2;
     mdr_cout_str(screenlastrow, helpcol - 6, eoltype, SCHEME_STBAR1, 5);
+  }
+
+  /* line number */
+  {
+    unsigned short x = 1 + db->curline;
+    unsigned short coloffset = 9;
+    do {
+      mdr_cout_char(screenlastrow, helpcol - coloffset, '0' + (x % 10), SCHEME_STBAR1);
+      x /= 10;
+      coloffset++;
+    } while (x);
   }
 
   mdr_cout_str(screenlastrow, helpcol, s, SCHEME_STBAR2, 40);
@@ -952,10 +964,11 @@ void main(void) {
 
     ui_refresh(db);
 
-    if ((uidirty.statusbar != 0) || (db->modflagprev != db->modflag)) {
+    if ((uidirty.statusbar != 0) || (db->modflagprev != db->modflag) || (db->curline_prev != db->curline)) {
       ui_statusbar(db, curfile);
       uidirty.statusbar = 0;
       db->modflagprev = db->modflag;
+      db->curline_prev = db->curline;
     }
 #ifdef DBG_LINENUM
       {
