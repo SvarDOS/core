@@ -559,7 +559,7 @@ static int loadfile(struct file *db, const char *fname) {
 
   if (fname == NULL) goto SKIPLOADING;
 
-  memcpy(db->fname, fname, strlen(fname));
+  mdr_dos_truename(db->fname, fname);
 
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
     return(1);
@@ -727,7 +727,7 @@ static int parseargv(struct file *dbarr) {
     if (err) {
       if (err == 1) { /* file not found */
         if ((count == 0) && (lastarg != 0)) { /* a 'file not found' is fine if only one file was given */
-          memcpy(dbarr[count].fname, arg, strlen(arg) + 1);
+          mdr_dos_truename(dbarr[count].fname, arg);
           err = 0;
         } else {
           err = 11;
@@ -1104,7 +1104,7 @@ void main(void) {
             ui_getstring(svarlang_str(0,6), fname, sizeof(fname));
             if (*fname == 0) break;
             saveflag = savefile(db, fname);
-            if (saveflag == 0) memcpy(db->fname, fname, sizeof(fname));
+            if (saveflag == 0) mdr_dos_truename(db->fname, fname);
           } else {
             saveflag = savefile(db, NULL);
           }
