@@ -786,6 +786,9 @@ static int savefile(const struct file *db, const char *newfname) {
     l = l->next;
   }
 
+  /* emit a 0-bytes write - this means "truncate file at current position" */
+  errflag |= _dos_write(fd, NULL, 0, &bytes);
+
   errflag |= _dos_close(fd);
 
   return(errflag);
