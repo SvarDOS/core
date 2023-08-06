@@ -105,4 +105,9 @@ time_t mdr_dos_date2unix(unsigned short d);
  * SSSSS  = seconds/2 (always within 0-29 range) */
 void mdr_dos_time2hms(unsigned char *h, unsigned char *m, unsigned char *s, unsigned short t);
 
+/* Determine the canonical name of the specified filename or path and writes
+ * the result into result. The input path does not need to actually exist.
+ * result is zeroed to an empty string on error. */
+void mdr_dos_truename(char *result, const char *name);
+
 #endif

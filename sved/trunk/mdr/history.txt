@@ -1,6 +1,13 @@
 version xxxx (xx xxx xxxx)
-- added mdr_dos_selfexe()
-- added mdr_coutraw_str() and mdr_coutraw_crlf()
+- new mdr_dos_selfexe()
+- new mdr_dos_truename()
+- new mdr_coutraw_str() and mdr_coutraw_crlf()
+- new mdr_dos_ctrlc_inhibit(), mdr_dos_ctrlc_enable(), mdr_dos_ctrlc_disable()
+- renamed keyb_getkey() to mdr_dos_getkey()
+- renamed keyb_flush() to mdr_dos_flushkeyb()
+- new mdr_dos_getkey2(), same as mdr_dos_getkey() but immune to CTRL+C
+- new mdr_dos_keypending()
+- removed keyb_getkey_ifany(): use mdr_dos_keypending + mdr_dos_getkey instead
 
 version 2023 (29 Jul 2023)
 - all routines are built as a library now
