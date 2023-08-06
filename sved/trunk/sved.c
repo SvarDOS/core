@@ -1138,7 +1138,10 @@ void main(void) {
           for (curfile = 0; curfile < 10; curfile++) {
             if (dbarr[curfile].modflag) {
               db = select_slot(dbarr, curfile);
-              if (ui_confirm_if_unsaved(db) != 0) quitnow = 0;
+              if (ui_confirm_if_unsaved(db) != 0) {
+                quitnow = 0;
+                break;
+              }
             }
           }
           break;
