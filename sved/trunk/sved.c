@@ -34,7 +34,7 @@
 #include "svarlang\svarlang.h"
 
 
-#define PVER "2023.1"
+#define PVER "2023.2"
 #define PDATE "2023"
 
 /*****************************************************************************
@@ -745,20 +745,37 @@ static int parseargv(struct file *dbarr) {
 }
 
 
-static int savefile(const struct file *db, const char *newfname) {
-  int fd;
+static int savefile(const struct file *db, const char *saveas) {
+  int fd = 0;
   const struct line far *l;
   unsigned int bytes;
   unsigned char eollen;
   unsigned char eolbuf[2];
   int errflag = 0;
 
-  /* either create a new file if newfname provided, or... */
-  if (newfname) {
-    if (_dos_creatnew(newfname, _A_NORMAL, &fd) != 0) return(-1);
-  } else { /* ...open db->fname */
-    if (_dos_open(db->fname, O_WRONLY, &fd) != 0) return(-1);
+  /* if filename not overloaded then use the fname in db */
+  if (saveas == NULL) saveas = db->fname;
+
+  _asm {
+    push ax
+    push cx
+    push dx
+
+    mov ah, 0x3C    /* create or truncate file */
+    xor cx, cx      /* file attributes */
+    mov dx, saveas  /* works only in SMALL/TINY mode */
+    int 0x21
+    jnc DONE
+    mov errflag, ax
+    DONE:
+    mov fd, ax
+
+    pop dx
+    pop cx
+    pop ax
   }
+
+  if (errflag != 0) return(-1);
 
   l = db->cursor;
   while (l->prev) l = l->prev;
@@ -783,9 +800,6 @@ static int savefile(const struct file *db, const char *newfname) {
     errflag |= _dos_write(fd, eolbuf, eollen, &bytes);
     l = l->next;
   }
-
-  /* emit a 0-bytes write - this means "truncate file at current position" */
-  errflag |= _dos_write(fd, NULL, 0, &bytes);
 
   errflag |= _dos_close(fd);
 
