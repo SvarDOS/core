@@ -1,0 +1,108 @@
+
+
+                             THE SVARDOS EDITOR
+
+
+### WHAT IT IS ###############################################################
+
+The SvarDOS editor (SVED) is designed for basic editing of configuration files
+and such. It is NOT meant to be a full-featured text editor. On the pro side,
+it has a low memory footprint and is only a couple kilobytes big, which makes
+it a good fit for bootdisks and systems with extremely limited resources.
+
+ - runs comfortably on a 8086-class PC with 256 KiB of RAM
+ - auto-detects color and monochrome video modes
+ - supports unusual text modes like 80x43, 80x50, 132x60, 40x25...
+ - multilingual UI
+ - only 7 KiB of disk footprint
+ - screen estate dedicated to text (no stupid frames, menus and such)
+ - loads files larger than 64 KiB
+ - no line length limit
+ - can load up to 10 files simultaneously
+ - COPY/CUT/PASTE between files
+ - handles CR/LF and LF line endings and can convert between them
+
+What SVED does NOT have:
+
+ - mouse support
+ - an integrated file browser
+ - undo
+ - search
+ - ...
+
+
+### USAGE AND KEY BINDINGS ###################################################
+
+Navigation within the text file is achieved through the usual, standard keys:
+ - up, down, right and left arrows
+ - PageUp / PageDown
+ - Home / End
+
+On top of these, the following key bindings are available:
+
+ESC        = access the program's menu
+CTRL+RIGHT = jump to next word
+CTRL+LEFT  = jump to previous word
+CTRL+C     = copy the current line to clipboard
+CTRL+X     = cut the current line and move it to clipboard
+CTRL+V     = paste the clipboard content to current location
+
+SVED can load up to 10 files simultaneously. To switch from one file to
+another use the F1..F10 function keys (F1 = file 1, F2 = file 2, etc).
+
+
+### MULTILINGUAL SUPPORT #####################################################
+
+The LNG file contains non-english strings. It should be placed in the same
+directory where the program's executable resides. The UI language is
+controlled by the LANG environment variable, for example SET LANG=PL would
+make it display polish strings.
+Following LANG settings are supported: EN FR PL RU.
+
+If you rename the SVED.COM executable (for example to EDIT.COM), then you need
+to rename the LNG file accordingly (for example to EDIT.LNG).
+
+You can safely delete the LNG file if you are happy with an english-only UI
+and wish to free a bit of disk space.
+
+
+### CHANGELOG ################################################################
+
+2023.2 [07 Aug 2023]
+- added french translations
+- fixed saving to new file when filename was passed on command-line
+
+2023.1 [07 Aug 2023]
+- fixed onscreen garbage when opening a non-existent file (sved notexist.txt)
+- abort with error when an invalid filename is given as argument (sved *)
+
+2023.0 [07 Aug 2023]
+- initial release
+
+
+### LICENSE ##################################################################
+
+The SvarDOS editor (SVED) is released under the terms of the MIT license.
+
+Copyright (C) 2023 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+###################################################################### EOF ###

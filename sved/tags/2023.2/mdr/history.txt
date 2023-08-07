@@ -1,0 +1,28 @@
+version xxxx (xx xxx xxxx)
+- new mdr_dos_selfexe()
+- new mdr_dos_truename()
+- new mdr_coutraw_str() and mdr_coutraw_crlf()
+- new mdr_dos_ctrlc_inhibit(), mdr_dos_ctrlc_enable(), mdr_dos_ctrlc_disable()
+- renamed keyb_getkey() to mdr_dos_getkey()
+- renamed keyb_flush() to mdr_dos_flushkeyb()
+- new mdr_dos_getkey2(), same as mdr_dos_getkey() but immune to CTRL+C
+- new mdr_dos_keypending()
+- removed keyb_getkey_ifany(): use mdr_dos_keypending + mdr_dos_getkey instead
+
+version 2023 (29 Jul 2023)
+- all routines are built as a library now
+- advertising MDR version (MDR_VER_MAJOR and MDR_VER_MINOR in VER.H)
+- added the SBDIGI driver (SoundBlaster Digitized sound)
+- added the COUT module (text-mode console output)
+- added the DOS module (mdr_dos_* functions)
+- added the UNZIP module for iteration over ZIP archives
+- added the BIOS module (with the mdr_bios_tickswait() function)
+- vid12: fast VRAM copy (vid12_vramcpy_* functions)
+- vid12: vid12_clrline()
+- vid12: fixed color mapping in vid12_setpalette()
+- vid12: added functions vid12_hline() and vid12_linepat()
+- vid12: fixed reverting the previous video mode at vid12_close()
+- vid12: optimized vid12_putpixel() - 17% faster
+
+version 2022 (09 Oct 2022)
+- initial public release
