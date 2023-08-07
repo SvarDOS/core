@@ -34,7 +34,7 @@
 #include "svarlang\svarlang.h"
 
 
-#define PVER "2023.0"
+#define PVER "2023.1"
 #define PDATE "2023"
 
 /*****************************************************************************
@@ -544,6 +544,7 @@ static int loadfile(struct file *db, const char *fname) {
   unsigned int len, llen;
   int fd;
   unsigned char eolfound;
+  int err = 0;
 
   /* free the entire linked list of lines */
   db_rewind(db);
@@ -557,20 +558,19 @@ static int loadfile(struct file *db, const char *fname) {
   /* zero out the struct */
   bzero(db, sizeof(struct file));
 
+  /* start by adding an empty line */
+  if (line_add(db, NULL, 0) != 0) return(2);
+
   if (fname == NULL) goto SKIPLOADING;
 
   mdr_dos_truename(db->fname, fname);
 
   if (_dos_open(fname, O_RDONLY, &fd) != 0) {
-    return(1);
+    err = 1;
+    goto SKIPLOADING;
   }
 
   db->lfonly = 1;
-
-  /* start by adding an empty line */
-  if (line_add(db, NULL, 0) != 0) {
-    /* TODO ERROR HANDLING */
-  }
 
   for (eolfound = 0;;) {
     unsigned short consumedbytes;
@@ -643,11 +643,10 @@ static int loadfile(struct file *db, const char *fname) {
 
   SKIPLOADING:
 
-  /* add an empty line at end if not present already, also rewind cursor to top of file */
-  if ((db->cursor == NULL) || (db->cursor->len != 0)) line_add(db, NULL, 0);
+  /* rewind cursor to top of file because it has been used by line_add() */
   db_rewind(db);
 
-  return(0);
+  return(err);
 
   IOERR:
   _dos_close(fd);
@@ -727,7 +726,6 @@ static int parseargv(struct file *dbarr) {
     if (err) {
       if (err == 1) { /* file not found */
         if ((count == 0) && (lastarg != 0)) { /* a 'file not found' is fine if only one file was given */
-          mdr_dos_truename(dbarr[count].fname, arg);
           err = 0;
         } else {
           err = 11;

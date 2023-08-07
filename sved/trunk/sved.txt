@@ -64,6 +64,15 @@ You can safely delete the LNG file if you do not need non-english UI and wish
 to free some disk space.
 
 
+### CHANGELOG ################################################################
+
+2023.1 [xx xxx 2023]
+- fixed onscreen garbage when opening a non-existent file (sved notexist.txt)
+
+2023.0 [07 Aug 2023]
+- initial release
+
+
 ### LICENSE ##################################################################
 
 The SvarDOS editor (SVED) is released under the terms of the MIT license.
