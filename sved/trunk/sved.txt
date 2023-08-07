@@ -12,13 +12,14 @@ it a good fit for bootdisks and systems with extremely limited resources.
 
  - runs comfortably on a 8086-class PC with 256 KiB of RAM
  - auto-detects color and monochrome video modes
- - supports unusual text modes like 80x43, 80x50, 40x25...
+ - supports unusual text modes like 80x43, 80x50, 132x60, 40x25...
  - multilingual UI
  - only 7 KiB of disk footprint
  - screen estate dedicated to text (no stupid frames, menus and such)
  - loads files larger than 64 KiB
  - no line length limit
  - can load up to 10 files simultaneously
+ - COPY/CUT/PASTE between files
  - handles CR/LF and LF line endings and can convert between them
 
 What SVED does NOT have:
@@ -56,12 +57,13 @@ The LNG file contains non-english strings. It should be placed in the same
 directory where the program's executable resides. The UI language is
 controlled by the LANG environment variable, for example SET LANG=PL would
 make it display polish strings.
+Following LANG settings are supported: EN FR PL RU.
 
 If you rename the SVED.COM executable (for example to EDIT.COM), then you need
 to rename the LNG file accordingly (for example to EDIT.LNG).
 
-You can safely delete the LNG file if you do not need non-english UI and wish
-to free some disk space.
+You can safely delete the LNG file if you are happy with an english-only UI
+and wish to free a bit of disk space.
 
 
 ### CHANGELOG ################################################################
