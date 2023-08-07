@@ -538,13 +538,13 @@ static void bkspc(struct file *db) {
 
 
 /* returns 0 on success, 1 on file not found, 2 on other error */
-static int loadfile(struct file *db, const char *fname) {
+static unsigned char loadfile(struct file *db, const char *fname) {
   char buff[512]; /* read one entire sector at a time (faster) */
   char *buffptr;
   unsigned int len, llen;
   int fd;
   unsigned char eolfound;
-  int err = 0;
+  unsigned char err = 0;
 
   /* free the entire linked list of lines */
   db_rewind(db);
@@ -662,7 +662,7 @@ static int parseargv(struct file *dbarr) {
   unsigned short count = 0;
   char *arg;
   unsigned short lastarg = 0;
-  int err;
+  unsigned char err;
 
   while (!lastarg) {
     /* jump to nearest arg */
@@ -1077,7 +1077,7 @@ void main(void) {
           /* ask for filename */
           ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
           if (fname[0] != 0) {
-            int err;
+            unsigned char err;
             err = loadfile(db, fname);
             if (err != 0) {
               if (err == 1) {
