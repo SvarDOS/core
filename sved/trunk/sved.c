@@ -749,8 +749,8 @@ static int savefile(const struct file *db, const char *saveas) {
   int fd = 0;
   const struct line far *l;
   unsigned int bytes;
-  unsigned char eollen;
-  unsigned char eolbuf[2];
+  unsigned char eollen = 2;
+  const unsigned char *eolbuf = "\r\n";
   int errflag = 0;
 
   /* if filename not overloaded then use the fname in db */
@@ -782,12 +782,8 @@ static int savefile(const struct file *db, const char *saveas) {
 
   /* preset line terminators */
   if (db->lfonly) {
-    eolbuf[0] = '\n';
-    eollen = 1;
-  } else {
-    eolbuf[0] = '\r';
-    eolbuf[1] = '\n';
-    eollen = 2;
+    eolbuf++;
+    eollen--;
   }
 
   while (l) {
