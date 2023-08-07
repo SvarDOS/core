@@ -31,7 +31,7 @@ sved.svp: sved.com
 	copy sved.com bin
 	copy sved.lng bin
 	copy sved.txt doc\sved
-	echo version: 2023.0 > appinfo\sved.lsm
+	echo version: 2023.1 > appinfo\sved.lsm
 	echo description: SvarDOS text editor >> appinfo\sved.lsm
 	zip -9rkDX -m sved.svp bin appinfo doc
 	rmdir doc\sved
