@@ -1,0 +1,28 @@
+20230730
+- dropped svarlang_autoload() (replaced by more specialized functions below)
+- added svarlang_autoload_exepath() and svarlang_autoload_nlspath()
+- svarlang_load() simplified so it takes the target filename as an argument
+- file access relies on fopen() when svarlang is compiled with -DWITHSTDIO
+- new file format: sorted dictionary for faster lookup (by Bernd Boeckmann)
+  breaking change! See svarlang.txt for file format specification
+
+20230630
+- tlumacz.exe warns about empty strings (patch by Bernd Boeckmann)
+- tlumacz.exe does not abort when a malformed line is found
+
+20230629
+- deflang.c has each message on a different line so it is nicer to VCSes
+
+20230628
+- added support for \e sequences in translation strings
+- implemented svarlang_getver()
+
+20220314
+- added support for flagging strings as being "dirty", eg: ?1.1:Hello, World
+
+20220309
+- static lib buffer is sized to fit the largest lang block +5% of margin
+  (was: twice the size of the reference language)
+
+20220226
+- replaced fopen() and friends by direct DOS calls (smaller memory footprint)
