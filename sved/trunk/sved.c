@@ -93,10 +93,15 @@ struct file {
 static struct line far *line_calloc(unsigned short siz) {
   struct line far *res;
   unsigned int seg;
+
   if (_dos_allocmem((sizeof(struct line) + siz + 15) / 16, &seg) != 0) return(NULL);
+
   res = MK_FP(seg, 0);
-  _fmemset(res, 0, sizeof(struct line) + siz);
-  return(MK_FP(seg, 0));
+  res->len = 0;
+  res->next = NULL;
+  res->prev = NULL;
+
+  return(res);
 }
 
 
