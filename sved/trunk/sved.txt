@@ -66,8 +66,9 @@ to free some disk space.
 
 ### CHANGELOG ################################################################
 
-2023.1 [xx xxx 2023]
+2023.1 [07 Aug 2023]
 - fixed onscreen garbage when opening a non-existent file (sved notexist.txt)
+- abort with error when an invalid filename is given as argument (sved *)
 
 2023.0 [07 Aug 2023]
 - initial release

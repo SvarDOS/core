@@ -537,6 +537,8 @@ static void bkspc(struct file *db) {
 }
 
 
+#define LOADFILE_FILENOTFOUND 2
+
 /* returns 0 on success, 1 on file not found, 2 on other error */
 static unsigned char loadfile(struct file *db, const char *fname) {
   char buff[512]; /* read one entire sector at a time (faster) */
@@ -565,10 +567,8 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   mdr_dos_truename(db->fname, fname);
 
-  if (_dos_open(fname, O_RDONLY, &fd) != 0) {
-    err = 1;
-    goto SKIPLOADING;
-  }
+  err = _dos_open(fname, O_RDONLY, &fd);
+  if (err != 0) goto SKIPLOADING;
 
   db->lfonly = 1;
 
@@ -650,7 +650,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   IOERR:
   _dos_close(fd);
-  return(2);
+  return(1);
 }
 
 
@@ -724,7 +724,7 @@ static int parseargv(struct file *dbarr) {
     mdr_coutraw_puts(arg);
     err = loadfile(&(dbarr[count]), arg);
     if (err) {
-      if (err == 1) { /* file not found */
+      if (err == LOADFILE_FILENOTFOUND) { /* file not found */
         if ((count == 0) && (lastarg != 0)) { /* a 'file not found' is fine if only one file was given */
           err = 0;
         } else {
@@ -1080,7 +1080,7 @@ void main(void) {
             unsigned char err;
             err = loadfile(db, fname);
             if (err != 0) {
-              if (err == 1) {
+              if (err == LOADFILE_FILENOTFOUND) {
                 ui_msg(svarlang_str(0,11), NULL, SCHEME_ERR); /* file not found */
               } else {
                 ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
