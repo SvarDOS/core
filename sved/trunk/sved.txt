@@ -70,7 +70,7 @@ and wish to free a bit of disk space.
 
 2023.2 [07 Aug 2023]
 - added french translations
-- fixed saving to new file passed on command-line
+- fixed saving to new file when filename was passed on command-line
 
 2023.1 [07 Aug 2023]
 - fixed onscreen garbage when opening a non-existent file (sved notexist.txt)
