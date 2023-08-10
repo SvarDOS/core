@@ -98,6 +98,7 @@ int main(void) {
   addnew("FR", "French (France)", "fr", 858, 1, 1, 0);
   addnew("FR", "French (Canada, standard)", "cf", 863, 9, 1, 0);
   addnew("FR", "French (Canada, legacy)", "cf", 863, 9, 1, 501);
+  addnew("FR", "French (Switzerland)", "sf", 858, 1, 1, 0);
 
   /* German */
   addnew("DE", "German", "de", 858, 1, 1, 0);

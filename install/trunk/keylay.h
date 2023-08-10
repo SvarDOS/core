@@ -14,6 +14,7 @@ const char *kblayouts[] = {
   "French (France)\0fr\0\3\132\1\1\0\0",
   "French (Canada, standard)\0cf\0\3\137\11\1\0\0",
   "French (Canada, legacy)\0cf\0\3\137\11\1\1\365",
+  "French (Switzerland)\0sf\0\3\132\1\1\0\0",
   /****** DE ******/
   "German\0de\0\3\132\1\1\0\0",
   /****** HU ******/
