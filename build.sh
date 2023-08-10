@@ -166,7 +166,6 @@ cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/svarcom.svp" command.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/display.svp" bin/display.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOTCORE/edit.svp" bin/edit.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/fdisk.svp" bin/fdisk.exe bin/fdiskpt.ini -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/format.svp" bin/format.exe -d "$FLOPROOT/"
@@ -175,6 +174,7 @@ unzip -CLj "$REPOROOTCORE/mem.svp" bin/mem.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/mode.svp" bin/mode.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/more.svp" bin/more.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/sved.svp" bin/sved.com -d "$FLOPROOT/"
 
 # generate a simple autoexec.bat file
 echo '@ECHO OFF' > "$FLOPROOT/autoexec.bat"
@@ -235,7 +235,6 @@ rm "$FLOPROOT"/*.cpx
 rm "$FLOPROOT"/install.lng
 rm "$FLOPROOT"/display.exe
 rm "$FLOPROOT"/mode.com
-rm "$FLOPROOT"/edit.*
 #
 prep_flop 40 2  9  360 "$PUBDIR"
 
