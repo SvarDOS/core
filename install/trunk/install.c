@@ -942,7 +942,7 @@ int main(int argc, char **argv) {
   action = selectlang(&locales); /* welcome to svardos, select your language */
   if (action != MENUNEXT) goto Quit;
   loadcp(&locales);
-  svarlang_load("INSTALL", locales.lang, NULL); /* NLS support */
+  svarlang_load("INSTALL.LNG", locales.lang); /* NLS support */
 
  SelectKeyb:
   action = selectkeyb(&locales);  /* what keyb layout should we use? */
