@@ -18,7 +18,7 @@
 0.0:ESC=MENÜ
 0.1:BAŞLIKSIZ
 0.2:KAYDEDİLDİ
-0.4:Kaydedilmeyen değişiklikler kaybolacak.
+0.4:Değişiklikler kaybolacak.
 0.5:Onay için ENTER'a basın.
 0.6:Farklı kaydet:
 0.7:Yükle:
@@ -37,7 +37,7 @@
 1.3:Sved, SvarDOS düzenleyicisi
 1.4:sürüm
 1.10:/m  tek renkli kipi zorla
-1.11:/t  sekme karakterlerini genişletme
+1.11:/t  sekmeleri genişletme
 
 
 ########
