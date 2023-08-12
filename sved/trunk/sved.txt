@@ -68,6 +68,9 @@ and wish to free a bit of disk space.
 
 ### CHANGELOG ################################################################
 
+2023.3 [xx xxx 2023]
+- added turkish translation, courtesy of Berki Yenigun
+
 2023.2 [07 Aug 2023]
 - added french translations
 - fixed saving to new file when filename was passed on command-line
