@@ -26,7 +26,7 @@
 0.8:Anuluj z ESC.
 0.10:BŁĄD
 0.11:NIE ZNALEZIONO PLIKU
-0.12:Za duża ilość plików
+0.12:Zbyt wiele plików
 
 
 ################
