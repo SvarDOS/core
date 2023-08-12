@@ -18,11 +18,11 @@
 0.0:ESC=MENÜ
 0.1:BAŞLIKSIZ
 0.2:KAYDEDİLDİ
-0.4:Kaydedilmeyen değişiklikler kaybolacaktır.
-0.5:Onaylamak için ENTER'a basın.
+0.4:Kaydedilmeyen değişiklikler kaybolacak.
+0.5:Onay için ENTER'a basın.
 0.6:Farklı kaydet:
 0.7:Yükle:
-0.8:İptal etmek için ESC'e basın.
+0.8:İptal için ESC'e basın.
 0.10:HATA
 0.11:DOSYA BULUNAMADI
 0.12:Çok fazla dosya
@@ -48,8 +48,6 @@
 8.2:Kaydet
 8.3:Farklı kaydet...
 8.4:Dosyayı kapat
-8.5:Satır sonunu değiştir
+8.5:EOL değiştir
 8.6:Çık
-
-
 
