@@ -57,7 +57,7 @@ The LNG file contains non-english strings. It should be placed in the same
 directory where the program's executable resides. The UI language is
 controlled by the LANG environment variable, for example SET LANG=PL would
 make it display polish strings.
-Following LANG settings are supported: EN FR PL RU.
+Following LANG settings are supported: EN FR PL RU TR.
 
 If you rename the SVED.COM executable (for example to EDIT.COM), then you need
 to rename the LNG file accordingly (for example to EDIT.LNG).
@@ -68,7 +68,7 @@ and wish to free a bit of disk space.
 
 ### CHANGELOG ################################################################
 
-2023.3 [xx xxx 2023]
+2023.3 [13 Aug 2023]
 - added turkish translation, courtesy of Berki Yenigun
 
 2023.2 [07 Aug 2023]
