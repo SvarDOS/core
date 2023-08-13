@@ -66,20 +66,33 @@ Let's imagine that we have a package named NASM in version 2.12. A new version
 2.15 of this software has been released, you tested it, found it stable so you
 packaged it. How to add it to the SvarDOS packages repository?
 
-Add the new version of your package:
+Duplicate the last version of the package into a new file:
 
-$ svn add nasm-2.15.svp
-$ svn add nasm-2.15.zip              <-- optional (only if package has sources)
+$ svn cp nasm-2.14.svp nasm-2.15.svp
+$ svn cp nasm-2.14.zip nasm-2.15.zip      <-- only if package has sources
+
+Then overwrite the new version files with the actual new files (ie. overwrite
+the nasm-2.15.* files in the example above).
 
 Finally, review and commit your changes:
 
 $ svn st
 $ svn commit -m 'updated package NASM to version 2.15'
 
-The repository server will automatically serve the latest available version as
-the "preferred" version to users. The version strings are processed (and
-compared with each other) through the PHP version_compare() function documented
-here: <https://www.php.net/manual/en/function.version-compare>
+An alternative way would be to simply svn add the new version of files and it
+would work just as well, but going through the "svn cp" + overwriting steps
+allows svn to store the new version of the files much more efficiently, as it
+will store only the bytes that changed instead of the entire file. Subversion
+makes use of the xdelta algorithm for storing changes, and this algorithm works
+both on text and binary content.
+
+
+Which version of the package will users get?
+
+The repository server automatically serves the latest available version as the
+"preferred" version to users. The version strings are processed (and compared
+to each other) through the PHP version_compare() function documented here:
+<https://www.php.net/manual/en/function.version-compare>
 
 This function works relatively well, but it might fail on some exotic version
 strings. For the time being, there is no way to flag a specific package version
@@ -88,10 +101,10 @@ as being "preferred".
 
 === REMOVING A PACKAGE ========================================================
 
-On rare occasions it may be necessary to delete some packages. For example if
-they proved to be harmful in some way, or if their licensing is not compatible
-with SvarDOS distribution, etc. Removing a package means deleting it from the
-svn repository and commiting the change. Example:
+On rare occasions it may be necessary to delete a package. For example if they
+proved to be harmful in some way, or if their licensing is not compatible with
+SvarDOS distribution, etc. Removing a package is as simple as deleting it from
+the svn repository and commiting the change. Example:
 
 $ cd svardos-pkgs
 $ svn del package.svp
