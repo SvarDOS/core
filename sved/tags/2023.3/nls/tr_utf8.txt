@@ -1,0 +1,54 @@
+#############################################################################
+# SVED IN TURKISH                                                           #
+# Translated from English by Berki Yenigun                                  #
+#############################################################################
+
+#############################################################################
+#                                                                           #
+# IMPORTANT: Translations should be as compact as possible so they do not   #
+# increase Sved's footprint. New translation files should be no larger than #
+# the biggest existing translation. Run REGEN.BAT to see current sizes.     #
+#                                                                           #
+#############################################################################
+
+
+###############
+# MAIN SCREEN #
+###############
+
+0.0:ESC=MENÜ
+0.1:BAŞLIKSIZ
+0.2:KAYDEDİLDİ
+0.4:Değişiklikler kaybolacak.
+0.5:Onay için ENTER'a basın.
+0.6:Farklı kaydet:
+0.7:Yükle:
+0.8:İptal için ESC'e basın.
+0.10:HATA
+0.11:DOSYA BULUNAMADI
+0.12:Çok fazla dosya
+
+
+####################
+# CONSOLE MESSAGES #
+####################
+
+1.1:[dosya1.txt] ... [dosya10.txt]
+1.2:Yükleniyor
+1.3:Sved, SvarDOS düzenleyicisi
+1.4:sürüm
+1.10:/m  tek renkli kipi zorla
+1.11:/t  sekmeleri genişletme
+
+
+########
+# MENU #
+########
+
+8.1:Dosya aç
+8.2:Kaydet
+8.3:Farklı kaydet...
+8.4:Dosyayı kapat
+8.5:EOL değiştir
+8.6:Çık
+

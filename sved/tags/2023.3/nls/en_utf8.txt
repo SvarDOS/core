@@ -1,0 +1,52 @@
+#############################################################################
+# SVED IN ENGLISH                                                           #
+#############################################################################
+
+#############################################################################
+#                                                                           #
+# IMPORTANT: Translations should be as compact as possible so they do not   #
+# increase Sved's footprint. New translation files should be no larger than #
+# the biggest existing translation. Run REGEN.BAT to see current sizes.     #
+#                                                                           #
+#############################################################################
+
+
+###############
+# MAIN SCREEN #
+###############
+
+0.0:ESC=MENU
+0.1:UNTITLED
+0.2:SAVED
+0.4:Unsaved changes will be lost.
+0.5:Press ENTER to confirm.
+0.6:Save as:
+0.7:Load:
+0.8:Press ESC to cancel.
+0.10:ERROR
+0.11:FILE NOT FOUND
+0.12:Too many files
+
+
+####################
+# CONSOLE MESSAGES #
+####################
+
+1.1:[file1.txt] ... [file10.txt]
+1.2:Loading
+1.3:Sved, the SvarDOS editor
+1.4:ver
+1.10:/m  force monochrome mode
+1.11:/t  do not expand tab characters
+
+
+########
+# MENU #
+########
+
+8.1:Open file
+8.2:Save
+8.3:Save as...
+8.4:Close file
+8.5:Change EOL
+8.6:Quit
