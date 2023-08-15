@@ -134,32 +134,32 @@ and     ax, 0DFDFh                     ; sure it is always upper case
 ; ****************************************************************************
 
 ; DE [44h 45h]
-mov     di, TEXT_DE
+mov     bp, TEXT_DE
 cmp     ax, 4544h
 je      LANGOK
 
 ; FR [46h 52h]
-mov     di, TEXT_FR
+mov     bp, TEXT_FR
 cmp     ax, 5246h
 je      LANGOK
 
 ; NL [4Eh 4Ch]
-mov     di, TEXT_NL
+mov     bp, TEXT_NL
 cmp     ax, 4C4Eh
 je      LANGOK
 
 ; PL [50h 4Ch]
-mov     di, TEXT_PL
+mov     bp, TEXT_PL
 cmp     ax, 4C50h
 je      LANGOK
 
 ; RU [52h 55h]
-mov     di, TEXT_RU
+mov     bp, TEXT_RU
 cmp     ax, 5552h
 je      LANGOK
 
 ; TR [54h 52h]
-mov     di, TEXT_TR
+mov     bp, TEXT_TR
 cmp     ax, 5254h
 je      LANGOK
 
@@ -167,7 +167,7 @@ je      LANGOK
 ; *** LANG NOT FOUND OR LANG ID MATCH FAILED: FALL BACK TO EN ****************
 
 ENDOFENV:
-mov di, TEXT_EN
+mov     bp, TEXT_EN
 
 LANGOK:
 
@@ -179,11 +179,11 @@ LANGOK:
 ; * situations when stdin is redirected (eg. with CTTY)                      *
 ; ****************************************************************************
 
-; duplicate stdin and keep the new file handle in BP
+; duplicate stdin and keep the new file handle in FHANDLE
 xor     bx, bx
 mov     ah, 45h
 int     21h
-mov     bp, ax
+mov     [FHANDLE], ax
 
 ; I can close stdin now
 mov     ah, 3Eh
@@ -203,17 +203,23 @@ mov ah, 2h                             ; write character in DL to stdout
 mov dl, 0Dh                            ; carriage return
 int 21h
 
+; reset BX - from now on bh = cur row and bl = cur col
+xor     bx, bx
 
 ; consume stdin bytes by loading them into buffer
 RELOADBUF:
+xchg    di, bx                         ; save BX to DI (contains cur row+col)
 mov     ah, 3Fh                        ; DOS 2+ - read from file or device
-mov     bx, bp                         ; duplicated stdin is still in bp
+mov     bx, [FHANDLE]                  ; duplicated stdin was saved in FHANDLE
 mov     cx, 1024
 mov     dx, offset BUFFER
 int     21h
 
 ; abort on error
 jc EXIT
+
+; restore bx
+xchg    bx, di
 
 ; did I get any bytes? 0 bytes read means "EOF"
 test    ax, ax
@@ -245,51 +251,46 @@ je      OUTPUT_CHAR
 ; first column already. it does not blank the characters it passes over.
 cmp     al, 8h
 jne     NOTBS
-cmp     byte ptr [CURCOL], 0
-je      OUTPUT_CHAR
-dec     byte ptr [CURCOL]
+test    bl, bl                         ; am I on on column 0? (bl = cur col)
+jz      OUTPUT_CHAR
+dec     bl
 jmp     short OUTPUT_CHAR
 NOTBS:
 
 ; [9h] TAB?
 cmp     al, 9h
 jne     NOTTAB
-mov     ah, [CURCOL]
-add     ah, 7
-and     ah, 11111000b
-inc     ah
-mov     [CURCOL], ah
+add     bl, 8                          ; bl = cur col
+and     bl, 248
 jmp     short OUTPUT_CHAR
 NOTTAB:
 
 ; [0Ah] LF?
 cmp     al, 0Ah
 jne     NOTLF
-inc     byte ptr [CURROW]
+inc     bh                             ; bh = cur row
 jmp     short OUTPUT_CHAR
 NOTLF:
 
 ; [0Dh] CR?
 cmp     al, 0Dh
 jnz     NOTCR
-mov     byte ptr [CURCOL], 0
+xor     bl, bl                         ; bl = cur col
 jmp     short OUTPUT_CHAR
 NOTCR:
 
 ; otherwise: increment cur column, and then maybe cur row
-inc     byte ptr [CURCOL]
-mov     ah, [CURCOL]
-cmp     ah, [MAXCOL]
+inc     bl                             ; bl = cur col
+cmp     bl, [MAXCOL]
 jb      OUTPUT_CHAR
-inc     byte ptr [CURROW]
-mov     byte ptr [CURCOL], 0
+inc     bh                             ; bh = cur row
+xor     bl, bl                         ; bl = cur col
 
 OUTPUT_CHAR:
 mov     dl, al
 mov     ah, 2h
 int     21h
-mov     ah, [CURROW]
-cmp     ah, [MAXROW]
+cmp     bh, [MAXROW]                   ; bh = cur row
 jae     PRESSANYKEY
 
 CHARLOOP:
@@ -302,7 +303,7 @@ PRESSANYKEY:
 mov     ah, 9h                         ; disp $-termin. string pointed by DX
 mov     dx, offset SEPAR1
 int     21h
-mov     dx, di
+mov     dx, bp
 int     21h
 mov     dx, offset SEPAR2
 int     21h
@@ -320,8 +321,7 @@ GETKEY_DONE:
 mov     dx, offset CRLF
 mov     ah, 9h
 int     21h
-mov     byte ptr [CURCOL], 0
-mov     byte ptr [CURROW], 0
+xor     bx, bx                         ; bh = cur row, bl = cur col
 jmp     CHARLOOP
 
 
@@ -331,9 +331,6 @@ jmp     CHARLOOP
 
 MAXROW  db      24                     ; maximum *addressable* row (not total)
 MAXCOL  db      80                     ; total available columns
-CURROW  db      0
-CURCOL  db      0
-
 
 CRLF DB 13, 10, '$'
 LANG DB "LANG="
@@ -348,5 +345,8 @@ TEXT_PL DB "DALEJ$"
 TEXT_RU DB 84h,80h,8Bh,85h,85h,'$'     ; "DALEE" (CP 866)
 TEXT_TR DB "DAHA FAZLA$"
 
-; uninitialized buffer area (must be defined last)
+; uninitialized area (must be defined last)
+
+FHANDLE dw      ?                      ; file handle I read from (DUPed stdin)
+
 BUFFER:
