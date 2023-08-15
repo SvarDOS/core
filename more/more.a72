@@ -91,6 +91,12 @@ SKIP_ROWS_DETECTION:
 
 
 ; ****************************************************************************
+; * preset lang to EN                                                        *
+; ****************************************************************************
+mov     bp, LANGLIST+2
+
+
+; ****************************************************************************
 ; * Scan the environement block looking for the LANG variable                *
 ; ****************************************************************************
 
@@ -105,7 +111,7 @@ CMP_NEXT_VAR:
 ; if it points at a nul already then it's the end of the env block
 mov     al, [es:di]
 test    al, al
-jz      ENDOFENV
+jz      LANG_DONE
 
 mov     si, LANG
 mov     cx, 5
@@ -118,88 +124,43 @@ jcxz    FOUND_LANG
 xor     al, al
 mov     cx, 0ffffh
 repne   scasb                          ; compare AL with [ES:DI++]
-jmp     CMP_NEXT_VAR
+jmp     short CMP_NEXT_VAR
 
 ; FOUND THE LANG VARIABLE (at ES:DI)
 FOUND_LANG:
 
-mov     ax, [es:di]                    ; load the LANG ID to AX and make
-and     ax, 0DFDFh                     ; sure it is always upper case
+mov     bx, [es:di]                    ; load the LANG ID to BX and make
+and     bx, 0DFDFh                     ; sure it is always upper case
 
 
 ; ****************************************************************************
-; * Now I have a LANG ID in AX and I have to match it for something I know.  *
-; * The LANG ID is simply the value for the two uppercase LANG letters, for  *
-; * example the LANG ID for "PL" is 4C50h (50h = 'P', 4Ch = 'L').            *
+; * Now I have a LANG ID in BX and I have to match it for something I know.  *
 ; ****************************************************************************
 
-; DE [44h 45h]
-mov     bp, TEXT_DE
-cmp     ax, 4544h
-je      LANGOK
+mov     di, LANGLIST
+mov     ax, ds
+mov     es, ax
 
-; DK [44h 4Bh]
-mov     bp, TEXT_DK
-cmp     ax, 4B44h
-je      LANGOK
+NEXTLANG:
+cmp     byte ptr [di], 0               ; look for the end of list terminator
+je      LANG_DONE
+cmp     [di], bx                       ; look for a LANG ID match
+je      LANGIDOK
 
-; ES [45h 53h]
-mov     bp, TEXT_ES
-cmp     ax, 5345h
-je      LANGOK
+; skip string (look for its $ terminator) and repeat
+SKIPLANG:
+mov     al, '$'
+mov     cx, 0ffffh
+repne   scasb                          ; compare AL with [ES:DI++]
+jmp     short NEXTLANG
 
-; FI [46h 49h]
-mov     bp, TEXT_FI
-cmp     ax, 4946h
-je      LANGOK
-
-; FR [46h 52h]
-mov     bp, TEXT_FR
-cmp     ax, 5246h
-je      LANGOK
-
-; IT [49h 54h]
-mov     bp, TEXT_IT
-cmp     ax, 5449h
-je      LANGOK
-
-; NL [4Eh 4Ch]
-mov     bp, TEXT_NL
-cmp     ax, 4C4Eh
-je      LANGOK
-
-; PL [50h 4Ch]
-mov     bp, TEXT_PL
-cmp     ax, 4C50h
-je      LANGOK
-
-; RU [52h 55h]
-mov     bp, TEXT_RU
-cmp     ax, 5552h
-je      LANGOK
-
-; SL [53h 4Ch]
-mov     bp, TEXT_SL
-cmp     ax, 4C53h
-je      LANGOK
-
-; SV [53h 56h]
-mov     bp, TEXT_SV
-cmp     ax, 5653h
-je      LANGOK
-
-; TR [54h 52h]
-mov     bp, TEXT_TR
-cmp     ax, 5254h
-je      LANGOK
+LANGIDOK:
+mov     bp, di                         ; ptr to localized msg is always in BP
+inc     bp
+inc     bp
 
 
-; *** LANG NOT FOUND OR LANG ID MATCH FAILED: FALL BACK TO EN ****************
-
-ENDOFENV:
-mov     bp, TEXT_EN
-
-LANGOK:
+LANG_DONE:
 
 
 ; ****************************************************************************
@@ -367,19 +328,21 @@ LANG DB "LANG="
 SEPAR1 DB "--- $"
 SEPAR2 DB " ---$"
 
-TEXT_DE DB "WEITER$"
-TEXT_DK DB "MERE$"
-TEXT_ES DB "M", 0B5h, "S$"              ; "MAS" with an A-acute (CP 850)
-TEXT_EN DB "MORE$"
-TEXT_FI DB "LIS", 8Eh, 8Eh, "$"         ; "LISAA" - AA with diaeresis (CP 850)
-TEXT_FR DB "PLUS$"
-TEXT_IT DB "PI", 0EBh, "$"              ; "PIU" with U-acute (CP 850)
-TEXT_NL DB "MEER$"
-TEXT_PL DB "DALEJ$"
-TEXT_RU DB 84h,80h,8Bh,85h,85h,'$'     ; "DALEE" (CP 866)
-TEXT_SL DB "VE", 0ACh, "$"             ; "VEC" with C-caron (CP 852)
-TEXT_SV DB "MERA$"
-TEXT_TR DB "DAHA FAZLA$"
+LANGLIST:
+DB "EN",  "MORE$"                      ; EN must be 1st to be used as default
+DB "DE",  "WEITER$"
+DB "DK",  "MERE$"
+DB "ES",  "M", 0B5h, "S$"              ; "MAS" with an A-acute (CP 850)
+DB "FI",  "LIS", 8Eh, 8Eh, "$"         ; "LISAA" - AA with diaeresis (CP 850)
+DB "FR",  "PLUS$"
+DB "IT",  "PI", 0EBh, "$"              ; "PIU" with U-acute (CP 850)
+DB "NL",  "MEER$"
+DB "PL",  "DALEJ$"
+DB "RU",  84h,80h,8Bh,85h,85h,'$'      ; "DALEE" (CP 866)
+DB "SL",  "VE", 0ACh, "$"              ; "VEC" with C-caron (CP 852)
+DB "SV",  "MERA$"
+DB "TR",  "DAHA FAZLA$"
+DB, 0                                  ; LANGLIST terminator
 
 ; uninitialized area (must be defined last)
 
