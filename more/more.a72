@@ -336,6 +336,7 @@ DB "DK",  "MERE$"
 DB "ES",  "M", 0B5h, "S$"              ; "MAS" with an A-acute (CP 850)
 DB "FI",  "LIS", 8Eh, 8Eh, "$"         ; "LISAA" - AA with diaeresis (CP 850)
 DB "FR",  "PLUS$"
+DB "HU",  "T", 99h, "BB$"              ; TOBB with O-diaeresis (CP 852)
 DB "IT",  "PI", 0EBh, "$"              ; "PIU" with U-acute (CP 850)
 DB "LV",  "T", 0A0h, "L", 0A0h, "K$"   ; "TALAK" with A-makron (CP 775)
 DB "NL",  "MEER$"
