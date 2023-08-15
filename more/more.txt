@@ -1,0 +1,43 @@
+
+                                 SvarDOS MORE
+
+SvarDOS MORE is a filter that displays output one screen at a time. It is part
+of the SvarDOS project <http://svardos.org>, and as such it shares SvarDOS'
+principles of minimalism, compactness and bare-bones functionality. It is:
+
+ - multilingual (looks up the LANG env variable)
+ - tiny (fits within a single disk sector)
+
+Usage:
+
+  MORE < FILE.TXT
+  TYPE FILE.TXT | MORE
+
+SvarDOS MORE is hand crafted in x86 assembly and built using the excellent
+A72 assembler by Mr R. Swan <https://github.com/swanlizard/a72>.
+
+
+### Distributed under the terms of the MIT LICENSE ###########################
+
+Copyright (C) 2023 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
+
+
+###################################################################### EOF ###
