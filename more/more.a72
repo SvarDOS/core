@@ -1,0 +1,342 @@
+;
+; MORE ver 2023.0
+;
+; Displays output one screen at a time
+;
+;  - multilingual (looks up the LANG env variable)
+;  - tiny (fits in a single disk sector)
+;
+; This program is part of the SvarDOS project
+; http://svardos.org
+;
+; *** Distributed under the terms of the MIT LICENSE *************************
+;
+; Copyright (C) 2023 Mateusz Viste
+;
+; Permission is hereby granted, free of charge, to any person obtaining a copy
+; of this software and associated documentation files (the "Software"), to
+; deal in the Software without restriction, including without limitation the
+; rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+; sell copies of the Software, and to permit persons to whom the Software is
+; furnished to do so, subject to the following conditions:
+;
+; The above copyright notice and this permission notice shall be included in
+; all copies or substantial portions of the Software.
+;
+; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+; IN THE SOFTWARE.
+; ****************************************************************************
+;
+; To be compiled with the A72 assembler:
+; A72 MORE.ASM MORE.COM
+;
+
+
+; COM file always has a 100h origin
+ORG     100h
+
+
+; ****************************************************************************
+; * Display a short help screen if any (non-empty) argument is provided.     *
+; *                                                                          *
+; * detect presence of arguments in the command's tail (PSP 81h), looking    *
+; * at the first non-space character. If it's a CR then no argument (CR is   *
+; * the tail's terminator).                                                  *
+; ****************************************************************************
+mov     ax, ds
+mov     es, ax
+mov     al, ' '
+mov     cx, 0ffh
+mov     di, 81h
+repe    scasb                          ; compare AL with [ES:DI++]
+mov     al, [di-1]
+
+cmp     al, 0Dh
+je      NO_ARGS
+
+; some arg found: display help and quit
+mov     ah, 9h
+mov     dx, offset HELP
+int     21h
+int     20h
+
+HELP db "MORE 2023.0", 13, 10
+     db 10
+     db "MORE < README.TXT", 13, 10
+     db "DIR | MORE", 13, 10, '$'
+
+NO_ARGS:
+
+
+; ****************************************************************************
+; * detect screen dimensions (max usable row and column)                     *
+; ****************************************************************************
+mov     ah, 0Fh                        ; GET CURRENT VIDEO MODE
+int     10h
+mov     byte ptr [MAXCOL], ah
+mov     ax, 40h
+mov     es, ax
+mov     ah, [es:84h]                   ; 0040:0084
+test    ah, ah                         ; ancient PCes do not know this
+jz      SKIP_ROWS_DETECTION
+mov     byte ptr [MAXROW], ah
+
+SKIP_ROWS_DETECTION:
+
+
+; ****************************************************************************
+; * Scan the environement block looking for the LANG variable                *
+; ****************************************************************************
+
+; set ES to point at the environment segment (PSP's offset 2Ch)
+mov     es, [2Ch]
+
+; compare DS:[SI] with ES:[DI], up to 5 bytes ("LANG=")
+cld
+mov     di, 0
+CMP_NEXT_VAR:
+
+; if it points at a nul already then it's the end of the env block
+mov     al, [es:di]
+test    al, al
+jz      ENDOFENV
+
+mov     si, LANG
+mov     cx, 5
+repe    cmpsb
+
+; if CX == 0 then found a LANG= match
+jcxz    FOUND_LANG
+
+; otherwise jump to next var (look for nearest nul terminator)
+xor     al, al
+mov     cx, 0ffffh
+repne   scasb                          ; compare AL with [ES:DI++]
+jmp     CMP_NEXT_VAR
+
+; FOUND THE LANG VARIABLE (at ES:DI)
+FOUND_LANG:
+
+mov     ax, [es:di]                    ; load the LANG ID to AX and make
+and     ax, 0DFDFh                     ; sure it is always upper case
+
+
+; ****************************************************************************
+; * Now I have a LANG ID in AX and I have to match it for something I know.  *
+; * The LANG ID is simply the value for the two uppercase LANG letters, for  *
+; * example the LANG ID for "PL" is 4C50h (50h = 'P', 4Ch = 'L').            *
+; ****************************************************************************
+
+; DE [44h 45h]
+mov     di, TEXT_DE
+cmp     ax, 4544h
+je      LANGOK
+
+; FR [46h 52h]
+mov     di, TEXT_FR
+cmp     ax, 5246h
+je      LANGOK
+
+; NL [4Eh 4Ch]
+mov     di, TEXT_NL
+cmp     ax, 4C4Eh
+je      LANGOK
+
+; PL [50h 4Ch]
+mov     di, TEXT_PL
+cmp     ax, 4C50h
+je      LANGOK
+
+; RU [52h 55h]
+mov     di, TEXT_RU
+cmp     ax, 5552h
+je      LANGOK
+
+; TR [54h 52h]
+mov     di, TEXT_TR
+cmp     ax, 5254h
+je      LANGOK
+
+
+; *** LANG NOT FOUND OR LANG ID MATCH FAILED: FALL BACK TO EN ****************
+
+ENDOFENV:
+mov di, TEXT_EN
+
+LANGOK:
+
+
+; ****************************************************************************
+; * DUPLICATING HANDLES: here I duplicate stdin into a new handle so I can   *
+; * safely close original stdin (file handle 0) and then duplicate stderr    *
+; * into stdin. The purpose of these shenanigans is to be able to cope with  *
+; * situations when stdin is redirected (eg. with CTTY)                      *
+; ****************************************************************************
+
+; duplicate stdin and keep the new file handle in BP
+xor     bx, bx
+mov     ah, 45h
+int     21h
+mov     bp, ax
+
+; I can close stdin now
+mov     ah, 3Eh
+int     21h
+
+; duplicate stderr to stdin
+; bx = file handle / cx = file handle to become duplicate of bx
+mov     ah, 46h
+mov     bx, 2
+xor     cx, cx
+int     21h
+; ****************************************************************************
+
+
+; make sure cursor is on column 0
+mov ah, 2h                             ; write character in DL to stdout
+mov dl, 0Dh                            ; carriage return
+int 21h
+
+
+; consume stdin bytes by loading them into buffer
+RELOADBUF:
+mov     ah, 3Fh                        ; DOS 2+ - read from file or device
+mov     bx, bp                         ; duplicated stdin is still in bp
+mov     cx, 1024
+mov     dx, offset BUFFER
+int     21h
+
+; abort on error
+jc EXIT
+
+; did I get any bytes? 0 bytes read means "EOF"
+test    ax, ax
+jnz     PREPLOOP
+
+EXIT:
+int     20h
+
+; prepare the LODSB loop
+PREPLOOP:
+mov     cx, ax
+mov     si, dx
+
+NEXTCHAR:
+
+; AL = DS:[SI++]
+cld
+lodsb
+
+; EOF char? (check this first so a short jump to exit is still possible)
+cmp     al, 1Ah
+jz      EXIT
+
+; [7h] BELL?
+cmp     al, 7h
+je      OUTPUT_CHAR
+
+; [8h] BACKSPACE? moves the cursor back by one column, no effect if it is on
+; first column already. it does not blank the characters it passes over.
+cmp     al, 8h
+jne     NOTBS
+cmp     byte ptr [CURCOL], 0
+je      OUTPUT_CHAR
+dec     byte ptr [CURCOL]
+jmp     short OUTPUT_CHAR
+NOTBS:
+
+; [9h] TAB?
+cmp     al, 9h
+jne     NOTTAB
+mov     ah, [CURCOL]
+add     ah, 7
+and     ah, 11111000b
+inc     ah
+mov     [CURCOL], ah
+jmp     short OUTPUT_CHAR
+NOTTAB:
+
+; [0Ah] LF?
+cmp     al, 0Ah
+jne     NOTLF
+inc     byte ptr [CURROW]
+jmp     short OUTPUT_CHAR
+NOTLF:
+
+; [0Dh] CR?
+cmp     al, 0Dh
+jnz     NOTCR
+mov     byte ptr [CURCOL], 0
+jmp     short OUTPUT_CHAR
+NOTCR:
+
+; otherwise: increment cur column, and then maybe cur row
+inc     byte ptr [CURCOL]
+mov     ah, [CURCOL]
+cmp     ah, [MAXCOL]
+jb      OUTPUT_CHAR
+inc     byte ptr [CURROW]
+mov     byte ptr [CURCOL], 0
+
+OUTPUT_CHAR:
+mov     dl, al
+mov     ah, 2h
+int     21h
+mov     ah, [CURROW]
+cmp     ah, [MAXROW]
+jae     PRESSANYKEY
+
+CHARLOOP:
+loop    NEXTCHAR                       ; dec cx and jmp to NEXTCHAR if cx > 0
+jmp     RELOADBUF
+
+
+; display "Press any key..."
+PRESSANYKEY:
+mov     dx, di
+mov     ah, 9h                         ; disp $-termin. string pointed by DX
+int     21h
+mov     dx, DOTS
+int     21h
+
+mov     ax, 0C08h                      ; flush keyb + wait for key, no echo
+int     21h
+
+; output a CR/LF pair and reset counters
+mov     dx, offset CRLF
+mov     ah, 9h
+int     21h
+mov     byte ptr [CURCOL], 0
+mov     byte ptr [CURROW], 0
+jmp     CHARLOOP
+
+
+; ****************************************************************************
+; * DATA                                                                     *
+; ****************************************************************************
+
+MAXROW  db      24                     ; maximum *addressable* row (not total)
+MAXCOL  db      80                     ; total available columns
+CURROW  db      0
+CURCOL  db      0
+
+
+CRLF DB 13, 10, '$'
+LANG DB "LANG="
+DOTS DB "...$"
+
+TEXT_DE DB "WEITER$"
+TEXT_EN DB "MORE$"
+TEXT_FR DB "PLUS$"
+TEXT_NL DB "MEER$"
+TEXT_PL DB "DALEJ$"
+TEXT_RU DB 84h,80h,8Bh,85h,85h,'$'     ; "DALEE" (CP866)
+TEXT_TR DB "DAHA FAZLA$"
+
+; uninitialized buffer area (must be defined last)
+BUFFER:
