@@ -307,8 +307,14 @@ int     21h
 mov     dx, offset SEPAR2
 int     21h
 
-mov     ax, 0C08h                      ; flush keyb + wait for key, no echo
+; wait for a keypress
+mov     ah, 08h                        ; read char from stdin, no echo
 int     21h
+; read again if an extended key was pressed
+test    al, al
+jnz     GETKEY_DONE
+int     21h
+GETKEY_DONE:
 
 ; output a CR/LF pair and reset counters
 mov     dx, offset CRLF
