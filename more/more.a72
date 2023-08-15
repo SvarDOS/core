@@ -138,9 +138,29 @@ mov     bp, TEXT_DE
 cmp     ax, 4544h
 je      LANGOK
 
+; DK [44h 4Bh]
+mov     bp, TEXT_DK
+cmp     ax, 4B44h
+je      LANGOK
+
+; ES [45h 53h]
+mov     bp, TEXT_ES
+cmp     ax, 5345h
+je      LANGOK
+
+; FI [46h 49h]
+mov     bp, TEXT_FI
+cmp     ax, 4946h
+je      LANGOK
+
 ; FR [46h 52h]
 mov     bp, TEXT_FR
 cmp     ax, 5246h
+je      LANGOK
+
+; IT [49h 54h]
+mov     bp, TEXT_IT
+cmp     ax, 5449h
 je      LANGOK
 
 ; NL [4Eh 4Ch]
@@ -156,6 +176,16 @@ je      LANGOK
 ; RU [52h 55h]
 mov     bp, TEXT_RU
 cmp     ax, 5552h
+je      LANGOK
+
+; SL [53h 4Ch]
+mov     bp, TEXT_SL
+cmp     ax, 4C53h
+je      LANGOK
+
+; SV [53h 56h]
+mov     bp, TEXT_SV
+cmp     ax, 5653h
 je      LANGOK
 
 ; TR [54h 52h]
@@ -338,11 +368,17 @@ SEPAR1 DB "--- $"
 SEPAR2 DB " ---$"
 
 TEXT_DE DB "WEITER$"
+TEXT_DK DB "MERE$"
+TEXT_ES DB "M", 0B5h, "S$"              ; "MAS" with an A-acute (CP 850)
 TEXT_EN DB "MORE$"
+TEXT_FI DB "LIS", 8Eh, 8Eh, "$"         ; "LISAA" - AA with diaeresis (CP 850)
 TEXT_FR DB "PLUS$"
+TEXT_IT DB "PI", 0EBh, "$"              ; "PIU" with U-acute (CP 850)
 TEXT_NL DB "MEER$"
 TEXT_PL DB "DALEJ$"
 TEXT_RU DB 84h,80h,8Bh,85h,85h,'$'     ; "DALEE" (CP 866)
+TEXT_SL DB "VE", 0ACh, "$"             ; "VEC" with C-caron (CP 852)
+TEXT_SV DB "MERA$"
 TEXT_TR DB "DAHA FAZLA$"
 
 ; uninitialized area (must be defined last)
