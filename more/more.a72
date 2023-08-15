@@ -297,12 +297,14 @@ loop    NEXTCHAR                       ; dec cx and jmp to NEXTCHAR if cx > 0
 jmp     RELOADBUF
 
 
-; display " --- More --- "
+; display " --- More ---"
 PRESSANYKEY:
-mov     dx, di
 mov     ah, 9h                         ; disp $-termin. string pointed by DX
+mov     dx, offset SEPAR1
 int     21h
-mov     dx, DOTS
+mov     dx, di
+int     21h
+mov     dx, offset SEPAR2
 int     21h
 
 mov     ax, 0C08h                      ; flush keyb + wait for key, no echo
@@ -329,7 +331,8 @@ CURCOL  db      0
 
 CRLF DB 13, 10, '$'
 LANG DB "LANG="
-DOTS DB "...$"
+SEPAR1 DB "--- $"
+SEPAR2 DB " ---$"
 
 TEXT_DE DB "WEITER$"
 TEXT_EN DB "MORE$"
