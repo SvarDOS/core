@@ -122,7 +122,7 @@ jcxz    FOUND_LANG
 
 ; otherwise jump to next var (look for nearest nul terminator)
 xor     al, al
-mov     cx, 0ffffh
+mov     ch, 0ffh
 repne   scasb                          ; compare AL with [ES:DI++]
 jmp     short CMP_NEXT_VAR
 
@@ -150,7 +150,7 @@ je      LANGIDOK
 ; skip string (look for its $ terminator) and repeat
 SKIPLANG:
 mov     al, '$'
-mov     cx, 0ffffh
+mov     ch, 0ffh
 repne   scasb                          ; compare AL with [ES:DI++]
 jmp     short NEXTLANG
 
