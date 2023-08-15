@@ -1,15 +1,16 @@
 ;
-; MORE ver 2023.0
+; SvarDOS MORE
 ;
 ; Displays output one screen at a time
 ;
 ;  - multilingual (looks up the LANG env variable)
 ;  - tiny (fits in a single disk sector)
 ;
-; This program is part of the SvarDOS project
-; http://svardos.org
+; This program is part of the SvarDOS project <http://svardos.org>
 ;
+; ****************************************************************************
 ; *** Distributed under the terms of the MIT LICENSE *************************
+; ****************************************************************************
 ;
 ; Copyright (C) 2023 Mateusz Viste
 ;
@@ -65,10 +66,10 @@ mov     dx, offset HELP
 int     21h
 int     20h
 
-HELP db "MORE 2023.0", 13, 10
+HELP db "SvarDOS MORE 2023.0", 13, 10
      db 10
      db "MORE < README.TXT", 13, 10
-     db "DIR | MORE", 13, 10, '$'
+     db "TYPE README.TXT | MORE", 13, 10, '$'
 
 NO_ARGS:
 
@@ -296,7 +297,7 @@ loop    NEXTCHAR                       ; dec cx and jmp to NEXTCHAR if cx > 0
 jmp     RELOADBUF
 
 
-; display "Press any key..."
+; display " --- More --- "
 PRESSANYKEY:
 mov     dx, di
 mov     ah, 9h                         ; disp $-termin. string pointed by DX
@@ -335,7 +336,7 @@ TEXT_EN DB "MORE$"
 TEXT_FR DB "PLUS$"
 TEXT_NL DB "MEER$"
 TEXT_PL DB "DALEJ$"
-TEXT_RU DB 84h,80h,8Bh,85h,85h,'$'     ; "DALEE" (CP866)
+TEXT_RU DB 84h,80h,8Bh,85h,85h,'$'     ; "DALEE" (CP 866)
 TEXT_TR DB "DAHA FAZLA$"
 
 ; uninitialized buffer area (must be defined last)
