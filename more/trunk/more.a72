@@ -289,7 +289,7 @@ loop    NEXTCHAR                       ; dec cx and jmp to NEXTCHAR if cx > 0
 jmp     RELOADBUF
 
 
-; display " --- More ---"
+; display "--- More ---"
 PRESSANYKEY:
 mov     ah, 9h                         ; disp $-termin. string pointed by DX
 mov     dx, offset SEPAR1
