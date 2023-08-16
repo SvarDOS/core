@@ -172,7 +172,7 @@ unzip -CLj "$REPOROOTCORE/format.svp" bin/format.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/mem.svp" bin/mem.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/mode.svp" bin/mode.com -d "$FLOPROOT/"
-unzip -CLj "$REPOROOTCORE/more.svp" bin/more.exe -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/more.svp" bin/more.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/sved.svp" bin/sved.com -d "$FLOPROOT/"
 
