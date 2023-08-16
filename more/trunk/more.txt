@@ -5,8 +5,8 @@ SvarDOS MORE is a filter that displays output one screen at a time. It is part
 of the SvarDOS project <http://svardos.org>, and as such it shares SvarDOS'
 principles of minimalism, compactness and bare-bones functionality. It is:
 
- - multilingual (via the LANG variable, eg. "SET LANG=PL" switches to Polish)
- - tiny (fits within a single disk sector)
+ - multilingual (use the LANG variable, eg. "SET LANG=PL" switches to Polish)
+ - TINY! (fits within a single disk sector)
 
 Usage:
 

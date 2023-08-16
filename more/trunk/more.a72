@@ -4,7 +4,7 @@
 ; Displays output one screen at a time
 ;
 ;  - multilingual (looks up the LANG env variable)
-;  - tiny (fits in a single disk sector)
+;  - TINY! (fits in a single disk sector)
 ;
 ; This program is part of the SvarDOS project <http://svardos.org>
 ;
