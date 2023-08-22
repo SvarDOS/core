@@ -40,7 +40,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20230823-devel"
+#define PVER "20230823"
 #define PDATE "2021-2023"
 
 #define HOSTADDR "svardos.org"
