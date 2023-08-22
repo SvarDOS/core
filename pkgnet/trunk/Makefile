@@ -10,16 +10,14 @@ all: pkgnet.exe
 release: pkgnet.exe .symbolic
 	mkdir bin
 	mkdir appinfo
-	mkdir nls
 	upx --8086 -9 pkgnet.exe
 	copy pkgnet.exe bin
+	copy pkgnet.lng bin
 	copy pkgnet.lsm appinfo
-	copy pkgnet.lng nls
 	if exist pkgnet.svp del pkgnet.svp
-	zip -9krDX -m pkgnet.svp bin appinfo nls
+	zip -9krDX -m pkgnet.svp bin appinfo
 	rmdir bin
 	rmdir appinfo
-	rmdir nls
 	if exist pkgnet.zip del pkgnet.zip
 	zip -9krDX pkgnet.zip Makefile *.c *.h nls_utf8 pkgnet.lsm watt32 svarlang.lib
 
