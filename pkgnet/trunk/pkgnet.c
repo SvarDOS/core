@@ -397,6 +397,9 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
   ALLGOOD:
   if (fd != NULL) fclose(fd);
   net_close(sock);
+
+  net_shut();
+
   return(flen);
 }
 
@@ -424,7 +427,6 @@ int main(int argc, char **argv) {
   } *mem;
 
 
-  puts("SvarLANG autoload...");
   svarlang_autoload_exepath(argv[0], getenv("LANG"));
 
   /* look for PKGNETBUFSZ env var to size up the buffer (default=5000 bytes) */

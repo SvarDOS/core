@@ -1,6 +1,6 @@
 /*
  * This file is part of the pkgnet package - the SvarDOS package manager.
- * Copyright (C) Mateusz Viste 2013-2022
+ * Copyright (C) Mateusz Viste 2013-2023
  *
  * Provides all network functions used by pkgnet, wrapped around the
  * Watt-32 TCP/IP stack.
@@ -123,6 +123,11 @@ void net_close(struct net_tcpsocket *socket) {
    * forget about the connection (esp. if the peer is misbehaving) */
   sock_abort(&(socket->sock));
   free(socket);
+}
+
+
+void net_shut(void) {
+  sock_exit();
 }
 
 

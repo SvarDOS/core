@@ -1,6 +1,6 @@
 /*
  * This file is part of the pkgnet package - the SvarDOS package manager.
- * Copyright (C) Mateusz Viste 2013-2022
+ * Copyright (C) Mateusz Viste 2013-2023
  */
 
 
@@ -38,6 +38,9 @@ int net_recv(struct net_tcpsocket *socket, void *buff, long maxlen);
 
 /* Close the 'sock' socket. */
 void net_close(struct net_tcpsocket *socket);
+
+/* network subsystem deinitialization */
+void net_shut(void);
 
 /* Returns an info string about the networking engine being used */
 const char *net_engine(void);
