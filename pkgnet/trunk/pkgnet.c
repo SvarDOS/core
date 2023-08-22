@@ -40,7 +40,7 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20230208"
+#define PVER "20230823-devel"
 #define PDATE "2021-2023"
 
 #define HOSTADDR "svardos.org"
@@ -423,7 +423,9 @@ int main(int argc, char **argv) {
     char outfname[16];
   } *mem;
 
-  svarlang_autoload("PKGNET");
+
+  puts("SvarLANG autoload...");
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));
 
   /* look for PKGNETBUFSZ env var to size up the buffer (default=5000 bytes) */
   {
