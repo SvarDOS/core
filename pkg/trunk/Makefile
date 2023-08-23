@@ -4,7 +4,7 @@
 #
 
 CFLAGS = -0 -mc -os -wx -we -d0 -i=zlib
-LDFLAGS = -lr -fe=pkg.exe
+LDFLAGS = -lr -fe=pkg.exe -fm=pkg.map
 LIBS = zlib\zlib_c.lib svarlang.lib\svarlngc.lib
 
 all: pkg.exe
