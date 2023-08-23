@@ -165,7 +165,7 @@ if (($a === 'pull') || ($a === 'pullsrc')) {
         echo get_msg('PKG_NO_SRC', $lang) . "\r\n";
       }
     } else {
-      header('Content-Disposition: attachment; filename="' . $fname);
+      header('Content-Disposition: attachment; filename="' . $p . '.svp');
       header('Content-Type: application/octet-stream');
       readfile($fname);
     }
