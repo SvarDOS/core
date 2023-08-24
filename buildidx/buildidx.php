@@ -451,6 +451,7 @@ foreach ($pkgdb as $pkg => $versions) {
 
     $meta2['ver'] = strval($ver);
     $meta2['bsum'] = $bsum;
+    if (!empty($meta['hwreq'])) $meta2['hwreq'] = strtolower($meta['hwreq']);
 
     if (empty($db[$pkg]['desc'])) $db[$pkg]['desc'] = $desc;
     if (empty($db[$pkg]['cats'])) {
