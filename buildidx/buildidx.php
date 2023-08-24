@@ -421,6 +421,7 @@ foreach ($pkgfiles as $fname) {
   // do I understand the version string?
   if (vertoarr($lsmarray['version']) === false) echo "WARNING: {$fname} parsing of version string failed ('{$lsmarray['version']}')\n";
 
+  $meta = array();
   $meta['fname'] = $fname;
   $meta['desc'] = $lsmarray['description'];
   $meta['cats'] = array_unique($catlist);
@@ -449,6 +450,7 @@ foreach ($pkgdb as $pkg => $versions) {
 
     $bsum = file2bsum(realpath($repodir . '/' . $fname));
 
+    $meta2 = array();
     $meta2['ver'] = strval($ver);
     $meta2['bsum'] = $bsum;
     if (!empty($meta['hwreq'])) $meta2['hwreq'] = strtolower($meta['hwreq']);
