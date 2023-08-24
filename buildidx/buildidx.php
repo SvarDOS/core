@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  24 aug 2023: load hwreq data from LSM and store them in the json index + skip the '.svn' dir
   30 jun 2023: adapted for new CORE packages location (../packages-core)
   28 feb 2022: svarcom allowed to have a COMMAND.COM file without subdirectory
   24 feb 2022: added hardcoded hack to translate version 'x.xx' to '0.44' (NESticle)
@@ -37,7 +38,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20230630";
+$PVER = "20230824";
 
 
 // computes the BSD sum of a file and returns it
@@ -306,11 +307,14 @@ foreach ($pkgfiles as $fname) {
     continue;
   }
 
+  // silently skip the hidden .svn directory
+  if ($fname === '.svn') continue;
+
   // skip (and warn about) non-svp
   if (!preg_match('/\.svp$/', $fname)) {
     $okfiles = array('.', '..', '_cats.json', '_index.json', '_buildidx.log');
     if (array_search($fname, $okfiles) !== false) continue;
-    echo "WARNING: wild file '{$fname} (this is either an useless file that should be removed, or a misnamed package or source archive)'\n";
+    echo "WARNING: wild file '{$fname}' (this is either an useless file that should be removed, or a misnamed package or source archive)'\n";
     continue;
   }
 
@@ -420,6 +424,7 @@ foreach ($pkgfiles as $fname) {
   $meta['fname'] = $fname;
   $meta['desc'] = $lsmarray['description'];
   $meta['cats'] = array_unique($catlist);
+  if (!empty($lsmarray['hwreq'])) $meta['hwreq'] = $lsmarray['hwreq'];
 
   $pkgdb[$pkgnam][$lsmarray['version']] = $meta;
 }
