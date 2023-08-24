@@ -35,6 +35,62 @@
 
 <?php
 
+// hw filter?
+$hw = array();
+if (!empty($_GET['hw'])) {
+  $hw = explode(' ', strtolower($_GET['hw']));
+  foreach ($hw as $h) {
+
+    // add all supported CPUs
+    if ($h == '586') {
+      $hw[] = '8086';
+      $hw[] = '186';
+      $hw[] = '286';
+      $hw[] = '386';
+      $hw[] = '486';
+    }
+    if ($h == '486') {
+      $hw[] = '8086';
+      $hw[] = '186';
+      $hw[] = '286';
+      $hw[] = '386';
+    }
+    if ($h == '386') {
+      $hw[] = '8086';
+      $hw[] = '186';
+      $hw[] = '286';
+    }
+    if ($h == '286') {
+      $hw[] = '8086';
+      $hw[] = '186';
+    }
+    if ($h == '186') {
+      $hw[] = '8086';
+    }
+
+    // add all supported graphic
+    if ($h == 'svga') {
+      $hw[] = 'vga';
+      $hw[] = 'ega';
+      $hw[] = 'cga';
+      $hw[] = 'mda';
+    }
+    if ($h == 'vga') {
+      $hw[] = 'ega';
+      $hw[] = 'cga';
+      $hw[] = 'mda';
+    }
+    if ($h == 'ega') {
+      $hw[] = 'cga';
+      $hw[] = 'mda';
+    }
+    if ($h == 'cga') {
+      $hw[] = 'mda';
+    }
+
+  }
+}
+
 $db = json_decode(file_get_contents('../packages/_index.json'), true);
 
 echo "<table style=\"width: 100%;\">\n";
@@ -46,11 +102,22 @@ foreach ($db as $pkg => $meta) {
   if ((!empty($catfilter)) && (array_search($catfilter, $meta['cats']) === false)) continue;
 
   $desc = $meta['desc'];
+  check_next_ver:
   $pref = array_shift($meta['versions']); // get first version (that's the preferred one)
+  if (empty($pref)) continue; // no more versions
+  $hwhint = '';
+  if (!empty($pref['hwreq'])) {
+    /* if hw filter present, make sure it fullfills package's requirements */
+    foreach (explode(' ', $pref['hwreq']) as $req) {
+      if (array_search($req, $hw, true) === false) goto check_next_ver;
+    }
+
+    $hwhint = ' title="' . htmlspecialchars(strtoupper($pref['hwreq'])) . '"';
+  }
   $ver = $pref['ver'];
   $bsum = $pref['bsum'];
 
-  echo "<tr><td><a href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a></td><td>{$ver}</td><td>{$desc}</td></tr>\n";
+  echo "<tr><td><a{$hwhint} href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a></td><td>{$ver}</td><td>{$desc}</td></tr>\n";
 }
 echo "</table>\n";
 
