@@ -1,11 +1,7 @@
 
                             %h*** SVARDOS HELP ***
 
-This help documentation is a work-in-progress thing. For the time being it
-provides only very limited content. (wanna help building it? get in touch with
-us on the SvarDOS %lcontact.ama:mailing list%t!)
-
-=== Chapters =================================================================
+ * %lcommands.ama:List of commands
 
  * %lnls.ama:Internationalization and NLS overview
  * %lpkg.ama:Packages management (install/remove/update software)
@@ -20,5 +16,3 @@ us on the SvarDOS %lcontact.ama:mailing list%t!)
  * %lmeaning.ama:What does "Svarog" mean?
  * %l8086.ama:8086 compatibility list
  * %llicense.ama:SvarDOS license
-
-==============================================================================

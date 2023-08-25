@@ -1,0 +1,45 @@
+
+  +------------------------------------------------------------------------+
+  | For a detailed help on any given command, either run the command with  |
+  | the /? argument or consult the documentation in %%DOSDIR%%\DOC\.         |
+  +------------------------------------------------------------------------+
+
+
+%hInternal (SvarCOM) commands
+
+NOT YET DOCUMENTED (WRITE ME!)
+
+
+%hExternal commands
+
+AMB      AMB reader (used by HELP)
+ATTRIB   display and set file attributes
+CHKDSK   check FAT FS for errors
+CHOICE   present a choice to the user and wait for a key press
+COMMAND  .
+DEBUG    program testing and editing tool
+DELTREE  delete files and directories with all included files and subdirs
+DISKCOPY copy one disk or image file to another
+DISPLAY  driver for codepage management (screen or printer)
+DOSFSCK  checks the consistency of DOS file systems and optionally repear them
+FC       file compare utility
+FDAPM    APM/ACPI energy saving TSR
+FDISK    fixed disk partition tool
+FIND     display all lines in one or more files that contain a given string
+FORMAT   disk formatting program, creates FAT file systems
+HELP     SvarDOS help
+HIMEMX   XMS memory manager
+KEYB     keyboard driver for international support
+LABEL    sets or changesthe disk volume label
+LOCALCFG locales preferences configuration tool
+MEM      display used and free RAM
+MODE     .
+MORE     display output one screen at a time
+MOVE     move files from here to there
+PKG      installs, removes and updates packages
+PKGNET   pulls packages from the online SvarDOS repository
+SHSUCDX  .
+SORT     .
+SVED     system text editor
+SYS      .
+TREE     display the folder structure of a drive or path
