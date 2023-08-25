@@ -12,12 +12,62 @@
 
   $catfilter = '';
   if (!empty($_GET['cat'])) $catfilter = strtolower($_GET['cat']);
+
+  // hw filter?
+  $hw = array();
+  if (!empty($_GET['hwcpu'])) $hw[] = strtolower($_GET['hwcpu']);
+  if (!empty($_GET['hwvid'])) $hw[] = strtolower($_GET['hwvid']);
+  if ((!empty($_GET['fpu'])) && ($_GET['fpu'] == 'yes')) $hw[] = 'fpu';
+
 ?>
 
 <form action="?" method="get">
 <br>
-<p>Category filter:&nbsp;
+<p>Filters:<br>
 <input type="hidden" name="p" value="repo">
+
+Target hardware:
+
+<select name="hwcpu">
+
+<?php
+  // build form with list of CPUs + preselect the current CPU (if any)
+  $cpus = array('586', '486', '186', '8086');
+  foreach ($cpus as $cpu) {
+    $sel = '';
+    if (array_search($cpu, $hw) !== false) $sel = ' selected';
+    echo "<option{$sel}>{$cpu}</option>\n";
+  }
+?>
+</select>
+
+<select name="hwfpu">
+<?php
+if (empty($_GET['hwfpu'])) {
+  echo "<option selected value=\"\">no FPU</option>\n";
+  echo "<option>FPU</option>\n";
+} else {
+  echo "<option value=\"\">no FPU</option>\n";
+  echo "<option selected>FPU</option>\n";
+}
+?>
+</select>
+
+<select name="hwvid">
+<?php
+  // build form with list of CPUs + preselect the current CPU (if any)
+  $vids = array('SVGA', 'VGA', 'MCGA', 'EGA', 'CGA', 'MDA', 'HGC');
+  foreach ($vids as $v) {
+    $sel = '';
+    if (array_search(strtolower($v), $hw) !== false) $sel = ' selected';
+    echo "<option{$sel}>{$v}</option>\n";
+  }
+?>
+</select>
+
+<br>
+
+Category:
 <select name="cat">
   <option value="">ALL</option>
 <?php
@@ -28,68 +78,75 @@
   }
 ?>
 </select>
-<input type="submit" value="refresh">
+
+<input type="submit" value="apply">
 </p>
 </form>
 
 
 <?php
 
-// hw filter?
-$hw = array();
-if (!empty($_GET['hw'])) {
-  $hw = explode(' ', strtolower($_GET['hw']));
-  foreach ($hw as $h) {
+// add all supported subsets of hardware (eg. VGA supports MDA, EGA and CGA modes)
+foreach ($hw as $h) {
 
-    // add all supported CPUs
-    if ($h == '586') {
-      $hw[] = '8086';
-      $hw[] = '186';
-      $hw[] = '286';
-      $hw[] = '386';
-      $hw[] = '486';
-    }
-    if ($h == '486') {
-      $hw[] = '8086';
-      $hw[] = '186';
-      $hw[] = '286';
-      $hw[] = '386';
-    }
-    if ($h == '386') {
-      $hw[] = '8086';
-      $hw[] = '186';
-      $hw[] = '286';
-    }
-    if ($h == '286') {
-      $hw[] = '8086';
-      $hw[] = '186';
-    }
-    if ($h == '186') {
-      $hw[] = '8086';
-    }
-
-    // add all supported graphic
-    if ($h == 'svga') {
-      $hw[] = 'vga';
-      $hw[] = 'ega';
-      $hw[] = 'cga';
-      $hw[] = 'mda';
-    }
-    if ($h == 'vga') {
-      $hw[] = 'ega';
-      $hw[] = 'cga';
-      $hw[] = 'mda';
-    }
-    if ($h == 'ega') {
-      $hw[] = 'cga';
-      $hw[] = 'mda';
-    }
-    if ($h == 'cga') {
-      $hw[] = 'mda';
-    }
-
+  // add all supported CPUs
+  if ($h == '586') {
+    $hw[] = '8086';
+    $hw[] = '186';
+    $hw[] = '286';
+    $hw[] = '386';
+    $hw[] = '486';
   }
+  if ($h == '486') {
+    $hw[] = '8086';
+    $hw[] = '186';
+    $hw[] = '286';
+    $hw[] = '386';
+  }
+  if ($h == '386') {
+    $hw[] = '8086';
+    $hw[] = '186';
+    $hw[] = '286';
+  }
+  if ($h == '286') {
+    $hw[] = '8086';
+    $hw[] = '186';
+  }
+  if ($h == '186') {
+    $hw[] = '8086';
+  }
+
+  // add all supported graphic
+  if ($h == 'svga') {
+    $hw[] = 'vga';
+    $hw[] = 'ega';
+    $hw[] = 'cga';
+    $hw[] = 'mda';
+  }
+  if ($h == 'vga') {
+    $hw[] = 'mcga';
+    $hw[] = 'ega';
+    $hw[] = 'cga';
+    $hw[] = 'mda';
+  }
+  if ($h == 'mcga') {
+    $hw[] = 'ega';
+    $hw[] = 'cga';
+    $hw[] = 'mda';
+  }
+  if ($h == 'ega') {
+    $hw[] = 'cga';
+    $hw[] = 'mda';
+  }
+  if ($h == 'cga') {
+    $hw[] = 'mda';
+  }
+  if ($h == 'hgc') {
+    $hw[] = 'mda';
+  }
+
 }
+
 
 $db = json_decode(file_get_contents('../packages/_index.json'), true);
 
@@ -106,7 +163,7 @@ foreach ($db as $pkg => $meta) {
   $pref = array_shift($meta['versions']); // get first version (that's the preferred one)
   if (empty($pref)) continue; // no more versions
   $hwhint = '';
-  if (!empty($pref['hwreq'])) {
+  if (!empty($pref['hwreq']) && (!empty($hw))) {
     /* if hw filter present, make sure it fullfills package's requirements */
     foreach (explode(' ', $pref['hwreq']) as $req) {
       if (array_search($req, $hw, true) === false) goto check_next_ver;
