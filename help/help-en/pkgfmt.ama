@@ -82,6 +82,18 @@ format is very simple, it must contain at least two lines:
   version: x.y.z
   description: package description
 
+It may optionally contain also a line describing hardware requirements of the
+package, such as:
+
+  hwreq: 286 fpu cga hgc
+
+The "hwreq" line contains a space-separated list of tokens that represent
+hardware requirements. Following tokens are possible.
+
+CPU family   : 8086 186 286 386 486 586
+CPU features : fpu
+Graphic cards: mda cga ega mcga vga svga hgc
+
 Any other lines are ignored by the SvarDOS package manager.
 
 
