@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  25 aug 2023: validation of the hwreq section in LSM files
   24 aug 2023: load hwreq data from LSM and store them in the json index + skip the '.svn' dir
   30 jun 2023: adapted for new CORE packages location (../packages-core)
   28 feb 2022: svarcom allowed to have a COMMAND.COM file without subdirectory
@@ -38,7 +39,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20230824";
+$PVER = "20230825";
 
 
 // computes the BSD sum of a file and returns it
@@ -425,7 +426,14 @@ foreach ($pkgfiles as $fname) {
   $meta['fname'] = $fname;
   $meta['desc'] = $lsmarray['description'];
   $meta['cats'] = array_unique($catlist);
-  if (!empty($lsmarray['hwreq'])) $meta['hwreq'] = $lsmarray['hwreq'];
+
+  if (!empty($lsmarray['hwreq'])) {
+    $meta['hwreq'] = explode(' ', strtolower($lsmarray['hwreq']));
+
+    // validate list of valid hwreq tokens
+    $validtokens = array('8086', '186', '286', '386', '486', '586', 'fpu', 'mda', 'cga', 'ega', 'vga', 'mcga', 'svga');
+    foreach (array_diff($meta['hwreq'], $validtokens) as $tok) echo "WARNING: {$fname} contains an LSM hwreq section with invalid token: {$tok}\n";
+  }
 
   $pkgdb[$pkgnam][$lsmarray['version']] = $meta;
 }
@@ -453,7 +461,7 @@ foreach ($pkgdb as $pkg => $versions) {
     $meta2 = array();
     $meta2['ver'] = strval($ver);
     $meta2['bsum'] = $bsum;
-    if (!empty($meta['hwreq'])) $meta2['hwreq'] = strtolower($meta['hwreq']);
+    if (!empty($meta['hwreq'])) $meta2['hwreq'] = $meta['hwreq'];
 
     if (empty($db[$pkg]['desc'])) $db[$pkg]['desc'] = $desc;
     if (empty($db[$pkg]['cats'])) {
