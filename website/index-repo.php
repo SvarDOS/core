@@ -32,7 +32,7 @@ Target hardware:
 
 <?php
   // build form with list of CPUs + preselect the current CPU (if any)
-  $cpus = array('586', '486', '186', '8086');
+  $cpus = array('586', '486', '386', '286', '186', '8086');
   foreach ($cpus as $cpu) {
     $sel = '';
     if (array_search($cpu, $hw) !== false) $sel = ' selected';
@@ -55,8 +55,8 @@ if (empty($_GET['hwfpu'])) {
 
 <select name="hwvid">
 <?php
-  // build form with list of CPUs + preselect the current CPU (if any)
-  $vids = array('SVGA', 'VGA', 'MCGA', 'EGA', 'CGA', 'MDA', 'HGC');
+  // build form with list of graphic cards + preselect the current card (if any)
+  $vids = array('SVGA', 'VGA', 'MCGA', 'EGA', 'CGA', 'MDA');
   foreach ($vids as $v) {
     $sel = '';
     if (array_search(strtolower($v), $hw) !== false) $sel = ' selected';
@@ -141,10 +141,6 @@ foreach ($hw as $h) {
   if ($h == 'cga') {
     $hw[] = 'mda';
   }
-  if ($h == 'hgc') {
-    $hw[] = 'mda';
-  }
-
 }
 
 
@@ -163,13 +159,15 @@ foreach ($db as $pkg => $meta) {
   $pref = array_shift($meta['versions']); // get first version (that's the preferred one)
   if (empty($pref)) continue; // no more versions
   $hwhint = '';
-  if (!empty($pref['hwreq']) && (!empty($hw))) {
-    /* if hw filter present, make sure it fullfills package's requirements */
-    foreach (explode(' ', $pref['hwreq']) as $req) {
-      if (array_search($req, $hw, true) === false) goto check_next_ver;
-    }
-
+  if (!empty($pref['hwreq'])) {
     $hwhint = ' title="' . htmlspecialchars(strtoupper($pref['hwreq'])) . '"';
+
+    /* if hw filter present, make sure it fullfills package's requirements */
+    if (!empty($hw)) {
+      foreach (explode(' ', $pref['hwreq']) as $req) {
+        if (array_search($req, $hw, true) === false) goto check_next_ver;
+      }
+    }
   }
   $ver = $pref['ver'];
   $bsum = $pref['bsum'];
