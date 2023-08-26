@@ -239,6 +239,7 @@ rm "$FLOPROOT"/mode.com
 # disabling EN-ONLY builds of 1.4M, 1.2M and 720K because EN-ONLY does not
 # decrease the amount of diskettes at this moment.
 #prep_flop 80 2 18 1440 "$PUBDIR" "1.44M-EN_ONLY"
+prep_flop 80 2 21 1680 "$PUBDIR" "1.44M-DMF-EN_ONLY"
 #prep_flop 80 2 15 1200 "$PUBDIR" "1.2M-EN_ONLY"
 #prep_flop 80 2  9  720 "$PUBDIR" "720K-EN_ONLY"
 prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY"
