@@ -75,9 +75,10 @@ ALLPKGS="$COREPKGS $EXTRAPKGS"
 # $3 sectors per track
 # $4 size
 # $5 working directory (for temporary files etc)
-# $6 where to put a copy of the image (optional)
+# $6 name of the set (eg. "1440k" or "1440k-EN")
+# $7 where to put a copy of the image (optional)
 function prep_flop {
-  WORKDIR="$5/$4"
+  WORKDIR="$5/$6"
   mkdir "$WORKDIR"
   mformat -C -t $1 -h $2 -s $3 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
   mcopy -sQm -i "$WORKDIR/disk1.img" "$FLOPROOT/"* ::/
@@ -116,13 +117,12 @@ function prep_flop {
   unix2dos "$WORKDIR/readme.txt"
 
   # make a copy of the image, if requested
-  if [ "x$6" != "x" ] ; then
-    cp "$WORKDIR/disk1.img" $6
+  if [ "x$7" != "x" ] ; then
+    cp "$WORKDIR/disk1.img" $7
   fi
 
   # zip the images (and remove them at the same time)
-  rm -f "$PUBDIR/svardos-floppy-$4k.zip"
-  zip -9 -rmj "$PUBDIR/svardos-$CURDATE-floppy-$4k.zip" "$WORKDIR"/*
+  zip -9 -rmj "$PUBDIR/svardos-$CURDATE-floppy-$6.zip" "$WORKDIR"/*
 
   # clean up
   rmdir "$WORKDIR"
@@ -223,20 +223,25 @@ echo
 export MTOOLS_NO_VFAT=1
 
 # prepare images for floppies in different sizes (args are C H S SIZE)
-prep_flop 80 2 36 2880 "$PUBDIR" "$CDROOT/boot.img"
-prep_flop 80 2 18 1440 "$PUBDIR"
-prep_flop 80 2 15 1200 "$PUBDIR"
-prep_flop 80 2  9  720 "$PUBDIR"
+prep_flop 80 2 36 2880 "$PUBDIR" "2.88M" "$CDROOT/boot.img"
+prep_flop 80 2 18 1440 "$PUBDIR" "1.44M"
+prep_flop 80 2 15 1200 "$PUBDIR" "1.2M"
+prep_flop 80 2  9  720 "$PUBDIR" "720K"
 
-# special case for 360K diskettes: some files must be deleted to make some room,
-# for this reason the 360K floppy must be generated as last (after all other
-# floppies and after the USB image)
+# remove internationalization files for EN-ONLY releases. This is the only way
+# to build the 360K variant
 rm "$FLOPROOT"/*.cpx
 rm "$FLOPROOT"/install.lng
 rm "$FLOPROOT"/display.exe
 rm "$FLOPROOT"/mode.com
 #
-prep_flop 40 2  9  360 "$PUBDIR"
+
+# disabling EN-ONLY builds of 1.4M, 1.2M and 720K because EN-ONLY does not
+# decrease the amount of diskettes at this moment.
+#prep_flop 80 2 18 1440 "$PUBDIR" "1.44M-EN_ONLY"
+#prep_flop 80 2 15 1200 "$PUBDIR" "1.2M-EN_ONLY"
+#prep_flop 80 2  9  720 "$PUBDIR" "720K-EN_ONLY"
+prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY"
 
 
 echo
