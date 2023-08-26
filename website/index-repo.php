@@ -160,11 +160,11 @@ foreach ($db as $pkg => $meta) {
   if (empty($pref)) continue; // no more versions
   $hwhint = '';
   if (!empty($pref['hwreq'])) {
-    $hwhint = ' title="' . htmlspecialchars(strtoupper($pref['hwreq'])) . '"';
+    $hwhint = ' title="' . htmlspecialchars(strtoupper(implode(', ', $pref['hwreq']))) . '"';
 
     /* if hw filter present, make sure it fullfills package's requirements */
     if (!empty($hw)) {
-      foreach (explode(' ', $pref['hwreq']) as $req) {
+      foreach ($pref['hwreq'] as $req) {
         if (array_search($req, $hw, true) === false) goto check_next_ver;
       }
     }
