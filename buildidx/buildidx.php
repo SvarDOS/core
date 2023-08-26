@@ -429,6 +429,7 @@ foreach ($pkgfiles as $fname) {
 
   if (!empty($lsmarray['hwreq'])) {
     $meta['hwreq'] = explode(' ', strtolower($lsmarray['hwreq']));
+    sort($meta['hwreq']);
 
     // validate list of valid hwreq tokens
     $validtokens = array('8086', '186', '286', '386', '486', '586', 'fpu', 'mda', 'cga', 'ega', 'vga', 'mcga', 'svga');
