@@ -2,7 +2,7 @@
                             %h*** AJUDA DO SVARDOS ***
 
 Essa documentação de ajuda é um trabalho em andamento. Por enquanto somente
-fornece conteúdo bastante limitado. (gostaria de ajudar a fazê-la? 
+fornece conteúdo bastante limitado. (gostaria de ajudar a fazê-la?
 entre em contato conosco na %lcontact.ama:Lista de e-mail do SvarDOS%t!)
 
 === Capítulos ================================================================
@@ -13,12 +13,10 @@ entre em contato conosco na %lcontact.ama:Lista de e-mail do SvarDOS%t!)
  * %lmouse.ama:Suporte a mouse
 
  * %lfreedos.ama:SvarDOS vs FreeDOS: qual é a história?
- * %ltodo.ama:A lista "TODO" do projeto
  * %lcontact.ama:Como entro em contato com a comunidade SvarDOS?
 
  * %lhistory.ama:Origens do SvarDOS
  * %lmeaning.ama:O que significa "Svarog"?
- * %l8086.ama:Lista de compatibilidade 8086
  * %llicense.ama:Licença do SvarDOS
 
 ==============================================================================
