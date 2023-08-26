@@ -92,7 +92,7 @@ hardware requirements. Following tokens are possible.
 
 CPU family   : 8086 186 286 386 486 586
 CPU features : fpu
-Graphic cards: mda cga ega mcga vga svga hgc
+Graphic cards: mda cga ega mcga vga svga
 
 Any other lines are ignored by the SvarDOS package manager.
 
