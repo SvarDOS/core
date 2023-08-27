@@ -3,14 +3,6 @@
 # Translated from English by Berki Yenigun                                  #
 #############################################################################
 
-#############################################################################
-#                                                                           #
-# IMPORTANT: Translations should be as compact as possible so they do not   #
-# increase Sved's footprint. New translation files should be no larger than #
-# the biggest existing translation. Run REGEN.BAT to see current sizes.     #
-#                                                                           #
-#############################################################################
-
 
 ###############
 # MAIN SCREEN #

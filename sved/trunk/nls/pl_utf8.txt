@@ -3,14 +3,6 @@
 # translated from English by Mateusz Viste                                  #
 #############################################################################
 
-#############################################################################
-#                                                                           #
-# IMPORTANT: Translations should be as compact as possible so they do not   #
-# increase Sved's footprint. New translation files should be no larger than #
-# the biggest existing translation. Run REGEN.BAT to see current sizes.     #
-#                                                                           #
-#############################################################################
-
 
 ###############
 # MAIN SCREEN #
@@ -19,7 +11,7 @@
 0.0:ESC=MENU
 0.1:BEZ NAZWY
 0.2:ZAPISANO
-0.4:Niezapisane zmiany będą utracone.
+0.4:Niezapisane zmiany zostaną utracone.
 0.5:Potwierdź z ENTER.
 0.6:Zapisz jako:
 0.7:Otwórz:
