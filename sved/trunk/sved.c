@@ -34,7 +34,7 @@
 #include "svarlang\svarlang.h"
 
 
-#define PVER "2023.3"
+#define PVER "2023.4"
 #define PDATE "2023"
 
 /*****************************************************************************

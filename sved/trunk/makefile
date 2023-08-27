@@ -12,7 +12,7 @@ CFLAGS += -s
 LDFLAGS = -lr -mt -fm=sved.map -fe=sved.com
 LDLIBS = svarlang\svarlngs.lib mdr\mdrs2023.lib
 
-PVER = 2023.3
+PVER = 2023.4
 
 all: sved.com
 
