@@ -107,6 +107,7 @@ void mdr_dos_time2hms(unsigned char *h, unsigned char *m, unsigned char *s, unsi
 
 /* Determine the canonical name of the specified filename or path and writes
  * the result into result. The input path does not need to actually exist.
+ * This function requires a 3.x+ DOS kernel.
  * result is zeroed to an empty string on error. */
 void mdr_dos_truename(char *result, const char *name);
 
