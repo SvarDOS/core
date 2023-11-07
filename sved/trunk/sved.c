@@ -649,15 +649,8 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   if (fname == NULL) goto SKIPLOADING;
 
-  /* make the filename canonical if DOS 3+ detected */
-  if (_osmajor >= 3) {
-    mdr_dos_truename(db->fname, fname);
-  } else { /* copy the string as-is (DOS TRUENAME is not available on DOS 2.x) */
-    /* I could just as well call strcpy() here, but pulling strcpy() in makes
-     * the upxed sved executable grow over 7K in size, so I use a cheaper
-     * approach instead */
-    _fmemmove(db->fname, fname, strlen(fname) + 1); /* _fmemmove() to avoid pulling in memmove() */
-  }
+  /* make the filename canonical (DOS 3+ only, on earlier versions it just copies the filename) */
+  mdr_dos_truename(db->fname, fname);
 
   err = _dos_open(fname, O_RDONLY, &fd);
   if (err != 0) goto SKIPLOADING;
