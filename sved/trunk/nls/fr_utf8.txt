@@ -12,7 +12,7 @@
 0.1:SANS NOM
 0.2:OK
 0.4:Les données non enreg. seront perdues
-0.5:ENTRÉE pour valider
+0.5:ENTRÉE=valider / ESPACE=enregistrer
 0.6:Enreg. sous:
 0.7:Ouvrir:
 0.8:ÉCHAP pour annuler

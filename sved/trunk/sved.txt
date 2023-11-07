@@ -69,6 +69,7 @@ and wish to free a bit of disk space.
 ### CHANGELOG ################################################################
 
 2023.5 [xx Nov 2023]
+- modified files can be saved at exit time with the space key
 - improved compatibility with DOS 2.x
 
 2023.4 [27 Aug 2023]

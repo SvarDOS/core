@@ -222,6 +222,64 @@ static void db_rewind(struct file *db) {
 }
 
 
+static int savefile(const struct file *db, const char *saveas) {
+  int fd = 0;
+  const struct line far *l;
+  unsigned int bytes;
+  unsigned char eollen = 2;
+  const unsigned char *eolbuf = "\r\n";
+  int errflag = 0;
+
+  /* if filename not overloaded then use the fname in db */
+  if (saveas == NULL) saveas = db->fname;
+
+  _asm {
+    push ax
+    push cx
+    push dx
+
+    mov ah, 0x3C    /* create or truncate file */
+    xor cx, cx      /* file attributes */
+    mov dx, saveas  /* works only in SMALL/TINY mode */
+    int 0x21
+    jnc DONE
+    mov errflag, ax
+    DONE:
+    mov fd, ax
+
+    pop dx
+    pop cx
+    pop ax
+  }
+
+  if (errflag != 0) return(-1);
+
+  l = db->cursor;
+  while (l->prev) l = l->prev;
+
+  /* preset line terminators */
+  if (db->lfonly) {
+    eolbuf++;
+    eollen--;
+  }
+
+  while (l) {
+    /* do not write the last empty line, it is only useful for edition */
+    if (l->len != 0) {
+      errflag |= _dos_write(fd, l->payload, l->len, &bytes);
+    } else if (l->next == NULL) {
+      break;
+    }
+    errflag |= _dos_write(fd, eolbuf, eollen, &bytes);
+    l = l->next;
+  }
+
+  errflag |= _dos_close(fd);
+
+  return(errflag);
+}
+
+
 static void ui_statusbar(const struct file *db, unsigned char slotnum) {
   const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
@@ -303,7 +361,7 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
   }
 
   y = (screenh - 6) >> 1;
-  x = (screenw - msglen - 4) >> 1;
+  x = (screenw - msglen - 3) >> 1;
   for (i = y+2+msg2flag; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
   x++;
 
@@ -315,19 +373,31 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
 }
 
 
+/* returns 0 if operation may proceed, non-zero to cancel */
 static unsigned char ui_confirm_if_unsaved(const struct file *db) {
-  unsigned char r = 0;
+  int k;
+
   if (db->modflag == 0) return(0);
 
   mdr_cout_cursor_hide();
 
-  /* if file has been modified then ask for confirmation */
+  /* if file has been modified then ask for confirmation:
+   * ENTER        : agree to data loss
+   * SPACE        : SAVE file before quit (only if valid filename present)
+   * anything else: ABORT */
   ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
-  if (mdr_dos_getkey2() != '\r') r = 1;
 
+  k = mdr_dos_getkey2();
   mdr_cout_cursor_show();
 
-  return(r);
+  /* ENTER = agree to loose unsaved data */
+  if (k == '\r') return(0);
+
+  /* SPACE = save file and continue */
+  if ((k == ' ') && (db->fname[0] != 0) && (savefile(db, NULL) == 0)) return(0);
+
+  /* any other key = cancel operation */
+  return(1);
 }
 
 
@@ -756,64 +826,6 @@ static int parseargv(struct file *dbarr) {
   }
 
   return(0);
-}
-
-
-static int savefile(const struct file *db, const char *saveas) {
-  int fd = 0;
-  const struct line far *l;
-  unsigned int bytes;
-  unsigned char eollen = 2;
-  const unsigned char *eolbuf = "\r\n";
-  int errflag = 0;
-
-  /* if filename not overloaded then use the fname in db */
-  if (saveas == NULL) saveas = db->fname;
-
-  _asm {
-    push ax
-    push cx
-    push dx
-
-    mov ah, 0x3C    /* create or truncate file */
-    xor cx, cx      /* file attributes */
-    mov dx, saveas  /* works only in SMALL/TINY mode */
-    int 0x21
-    jnc DONE
-    mov errflag, ax
-    DONE:
-    mov fd, ax
-
-    pop dx
-    pop cx
-    pop ax
-  }
-
-  if (errflag != 0) return(-1);
-
-  l = db->cursor;
-  while (l->prev) l = l->prev;
-
-  /* preset line terminators */
-  if (db->lfonly) {
-    eolbuf++;
-    eollen--;
-  }
-
-  while (l) {
-    /* do not write the last empty line, it is only useful for edition */
-    if (l->len != 0) {
-      errflag |= _dos_write(fd, l->payload, l->len, &bytes);
-    } else if (l->next == NULL) {
-      break;
-    }
-    errflag |= _dos_write(fd, eolbuf, eollen, &bytes);
-    l = l->next;
-  }
-
-  errflag |= _dos_close(fd);
-
-  return(errflag);
 }
 
 

@@ -12,7 +12,7 @@
 0.1:BEZ NAZWY
 0.2:ZAPISANO
 0.4:Niezapisane zmiany zostaną utracone.
-0.5:Potwierdź z ENTER.
+0.5:ENTER = potwierdź / SPACJA = zapisz
 0.6:Zapisz jako:
 0.7:Otwórz:
 0.8:Anuluj z ESC.
