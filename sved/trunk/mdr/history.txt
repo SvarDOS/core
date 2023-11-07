@@ -1,13 +1,23 @@
 version xxxx (xx xxx xxxx)
+- added the OPL driver (Adlib-style OPL2 FM synth) along with IMF playback
 - new mdr_dos_selfexe()
 - new mdr_dos_truename()
 - new mdr_coutraw_str() and mdr_coutraw_crlf()
 - new mdr_dos_ctrlc_inhibit(), mdr_dos_ctrlc_enable(), mdr_dos_ctrlc_disable()
+- added mdr_bios_ticks()
 - renamed keyb_getkey() to mdr_dos_getkey()
 - renamed keyb_flush() to mdr_dos_flushkeyb()
+- renamed all timer_ functions to mdr_timer_
 - new mdr_dos_getkey2(), same as mdr_dos_getkey() but immune to CTRL+C
 - new mdr_dos_keypending()
 - removed keyb_getkey_ifany(): use mdr_dos_keypending + mdr_dos_getkey instead
+- renamed pcx_anal() and pcx_load() to mdr_pcx_anal() and mdr_pcx_load()
+- added pcx_loadrow(): loads PCX data row by row (useful on PCX files > 64K)
+- replaced pcx_convto8bpp() by mdr_pcx_to8bpp()
+- vid12_putscanline() optimizations: 22% faster
+- renamed all the mouse_ functions to mdr_mouse_
+- added mdr_mouse_setcursor()
+- added vid12_waitblank()
 
 version 2023 (29 Jul 2023)
 - all routines are built as a library now

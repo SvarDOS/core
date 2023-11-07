@@ -4,7 +4,7 @@
  * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2022 Mateusz Viste
+ * Copyright (C) 2014-2023 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -29,20 +29,32 @@
   #define MDR_MOUSE_H
 
   /* init the mouse driver (and checks for presence of mouse support at same time)
-   * returns 0 if no mouse is present, and the number of buttons otherwise */
-  int mouse_init(void);
+   * returns 0 if no mouse is present, and the number of buttons otherwise.
+   * after initialization the mouse cursor is hidden, use mdr_mouse_show() to
+   * make it visible. */
+  int mdr_mouse_init(void);
 
   /* shows the mouse pointer */
-  void mouse_show(void);
+  void mdr_mouse_show(void);
 
   /* hides the mouse pointer */
-  void mouse_hide(void);
+  void mdr_mouse_hide(void);
 
   /* get x/y coordinates of the mouse, and returns a bitfield with state of buttons */
-  int mouse_getstate(int *x, int *y);
+  int mdr_mouse_getstate(int *x, int *y);
 
   /* get x/y coordinates of the mouse when the last button release occured since last check.
      returns the id of the button pressed (1 or 2), or 0 if no event occured. */
-  int mouse_fetchrelease(int *x, int *y);
+  int mdr_mouse_fetchrelease(int *x, int *y);
+
+  /* set graphic pointer shape. icon is 64-bytes long, two sets of 32. each set
+   * of 32 bytes is organized as a 16x16 bitmap, ie. 16 rows of 16-bit values.
+   * a) the first set of 16 shorts defines the background mask - that is, the
+   * background will show through wherever there is a 1-bit in that data.
+   * b) the second set defines the "XOR mask" - that is, the pixels matching the
+   * 1-bit in this data set are toggled.
+   * hotspotx and hotspoty define respectively the horizontal and vertical hot
+   * spot of the pointer (default being [0,0], that is the top left corner). */
+  void mdr_mouse_setcursor(const unsigned short *icon, unsigned char hotspotx, unsigned char hotspoty);
 
 #endif

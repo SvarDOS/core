@@ -4,7 +4,7 @@
  * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2022 Mateusz Viste
+ * Copyright (C) 2022-2023 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -29,11 +29,15 @@
 
   #define MDR_VID12_H
 
-  /* init video mode 12h (640x480x16c) */
+  /* init video mode 12h (640x480x16c)
+   * remember to call vid12_close() at exit time */
   void vid12_init(void);
 
-  /* Wait until VBLANK */
+  /* wait until VBLANK */
   void vid12_waitvblank(void);
+
+  /* wait until ANY blank: either VBLANK or HBLANK */
+  void vid12_waitblank(void);
 
   /* clear screen using color
    * this function is fastest when color is 0 or 15 */
@@ -48,14 +52,26 @@
    * pattern must be 8 bytes long */
   void vid12_linepat(unsigned short linefirst, unsigned short linelast, const unsigned char *pattern);
 
+  /* deinit video mode 12h and resets to previous mode */
   void vid12_close(void);
 
+  /* puts a pixel on screen */
   void vid12_putpixel(unsigned short x, unsigned short y, unsigned char col);
 
   /* draws a horizonatal line from [x1,y] to [x2,y] */
   void vid12_hline(unsigned short y, unsigned short x1, unsigned short x2, unsigned char color);
 
+  /* write an entire scanline (640 pixels) to screen. the pixels data must be
+   * a serie of 640 bytes having values in the range [0..15] */
   void vid12_putscanline(unsigned short scanline, const unsigned char *pixels);
+
+  /* set index palette color to given R,G,B value. each R,G,B component must be
+   * a 6 bit value in the range [0..63] (where 63 is the maximum luminosity) */
+  void vid12_setpalette(unsigned char index, unsigned char r, unsigned char g, unsigned char b);
+
+  /*****************************
+   *  VRAM TO VRAM operations  *
+   *****************************/
 
   /* prepares VGA for a VRAM-to-VRAM copy operation */
   void vid12_vramcpy_prep(void);
@@ -68,5 +84,4 @@
   /* sets VGA back to its normal state after VRAM-to-VRAM operations */
   void vid12_vramcpy_done(void);
 
-  void vid12_setpalette(unsigned char index, unsigned char r, unsigned char g, unsigned char b);
 #endif

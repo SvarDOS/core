@@ -4,7 +4,7 @@
  * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2022 Mateusz Viste
+ * Copyright (C) 2014-2023 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -28,25 +28,24 @@
 #ifndef MDR_TIMER_H
 #define MDR_TIMER_H
 
-/* reset the timer value, this can be used by the application to make sure
- * no timer wrap occurs during critical parts of the code flow */
-void timer_reset(void);
+/* Starts the timer by reprogramming the 8253 chip from its default 18.2 Hz
+ * frequency to about 1.1 kHz. It is mandatory to revert the timer to its
+ * original frequency via mdr_timer_stop() before your application quits. */
+void mdr_timer_init(void);
 
-/* This routine will stop the fast clock if it is going. It has void return
- * value so that it can be an exit procedure. */
-void timer_stop(void);
+/* Fills res with the amount of microseconds that elapsed since either
+ * mdr_timer_init() or mdr_timer_reset(), whichever was called last.
+ * Note that the res counter wraps around approximately every 71 minutes if
+ * mdr_timer_reset() is not called. */
+void mdr_timer_read(unsigned long *res);
 
-/* This routine will start the fast clock rate by installing the
- * handle_clock routine as the interrupt service routine for the clock
- * interrupt and then setting the interrupt rate up to its higher speed
- * by programming the 8253 timer chip.
- * This routine does nothing if the clock rate is already set to
- * its higher rate, but then it returns -1 to indicate the error. */
-void timer_init(void);
+/* Reset the timer value, this can be used by the application to make sure
+ * no timer wrap occurs during critical parts of your code flow */
+void mdr_timer_reset(void);
 
-/* This routine will return the present value of the time, which is
- * read from the nowtime structure. Interrupts are disabled during this
- * time to prevent the clock from changing while it is being read. */
-void timer_read(unsigned long *res);
+/* Stops (uninstalls) the timer. This must be called before your application
+ * quits, otherwise the system will likely crash. This function has a void
+ * return value so that it can be registered as an atexit() procedure. */
+void mdr_timer_stop(void);
 
 #endif

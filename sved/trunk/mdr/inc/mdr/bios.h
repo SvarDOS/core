@@ -32,4 +32,8 @@
  * works on IBM PC, XT, AT - ie. it's always safe */
 void mdr_bios_tickswait(unsigned short ticks);
 
+/* returns the current BIOS tick counter (18.2 Hz, 1 tick is roughly 55ms, an
+ * hour has 65543 ticks). works on IBM PC, XT, AT - ie. it's always safe */
+unsigned short mdr_bios_ticks(void);
+
 #endif
