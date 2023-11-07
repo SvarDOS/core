@@ -940,7 +940,7 @@ void main(void) {
   unsigned char curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
   struct line far *clipboard = NULL;
-  unsigned char original_breakflag;
+  static unsigned char original_breakflag;
 
   { /* load NLS resource */
     unsigned short i = 0;
