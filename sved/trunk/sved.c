@@ -222,7 +222,9 @@ static void db_rewind(struct file *db) {
 }
 
 
-static int savefile(const struct file *db, const char *saveas) {
+/* saves db file, resets db->modflag on success and overwrites the filename
+ * field if saveas is not NULL */
+static int savefile(struct file *db, const char *saveas) {
   int fd = 0;
   const struct line far *l;
   unsigned int bytes;
@@ -275,6 +277,12 @@ static int savefile(const struct file *db, const char *saveas) {
   }
 
   errflag |= _dos_close(fd);
+
+  /* did it all work? */
+  if (errflag == 0) {
+    db->modflag = 0;
+    if (saveas != db->fname) mdr_dos_truename(db->fname, saveas);
+  }
 
   return(errflag);
 }
@@ -374,7 +382,7 @@ static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
 
 
 /* returns 0 if operation may proceed, non-zero to cancel */
-static unsigned char ui_confirm_if_unsaved(const struct file *db) {
+static unsigned char ui_confirm_if_unsaved(struct file *db) {
   int k;
 
   if (db->modflag == 0) return(0);
@@ -1138,7 +1146,6 @@ void main(void) {
             ui_getstring(svarlang_str(0,6), fname, sizeof(fname));
             if (*fname == 0) break;
             saveflag = savefile(db, fname);
-            if (saveflag == 0) mdr_dos_truename(db->fname, fname);
           } else {
             saveflag = savefile(db, NULL);
           }
@@ -1146,7 +1153,6 @@ void main(void) {
           mdr_cout_cursor_hide();
 
           if (saveflag == 0) {
-            db->modflag = 0;
             ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
             mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
           } else {
