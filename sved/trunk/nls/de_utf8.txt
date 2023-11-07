@@ -11,8 +11,8 @@
 0.0:ESC=MENÜ
 0.1:UNBENANNT
 0.2:GESPEICHERT
-0.4:Ungespeicherte Änderungen gehen verloren.
-0.5:Drücken Sie ENTER zum Bestätigen.
+0.4:Änderungen gehen verloren.
+0.5:ENTER=fortsetzen / LEERZ=speichern
 0.6:Speichern als:
 0.7:Öffnen:
 0.8:Drücken Sie ESC zum Abbrechen.
