@@ -27,6 +27,7 @@
 #include <fcntl.h>    /* O_RDONLY, O_WRONLY */
 #include <stdlib.h>   /* _osmajor symbol provided by Open Watcom */
 #include <string.h>
+#include <strings.h>
 
 #include "mdr\bios.h"
 #include "mdr\cout.h"

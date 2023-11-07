@@ -7,7 +7,7 @@
 #   wmake release    builds distribuable packages (svp, zip, sources...)
 
 CC = wcc
-CFLAGS = -0 -ms -os -wx -we -d0 -I=mdr\inc
+CFLAGS = -0 -ms -os -wx -we -d0 -bt=dos -I=mdr\inc
 CFLAGS += -s
 LDFLAGS = -lr -mt -fm=sved.map -fe=sved.com
 LDLIBS = svarlang\svarlngs.lib mdr\mdrs2024.lib
