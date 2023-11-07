@@ -11,11 +11,12 @@
 0.0:ESC=MENÜ
 0.1:UNBENANNT
 0.2:GESPEICHERT
-0.4:Änderungen gehen verloren.
-0.5:ENTER=fortsetzen / LEERZ=speichern
+0.4:Änderungen gehen verloren!
+0.5:ENTER = fortsetzen
 0.6:Speichern als:
 0.7:Öffnen:
-0.8:Drücken Sie ESC zum Abbrechen.
+0.8:ESC = cancel
+0.9:LEERZ = speichern
 0.10:FEHLER
 0.11:DATEI NICHT GEFUNDEN
 0.12:Zu viele Dateien

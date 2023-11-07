@@ -356,24 +356,37 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
 }
 
 
-static void ui_msg(const char *msg1, const char *msg2, unsigned char attr) {
-  unsigned short x, y, msglen, i;
-  unsigned short msg2flag = 0;
+static void ui_msg(unsigned short msgid1, unsigned short msgid2, unsigned short msgid3, unsigned char attr) {
+  unsigned short x, y, maxmsglen, i;
+  unsigned short msgcount = 1;
+  const char *msg[3];
 
-  msglen = strlen(msg1);
-  if (msg2) {
-    msg2flag = 1;
-    i = strlen(msg2);
-    if (i > msglen) msglen = i;
+  msg[0] = svarlang_strid(msgid1);
+
+  if (msgid2 != 0) {
+    msgcount = 2;
+    msg[1] = svarlang_strid(msgid2);
+  }
+  if (msgid3 != 0) {
+    msgcount = 3;
+    msg[2] = svarlang_strid(msgid3);
+  }
+
+  /* find longest msg */
+  maxmsglen = 0;
+  for (i = 0; i < msgcount; i++) {
+    y = strlen(msg[i]);
+    if (y > maxmsglen) maxmsglen = y;
   }
 
   y = (screenh - 6) >> 1;
-  x = (screenw - msglen - 3) >> 1;
-  for (i = y+2+msg2flag; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, msglen + 2);
+  x = (screenw - maxmsglen - 3) >> 1;
+  for (i = y+1+msgcount; i >= y; i--) mdr_cout_char_rep(i, x, ' ', attr, maxmsglen + 2);
   x++;
 
-  mdr_cout_str(y+1, x, msg1, attr, msglen);
-  if (msg2) mdr_cout_str(y+2, x, msg2, attr, msglen);
+  for (i = 0; i < msgcount; i++) {
+    mdr_cout_str(y+1+i, x, msg[i], attr, maxmsglen);
+  }
 
   if (uidirty.from > y) uidirty.from = y;
   if (uidirty.to < y+4) uidirty.to = y+4;
@@ -392,7 +405,7 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
    * ENTER        : agree to data loss
    * SPACE        : SAVE file before quit (only if valid filename present)
    * anything else: ABORT */
-  ui_msg(svarlang_str(0,4), svarlang_str(0,5), SCHEME_MSG);
+  ui_msg(4, 5, (db->fname[0])?9:8, SCHEME_MSG);
 
   k = mdr_dos_getkey2();
   mdr_cout_cursor_show();
@@ -1108,7 +1121,7 @@ void main(void) {
 
         case MENU_OPEN:
           /* display a warning if unsaved changes are pending */
-          if (db->modflag != 0) ui_msg(svarlang_str(0,4), svarlang_str(0,8), SCHEME_MSG);
+          if (db->modflag != 0) ui_msg(4, 8, 0, SCHEME_MSG);
 
           /* ask for filename */
           ui_getstring(svarlang_str(0,7), fname, sizeof(fname));
@@ -1117,9 +1130,9 @@ void main(void) {
             err = loadfile(db, fname);
             if (err != 0) {
               if (err == LOADFILE_FILENOTFOUND) {
-                ui_msg(svarlang_str(0,11), NULL, SCHEME_ERR); /* file not found */
+                ui_msg(11, 0, 0, SCHEME_ERR); /* file not found */
               } else {
-                ui_msg(svarlang_str(0,10), NULL, SCHEME_ERR);  /* ERROR */
+                ui_msg(10, 0, 0, SCHEME_ERR);  /* ERROR */
               }
               mdr_bios_tickswait(44); /* 3s */
               loadfile(db, NULL);
@@ -1145,10 +1158,10 @@ void main(void) {
           mdr_cout_cursor_hide();
 
           if (saveflag == 0) {
-            ui_msg(svarlang_str(0, 2), NULL, SCHEME_MSG);
+            ui_msg(2, 0, 0, SCHEME_MSG);
             mdr_bios_tickswait(11); /* 11 ticks is about 600 ms */
           } else {
-            ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR);
+            ui_msg(10, 0, 0, SCHEME_ERR);
             mdr_bios_tickswait(36); /* 2s */
           }
           mdr_cout_cursor_show();
@@ -1262,7 +1275,7 @@ void main(void) {
       /* copy cursor line to clipboard */
       clipboard = line_calloc(db->cursor->len);
       if (clipboard == NULL) {
-        ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
+        ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
         mdr_bios_tickswait(18); /* 1s */
       } else {
         mdr_cout_char_rep(db->cursorposy, 0, ' ', ((SCHEME_TEXT >> 4) | (SCHEME_TEXT << 4)) & 0xff, screenlastcol);
@@ -1294,7 +1307,7 @@ void main(void) {
 
     } else if ((k == 0x016) && (clipboard != NULL)) { /* CTRL+V */
       if (line_add(db, clipboard->payload, clipboard->len) != 0) {
-        ui_msg(svarlang_str(0, 10), NULL, SCHEME_ERR); /* ERROR */
+        ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
         mdr_bios_tickswait(18); /* 1s */
       } else {
         /* rewire the linked list so the new line is on top of the previous one */

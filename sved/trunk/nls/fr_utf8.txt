@@ -12,10 +12,11 @@
 0.1:SANS NOM
 0.2:OK
 0.4:Les données non enreg. seront perdues
-0.5:ENTRÉE=valider / ESPACE=enregistrer
+0.5:ENTRÉE = valider
 0.6:Enreg. sous:
 0.7:Ouvrir:
-0.8:ÉCHAP pour annuler
+0.8:ÉCHAP = annuler
+0.9:ESPACE = enregistrer
 0.10:ERREUR
 0.11:FICHIER NON TROUVÉ
 0.12:Trop de fichiers
