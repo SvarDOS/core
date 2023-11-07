@@ -161,20 +161,18 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
 
 static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
   unsigned short len = 0;
-  unsigned char y, x;
+  unsigned char x;
   int k;
 
   if (maxlen == 0) return;
   maxlen--; /* make room for the nul terminator */
 
-  y = screenlastrow;
-
   /* print query string */
-  x = mdr_cout_str(y, 0, query, SCHEME_STBAR3, 40);
-  mdr_cout_char_rep(y, x++, ' ', SCHEME_STBAR3, screenw - x);
+  x = mdr_cout_str(screenlastrow, 0, query, SCHEME_STBAR3, 40);
+  mdr_cout_char_rep(screenlastrow, x++, ' ', SCHEME_STBAR3, screenw - x);
 
   for (;;) {
-    mdr_cout_locate(y, x + len);
+    mdr_cout_locate(screenlastrow, x + len);
     k = mdr_dos_getkey2();
 
     switch (k) {
@@ -187,12 +185,12 @@ static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
       case 0x08: /* BKSPC */
         if (len > 0) {
           len--;
-          mdr_cout_char(y, x + len, ' ', SCHEME_STBAR3);
+          mdr_cout_char(screenlastrow, x + len, ' ', SCHEME_STBAR3);
         }
         break;
       default:
         if ((k <= 0xff) && (k >= ' ') && (len < maxlen)) {
-          mdr_cout_char(y, x + len, k, SCHEME_STBAR3);
+          mdr_cout_char(screenlastrow, x + len, k, SCHEME_STBAR3);
           s[len++] = k;
         }
     }
