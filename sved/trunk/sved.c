@@ -25,6 +25,7 @@
 
 #include <dos.h>      /* _dos_open(), _dos_read(), _dos_close(), ... */
 #include <fcntl.h>    /* O_RDONLY, O_WRONLY */
+#include <stdlib.h>   /* _osmajor symbol provided by Open Watcom */
 #include <string.h>
 
 #include "mdr\bios.h"
@@ -34,7 +35,7 @@
 #include "svarlang\svarlang.h"
 
 
-#define PVER "2023.4"
+#define PVER "2023.5"
 #define PDATE "2023"
 
 /*****************************************************************************
@@ -570,7 +571,15 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   if (fname == NULL) goto SKIPLOADING;
 
-  mdr_dos_truename(db->fname, fname);
+  /* make the filename canonical if DOS 3+ detected */
+  if (_osmajor >= 3) {
+    mdr_dos_truename(db->fname, fname);
+  } else { /* copy the string as-is (DOS TRUENAME is not available on DOS 2.x) */
+    /* I could just as well call strcpy() here, but pulling strcpy() in makes
+     * the upxed sved executable grow over 7K in size, so I use a cheaper
+     * approach instead */
+    _fmemmove(db->fname, fname, strlen(fname) + 1); /* _fmemmove() to avoid pulling in memmove() */
+  }
 
   err = _dos_open(fname, O_RDONLY, &fd);
   if (err != 0) goto SKIPLOADING;
