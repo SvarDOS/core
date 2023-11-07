@@ -1,6 +1,6 @@
 #############################################################################
 # SVED IN TURKISH                                                           #
-# Translated from English by Berki Yenigun                                  #
+# Translated from English by Berki Yenigün                                  #
 #############################################################################
 
 
@@ -12,7 +12,7 @@
 0.1:BAŞLIKSIZ
 0.2:KAYDEDİLDİ
 0.4:Değişiklikler kaybolacak.
-0.5:Onay için ENTER'a basın.
+0.5:ENTER = onay / BOŞLUK = kaydet
 0.6:Farklı kaydet:
 0.7:Yükle:
 0.8:İptal için ESC'e basın.
@@ -43,4 +43,3 @@
 8.4:Dosyayı kapat
 8.5:EOL değiştir
 8.6:Çık
-
