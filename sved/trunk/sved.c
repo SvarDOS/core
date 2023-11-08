@@ -86,6 +86,7 @@ struct file {
   char lfonly;   /* set if line endings are LF (CR/LF otherwise) */
   char modflag;  /* non-zero if file has been modified since last save */
   char modflagprev;
+  char slotid; /* 0..9 */
   char fname[128];
 };
 
@@ -289,7 +290,7 @@ static int savefile(struct file *db, const char *saveas) {
 }
 
 
-static void ui_statusbar(const struct file *db, unsigned char slotnum) {
+static void ui_statusbar(const struct file *db) {
   const char *s = svarlang_strid(0); /* ESC=MENU */
   unsigned short helpcol = screenw - strlen(s);
   unsigned short col;
@@ -297,11 +298,10 @@ static void ui_statusbar(const struct file *db, unsigned char slotnum) {
   /* slot number (guaranteed to be 0-9) */
   {
     char slot[4] = "#00";
-    if (slotnum == 9) {
+    if (db->slotid == 9) {
       slot[1] = '1';
     } else {
-      slotnum++;
-      slot[2] += slotnum;
+      slot[2] += db->slotid + 1;
     }
     mdr_cout_str(screenlastrow, 0, slot, SCHEME_STBAR2, 3);
   }
@@ -945,15 +945,16 @@ static enum MENU_ACTION ui_menu(void) {
 }
 
 
-static struct file *select_slot(struct file *dbarr, unsigned char curfile) {
+static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
   uidirty.from = 0;
   uidirty.to = 0xff;
   uidirty.statusbar = 1;
 
   dbarr = &(dbarr[curfile]);
+
   /* force redraw now, because the main() routine might not if this is exit
    * time and we want to show the user which file has unsaved changes */
-  ui_statusbar(dbarr, curfile);
+  ui_statusbar(dbarr);
   ui_refresh(dbarr);
   return(dbarr);
 }
@@ -963,7 +964,6 @@ static struct file *select_slot(struct file *dbarr, unsigned char curfile) {
  * (this saves 20 bytes of executable footprint) */
 void main(void) {
   static struct file dbarr[10];
-  unsigned short curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
   static struct line far *clipboard;
   static unsigned char original_breakflag;
@@ -982,9 +982,12 @@ void main(void) {
   }
 
   /* preload all slots with empty files */
-  for (curfile = 9;; curfile--) {
-    loadfile(&(dbarr[curfile]), NULL);
-    if (curfile == 0) break;
+  {
+    unsigned short i;
+    for (i = 0; i < 10; i++) {
+      loadfile(&(dbarr[i]), NULL);
+      dbarr[i].slotid = i;
+    }
   }
 
   /* parse argv (and load files, if any passed on) */
@@ -1028,7 +1031,7 @@ void main(void) {
     ui_refresh(db);
 
     if ((uidirty.statusbar != 0) || (db->modflagprev != db->modflag) || (db->curline_prev != db->curline)) {
-      ui_statusbar(db, curfile);
+      ui_statusbar(db);
       uidirty.statusbar = 0;
       db->modflagprev = db->modflag;
       db->curline_prev = db->curline;
@@ -1184,8 +1187,10 @@ void main(void) {
 
         case MENU_QUIT:
           quitnow = 1;
-          for (curfile = 0; curfile < 10; curfile++) {
-            if (dbarr[curfile].modflag) {
+          {
+            unsigned short curfile;
+            for (curfile = 0; curfile < 10; curfile++) {
+              if (dbarr[curfile].modflag == 0) continue; /* skip unmodified slots */
               db = select_slot(dbarr, curfile);
               if (ui_confirm_if_unsaved(db) != 0) {
                 quitnow = 0;
@@ -1234,8 +1239,7 @@ void main(void) {
       }
 
     } else if ((k >= 0x13b) && (k <= 0x144)) { /* F1..F10 */
-      curfile = k - 0x13b;
-      db = select_slot(dbarr, curfile);
+      db = select_slot(dbarr, k - 0x13b);
 
     } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
       /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */
