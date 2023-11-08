@@ -115,7 +115,7 @@ static void line_free(struct line far *ptr) {
 }
 
 
-static int curline_resize(struct file far *db, unsigned short newsiz) {
+static int curline_resize(struct file *db, unsigned short newsiz) {
   unsigned int maxavail;
   struct line far *newptr;
 
@@ -204,7 +204,7 @@ static void ui_getstring(const char *query, char *s, unsigned short maxlen) {
 
 
 /* append a nul-terminated string to line at cursor position */
-static int line_append(struct file *f, const char far *buf, unsigned short len) {
+static int line_append(struct file *f, const char *buf, unsigned short len) {
   if (sizeof(struct line) + f->cursor->len + len < len) goto ERR; /* overflow check */
   if (curline_resize(f, f->cursor->len + len) != 0) goto ERR;
 
