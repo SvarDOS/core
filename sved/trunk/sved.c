@@ -1308,6 +1308,7 @@ void main(void) {
           }
           line_free(clipboard->prev);
           db->totlines -= 1;
+          db->modflag = 1;
           uidirty.from = 0;
           uidirty.to = 0xff;
           recompute_curline(db);
@@ -1330,6 +1331,7 @@ void main(void) {
         clipboard->prev->prev = db->cursor;
         db->cursor->next = clipboard->prev;
         cursor_down(db);
+        db->modflag = 1;
       }
       uidirty.from = 0;
       uidirty.to = 0xff;
