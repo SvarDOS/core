@@ -16,11 +16,11 @@ it a good fit for bootdisks and systems with extremely limited resources.
  - multilingual UI
  - only 7 KiB of disk footprint
  - screen estate dedicated to text (no stupid frames, menus and such)
- - loads files larger than 64 KiB
+ - loads files larger than 64 KiB (limited to available conventional memory)
  - no line length limit
  - can load up to 10 files simultaneously
  - COPY/CUT/PASTE between files
- - handles CR/LF and LF line endings and can convert between them
+ - handles CR/LF and LF line endings and can convert between the two
 
 What SVED does NOT have:
 
