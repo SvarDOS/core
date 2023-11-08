@@ -58,6 +58,8 @@ static unsigned char SCHEME_TEXT   = 0x07,
 static unsigned char screenw, screenh, screenlastrow, screenlastcol;
 static unsigned char glob_monomode, glob_tablessmode;
 
+static char buff[512]; /* short lived buffer for whatever needed */
+
 static struct {
     unsigned char from;
     unsigned char to;
@@ -637,7 +639,6 @@ static void bkspc(struct file *db) {
 
 /* returns 0 on success, 1 on file not found, 2 on other error */
 static unsigned char loadfile(struct file *db, const char *fname) {
-  char buff[512]; /* read one entire sector at a time (faster) */
   char *buffptr;
   unsigned int len, llen;
   int fd;
@@ -962,21 +963,21 @@ static struct file *select_slot(struct file *dbarr, unsigned char curfile) {
  * (this saves 20 bytes of executable footprint) */
 void main(void) {
   static struct file dbarr[10];
-  unsigned char curfile;
+  unsigned short curfile;
   struct file *db = dbarr; /* visible file is the first slot by default */
-  struct line far *clipboard = NULL;
+  static struct line far *clipboard;
   static unsigned char original_breakflag;
 
   { /* load NLS resource */
     unsigned short i = 0;
     const char far *selfptr;
-    char self[128], lang[8];
+    char lang[8];
     selfptr = mdr_dos_selfexe();
     if (selfptr != NULL) {
       do {
-        self[i] = selfptr[i];
-      } while (self[i++] != 0);
-      svarlang_autoload_exepath(self, mdr_dos_getenv(lang, "LANG", sizeof(lang)));
+        buff[i] = selfptr[i];
+      } while (buff[i++] != 0);
+      svarlang_autoload_exepath(buff, mdr_dos_getenv(lang, "LANG", sizeof(lang)));
     }
   }
 
