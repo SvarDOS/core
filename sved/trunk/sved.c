@@ -654,8 +654,12 @@ static unsigned char loadfile(struct file *db, const char *fname) {
     line_free(victim);
   }
 
-  /* zero out the struct */
-  bzero(db, sizeof(struct file));
+  /* zero out the struct (take care to preserve the id of the slot, though) */
+  {
+    unsigned char slotid = db->slotid;
+    bzero(db, sizeof(struct file));
+    db->slotid = slotid;
+  }
 
   /* start by adding an empty line */
   if (line_add(db, NULL, 0) != 0) return(2);
