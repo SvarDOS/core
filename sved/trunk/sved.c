@@ -25,7 +25,6 @@
 
 #include <dos.h>      /* _dos_open(), _dos_read(), _dos_close(), ... */
 #include <fcntl.h>    /* O_RDONLY, O_WRONLY */
-#include <stdlib.h>   /* _osmajor symbol provided by Open Watcom */
 #include <string.h>
 #include <strings.h>
 
