@@ -26,32 +26,6 @@ void far *_fmemmove(void far *dst, const void far *src, size_t len) {
   return(dst);
 }
 
-unsigned short mdr_dos_fopen(const char *fname, unsigned short *fhandle) {
-  unsigned short res = 0;
-  unsigned short handle = 0;
-  _asm {
-    push cx
-    push dx
-
-    mov ax, 0x3d00
-    mov dx, fname
-    xor cl, cl
-    int 0x21
-    jc err
-    mov handle, ax
-    jmp done
-    err:
-    mov res, ax
-    done:
-
-    pop dx
-    pop cx
-  }
-  *fhandle = handle;
-  return(res);
-}
-
-
 unsigned short mdr_dos_fclose(unsigned short handle) {
   unsigned short res = 0;
   _asm {
