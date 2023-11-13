@@ -1,0 +1,10 @@
+name sved
+system dos com
+option map
+option nodefaultlibs
+file startup
+file sved
+file deflang
+file libc
+lib svarlang\svarlngs
+lib mdr\mdrs2024.lib

@@ -23,10 +23,9 @@
  * IN THE SOFTWARE.
  */
 
-#include <dos.h>      /* _dos_open(), _dos_read(), _dos_close(), ... */
-#include <fcntl.h>    /* O_RDONLY, O_WRONLY */
-#include <string.h>
-#include <strings.h>
+#include <i86.h> /* MK_FP() */
+
+#include "libc.h"
 
 #include "mdr\bios.h"
 #include "mdr\cout.h"
@@ -96,10 +95,10 @@ struct file {
 
 static struct line far *line_calloc(unsigned short siz) {
   struct line far *res;
-  unsigned int seg;
+  unsigned short seg;
 
-  if (_dos_allocmem((sizeof(struct line) + siz + 15) / 16, &seg) != 0) return(NULL);
-
+  seg = mdr_dos_allocmem((sizeof(struct line) + siz + 15) / 16);
+  if (seg == 0) return(NULL);
   res = MK_FP(seg, 0);
   res->len = 0;
   res->next = NULL;
@@ -115,11 +114,11 @@ static void line_free(struct line far *ptr) {
 
 
 static int curline_resize(struct file *db, unsigned short newsiz) {
-  unsigned int maxavail;
+  unsigned short maxavail;
   struct line far *newptr;
 
   /* try resizing the block (much faster) */
-  if (_dos_setblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor), &maxavail) == 0) return(0);
+  if (mdr_dos_resizeblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor), &maxavail) == 0) return(0);
 
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
@@ -228,7 +227,7 @@ static void db_rewind(struct file *db) {
 static int savefile(struct file *db, const char *saveas) {
   int fd = 0;
   const struct line far *l;
-  unsigned int bytes;
+  unsigned short bytes;
   unsigned char eollen = 2;
   const unsigned char *eolbuf = "\r\n";
   int errflag = 0;
@@ -269,15 +268,15 @@ static int savefile(struct file *db, const char *saveas) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      errflag |= _dos_write(fd, l->payload, l->len, &bytes);
+      errflag |= mdr_dos_write(fd, l->payload, l->len, &bytes);
     } else if (l->next == NULL) {
       break;
     }
-    errflag |= _dos_write(fd, eolbuf, eollen, &bytes);
+    errflag |= mdr_dos_write(fd, eolbuf, eollen, &bytes);
     l = l->next;
   }
 
-  errflag |= _dos_close(fd);
+  errflag |= mdr_dos_fclose(fd);
 
   /* did it all work? */
   if (errflag == 0) {
@@ -639,8 +638,8 @@ static void bkspc(struct file *db) {
 /* returns 0 on success, 1 on file not found, 2 on other error */
 static unsigned char loadfile(struct file *db, const char *fname) {
   char *buffptr;
-  unsigned int len, llen;
-  int fd;
+  unsigned short len, llen;
+  unsigned short fd;
   unsigned char eolfound;
   unsigned char err = 0;
 
@@ -668,7 +667,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   /* make the filename canonical (DOS 3+ only, on earlier versions it just copies the filename) */
   mdr_dos_truename(db->fname, fname);
 
-  err = _dos_open(fname, O_RDONLY, &fd);
+  err = mdr_dos_fopen(fname, &fd);
   if (err != 0) goto SKIPLOADING;
 
   db->lfonly = 1;
@@ -676,7 +675,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   for (eolfound = 0;;) {
     unsigned short consumedbytes;
 
-    if ((_dos_read(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
+    if ((mdr_dos_read(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
     buffptr = buff;
 
     FINDLINE:
@@ -740,7 +739,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   }
 
-  _dos_close(fd);
+  mdr_dos_fclose(fd);
 
   SKIPLOADING:
 
@@ -750,7 +749,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   return(err);
 
   IOERR:
-  _dos_close(fd);
+  mdr_dos_fclose(fd);
   return(1);
 }
 
@@ -971,6 +970,14 @@ void main(void) {
   static struct line far *clipboard;
   static unsigned char original_breakflag;
 
+  mdr_coutraw_puts("glob_monomode:");
+  mdr_coutraw_char('0' + glob_monomode);
+  mdr_coutraw_crlf();
+
+  mdr_coutraw_puts("original_breakflag:");
+  mdr_coutraw_char('0' + original_breakflag);
+  mdr_coutraw_crlf();
+
   { /* load NLS resource */
     unsigned short i = 0;
     const char far *selfptr;
@@ -1008,6 +1015,10 @@ void main(void) {
     SCHEME_SCROLL = 0x70;
     SCHEME_MSG = 0x6f;
     SCHEME_ERR = 0x4f;
+  } else {
+    // FIXME
+    mdr_coutraw_char('0' + glob_monomode);
+    _asm int 0x20
   }
   screenlastrow = screenh - 1;
   screenlastcol = screenw - 1;

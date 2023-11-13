@@ -7,17 +7,16 @@
 #   wmake release    builds distribuable packages (svp, zip, sources...)
 
 CC = wcc
-CFLAGS = -0 -ms -os -wx -we -d0 -bt=dos -I=mdr\inc
+CFLAGS = -0 -ms -zl -os -wx -we -d0 -bt=dos -I=mdr\inc
 CFLAGS += -s
-LDFLAGS = -lr -mt -fm=sved.map -fe=sved.com
-LDLIBS = svarlang\svarlngs.lib mdr\mdrs2024.lib
 
 PVER = 2023.5
 
 all: sved.com
 
-sved.com: sved.obj deflang.obj
-	wcl $(LDLIBS) sved.obj deflang.obj $(LDFLAGS)
+sved.com: sved.obj deflang.obj libc.obj
+	wasm startup.asm
+	wlink @sved.lnk
 	upx -9 --8086 sved.com
 
 .c.obj: .autodepend
