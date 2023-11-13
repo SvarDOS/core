@@ -1,8 +1,11 @@
+; minimalist Watcom C startup routine - TINY memory model ONLY - (.COM files)
+; kindly contributed by Bernd Boeckmann
+
 .8086
 
 STACK_SIZE = 2048
 
-      dgroup group _TEXT,_DATA,CONST,CONST2,_STACK,_BSS
+      DGROUP group _TEXT,_DATA,CONST,CONST2,_BSS,_EOF
 
       extrn   "C",main : near
 
@@ -23,10 +26,13 @@ _cstart_:
       ; for this reasons it is beneficial to resize the memory block we occupy
       ; into a more reasonable value
 
-      ; step 1: if SP is higher than my top_of_stack, then set SP explicitely
-      cmp sp, top_of_stack
-      jle resizemem
-      mov sp, top_of_stack
+      ; step 1: if SP > COM size + stack size, then set SP explicitely
+      ; POTENTIAL error: offset DGROUP:_EOF + STACK_SIZE may overflow!
+      ; Has to be detected at linking stage, but WLINK does not catch it.
+    adjustsp:
+      cmp sp, offset DGROUP:_EOF + STACK_SIZE
+      jbe resizemem   ; JBE instead of JLE (unsigned comparison!)
+      mov sp, offset DGROUP:_EOF + STACK_SIZE
 
       ; step 2: resize our memory block to sp bytes (ie. sp/16 paragraphs)
     resizemem:
@@ -39,6 +45,14 @@ _cstart_:
       inc bx
       int 21h
 
+      ; clear _BSS to be ANSI C conformant
+      mov di, offset DGROUP:_BSS
+      mov cx, offset DGROUP:_EOF
+      sub cx, di
+      xor al, al
+      cld
+      rep stosb
+
       call  main
       mov   ah, 4ch
       int   21h
@@ -48,29 +62,25 @@ _cstart_:
 ;__STK:
 ;      ret
 
-_DATA   segment word public 'DATA'
-_DATA   ends
+_DATA segment word public 'DATA'
+_DATA ends
 
-CONST   segment word public 'DATA'
-CONST   ends
+CONST segment word public 'DATA'
+CONST ends
 
-CONST2  segment word public 'DATA'
-CONST2  ends
+CONST2 segment word public 'DATA'
+CONST2 ends
 
-_BSS    segment word public 'BSS'
-_BSS    ends
+_BSS  segment word public 'BSS'
+_BSS  ends
 
-_STACK  segment para public 'BSS'
-        db      (STACK_SIZE) dup(0) ; set this explicitely to zero, otherwise
-                                    ; static variables are not properly
-                                    ; initialized. this makes the COM file
-                                    ; much bigger, but it is irrelevant if it
-                                    ; is UPXed afterwards anyway. If you care,
-                                    ; then you may zero out this area in
-                                    ; code instead (before calling main)
-        top_of_stack:
-_STACK  ends
+; _EOF should be the last segment in .COM (see linker memory map)
+; if not, someone introduced other segments, or startup.obj is not the first
+; linker object file
+_EOF  segment word public
+_EOF  ends
 
 _TEXT ends
 
       end _cstart_
+
