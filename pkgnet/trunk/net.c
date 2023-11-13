@@ -34,6 +34,19 @@ struct net_tcpsocket {
 };
 
 
+int net_dnsresolve(char *ip, const char *name, int retries) {
+  unsigned long ipnum;
+  do {
+    ipnum = resolve(name); /* I could use WatTCP's lookup_host() to do all the
+                              job for me, unfortunately lookup_host() issues
+                              wild outs() calls putting garbage on screen... */
+  } while ((ipnum == 0) && (retries-- > 0));
+  if (ipnum == 0) return(-1);
+  _inet_ntoa(ip, ipnum); /* convert to string */
+  return(0);
+}
+
+
 static int dummy_printf(const char * format, ...) {
   if (format == NULL) return(-1);
   return(0);

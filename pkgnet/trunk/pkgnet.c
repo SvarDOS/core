@@ -43,8 +43,8 @@
 #define PVER "20230823"
 #define PDATE "2021-2023"
 
-#define HOSTNAME "svardos.org"
-#define HOSTADDR "141.95.149.60"
+#define HOSTADDR "svardos.org"
+
 
 /* convenience define that outputs nls strings to screen (followed by CR/LF) */
 #define putsnls(x,y) puts(svarlang_strid((x << 8) | y))
@@ -262,7 +262,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
 
   sock = net_connect(ipaddr, 80, tcpbuflen);
   if (sock == NULL) {
-    printf(svarlang_strid(0x0902), HOSTNAME); /* "ERROR: failed to connect to " HOSTNAME */
+    printf(svarlang_strid(0x0902), HOSTADDR); /* "ERROR: failed to connect to " HOSTADDR */
     puts("");
     goto SHITQUIT;
   }
@@ -272,7 +272,7 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
     int connstate = net_isconnected(sock);
     if (connstate > 0) break;
     if (connstate < 0) {
-      printf(svarlang_strid(0x0902), HOSTNAME); /* "ERROR: failed to connect to " HOSTNAME */
+      printf(svarlang_strid(0x0902), HOSTADDR); /* "ERROR: failed to connect to " HOSTADDR */
       puts("");
       goto SHITQUIT;
     }
@@ -281,9 +281,9 @@ static long htget(const char *ipaddr, const char *url, const char *outfname, uns
 
   /* socket is connected - send the http request (MUST be HTTP/1.0 because I do not support chunked transfers!) */
   if (ispost) {
-    snprintf((char *)buffer, buffersz, "POST %s HTTP/1.1\r\nHOST: " HOSTNAME "\r\nUSER-AGENT: pkgnet/" PVER "\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n", url);
+    snprintf((char *)buffer, buffersz, "POST %s HTTP/1.1\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet/" PVER "\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n", url);
   } else {
-    snprintf((char *)buffer, buffersz, "GET %s HTTP/1.1\r\nHOST: " HOSTNAME "\r\nUSER-AGENT: pkgnet/" PVER "\r\nConnection: close\r\n\r\n", url);
+    snprintf((char *)buffer, buffersz, "GET %s HTTP/1.1\r\nHOST: " HOSTADDR "\r\nUSER-AGENT: pkgnet/" PVER "\r\nConnection: close\r\n\r\n", url);
   }
 
   if (net_send(sock, buffer, strlen((char *)buffer)) != (int)strlen((char *)buffer)) {
@@ -421,6 +421,7 @@ int main(int argc, char **argv) {
 
   struct {
     unsigned char buffer[5000];
+    char ipaddr[64];
     char url[64];
     char outfname[16];
   } *mem;
@@ -465,7 +466,12 @@ int main(int argc, char **argv) {
 
   puts(""); /* required because watt-32 likes to print out garbage sometimes ("configuring through DHCP...") */
 
-  flen = htget(HOSTADDR, mem->url, mem->outfname, &bsum, ispost, mem->buffer, sizeof(mem->buffer), tcpbufsz);
+  if (net_dnsresolve(mem->ipaddr, HOSTADDR, 2) != 0) {
+    putsnls(9, 12); /* "ERROR: DNS resolution failed" */
+    return(1);
+  }
+
+  flen = htget(mem->ipaddr, mem->url, mem->outfname, &bsum, ispost, mem->buffer, sizeof(mem->buffer), tcpbufsz);
   if (flen < 1) return(1);
 
   if (mem->outfname[0] != 0) {
