@@ -19,11 +19,12 @@ void bzero(void *ptr, size_t len) {
 }
 
 /* TODO this function does not handle overlapping strings well! */
-void far *_fmemmove(void far *dst, const void far *src, size_t len) {
+void fmemmove(void far *dst, const void far *src, size_t len) {
   while (len-- > 0) {
-    ((char far *)dst)[len] = ((char far *)src)[len];
+    *(char far *)dst = *(char far *)src;
+    dst = (char far *)dst + 1;
+    src = (char far *)src + 1;
   }
-  return(dst);
 }
 
 unsigned short mdr_dos_fclose(unsigned short handle) {

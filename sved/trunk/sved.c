@@ -122,7 +122,7 @@ static int curline_resize(struct file *db, unsigned short newsiz) {
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
   if (newptr == NULL) return(-1);
-  _fmemmove(newptr, db->cursor, sizeof(struct line) + db->cursor->len);
+  fmemmove(newptr, db->cursor, sizeof(struct line) + db->cursor->len);
 
   /* rewire the linked list */
   db->cursor = newptr;
@@ -149,7 +149,7 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
   }
   db->cursor = l;
   if (slen > 0) {
-    _fmemmove(l->payload, line, slen);
+    fmemmove(l->payload, line, slen);
     l->len = slen;
   }
 
@@ -205,7 +205,7 @@ static int line_append(struct file *f, const char *buf, unsigned short len) {
   if (sizeof(struct line) + f->cursor->len + len < len) goto ERR; /* overflow check */
   if (curline_resize(f, f->cursor->len + len) != 0) goto ERR;
 
-  _fmemmove(f->cursor->payload + f->cursor->len, buf, len);
+  fmemmove(f->cursor->payload + f->cursor->len, buf, len);
   f->cursor->len += len;
 
   return(0);
@@ -597,7 +597,7 @@ static void cursor_right(struct file *db) {
 
 static void del(struct file *db) {
   if (db->cursorposx + db->xoffset < db->cursor->len) {
-    _fmemmove(db->cursor->payload + db->cursorposx + db->xoffset, db->cursor->payload + db->cursorposx + db->xoffset + 1, db->cursor->len - db->cursorposx - db->xoffset);
+    fmemmove(db->cursor->payload + db->cursorposx + db->xoffset, db->cursor->payload + db->cursorposx + db->xoffset + 1, db->cursor->len - db->cursorposx - db->xoffset);
     db->cursor->len -= 1; /* do this AFTER memmove so the copy includes the nul terminator */
     uidirty.from = db->cursorposy;
     uidirty.to = db->cursorposy;
@@ -606,7 +606,7 @@ static void del(struct file *db) {
     struct line far *nextline = db->cursor->next;
     if (db->cursor->next->len > 0) {
       if (curline_resize(db, db->cursor->len + db->cursor->next->len + 1) == 0) {
-        _fmemmove(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
+        fmemmove(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
         db->cursor->len += db->cursor->next->len;
       }
     }
@@ -866,7 +866,7 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
   if (curline_resize(db, db->cursor->len + len) == 0) {
     unsigned short off = db->xoffset + db->cursorposx;
     db->modflag = 1;
-    _fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
+    fmemmove(db->cursor->payload + off + len, db->cursor->payload + off, db->cursor->len - off + 1);
     db->cursor->len += len;
     uidirty.from = db->cursorposy;
     uidirty.to = db->cursorposy;
@@ -1306,7 +1306,7 @@ void main(void) {
         uidirty.from = db->cursorposy;
         uidirty.to = db->cursorposy;
         if (db->cursor->len != 0) {
-          _fmemmove(clipboard->payload, db->cursor->payload, db->cursor->len);
+          fmemmove(clipboard->payload, db->cursor->payload, db->cursor->len);
           clipboard->len = db->cursor->len;
         }
         mdr_bios_tickswait(2); /* ca 100ms */
