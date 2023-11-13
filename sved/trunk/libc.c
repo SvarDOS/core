@@ -9,9 +9,9 @@
 
 
 size_t strlen(const char *s) {
-  size_t res = 0;
-  while (s[res] != 0) res++;
-  return(res);
+  const char *ptr = s;
+  while (*ptr != 0) ptr++;
+  return(ptr - s);
 }
 
 void bzero(void *ptr, size_t len) {
