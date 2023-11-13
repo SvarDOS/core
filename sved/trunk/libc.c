@@ -29,19 +29,14 @@ void far *_fmemmove(void far *dst, const void far *src, size_t len) {
 unsigned short mdr_dos_fopen(const char *fname, unsigned short *fhandle) {
   unsigned short res = 0;
   unsigned short handle = 0;
-  unsigned short fname_seg = FP_SEG(fname);
-  unsigned short fname_off = FP_OFF(fname);
   _asm {
     push cx
     push dx
 
     mov ax, 0x3d00
-    mov dx, fname_off
+    mov dx, fname
     xor cl, cl
-    push ds
-    mov ds, fname_seg
     int 0x21
-    pop ds
     jc err
     mov handle, ax
     jmp done
@@ -112,8 +107,7 @@ unsigned short mdr_dos_allocmem(unsigned short siz) {
 }
 
 
-unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn, unsigned short *maxsiz) {
-  unsigned short resbx = 0;
+unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn) {
   unsigned short res = 0;
 
   _asm {
@@ -125,7 +119,6 @@ unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn, unsi
     mov es, segn
     int 0x21
     jnc done
-    mov resbx, bx
     mov res, ax
 
     done:
@@ -134,7 +127,6 @@ unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn, unsi
     pop bx
   }
 
-  *maxsiz = resbx;
   return(res);
 }
 

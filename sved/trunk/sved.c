@@ -114,11 +114,10 @@ static void line_free(struct line far *ptr) {
 
 
 static int curline_resize(struct file *db, unsigned short newsiz) {
-  unsigned short maxavail;
   struct line far *newptr;
 
   /* try resizing the block (much faster) */
-  if (mdr_dos_resizeblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor), &maxavail) == 0) return(0);
+  if (mdr_dos_resizeblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor)) == 0) return(0);
 
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
