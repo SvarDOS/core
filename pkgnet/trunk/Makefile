@@ -10,7 +10,6 @@ all: pkgnet.exe
 release: pkgnet.exe .symbolic
 	mkdir bin
 	mkdir appinfo
-	upx --8086 -9 pkgnet.exe
 	copy pkgnet.exe bin
 	copy pkgnet.lng bin
 	copy pkgnet.lsm appinfo
@@ -33,6 +32,7 @@ pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj
 	move /y out.lng ..\pkgnet.lng
 	cd ..
 	*wcl -lr -k4096 $(LIB) pkgnet.obj deflang.c net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
+	upx --8086 -9 pkgnet.exe
 
 pkgnet.obj: pkgnet.c
 	*wcc $(CFLAGS) pkgnet.c

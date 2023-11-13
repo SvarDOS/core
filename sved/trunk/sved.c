@@ -666,7 +666,25 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   /* make the filename canonical (DOS 3+ only, on earlier versions it just copies the filename) */
   mdr_dos_truename(db->fname, fname);
 
-  err = mdr_dos_fopen(fname, &fd);
+  /* fopen file */
+  fd = 0;
+  _asm {
+    push cx
+    push dx
+
+    mov ax, 0x3d00
+    mov dx, fname   // works only in SMALL memory model!
+    xor cl, cl
+    int 0x21
+    mov fd, ax
+    jnc done
+    mov err, al
+    done:
+
+    pop dx
+    pop cx
+  }
+
   if (err != 0) goto SKIPLOADING;
 
   db->lfonly = 1;
@@ -969,14 +987,6 @@ void main(void) {
   static struct line far *clipboard;
   static unsigned char original_breakflag;
 
-  mdr_coutraw_puts("glob_monomode:");
-  mdr_coutraw_char('0' + glob_monomode);
-  mdr_coutraw_crlf();
-
-  mdr_coutraw_puts("original_breakflag:");
-  mdr_coutraw_char('0' + original_breakflag);
-  mdr_coutraw_crlf();
-
   { /* load NLS resource */
     unsigned short i = 0;
     const char far *selfptr;
@@ -1014,10 +1024,6 @@ void main(void) {
     SCHEME_SCROLL = 0x70;
     SCHEME_MSG = 0x6f;
     SCHEME_ERR = 0x4f;
-  } else {
-    // FIXME
-    mdr_coutraw_char('0' + glob_monomode);
-    _asm int 0x20
   }
   screenlastrow = screenh - 1;
   screenlastcol = screenw - 1;

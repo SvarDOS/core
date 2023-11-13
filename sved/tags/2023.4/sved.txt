@@ -68,6 +68,9 @@ and wish to free a bit of disk space.
 
 ### CHANGELOG ################################################################
 
+2023.5 [07 Nov 2023]
+- improved compatibility with MS-DOS 2.x
+
 2023.4 [27 Aug 2023]
 - added german translation, credits to Bernd Boeckmann
 
