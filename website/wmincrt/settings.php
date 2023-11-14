@@ -4,15 +4,9 @@ $PROJNAME = 'WMINCRT';
 $SHORT = 'a minimalist startup code for Open Watcom';
 
 $LONGHTML = '
-<p>lorem ipsum etc</p>
-
-<ul>
-<li>feature 1</li>
-<li>feature 2</li>
-<li>feature 3</li>
-</ul>
-
-<p>some other words</p>
+<p>until a proper description is placed here, please have a look at the 
+<a href=http://svn.svardos.org/listing.php?repname=SvarDOS&path=%2Fwmincrt>SVN repository</a>
+</p>
 ';
 
 $COPYRDATE = '2023';
