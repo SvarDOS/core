@@ -8,31 +8,6 @@
 #include "libc.h"
 
 
-
-unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn) {
-  unsigned short res = 0;
-
-  _asm {
-    push bx
-    push es
-
-    mov ah, 0x4a
-    mov bx, siz
-    mov es, segn
-    int 0x21
-    jnc done
-    mov res, ax
-
-    done:
-
-    pop es
-    pop bx
-  }
-
-  return(res);
-}
-
-
 unsigned short mdr_dos_write(unsigned short handle, const void far *buf, unsigned short count, unsigned short *bytes) {
   unsigned short res = 0;
   unsigned short resax = 0;

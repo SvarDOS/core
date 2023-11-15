@@ -140,6 +140,16 @@ unsigned short dosfread(unsigned short handle, void *buf, unsigned short count, 
 parm [bx] [dx] [cx] [di] \
 value [ax]
 
+unsigned short dos_resizeblock(unsigned short siz, unsigned short segn);
+
+#pragma aux dos_resizeblock = \
+"mov ah, 0x4a" \
+"int 0x21" \
+"jc done" \
+"xor ax, ax" \
+"done:" \
+parm [bx] [es] \
+value [ax]
 
 
 /*****************************************************************************
@@ -198,7 +208,7 @@ static int curline_resize(struct file *db, unsigned short newsiz) {
   struct line far *newptr;
 
   /* try resizing the block (much faster) */
-  if (mdr_dos_resizeblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor)) == 0) return(0);
+  if (dos_resizeblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor)) == 0) return(0);
 
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
