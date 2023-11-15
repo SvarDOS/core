@@ -89,6 +89,35 @@ struct file {
 };
 
 
+
+/*****************************************************************************
+ * assembly "functions"                                                      *
+ *****************************************************************************/
+
+unsigned short dosalloc(unsigned short siz);
+
+#pragma aux dosalloc = \
+"mov ah, 0x48" \
+"int 0x21" \
+"jnc done" \
+"xor ax, ax" \
+"done:" \
+parm [bx] \
+value [ax];
+
+
+unsigned short dosfree(unsigned short segn);
+
+#pragma aux dosfree = \
+"mov ah, 0x49" \
+"int 0x21" \
+"jc done" \
+"xor ax, ax" \
+"done:" \
+parm [es] \
+value [ax];
+
+
 /*****************************************************************************
  * functions                                                                 *
  *****************************************************************************/
@@ -97,7 +126,7 @@ static struct line far *line_calloc(unsigned short siz) {
   struct line far *res;
   unsigned short seg;
 
-  seg = mdr_dos_allocmem((sizeof(struct line) + siz + 15) / 16);
+  seg = dosalloc((sizeof(struct line) + siz + 15) / 16);
   if (seg == 0) return(NULL);
   res = MK_FP(seg, 0);
   res->len = 0;
@@ -109,7 +138,7 @@ static struct line far *line_calloc(unsigned short siz) {
 
 
 static void line_free(struct line far *ptr) {
-  _dos_freemem(FP_SEG(ptr));
+  dosfree(FP_SEG(ptr));
 }
 
 

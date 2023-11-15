@@ -50,43 +50,6 @@ unsigned short mdr_dos_fclose(unsigned short handle) {
 }
 
 
-unsigned short _dos_freemem(unsigned short segn) {
-  unsigned short res = 0;
-  _asm {
-    push es
-    mov ah, 0x49
-    mov es, segn
-    int 0x21
-    pop es
-    jnc done
-    mov res, ax
-    done:
-  }
-  return(res);
-}
-
-
-unsigned short mdr_dos_allocmem(unsigned short siz) {
-  unsigned short segnum = 0;
-
-  _asm {
-    push bx
-
-    mov ah, 0x48
-    mov bx, siz
-    int 0x21
-    jc done
-    mov segnum, ax
-
-    done:
-
-    pop bx
-  }
-
-  return(segnum);
-}
-
-
 unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn) {
   unsigned short res = 0;
 
