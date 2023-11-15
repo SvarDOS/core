@@ -14,7 +14,7 @@ it a good fit for bootdisks and systems with extremely limited resources.
  - auto-detects color and monochrome video modes
  - supports unusual text modes like 80x43, 80x50, 132x60, 40x25...
  - multilingual UI
- - only 7 KiB of disk footprint
+ - only 6 KiB of disk footprint
  - screen estate dedicated to text (no stupid frames, menus and such)
  - loads files larger than 64 KiB (limited to available conventional memory)
  - no line length limit
@@ -70,8 +70,10 @@ and wish to free a bit of disk space.
 
 2023.5 [xx Nov 2023]
 - modified files can be saved at exit time with the space key
-- fix: CTRL+X and CTRL+V were not marking the file as "modified"
+- fix: CTRL+X and CTRL+V were not flagging the file as "modified"
 - improved compatibility with DOS 2.x
+- removed the Watcom RTL; HUGE thanks to Bernd Boeckmann for WMINCRT
+- SVED's disk footprint decreased from 7K to 6K
 
 2023.4 [27 Aug 2023]
 - added german translation, credits to Bernd Boeckmann
