@@ -89,8 +89,9 @@ struct file {
 
 
 /*****************************************************************************
- * assembly "functions"                                                      *
+ * assembly pragma "functions"                                               *
  *****************************************************************************/
+
 
 unsigned short dosalloc(unsigned short siz);
 
@@ -115,6 +116,7 @@ unsigned short dosfree(unsigned short segn);
 parm [es] \
 value [ax];
 
+
 unsigned short dosfclose(unsigned short handle);
 
 #pragma aux dosfclose = \
@@ -125,6 +127,7 @@ unsigned short dosfclose(unsigned short handle);
 "done:" \
 parm [bx] \
 value [ax];
+
 
 unsigned short dosfread(unsigned short handle, void *buf, unsigned short count, unsigned short *bytes);
 
@@ -138,6 +141,7 @@ unsigned short dosfread(unsigned short handle, void *buf, unsigned short count, 
 parm [bx] [dx] [cx] [di] \
 value [ax]
 
+
 unsigned short dos_resizeblock(unsigned short siz, unsigned short segn);
 
 #pragma aux dos_resizeblock = \
@@ -150,45 +154,28 @@ parm [bx] [es] \
 value [ax]
 
 
+unsigned short dos_write(unsigned short handle, unsigned short count, unsigned short *bytes, const void far *buf);
+/* NOTE: last parameter (far pointer buf) is passed on the stack */
+#pragma aux dos_write = \
+"push ds" \
+"pop ax" \
+"pop dx" \
+"pop ds" \
+"push ax" \
+"mov ah, 0x40" \
+"int 0x21" \
+"pop ds" \
+"jc done" \
+"mov [di], ax" \
+"xor ax, ax" \
+"done:" \
+parm [bx] [cx] [di] \
+value [ax]
+
+
 /*****************************************************************************
  * functions                                                                 *
  *****************************************************************************/
-
-
-static unsigned short dos_write(unsigned short handle, const void far *buf, unsigned short count, unsigned short *bytes) {
-  unsigned short res = 0;
-  unsigned short resax = 0;
-  unsigned short buf_seg = FP_SEG(buf);
-  unsigned short buf_off = FP_OFF(buf);
-
-  _asm {
-    push bx
-    push cx
-    push dx
-
-    mov ah, 0x40
-    mov bx, handle
-    mov cx, count
-    mov dx, buf_off
-    push ds
-    mov ds, buf_seg
-
-    int 0x21
-    pop ds
-    jnc done
-    mov res, ax
-
-    done:
-    mov resax, ax
-
-    pop dx
-    pop cx
-    pop bx
-  }
-
-  *bytes = resax;
-  return(res);
-}
 
 
 static size_t strlen(const char *s) {
@@ -392,11 +379,11 @@ static int savefile(struct file *db, const char *saveas) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      errflag |= dos_write(fd, l->payload, l->len, &bytes);
+      errflag |= dos_write(fd, l->len, &bytes, l->payload);
     } else if (l->next == NULL) {
       break;
     }
-    errflag |= dos_write(fd, eolbuf, eollen, &bytes);
+    errflag |= dos_write(fd, eollen, &bytes, eolbuf);
     l = l->next;
   }
 
