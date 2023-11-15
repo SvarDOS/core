@@ -14,7 +14,7 @@ PVER = 2023.5
 
 all: sved.com
 
-sved.com: sved.obj deflang.obj libc.obj
+sved.com: sved.obj deflang.obj
 	wasm startup.asm
 	wlink @sved.lnk
 	upx -9 --8086 sved.com

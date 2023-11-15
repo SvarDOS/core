@@ -25,8 +25,6 @@
 
 #include <i86.h> /* MK_FP() */
 
-#include "libc.h"
-
 #include "mdr\bios.h"
 #include "mdr\cout.h"
 #include "mdr\dos.h"
@@ -155,6 +153,42 @@ value [ax]
 /*****************************************************************************
  * functions                                                                 *
  *****************************************************************************/
+
+
+static unsigned short dos_write(unsigned short handle, const void far *buf, unsigned short count, unsigned short *bytes) {
+  unsigned short res = 0;
+  unsigned short resax = 0;
+  unsigned short buf_seg = FP_SEG(buf);
+  unsigned short buf_off = FP_OFF(buf);
+
+  _asm {
+    push bx
+    push cx
+    push dx
+
+    mov ah, 0x40
+    mov bx, handle
+    mov cx, count
+    mov dx, buf_off
+    push ds
+    mov ds, buf_seg
+
+    int 0x21
+    pop ds
+    jnc done
+    mov res, ax
+
+    done:
+    mov resax, ax
+
+    pop dx
+    pop cx
+    pop bx
+  }
+
+  *bytes = resax;
+  return(res);
+}
 
 
 static size_t strlen(const char *s) {
@@ -358,11 +392,11 @@ static int savefile(struct file *db, const char *saveas) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      errflag |= mdr_dos_write(fd, l->payload, l->len, &bytes);
+      errflag |= dos_write(fd, l->payload, l->len, &bytes);
     } else if (l->next == NULL) {
       break;
     }
-    errflag |= mdr_dos_write(fd, eolbuf, eollen, &bytes);
+    errflag |= dos_write(fd, eolbuf, eollen, &bytes);
     l = l->next;
   }
 
