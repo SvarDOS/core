@@ -117,6 +117,17 @@ unsigned short dosfree(unsigned short segn);
 parm [es] \
 value [ax];
 
+unsigned short dosfclose(unsigned short handle);
+
+#pragma aux dosfclose = \
+"mov ah,0x3e" \
+"int 0x21" \
+"jc done" \
+"xor ax, ax" \
+"done:" \
+parm [bx] \
+value [ax];
+
 
 /*****************************************************************************
  * functions                                                                 *
@@ -304,7 +315,7 @@ static int savefile(struct file *db, const char *saveas) {
     l = l->next;
   }
 
-  errflag |= mdr_dos_fclose(fd);
+  errflag |= dosfclose(fd);
 
   /* did it all work? */
   if (errflag == 0) {
@@ -785,7 +796,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   }
 
-  mdr_dos_fclose(fd);
+  dosfclose(fd);
 
   SKIPLOADING:
 
@@ -795,7 +806,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   return(err);
 
   IOERR:
-  mdr_dos_fclose(fd);
+  dosfclose(fd);
   return(1);
 }
 

@@ -32,23 +32,6 @@ void fmemmove(void far *dst, const void far *src, size_t len) {
   }
 }
 
-unsigned short mdr_dos_fclose(unsigned short handle) {
-  unsigned short res = 0;
-  _asm {
-    push bx
-
-    mov ah, 0x3e
-    mov bx, handle
-    int 0x21
-    jnc done
-    mov res, ax
-    done:
-
-    pop bx
-  }
-  return(res);
-}
-
 
 unsigned short mdr_dos_resizeblock(unsigned short siz, unsigned short segn) {
   unsigned short res = 0;
