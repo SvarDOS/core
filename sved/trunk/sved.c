@@ -157,11 +157,11 @@ value [ax]
 unsigned short dos_write(unsigned short handle, unsigned short count, unsigned short *bytes, const void far *buf);
 /* NOTE: last parameter (far pointer buf) is passed on the stack */
 #pragma aux dos_write = \
-"push ds" \
+"push ds"   /* save DS into AX */ \
 "pop ax" \
 "pop dx" \
 "pop ds" \
-"push ax" \
+"push ax"   /* save DS into stack for later restoration */ \
 "mov ah, 0x40" \
 "int 0x21" \
 "pop ds" \
@@ -195,12 +195,18 @@ static void bzero(void *ptr, size_t len) {
 }
 
 
-/* TODO this function does not handle overlapping strings well! */
 static void fmemmove(void far *dst, const void far *src, size_t len) {
+  short delta = 1;
+  /* detect possible overlap in the forward direction */
+  if (dst >= src) {
+    dst = (char far *)dst + len - 1;
+    src = (char far *)src + len - 1;
+    delta = -1;
+  }
   while (len-- > 0) {
     *(char far *)dst = *(char far *)src;
-    dst = (char far *)dst + 1;
-    src = (char far *)src + 1;
+    dst = (char far *)dst + delta;
+    src = (char far *)src + delta;
   }
 }
 
