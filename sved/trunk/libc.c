@@ -15,7 +15,12 @@ size_t strlen(const char *s) {
 }
 
 void bzero(void *ptr, size_t len) {
-  while (len > 0) ((char *)ptr)[--len] = 0;
+  char *p = ptr;
+  while (len > 0) {
+    *p = 0;
+    p++;
+    len--;
+  }
 }
 
 /* TODO this function does not handle overlapping strings well! */
