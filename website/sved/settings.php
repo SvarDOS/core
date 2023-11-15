@@ -14,7 +14,7 @@ it a good fit for bootdisks or systems with extremely limited resources.</p>
 <li>auto-detects color and monochrome video modes</li>
 <li>supports unusual text modes like 80x43, 80x50, 132x60, 40x25...</li>
 <li>multilingual UI</li>
-<li>only 7 KiB of disk footprint</li>
+<li>only 6 KiB of disk footprint</li>
 <li>screen estate dedicated to text (no stupid frames, menus and such)</li>
 <li>loads files larger than 64 KiB</li>
 <li>no line length limit</li>
