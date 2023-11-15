@@ -48,7 +48,7 @@ sved.zip: sved.com
 # source package (no binaries)
 sved_src.zip:
 	IF EXIST SVED_SRC.ZIP DEL SVED_SRC.ZIP
-	zip -9rkDX sved_src.zip *.txt *.c *.h *.lng makefile mdr nls svarlang
+	zip -9rkDX sved_src.zip *.txt *.asm *.c *.h *.lng makefile mdr nls svarlang
 
 release: sved.svp sved.zip sved_src.zip .symbolic
 
