@@ -15,7 +15,7 @@ PVER = 2023.5
 all: sved.com
 
 sved.com: sved.obj deflang.obj
-	wasm startup.asm
+	wasm -DSTACKSIZE=1024 -DNOSTACKCHECK startup.asm
 	wlink @sved.lnk
 	upx -9 --8086 sved.com
 
