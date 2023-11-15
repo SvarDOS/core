@@ -93,9 +93,9 @@ struct file {
  *****************************************************************************/
 
 
-unsigned short dosalloc(unsigned short siz);
+unsigned short dos_alloc(unsigned short siz);
 
-#pragma aux dosalloc = \
+#pragma aux dos_alloc = \
 "mov ah, 0x48" \
 "int 0x21" \
 "jnc done" \
@@ -105,9 +105,9 @@ parm [bx] \
 value [ax];
 
 
-unsigned short dosfree(unsigned short segn);
+unsigned short dos_free(unsigned short segn);
 
-#pragma aux dosfree = \
+#pragma aux dos_free = \
 "mov ah, 0x49" \
 "int 0x21" \
 "jc done" \
@@ -117,9 +117,9 @@ parm [es] \
 value [ax];
 
 
-unsigned short dosfclose(unsigned short handle);
+unsigned short dos_fclose(unsigned short handle);
 
-#pragma aux dosfclose = \
+#pragma aux dos_fclose = \
 "mov ah,0x3e" \
 "int 0x21" \
 "jc done" \
@@ -129,9 +129,9 @@ parm [bx] \
 value [ax];
 
 
-unsigned short dosfread(unsigned short handle, void *buf, unsigned short count, unsigned short *bytes);
+unsigned short dos_fread(unsigned short handle, void *buf, unsigned short count, unsigned short *bytes);
 
-#pragma aux dosfread = \
+#pragma aux dos_fread = \
 "mov ah, 0x3f" \
 "int 0x21" \
 "jc done" \
@@ -154,9 +154,9 @@ parm [bx] [es] \
 value [ax]
 
 
-unsigned short dos_write(unsigned short handle, unsigned short count, unsigned short *bytes, const void far *buf);
+unsigned short dos_fwrite(unsigned short handle, unsigned short count, unsigned short *bytes, const void far *buf);
 /* NOTE: last parameter (far pointer buf) is passed on the stack */
-#pragma aux dos_write = \
+#pragma aux dos_fwrite = \
 "push ds"   /* save DS into AX */ \
 "pop ax" \
 "pop dx" \
@@ -215,7 +215,7 @@ static struct line far *line_calloc(unsigned short siz) {
   struct line far *res;
   unsigned short seg;
 
-  seg = dosalloc((sizeof(struct line) + siz + 15) / 16);
+  seg = dos_alloc((sizeof(struct line) + siz + 15) / 16);
   if (seg == 0) return(NULL);
   res = MK_FP(seg, 0);
   res->len = 0;
@@ -227,7 +227,7 @@ static struct line far *line_calloc(unsigned short siz) {
 
 
 static void line_free(struct line far *ptr) {
-  dosfree(FP_SEG(ptr));
+  dos_free(FP_SEG(ptr));
 }
 
 
@@ -385,15 +385,15 @@ static int savefile(struct file *db, const char *saveas) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      errflag |= dos_write(fd, l->len, &bytes, l->payload);
+      errflag |= dos_fwrite(fd, l->len, &bytes, l->payload);
     } else if (l->next == NULL) {
       break;
     }
-    errflag |= dos_write(fd, eollen, &bytes, eolbuf);
+    errflag |= dos_fwrite(fd, eollen, &bytes, eolbuf);
     l = l->next;
   }
 
-  errflag |= dosfclose(fd);
+  errflag |= dos_fclose(fd);
 
   /* did it all work? */
   if (errflag == 0) {
@@ -810,7 +810,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   for (eolfound = 0;;) {
     unsigned short consumedbytes;
 
-    if ((dosfread(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
+    if ((dos_fread(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
     buffptr = buff;
 
     FINDLINE:
@@ -874,7 +874,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   }
 
-  dosfclose(fd);
+  dos_fclose(fd);
 
   SKIPLOADING:
 
@@ -884,7 +884,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   return(err);
 
   IOERR:
-  dosfclose(fd);
+  dos_fclose(fd);
   return(1);
 }
 
