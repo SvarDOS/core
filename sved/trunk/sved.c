@@ -146,6 +146,34 @@ value [ax]
  * functions                                                                 *
  *****************************************************************************/
 
+
+static size_t strlen(const char *s) {
+  const char *ptr = s;
+  while (*ptr != 0) ptr++;
+  return(ptr - s);
+}
+
+
+static void bzero(void *ptr, size_t len) {
+  char *p = ptr;
+  while (len > 0) {
+    *p = 0;
+    p++;
+    len--;
+  }
+}
+
+
+/* TODO this function does not handle overlapping strings well! */
+static void fmemmove(void far *dst, const void far *src, size_t len) {
+  while (len-- > 0) {
+    *(char far *)dst = *(char far *)src;
+    dst = (char far *)dst + 1;
+    src = (char far *)src + 1;
+  }
+}
+
+
 static struct line far *line_calloc(unsigned short siz) {
   struct line far *res;
   unsigned short seg;
