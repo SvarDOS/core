@@ -128,6 +128,19 @@ unsigned short dosfclose(unsigned short handle);
 parm [bx] \
 value [ax];
 
+unsigned short dosfread(unsigned short handle, void *buf, unsigned short count, unsigned short *bytes);
+
+#pragma aux dosfread = \
+"mov ah, 0x3f" \
+"int 0x21" \
+"jc done" \
+"mov [di], ax" \
+"xor ax, ax" \
+"done:" \
+parm [bx] [dx] [cx] [di] \
+value [ax]
+
+
 
 /*****************************************************************************
  * functions                                                                 *
@@ -732,7 +745,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   for (eolfound = 0;;) {
     unsigned short consumedbytes;
 
-    if ((mdr_dos_read(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
+    if ((dosfread(fd, buff, sizeof(buff), &len) != 0) || (len == 0)) break;
     buffptr = buff;
 
     FINDLINE:
