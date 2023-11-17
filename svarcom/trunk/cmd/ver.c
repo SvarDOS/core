@@ -26,7 +26,7 @@
  * ver
  */
 
-#define PVER "2023.1"
+#define PVER "2023.2"
 #define COPYRDATE "2021-2023"
 
 static enum cmd_result cmd_ver(struct cmd_funcparam *p) {

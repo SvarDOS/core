@@ -104,23 +104,54 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     return(NULL);
   }
 
-  /* copy rmod to its destination, prefixed with a copy of my own PSP */
+  /* copy my own PSP where RMOD is about to land, so it has a proper PSP as well */
+  /* take care to init the JFT (20 bytes starting at offset 0x18) to 0xff, which
+   * essentially means "empty JFT slot" */
   myptr = MK_FP(rmodseg, 0);
   {
     unsigned short i;
     char *mypsp = (void *)0;
     for (i = 0; i < 0x100; i++) myptr[i] = mypsp[i];
+    for (i = 0x18; i < 0x18+20; i++) myptr[i] = 0xff;
   }
+
+  /* patch up RMOD's PSP: Parent's PSP segment @ 0x16-0x17 */
+  myptr[0x16] = rmodseg & 0xff; /* RMOD is his own parent */
+  myptr[0x17] = rmodseg >> 8;
+
+  /* patch up RMOD's PSP: SS:SP pointer @ 0x2E-0x31 */
+  myptr[0x2e] = 254; /* I abuse the PSP's command line tail as stack */
+  myptr[0x2f] = 0;
+  myptr[0x30] = rmodseg & 0xff;
+  myptr[0x31] = rmodseg >> 8;
+
+  /* patch up RMOD's PSP: JFT size @ 0x32-0x33 */
+  myptr[0x32] = 0; /* default JFT size (max that fits without an extra allocation) */
+  myptr[0x33] = 0;
+
+  /* patch up RMOD's PSP: JFT pointer @ 0x34-0x37 */
+  myptr[0x34] = 0x18; /* the JFT is in the PSP itself */
+  myptr[0x35] = 0;
+  myptr[0x36] = rmodseg & 0xff;
+  myptr[0x37] = rmodseg >> 8;
+
+  /* patch up RMOD's PSP: pointer to previous PSP @ 0x38-0x3B */
+  myptr[0x38] = 0;
+  myptr[0x39] = 0;
+  myptr[0x3A] = rmodseg & 0xff;
+  myptr[0x3B] = rmodseg >> 8;
+
+  /* copy rmod to its destination (right past the PSP I prepared) */
   myptr = MK_FP(rmodseg, 0x100);
   _fmemcpy(myptr, rmodcore, rmodcore_len);
 
-  /* mark rmod memory as "self owned" */
+  /* mark rmod memory (MCB) as "self owned" */
   mcb = MK_FP(rmodseg - 1, 0);
   owner = (void far *)(mcb + 1);
   *owner = rmodseg;
   _fmemcpy(mcb + 8, "SVARCOM", 8);
 
-  /* mark env memory as "owned by rmod" */
+  /* mark env memory (MCB) as "owned by rmod" */
   mcb = MK_FP(envseg - 1, 0);
   owner = (void far *)(mcb + 1);
   *owner = rmodseg;
