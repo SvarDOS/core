@@ -65,7 +65,7 @@ file2c.com: file2c.c
 	wcl $(LDFLAGS) file2c.c
 
 rmod.bin: rmod.asm
-	nasm -f bin -l rmod.lst -o rmod.bin rmod.asm
+	bldrmod.bat
 
 clean: .SYMBOLIC
 	del *.com
