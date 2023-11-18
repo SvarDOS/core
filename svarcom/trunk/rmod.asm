@@ -103,8 +103,8 @@ call REVERT_REDIR_IF_ANY
 ; redirect stdin and/or stdout if required
 call REDIR_INOUTFILE_IF_REQUIRED
 
-; should I executed command.com or a pre-set application?
-or [EXECPROG], byte 0
+; should I execute command.com or a pre-set application?
+cmp [EXECPROG], byte 0
 jz EXEC_COMMAND_COM
 
 ; TODO: perhaps I should call the DOS SetPSP function here? But if I do, the
