@@ -126,7 +126,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   myptr[0x31] = rmodseg >> 8;
 
   /* patch up RMOD's PSP: JFT size @ 0x32-0x33 */
-  myptr[0x32] = 0; /* default JFT size (max that fits without an extra allocation) */
+  myptr[0x32] = 20; /* default JFT size (max that fits without an extra allocation) */
   myptr[0x33] = 0;
 
   /* patch up RMOD's PSP: JFT pointer @ 0x34-0x37 */
