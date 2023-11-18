@@ -119,9 +119,19 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   myptr[0x16] = rmodseg & 0xff; /* RMOD is his own parent */
   myptr[0x17] = rmodseg >> 8;
 
-  /* patch up RMOD's PSP: SS:SP pointer @ 0x2E-0x31 */
-  myptr[0x2e] = 254; /* I abuse the PSP's command line tail as stack */
-  myptr[0x2f] = 0;
+  /* patch up RMOD's PSP: SS:SP pointer @ 0x2E-0x31  --  I abuse the PSP's
+   * command line tail as stack, but I do NOT set the stacat the end of the
+   * tail. E. C. Masloch kindly explained why this would be a bad idea:
+   *
+   * "This is wrong and will potentially overwrite part of your buffers that
+   * start past the PSP. This is because the dword [PSP:2Eh] is not used merely
+   * to set SS:SP but rather to find the stack frame created by the int 21h
+   * call. Therefore the int 21h call that terminates the child process will
+   * then pop a number of registers off starting from the address stored in the
+   * PSP." <https://github.com/SvarDOS/bugz/issues/38#issuecomment-1817445740>
+   */
+  myptr[0x2e] = 192; /* middle of the command line tail area so I have 64 bytes */
+  myptr[0x2f] = 0;   /* before and 64 bytes in front of me */
   myptr[0x30] = rmodseg & 0xff;
   myptr[0x31] = rmodseg >> 8;
 
