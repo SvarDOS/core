@@ -112,7 +112,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     unsigned short i;
     char *mypsp = (void *)0;
     for (i = 0; i < 0x100; i++) myptr[i] = mypsp[i];
-    for (i = 0x18; i < 0x18+20; i++) myptr[i] = 0xff;
+    /* for (i = 0x18; i < 0x18+20; i++) myptr[i] = 0xff; */ /* do NOT close file handlers, RMOD's children might need stdin/stdout/etc */
   }
 
   /* patch up RMOD's PSP: Parent's PSP segment @ 0x16-0x17 */
@@ -120,7 +120,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   myptr[0x17] = rmodseg >> 8;
 
   /* patch up RMOD's PSP: SS:SP pointer @ 0x2E-0x31  --  I abuse the PSP's
-   * command line tail as stack, but I do NOT set the stacat the end of the
+   * command line tail as stack, but I do NOT set the stack at the end of the
    * tail. E. C. Masloch kindly explained why this would be a bad idea:
    *
    * "This is wrong and will potentially overwrite part of your buffers that
