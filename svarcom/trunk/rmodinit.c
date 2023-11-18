@@ -104,16 +104,16 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     return(NULL);
   }
 
-  /* copy my own PSP where RMOD is about to land, so it has a proper PSP as well */
-  /* take care to init the JFT (20 bytes starting at offset 0x18) to 0xff, which
-   * essentially means "empty JFT slot" */
-  myptr = MK_FP(rmodseg, 0);
-  {
-    unsigned short i;
-    char *mypsp = (void *)0;
-    for (i = 0; i < 0x100; i++) myptr[i] = mypsp[i];
-    /* for (i = 0x18; i < 0x18+20; i++) myptr[i] = 0xff; */ /* do NOT close file handlers, RMOD's children might need stdin/stdout/etc */
+  /* generate a new PSP where RMOD is about to land */
+  _asm {
+    push dx
+    mov ah, 0x26 /* CREATE NEW PROGRAM SEGMENT PREFIX (DOS 1+) */
+    mov dx, rmodseg
+    int 0x21
+    pop dx
   }
+
+  myptr = MK_FP(rmodseg, 0);
 
   /* patch up RMOD's PSP: Parent's PSP segment @ 0x16-0x17 */
   myptr[0x16] = rmodseg & 0xff; /* RMOD is his own parent */
