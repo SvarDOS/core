@@ -56,6 +56,10 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   }
 
   _asm {
+    push bx
+    push cx
+    push dx
+
     /* link in the UMB memory chain for enabling high-memory allocation (and save initial status on stack) */
     mov ax, 0x5802  /* GET UMB LINK STATE */
     int 0x21
@@ -97,6 +101,10 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     mov ax, 0x5803
     pop bx       /* pop initial UMB link state from stack */
     int 0x21
+
+    pop dx
+    pop cx
+    pop bx
   }
 
   if (rmodseg == 0xffff) {
