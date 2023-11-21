@@ -246,6 +246,13 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     ptr[1] = rmodseg;
   }
 
+  /* set my own parent to RMOD (this is not necessary for MS-DOS nor FreeDOS but
+   * might be on other DOS implementations) */
+  {
+    unsigned short *ptr = (void *)0x16;
+    *ptr = rmodseg;
+  }
+
   return(res);
 }
 
