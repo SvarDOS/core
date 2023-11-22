@@ -48,12 +48,12 @@ void sayonara(struct rmod_props far *rmod) {
   _asm {
     /* free RMOD's code segment and env segment */
     mov ah, 0x49   /* DOS 2+ -- Free Memory Block */
-    mov es, [rmodseg]
+    mov es, rmodseg
     int 0x21
 
     /* free RMOD's env segment */
     mov ah, 0x49   /* DOS 2+ -- Free Memory Block */
-    mov es, [rmodenv]
+    mov es, rmodenv
     int 0x21
 
     /* gameover */
