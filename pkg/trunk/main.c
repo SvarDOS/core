@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2022 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2023 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
   const char *dosdir;
   struct customdirs *dirlist;
 
-  svarlang_autoload("pkg"); /* NLS init */
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));   /* NLS init */
 
   action = parsearg(argc, argv);
   switch (action) {
