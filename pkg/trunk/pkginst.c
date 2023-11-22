@@ -211,6 +211,43 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
 }
 
 
+/* look for a "warn" field in the package's LSM file and display it if found */
+static void display_warn_if_exists(const char *pkgname, const char *dosdir, char *buff, size_t buffsz) {
+  FILE *fd;
+  char *msgptr;
+  int warncount = 0, i;
+
+  sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
+  fd = fopen(buff, "rb");
+  if (fd == NULL) return;
+
+  while (freadtokval(fd, buff, buffsz, &msgptr, ':') == 0) {
+    if (msgptr != NULL) {
+      if (strcasecmp(buff, "warn") == 0) {
+        /* print a visual delimiter */
+        if (warncount == 0) {
+          puts("");
+          for (i = 0; i < 79; i++) putchar('*');
+          puts("");
+        }
+        /* there may be more than one "warn" line */
+        puts(msgptr);
+        warncount++;
+      }
+    }
+  }
+
+  fclose(fd);
+
+  /* if one or more warn lines have been displayed then close with a delimiter again */
+  if (warncount > 0) {
+    for (i = 0; i < 79; i++) putchar('*');
+    puts("");
+  }
+
+}
+
+
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
 int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
@@ -262,5 +299,9 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
 
   kitten_printf(3, 19, pkgname, filesextractedsuccess, filesextractedfailure); /* "Package %s installed: %ld files extracted, %ld errors." */
   puts("");
+
+  /* scan the LSM file for a "warn" message to display */
+  display_warn_if_exists(pkgname, dosdir, buff, sizeof(buff));
+
   return(filesextractedfailure);
 }
