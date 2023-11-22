@@ -1,6 +1,6 @@
 /*
  * This file is part of pkg (SvarDOS)
- * Copyright (C) 2012-2022 Mateusz Viste
+ * Copyright (C) 2012-2023 Mateusz Viste
  */
 
 #include <ctype.h>     /* toupper() */
@@ -112,9 +112,18 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     return(NULL);
   }
 
+  /* copy zip filename into fname */
+  strcpy(fname, zipfile);
+
+  /* append an .SVP extension if not present */
+  {
+    int slen = strlen(fname);
+    if ((slen > 3) && (fname[slen - 4] != '.')) strcat(fname, ".SVP");
+  }
+
   /* Now let's check the content of the zip file */
 
-  *zipfd = fopen(zipfile, "rb");
+  *zipfd = fopen(fname, "rb");
   if (*zipfd == NULL) {
     puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
     goto RAII;

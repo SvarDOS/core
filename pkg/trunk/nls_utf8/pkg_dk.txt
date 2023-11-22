@@ -8,8 +8,8 @@
 #### Help ####
 
 1.0:Pakke administrator til SvarDOS.
-1.20:Anvendelse: pkg install package.svp
-1.21:            pkg update package.svp
+1.20:Anvendelse: pkg install package[.svp]
+1.21:            pkg update package[.svp]
 1.22:            pkg remove package
 1.23:            pkg listfiles package
 1.24:            pkg listlocal [filter]
