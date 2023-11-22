@@ -235,8 +235,9 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     pop ax
   }
 
-  /* save my original parent in rmod's memory */
-  res->origparent = *((unsigned long *)0x0a); /* original parent seg:off is at 0x0a of my PSP */
+  /* save my original int22h handler and parent in rmod's memory */
+  res->origint22 = *((unsigned long *)0x0a); /* original int22h handler seg:off is at 0x0a of my PSP */
+  res->origparent = *((unsigned short *)0x16); /* PSP segment of my parent is at 0x16 of my PSP */
 
   /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I
    * terminate and save the original handler in rmod's memory */

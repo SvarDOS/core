@@ -58,7 +58,8 @@ struct forctx {
 
 struct rmod_props {
   unsigned short rmodseg;     /* segment where rmod is loaded */
-  unsigned long origparent;   /* original parent (far ptr) of the shell */
+  unsigned long origint22;    /* original int 22 handler (far ptr) of the shell */
+  unsigned short origparent;  /* original parent (PSP's segment) */
   unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
   unsigned char version;      /* used to detect mismatch between rmod and SvarCOM */

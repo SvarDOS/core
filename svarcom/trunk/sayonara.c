@@ -33,16 +33,20 @@
  * my parent is unknown */
 void sayonara(struct rmod_props far *rmod) {
   unsigned short rmodseg = rmod->rmodseg;
-  unsigned long *myparent = (void *)0x0A;
+  unsigned long *myint22 = (void *)0x0A;
+  unsigned short *myparent = (void *)0x16;
   unsigned short far *rmodenv_ptr = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
   unsigned short rmodenv = *rmodenv_ptr;
 
   /* detect "I am the origin shell" situations */
   if (rmod->flags & FLAG_PERMANENT) return; /* COMMAND.COM /P */
-  if ((rmod->origparent >> 16) == 0xffff) return; /* original parent seg set to 0xffff (DOS-C / FreeDOS) */
+  if ((rmod->origint22 >> 16) == 0xffff) return; /* original int22h seg set to 0xffff (DOS-C / FreeDOS) */
   if (rmod->origenvseg == 0) return; /* no original environment (MSDOS 5/6) */
 
-  /* set my parent back to original value */
+  /* set my int 22h handler back to its original value */
+  *myint22 = rmod->origint22;
+
+  /* set my parent back to its original value */
   *myparent = rmod->origparent;
 
   _asm {

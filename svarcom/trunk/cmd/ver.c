@@ -53,7 +53,8 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     char far *fptr;
     unsigned short i;
     printf("rmod->rmodseg = 0x%04X\r\n", p->rmod->rmodseg);
-    printf("rmod->origparent = %04X:%04X\r\n", p->rmod->origparent >> 16, p->rmod->origparent & 0xffff);
+    printf("rmod->origint22 = %04X:%04X\r\n", p->rmod->origint22 >> 16, p->rmod->origint22 & 0xffff);
+    printf("rmod->origparent = 0x%04X\r\n", p->rmod->origparent);
     printf("rmod->origenvseg = 0x%04X\r\n", p->rmod->origenvseg);
     printf("rmod->flags = 0x%02X\r\n", p->rmod->flags);
     printf("[rmod:RMOD_OFFSET_ENVSEG] = 0x%04X\r\n", *rmod_envseg);
