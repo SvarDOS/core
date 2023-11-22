@@ -118,7 +118,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
   /* append an .SVP extension if not present */
   {
     int slen = strlen(fname);
-    if ((slen > 3) && (fname[slen - 4] != '.')) strcat(fname, ".SVP");
+    if ((slen < 4) || (fname[slen - 4] != '.')) strcat(fname, ".SVP");
   }
 
   /* Now let's check the content of the zip file */
