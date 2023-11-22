@@ -94,6 +94,16 @@ CPU family   : 8086 186 286 386 486 586
 CPU features : fpu
 Graphic cards: mda cga ega mcga vga svga
 
+If the package should display an informational message after its installation,
+then the LSM file may contain one or more "warn" lines. These are displayed by
+the pkg tool whenever the package is installed or updated. Example:
+
+  version: 1.0
+  description: logic game with lots of colors
+  hw: 386 vga
+  warn: This game will not run properly unless you define a TEMP
+  warn: environment variable that points at a writeable directory.
+
 Any other lines are ignored by the SvarDOS package manager.
 
 
