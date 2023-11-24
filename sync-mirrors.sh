@@ -9,6 +9,6 @@
 svnsync sync svn+ssh://mateuszviste@svn.osdn.net/svnroot/svardos-mirror
 
 # sync the packages repo to my HelixTeam hub account
-svnsync sync svn+ssh://hth@helixteamhub.cloud/mateuszviste/projects/svardos-packages-mirror/repositories/subversion/packages
+svnsync sync svn+ssh://hth@helixteamhub.cloud/mateuszviste/projects/svardos-mirror/repositories/subversion/packages
 
 echo "done."
