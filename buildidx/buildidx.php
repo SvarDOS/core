@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  24 nov 2023: SVED included in the MS-DOS compat list instead of EDIT
   25 aug 2023: validation of the hwreq section in LSM files
   24 aug 2023: load hwreq data from LSM and store them in the json index + skip the '.svn' dir
   30 jun 2023: adapted for new CORE packages location (../packages-core)
@@ -290,7 +291,7 @@ $pkgcount = 0;
 // load the list of CORE and MSDOS_COMPAT packages
 
 $core_packages_list = load_core_list($repodir . '/../packages-core/');
-$msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice comp cpidos debug defrag deltree diskcomp diskcopy display edit edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort svarcom swsubst tree undelete unformat xcopy');
+$msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice comp cpidos debug defrag deltree diskcomp diskcopy display edlin exe2bin fc fdapm fdisk find format help himemx kernel keyb label localcfg mem mirror mode more move nlsfunc print replace share shsucdx sort svarcom sved swsubst tree undelete unformat xcopy');
 
 // do a list of all svp packages with their available versions and descriptions
 
