@@ -164,7 +164,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
 
 /* unzips a file. zipfd points to the open zip file, curzipnode to the entry to extract, and fulldestfilename is the destination file where to unzip it. returns 0 on success, non-zero otherwise. */
 int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilename) {
-  #define buffsize 32 * 1024l /* MUST be at least 32K */
+  #define buffsize (12 * 1024) /* bigger buffer is better, but pkg has to work on a 256K PC so let's not get too crazy with RAM */
   FILE *filefd;
   unsigned long cksum;
   int extract_res;
@@ -215,7 +215,8 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilen
       i += toread;
     }
   } else if (curzipnode->compmethod == 8) {  /* if the file is deflated, inflate it */
-    extract_res = inf(zipfd, filefd, buff, &cksum, curzipnode->compressedfilelen);
+    /* use 1/3 of my buffer as input and 2/3 as output */
+    extract_res = inf(zipfd, filefd, buff, buffsize / 3, buff + (buffsize / 3), buffsize / 3 * 2, &cksum, curzipnode->compressedfilelen);
   }
 
   /* clean up memory, close the dst file and terminates crc32 */
@@ -237,6 +238,7 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilen
   filetimestamp.modtime = curzipnode->timestamp;
   utime(fulldestfilename, &filetimestamp);
   return(0);
+#undef buffsize
 }
 
 

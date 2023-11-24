@@ -8,6 +8,6 @@
  * Z_VERSION_ERROR if the version of zlib.h and the version of the library
  * linked do not match, or Z_ERRNO if there is an error reading or writing the
  * files. */
-int inf(FILE *source, FILE *dest, unsigned char *buff32k, unsigned long *cksum, long streamlen);
+int inf(FILE *source, FILE *dest, unsigned char *buffin, unsigned short buffinsz, unsigned char *buffout, unsigned short buffoutsz, unsigned long *cksum, long streamlen);
 
 #endif
