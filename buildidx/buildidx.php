@@ -10,7 +10,7 @@
 
   requires php-zip
 
-  24 nov 2023: SVED included in the MS-DOS compat list instead of EDIT
+  24 nov 2023: SVED included in the MS-DOS compat list instead of EDIT + support for "release xyz" versions
   25 aug 2023: validation of the hwreq section in LSM files
   24 aug 2023: load hwreq data from LSM and store them in the json index + skip the '.svn' dir
   30 jun 2023: adapted for new CORE packages location (../packages-core)
@@ -83,6 +83,9 @@ function vertoarr($verstr) {
 
   // switch string to lcase for easier processing and trim any leading or trailing white spaces
   $verstr = strtolower(trim($verstr));
+
+  // Special hack for E. C. Masloch's lDebug. lDebug's versions are identifying as "releases" and wish to be recognized as such. If the version string starts with "release " I remove this word and continue.
+  if (preg_match('/^release /', $verstr)) $verstr = substr($verstr, 8);
 
   // replace all '-' and '/' characters to '.' (uniformization of sub-version parts delimiters)
   $verstr = strtr($verstr, '-/', '..');
