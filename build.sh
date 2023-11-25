@@ -228,22 +228,6 @@ prep_flop 80 2 18 1440 "$PUBDIR" "1.44M"
 prep_flop 80 2 15 1200 "$PUBDIR" "1.2M"
 prep_flop 80 2  9  720 "$PUBDIR" "720K"
 
-# remove internationalization files for EN-ONLY releases. This is the only way
-# to build the 360K variant
-rm "$FLOPROOT"/*.cpx
-rm "$FLOPROOT"/install.lng
-rm "$FLOPROOT"/display.exe
-rm "$FLOPROOT"/mode.com
-#
-
-# disabling EN-ONLY builds of 1.4M, 1.2M and 720K because EN-ONLY does not
-# decrease the amount of diskettes at this moment.
-#prep_flop 80 2 18 1440 "$PUBDIR" "1.44M-EN_ONLY"
-prep_flop 80 2 21 1680 "$PUBDIR" "1.44M-DMF-EN_ONLY"
-#prep_flop 80 2 15 1200 "$PUBDIR" "1.2M-EN_ONLY"
-#prep_flop 80 2  9  720 "$PUBDIR" "720K-EN_ONLY"
-prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY"
-
 
 echo
 echo "### Computing DOSEMU.zip"
@@ -329,7 +313,38 @@ $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CD
 # compress the ISO
 zip -mj9 "$CDZIP" "$CDISO"
 
-# cleanup temporary things
+
+###############################################################################
+# remove internationalization files for EN-ONLY releases. This is the only    #
+# way to build the 360K variant                                               #
+###############################################################################
+
+rm "$FLOPROOT"/*.cpx
+rm "$FLOPROOT"/install.lng
+rm "$FLOPROOT"/display.exe
+rm "$FLOPROOT"/mode.com
+
+###############################################################################
+# remove NLS and LNG files from packages to build EN-ONLY builds              #
+###############################################################################
+
+echo "### remove NLS and LNG files from packages to build EN-ONLY builds"
+for p in $COREPKGS ; do
+  # the || true bit is because zip returns a non-zero exit code on no file match
+  zip -dq "$CDROOT/$p.svp" 'bin/*.lng' 'BIN/*.LNG' 'nls/*' 'NLS/*' || true
+done
+
+prep_flop 80 2 18 1440 "$PUBDIR" "1.44M-EN_ONLY"
+#prep_flop 80 2 21 1680 "$PUBDIR" "1.44M-DMF-EN_ONLY"
+prep_flop 80 2 15 1200 "$PUBDIR" "1.2M-EN_ONLY"
+prep_flop 80 2  9  720 "$PUBDIR" "720K-EN_ONLY"
+prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY"
+
+
+###############################################################################
+# cleanup all temporary things                                                #
+###############################################################################
+
 if [ "x$2" != "xnoclean" ] ; then
   echo
   echo "### Cleanup of temporary directories:"
