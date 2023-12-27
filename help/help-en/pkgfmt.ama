@@ -100,7 +100,7 @@ the pkg tool whenever the package is installed or updated. Example:
 
   version: 1.0
   description: logic game with lots of colors
-  hw: 386 vga
+  hwreq: 386 vga
   warn: This game will not run properly unless you define a TEMP
   warn: environment variable that points at a writeable directory.
 
