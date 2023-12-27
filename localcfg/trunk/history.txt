@@ -1,5 +1,8 @@
 localcfg history file
 
+* localcfg ver 20231227
+ - upgraded svarlang to ver 20230730, LNG now stored in same dir as executable
+
 * localcfg ver 20230630
  - added TR and FR translations, both kindly contributed by Berki Yenigun
 

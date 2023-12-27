@@ -18,16 +18,14 @@ release: localcfg.com .SYMBOLIC
 	mkdir bin
 	mkdir doc
 	mkdir doc\localcfg
-	mkdir nls
 	copy localcfg.lsm appinfo
 	copy localcfg.com bin
-	copy localcfg.lng nls
+	copy localcfg.lng bin
 	copy *.txt doc\localcfg
 	if exist localcfg.zip del localcfg.zip
-	zip -9rkDX -m localcfg.svp appinfo bin doc nls
+	zip -9rkDX -m localcfg.svp appinfo bin doc
 	zip -9rkDX localcfg.zip *.txt *.c *.h makefile svarlang.lib nls_lang
 	rmdir appinfo
 	rmdir bin
 	rmdir doc\localcfg
 	rmdir doc
-	rmdir nls

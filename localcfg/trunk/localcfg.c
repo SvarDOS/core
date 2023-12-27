@@ -389,7 +389,7 @@ int main(int argc, char **argv) {
   static char fname[130];
   static char buff[64];
 
-  svarlang_autoload("localcfg");
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));
 
   /* scan argv looking for the path to country.sys */
   for (x = 1; x < argc; x++) {
