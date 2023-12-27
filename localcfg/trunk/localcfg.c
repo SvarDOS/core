@@ -32,7 +32,7 @@
 
 #include "country.h"
 
-#define PVER "20230630"
+#define PVER "20231227"
 #define PDATE "2015-2023"
 
 
