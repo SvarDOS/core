@@ -1,0 +1,25 @@
+localcfg history file
+
+* localcfg ver 20231227
+ - upgraded svarlang to ver 20230730, LNG now stored in same dir as executable
+
+* localcfg ver 20230630
+ - added TR and FR translations, both kindly contributed by Berki Yenigun
+
+* localcfg ver 20230208
+ - added BR translations, courtesy of Luzemario Dantes
+
+* localcfg ver 20220203
+ - NLS (translations) support through the SvarLANG library
+ - memory usage optimizations
+ - extra error messages
+
+* localcfg ver 20220202 (merged into the SvarDOS project)
+ - country.sys path is optional, defaults to %DOSDIR%\CFG\COUNTRY.SYS
+ - COUNTRY=xxx example contains the actual codepage and path to COUNTRY.SYS
+ - improved loading/saving routines so they rely on memory structures
+ - relicensed from BSD 2-clause to MIT
+ - moved from Turbo C to OpenWatcom
+
+* localcfg v0.90 [02 June 2015]
+ - first public release

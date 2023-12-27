@@ -1,0 +1,56 @@
+#
+# LOCALCFG language file
+#
+# Language...: Turkish
+# Authors....: Berki Yenigün
+# Last update: 29 Jun 2023
+#
+
+### HELP SCREEN ###########################################################
+
+0.0:sürüm
+0.1:yerel COUNTRY.SYS tercihlerini oluşturur veya düzenler
+0.2:kullanım: localcfg [sürücü:][yol][COUNTRY.SYS] [seçenekler]
+0.3:options:
+
+0.10:/country:XX ülke kodunu XX olarak ayarla (33=Fransa, 90=Türkiye, vs.)
+0.11:/cp:XXX     ülke verilerini kod sayfası XXX için uyarla (mesela: '857')
+0.12:/decim:X    ondalık simgesini 'X' olarak yeniden yapılandır
+0.13:/thous:X    binler simgesini 'X' olarak yeniden yapılandırır
+0.14:/datesep:X  tarih ayracını 'X' olarak ayarlar (mesela '/')
+0.15:/datefmt:X  tarih biçimini ayarlar, şunlar olabilir: MDY, DMY veya YMD
+0.16:/timesep:X  zaman ayracını 'X' olarak ayarlar (mesela ':')
+0.17:/timefmt:X  saat biçimini ayarlar: 0=12s AM/PM ile veya 1=24s
+0.18:/curr:XXX   para birimini XXX olarak ayarlar (1 ila 4 karakterlik dize)
+0.19:/currpos:X  para birimi simgesi konumunu X'e ayarlar, X şunlardan biridir:
+0.20:            0=para birimi değerden önce, 1=para birimi değerden sonra ve
+0.21:            2=para birimi ondalık simgesinin yerine geçer
+0.22:/currspc:X  para birimi ve değer arasında boşluk (0=hayır, 1=evet)
+0.23:/currprec:X para biriminin hassasiyeti (ondalık rakam sayısı, 0..9)
+0.24:/yesno:XY   'Evet/Hayır' harflerini XY olarak ayarlar (varsayılan: YN)
+
+0.50:Şayet COUNTRY.SYS konumu sağlanmadıysa, localcfg onu şuradan yüklemeyi
+0.51:deneyecektir: %DOSDIR%\\CFG\\COUNTRY.SYS
+
+
+### INFO SCREEN ###########################################################
+
+7.0:Ülke kodu..............:
+7.1:Kod sayfası............:
+7.2:Ondalık ayracı.........:
+7.3:Binler ayracı..........:
+7.4:Tarih biçimi...........:
+7.5:Saat biçimi............:
+7.6:Evet/Hayır karakterleri:
+7.7:Para birimi örneği.....:
+
+7.9:CONFIG.SYS dosyanızın şu yönergeyi içerdiğinden emin olun:
+
+### ERROR MESSAGES ########################################################
+
+9.0:HATA: dosya yolu sadece bir defa sağlanabilir
+9.1:HATA: dosya için geçersiz yol
+9.2:HATA: dosyanın okunması başarısız oldu
+9.3:HATA: geçersiz parametre söz dizimi
+9.4:HATA: dosya geçerli bir COUNTRY.SYS değil
+9.5:HATA: dosya LOCALCFG ile oluşturulmamış
