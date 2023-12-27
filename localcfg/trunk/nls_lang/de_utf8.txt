@@ -30,7 +30,7 @@
 0.24:/yesno:XY   legt die "Ja/Nein"-Buchstaben auf XY fest (Standard: YN)
 
 0.50:Falls Ort von COUNTRY.SYS nicht angegeben wurde, versucht localcfg sie
-0.51:von %DOSDIR%\CFG\COUNTRY.SYS zu laden
+0.51:von %DOSDIR%\\CFG\\COUNTRY.SYS zu laden
 
 
 ### INFO SCREEN ###########################################################

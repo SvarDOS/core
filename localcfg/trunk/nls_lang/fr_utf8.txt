@@ -30,7 +30,7 @@
 0.24:/yesno:XY   définir la lettre 'Oui/Non' en XY (par défaut: YN)
 
 0.50:Si l'emplacement de COUNTRY.SYS n'est pas fourni, localcfg essayera de le
-0.51:charger depuis %DOSDIR%\CFG\COUNTRY.SYS
+0.51:charger depuis %DOSDIR%\\CFG\\COUNTRY.SYS
 
 
 ### INFO SCREEN ###########################################################

@@ -30,7 +30,7 @@
 0.24:/yesno:XY   'Evet/Hayır' harflerini XY olarak ayarlar (varsayılan: YN)
 
 0.50:Şayet COUNTRY.SYS konumu sağlanmadıysa, localcfg onu şuradan yüklemeyi
-0.51:deneyecektir: %DOSDIR%\CFG\COUNTRY.SYS
+0.51:deneyecektir: %DOSDIR%\\CFG\\COUNTRY.SYS
 
 
 ### INFO SCREEN ###########################################################
