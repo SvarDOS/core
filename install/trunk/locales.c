@@ -3,7 +3,7 @@
  * contains the list of all supported keyboard layouts, along with a way to
  * select sets of keyboard layouts that apply to only a specific region.
  *
- * Copyright (C) 2016-2023 Mateusz Viste
+ * Copyright (C) 2016-2024 Mateusz Viste
  */
 
 /* the kblayouts list is a NULL-terminated array that contains entries in the
@@ -108,6 +108,9 @@ int main(void) {
 
   /* Italian */
   addnew("IT", "Italian", "it", 858, 1, 1, 0);
+
+  /* Latin-American */
+  addnew("LA", "Latin-American", "la", 437, 0, 1, 0);
 
   /* Norvegian */
   addnew("NO", "Norvegian", "no", 858, 9, 1, 0);

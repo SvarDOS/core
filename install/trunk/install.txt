@@ -1,6 +1,5 @@
 
                            SVARDOS INSTALLER
-                 Copyright (C) 2016-2023 Mateusz Viste
 
 This is a simple installer for SvarDOS. It installs packages from the CD or
 floppy (relying on pkginst), SYS the boot disk and pre-configures default boot
@@ -11,7 +10,7 @@ files (autoexec.bat and config.sys).
 
 The SvarDOS INSTALL program is published under the terms of the MIT license.
 
-Copyright (C) 2016-2023 Mateusz Viste
+Copyright (C) 2016-2024 Mateusz Viste
 All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

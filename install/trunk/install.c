@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2023 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2024 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

@@ -21,6 +21,8 @@ const char *kblayouts[] = {
   "Hungarian\0hu\0\3\124\1\1\0\320",
   /****** IT ******/
   "Italian\0it\0\3\132\1\1\0\0",
+  /****** LA ******/
+  "Latin-American\0la\0\1\265\0\1\0\0",
   /****** NO ******/
   "Norvegian\0no\0\3\132\11\1\0\0",
   /****** PL ******/
