@@ -81,7 +81,7 @@ loading whatever language is being set up in the LANG environment variable.
 
 SvarCOM is published under the terms of the MIT license.
 
-Copyright (C) 2021-2022 Mateusz Viste
+Copyright (C) 2021-2024 Mateusz Viste
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
