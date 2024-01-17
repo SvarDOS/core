@@ -11,6 +11,7 @@
  - EDR-DOS compatibility fixes: resident module's PSP is being patched with
    cleared JFTs and its parent fields are rewired to SvarCOM. Many thanks to
    E.C. Masloch (pushbx) for suggesting this.
+ - updated SvarLANG.lib to ver 20230730
 
 
 === ver 2023.1 (17.02.2023) ==================================================

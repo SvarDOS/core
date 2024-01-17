@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -648,9 +648,10 @@ void nls_strtoup(char *buff) {
 
 /* reload nls ressources from svarcom.lng into svarlang_mem */
 void nls_langreload(char *buff, unsigned short env) {
-  const char far *nlspath;
+  const char far *dosdir;
   const char far *lang;
   static unsigned short lastlang;
+  unsigned short dosdirlen;
 
   /* look up the LANG env variable, upcase it and copy to lang */
   lang = env_lookup_val(env, "LANG");
@@ -662,10 +663,20 @@ void nls_langreload(char *buff, unsigned short env) {
   if (memcmp(&lastlang, buff, 2) == 0) return;
 
   buff[4] = 0;
-  nlspath = env_lookup_val(env, "NLSPATH");
-  if (nlspath != NULL) _fstrcpy(buff + 4, nlspath);
+  dosdir = env_lookup_val(env, "DOSDIR");
+  if (dosdir == NULL) return;
 
-  if (svarlang_load("SVARCOM", buff, buff + 4) != 0) return;
+  _fstrcpy(buff + 4, dosdir);
+  dosdirlen = strlen(buff + 4);
+  if (buff[4 + dosdirlen - 1] == '\\') dosdirlen--;
+  memcpy(buff + 4 + dosdirlen, "\\SVARCOM.LNG", 13);
+
+  /* try loading %DOSDIR%\SVARCOM.LNG */
+  if (svarlang_load(buff + 4, buff) != 0) {
+    /* failed! try %DOSDIR%\BIN\SVARCOM.LNG now */
+    memcpy(buff + 4 + dosdirlen, "\\BIN\\SVARCOM.LNG", 17);
+    if (svarlang_load(buff + 4, buff) != 0) return;
+  }
 
   _fmemcpy(&lastlang, lang, 2);
 }

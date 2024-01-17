@@ -84,16 +84,16 @@ release: command.com .SYMBOLIC
 	zip -9rkDX svarcom.zip makefile *.c *.h *.txt *.asm cmd lang svarlang.lib
 	# SvarDOS binary package
 	mkdir appinfo
+	mkdir bin
 	mkdir doc
 	mkdir doc\svarcom
-	mkdir nls
-	copy command.com bin
 	copy *.txt doc\svarcom\
 	copy svarcom.lsm appinfo\
-	copy svarcom.lng nls\
+	copy svarcom.lng bin\
 	upx -9 --8086 command.com
-	zip -9rkDX -m svarcom.svp command.com appinfo doc nls
+	zip -9rkDX -m svarcom.svp command.com appinfo bin doc
 	rmdir appinfo
+	rmdir bin
 	rmdir nls
 	rmdir doc\svarcom
 	rmdir doc
