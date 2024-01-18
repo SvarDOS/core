@@ -15,7 +15,7 @@ CLS        Clears the screen.
 COPY       Copies one or more files to another location.
 DATE       Displays or sets the system date.
 DEL/ERASE  Deletes one or more files.
-DIR        ListS files and subdirectories in a directory.
+DIR        Lists files and subdirectories in a directory.
 ECHO       Displays messages, or toggles command-echoing.
 EXIT       Quits the command interpreter program.
 FOR        Runs a specified command for each listed element.
