@@ -673,8 +673,8 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "LASTDRIVE=Z\r\n"
-              "FILES=50\r\n");
-  fprintf(fd, "DEVICE=C:\\SVARDOS\\BIN\\HIMEMX.EXE\r\n");
+              "FILES=40\r\n");
+  fprintf(fd, "DEVICE=C:\\SVARDOS\\HIMEMX.EXE\r\n");
   fprintf(fd, "DOS=UMB,HIGH\r\n");
   fprintf(fd, "SHELL=C:\\COMMAND.COM /E:512 /P\r\n");
   fprintf(fd, "REM COUNTRY=001,%u,C:\\SVARDOS\\CFG\\COUNTRY.SYS\r\n", locales->codepage);
