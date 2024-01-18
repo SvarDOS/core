@@ -1,0 +1,47 @@
+#
+# This is a localization file for the SvarDOS INSTALL program
+#
+# Language..: Polish
+# Translator: Mateusz Viste
+#
+
+### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
+0.0:INSTALACJA SVARDOS
+0.1:Instaluj SvarDOS
+0.2:Wyjdź do DOS
+0.3:Stwórz partycję automatycznie
+0.4:Uruchom narzędzie partycjonowania FDISK
+0.5:Naciśnij dowolny klawisz...
+0.7:Formatuj dysk %c:
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:Góra/Dół = Wybór pozycji | Enter = Zatwierdź wybór | ESC = Poprzedni ekran
+0.11:Góra/Dół = Wybór pozycji | Enter = Zatwierdź wybór | ESC = Wyjdź do DOS
+
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
+1.0:Witaj w systemie SvarDOS
+1.1:Wybierz swój język z poniższej listy:
+1.5:SvarDOS wspiera różne układy klawiatury. Wybierz układ, który ci odpowiada.
+
+### WELCOME SCREEN ###
+2.0:Za chwilę rozpocznie się instalacja systemu SvarDOS: bezpłatnego systemu operacyjnego opartego na jądrze FreeDOS, i kompatybilnego z MSDOS. SvarDOS zawiera mnóstwo aplikacji dodatkowych.\n\nUWAGA: Jeśli twój komputer posiada już inny system operacyjny, system ten może nie zdołać uruchomić się po instalacji SvarDOS.
+
+### DISK SETUP ###
+3.0:BŁĄD: Nie wykryto dysku %c:. Być może twój dysk powinien zostać najpierw spartycjonowany. Utwórz co najmniej jedną partycję na twoim dysku, aby SvarDOS mógł zostać na nią zainstalowany. SvarDOS wymaga co najmniej %d MiB miejsca.\n\nMożesz skorzystać z narzędzia FDISK aby stworzyć wymaganą partycję ręcznie, lub pozwolić instalatorowi stworzyć ją automatycznie. Możesz także wstrzymać instalację aby użyć jakiegokolwiek innego narzędzia do partycjonowania.
+3.1:Twój komputer zostanie teraz uruchomiony ponownie.
+3.2:BŁĄD: Dysk %c: jest nośnikiem wymiennym. Instalacja zatrzymana.
+3.3:BŁĄD: Dysk %c: zdaje się nie być sformatowany.
+3.4:BŁĄD: Dysk %c: jest za mały! SvarDOS wymaga co najmniej %d MiB miejsca.
+3.5:BŁĄD: Dysk %c: nie jest pusty. SvarDOS może być zainstalowany wyłącznie na pustym dysku.\n\nMożesz sformatować dysk teraz, aby go opróżnić. Operacja ta sprawi jednak że WSZYSTKIE OBECNE DANE ZOSTANĄ UTRACONE.
+3.6:Za chwilę rozpocznie się instalacja systemu SvarDOS na dysk %c:.
+
+### PACKAGES INSTALLATION ###
+# example: "Installing package 4/50: FDISK"
+4.0:Instalacja pakietu %d/%d: %s
+4.1:*** WŁÓŻ NASTĘPNĄ DYSKIETKĘ I NACIŚNIJ DOWOLNY KLAWISZ ***
+
+### END SCREEN ###
+5.0:Twój komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napędu.
+5.1:SvarDOS (build %s) został zainstalowany. Zrestartuj teraz komputer.
+
+### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
+6.0:Witaj w systemie SvarDOS! Wpisz 'HELP' jeśli potrzebujesz pomocy.
