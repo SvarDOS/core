@@ -1,6 +1,6 @@
 /*
  * This file is part of pkg (SvarDOS).
- * Copyright (C) 2012-2021 Mateusz Viste
+ * Copyright (C) 2012-2024 Mateusz Viste
  */
 
 #include <stdio.h>  /* printf(), fclose(), fopen()... */
@@ -58,7 +58,6 @@ static int validatedirlist(const struct customdirs *dirlist) {
     }
     /* check for forbidden names */
     if ((strcasecmp(dirlist->name, "appinfo") == 0) ||
-        (strcasecmp(dirlist->name, "bin") == 0) ||
         (strcasecmp(dirlist->name, "doc") == 0) ||
         (strcasecmp(dirlist->name, "help") == 0) ||
         (strcasecmp(dirlist->name, "nls") == 0) ||
