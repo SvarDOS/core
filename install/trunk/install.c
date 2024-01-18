@@ -690,7 +690,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS;.\r\n");
   fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
   fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
-  fprintf(fd, "PATH %%DOSDIR%%\\BIN\r\n");
+  fprintf(fd, "PATH %%DOSDIR%%\r\n");
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "FDAPM APMDOS\r\n");
   fprintf(fd, "\r\n");
@@ -712,6 +712,9 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "# pkg config file - specifies locations where packages should be installed\r\n"
+              "\r\n"
+              "# DOS core binaries\r\n"
+              "DIR BIN C:\\SVARDOS\r\n"
               "\r\n"
               "# Programs\r\n"
               "DIR PROGS C:\\\r\n"
