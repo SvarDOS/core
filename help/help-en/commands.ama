@@ -1,7 +1,7 @@
 
   +------------------------------------------------------------------------+
   | For a detailed help on any given command, either run the command with  |
-  | the /? argument or consult the documentation in %%DOSDIR%%\DOC\.       |
+  | the /? argument or consult the documentation in %%DOSDIR%%\DOC\.         |
   +------------------------------------------------------------------------+
 
 
@@ -25,11 +25,11 @@ LN         Manipulates global executable links.
 MD/MKDIR   Creates a directory.
 PATH       Displays or sets search path for executable files.
 PAUSE      Suspends processing of a batch program.
-PROMPT     Changes the DOS command prompt
+PROMPT     Changes the DOS command prompt.
 RD/RMDIR   Removes/deletes a directory.
 REM        Records comments/remarks in a batch file.
 REN/RENAME Renames one or more files or directories.
-SET        Displays, sets or removes environment variables .
+SET        Displays, sets or removes environment variables.
 SHIFT      Changes the position of arguments in a batch file.
 TIME       Displays or sets the system time.
 TRUENAME   Returns a fully qualified path or filename.
@@ -41,11 +41,11 @@ VOL        Displays the disk volume label and serial number.
 
 %hExternal commands
 
-AMB        Ancient Machine Book book reader for .AMB files.
+AMB        Ancient Machine Book book reader for .AMB files (used by HELP).
 ATTRIB     Displays or changes file attributes.
 CHKDSK     Checks a disk and displays a status report.
 CHOICE     Presents a choice to the user and waits for a key.
-COMMAND    SvarCOM Command-line interpreter
+COMMAND    SvarCOM Command-line interpreter.
 DEBUG      Tool that aids developers in inspecting code.
 DELTREE    Deletes directories with all their contents.
 DISKCOPY   Copies the contents of one floppy disk to another.
