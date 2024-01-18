@@ -1,0 +1,76 @@
+#
+# PKG language file
+#
+# Language..: Polish
+# Translator: Mateusz Viste
+#
+
+#### Help ####
+
+1.0:Menadżer pakietów dla SvarDOS.
+1.20:Użycie: pkg install pakiet[.svp]
+1.21:        pkg update pakiet[.svp]
+1.22:        pkg remove pakiet
+1.23:        pkg listfiles pakiet
+1.24:        pkg listlocal [filtr]
+1.27:        pkg unzip plik.zip
+1.25:PKG jest opublikowany na licencji MIT.
+1.26:Konfiguracja znajduje się w pliku %DOSDIR%\\CFG\\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% nie ustawione! Ustaw by wskazywało na katalog instalacji SvarDOS.
+2.3:Przykład: SET DOSDIR=C:\\SVARDOS
+2.14:Brak pamięci! (%s)
+
+#### Installing package ####
+
+3.8:BŁĄD: Nieprawidłowe archiwum zip! Pakiet nie został zainstalowany.
+3.9:BŁĄD: Pakiet zawiera plik który już istnieje lokalnie:
+3.10:BŁĄD: Nie udało się stworzyć %s!
+3.12:BŁĄD: Pakiet nie zawiera pliku %s! Nieprawidłowy pakiet SvarDOS.
+3.18:Pakiet %s jest już zainstalowany! Zobacz akcję 'update'.
+3.19:Pakiet %s został zainstalowany: rozpakowano %ld plików, %ld błędów.
+3.20:BŁĄD: Pakiet zawiera zaszyfrowany plik:
+3.23:BŁĄD: Pakiet zawiera plik o nieprawidłowej nazwie:
+3.24:BŁĄD: Zbyt długa nazwa pakietu
+
+#### Removing package ####
+
+4.0:Pakiet %s nie jest zainstalowany, więc nie wykasowany.
+4.3:Brak pamięci! Nie zapamiętano katalogu %s!
+4.4:usuwanie %s
+4.5:Pakiet %s został usunięty.
+
+#### Searching package ####
+
+5.0:Żaden pakiet nie pasuje do wyszukiwania.
+
+#### Loading configuration ####
+
+7.0:BŁĄD: repozytorium '%s' jest skonfigurowane dwa razy!
+7.1:BŁĄD: nie zdołano otworzyć pliku konfiguracyjnego '%s'!
+7.4:Uwaga: token z pustą wartością w linii #%d
+7.8:Uwaga: Nieznany token '%s' w linii #%d
+7.11:Uwaga: Nieprawidłowe polecenie 'DIR' w linii #%d
+7.15:BŁĄD: katalog specjalny '%s' nie jest prawidłową ścieżką!
+7.16:BŁĄD: katalog specjalny '%s' jest zarezerwowaną nazwą!
+
+#### Unziping package ####
+
+8.1:nieznana sygnatura zip: 0x%08lx
+8.2:BŁĄD: Pakiet zawiera plik skompresowany nieznaną metodę (%d):
+8.3:BŁĄD: rozpakowanie '%s' do '%s' nie powiodło się!
+
+#### Handling the local list of installed packages ####
+
+9.0:BŁĄD: Dostęp do katalogu %s nie powiódł się.
+9.1:BŁĄD: Nie znaleziono lokalnego pakietu %s.
+
+#### unzip ####
+
+10.0:OK
+10.1:BŁĄD: Otwarcie pliku archiwum nie powiodło się
+10.2:BŁĄD: Nieprawidłowe archiwum ZIP
+10.3:BŁĄD: Plik już istnieje
+10.4:BŁĄD: błąd unzip (%d)
