@@ -1,45 +1,75 @@
 
   +------------------------------------------------------------------------+
   | For a detailed help on any given command, either run the command with  |
-  | the /? argument or consult the documentation in %%DOSDIR%%\DOC\.         |
+  | the /? argument or consult the documentation in %%DOSDIR%%\DOC\.       |
   +------------------------------------------------------------------------+
 
 
 %hInternal (SvarCOM) commands
 
-NOT YET DOCUMENTED (WRITE ME!)
+BREAK      Sets or clears CTRL+C checking.
+CALL       Calls a batch file from within another batch file.
+CD/CHDIR   Displays name or changes the current directory.
+CHCP       Displays or sets the active code page number.
+CLS        Clears the screen.
+COPY       Copies one or more files to another location.
+DATE       Displays or sets the system date.
+DEL/ERASE  Deletes one or more files.
+DIR        ListS files and subdirectories in a directory.
+ECHO       Displays messages, or toggles command-echoing.
+EXIT       Quits the command interpreter program.
+FOR        Runs a specified command for each listed element.
+GOTO       Directs batch processing to a labelled line.
+IF         Performs conditional processing in batch programs.
+LN         Manipulates global executable links.
+MD/MKDIR   Creates a directory.
+PATH       Displays or sets search path for executable files.
+PAUSE      Suspends processing of a batch program.
+PROMPT     Changes the DOS command prompt
+RD/RMDIR   Removes/deletes a directory.
+REM        Records comments/remarks in a batch file.
+REN/RENAME Renames one or more files or directories.
+SET        Displays, sets or removes environment variables .
+SHIFT      Changes the position of arguments in a batch file.
+TIME       Displays or sets the system time.
+TRUENAME   Returns a fully qualified path or filename.
+TYPE       Displays the contents of a text file.
+VER        Displays the DOS kernel and shell versions.
+VERIFY     Verifies that files are written correctly.
+VOL        Displays the disk volume label and serial number.
 
 
 %hExternal commands
 
-AMB      AMB reader (used by HELP)
-ATTRIB   display and set file attributes
-CHKDSK   check FAT FS for errors
-CHOICE   present a choice to the user and wait for a key press
-COMMAND  .
-DEBUG    program testing and editing tool
-DELTREE  delete files and directories with all included files and subdirs
-DISKCOPY copy one disk or image file to another
-DISPLAY  driver for codepage management (screen or printer)
-DOSFSCK  checks the consistency of DOS file systems and optionally repear them
-FC       file compare utility
-FDAPM    APM/ACPI energy saving TSR
-FDISK    fixed disk partition tool
-FIND     display all lines in one or more files that contain a given string
-FORMAT   disk formatting program, creates FAT file systems
-HELP     SvarDOS help
-HIMEMX   XMS memory manager
-KEYB     keyboard driver for international support
-LABEL    sets or changesthe disk volume label
-LOCALCFG locales preferences configuration tool
-MEM      display used and free RAM
-MODE     .
-MORE     display output one screen at a time
-MOVE     move files from here to there
-PKG      installs, removes and updates packages
-PKGNET   pulls packages from the online SvarDOS repository
-SHSUCDX  .
-SORT     .
-SVED     system text editor
-SYS      .
-TREE     display the folder structure of a drive or path
+AMB        Ancient Machine Book book reader for .AMB files.
+ATTRIB     Displays or changes file attributes.
+CHKDSK     Checks a disk and displays a status report.
+CHOICE     Presents a choice to the user and waits for a key.
+COMMAND    SvarCOM Command-line interpreter
+DEBUG      Tool that aids developers in inspecting code.
+DELTREE    Deletes directories with all their contents.
+DISKCOPY   Copies the contents of one floppy disk to another.
+DISPLAY    Driver for code page management.
+FC         Compares files and displays its differences.
+FDAPM      Controls and reports on energy/power.
+FDISK      Prepares a hard drive for use with SvarDOS.
+FIND       Searches for a text string inside files.
+FORMAT     Formats a disk to use with SvarDOS.
+HELP       Displays the help page you are reading right now.
+HIMEMX     XMS memory manager.
+IDLEDPMS   Energy-saving screensaver.
+KEYB       Sets the keyboard layout.
+LABEL      Modifies the volume label of a disk.
+LOCALCFG   Locale preferences configuration tool.
+MEM        Displays memory information.
+MODE       Configures system devices.
+MORE       Displays console output one screen at a time.
+MOVE       Moves files from one location to another.
+PKG        Package manager to handle package deployment.
+PKGNET     Pulls packages from the online SvarDOS repository.
+SHCDX86    8086 CD-ROM extender replacement.
+SHSUCDX    Unloadable CD-ROM extender for SvarDOS.
+SORT       Sorts the contents of its input.
+SVED       Default SvarDOS text editor.
+SYS        Transfers system files to another drive.
+TREE       Displays the directory structure of its argument.
