@@ -2,9 +2,9 @@
 //
 // mateuszbb - minimalist bulletin board forum. MIT license.
 //
-// VERSION 20230523
+// VERSION 20240119
 //
-// Copyright (C) 2021-2023 Mateusz Viste
+// Copyright (C) 2021-2024 Mateusz Viste
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the “Software”), to
@@ -193,6 +193,7 @@ function mateuszbb_rss() {
   echo "<channel>\n";
   echo "<title>" . htmlspecialchars($RSS_TITLE, ENT_XML1) . "</title>\n";
   echo "<link>" . selfurl(). "</link>\n";
+  echo "<description>" . htmlspecialchars($RSS_TITLE, ENT_XML1) . "</description>\n";
 
   while ($row = $sqlres->fetchArray()) {
     $rawtitle = file_get_contents($DATADIR . 'threads/' . $row['thread'] . '/title.txt');
