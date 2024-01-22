@@ -33,7 +33,6 @@
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-cd.zip">SvarDOS install CD (ISO)</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-2.88M.zip">SvarDOS install on 2.88M floppy disks</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1.44M.zip">SvarDOS install on 1.44M floppy disks</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1.44M-DMF-EN_ONLY.zip">SvarDOS install on a single 1.44M floppy (DMF, EN only)</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1.2M.zip">SvarDOS install on 1.2M floppy disks</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-720K.zip">SvarDOS install on 720K floppy disks</a></li>
       <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-360K-EN_ONLY.zip">SvarDOS install on 360K floppy disks (EN only)</a></li>
