@@ -2,7 +2,7 @@
 //
 // mateuszbb - minimalist bulletin board forum. MIT license.
 //
-// VERSION 20240119
+// VERSION 20240123
 //
 // Copyright (C) 2021-2024 Mateusz Viste
 //
@@ -13,7 +13,7 @@
 // sell copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-//The above copyright notice and this permission notice shall be included in
+// The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -72,6 +72,36 @@ $STR['en']['captcha'][2]  = 'check the MIDDLE box';
 $STR['en']['captcha'][3]  = 'check the LAST box';
 $STR['en']['captcha'][4]  = 'check the FIRST and LAST boxes';
 $STR['en']['captcha'][5]  = 'check the TWO LAST boxes';
+
+// DE translations by Robert Riebisch
+$STR['de']['opnewthread'] = 'Neues Thema eröffnen';
+$STR['de']['newthread']   = 'Neues Thema';
+$STR['de']['latestentry'] = 'Neuester Eintrag:';
+$STR['de']['searchterm']  = 'Gesuchter Begriff:';
+$STR['de']['noresults']   = 'Keine Ergebnisse';
+$STR['de']['reply']       = 'Antworten';
+$STR['de']['jumptoend']   = 'Zum Ende springen';
+$STR['de']['listthreads'] = 'Liste der Themen';
+$STR['de']['author']      = 'Autor:';
+$STR['de']['address']     = 'Adresse:';
+$STR['de']['date']        = 'Zeitpunkt:';
+$STR['de']['nameornick']  = 'Dein Name oder Spitzname';
+$STR['de']['threadsubj']  = 'Thema';
+$STR['de']['yourmsg']     = 'Deine Nachricht';
+$STR['de']['cancel']      = 'Abbrechen';
+$STR['de']['send']        = 'Senden';
+$STR['de']['archives']    = 'Archiv';
+$STR['de']['backtocur']   = 'Zurück zu den aktuellen Themen';
+$STR['de']['search']      = 'Suchbegriff';
+$STR['de']['password']    = 'Kennwort';
+$STR['de']['optional']    = 'optional';
+$STR['de']['passhelp']    = 'Wenn du hier ein Kennwort eingibst, wird deine Nachricht mit einer eindeutigen digitalen Signatur versehen.';
+$STR['de']['locked']      = "Thema wegen Inaktivität seit über {$LOCK_DELAY} Tagen gesperrt.";
+$STR['de']['captcha'][1]  = 'Kreuze das ERSTE Kästchen an';
+$STR['de']['captcha'][2]  = 'Kreuze das MITTLERE Kästchen an';
+$STR['de']['captcha'][3]  = 'Kreuze das LETZTE Kästchen an';
+$STR['de']['captcha'][4]  = 'Kreuze das ERSTE und LETZTE Kästchen an';
+$STR['de']['captcha'][5]  = 'Kreuze die beiden LETZTEN Kästchen an';
 
 // PL translations by Mateusz Viste
 $STR['pl']['opnewthread'] = 'stwórz nowy wątek';
