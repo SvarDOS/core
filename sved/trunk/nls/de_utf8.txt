@@ -1,6 +1,6 @@
 #############################################################################
 # SVED IN GERMAN                                                            #
-# translated from English by Bernd Boeckmann                                #
+# translated from English by Bernd Boeckmann & Robert Riebisch              #
 #############################################################################
 
 
@@ -11,12 +11,12 @@
 0.0:ESC=MENÜ
 0.1:UNBENANNT
 0.2:GESPEICHERT
-0.4:Änderungen gehen verloren!
-0.5:ENTER = fortsetzen
+0.4:Ungespeicherte Änderungen gehen verloren!
+0.5:ENTER = Fortsetzen
 0.6:Speichern als:
 0.7:Öffnen:
-0.8:ESC = cancel
-0.9:LEERZ = speichern
+0.8:ESC = Abbrechen
+0.9:LEER = Speichern
 0.10:FEHLER
 0.11:DATEI NICHT GEFUNDEN
 0.12:Zu viele Dateien
@@ -27,11 +27,11 @@
 ####################
 
 1.1:[Datei1.txt] ... [Datei2.txt]
-1.2:Lade Datei...
-1.3:Sved, der SvarDOS Editor
+1.2:Wird geladen
+1.3:Sved, der SvarDOS-Editor
 1.4:ver
 1.10:/m  Monochrommodus erzwingen
-1.11:/t  Tab Zeichen nicht expandieren
+1.11:/t  Tab-Zeichen nicht expandieren
 
 
 ########
