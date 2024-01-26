@@ -8,7 +8,7 @@ Software vom System zu ermöglichen. Um etwas über die richtige Verwendung von
 pkg zu erfahren, geben Sie pkg /? an der SvarDOS-Befehlszeile ein.
 
 Sie können viele SvarDOS-Pakete von der SvarDOS-Homepage
-<http://svardos.osdn.io> beziehen. Wenn Ihr SvarDOS-System mit dem Internet
+<http://svardos.org> beziehen. Wenn Ihr SvarDOS-System mit dem Internet
 verbunden ist, dann können Sie auch den Befehl "pkgnet" verwenden. pkgnet ist
 ein Netzwerkwerkzeug, das es einfach macht, nach SvarDOS-Paketen im SvarDOS-
 Projektarchiv zu suchen und sie auf der Stelle herunterzuladen. Geben Sie

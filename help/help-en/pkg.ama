@@ -7,7 +7,7 @@ packages and removing existing software from the system. To learn about exact
 pkg usage, type pkg /? in the SvarDOS command line shell.
 
 You may obtain many SvarDOS packages from the SvarDOS web homepage at
-<http://svardos.osdn.io>. If your SvarDOS system is connected to the internet,
+<http://svardos.org>. If your SvarDOS system is connected to the internet,
 then you may also use the "pkgnet" command. pkgnet is a network tool that
 makes it easy to search for SvarDOS packages in the SvarDOS repository and
 download them right away. Type pkgnet /? in the SvarDOS command line shell to
