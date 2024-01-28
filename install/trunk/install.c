@@ -653,7 +653,7 @@ static void genlocalesconf(FILE *fd, const struct slocales *locales) {
   }
 
   if (locales->keybfile > 0) {
-    fprintf(fd, "KEYB %s,%d,%%DOSDIR%%\\BIN\\", locales->keybcode, locales->codepage);
+    fprintf(fd, "KEYB %s,%d,%%DOSDIR%%\\", locales->keybcode, locales->codepage);
     if (locales->keybfile == 1) {
       fprintf(fd, "KEYBOARD.SYS");
     } else {
@@ -868,7 +868,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   fprintf(fd, "@ECHO OFF\r\n"
               "SET DOSDIR=C:\\SVARDOS\r\n"
               "SET NLSPATH=%%DOSDIR%%\\NLS\r\n"
-              "PATH %%DOSDIR%%\\BIN\r\n");
+              "PATH %%DOSDIR%%\r\n");
   fprintf(fd, "CD TEMP\r\n"
               "postinst.bat\r\n");
   fclose(fd);
