@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# SvarDOS subversion repostories are mirrored for extra safety. This script
+# SvarDOS subversion repositories are mirrored for extra safety. This script
 # synchronizes the mirrors.
 # This requires specific credentials, hence at this time it can be executed
 # only by me (Mateusz).
