@@ -33,10 +33,9 @@
 #include <string.h>  /* memcpy() */
 #include <unistd.h>
 
+#include "mdr\cout.h"
 #include "mdr\dos.h"
 #include "svarlang.lib\svarlang.h"
-
-#include "video.h"
 
 /* keyboard layouts and locales */
 #include "keylay.h"
@@ -47,13 +46,13 @@ void int24hdl(void);
 
 
 /* color scheme (color, mono) */
-static unsigned short COLOR_TITLEBAR[2] = {0x7000,0x7000};
-static unsigned short COLOR_BODY[2] = {0x1700,0x0700};
-static unsigned short COLOR_SELECT[2] = {0x7000,0x7000};
-static unsigned short COLOR_SELECTCUR[2] = {0x1F00,0x0700};
+static unsigned char COLOR_TITLEBAR[2] = {0x70,0x70};
+static unsigned char COLOR_BODY[2] = {0x07,0x17};
+static unsigned char COLOR_SELECT[2] = {0x70,0x70};
+static unsigned char COLOR_SELECTCUR[2] = {0x07,0x1F};
 
-/* mono flag */
-static int mono = 0;
+/* mono flag (0=mono 1=color) */
+static unsigned char mono = 0;
 
 /* how much disk space does SvarDOS require (in MiB) */
 #define SVARDOS_DISK_REQ 8
@@ -78,6 +77,18 @@ struct slocales {
 };
 
 
+/* put a string on screen and fill it until w chars with whilte space */
+static void video_putstringfix(unsigned char y, unsigned char x, unsigned char attr, const char *s, unsigned char w) {
+  unsigned char i;
+
+  /* print the string up to w characters */
+  i = mdr_cout_str(y, x, s, attr, w);
+
+  /* fill in left space (if any) with blanks */
+  mdr_cout_char_rep(y, x + i, ' ', attr, w - i);
+}
+
+
 /* reboot the computer */
 static void reboot(void) {
   void ((far *bootroutine)()) = (void (far *)()) 0xFFFF0000L;
@@ -88,10 +99,9 @@ static void reboot(void) {
 
 
 /* outputs a string to screen with taking care of word wrapping. returns amount of lines. */
-static int putstringwrap(int y, int x, unsigned short attr, const char *s) {
-  int linew, lincount;
-  linew = 80;
-  if (x >= 0) linew -= (x << 1);
+static unsigned char putstringwrap(unsigned char y, unsigned char x, unsigned char attr, const char *s) {
+  unsigned char linew, lincount;
+  linew = 80 - (x << 1);
 
   for (lincount = 1; y+lincount < 25; lincount++) {
     int i, len = linew;
@@ -106,7 +116,7 @@ static int putstringwrap(int y, int x, unsigned short attr, const char *s) {
         break;
       }
     }
-    video_putstring(y++, x, attr, s, len);
+    mdr_cout_str(y++, x, s, attr, len);
     s += len;
     if (*s == 0) break;
     s += 1; /* skip the whitespace char */
@@ -117,7 +127,7 @@ static int putstringwrap(int y, int x, unsigned short attr, const char *s) {
 
 /* an NLS wrapper around video_putstring(), also performs line wrapping when
  * needed. returns the amount of lines that were output */
-static int putstringnls(int y, int x, unsigned short attr, int nlsmaj, int nlsmin) {
+static unsigned char putstringnls(unsigned char y, unsigned char x, unsigned char attr, unsigned char nlsmaj, unsigned char nlsmin) {
   const char *s = svarlang_str(nlsmaj, nlsmin);
   if (s == NULL) s = "";
   return(putstringwrap(y, x, attr, s));
@@ -155,8 +165,10 @@ static int fcopy(const char *f2, const char *f1, void *buff, size_t buffsz) {
 }
 
 
-static int menuselect(int ypos, int xpos, int height, const char **list, int listlen) {
+static int menuselect(unsigned char ypos, int xpos, unsigned char height, const char **list, int listlen) {
   int i, offset = 0, res = 0, count, width = 0;
+  unsigned char y;
+
   /* count how many positions there is, and check their width */
   for (count = 0; (list[count] != NULL) && (count != listlen); count++) {
     int len = strlen(list[count]);
@@ -166,30 +178,33 @@ static int menuselect(int ypos, int xpos, int height, const char **list, int lis
   /* if xpos negative, means 'center out' */
   if (xpos < 0) xpos = 39 - (width >> 1);
 
-  video_putchar(ypos, xpos+width+2, COLOR_SELECT[mono], 0xBF);         /*       \ */
-  video_putchar(ypos, xpos-1, COLOR_SELECT[mono], 0xDA);               /*  /      */
-  video_putchar(ypos+height-1, xpos-1, COLOR_SELECT[mono], 0xC0);      /*  \      */
-  video_putchar(ypos+height-1, xpos+width+2, COLOR_SELECT[mono], 0xD9);/*      /  */
-  video_putcharmulti(ypos, xpos, COLOR_SELECT[mono], 0xC4, width + 2, 1);
-  video_putcharmulti(ypos+height-1, xpos, COLOR_SELECT[mono], 0xC4, width + 2, 1);
-  video_putcharmulti(ypos+1, xpos-1, COLOR_SELECT[mono], 0xB3, height - 2, 80);
-  video_putcharmulti(ypos+1, xpos+width+2, COLOR_SELECT[mono], 0xB3, height - 2, 80);
+  mdr_cout_char(ypos, xpos+width+2, 0xBF, COLOR_SELECT[mono]);         /*       \ */
+  mdr_cout_char(ypos, xpos-1, 0xDA, COLOR_SELECT[mono]);               /*  /      */
+  mdr_cout_char(ypos+height-1, xpos-1, 0xC0, COLOR_SELECT[mono]);      /*  \      */
+  mdr_cout_char(ypos+height-1, xpos+width+2, 0xD9, COLOR_SELECT[mono]);/*      /  */
+  mdr_cout_char_rep(ypos, xpos, 0xC4, COLOR_SELECT[mono], width + 2);
+  mdr_cout_char_rep(ypos+height-1, xpos, 0xC4, COLOR_SELECT[mono], width + 2);
+
+  for (y = ypos + 1; y < (ypos + height - 1); y++) {
+    mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT[mono]);
+    mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT[mono]);
+  }
 
   for (;;) {
     int key;
     /* list of selectable items */
     for (i = 0; i < height - 2; i++) {
       if (i + offset == res) {
-        video_putchar(ypos + 1 + i, xpos, COLOR_SELECTCUR[mono], 16);
-        video_putchar(ypos + 1 + i, xpos+width+1, COLOR_SELECTCUR[mono], 17);
-        video_movecursor(ypos + 1 + i, xpos);
+        mdr_cout_char(ypos + 1 + i, xpos, 16, COLOR_SELECTCUR[mono]);
+        mdr_cout_char(ypos + 1 + i, xpos+width+1, 17, COLOR_SELECTCUR[mono]);
+        mdr_cout_locate(ypos + 1 + i, xpos);
         video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECTCUR[mono], list[i + offset], width);
       } else if (i + offset < count) {
-        video_putchar(ypos + 1 + i, xpos, COLOR_SELECT[mono], ' ');
-        video_putchar(ypos + 1 + i, xpos+width+1, COLOR_SELECT[mono], ' ');
+        mdr_cout_char(ypos + 1 + i, xpos, ' ', COLOR_SELECT[mono]);
+        mdr_cout_char(ypos + 1 + i, xpos+width+1, ' ', COLOR_SELECT[mono]);
         video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECT[mono], list[i + offset], width);
       } else {
-        video_putcharmulti(ypos + 1 + i, xpos, COLOR_SELECT[mono], ' ', width+2, 1);
+        mdr_cout_char_rep(ypos + 1 + i, xpos, ' ', COLOR_SELECT[mono], width+2);
       }
     }
     key = mdr_dos_getkey();
@@ -221,12 +236,12 @@ static int menuselect(int ypos, int xpos, int height, const char **list, int lis
   }
 }
 
-static void newscreen(int statusbartype) {
+static void newscreen(unsigned char statusbartype) {
   const char *msg;
+  mdr_cout_cls(COLOR_BODY[mono]);
   msg = svarlang_strid(0x00); /* "SVARDOS INSTALLATION" */
-  video_putcharmulti(0, 0, COLOR_TITLEBAR[mono], ' ', 80, 1);
-  video_putstring(0, 40 - (strlen(msg) >> 1), COLOR_TITLEBAR[mono], msg, -1);
-  video_clear(COLOR_BODY[mono], 80, -80);
+  mdr_cout_char_rep(0, 0, ' ', COLOR_TITLEBAR[mono], 80);
+  mdr_cout_str(0, 40 - (strlen(msg) >> 1), msg, COLOR_TITLEBAR[mono], 80);
   switch (statusbartype) {
     case 1:
       msg = svarlang_strid(0x000B); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS" */
@@ -241,9 +256,9 @@ static void newscreen(int statusbartype) {
       msg = svarlang_strid(0x000A); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen" */
       break;
   }
-  video_putchar(24, 0, COLOR_TITLEBAR[mono], ' ');
+  mdr_cout_char(24, 0, ' ', COLOR_TITLEBAR[mono]);
   video_putstringfix(24, 1, COLOR_TITLEBAR[mono], msg, 79);
-  video_movecursor(25,0);
+  mdr_cout_locate(25,0);
 }
 
 /* fills a slocales struct accordingly to the value of its keyboff member */
@@ -281,9 +296,17 @@ static int selectlang(struct slocales *locales) {
   newscreen(1);
   msg = svarlang_strid(0x0100); /* "Welcome to SvarDOS" */
   x = 40 - (strlen(msg) >> 1);
-  video_putstring(4, x, COLOR_BODY[mono], msg, -1);
-  video_putcharmulti(5, x, COLOR_BODY[mono], '=', strlen(msg), 1);
-  putstringnls(8, -1, COLOR_BODY[mono], 1, 1); /* "Please select your language from the list below:" */
+  mdr_cout_str(4, x, msg, COLOR_BODY[mono], 80);
+  mdr_cout_char_rep(5, x, '=', COLOR_BODY[mono], strlen(msg));
+
+  /* center out the string "Please select your language..." */
+  msg = svarlang_str(1, 1); /* "Please select your language from the list below:" */
+  if (strlen(msg) > 74) {
+    putstringwrap(8, 1, COLOR_BODY[mono], msg);
+  } else {
+    mdr_cout_str(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY[mono], 80);
+  }
+
   choice = menuselect(11, -1, 11, langlist, -1);
   if (choice < 0) return(MENUPREV);
   /* populate locales with default values */
@@ -532,8 +555,8 @@ static int preparedrive(char sourcedrv) {
           system(buff);
           break;
         case 1:
-          video_clear(0x0700, 0, 0);
-          video_movecursor(0, 0);
+          mdr_cout_cls(0x07);
+          mdr_cout_locate(0, 0);
           sprintf(buff, "FDISK %d", driveid);
           system(buff);
           break;
@@ -555,7 +578,7 @@ static int preparedrive(char sourcedrv) {
     } else if (driveremovable > 0) {
       newscreen(2);
       snprintf(buff, sizeof(buff), svarlang_strid(0x0302), cselecteddrive); /* "ERROR: Drive %c: is a removable device */
-      video_putstring(9, 1, COLOR_BODY[mono], buff, -1);
+      mdr_cout_str(9, 1, buff, COLOR_BODY[mono], 80);
       putstringnls(11, 2, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
       return(MENUQUIT);
     }
@@ -564,7 +587,7 @@ static int preparedrive(char sourcedrv) {
       const char *list[3];
       newscreen(0);
       snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
-      video_putstring(7, 1, COLOR_BODY[mono], buff, -1);
+      mdr_cout_str(7, 1, buff, COLOR_BODY[mono], 80);
 
       snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
       list[0] = buff;
@@ -574,8 +597,8 @@ static int preparedrive(char sourcedrv) {
       choice = menuselect(12, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
-      video_clear(0x0700, 0, 0);
-      video_movecursor(0, 0);
+      mdr_cout_cls(0x07);
+      mdr_cout_locate(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
       system(buff);
       continue;
@@ -607,8 +630,8 @@ static int preparedrive(char sourcedrv) {
       choice = menuselect(++y, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
-      video_clear(0x0700, 0, 0);
-      video_movecursor(0, 0);
+      mdr_cout_cls(0x07);
+      mdr_cout_locate(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
       system(buff);
       continue;
@@ -619,7 +642,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* Quit to DOS */
       list[2] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
-      video_putstring(7, -1, COLOR_BODY[mono], buff, -1);
+      mdr_cout_str(7, 40 - strlen(buff), buff, COLOR_BODY[mono], 80);
       choice = menuselect(10, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
@@ -755,14 +778,14 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   /* load pkg list */
   fd = fopen("install.lst", "rb");
   if (fd == NULL) {
-    video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST NOT FOUND", -1);
+    mdr_cout_str(10, 30, "ERROR: INSTALL.LST NOT FOUND", COLOR_BODY[mono], 80);
     mdr_dos_getkey();
     return(-1);
   }
   pkglistflen = fread(pkglist, 1, sizeof(pkglist) - 2, fd);
   fclose(fd);
   if (pkglistflen == sizeof(pkglist) - 2) {
-    video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST TOO LARGE", -1);
+    mdr_cout_str(10, 30, "ERROR: INSTALL.LST TOO LARGE", COLOR_BODY[mono], 80);
     mdr_dos_getkey();
     return(-1);
   }
@@ -824,12 +847,12 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     /* install the package */
     snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Installing package %d/%d: %s" */
     strcat(buff, "       ");
-    video_putstringfix(10, 1, COLOR_BODY[mono], buff, sizeof(buff));
+    mdr_cout_str(10, 1, buff, COLOR_BODY[mono], 40);
 
     /* proceed with package copy */
     sprintf(buff, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
     if (fcopy(buff, buff + 7, buff, sizeof(buff)) != 0) {
-      video_putstring(10, 30, COLOR_BODY[mono], "READ ERROR", -1);
+      mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY[mono], 80);
       mdr_dos_getkey();
       fclose(fd);
       return(-1);
@@ -890,7 +913,7 @@ static void finalreboot(void) {
 static void loadcp(const struct slocales *locales) {
   char buff[64];
   if (locales->codepage == 437) return;
-  video_movecursor(1, 0);
+  mdr_cout_locate(1, 0);
   if (locales->egafile == 1) {
     snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) EGA.CPX) > NUL", locales->codepage);
   } else {
@@ -939,7 +962,7 @@ int main(int argc, char **argv) {
   sourcedrv = get_cur_drive() + 'A';
 
   /* init screen and detect mono status */
-  mono = video_init();
+  mono = mdr_cout_init(NULL, NULL);
 
  SelectLang:
   action = selectlang(&locales); /* welcome to svardos, select your language */
@@ -969,7 +992,7 @@ int main(int argc, char **argv) {
   finalreboot(); /* remove the CD and reboot */
 
  Quit:
-  video_clear(0x0700, 0, 0);
-  video_movecursor(0, 0);
+  mdr_cout_locate(0, 0);
+  mdr_cout_close();
   return(0);
 }
