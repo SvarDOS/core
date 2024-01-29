@@ -45,14 +45,12 @@
 void int24hdl(void);
 
 
-/* color scheme (color, mono) */
-static unsigned char COLOR_TITLEBAR[2] = {0x70,0x70};
-static unsigned char COLOR_BODY[2] = {0x07,0x17};
-static unsigned char COLOR_SELECT[2] = {0x70,0x70};
-static unsigned char COLOR_SELECTCUR[2] = {0x07,0x1F};
+/* color scheme (preset for color) */
+static unsigned char COLOR_TITLEBAR  = 0x70;
+static unsigned char COLOR_BODY      = 0x17;
+static unsigned char COLOR_SELECT    = 0x70;
+static unsigned char COLOR_SELECTCUR = 0x1F;
 
-/* mono flag (0=mono 1=color) */
-static unsigned char mono = 0;
 
 /* how much disk space does SvarDOS require (in MiB) */
 #define SVARDOS_DISK_REQ 8
@@ -178,16 +176,16 @@ static int menuselect(unsigned char ypos, int xpos, unsigned char height, const 
   /* if xpos negative, means 'center out' */
   if (xpos < 0) xpos = 39 - (width >> 1);
 
-  mdr_cout_char(ypos, xpos+width+2, 0xBF, COLOR_SELECT[mono]);         /*       \ */
-  mdr_cout_char(ypos, xpos-1, 0xDA, COLOR_SELECT[mono]);               /*  /      */
-  mdr_cout_char(ypos+height-1, xpos-1, 0xC0, COLOR_SELECT[mono]);      /*  \      */
-  mdr_cout_char(ypos+height-1, xpos+width+2, 0xD9, COLOR_SELECT[mono]);/*      /  */
-  mdr_cout_char_rep(ypos, xpos, 0xC4, COLOR_SELECT[mono], width + 2);
-  mdr_cout_char_rep(ypos+height-1, xpos, 0xC4, COLOR_SELECT[mono], width + 2);
+  mdr_cout_char(ypos, xpos+width+2, 0xBF, COLOR_SELECT);         /*       \ */
+  mdr_cout_char(ypos, xpos-1, 0xDA, COLOR_SELECT);               /*  /      */
+  mdr_cout_char(ypos+height-1, xpos-1, 0xC0, COLOR_SELECT);      /*  \      */
+  mdr_cout_char(ypos+height-1, xpos+width+2, 0xD9, COLOR_SELECT);/*      /  */
+  mdr_cout_char_rep(ypos, xpos, 0xC4, COLOR_SELECT, width + 2);
+  mdr_cout_char_rep(ypos+height-1, xpos, 0xC4, COLOR_SELECT, width + 2);
 
   for (y = ypos + 1; y < (ypos + height - 1); y++) {
-    mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT[mono]);
-    mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT[mono]);
+    mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT);
+    mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT);
   }
 
   for (;;) {
@@ -195,16 +193,16 @@ static int menuselect(unsigned char ypos, int xpos, unsigned char height, const 
     /* list of selectable items */
     for (i = 0; i < height - 2; i++) {
       if (i + offset == res) {
-        mdr_cout_char(ypos + 1 + i, xpos, 16, COLOR_SELECTCUR[mono]);
-        mdr_cout_char(ypos + 1 + i, xpos+width+1, 17, COLOR_SELECTCUR[mono]);
+        mdr_cout_char(ypos + 1 + i, xpos, 16, COLOR_SELECTCUR);
+        mdr_cout_char(ypos + 1 + i, xpos+width+1, 17, COLOR_SELECTCUR);
         mdr_cout_locate(ypos + 1 + i, xpos);
-        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECTCUR[mono], list[i + offset], width);
+        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECTCUR, list[i + offset], width);
       } else if (i + offset < count) {
-        mdr_cout_char(ypos + 1 + i, xpos, ' ', COLOR_SELECT[mono]);
-        mdr_cout_char(ypos + 1 + i, xpos+width+1, ' ', COLOR_SELECT[mono]);
-        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECT[mono], list[i + offset], width);
+        mdr_cout_char(ypos + 1 + i, xpos, ' ', COLOR_SELECT);
+        mdr_cout_char(ypos + 1 + i, xpos+width+1, ' ', COLOR_SELECT);
+        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECT, list[i + offset], width);
       } else {
-        mdr_cout_char_rep(ypos + 1 + i, xpos, ' ', COLOR_SELECT[mono], width+2);
+        mdr_cout_char_rep(ypos + 1 + i, xpos, ' ', COLOR_SELECT, width+2);
       }
     }
     key = mdr_dos_getkey();
@@ -231,17 +229,17 @@ static int menuselect(unsigned char ypos, int xpos, unsigned char height, const 
     }/* else {
       char buf[8];
       snprintf(buf, sizeof(buf), "0x%02X ", key);
-      video_putstring(1, 0, COLOR_BODY[mono], buf, -1);
+      video_putstring(1, 0, COLOR_BODY, buf, -1);
     }*/
   }
 }
 
 static void newscreen(unsigned char statusbartype) {
   const char *msg;
-  mdr_cout_cls(COLOR_BODY[mono]);
+  mdr_cout_cls(COLOR_BODY);
   msg = svarlang_strid(0x00); /* "SVARDOS INSTALLATION" */
-  mdr_cout_char_rep(0, 0, ' ', COLOR_TITLEBAR[mono], 80);
-  mdr_cout_str(0, 40 - (strlen(msg) >> 1), msg, COLOR_TITLEBAR[mono], 80);
+  mdr_cout_char_rep(0, 0, ' ', COLOR_TITLEBAR, 80);
+  mdr_cout_str(0, 40 - (strlen(msg) >> 1), msg, COLOR_TITLEBAR, 80);
   switch (statusbartype) {
     case 1:
       msg = svarlang_strid(0x000B); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS" */
@@ -256,8 +254,8 @@ static void newscreen(unsigned char statusbartype) {
       msg = svarlang_strid(0x000A); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Previous screen" */
       break;
   }
-  mdr_cout_char(24, 0, ' ', COLOR_TITLEBAR[mono]);
-  video_putstringfix(24, 1, COLOR_TITLEBAR[mono], msg, 79);
+  mdr_cout_char(24, 0, ' ', COLOR_TITLEBAR);
+  video_putstringfix(24, 1, COLOR_TITLEBAR, msg, 79);
   mdr_cout_locate(25,0);
 }
 
@@ -296,15 +294,15 @@ static int selectlang(struct slocales *locales) {
   newscreen(1);
   msg = svarlang_strid(0x0100); /* "Welcome to SvarDOS" */
   x = 40 - (strlen(msg) >> 1);
-  mdr_cout_str(4, x, msg, COLOR_BODY[mono], 80);
-  mdr_cout_char_rep(5, x, '=', COLOR_BODY[mono], strlen(msg));
+  mdr_cout_str(4, x, msg, COLOR_BODY, 80);
+  mdr_cout_char_rep(5, x, '=', COLOR_BODY, strlen(msg));
 
   /* center out the string "Please select your language..." */
   msg = svarlang_str(1, 1); /* "Please select your language from the list below:" */
   if (strlen(msg) > 74) {
-    putstringwrap(8, 1, COLOR_BODY[mono], msg);
+    putstringwrap(8, 1, COLOR_BODY, msg);
   } else {
-    mdr_cout_str(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY[mono], 80);
+    mdr_cout_str(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY, 80);
   }
 
   choice = menuselect(11, -1, 11, langlist, -1);
@@ -374,7 +372,7 @@ static int selectkeyb(struct slocales *locales) {
   int menuheight, choice;
   if (locales->keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
   newscreen(0);
-  putstringnls(5, 1, COLOR_BODY[mono], 1, 5); /* "SvarDOS supports different keyboard layouts */
+  putstringnls(5, 1, COLOR_BODY, 1, 5); /* "SvarDOS supports different keyboard layouts */
   menuheight = locales->keyblen + 2;
   if (menuheight > 13) menuheight = 13;
   choice = menuselect(10, -1, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
@@ -394,7 +392,7 @@ static int welcomescreen(void) {
   choice[1] = svarlang_strid(0x0002);
   choice[2] = NULL;
   newscreen(0);
-  putstringnls(4, 1, COLOR_BODY[mono], 2, 0); /* "You are about to install SvarDOS */
+  putstringnls(4, 1, COLOR_BODY, 2, 0); /* "You are about to install SvarDOS */
   c = menuselect(13, -1, 4, choice, -1);
   if (c < 0) return(MENUPREV);
   if (c == 0) return(MENUNEXT);
@@ -549,7 +547,7 @@ static int preparedrive(char sourcedrv) {
       list[2] = svarlang_str(0, 2); /* Quit to DOS */
       list[3] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0300), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: could not be found. Note, that SvarDOS requires at least %d MiB of available disk space */
-      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY[mono], buff), -1, 5, list, -1)) {
+      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), -1, 5, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /PRI:MAX %d", driveid);
           system(buff);
@@ -570,16 +568,16 @@ static int preparedrive(char sourcedrv) {
       sprintf(buff, "FDISK /LOADIPL %d", driveid);
       system(buff); /* writes BOOT.MBR into actual MBR */
       newscreen(2);
-      putstringnls(10, 10, COLOR_BODY[mono], 3, 1); /* "Your computer will reboot now." */
-      putstringnls(12, 10, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
+      putstringnls(10, 10, COLOR_BODY, 3, 1); /* "Your computer will reboot now." */
+      putstringnls(12, 10, COLOR_BODY, 0, 5); /* "Press any key..." */
       mdr_dos_getkey();
       reboot();
       return(MENUQUIT);
     } else if (driveremovable > 0) {
       newscreen(2);
       snprintf(buff, sizeof(buff), svarlang_strid(0x0302), cselecteddrive); /* "ERROR: Drive %c: is a removable device */
-      mdr_cout_str(9, 1, buff, COLOR_BODY[mono], 80);
-      putstringnls(11, 2, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
+      mdr_cout_str(9, 1, buff, COLOR_BODY, 80);
+      putstringnls(11, 2, COLOR_BODY, 0, 5); /* "Press any key..." */
       return(MENUQUIT);
     }
     /* if not formatted, propose to format it right away (try to create a directory) */
@@ -587,7 +585,7 @@ static int preparedrive(char sourcedrv) {
       const char *list[3];
       newscreen(0);
       snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
-      mdr_cout_str(7, 1, buff, COLOR_BODY[mono], 80);
+      mdr_cout_str(7, 1, buff, COLOR_BODY, 80);
 
       snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
       list[0] = buff;
@@ -609,8 +607,8 @@ static int preparedrive(char sourcedrv) {
       int y = 9;
       newscreen(2);
       snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
-      y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
-      putstringnls(++y, 1, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
+      y += putstringwrap(y, 1, COLOR_BODY, buff);
+      putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
       mdr_dos_getkey();
       return(MENUQUIT);
     }
@@ -620,7 +618,7 @@ static int preparedrive(char sourcedrv) {
       const char *list[3];
       int y = 6;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0305), cselecteddrive); /* "ERROR: Drive %c: not empty" */
-      y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
+      y += putstringwrap(y, 1, COLOR_BODY, buff);
 
       snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
       list[0] = buff;
@@ -642,7 +640,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* Quit to DOS */
       list[2] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
-      mdr_cout_str(7, 40 - strlen(buff), buff, COLOR_BODY[mono], 80);
+      mdr_cout_str(7, 40 - strlen(buff), buff, COLOR_BODY, 80);
       choice = menuselect(10, -1, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
@@ -778,14 +776,14 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   /* load pkg list */
   fd = fopen("install.lst", "rb");
   if (fd == NULL) {
-    mdr_cout_str(10, 30, "ERROR: INSTALL.LST NOT FOUND", COLOR_BODY[mono], 80);
+    mdr_cout_str(10, 30, "ERROR: INSTALL.LST NOT FOUND", COLOR_BODY, 80);
     mdr_dos_getkey();
     return(-1);
   }
   pkglistflen = fread(pkglist, 1, sizeof(pkglist) - 2, fd);
   fclose(fd);
   if (pkglistflen == sizeof(pkglist) - 2) {
-    mdr_cout_str(10, 30, "ERROR: INSTALL.LST TOO LARGE", COLOR_BODY[mono], 80);
+    mdr_cout_str(10, 30, "ERROR: INSTALL.LST TOO LARGE", COLOR_BODY, 80);
     mdr_dos_getkey();
     return(-1);
   }
@@ -836,9 +834,9 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
       while (*pkgptr == 0) pkgptr++;
       /* end of list? ask for next floppy, there's nothing interesting left on this one */
       if (*pkgptr == 0xff) {
-        putstringnls(12, 1, COLOR_BODY[mono], 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
+        putstringnls(12, 1, COLOR_BODY, 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
         mdr_dos_getkey();
-        video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
+        video_putstringfix(12, 1, COLOR_BODY, "", 80); /* erase the 'insert disk' message */
         goto RETRY_ENTIRE_LIST;
       }
       goto TRY_NEXTPKG;
@@ -847,12 +845,12 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     /* install the package */
     snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Installing package %d/%d: %s" */
     strcat(buff, "       ");
-    mdr_cout_str(10, 1, buff, COLOR_BODY[mono], 40);
+    mdr_cout_str(10, 1, buff, COLOR_BODY, 40);
 
     /* proceed with package copy */
     sprintf(buff, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
     if (fcopy(buff, buff + 7, buff, sizeof(buff)) != 0) {
-      mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY[mono], 80);
+      mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY, 80);
       mdr_dos_getkey();
       fclose(fd);
       return(-1);
@@ -903,8 +901,8 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
 static void finalreboot(void) {
   int y = 9;
   newscreen(2);
-  y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0); /* "Your computer will reboot now.\nPlease remove the installation disk from your drive" */
-  putstringnls(++y, 1, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
+  y += putstringnls(y, 1, COLOR_BODY, 5, 0); /* "Your computer will reboot now.\nPlease remove the installation disk from your drive" */
+  putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
   mdr_dos_getkey();
   reboot();
 }
@@ -961,8 +959,14 @@ int main(int argc, char **argv) {
 
   sourcedrv = get_cur_drive() + 'A';
 
-  /* init screen and detect mono status */
-  mono = mdr_cout_init(NULL, NULL);
+  /* init screen and detect mono adapters */
+  if (mdr_cout_init(NULL, NULL) == 0) {
+    /* overload color scheme with mono settings */
+    COLOR_TITLEBAR = 0x70;
+    COLOR_BODY = 0x07;
+    COLOR_SELECT = 0x70;
+    COLOR_SELECTCUR = 0x07;
+  }
 
  SelectLang:
   action = selectlang(&locales); /* welcome to svardos, select your language */
