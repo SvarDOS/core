@@ -45,10 +45,10 @@ The directory structure of a package depends on the type of packages.
 For "core" packages, we have this:
 
   APPINFO            Put the program's LSM file here
-  BIN                Binaries, such as exe and com files
-  DOC\PKGNAME        Package documentation
-  HELP               Used ONLY by the "help" package
-  NLS\PKGNAME        Localizations (NLS language files) of the package
+  BIN                Binaries, such as EXE, COM and LNG files
+  DOC\PKGNAME        Package documentation, if any
+  HELP\              Optional "help" documentation in AMB format (PKGNAME.AMB)
+  NLS\PKGNAME        Localization files in the legacy, multifile (CATS) format
 
 Non-core packages use a slightly different directory organization. For
 example, if we were to consider a package FOO, we might end up with the
