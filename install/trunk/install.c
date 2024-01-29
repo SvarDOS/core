@@ -163,18 +163,18 @@ static int fcopy(const char *f2, const char *f1, void *buff, size_t buffsz) {
 }
 
 
-static int menuselect(unsigned char ypos, int xpos, unsigned char height, const char **list, int listlen) {
-  int i, offset = 0, res = 0, count, width = 0;
-  unsigned char y;
+static int menuselect(unsigned char ypos, unsigned char height, const char **list, int maxlistlen) {
+  int i, offset = 0, res = 0, count;
+  unsigned char y, xpos, width = 0;
 
   /* count how many positions there is, and check their width */
-  for (count = 0; (list[count] != NULL) && (count != listlen); count++) {
+  for (count = 0; (list[count] != NULL) && (count != maxlistlen); count++) {
     int len = strlen(list[count]);
     if (len > width) width = len;
   }
 
   /* if xpos negative, means 'center out' */
-  if (xpos < 0) xpos = 39 - (width >> 1);
+  xpos = 39 - (width >> 1);
 
   mdr_cout_char(ypos, xpos+width+2, 0xBF, COLOR_SELECT);         /*       \ */
   mdr_cout_char(ypos, xpos-1, 0xDA, COLOR_SELECT);               /*  /      */
@@ -305,7 +305,7 @@ static int selectlang(struct slocales *locales) {
     mdr_cout_str(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY, 80);
   }
 
-  choice = menuselect(11, -1, 11, langlist, -1);
+  choice = menuselect(11, 11, langlist, -1);
   if (choice < 0) return(MENUPREV);
   /* populate locales with default values */
   memset(locales, 0, sizeof(struct slocales));
@@ -375,7 +375,7 @@ static int selectkeyb(struct slocales *locales) {
   putstringnls(5, 1, COLOR_BODY, 1, 5); /* "SvarDOS supports different keyboard layouts */
   menuheight = locales->keyblen + 2;
   if (menuheight > 13) menuheight = 13;
-  choice = menuselect(10, -1, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
+  choice = menuselect(10, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
   if (choice < 0) return(MENUPREV);
   /* (re)load the keyboard layout & codepage setup */
   locales->keyboff += choice;
@@ -393,7 +393,7 @@ static int welcomescreen(void) {
   choice[2] = NULL;
   newscreen(0);
   putstringnls(4, 1, COLOR_BODY, 2, 0); /* "You are about to install SvarDOS */
-  c = menuselect(13, -1, 4, choice, -1);
+  c = menuselect(13, 4, choice, -1);
   if (c < 0) return(MENUPREV);
   if (c == 0) return(MENUNEXT);
   return(MENUQUIT);
@@ -547,7 +547,7 @@ static int preparedrive(char sourcedrv) {
       list[2] = svarlang_str(0, 2); /* Quit to DOS */
       list[3] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0300), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: could not be found. Note, that SvarDOS requires at least %d MiB of available disk space */
-      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), -1, 5, list, -1)) {
+      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 5, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /PRI:MAX %d", driveid);
           system(buff);
@@ -592,7 +592,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
       list[2] = NULL;
 
-      choice = menuselect(12, -1, 4, list, -1);
+      choice = menuselect(12, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       mdr_cout_cls(0x07);
@@ -625,7 +625,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
       list[2] = NULL;
 
-      choice = menuselect(++y, -1, 4, list, -1);
+      choice = menuselect(++y, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       mdr_cout_cls(0x07);
@@ -641,7 +641,7 @@ static int preparedrive(char sourcedrv) {
       list[2] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
       mdr_cout_str(7, 40 - strlen(buff), buff, COLOR_BODY, 80);
-      choice = menuselect(10, -1, 4, list, -1);
+      choice = menuselect(10, 4, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
