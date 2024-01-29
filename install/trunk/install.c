@@ -33,9 +33,9 @@
 #include <string.h>  /* memcpy() */
 #include <unistd.h>
 
+#include "mdr\dos.h"
 #include "svarlang.lib\svarlang.h"
 
-#include "input.h"
 #include "video.h"
 
 /* keyboard layouts and locales */
@@ -192,7 +192,7 @@ static int menuselect(int ypos, int xpos, int height, const char **list, int lis
         video_putcharmulti(ypos + 1 + i, xpos, COLOR_SELECT[mono], ' ', width+2, 1);
       }
     }
-    key = input_getkey();
+    key = mdr_dos_getkey();
     if (key == 0x0D) { /* ENTER */
       return(res);
     } else if (key == 0x148) { /* up */
@@ -549,7 +549,7 @@ static int preparedrive(char sourcedrv) {
       newscreen(2);
       putstringnls(10, 10, COLOR_BODY[mono], 3, 1); /* "Your computer will reboot now." */
       putstringnls(12, 10, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
-      input_getkey();
+      mdr_dos_getkey();
       reboot();
       return(MENUQUIT);
     } else if (driveremovable > 0) {
@@ -588,7 +588,7 @@ static int preparedrive(char sourcedrv) {
       snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
       y += putstringwrap(y, 1, COLOR_BODY[mono], buff);
       putstringnls(++y, 1, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
-      input_getkey();
+      mdr_dos_getkey();
       return(MENUQUIT);
     }
     /* is the disk empty? */
@@ -756,14 +756,14 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   fd = fopen("install.lst", "rb");
   if (fd == NULL) {
     video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST NOT FOUND", -1);
-    input_getkey();
+    mdr_dos_getkey();
     return(-1);
   }
   pkglistflen = fread(pkglist, 1, sizeof(pkglist) - 2, fd);
   fclose(fd);
   if (pkglistflen == sizeof(pkglist) - 2) {
     video_putstring(10, 30, COLOR_BODY[mono], "ERROR: INSTALL.LST TOO LARGE", -1);
-    input_getkey();
+    mdr_dos_getkey();
     return(-1);
   }
   /* mark the end of list */
@@ -814,7 +814,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
       /* end of list? ask for next floppy, there's nothing interesting left on this one */
       if (*pkgptr == 0xff) {
         putstringnls(12, 1, COLOR_BODY[mono], 4, 1); /* "INSERT THE DISK THAT CONTAINS THE REQUIRED FILE AND PRESS ANY KEY" */
-        input_getkey();
+        mdr_dos_getkey();
         video_putstringfix(12, 1, COLOR_BODY[mono], "", 80); /* erase the 'insert disk' message */
         goto RETRY_ENTIRE_LIST;
       }
@@ -830,7 +830,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     sprintf(buff, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
     if (fcopy(buff, buff + 7, buff, sizeof(buff)) != 0) {
       video_putstring(10, 30, COLOR_BODY[mono], "READ ERROR", -1);
-      input_getkey();
+      mdr_dos_getkey();
       fclose(fd);
       return(-1);
     }
@@ -882,7 +882,7 @@ static void finalreboot(void) {
   newscreen(2);
   y += putstringnls(y, 1, COLOR_BODY[mono], 5, 0); /* "Your computer will reboot now.\nPlease remove the installation disk from your drive" */
   putstringnls(++y, 1, COLOR_BODY[mono], 0, 5); /* "Press any key..." */
-  input_getkey();
+  mdr_dos_getkey();
   reboot();
 }
 

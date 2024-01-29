@@ -9,8 +9,8 @@
 
 all: install.com
 
-install.com: keylay.h install.c input.c video.c deflang.c int24hdl.obj
-	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox install.c input.c video.c deflang.c int24hdl.obj svarlang.lib\svarlngs.lib
+install.com: keylay.h install.c video.c deflang.c int24hdl.obj
+	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox install.c video.c deflang.c int24hdl.obj mdr\mdrs2024.lib svarlang.lib\svarlngs.lib
 	upx --8086 -9 install.com
 
 int24hdl.obj: int24hdl.asm
