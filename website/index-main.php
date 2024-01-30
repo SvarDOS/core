@@ -29,17 +29,32 @@
     echo '<h2>Downloads (build ' . $lastver . ')</h2>'
     ?>
 
-    <ul>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-cd.zip">SvarDOS install CD (ISO)</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-2.88M.zip">SvarDOS install on 2.88M floppy disks</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1.44M.zip">SvarDOS install on 1.44M floppy disks</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-1.2M.zip">SvarDOS install on 1.2M floppy disks</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-720K.zip">SvarDOS install on 720K floppy disks</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-floppy-360K-EN_ONLY.zip">SvarDOS install on 360K floppy disks (EN only)</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-usb.zip">SvarDOS install on a bootable USB image</a></li>
-      <li><a href="download/<?php echo $lastver; ?>/svardos-<?php echo $lastver; ?>-dosemu.zip">SvarDOS image for DOSEMU</a><span class="helpmsg" title="a pre-installed image for the DOSEMU emulator, usually needs to be unzipped in ~/.dosemu/drive_c/">?</span></li>
-    </ul>
+    <p>SvarDOS is available in a variety of installation images. Some of the images may be available either in multilingual version or English-only. The English-only versions are smaller because they miss all the translations, this makes them fit on a lower number of floppy disks. You can upgrade an EN-only installation with multilingual support should you change your mind afterwards.</p>
 
-    <p>The links above point to the latest stable build of installation images (that is, build <?php echo $lastver?>) and that's the build we recommend. Otherwise, archival and staging builds can be found in our <a href="?p=files">files section</a>, but that's only if you like living dangerously.</p>
+    <div class="download">
+    <div>
+      <p>Multilingual support</p>
+      <?php
+        $arr = array('cd' => 'CD-ROM ISO', 'floppy-2.88M' => '2.88M floppy disks', 'floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'usb' => 'bootable USB image');
+
+        foreach ($arr as $l => $d) {
+          echo "<a href=\"download/{$lastver}/svardos-{$lastver}-{$l}.zip\">{$d}</a>\n";
+        }
+      ?>
+      </div>
+      <div>
+      <p>English only</p>
+
+      <?php
+        $arr = array('floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'floppy-360K' => '360K floppy disks');
+
+        foreach ($arr as $l => $d) {
+          echo "<a href=\"download/{$lastver}/svardos-{$lastver}-{$l}-EN_ONLY.zip\">{$d}</a>\n";
+        }
+      ?>
+    </div>
+    </div>
+
+    <p>The links above point to the latest stable build of installation images and that's the build we recommend. Archival and staging builds can be found in our <a href="?p=files">files section</a>, but that's only if you like living dangerously.</p>
 
     <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files and scripts are stored. To pull the sources using the standard subversion client use this:<br>svn co svn://svn.svardos.org/svardos svardos</p>

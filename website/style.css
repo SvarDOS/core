@@ -56,6 +56,24 @@ body {
   border-top: 0;
 }
 
+div.download {
+  display: flex;
+  justify-content; start;
+}
+
+div.download div {
+  display: flex;
+  flex-direction: column;
+  border: 1px #aaa solid;
+  border-radius: 0.25em;
+  margin: 0.75em 3em 0.75em 0.25em;
+  padding: 0.2em 0.75em;
+}
+
+div.download div p {
+  margin: 0 0 0.5em 0;
+}
+
 a:link { /* unvisited link */
   color: #008; text-decoration: none;
 }
