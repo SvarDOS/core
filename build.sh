@@ -80,7 +80,7 @@ ALLPKGS="$COREPKGS $EXTRAPKGS"
 function prep_flop {
   WORKDIR="$5/$6"
   mkdir "$WORKDIR"
-  mformat -C -t $1 -h $2 -s $3 -v SVARDOS -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
+  mformat -C -t $1 -h $2 -s $3 -v $CURDATE -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
   mcopy -sQm -i "$WORKDIR/disk1.img" "$FLOPROOT/"* ::/
 
   # now populate the floppies
@@ -191,7 +191,7 @@ echo 'ECHO  ********************' >> "$FLOPROOT/autoexec.bat"
 echo "ECHO  build: $CURDATE" >> "$FLOPROOT/autoexec.bat"
 echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
 echo '' >> "$FLOPROOT/autoexec.bat"
-echo "INSTALL $CURDATE" >> "$FLOPROOT/autoexec.bat"
+echo "INSTALL" >> "$FLOPROOT/autoexec.bat"
 unix2dos "$FLOPROOT/autoexec.bat"
 
 

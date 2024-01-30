@@ -47,10 +47,13 @@ void int24hdl(void);
 
 /* color scheme (preset for color) */
 static unsigned char COLOR_TITLEBAR  = 0x70;
+static unsigned char COLOR_TITLEVER  = 0x78;
 static unsigned char COLOR_BODY      = 0x17;
 static unsigned char COLOR_SELECT    = 0x70;
 static unsigned char COLOR_SELECTCUR = 0x1F;
 
+/* build release string, populated at startup by reading floppy's label */
+static char BUILDSTRING[13];
 
 /* how much disk space does SvarDOS require (in MiB) */
 #define SVARDOS_DISK_REQ 8
@@ -269,6 +272,8 @@ static void newscreen(unsigned char statusbartype) {
   msg = svarlang_strid(0x00); /* "SVARDOS INSTALLATION" */
   mdr_cout_char_rep(0, 0, ' ', COLOR_TITLEBAR, 80);
   mdr_cout_str(0, 40 - (strlen(msg) >> 1), msg, COLOR_TITLEBAR, 80);
+  mdr_cout_str(0, 80 - strlen(BUILDSTRING), BUILDSTRING, COLOR_TITLEVER, 12);
+
   switch (statusbartype) {
     case 1:
       msg = svarlang_strid(0x000B); /* "Up/Down = Select entry | Enter = Validate your choice | ESC = Quit to DOS" */
@@ -793,7 +798,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
 }
 
 
-static int installpackages(char targetdrv, char srcdrv, const struct slocales *locales, const char *buildstring) {
+static int installpackages(char targetdrv, char srcdrv, const struct slocales *locales) {
   char pkglist[512];
   int i, pkglistlen;
   size_t pkglistflen;
@@ -839,7 +844,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   snprintf(buff, sizeof(buff), "%c:\\temp\\postinst.bat", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
-  fprintf(fd, "@ECHO OFF\r\nECHO INSTALLING SVARDOS BUILD %s\r\n", buildstring);
+  fprintf(fd, "@ECHO OFF\r\nECHO INSTALLING SVARDOS BUILD %s\r\n", BUILDSTRING);
 
   /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
   fprintf(fd, "COPY \\COMMAND.COM \\CMD.COM\r\n");
@@ -905,7 +910,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
               "ECHO ");
-  fprintf(fd, svarlang_strid(0x0501), buildstring); /* "SvarDOS installation is over. Please restart your computer now" */
+  fprintf(fd, svarlang_strid(0x0501), BUILDSTRING); /* "SvarDOS installation is over. Please restart your computer now" */
   fprintf(fd, "\r\n"
               "ECHO.\r\n");
   fclose(fd);
@@ -973,17 +978,41 @@ static int checkinstsrc(char drv) {
 #endif
 
 
-int main(int argc, char **argv) {
+int main(void) {
   struct slocales locales;
   int targetdrv;
   int sourcedrv;
   int action;
-  const char *buildstring = "###";
 
   /* setup the internal int 24h handler ("always fail") */
   int24hdl();
 
-  if (argc != 1) buildstring = argv[1];
+  /* read the svardos build revision (from floppy label) */
+  {
+    const char *fspec = "*.*";
+    const char *res = (void*)0x9E; /* default DTA is at PSP:80h, field 1Eh of DTA is the ASCIZ file name */
+
+    _asm {
+      push cx
+      push dx
+
+      mov ax, 0x4e00  /* findfirst */
+      mov cx, 0x08    /* file attr mask, 0x08 = volume label */
+      mov dx, fspec
+      int 0x21
+      jnc good
+      xor ah, ah
+      xchg bx, dx
+      mov [bx], ah
+      xchg bx, dx
+      good:
+
+      pop dx
+      pop cx
+    }
+
+    memcpy(BUILDSTRING, res, 12);
+  }
 
   sourcedrv = get_cur_drive() + 'A';
 
@@ -991,6 +1020,7 @@ int main(int argc, char **argv) {
   if (mdr_cout_init(NULL, NULL) == 0) {
     /* overload color scheme with mono settings */
     COLOR_TITLEBAR = 0x70;
+    COLOR_TITLEVER = 0x70;
     COLOR_BODY = 0x07;
     COLOR_SELECT = 0x70;
     COLOR_SELECTCUR = 0x07;
@@ -1018,7 +1048,7 @@ int main(int argc, char **argv) {
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
   bootfilesgen(targetdrv, &locales); /* generate boot files and other configurations */
-  if (installpackages(targetdrv, sourcedrv, &locales, buildstring) != 0) goto Quit;    /* install packages */
+  if (installpackages(targetdrv, sourcedrv, &locales) != 0) goto Quit;    /* install packages */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */
   finalreboot(); /* remove the CD and reboot */
