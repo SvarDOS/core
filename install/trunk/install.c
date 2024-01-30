@@ -673,7 +673,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* Quit to DOS */
       list[2] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
-      mdr_cout_str(7, 40 - strlen(buff), buff, COLOR_BODY, 80);
+      mdr_cout_str(7, 40 - (strlen(buff) / 2), buff, COLOR_BODY, 80);
       choice = menuselect(10, 2, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
@@ -1001,10 +1001,8 @@ int main(void) {
       mov dx, fspec
       int 0x21
       jnc good
-      xor ah, ah
-      xchg bx, dx
-      mov [bx], ah
-      xchg bx, dx
+      mov bx, res
+      mov [bx], byte ptr 0
       good:
 
       pop dx
