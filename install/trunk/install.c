@@ -163,46 +163,67 @@ static int fcopy(const char *f2, const char *f1, void *buff, size_t buffsz) {
 }
 
 
+/* display a menu with items and return user's choice.
+ * ypos: starting line where the menu is drawn
+ * height: number of items to display inside the menu
+ * list: NULL-terminated list of items
+ * maxlistlen: limit list to this many items tops */
 static int menuselect(unsigned char ypos, unsigned char height, const char **list, int maxlistlen) {
   int i, offset = 0, res = 0, count;
   unsigned char y, xpos, width = 0;
 
-  /* count how many positions there is, and check their width */
+  /* count how many positions there are, and check their width */
   for (count = 0; (list[count] != NULL) && (count != maxlistlen); count++) {
     int len = strlen(list[count]);
     if (len > width) width = len;
   }
+  width++; /* it's nice to have a small margin to the right of the widest item */
 
   /* if xpos negative, means 'center out' */
   xpos = 39 - (width >> 1);
 
+  mdr_cout_char_rep(ypos, xpos, 0xC4, COLOR_SELECT, width + 2);  /* top line */
   mdr_cout_char(ypos, xpos+width+2, 0xBF, COLOR_SELECT);         /*       \ */
   mdr_cout_char(ypos, xpos-1, 0xDA, COLOR_SELECT);               /*  /      */
-  mdr_cout_char(ypos+height-1, xpos-1, 0xC0, COLOR_SELECT);      /*  \      */
-  mdr_cout_char(ypos+height-1, xpos+width+2, 0xD9, COLOR_SELECT);/*      /  */
-  mdr_cout_char_rep(ypos, xpos, 0xC4, COLOR_SELECT, width + 2);
-  mdr_cout_char_rep(ypos+height-1, xpos, 0xC4, COLOR_SELECT, width + 2);
-
-  for (y = ypos + 1; y < (ypos + height - 1); y++) {
-    mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT);
-    mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT);
-  }
+  ypos++; /* from now on ypos relates to the position of the content */
+  mdr_cout_char(ypos+height, xpos-1, 0xC0, COLOR_SELECT);      /*  \      */
+  mdr_cout_char(ypos+height, xpos+width+2, 0xD9, COLOR_SELECT);/*      /  */
+  mdr_cout_char_rep(ypos+height, xpos, 0xC4, COLOR_SELECT, width + 2);
 
   for (;;) {
     int key;
-    /* list of selectable items */
-    for (i = 0; i < height - 2; i++) {
-      if (i + offset == res) {
-        mdr_cout_char(ypos + 1 + i, xpos, 16, COLOR_SELECTCUR);
-        mdr_cout_char(ypos + 1 + i, xpos+width+1, 17, COLOR_SELECTCUR);
-        mdr_cout_locate(ypos + 1 + i, xpos);
-        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECTCUR, list[i + offset], width);
-      } else if (i + offset < count) {
-        mdr_cout_char(ypos + 1 + i, xpos, ' ', COLOR_SELECT);
-        mdr_cout_char(ypos + 1 + i, xpos+width+1, ' ', COLOR_SELECT);
-        video_putstringfix(ypos + 1 + i, xpos+1, COLOR_SELECT, list[i + offset], width);
+
+    /* draw side borders of the menu + the cursor */
+    if (count <= height) { /* no need for a cursor, all fits on one page */
+      i = 255;
+    } else {
+      i = offset * (height - 1) / (count - height);
+    }
+    mdr_cout_char(0, 0, '0' + (i / 10), COLOR_SELECT);
+    mdr_cout_char(0, 1, '0' + (i % 10), COLOR_SELECT);
+
+    for (y = ypos; y < (ypos + height); y++) {
+      mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT); /* left side */
+      if (y - ypos == i) {
+        mdr_cout_char(y, xpos+width+2, '@', COLOR_SELECT); /* cursor */
       } else {
-        mdr_cout_char_rep(ypos + 1 + i, xpos, ' ', COLOR_SELECT, width+2);
+        mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT); /* right side */
+      }
+    }
+
+    /* list of selectable items */
+    for (i = 0; i < height; i++) {
+      if (i + offset == res) {
+        mdr_cout_char(ypos + i, xpos, 16, COLOR_SELECTCUR);
+        mdr_cout_char(ypos + i, xpos+width+1, 17, COLOR_SELECTCUR);
+        mdr_cout_locate(ypos + i, xpos);
+        video_putstringfix(ypos + i, xpos+1, COLOR_SELECTCUR, list[i + offset], width);
+      } else if (i + offset < count) {
+        mdr_cout_char(ypos + i, xpos, ' ', COLOR_SELECT);
+        mdr_cout_char(ypos + i, xpos+width+1, ' ', COLOR_SELECT);
+        video_putstringfix(ypos + i, xpos+1, COLOR_SELECT, list[i + offset], width);
+      } else {
+        mdr_cout_char_rep(ypos + i, xpos, ' ', COLOR_SELECT, width+2);
       }
     }
     key = mdr_dos_getkey();
@@ -216,14 +237,14 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
     } else if (key == 0x150) { /* down */
       if (res+1 < count) {
         res++;
-        if (res > offset + height - 3) offset = res - (height - 3);
+        if (res > offset + height - 1) offset = res - (height - 1);
       }
     } else if (key == 0x147) { /* home */
       res = 0;
       offset = 0;
     } else if (key == 0x14F) { /* end */
       res = count - 1;
-      if (res > offset + height - 3) offset = res - (height - 3);
+      if (res > offset + height - 1) offset = res - (height - 1);
     } else if (key == 0x1B) {  /* ESC */
       return(-1);
     }/* else {
@@ -305,7 +326,7 @@ static int selectlang(struct slocales *locales) {
     mdr_cout_str(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY, 80);
   }
 
-  choice = menuselect(11, 11, langlist, -1);
+  choice = menuselect(11, 9, langlist, -1);
   if (choice < 0) return(MENUPREV);
   /* populate locales with default values */
   memset(locales, 0, sizeof(struct slocales));
@@ -373,8 +394,8 @@ static int selectkeyb(struct slocales *locales) {
   if (locales->keyblen == 1) return(MENUNEXT); /* do not ask for keyboard layout if only one is available for given language */
   newscreen(0);
   putstringnls(5, 1, COLOR_BODY, 1, 5); /* "SvarDOS supports different keyboard layouts */
-  menuheight = locales->keyblen + 2;
-  if (menuheight > 13) menuheight = 13;
+  menuheight = locales->keyblen;
+  if (menuheight > 11) menuheight = 11;
   choice = menuselect(10, menuheight, &(kblayouts[locales->keyboff]), locales->keyblen);
   if (choice < 0) return(MENUPREV);
   /* (re)load the keyboard layout & codepage setup */
@@ -393,7 +414,7 @@ static int welcomescreen(void) {
   choice[2] = NULL;
   newscreen(0);
   putstringnls(4, 1, COLOR_BODY, 2, 0); /* "You are about to install SvarDOS */
-  c = menuselect(13, 4, choice, -1);
+  c = menuselect(13, 2, choice, -1);
   if (c < 0) return(MENUPREV);
   if (c == 0) return(MENUNEXT);
   return(MENUQUIT);
@@ -547,7 +568,7 @@ static int preparedrive(char sourcedrv) {
       list[2] = svarlang_str(0, 2); /* Quit to DOS */
       list[3] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0300), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: could not be found. Note, that SvarDOS requires at least %d MiB of available disk space */
-      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 5, list, -1)) {
+      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /PRI:MAX %d", driveid);
           system(buff);
@@ -592,7 +613,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
       list[2] = NULL;
 
-      choice = menuselect(12, 4, list, -1);
+      choice = menuselect(12, 2, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       mdr_cout_cls(0x07);
@@ -625,7 +646,7 @@ static int preparedrive(char sourcedrv) {
       list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
       list[2] = NULL;
 
-      choice = menuselect(++y, 4, list, -1);
+      choice = menuselect(++y, 2, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       mdr_cout_cls(0x07);
@@ -641,7 +662,7 @@ static int preparedrive(char sourcedrv) {
       list[2] = NULL;
       snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
       mdr_cout_str(7, 40 - strlen(buff), buff, COLOR_BODY, 80);
-      choice = menuselect(10, 4, list, -1);
+      choice = menuselect(10, 2, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
