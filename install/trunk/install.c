@@ -199,8 +199,6 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
     } else {
       i = offset * (height - 1) / (count - height);
     }
-    mdr_cout_char(0, 0, '0' + (i / 10), COLOR_SELECT);
-    mdr_cout_char(0, 1, '0' + (i % 10), COLOR_SELECT);
 
     for (y = ypos; y < (ypos + height); y++) {
       mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT); /* left side */
