@@ -2,7 +2,7 @@
 #
 # SvarDOS build script
 # http://svardos.org
-# Copyright (C) 2016-2023 Mateusz Viste
+# Copyright (C) 2016-2024 Mateusz Viste
 #
 # This script builds floppy and CD images. It should be executed each time that
 # a CORE package has been modified or the build script changed. This is usually
@@ -241,6 +241,7 @@ echo 'IF NOT EXIST C:\TEMP\NUL MKDIR C:\TEMP' >> "$DOSEMUDIR/install.bat"
 echo 'mkdir %DOSDIR%' >> "$DOSEMUDIR/install.bat"
 echo 'mkdir %DOSDIR%\cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO # pkg config file - specifies locations where packages should be installed >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
+echo 'ECHO DIR BIN %DOSDIR% >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO DIR PROGS C:\ >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO DIR GAMES C:\ >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
 echo 'ECHO DIR DRIVERS C:\DRIVERS\ >> %DOSDIR%\cfg\pkg.cfg' >> "$DOSEMUDIR/install.bat"
@@ -284,7 +285,7 @@ echo 'SET DOSDIR=C:\SVARDOS' >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET WATTCP.CFG=%DOSDIR%\CFG' >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET DIRCMD=/p/ogne' >> "$DOSEMUDIR/autoexec.bat"
 echo 'SET TEMP=C:\TEMP' >> "$DOSEMUDIR/autoexec.bat"
-echo 'PATH %DOSDIR%\BIN' >> "$DOSEMUDIR/autoexec.bat"
+echo 'PATH %DOSDIR%' >> "$DOSEMUDIR/autoexec.bat"
 echo "" >> "$DOSEMUDIR/autoexec.bat"
 echo 'IF NOT EXIST INSTALL.BAT GOTO NORMBOOT' >> "$DOSEMUDIR/autoexec.bat"
 echo "REM *** this is a one-time setup script used only during first initialization ***" >> "$DOSEMUDIR/autoexec.bat"
