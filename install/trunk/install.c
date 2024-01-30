@@ -96,6 +96,16 @@ static void reboot(void) {
 }
 
 
+/* returns 1 if file exists, zero otherwise */
+static int fileexists(const char *fname) {
+  FILE *fd;
+  fd = fopen(fname, "rb");
+  if (fd == NULL) return(0);
+  fclose(fd);
+  return(1);
+}
+
+
 /* outputs a string to screen with taking care of word wrapping. returns amount of lines. */
 static unsigned char putstringwrap(unsigned char y, unsigned char x, unsigned char attr, const char *s) {
   unsigned char linew, lincount;
@@ -310,6 +320,12 @@ static int selectlang(struct slocales *locales) {
     NULL
   };
 
+  /* do not ask for language on non-multilang setups */
+  if (!fileexists("INSTALL.LNG")) {
+    choice = 0;
+    goto SkipLangSelect;
+  }
+
   newscreen(1);
   msg = svarlang_strid(0x0100); /* "Welcome to SvarDOS" */
   x = 40 - (strlen(msg) >> 1);
@@ -326,6 +342,9 @@ static int selectlang(struct slocales *locales) {
 
   choice = menuselect(11, 9, langlist, -1);
   if (choice < 0) return(MENUPREV);
+
+  SkipLangSelect:
+
   /* populate locales with default values */
   memset(locales, 0, sizeof(struct slocales));
   switch (choice) {
@@ -485,16 +504,6 @@ static int get_cur_drive(void) {
   r.h.ah = 0x19; /* DOS 1+ GET CURRENT DEFAULT DRIVE */
   int86(0x21, &r, &r);
   return(r.h.al);
-}
-
-
-/* returns 0 if file exists, non-zero otherwise */
-static int fileexists(const char *fname) {
-  FILE *fd;
-  fd = fopen(fname, "rb");
-  if (fd == NULL) return(-1);
-  fclose(fd);
-  return(0);
 }
 
 
@@ -848,7 +857,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     /* is this package present on the floppy disk? */
     TRY_NEXTPKG:
     sprintf(buff, "%s.svp", pkgptr);
-    if (fileexists(buff) != 0) {
+    if (!fileexists(buff)) {
       while (*pkgptr != 0) pkgptr++;
       while (*pkgptr == 0) pkgptr++;
       /* end of list? ask for next floppy, there's nothing interesting left on this one */
@@ -959,7 +968,7 @@ static void loadcp(const struct slocales *locales) {
 static int checkinstsrc(char drv) {
   char fname[16];
   snprintf(fname, sizeof(fname), "%c:\\ATTRIB.SVP", drv);
-  return(fileexists(fname));
+  return(!fileexists(fname));
 }
 #endif
 
@@ -993,18 +1002,18 @@ int main(int argc, char **argv) {
   loadcp(&locales);
   svarlang_load("INSTALL.LNG", locales.lang); /* NLS support */
 
- SelectKeyb:
   action = selectkeyb(&locales);  /* what keyb layout should we use? */
   if (action == MENUQUIT) goto Quit;
-  if (action == MENUPREV) goto SelectLang;
+  if (action == MENUPREV) {
+    if (!fileexists("INSTALL.LNG")) goto Quit;
+    goto SelectLang;
+  }
 
  WelcomeScreen:
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto Quit;
-  if (action == MENUPREV) {
-    if (locales.keyblen > 1) goto SelectKeyb; /* if there is a choice of more than 1 layout, ask for it */
-    goto SelectLang;
-  }
+  if (action == MENUPREV) goto SelectLang;
+
   targetdrv = preparedrive(sourcedrv); /* what drive should we install from? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
