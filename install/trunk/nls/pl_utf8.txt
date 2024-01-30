@@ -40,8 +40,9 @@
 4.1:*** WŁÓŻ NASTĘPNĄ DYSKIETKĘ I NACIŚNIJ DOWOLNY KLAWISZ ***
 
 ### END SCREEN ###
-5.0:Twój komputer zostanie teraz uruchomiony ponownie.\nWyjmij dysk instalacyjny z napędu.
-5.1:SvarDOS (build %s) został zainstalowany. Zrestartuj teraz komputer.
+5.0:Twój komputer zostanie teraz uruchomiony ponownie.
+5.1:Wyjmij dysk instalacyjny z napędu.
+5.2:SvarDOS (build %s) został zainstalowany. Zrestartuj teraz komputer.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Witaj w systemie SvarDOS! Wpisz 'HELP' jeśli potrzebujesz pomocy.

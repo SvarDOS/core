@@ -38,8 +38,9 @@
 4.0:Şu paket kuruluyor: %d/%d: %s
 
 ### END SCREEN ###
-5.0:Bilgisayarınız şimdi yeniden başlayacaktır.\nLütfen kurulum diskini sürücünüzden çıkarın.
-5.1:SvarDOS (derleme %s) kurulumu sona ermiştir. Bilgisayarınızı şimdi tekrar başlatın.
+5.0:Bilgisayarınız şimdi yeniden başlayacaktır.
+5.1:Lütfen kurulum diskini sürücünüzden çıkarın.
+5.2:SvarDOS (derleme %s) kurulumu sona ermiştir. Bilgisayarınızı şimdi tekrar başlatın.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:SvarDOS'a hoş geldiniz! Yardıma ihtiyacınız varsa 'HELP' yazınız.

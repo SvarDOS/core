@@ -49,6 +49,7 @@ void int24hdl(void);
 static unsigned char COLOR_TITLEBAR  = 0x70;
 static unsigned char COLOR_TITLEVER  = 0x78;
 static unsigned char COLOR_BODY      = 0x17;
+static unsigned char COLOR_BODYWARN  = 0x1F;
 static unsigned char COLOR_SELECT    = 0x70;
 static unsigned char COLOR_SELECTCUR = 0x1F;
 
@@ -910,7 +911,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
               "ECHO ");
-  fprintf(fd, svarlang_strid(0x0501), BUILDSTRING); /* "SvarDOS installation is over. Please restart your computer now" */
+  fprintf(fd, svarlang_strid(0x0502), BUILDSTRING); /* "SvarDOS installation is over. Please restart your computer now" */
   fprintf(fd, "\r\n"
               "ECHO.\r\n");
   fclose(fd);
@@ -934,7 +935,8 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
 static void finalreboot(void) {
   int y = 9;
   newscreen(2);
-  y += putstringnls(y, 1, COLOR_BODY, 5, 0); /* "Your computer will reboot now.\nPlease remove the installation disk from your drive" */
+  y += putstringnls(y, 1, COLOR_BODY, 5, 0); /* "Your computer will reboot now." */
+  y += putstringnls(y, 1, COLOR_BODYWARN, 5, 1); /* Please remove the installation disk from your drive" */
   putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
   mdr_dos_getkey();
   reboot();
@@ -1020,6 +1022,7 @@ int main(void) {
     COLOR_TITLEBAR = 0x70;
     COLOR_TITLEVER = 0x70;
     COLOR_BODY = 0x07;
+    COLOR_BODYWARN = 0x07;
     COLOR_SELECT = 0x70;
     COLOR_SELECTCUR = 0x07;
   }

@@ -14,7 +14,7 @@
 0.5:Pressione qualquer tecla...
 0.7:Formatar drive %c:
 # Every string below must be at most 78 characters long! (used in status bar)
-0.10:Up/Down = Selecionar   | Enter = Escolher opção | ESC = Tela anterior  
+0.10:Up/Down = Selecionar   | Enter = Escolher opção | ESC = Tela anterior
 0.11:Up/Down = Selecionar   | Enter = Escolher opção | ESC = Sair para o DOS
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
@@ -40,8 +40,9 @@
 4.1:*** INSIRA O DISCO QUE CONTÉM O ARQUIVO NECESSÁRIO E PRESSIONE QUALQUER TECLA ***
 
 ### END SCREEN ###
-5.0:Seu computador irá reiniciar agora.\nPor favor remova o disco de instalação do drive.
-5.1:A instalação do SvarDOS terminou. Por favor reinicie seu computador\nagora.
+5.0:Seu computador irá reiniciar agora.
+5.1:Por favor remova o disco de instalação do drive.
+5.2:A instalação do SvarDOS terminou. Por favor reinicie seu computador agora.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Bem vindo ao SvarDOS! Digite 'HELP' se precisar de ajuda.

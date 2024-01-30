@@ -40,8 +40,9 @@
 4.1:*** LEGEN SIE DIE NÄCHSTE DISKETTE EIN UND DRÜCKEN SIE EINE BELIEBIGE TASTE ***
 
 ### END SCREEN ###
-5.0:Ihr Computer wird jetzt neu gestartet.\nBitte entfernen Sie den Installationsdatenträger.
-5.1:SvarDOS (Build %s) wurde installiert. Starten Sie Ihren Computer neu.
+5.0:Ihr Computer wird jetzt neu gestartet.
+5.1:Bitte entfernen Sie den Installationsdatenträger.
+5.2:SvarDOS (Build %s) wurde installiert. Starten Sie Ihren Computer neu.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Willkommen bei SvarDOS! Geben Sie 'HELP' ein, wenn Sie Hilfe benötigen.
