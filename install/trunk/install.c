@@ -205,7 +205,7 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
     for (y = ypos; y < (ypos + height); y++) {
       mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT); /* left side */
       if (y - ypos == i) {
-        mdr_cout_char(y, xpos+width+2, '@', COLOR_SELECT); /* cursor */
+        mdr_cout_char(y, xpos+width+2, '=', COLOR_SELECT); /* cursor */
       } else {
         mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT); /* right side */
       }
