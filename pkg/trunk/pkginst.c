@@ -159,11 +159,15 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       curzipnode->filename[0] = 0; /* in fact, I just mark the file as 'empty' on the filename - see later below */
     }
 
-    /* is it the appinfo file? remember it and keep it separate from the list for now */
+    /* is it the appinfo file? detach it from the list for now */
     if (strcmp(curzipnode->filename, appinfofile) == 0) {
       appinfoptr = curzipnode;
       curzipnode = curzipnode->nextfile;
-      if (prevzipnode != NULL) prevzipnode->nextfile = curzipnode;
+      if (prevzipnode == NULL) {
+        ziplinkedlist = curzipnode;
+      } else {
+        prevzipnode->nextfile = curzipnode;
+      }
       continue;
     }
 
