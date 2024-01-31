@@ -1,6 +1,6 @@
 /*
  * This file is part of pkg (SvarDOS package manager)
- * Copyright (C) 2012-2022 Mateusz Viste
+ * Copyright (C) 2012-2024 Mateusz Viste
  *
  * It contains a few helper function...
  */
@@ -23,6 +23,20 @@ void slash2backslash(char *str) {
   for (x = 0; str[x] != 0; x++) {
     if (str[x] == '/') str[x] = '\\';
   }
+}
+
+
+/* trim CRC from a filename and returns a pointer to the CRC part.
+ * this is used to parse filename lines from LSM files */
+char *trimfnamecrc(char *fname) {
+  while (*fname) {
+    if (*fname == '?') {
+      *fname = 0;
+      return(fname + 1);
+    }
+    fname++;
+  }
+  return(0);
 }
 
 

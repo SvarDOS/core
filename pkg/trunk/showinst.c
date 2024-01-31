@@ -1,6 +1,6 @@
 /*
  * This file is part of PKG (SvarDOS)
- * Copyright (C) 2013-2022 Mateusz Viste
+ * Copyright (C) 2013-2024 Mateusz Viste
  */
 
 #include <stdio.h>
@@ -26,7 +26,7 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
   char ver[16];
   int matchfound = 0;
 
-  sprintf(buff, "%s\\packages", dosdir);
+  sprintf(buff, "%s\\appinfo", dosdir);
   dp = opendir(buff);
   if (dp == NULL) {
     kitten_printf(9, 0, buff); /* "ERROR: Could not access directory %s" */
@@ -38,11 +38,11 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
     int tlen = strlen(ep->d_name);
     if (ep->d_name[0] == '.') continue; /* ignore '.', '..', and hidden directories */
     if (tlen < 4) continue; /* files must be at least 5 bytes long ("x.lst") */
-    if (strcasecmp(ep->d_name + tlen - 4, ".lst") != 0) continue;  /* if not an .lst file, skip it silently */
-    ep->d_name[tlen - 4] = 0; /* trim out the ".lst" suffix */
+    if (strcasecmp(ep->d_name + tlen - 4, ".lsm") != 0) continue;  /* if not an .lsm file, skip it silently */
+    ep->d_name[tlen - 4] = 0; /* trim out the ".lsm" suffix */
 
     if (filterstr != NULL) {
-      if (fdnpkg_strcasestr(ep->d_name, filterstr) == NULL) continue; /* if it's not matching the non-NULL filter, skip it */
+      if (fdnpkg_strcasestr(ep->d_name, filterstr) == NULL) continue; /* skip if not matching the non-NULL filter */
     }
 
     /* load the metadata from %DOSDIR\APPINFO\*.lsm */
@@ -79,15 +79,32 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
   sprintf(buff, "%s\\packages\\%s.lst", dosdir, pkgname);
   fd = fopen(buff, "rb");
   if (fd == NULL) {
-    kitten_printf(9, 1, pkgname); /* "ERROR: Local package '%s' not found." */
-    puts("");
-    return(NULL);
+    sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
+    fd = fopen(buff, "rb");
+    if (fd == NULL) {
+      kitten_printf(9, 1, pkgname); /* "ERROR: Local package '%s' not found." */
+      puts("");
+      return(NULL);
+    }
   }
+
   /* iterate through all lines of the file */
   while (freadtokval(fd, buff, sizeof(buff), NULL, 0) == 0) {
-    slash2backslash(buff); /* change all / to \ */
-    if (buff[0] == 0) continue; /* skip empty lines */
-    if (buff[strlen(buff) - 1] == '\\') continue; /* skip directories */
+    /* skip empty lines */
+    if (buff[0] == 0) continue;
+
+    /* normalize slashes to backslashes */
+    slash2backslash(buff);
+
+    /* skip garbage */
+    if ((buff[1] != ':') || (buff[2] != '\\')) continue;
+
+    /* skip directories */
+    if (buff[strlen(buff) - 1] == '\\') continue;
+
+    /* trim ? trailer (may contain the file's CRC) */
+    trimfnamecrc(buff);
+
     /* add the new node to the result */
     newnode = malloc(sizeof(struct flist_t) + strlen(buff));
     if (newnode == NULL) {

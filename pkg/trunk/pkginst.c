@@ -1,6 +1,6 @@
 /*
  * This file is part of pkg (SvarDOS)
- * Copyright (C) 2012-2023 Mateusz Viste
+ * Copyright (C) 2012-2024 Mateusz Viste
  */
 
 #include <ctype.h>     /* toupper() */
@@ -67,8 +67,8 @@ static int validfilename(const char *fname) {
 
 /* returns 0 if pkgname is not installed, non-zero otherwise */
 int is_package_installed(const char *pkgname, const char *dosdir) {
-  char fname[512];
-  sprintf(fname, "%s\\packages\\%s.lst", dosdir, pkgname);
+  char fname[256];
+  sprintf(fname, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
   return(fileexists(fname)); /* file exists -> package is installed */
 }
 
@@ -94,12 +94,16 @@ static struct flist_t *findfileinlist(struct flist_t *flist, const char *fname) 
 }
 
 
-/* prepare a package for installation. this is mandatory before actually installing it!
- * returns a pointer to the zip file's index on success, NULL on failure. the **zipfd pointer is updated with a file descriptor to the open zip file to install. */
+/* prepare a package for installation. this is mandatory before installing it!
+ * returns a pointer to the zip file's index on success, NULL on failure.
+ * the **zipfd pointer is updated with file descriptor of the open (to be
+ * installed) zip file.
+ * the returned ziplist is guaranteed to have the APPINFO file as first node
+ * the ziplist is also guaranteed not to contain any directory entries */
 struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist) {
   char fname[256];
-  char appinfofile[256];
-  int appinfopresence;
+  char appinfofile[32];
+  struct ziplist *appinfoptr;
   char *shortfile;
   struct ziplist *ziplinkedlist = NULL, *curzipnode, *prevzipnode;
   struct flist_t *flist = NULL;
@@ -121,7 +125,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     if ((slen < 4) || (fname[slen - 4] != '.')) strcat(fname, ".SVP");
   }
 
-  /* Now let's check the content of the zip file */
+  /* now let's check the content of the zip file */
 
   *zipfd = fopen(fname, "rb");
   if (*zipfd == NULL) {
@@ -137,9 +141,11 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
   if ((flags & PKGINST_UPDATE) != 0) {
     flist = pkg_loadflist(pkgname, dosdir);
   }
+
   /* Verify that there's no collision with existing local files, look for the appinfo presence */
-  appinfopresence = 0;
+  appinfoptr = NULL;
   prevzipnode = NULL;
+
   for (curzipnode = ziplinkedlist; curzipnode != NULL;) {
     /* change all slashes to backslashes, and switch into all-lowercase */
     slash2backslash(curzipnode->filename);
@@ -149,8 +155,16 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       curzipnode->filename[0] = 0; /* mark it "empty", will be removed in a short moment */
     }
     /* is it a "link file"? skip it - link files are no longer supported */
-    if (fdnpkg_strcasestr(curzipnode->filename, "links\\") == curzipnode->filename) {
+    if (strstr(curzipnode->filename, "links\\") == curzipnode->filename) {
       curzipnode->filename[0] = 0; /* in fact, I just mark the file as 'empty' on the filename - see later below */
+    }
+
+    /* is it the appinfo file? remember it and keep it separate from the list for now */
+    if (strcmp(curzipnode->filename, appinfofile) == 0) {
+      appinfoptr = curzipnode;
+      curzipnode = curzipnode->nextfile;
+      if (prevzipnode != NULL) prevzipnode->nextfile = curzipnode;
+      continue;
     }
 
     if (curzipnode->filename[0] == 0) { /* ignore empty filenames (maybe it was empty originally, or has been emptied because it's a dropped source or link) */
@@ -165,12 +179,14 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       }
       continue; /* go to the next item */
     }
+
     /* validate that the file has a valid filename (8+3, no shady chars...) */
     if (validfilename(curzipnode->filename) != 0) {
       puts(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
+
     /* look out for collisions with already existing files (unless we are
      * updating the package and the local file belongs to it */
     shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist);
@@ -180,12 +196,14 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       printf(" %s\n", fname);
       goto RAII_ERR;
     }
+
     /* abort if any entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
       puts(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
+
     /* abort if any file is compressed with an unsupported method */
     if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
       kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
@@ -193,16 +211,23 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
-    if (strcmp(curzipnode->filename, appinfofile) == 0) appinfopresence = 1;
+
+    /* add node to list */
     prevzipnode = curzipnode;
     curzipnode = curzipnode->nextfile;
   }
+
   /* if appinfo file not found, this is not a real SvarDOS package */
-  if (appinfopresence != 1) {
+  if (appinfoptr == NULL) {
     kitten_printf(3, 12, appinfofile); /* "ERROR: Package do not contain the %s file! Not a valid SvarDOS package." */
     puts("");
     goto RAII_ERR;
   }
+
+  /* attach the appinfo node to the top of the list (installation second stage
+   * relies on this) */
+  appinfoptr->nextfile = ziplinkedlist;
+  ziplinkedlist = appinfoptr;
 
   goto RAII;
 
@@ -262,37 +287,49 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
 int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
   char buff[256];
   char fulldestfilename[256];
-  char packageslst[32];
   char *shortfile;
   long filesextractedsuccess = 0, filesextractedfailure = 0;
   struct ziplist *curzipnode;
-  FILE *lstfd;
+  FILE *lsmfd;
+  int unzip_result;
 
-  sprintf(packageslst, "packages\\%s.lst", pkgname); /* Prepare the packages/xxxx.lst filename string for later use */
-
-  /* create the %DOSDIR%/packages directory, just in case it doesn't exist yet */
-  sprintf(buff, "%s\\packages\\", dosdir);
+  /* create the %DOSDIR%/APPINFO directory, just in case it doesn't exist yet */
+  sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
   mkpath(buff);
 
-  /* open the lst file */
-  sprintf(buff, "%s\\%s", dosdir, packageslst);
-  lstfd = fopen(buff, "wb"); /* opening it in binary mode, because I like to have control over line terminators (CR/LF) */
-  if (lstfd == NULL) {
+  /* start by extracting the APPINFO (LSM) file - I need it so I can append the
+   * list of files belonging to the packages later */
+  unzip_result = zip_unzip(zipfd, ziplinkedlist, buff);
+  if (unzip_result != 0) {
+    kitten_printf(8, 3, ziplinkedlist, buff); /* "ERROR: failed extracting '%s' to '%s'!" */
+    printf(" [%d]\n", unzip_result);
+    return(-1);
+  }
+  printf(" %s -> %s\n", ziplinkedlist->filename, buff);
+  filesextractedsuccess++;
+
+  /* open the (freshly created) LSM file */
+  lsmfd = fopen(buff, "ab"); /* opening in APPEND mode so I do not loose the LSM content */
+  if (lsmfd == NULL) {
     kitten_printf(3, 10, buff); /* "ERROR: Could not create %s!" */
     puts("");
     return(-2);
   }
+  fprintf(lsmfd, "\r\n"); /* in case the LSM does not end with a clear line already */
 
   /* write list of files in zip into the lst, and create the directories structure */
-  for (curzipnode = ziplinkedlist; curzipnode != NULL; curzipnode = curzipnode->nextfile) {
-    int unzip_result;
-    if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) continue; /* skip directories */
-    shortfile = computelocalpath(curzipnode->filename, buff, dosdir, dirlist); /* substitute paths to custom dirs */
-    /* log the filename to packages\pkg.lst */
-    fprintf(lstfd, "%s%s\r\n", buff, shortfile);
+  for (curzipnode = ziplinkedlist->nextfile; curzipnode != NULL; curzipnode = curzipnode->nextfile) {
+
+    /* substitute paths to custom dirs */
+    shortfile = computelocalpath(curzipnode->filename, buff, dosdir, dirlist);
+
+    /* log the filename to LSM metadata file + its CRC */
+    fprintf(lsmfd, "%s%s?%08lX\r\n", buff, shortfile, curzipnode->crc32);
+
     /* create the path, just in case it doesn't exist yet */
     mkpath(buff);
     sprintf(fulldestfilename, "%s%s", buff, shortfile);
+
     /* Now unzip the file */
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
     if (unzip_result != 0) {
@@ -304,7 +341,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
       filesextractedsuccess += 1;
     }
   }
-  fclose(lstfd);
+  fclose(lsmfd);
 
   kitten_printf(3, 19, pkgname, filesextractedsuccess, filesextractedfailure); /* "Package %s installed: %ld files extracted, %ld errors." */
   puts("");

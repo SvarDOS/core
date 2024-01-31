@@ -1,6 +1,6 @@
 /*
  *  This file is part of SvarDOS
- *  Copyright (C) 2012-2021 Mateusz Viste
+ *  Copyright (C) 2012-2024 Mateusz Viste
  */
 
 #ifndef pkginst_sentinel

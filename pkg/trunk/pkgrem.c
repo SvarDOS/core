@@ -1,6 +1,6 @@
 /*
  * This file is part of the pkg (SvarDOS) project.
- * Copyright (C) Mateusz Viste 2012-2022
+ * Copyright (C) Mateusz Viste 2012-2024
  */
 
 #include <ctype.h>    /* toupper() */
@@ -70,20 +70,35 @@ int pkgrem(const char *pkgname, const char *dosdir) {
   int lastdirsep;
   struct dirliststruct *dirlist = NULL; /* used to remember directories to remove */
 
-  /* open the file %DOSDIR%\packages\pkgname.lst */
+  /* open the (legacy) listing file at %DOSDIR%\packages\pkgname.lst
+   * if not exists then fall back to appinfo\pkgname.lsm */
   sprintf(fpath, "%s\\packages\\%s.lst", dosdir, pkgname);
   flist = fopen(fpath, "rb");
   if (flist == NULL) {
-    kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
-    puts("");
-    return(-1);
+    sprintf(fpath, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
+    flist = fopen(fpath, "rb");
+    if (flist == NULL) {
+      kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
+      puts("");
+      return(-1);
+    }
   }
 
-  /* remove all files/folders listed in pkgname.lst but NOT pkgname.lst */
+  /* remove all files/folders listed in pkgname.lsm but NOT pkgname.lsm */
   while (freadtokval(flist, buff, sizeof(buff), NULL, 0) == 0) {
     int x;
-    slash2backslash(buff); /* change all slash to backslash */
-    if (buff[0] == 0) continue; /* skip empty lines */
+
+    /* skip empty lines */
+    if (buff[0] == 0) continue;
+
+    /* change all slash to backslash */
+    slash2backslash(buff);
+
+    /* skip garbage */
+    if ((buff[1] != ':') || (buff[2] != '\\')) continue;
+
+    /* trim out CRC information (if present) */
+    trimfnamecrc(buff);
 
     /* remember the path part for removal later */
     lastdirsep = -1;
@@ -99,7 +114,8 @@ int pkgrem(const char *pkgname, const char *dosdir) {
     /* if it's a directory, skip it */
     if (buff[strlen(buff) - 1] == '\\') continue;
 
-    /* do not delete pkgname.lst at this point - I am using it (will be deleted later) */
+    /* do not delete pkgname.lst at this point because I am using it (will be
+     * deleted later) */
     if (strcasecmp(buff, fpath) == 0) continue;
 
     /* remove it */
@@ -108,7 +124,7 @@ int pkgrem(const char *pkgname, const char *dosdir) {
     unlink(buff);
   }
 
-  /* close the lst file */
+  /* close the lsm file */
   fclose(flist);
 
   /* iterate over dirlist and remove directories if empty, from longest to shortest */
@@ -135,7 +151,10 @@ int pkgrem(const char *pkgname, const char *dosdir) {
   }
 
   /* remove the lst file */
+  kitten_printf(4, 4, fpath); /* "removing %s" */
+  puts("");
   unlink(fpath);
+
   kitten_printf(4, 5, pkgname); /* "Package %s has been removed." */
   puts("");
   return(0);
