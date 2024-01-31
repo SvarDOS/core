@@ -1,6 +1,6 @@
 #
 # pkg Makefile -- requires OpenWatcom (wmake)
-# Copyright (C) 2021-2023 Mateusz Viste
+# Copyright (C) 2021-2024 Mateusz Viste
 #
 
 CFLAGS = -0 -mc -os -wx -we -d0 -i=zlib
