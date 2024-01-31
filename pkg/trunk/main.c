@@ -66,8 +66,8 @@ static int showhelp(void) {
   puts(svarlang_str(1, 27)); /* "       pkg unzip file.zip" */
   puts(svarlang_str(1, 28)); /* "       pkg crc32 file" */
   puts("");
-  puts(svarlang_str(1, 25)); /* "PKG is published under the MIT license." */
-  puts(svarlang_str(1, 26)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
+  puts(svarlang_str(1, 40)); /* "PKG is published under the MIT license." */
+  puts(svarlang_str(1, 41)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
   return(1);
 }
 

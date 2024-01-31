@@ -15,8 +15,8 @@
 1.24:        pkg listlocal [filtr]
 1.27:        pkg unzip plik.zip
 1.28:        pkg crc32 plik
-1.25:PKG jest opublikowany na licencji MIT.
-1.26:Konfiguracja znajduje się w pliku %DOSDIR%\\CFG\\PKG.CFG
+1.40:PKG jest opublikowany na licencji MIT.
+1.41:Konfiguracja znajduje się w pliku %DOSDIR%\\CFG\\PKG.CFG
 
 ### General stuff ####
 
