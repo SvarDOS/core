@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2023 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2024 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
 #include <string.h>   /* strcasecmp() */
 
 #include "svarlang.lib/svarlang.h"
+#include "crc32.h"
 #include "helpers.h"
 #include "kprintf.h"
 #include "libunzip.h"
@@ -47,6 +48,7 @@ enum ACTIONTYPES {
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
   ACTION_UNZIP,
+  ACTION_CRC32,
   ACTION_HELP
 };
 
@@ -62,6 +64,7 @@ static int showhelp(void) {
   puts(svarlang_str(1, 23)); /* "       pkg listfiles package" */
   puts(svarlang_str(1, 24)); /* "       pkg listlocal [filter]" */
   puts(svarlang_str(1, 27)); /* "       pkg unzip file.zip" */
+  puts(svarlang_str(1, 28)); /* "       pkg crc32 file" */
   puts("");
   puts(svarlang_str(1, 25)); /* "PKG is published under the MIT license." */
   puts(svarlang_str(1, 26)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
@@ -83,6 +86,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_LISTLOCAL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
+  } else if ((argc == 3) && (strcasecmp(argv[1], "crc32") == 0)) {
+    return(ACTION_CRC32);
   } else {
     return(ACTION_HELP);
   }
@@ -130,6 +135,37 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
 }
 
 
+/* pkg crc32 file */
+static int crcfile(const char *fname) {
+  FILE *fd;
+  unsigned long crc;
+  unsigned char buff[512];
+  unsigned int len;
+
+  fd = fopen(fname, "rb");
+  if (fd == NULL) {
+    puts(svarlang_str(10, 1)); /* failed to open file */
+    return(1);
+  }
+
+  crc = crc32_init();
+
+  for (;;) {
+    len = fread(buff, 1, sizeof(buff), fd);
+    if (len == 0) break;
+    crc32_feed(&crc, buff, len);
+  }
+  fclose(fd);
+
+  crc32_finish(&crc);
+
+  printf("%08lX", crc);
+  puts("");
+
+  return(0);
+}
+
+
 int main(int argc, char **argv) {
   int res = 1;
   enum ACTIONTYPES action;
@@ -146,6 +182,10 @@ int main(int argc, char **argv) {
       break;
     case ACTION_UNZIP:
       res = unzip(argv[2]);
+      goto GAMEOVER;
+      break;
+    case ACTION_CRC32:
+      res = crcfile(argv[2]);
       goto GAMEOVER;
       break;
   }

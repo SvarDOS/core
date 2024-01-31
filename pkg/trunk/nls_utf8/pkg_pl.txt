@@ -14,6 +14,7 @@
 1.23:        pkg listfiles pakiet
 1.24:        pkg listlocal [filtr]
 1.27:        pkg unzip plik.zip
+1.28:        pkg crc32 plik
 1.25:PKG jest opublikowany na licencji MIT.
 1.26:Konfiguracja znajduje się w pliku %DOSDIR%\\CFG\\PKG.CFG
 
@@ -70,7 +71,7 @@
 #### unzip ####
 
 10.0:OK
-10.1:BŁĄD: Otwarcie pliku archiwum nie powiodło się
+10.1:BŁĄD: Otwarcie pliku nie powiodło się
 10.2:BŁĄD: Nieprawidłowe archiwum ZIP
 10.3:BŁĄD: Plik już istnieje
 10.4:BŁĄD: błąd unzip (%d)

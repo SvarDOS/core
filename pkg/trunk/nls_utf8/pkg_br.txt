@@ -71,7 +71,7 @@
 #### unzip ####
 
 10.0:OK
-10.1:ERRO: Falha ao abrir o arquivo compactado
+10.1:ERRO: Falha ao abrir o arquivo
 10.2:ERRO: Arquivo ZIP inválido
 10.3:ERRO: Arquivo já existe
 10.4:ERRO: Falha na descompactação (%d)
