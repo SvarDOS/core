@@ -34,7 +34,7 @@
 ###############################################################################
 
 9.0:ERRO: variável %DOSDIR% não está configurada
-9.1:ERRO: Impossível acessar o diretório de pacotes %DOSDIR%\\packages
+9.1:ERRO: Impossível acessar o diretório de pacotes %DOSDIR%\\APPINFO
 9.2:ERRO: Falha na conexão a %s
 9.3:ERRO: Falha ao enviar requisição HTTP para o servidor remoto
 9.4:ERRO: Falha no envio de dados POST para o servidor remoto

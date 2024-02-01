@@ -35,7 +35,7 @@
 ###############################################################################
 
 9.0:FEHLER: Variable %DOSDIR% ist nicht gesetzt
-9.1:FEHLER: Konnte nicht auf das Verzeichnis %DOSDIR%\\packages zugreifen
+9.1:FEHLER: Konnte nicht auf das Verzeichnis %DOSDIR%\\APPINFO zugreifen
 9.2:FEHLER: Verbindung mit %s fehlgeschlagen
 9.3:FEHLER: Senden einer HTTP-Abfrage an den Remote-Server fehlgeschlagen
 9.4:FEHLER: Senden von POST-Daten an den Remote-Server fehlgeschlagen

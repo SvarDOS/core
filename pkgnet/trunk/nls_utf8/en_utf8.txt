@@ -35,7 +35,7 @@
 ###############################################################################
 
 9.0:ERROR: variable %DOSDIR% is not set
-9.1:ERROR: could not access the %DOSDIR%\\packages directory
+9.1:ERROR: could not access the %DOSDIR%\\APPINFO directory
 9.2:ERROR: failed to connect to %s
 9.3:ERROR: failed to send a HTTP query to the remote server
 9.4:ERROR: failed to send POST data to remote server

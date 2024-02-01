@@ -35,7 +35,7 @@
 ###############################################################################
 
 9.0:BŁĄD: zmienna %DOSDIR% nie jest ustawiona
-9.1:BŁĄD: dostęp do katalogu %DOSDIR%\\packages nie powiódł się
+9.1:BŁĄD: dostęp do katalogu %DOSDIR%\\APPINFO nie powiódł się
 9.2:BŁĄD: połączenie do %s nie powiodło się
 9.3:BŁĄD: nie zdołano wysłać zapytania HTTP do zdalnego serwera
 9.4:BŁĄD: nie zdołano wysłać danych POST do zdalnego serwera
