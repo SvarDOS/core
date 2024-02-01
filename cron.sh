@@ -34,6 +34,11 @@ svn up "$SVNREPODIR"
 rm -rf "$SVNREPODIR/packages/latest"
 php "$SVNREPODIR/buildidx/buildidx.php" "$SVNREPODIR/packages/" > "$SVNREPODIR/packages/_buildidx.log"
 
+# build the ISO that contains all latest packages from the repo
+mkisofs -input-charset cp437 -iso-level 1 -f -V SVARDOS_REPO -o "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR"/packages/latest/*
+mv "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR/website/repo/sv-repo.iso"
+md5sum "$SVNREPODIR/website/repo/sv-repo.iso" > "$SVNREPODIR/website/repo/sv-repo.iso.md5"
+
 
 # do I need to rebuild the install images as well?
 if [ "$NEEDTOREBUILD" -ne 0 ] ; then
