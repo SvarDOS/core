@@ -1,0 +1,49 @@
+#
+# PKGNET TRANSLATION FILE
+#
+# LANG  : EN
+# AUTHOR: MATEUSZ VISTE
+#
+
+###############################################################################
+# HELP SCREEN                                                                 #
+###############################################################################
+
+1.0:pkgnet is the SvarDOS package downloader.
+1.1:usage:  pkgnet search <term>
+1.2:        pkgnet pull <package>
+1.3:        pkgnet pull <package>-<version>
+1.4:        pkgnet pullsrc <package>
+1.5:        pkgnet pullsrc <package>-<version>
+1.6:        pkgnet checkup
+1.7:actions:
+1.8:search   - asks remote repository for the list of matching packages
+1.9:pull     - downloads package into current directory
+1.10:pullsrc  - downloads source code archive for package
+1.11:checkup  - lists updates available for your system
+
+
+###############################################################################
+# OPERATIONS                                                                  #
+###############################################################################
+
+2.0:Downloaded %ld KiB into %s (BSUM: %04X)
+
+
+###############################################################################
+# ERROR MESSAGES                                                              #
+###############################################################################
+
+9.0:ERROR: variable %DOSDIR% is not set
+9.1:ERROR: could not access the %DOSDIR%\\APPINFO directory
+9.2:ERROR: failed to connect to %s
+9.3:ERROR: failed to send a HTTP query to the remote server
+9.4:ERROR: failed to send POST data to remote server
+9.5:ERROR: TCP communication error #%d
+9.6:ERROR: failed to create file %s
+9.7:ERROR: failed to write data to file %s after %ld bytes
+9.8:ERROR: timeout while waiting for data
+9.9:ERROR: out of memory
+9.10:ERROR: file %s already exists
+9.11:ERROR: network subsystem initialization failed
+9.12:ERROR: DNS resolution failed
