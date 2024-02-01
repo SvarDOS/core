@@ -1,7 +1,7 @@
 <?php /*
 
   SvarDOS repo index builder
-  Copyright (C) Mateusz Viste 2012-2023
+  Copyright (C) Mateusz Viste 2012-2024
 
   buildidx computes an index json file for the SvarDOS repository.
   it must be executed pointing to a directory that stores packages (*.svp)
@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  01 feb 2024: computes the "latest" collection of symlinks
   24 nov 2023: SVED included in the MS-DOS compat list instead of EDIT + support for "release xyz" versions
   25 aug 2023: validation of the hwreq section in LSM files
   24 aug 2023: load hwreq data from LSM and store them in the json index + skip the '.svn' dir
@@ -420,6 +421,7 @@ foreach ($pkgfiles as $fname) {
     if ($f === 'games/') continue;
     if (str_head_is($f, "drivers/{$pkgdir}/")) continue;
     if ($f === 'drivers/') continue;
+    if (str_head_is($f, "kernels/{$pkgdir}/")) continue;
     echo "WARNING: {$fname} contains a file in an illegal location: {$f}\n";
   }
 
@@ -509,6 +511,18 @@ file_put_contents($repodir . '/_index.json', $json_blob);
 
 $cats_json = json_encode($cats);
 file_put_contents($repodir . '/_cats.json', $cats_json);
+
+
+// populate the 'latest' dir with symlinks to latest version of every svp
+mkdir($repodir . '/latest');
+foreach ($db as $pkg => $props) {
+  $fname = array_key_first($props['versions']);
+  $cat = array_values($props['cats'])[0];
+  //echo "pkg = '{$pkg}' ; fname = '{$fname}' ; cat = '{$cat}'\n";
+  if (!file_exists($repodir . '/latest/' . $cat)) mkdir($repodir . '/latest/' . $cat);
+  symlink('../../' . $fname, $repodir . '/latest/' . $cat . '/' . $pkg . '.svp');
+}
+
 
 exit(0);
 
