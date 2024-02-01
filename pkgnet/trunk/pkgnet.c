@@ -3,7 +3,7 @@
  *
  * PUBLISHED UNDER THE TERMS OF THE MIT LICENSE
  *
- * COPYRIGHT (C) 2016-2023 MATEUSZ VISTE, ALL RIGHTS RESERVED.
+ * COPYRIGHT (C) 2016-2024 MATEUSZ VISTE, ALL RIGHTS RESERVED.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -40,8 +40,8 @@
 #include "../../pkg/trunk/lsm.h"
 
 
-#define PVER "20230823"
-#define PDATE "2021-2023"
+#define PVER "20240201"
+#define PDATE "2021-2024"
 
 #define HOSTADDR "svardos.org"
 
@@ -209,10 +209,10 @@ static unsigned short checkupdata(char *buff) {
 
   /* if first call, open the package directory */
   if (dp == NULL) {
-    sprintf(buff, "%s\\packages", dosdir);
+    sprintf(buff, "%s\\appinfo", dosdir);
     dp = opendir(buff);
     if (dp == NULL) {
-      putsnls(9, 1); /* "ERROR: Could not access %DOSDIR%\\packages directory" */
+      putsnls(9, 1); /* "ERROR: Could not access %DOSDIR%\\appinfo directory" */
       return(0);
     }
   }
@@ -227,9 +227,9 @@ static unsigned short checkupdata(char *buff) {
     }
 
     tlen = strlen(ep->d_name);
-    if (tlen < 4) continue; /* files must be at least 5 bytes long ("x.lst") */
-    if (strcasecmp(ep->d_name + tlen - 4, ".lst") != 0) continue;  /* if not an .lst file, skip it silently */
-    ep->d_name[tlen - 4] = 0; /* trim out the ".lst" suffix */
+    if (tlen < 4) continue; /* files must be at least 5 bytes long ("x.lsm") */
+    if (strcasecmp(ep->d_name + tlen - 4, ".lsm") != 0) continue;  /* if not an .lsm file, skip it silently */
+    ep->d_name[tlen - 4] = 0; /* trim out the ".lsm" suffix */
 
     /* load the metadata from %DOSDIR\APPINFO\*.lsm */
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
