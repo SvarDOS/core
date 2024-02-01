@@ -31,6 +31,7 @@ fi
 
 # refresh the local copy of the repo and rebuild packages index
 svn up "$SVNREPODIR"
+rm -rf "$SVNREPODIR/packages/latest"
 php "$SVNREPODIR/buildidx/buildidx.php" "$SVNREPODIR/packages/" > "$SVNREPODIR/packages/_buildidx.log"
 
 

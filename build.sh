@@ -2,6 +2,7 @@
 #
 # SvarDOS build script
 # http://svardos.org
+#
 # Copyright (C) 2016-2024 Mateusz Viste
 #
 # This script builds floppy and CD images. It should be executed each time that
