@@ -15,7 +15,6 @@ release: pkg.exe .symbolic
 	mkdir appinfo
 	mkdir bin
 	copy pkg.lng bin
-	upx --8086 -9 pkg.exe -o bin\pkg.exe
 	copy pkg.lsm appinfo
 	zip -9moDkrX pkg.svp appinfo bin
 	zip -9oDkrX pkg.zip nls_utf8 svarlang.lib zlib *.c *.h pkg.lsm makefile
@@ -24,6 +23,7 @@ release: pkg.exe .symbolic
 
 pkg.exe: main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj deflang.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
+	upx --8086 -9 pkg.exe
 
 deflang.obj: nls_utf8\pkg_en.txt
 	cd nls_utf8
