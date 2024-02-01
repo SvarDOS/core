@@ -3,7 +3,7 @@
 
 <p>This page lists all packages that are available in the SvarDOS repository. These packages can be downloaded from within SvarDOS using the pkgnet tool, or you can download them from here.</p>
 
-<p>You may also download a CD ISO image that contains the latest version of each package: <a href="repo/sv-repo.iso">sv-repo.iso</a> (<?php echo intval(filesize('repo/sv-repo.iso') / 1024 / 1024); ?>M, <a href="repo/sv-repo.iso.md5">md5</a>)</p>
+<p>You may also download a CD ISO image that contains the latest version of each package: <a href="repo/sv-repo.iso">SV-REPO.ISO</a> (<?php echo intval(filesize('repo/sv-repo.iso') / 1024 / 1024); ?>M, <a href="repo/sv-repo.iso.md5">md5</a>)</p>
 
 <!-- <p>If you wish to receive notifications about new or updated packages, you may subscribe to the <a href="http://svn.svardos.org/rss.php?repname=SvarDOS&path=%2Fpackages%2F">SvarDOS Packages RSS feed</a>.</p>-->
 
