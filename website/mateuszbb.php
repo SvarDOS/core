@@ -606,6 +606,7 @@ if (isset($_POST['szukaj']) && (!empty(trim($_POST['szukaj'])))) {
   $licznik = 0;
   foreach ($resarr as $r) {
     if (mb_substr($r['link'], -1) === '/') continue;
+    if (strlen($r['link']) <= strlen(selfurl())) continue;
     echo '<a href=' . $r['link'] . ' class="minibb-searchresult">';
     echo "<div><h1>{$r['title']}</h1><p>{$r['htmlSnippet']}</p></div></a>\n";
     $licznik++;
