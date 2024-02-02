@@ -466,7 +466,7 @@ if (($action === 'newpost') && ($thread >= 0) && (!empty($_POST['msg'])) && (!em
       $artkey = $_COOKIE['mateuszbbkey'];
     } else {
       $artkey = bin2hex(random_bytes(128));
-      setcookie('mateuszbbkey', $artkey, array('secure' => true, 'httponly' => true, 'samesite' => 'Lax'));
+      setcookie('mateuszbbkey', $artkey, array('secure' => false, 'httponly' => true, 'samesite' => 'Lax'));
     }
   }
   // zapisz wiadomość
