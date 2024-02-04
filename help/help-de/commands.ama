@@ -1,0 +1,77 @@
+
+  +------------------------------------------------------------------------+
+  | Um ausführliche Hilfe zu einem bestimmten Befehl zu erhalten, führen   |
+  | Sie den Befehl mit dem Parameter /? aus oder konsultieren Sie die      |
+  | Dokumentation in %%DOSDIR%%\DOC\.                                        |
+  +------------------------------------------------------------------------+
+
+
+%hInterne (SvarCOM-)Befehle
+
+BREAK      Schaltet die erweiterte Prüfung für STRG+C ein oder aus.
+CALL       Ruft ein Stapelprogramm von einem anderen aus auf.
+CD/CHDIR   Zeigt den Namen des aktuellen Verzeichnisses an oder wechselt es.
+CHCP       Zeigt die Nummer der aktiven Codeseite an oder legt letztere fest.
+CLS        Leert den Bildschirm.
+COPY       Kopiert eine oder mehrere Dateien an eine andere Stelle.
+DATE       Zeigt das Systemdatum an oder legt es fest.
+DEL/ERASE  Löscht eine oder mehrere Dateien.
+DIR        Zeigt eine Liste von Dateien und Unterverzeichnissen eines
+           Verzeichnisses an.
+ECHO       Zeigt Meldungen an oder schaltet die Befehlsanzeige ein oder aus.
+EXIT       Verlässt das COMMAND.COM-Programm (Befehlsinterpreter).
+FOR        Führt einen angegebenen Befehl für jedes Element einer Liste aus.
+GOTO       Lenkt die Stapelverarbeitung zu einer Sprungmarke.
+IF         Führt eine bedingte Verarbeitung in Batchprogrammen durch.
+LN         Manipuliert globale ausführbare Verknüpfungen.
+MD/MKDIR   Erstellt ein Verzeichnis.
+PATH       Zeigt den Suchpfad für ausführbare Dateien an oder legt ihn fest.
+PAUSE      Pausiert die Ausführung eines Stapelskripts.
+PROMPT     Ändert die DOS-Eingabeaufforderung.
+RD/RMDIR   Entfernt (löscht) ein Verzeichnis.
+REM        Leitet Kommentare in einer Stapeldatei ein.
+REN/RENAME Benennt eine oder mehrere Dateien oder Verzeichnisse um.
+SET        Zeigt DOS-Umgebungsvariablen an, legt sie fest oder entfernt sie.
+SHIFT      Ändert die Position der Argumente in einer Stapeldatei.
+TIME       Zeigt die Systemzeit an oder legt sie fest.
+TRUENAME   Gibt einen vollständig qualifizierten Pfad oder Dateinamen zurück.
+TYPE       Zeigt den Inhalt einer Textdatei an.
+VER        Zeigt die Versionen von DOS-Kernel und SvarCOM-Shell an.
+VERIFY     Zeigt oder steuert den Überprüfen-nach-Schreiben-Schalter von DOS.
+VOL        Zeigt die Bezeichnung und Seriennummer eines Datenträgers an.
+
+
+%hExterne Befehle
+
+AMB        Anzeigeprogramm für .AMB-Dateien (verwendet von HELP).
+ATTRIB     Zeigt Dateiattribute an oder ändert sie.
+CHKDSK     Überprüft einen Datenträger und zeigt einen Statusbericht an.
+CHOICE     Bietet dem Benutzer eine Auswahl an und wartet auf eine Taste.
+COMMAND    SvarCOM-Befehlszeileninterpreter.
+DEBUG      Werkzeug, das Entwicklern bei der Überprüfung von Code hilft.
+DELTREE    Löscht Verzeichnisse mitsamt ihrem Inhalt.
+DISKCOPY   Kopiert den Inhalt einer Diskette auf eine andere.
+DISPLAY    Treiber für die Verwaltung von Codeseiten.
+FC         Vergleicht Dateien und zeigt die Unterschiede an.
+FDAPM      Werkzeug zur Energieverwaltung und -einsparung.
+FDISK      Bereitet ein Festplattenlaufwerk für die Verwendung mit DOS vor.
+FIND       Sucht nach einer Textzeichenfolge in Dateien.
+FORMAT     Formatiert einen Datenträger für die Verwendung mit DOS.
+HELP       Zeigt die Hilfeseite an, die Sie gerade lesen.
+HIMEMX     Treiber für die Verwaltung von XMS-Speicher.
+IDLEDPMS   Energiespar-Bildschirmschoner.
+KEYB       Stellt die Tastaturbelegung ein.
+LABEL      Ändert die Bezeichnung eines Datenträgers.
+LOCALCFG   Werkzeug zur Konfiguration der Gebietsschemaeinstellungen.
+MEM        Zeigt Informationen über den Arbeitsspeicher an.
+MODE       Konfiguriert Systemgeräte.
+MORE       Zeigt die Konsolenausgabe bildschirmweise an.
+MOVE       Verschiebt Dateien von einem Speicherort zu einem anderen.
+PKG        Paketmanager für die Bereitstellung von Paketen.
+PKGNET     Ruft Pakete aus dem SvarDOS-Paketarchiv im Internet ab.
+SHCDX86    SHSUCDX-Version geeignet für 8086/8088-Prozessoren.
+SHSUCDX    Entladbare CD-ROM-Erweiterung (MSCDEX-Ersatz).
+SORT       Sortiert den Inhalt seiner Eingabe.
+SVED       Standardmäßiger SvarDOS-Texteditor.
+SYS        Überträgt Systemdateien auf ein anderes Laufwerk.
+TREE       Zeigt die Verzeichnisstruktur seines Arguments an.
