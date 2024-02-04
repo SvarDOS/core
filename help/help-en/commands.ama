@@ -35,7 +35,7 @@ TIME       Displays or sets the system time.
 TRUENAME   Returns a fully qualified path or filename.
 TYPE       Displays the contents of a text file.
 VER        Displays the DOS kernel and shell versions.
-VERIFY     Verifies that files are written correctly.
+VERIFY     Displays or controls the DOS verify-after-write flag.
 VOL        Displays the disk volume label and serial number.
 
 
@@ -45,16 +45,16 @@ AMB        Ancient Machine Book book reader for .AMB files (used by HELP).
 ATTRIB     Displays or changes file attributes.
 CHKDSK     Checks a disk and displays a status report.
 CHOICE     Presents a choice to the user and waits for a key.
-COMMAND    SvarCOM Command-line interpreter.
+COMMAND    SvarCOM command-line interpreter.
 DEBUG      Tool that aids developers in inspecting code.
 DELTREE    Deletes directories with all their contents.
 DISKCOPY   Copies the contents of one floppy disk to another.
 DISPLAY    Driver for code page management.
 FC         Compares files and displays its differences.
 FDAPM      Controls and reports on energy/power.
-FDISK      Prepares a hard drive for use with SvarDOS.
+FDISK      Prepares a hard disk drive for use with DOS.
 FIND       Searches for a text string inside files.
-FORMAT     Formats a disk to use with SvarDOS.
+FORMAT     Formats a disk to use with DOS.
 HELP       Displays the help page you are reading right now.
 HIMEMX     XMS memory manager.
 IDLEDPMS   Energy-saving screensaver.
@@ -67,8 +67,8 @@ MORE       Displays console output one screen at a time.
 MOVE       Moves files from one location to another.
 PKG        Package manager to handle package deployment.
 PKGNET     Pulls packages from the online SvarDOS repository.
-SHCDX86    8086 CD-ROM extender replacement.
-SHSUCDX    Unloadable CD-ROM extender for SvarDOS.
+SHCDX86    SHSUCDX version suitable to run on 8086/8088 CPUs.
+SHSUCDX    Unloadable CD-ROM extension (MSCDEX replacement).
 SORT       Sorts the contents of its input.
 SVED       Default SvarDOS text editor.
 SYS        Transfers system files to another drive.
