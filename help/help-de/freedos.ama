@@ -3,7 +3,7 @@
 
 Das FreeDOS-Projekt ist ein freies, quelloffenes Betriebssystem mit dem Ziel,
 zu 100%% kompatibel mit MS-DOS zu sein. Und es ist großartig. Warum sollte ich
-also SvarDOS stattdessen verwenden?
+also stattdessen SvarDOS verwenden?
 
 %hLange Veröffentlichungszyklen
 
@@ -36,7 +36,7 @@ Ausschließlich freie Software zuzulassen bedeutet, dass eine große Anzahl
 nützlicher Programme, Werkzeuge und Spiele zurückbleiben. Zum Beispiel
 "Freeware"-Tools (wie in "kostenlos, aber ohne Quellcode") sind ein No-Go.
 Selbst Open-Source-Programme können abgelehnt werden, wenn sie nicht eindeutig
-angeben, dass sie einer OSI-genehmigten Lizenz entsprechen.
+angeben, dass sie einer OSI-bestätigten Lizenz entsprechen.
 
 SvarDOS hingegen ist viel liberaler, was die Aufnahme von Paketen angeht.
 Grundsätzlich kann alles, was objektiv nützlich, von angemessener Qualität
@@ -50,6 +50,6 @@ Lesen Sie mehr über %lpkgrules.ama:SvarDOS-Regeln für die Einbeziehung von Pak
 Es muss angemerkt werden, dass obwohl sich die Ziele von SvarDOS und FreeDOS
 etwas unterscheiden, SvarDOS ohne FreeDOS nicht existieren würde. In der Tat
 verwendet SvarDOS den exzellenten FreeDOS-Kernel, sowie einige andere
-Programme aus dem aus dem FreeDOS-Ökosystem.
+Programme aus dem FreeDOS-Ökosystem.
 
 Lesen Sie auch: %lhistory.ama:Ursprünge von SvarDOS
