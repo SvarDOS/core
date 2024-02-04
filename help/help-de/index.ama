@@ -1,21 +1,15 @@
 
                             %h*** SVARDOS-HILFE ***
 
-Diese Hilfedokumentation befindet sich noch im Aufbau. Im Moment bietet sie
-nur einen sehr begrenzten Umfang. (Wenn Sie bei der Erstellung unterstützen
-wollen, nehmen Sie über die %lcontact.ama:SvarDOS-Mailingliste%t Kontakt mit uns auf!)
-
-=== Kapitel ==================================================================
+ * %lcommands.ama:Liste der Befehle
 
  * %lpkg.ama:Paketverwaltung (Software installieren/entfernen/aktualisieren)
  * %lnetwork.ama:Verwendung im Netzwerk
  * %lmouse.ama:Mausunterstützung
 
  * %lfreedos.ama:SvarDOS vs. FreeDOS: Was ist die Geschichte?
- * %lcontact.ama:Wie trete ich mit der Projektgemeinschaft in Kontakt?
+ * %lcontact.ama:Wie trete ich mit der SvarDOS-Gemeinschaft in Kontakt?
 
  * %lhistory.ama:Ursprünge von SvarDOS
  * %lmeaning.ama:Was bedeutet "Svarog"?
  * %llicense.ama:SvarDOS-Lizenz
-
-==============================================================================
