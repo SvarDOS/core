@@ -34,24 +34,27 @@
     <div class="download">
     <div>
       <p>Multilingual support</p>
+      <ul>
       <?php
         $arr = array('cd' => 'CD-ROM ISO', 'floppy-2.88M' => '2.88M floppy disks', 'floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'usb' => 'bootable USB image');
 
         foreach ($arr as $l => $d) {
-          echo "<a href=\"download/{$lastver}/svardos-{$lastver}-{$l}.zip\">{$d}</a>\n";
+          echo "<li><a href=\"download/{$lastver}/svardos-{$lastver}-{$l}.zip\">{$d}</a></li>\n";
         }
       ?>
+      </ul>
       </div>
       <div>
       <p>English only</p>
-
+      <ul>
       <?php
         $arr = array('floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'floppy-360K' => '360K floppy disks');
 
         foreach ($arr as $l => $d) {
-          echo "<a href=\"download/{$lastver}/svardos-{$lastver}-{$l}-EN_ONLY.zip\">{$d}</a>\n";
+          echo "<li><a href=\"download/{$lastver}/svardos-{$lastver}-{$l}-EN_ONLY.zip\">{$d}</a></li>\n";
         }
       ?>
+      </ul>
     </div>
     </div>
 
