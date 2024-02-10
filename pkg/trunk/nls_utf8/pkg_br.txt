@@ -32,7 +32,7 @@
 3.10:ERRO: Impossível criar %s!
 3.12:ERRO: Pacote não contém o arquivo %s! Não é um pacote válido SvarDOS.
 3.18:Pacote %s já está instalado! Você pode querer usar a ação 'update'.
-3.19:Pacote %s instalado: %d arquivos extraídos, %d erros.
+3.19:Pacote %s instalado: %d erros, %d arquivos extraídos.
 3.20:ERRO: Pacote contém um arquivo encriptado:
 3.23:ERRO: Pacote contém um nome de arquivo inválido:
 3.24:ERRO: Nome do pacote muito longo

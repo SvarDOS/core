@@ -3,7 +3,7 @@
 #
 # Language....: English
 # Author......: Mateusz Viste
-# Last updated: 31 Jan 2024
+# Last updated: 10 Feb 2024
 #
 
 #### Help ####
@@ -32,7 +32,7 @@
 3.10:ERROR: Could not create %s!
 3.12:ERROR: Invalid SvarDOS package! Does not contain the %s file.
 3.18:Package %s already installed! You may want to use the 'update' action.
-3.19:Package %s installed: %ld files extracted, %ld errors.
+3.19:Package %s installed: %ld errors, %ld files extracted.
 3.20:ERROR: Package contains an encrypted file:
 3.23:ERROR: Package contains an invalid filename:
 3.24:ERROR: package name too long

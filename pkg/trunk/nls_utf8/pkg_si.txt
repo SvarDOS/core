@@ -30,7 +30,7 @@
 3.10:NAPAKA: Ni mogoče ustvariti %s.
 3.12:NAPAKA: Paket ne vsebuje datoteke %s; to ni veljaven SvarDOS paket.
 3.18:Paket %s je že nameščen! Morda želite uporabiti dejavnost UPDATE.
-3.19:Paket %s nameščen: %ld datotek razširjenih, %ld napak.
+3.19:Paket %s nameščen: %ld napak, %ld datotek razširjenih.
 3.20:NAPAKA: paket vsebuje šifrirano datoteko:
 3.23:NAPAKA: paket vsebuje neveljavno ime datoteke:
 3.24:NAPAKA: package name too long

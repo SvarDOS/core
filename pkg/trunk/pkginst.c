@@ -347,7 +347,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   }
   fclose(lsmfd);
 
-  kitten_printf(3, 19, pkgname, filesextractedsuccess, filesextractedfailure); /* "Package %s installed: %ld files extracted, %ld errors." */
+  kitten_printf(3, 19, pkgname, filesextractedfailure, filesextractedsuccess); /* "Package %s installed: %ld errors, %ld files extracted." */
   puts("");
 
   /* scan the LSM file for a "warn" message to display */

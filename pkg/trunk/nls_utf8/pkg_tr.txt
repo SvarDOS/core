@@ -30,7 +30,7 @@
 3.10:HATA: %s oluşturulamadı %s!
 3.12:HATA: Paket %s dosyasını içermiyor! Geçerli bir SvarDOS paketi değil.
 3.18:%s paketi zaten kuruludur! Güncelleme eylemini yapabilirsiniz.
-3.19:%s paketi kuruldu: %ld dosya çıkarıldı, %ld hata.
+3.19:%s paketi kuruldu: %ld hata, %ld dosya çıkarıldı.
 3.20:HATA: paket şifreli bir dosya içermektedir:
 3.23:HATA: paket geçersiz bir dosya ismi içermektedir:
 3.24:HATA: package name too long
