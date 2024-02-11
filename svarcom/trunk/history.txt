@@ -6,6 +6,13 @@
  (ticket numbers at https://osdn.net/projects/svardos/ticket/ in [] brackets)
 
 
+=== ver 2024.2 (xx.xx.2024) ==================================================
+
+ - command-line parsing modified to work around a DN bug. Thanks to bttr for
+   reporting the issue and to ECM for locating the root cause.
+   ref: https://github.com/SvarDOS/bugz/issues/67
+
+
 === ver 2024.1 (17.01.2023) ==================================================
 
  - EDR-DOS compatibility fixes: resident module's PSP is being patched with

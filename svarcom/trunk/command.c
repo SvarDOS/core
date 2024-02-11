@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2023 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -121,15 +121,11 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
 
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
-  const unsigned char *cmdlinelen = (void *)0x80;
   char *cmdline = (void *)0x81;
 
   memset(cfg, 0, sizeof(*cfg));
 
-  /* set a NULL terminator on cmdline */
-  cmdline[*cmdlinelen] = 0;
-
-  while (*cmdline != 0) {
+  while (*cmdline != 0x0d) {
 
     /* skip over any leading spaces */
     if (*cmdline == ' ') {
@@ -155,7 +151,7 @@ static void parse_argv(struct config *cfg) {
       case 'K':
         cmdline++;
         cfg->execcmd = cmdline;
-        return; /* further arguments are for the executed program, not for me */
+        goto DONE; /* further arguments are for the executed program, not for me */
 
       case 'y': /* /Y = execute batch file step-by-step (with /P, /K or /C) */
       case 'Y':
@@ -203,8 +199,14 @@ static void parse_argv(struct config *cfg) {
 
     /* move to next argument or quit processing if end of cmdline */
     SKIP_TO_NEXT_ARG:
-    while ((*cmdline != 0) && (*cmdline != ' ') && (*cmdline != '/')) cmdline++;
+    while ((*cmdline != 0x0d) && (*cmdline != ' ') && (*cmdline != '/')) cmdline++;
   }
+
+  DONE:
+
+  /* set a nul terminator on cmdline (expected later in the code) */
+  while (*cmdline != 0x0d) cmdline++;
+  *cmdline = 0;
 }
 
 
