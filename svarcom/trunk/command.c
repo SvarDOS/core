@@ -974,7 +974,7 @@ int main(void) {
   rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
   lastexitcode = MK_FP(rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
 
-  /* make COMPSEC point to myself */
+  /* make COMSPEC point to myself */
   set_comspec_to_self(*rmod_envseg);
 
   /* on /P check for the presence of AUTOEXEC.BAT and execute it if found,
@@ -1110,7 +1110,7 @@ int main(void) {
       }
     }
 
-    /* update rmod's ptr to COMPSPEC so it is always up to date */
+    /* update rmod's ptr to COMSPEC so it is always up to date */
     rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
     /* handle redirections (if any) */
