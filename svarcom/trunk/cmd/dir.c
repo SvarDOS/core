@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -54,6 +54,26 @@
  */
 
 #define WCOLWIDTH 15  /* width of a column in wide mode output */
+
+
+/* a "tiny" DTA is a DTA that is stripped from bytes that are not needed for
+ * DIR operations */
+_Packed struct TINYDTA {
+/*  char reserved[21];
+  unsigned char attr; */
+  unsigned short time_sec2:5;
+  unsigned short time_min:6;
+  unsigned short time_hour:5;
+  unsigned short date_dy:5;
+  unsigned short date_mo:4;
+  unsigned short date_yr:7;
+  unsigned long size;
+/*  char fname[13]; */
+  char fname[12];
+};
+
+/* max amount of DTAs that can be buffered (not using 65535 because fmalloc a bit of overhead space) */
+#define MAX_DTA_BUFCOUNT (65500 / sizeof(struct TINYDTA))
 
 
 /* fills freebytes with free bytes for drv (A=0, B=1, etc)
@@ -157,11 +177,27 @@ static int dir_parse_attr_list(const char *arg, unsigned char *attrfilter_may, u
 }
 
 
+/* compare attributes in a DTA node to mandatory and optional attributes. returns 1 on match, 0 otherwise */
+static int filter_attribs(const struct DTA *dta, unsigned char attrfilter_must, unsigned char attrfilter_may) {
+  /* if mandatory attribs are requested, filter them now */
+  if ((attrfilter_must & dta->attr) != attrfilter_must) return(0);
+
+  /* if file contains attributes that are not allowed -> skip */
+  if ((~attrfilter_may & dta->attr) != 0) return(0);
+
+  return(1);
+}
+
+
+
 #define DIR_ATTR_DEFAULT (DOS_ATTR_RO | DOS_ATTR_DIR | DOS_ATTR_ARC)
 
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
+  struct DTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
+  struct DTA far *dtabuf_root = NULL;
+  unsigned short dtabufcount = 0;
   unsigned short i;
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
   unsigned short screenw = screen_getwidth();
@@ -174,6 +210,12 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned char drv = 0;
   unsigned char attrfilter_may = DIR_ATTR_DEFAULT;
   unsigned char attrfilter_must = 0;
+  const char far *order = NULL; /* order string (like "GNE-SD"), this may come
+                                   either from the /O argument or from the
+                                   DIRCMD env variable (NULL = "no sort")
+                                   note 1: the '-' reverse relates only to
+                                   the letter that immediately follows it
+                                   note 2: '/O' is a shorthand for '/OGNE' */
 
   #define DIR_FLAG_PAUSE  1
   #define DIR_FLAG_RECUR  4
@@ -258,9 +300,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           break;
         case 'o':
         case 'O':
-          /* TODO */
-          outputnl("/O NOT IMPLEMENTED YET");
-          return(CMD_FAIL);
+          order = arg+1;
           break;
         case 'p':
         case 'P':
@@ -339,14 +379,64 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     return(CMD_FAIL);
   }
 
+  /* if sorting is involved, then let's buffer all results (and sort them) */
+  if (order != NULL) {
+    /* allocate a memory buffer - try several sizes until one succeeds */
+    unsigned short memsz[] = {65500, 32000, 16000, 8000, 4000, 2000, 0};
+    unsigned short max_dta_bufcount = 0;
+    for (i = 0; memsz[i] != 0; i++) {
+      dtabuf = _fmalloc(memsz[i]);
+      if (dtabuf != NULL) break;
+    }
+
+    if (dtabuf == NULL) {
+      nls_outputnl_doserr(8); /* out of memory */
+      return(CMD_FAIL);
+    }
+
+    /* remember the address so I can free it afterwards */
+    dtabuf_root = dtabuf;
+
+    /* compute the amount of DTAs I can buffer */
+    max_dta_bufcount = 1; //memsz[i] / sizeof(struct TINYDTA);
+    printf("max_dta_bufcount = %u\n", max_dta_bufcount);
+
+    do {
+      /* filter out files with uninteresting attributes */
+      if (filter_attribs(dta, attrfilter_must, attrfilter_may) == 0) continue;
+
+      _fmemcpy(&(dtabuf[dtabufcount]), ((char *)dta) + 22, sizeof(struct TINYDTA));
+
+      /* save attribs in sec field, otherwise zero it (this field is not
+       * displayed and dropping the attr field saves 2 bytes per entry) */
+      dtabuf[dtabufcount++].time_sec2 = (dta->attr & 31);
+
+      /* do I have any space left? */
+      if (dtabufcount == max_dta_bufcount) {
+        //outputnl("TOO MANY ENTRIES FOR SORTING! LIST IS UNSORTED");
+        break;
+      }
+
+    } while (findnext(dta) == 0);
+
+    /* sort the list - the tricky part is that my array is a far address while
+     * qsort works only with near pointers, so I have to use an ugly auxiliary
+     * table */
+    // qsort(dt); TODO
+
+    /* preload first entry */
+    _fmemcpy(((unsigned char *)dta) + 22, dtabuf, sizeof(struct TINYDTA));
+    dta->attr = dtabuf->time_sec2;
+    dtabuf++;
+    dtabufcount--;
+  }
+
   wcolcount = 0; /* may be used for columns counting with wide mode */
 
-  do {
-    /* if mandatory attribs are requested, filter them now */
-    if ((attrfilter_must & dta->attr) != attrfilter_must) continue;
+  for (;;) {
 
-    /* if file contains attributes that are not allowed -> skip */
-    if ((~attrfilter_may & dta->attr) != 0) continue;
+    /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
+    if (filter_attribs(dta, attrfilter_must, attrfilter_may) == 0) continue;
 
     /* turn string lcase (/L) */
     if (flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
@@ -417,7 +507,18 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
 
-  } while (findnext(dta) == 0);
+    /* take next entry, either from buf or disk */
+    if (dtabufcount > 0) {
+      /* preload first entry */
+      _fmemcpy(((unsigned char *)dta) + 22, dtabuf, sizeof(struct TINYDTA));
+      dta->attr = dtabuf->time_sec2;
+      dtabuf++;
+      dtabufcount--;
+    } else {
+      if (findnext(dta) != 0) break;
+    }
+
+  }
 
   if (wcolcount != 0) {
     outputnl(""); /* in wide mode make sure to end on a clear row */
@@ -451,6 +552,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     nls_outputnl(37,24); /* "bytes free" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
+
+  /* free the buffer memory (if used) */
+  if (dtabuf_root != NULL) _ffree(dtabuf_root);
 
   return(CMD_OK);
 }

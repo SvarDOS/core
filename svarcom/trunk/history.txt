@@ -8,6 +8,7 @@
 
 === ver 2024.2 (xx.xx.2024) ==================================================
 
+ - DIR command: added /O support
  - command-line parsing modified to work around a DN bug. Thanks to bttr for
    reporting the issue and to ECM for locating the root cause.
    ref: https://github.com/SvarDOS/bugz/issues/67
