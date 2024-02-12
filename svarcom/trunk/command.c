@@ -44,7 +44,8 @@
  * mismatch, then it would likely mean that SvarCOM has been upgraded and
  * RMOD should not be accessed as its structure might no longer be in sync
  * with what I think it is.
- *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***          */
+ *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***
+ *            (or at least whenever RMOD's struct is changed)            */
 #define BYTE_VERSION 4
 
 
@@ -121,11 +122,39 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
 
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
+  unsigned char *cmdlinelen = (void *)0x80;
   char *cmdline = (void *)0x81;
+
+  /* The arg tail at [81h] needs some care when being processed.
+   *
+   * Its length should be provided in [80h], but it is not always exact:
+   * https://github.com/SvarDOS/bugz/issues/67
+   *
+   * The tail string itself is usually terminated by a CR character. But
+   * sometimes it might be terminated by a nul. Or by nothing at all.
+   *
+   * The cautious approach is therefore to read the tail up until the length
+   * mentionned at [80h] or to first CR or nul, whichever comes first.
+   */
 
   memset(cfg, 0, sizeof(*cfg));
 
-  while (*cmdline != 0x0d) {
+  /* Make sure that the advertised cmdline length is no more than 126 bytes
+   * because the PSP ends at [0xff] and there ought to be at least 1 byte of
+   * room for the CR-terminator.
+   * According to Matthias Paul cmdlines longer than 126 (and even longer than
+   * 127) might happen with some buggy implementations. */
+  if (*cmdlinelen > 126) *cmdlinelen = 126;
+
+  /* trim out any trailing CR garbage (see the issue 67 mentioned above) */
+  while ((*cmdlinelen > 0) && (cmdline[*cmdlinelen - 1] == '\r')) (*cmdlinelen)--;
+
+  /* normalize the cmd so it is nul-terminated - this is expected later in a
+   * few places in the codeflow, among others in run_as_external() */
+  cmdline[*cmdlinelen] = 0;
+
+  /* process the parameters given to COMMAND.COM */
+  while (*cmdline != 0) {
 
     /* skip over any leading spaces */
     if (*cmdline == ' ') {
@@ -151,7 +180,7 @@ static void parse_argv(struct config *cfg) {
       case 'K':
         cmdline++;
         cfg->execcmd = cmdline;
-        goto DONE; /* further arguments are for the executed program, not for me */
+        return; /* further arguments are for the executed program, not for me */
 
       case 'y': /* /Y = execute batch file step-by-step (with /P, /K or /C) */
       case 'Y':
@@ -199,14 +228,8 @@ static void parse_argv(struct config *cfg) {
 
     /* move to next argument or quit processing if end of cmdline */
     SKIP_TO_NEXT_ARG:
-    while ((*cmdline != 0x0d) && (*cmdline != ' ') && (*cmdline != '/')) cmdline++;
+    while ((*cmdline != 0) && (*cmdline != ' ') && (*cmdline != '/')) cmdline++;
   }
-
-  DONE:
-
-  /* set a nul terminator on cmdline (expected later in the code) */
-  while (*cmdline != 0x0d) cmdline++;
-  *cmdline = 0;
 }
 
 
