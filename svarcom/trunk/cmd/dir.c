@@ -72,9 +72,6 @@ _Packed struct TINYDTA {
   char fname[12];
 };
 
-/* max amount of DTAs that can be buffered (not using 65535 because fmalloc a bit of overhead space) */
-#define MAX_DTA_BUFCOUNT (65500 / sizeof(struct TINYDTA))
-
 
 /* fills freebytes with free bytes for drv (A=0, B=1, etc)
  * returns DOS ERR code on failure */
@@ -203,8 +200,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned short screenw = screen_getwidth();
   unsigned short wcols = screenw / WCOLWIDTH; /* number of columns in wide mode */
   unsigned char wcolcount;
-  struct nls_patterns *nls = (void *)(p->BUFFER + (p->BUFFERSZ / 2));
-  char *buff2 = p->BUFFER + (p->BUFFERSZ / 2) + sizeof(*nls);
+  struct {
+    struct nls_patterns nls;
+    char buff64[64];
+    char path[128];
+  } *buf = (void *)(p->BUFFER);
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
@@ -249,11 +249,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     return(CMD_OK);
   }
 
-  i = nls_getpatterns(nls);
+  i = nls_getpatterns(&(buf->nls));
   if (i != 0) nls_outputnl_doserr(i);
 
   /* disable usage of thousands separator on narrow screens */
-  if (screenw < 80) nls->thousep[0] = 0;
+  if (screenw < 80) buf->nls.thousep[0] = 0;
 
   /* parse command line */
   for (i = 0; i < p->argc; i++) {
@@ -337,13 +337,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* special case: "DIR drive:" (truename() fails on "C:" under MS-DOS 6.0) */
   if ((filespecptr[0] != 0) && (filespecptr[1] == ':') && (filespecptr[2] == 0)) {
     if ((filespecptr[0] >= 'a') && (filespecptr[0] <= 'z')) {
-      p->BUFFER[0] = filespecptr[0] - ('a' - 1);
+      buf->path[0] = filespecptr[0] - ('a' - 1);
     } else {
-      p->BUFFER[0] = filespecptr[0] - ('A' - 1);
+      buf->path[0] = filespecptr[0] - ('A' - 1);
     }
-    i = curpathfordrv(p->BUFFER, p->BUFFER[0]);
+    i = curpathfordrv(buf->path, buf->path[0]);
   } else {
-    i = file_truename(filespecptr, p->BUFFER);
+    i = file_truename(filespecptr, buf->path);
   }
   if (i != 0) {
     nls_outputnl_doserr(i);
@@ -351,29 +351,29 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   if (format != DIR_OUTPUT_BARE) {
-    drv = p->BUFFER[0];
+    drv = buf->path[0];
     if (drv >= 'a') {
       drv -= 'a';
     } else {
       drv -= 'A';
     }
-    cmd_vol_internal(drv, buff2);
-    sprintf(buff2, svarlang_str(37,20)/*"Directory of %s"*/, p->BUFFER);
+    cmd_vol_internal(drv, buf->buff64);
+    sprintf(buf->buff64, svarlang_str(37,20)/*"Directory of %s"*/, buf->path);
     /* trim at first '?', if any */
-    for (i = 0; buff2[i] != 0; i++) if (buff2[i] == '?') buff2[i] = 0;
-    outputnl(buff2);
+    for (i = 0; buf->buff64[i] != 0; i++) if (buf->buff64[i] == '?') buf->buff64[i] = 0;
+    outputnl(buf->buff64);
     outputnl("");
     availrows -= 3;
   }
 
   /* if dir: append a backslash (also get its len) */
-  i = path_appendbkslash_if_dir(p->BUFFER);
+  i = path_appendbkslash_if_dir(buf->path);
 
   /* if ends with a \ then append ????????.??? */
-  if (p->BUFFER[i - 1] == '\\') strcat(p->BUFFER, "????????.???");
+  if (buf->path[i - 1] == '\\') strcat(buf->path, "????????.???");
 
   /* ask DOS for list of files, but only with allowed attribs */
-  i = findfirst(dta, p->BUFFER, attrfilter_may);
+  i = findfirst(dta, buf->path, attrfilter_may);
   if (i != 0) {
     nls_outputnl_doserr(i);
     return(CMD_FAIL);
@@ -382,7 +382,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* if sorting is involved, then let's buffer all results (and sort them) */
   if (order != NULL) {
     /* allocate a memory buffer - try several sizes until one succeeds */
-    unsigned short memsz[] = {65500, 32000, 16000, 8000, 4000, 2000, 0};
+    const unsigned short memsz[] = {65500, 32000, 16000, 8000, 4000, 2000, 1000, 0};
     unsigned short max_dta_bufcount = 0;
     for (i = 0; memsz[i] != 0; i++) {
       dtabuf = _fmalloc(memsz[i]);
@@ -398,7 +398,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     dtabuf_root = dtabuf;
 
     /* compute the amount of DTAs I can buffer */
-    max_dta_bufcount = 1; //memsz[i] / sizeof(struct TINYDTA);
+    max_dta_bufcount = memsz[i] / sizeof(struct TINYDTA);
     printf("max_dta_bufcount = %u\n", max_dta_bufcount);
 
     do {
@@ -452,33 +452,33 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           i = strlen(dta->fname);
           while (i++ < 12) output(" ");
         } else {
-          file_fname2fcb(buff2, dta->fname);
-          memmove(buff2 + 9, buff2 + 8, 4);
-          buff2[8] = ' ';
-          output(buff2);
+          file_fname2fcb(buf->buff64, dta->fname);
+          memmove(buf->buff64 + 9, buf->buff64 + 8, 4);
+          buf->buff64[8] = ' ';
+          output(buf->buff64);
         }
         output(" ");
         /* either <DIR> or right aligned 10-chars byte size */
-        memset(buff2, ' ', 10);
+        memset(buf->buff64, ' ', 10);
         if (dta->attr & DOS_ATTR_DIR) {
-          strcpy(buff2 + 10, svarlang_str(37,21));
+          strcpy(buf->buff64 + 10, svarlang_str(37,21));
         } else {
-          nls_format_number(buff2 + 10, dta->size, nls);
+          nls_format_number(buf->buff64 + 10, dta->size, &(buf->nls));
         }
-        output(buff2 + strlen(buff2) - 10);
+        output(buf->buff64 + strlen(buf->buff64) - 10);
         /* two spaces and NLS DATE */
-        buff2[0] = ' ';
-        buff2[1] = ' ';
+        buf->buff64[0] = ' ';
+        buf->buff64[1] = ' ';
         if (screenw >= 80) {
-          nls_format_date(buff2 + 2, dta->date_yr + 1980, dta->date_mo, dta->date_dy, nls);
+          nls_format_date(buf->buff64 + 2, dta->date_yr + 1980, dta->date_mo, dta->date_dy, &(buf->nls));
         } else {
-          nls_format_date(buff2 + 2, (dta->date_yr + 80) % 100, dta->date_mo, dta->date_dy, nls);
+          nls_format_date(buf->buff64 + 2, (dta->date_yr + 80) % 100, dta->date_mo, dta->date_dy, &(buf->nls));
         }
-        output(buff2);
+        output(buf->buff64);
 
         /* one space and NLS TIME */
-        nls_format_time(buff2 + 1, dta->time_hour, dta->time_min, 0xff, nls);
-        outputnl(buff2);
+        nls_format_time(buf->buff64 + 1, dta->time_hour, dta->time_min, 0xff, &(buf->nls));
+        outputnl(buf->buff64);
         break;
 
       case DIR_OUTPUT_WIDE: /* display in columns of 12 chars per item */
@@ -531,13 +531,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     unsigned char uint32maxlen = 13; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
     if (screenw < 80) uint32maxlen = 10;
     /* x file(s) */
-    memset(buff2, ' ', uint32maxlen);
-    i = nls_format_number(buff2 + uint32maxlen, summary_fcount, nls);
-    alignpos = sprintf(buff2 + uint32maxlen + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
-    output(buff2 + i);
+    memset(buf->buff64, ' ', uint32maxlen);
+    i = nls_format_number(buf->buff64 + uint32maxlen, summary_fcount, &(buf->nls));
+    alignpos = sprintf(buf->buff64 + uint32maxlen + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
+    output(buf->buff64 + i);
     /* xxxx bytes */
-    i = nls_format_number(buff2 + uint32maxlen, summary_totsz, nls);
-    output(buff2 + i + 1);
+    i = nls_format_number(buf->buff64 + uint32maxlen, summary_totsz, &(buf->nls));
+    output(buf->buff64 + i + 1);
     output(" ");
     nls_outputnl(37,23); /* "bytes" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
@@ -545,9 +545,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) nls_outputnl_doserr(i);
     alignpos += uint32maxlen * 2;
-    memset(buff2, ' ', alignpos); /* align the freebytes value to same column as totbytes */
-    i = nls_format_number(buff2 + alignpos, summary_totsz, nls);
-    output(buff2 + i + 1);
+    memset(buf->buff64, ' ', alignpos); /* align the freebytes value to same column as totbytes */
+    i = nls_format_number(buf->buff64 + alignpos, summary_totsz, &(buf->nls));
+    output(buf->buff64 + i + 1);
     output(" ");
     nls_outputnl(37,24); /* "bytes free" */
     if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
