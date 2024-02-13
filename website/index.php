@@ -2,6 +2,8 @@
 <html>
   <head>
 <?php
+  include 'mateuszbb.php';
+
   $chapters = array('' => 'Main page',
                     'repo' => 'Packages',
                     'help' => 'Help',
@@ -17,12 +19,15 @@
     if (in_array($_GET['p'], $hidden_pages, true)) $p = $_GET['p'];
   }
 
+  echo '    <title>';
   if (empty($p)) {
-    echo '<title>SvarDOS</title>';
+    echo 'SvarDOS';
+  } else if (($p === 'forum') && (!empty($_GET['thread']))) {
+    echo htmlspecialchars(mateuszbb_tytulwatku($_GET['thread']));
   } else {
-    echo '<title>SvarDOS ' . $chapters[$p] . '</title>';
+    echo 'SvarDOS ' . $chapters[$p];
   }
-  echo "\n";
+  echo "</title>\n";
 ?>
     <meta name="keywords" content="svardos,svarog386,freedos">
     <meta name="author" content="Mateusz Viste">

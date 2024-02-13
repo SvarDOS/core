@@ -4,7 +4,6 @@
 </a>
 
 <?php
-include 'mateuszbb.php';
 mateuszbb_preprocess();
 mateuszbb_start();
 ?>
