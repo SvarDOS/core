@@ -201,6 +201,13 @@ static int process_order_directive(const char *ordstring) {
   /* tabula rasa */
   glob_sortcmp_dat.order[0] = 0;
 
+  /* /O alone is a short hand for /OGN */
+  if (*ordstring == 0) {
+    glob_sortcmp_dat.order[0] = 'G';
+    glob_sortcmp_dat.order[1] = 'N';
+    glob_sortcmp_dat.order[2] = 0;
+  }
+
   /* parsing */
   for (ordi = 0; ordstring[ordi] != 0; ordi++) {
     if (ordstring[ordi] == '-') {
