@@ -416,7 +416,6 @@ static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
     }
   }
 
-  if (req->filespecptr == NULL) req->filespecptr = ".";
   return(0);
 }
 
@@ -439,15 +438,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
-
   struct dirrequest req;
-
-  /* preload req with default values */
-  bzero(&req, sizeof(req));
-  req.attrfilter_may = DIR_ATTR_DEFAULT;
-  /* req.attrfilter_must = 0;
-  req.flags = 0; */
-  req.format = DIR_OUTPUT_NORM;
 
   /* make sure there's no risk of buffer overflow */
   if (sizeof(buf) > p->BUFFERSZ) {
@@ -485,8 +476,36 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* disable usage of thousands separator on narrow screens */
   if (screenw < 80) buf->nls.thousep[0] = 0;
 
-  /* parse command line */
+  /*** PARSING COMMAND LINE STARTS *******************************************/
+
+  /* init req with some defaults */
+  bzero(&req, sizeof(req));
+  req.attrfilter_may = DIR_ATTR_DEFAULT;
+  req.format = DIR_OUTPUT_NORM;
+
+  /* process DIRCMD first (so it can be overidden by user's cmdline) */
+  {
+  const char far *dircmd = env_lookup_val(p->env_seg, "DIRCMD");
+  if (dircmd != NULL) {
+    const char *argvptrs[32];
+    cmd_explode(buf->buff64, dircmd, argvptrs);
+    if ((dir_parse_cmdline(&req, argvptrs) != 0) || (req.filespecptr != NULL)) {
+      nls_output(255, 10);/* bad environment */
+      output(" - ");
+      outputnl("DIRCMD");
+      return(CMD_FAIL);
+    }
+  }
+  }
+
+  /* parse user's command line */
   if (dir_parse_cmdline(&req, p->argv) != 0) return(CMD_FAIL);
+
+  /* if no filespec provided, then it's about the current directory */
+  if (req.filespecptr == NULL) req.filespecptr = ".";
+
+  /*** PARSING COMMAND LINE DONE *********************************************/
+
 
   availrows = screen_getheight() - 2;
 
