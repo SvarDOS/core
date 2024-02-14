@@ -15,7 +15,7 @@
    ref: https://github.com/SvarDOS/bugz/issues/67
 
 
-=== ver 2024.1 (17.01.2023) ==================================================
+=== ver 2024.1 (17.01.2024) ==================================================
 
  - EDR-DOS compatibility fixes: resident module's PSP is being patched with
    cleared JFTs and its parent fields are rewired to SvarCOM. Many thanks to
