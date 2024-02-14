@@ -94,6 +94,5 @@ release: command.com .SYMBOLIC
 	zip -9rkDX -m svarcom.svp command.com appinfo bin doc
 	rmdir appinfo
 	rmdir bin
-	rmdir nls
 	rmdir doc\svarcom
 	rmdir doc
