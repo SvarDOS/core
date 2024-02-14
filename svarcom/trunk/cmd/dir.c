@@ -194,7 +194,7 @@ static struct {
 
 /* translates an order string like "GNE-S" into values fed into the order[]
  * table of glob_sortcmp_dat. returns 0 on success, non-zero otherwise. */
-static int process_order_directive(const char *ordstring) {
+static int dir_process_order_directive(const char *ordstring) {
   const char *gnesd = "gnesd"; /* must be lower case */
   int ordi, orderi = 0, i;
 
@@ -313,8 +313,115 @@ static int sortcmp(const void *dtaid1, const void *dtaid2) {
 
 #define DIR_ATTR_DEFAULT (DOS_ATTR_RO | DOS_ATTR_DIR | DOS_ATTR_ARC)
 
+struct dirrequest {
+  unsigned char attrfilter_may;
+  unsigned char attrfilter_must;
+  const char *filespecptr;
+
+  #define DIR_FLAG_PAUSE  1
+  #define DIR_FLAG_RECUR  4
+  #define DIR_FLAG_LCASE  8
+  #define DIR_FLAG_SORT  16
+  unsigned char flags;
+
+  #define DIR_OUTPUT_NORM 1
+  #define DIR_OUTPUT_WIDE 2
+  #define DIR_OUTPUT_BARE 3
+  unsigned char format;
+};
+
+
+static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
+  for (; *argv != NULL; argv++) {
+    if (*argv[0] == '/') {
+      const char *arg = *argv + 1;
+      char neg = 0;
+      /* detect negations and get actual argument */
+      if (*arg == '-') {
+        neg = 1;
+        arg++;
+      }
+      /* */
+      switch (*arg) {
+        case 'a':
+        case 'A':
+          arg++;
+          /* preset defaults */
+          req->attrfilter_may = DIR_ATTR_DEFAULT;
+          req->attrfilter_must = 0;
+          /* /-A only allowed without further parameters (used to cancel possible previous /Asmth) */
+          if (neg) {
+            if (*arg != 0) {
+              nls_outputnl_err(0, 2); /* invalid switch */
+              return(-1);
+            }
+          } else {
+            /* skip colon if present */
+            if (*arg == ':') arg++;
+            /* start with "allow everything" */
+            req->attrfilter_may = (DOS_ATTR_ARC | DOS_ATTR_DIR | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_RO);
+            if (dir_parse_attr_list(arg, &(req->attrfilter_may), &(req->attrfilter_must)) != 0) {
+              nls_outputnl_err(0, 3); /* invalid parameter format */
+              return(-1);
+            }
+          }
+          break;
+        case 'b':
+        case 'B':
+          req->format = DIR_OUTPUT_BARE;
+          break;
+        case 'l':
+        case 'L':
+          req->flags |= DIR_FLAG_LCASE;
+          break;
+        case 'o':
+        case 'O':
+          if (neg) {
+            req->flags &= (0xff ^ DIR_FLAG_SORT);
+            break;
+          }
+          if (dir_process_order_directive(arg+1) != 0) {
+            nls_output_err(0, 3); /* invalid parameter format */
+            output(": ");
+            outputnl(arg);
+            return(-1);
+          }
+          req->flags |= DIR_FLAG_SORT;
+          break;
+        case 'p':
+        case 'P':
+          req->flags |= DIR_FLAG_PAUSE;
+          if (neg) req->flags &= (0xff ^ DIR_FLAG_PAUSE);
+          break;
+        case 's':
+        case 'S':
+          /* TODO */
+          outputnl("/S NOT IMPLEMENTED YET");
+          return(-1);
+          break;
+        case 'w':
+        case 'W':
+          req->format = DIR_OUTPUT_WIDE;
+          break;
+        default:
+          nls_outputnl_err(0, 2); /* invalid switch */
+          return(-1);
+      }
+    } else {  /* filespec */
+      if (req->filespecptr != NULL) {
+        nls_outputnl_err(0, 4); /* too many parameters */
+        return(-1);
+      }
+      req->filespecptr = *argv;
+    }
+  }
+
+  if (req->filespecptr == NULL) req->filespecptr = ".";
+  return(0);
+}
+
+
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
-  const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
   struct TINYDTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
   unsigned short dtabufcount = 0;
@@ -332,19 +439,15 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
-  unsigned char attrfilter_may = DIR_ATTR_DEFAULT;
-  unsigned char attrfilter_must = 0;
 
-  #define DIR_FLAG_PAUSE  1
-  #define DIR_FLAG_RECUR  4
-  #define DIR_FLAG_LCASE  8
-  #define DIR_FLAG_SORT  16
-  unsigned char flags = 0;
+  struct dirrequest req;
 
-  #define DIR_OUTPUT_NORM 1
-  #define DIR_OUTPUT_WIDE 2
-  #define DIR_OUTPUT_BARE 3
-  unsigned char format = DIR_OUTPUT_NORM;
+  /* preload req with default values */
+  bzero(&req, sizeof(req));
+  req.attrfilter_may = DIR_ATTR_DEFAULT;
+  /* req.attrfilter_must = 0;
+  req.flags = 0; */
+  req.format = DIR_OUTPUT_NORM;
 
   /* make sure there's no risk of buffer overflow */
   if (sizeof(buf) > p->BUFFERSZ) {
@@ -383,111 +486,27 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   if (screenw < 80) buf->nls.thousep[0] = 0;
 
   /* parse command line */
-  for (i = 0; i < p->argc; i++) {
-    if (p->argv[i][0] == '/') {
-      const char *arg = p->argv[i] + 1;
-      char neg = 0;
-      /* detect negations and get actual argument */
-      if (*arg == '-') {
-        neg = 1;
-        arg++;
-      }
-      /* */
-      switch (*arg) {
-        case 'a':
-        case 'A':
-          arg++;
-          /* preset defaults */
-          attrfilter_may = DIR_ATTR_DEFAULT;
-          attrfilter_must = 0;
-          /* /-A only allowed without further parameters (used to cancel possible previous /Asmth) */
-          if (neg) {
-            if (*arg != 0) {
-              nls_outputnl_err(0, 2); /* invalid switch */
-              return(CMD_FAIL);
-            }
-          } else {
-            /* skip colon if present */
-            if (*arg == ':') arg++;
-            /* start with "allow everything" */
-            attrfilter_may = (DOS_ATTR_ARC | DOS_ATTR_DIR | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_RO);
-            if (dir_parse_attr_list(arg, &attrfilter_may, &attrfilter_must) != 0) {
-              nls_outputnl_err(0, 3); /* invalid parameter format */
-              return(CMD_FAIL);
-            }
-          }
-          break;
-        case 'b':
-        case 'B':
-          format = DIR_OUTPUT_BARE;
-          break;
-        case 'l':
-        case 'L':
-          flags |= DIR_FLAG_LCASE;
-          break;
-        case 'o':
-        case 'O':
-          if (neg) {
-            flags &= (0xff ^ DIR_FLAG_SORT);
-            break;
-          }
-          if (process_order_directive(arg+1) != 0) {
-            nls_output_err(0, 3); /* invalid parameter format */
-            output(": ");
-            outputnl(arg);
-            return(CMD_FAIL);
-          }
-          flags |= DIR_FLAG_SORT;
-          break;
-        case 'p':
-        case 'P':
-          flags |= DIR_FLAG_PAUSE;
-          if (neg) flags &= (0xff ^ DIR_FLAG_PAUSE);
-          break;
-        case 's':
-        case 'S':
-          /* TODO */
-          outputnl("/S NOT IMPLEMENTED YET");
-          return(CMD_FAIL);
-          break;
-        case 'w':
-        case 'W':
-          format = DIR_OUTPUT_WIDE;
-          break;
-        default:
-          nls_outputnl_err(0, 2); /* invalid switch */
-          return(CMD_FAIL);
-      }
-    } else {  /* filespec */
-      if (filespecptr != NULL) {
-        nls_outputnl_err(0, 4); /* too many parameters */
-        return(CMD_FAIL);
-      }
-      filespecptr = p->argv[i];
-    }
-  }
-
-  if (filespecptr == NULL) filespecptr = ".";
+  if (dir_parse_cmdline(&req, p->argv) != 0) return(CMD_FAIL);
 
   availrows = screen_getheight() - 2;
 
   /* special case: "DIR drive:" (truename() fails on "C:" under MS-DOS 6.0) */
-  if ((filespecptr[0] != 0) && (filespecptr[1] == ':') && (filespecptr[2] == 0)) {
-    if ((filespecptr[0] >= 'a') && (filespecptr[0] <= 'z')) {
-      buf->path[0] = filespecptr[0] - ('a' - 1);
+  if ((req.filespecptr[0] != 0) && (req.filespecptr[1] == ':') && (req.filespecptr[2] == 0)) {
+    if ((req.filespecptr[0] >= 'a') && (req.filespecptr[0] <= 'z')) {
+      buf->path[0] = req.filespecptr[0] - ('a' - 1);
     } else {
-      buf->path[0] = filespecptr[0] - ('A' - 1);
+      buf->path[0] = req.filespecptr[0] - ('A' - 1);
     }
     i = curpathfordrv(buf->path, buf->path[0]);
   } else {
-    i = file_truename(filespecptr, buf->path);
+    i = file_truename(req.filespecptr, buf->path);
   }
   if (i != 0) {
     nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 
-  if (format != DIR_OUTPUT_BARE) {
+  if (req.format != DIR_OUTPUT_BARE) {
     drv = buf->path[0];
     if (drv >= 'a') {
       drv -= 'a';
@@ -510,14 +529,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   if (buf->path[i - 1] == '\\') strcat(buf->path, "????????.???");
 
   /* ask DOS for list of files, but only with allowed attribs */
-  i = findfirst(dta, buf->path, attrfilter_may);
+  i = findfirst(dta, buf->path, req.attrfilter_may);
   if (i != 0) {
     nls_outputnl_doserr(i);
     return(CMD_FAIL);
   }
 
   /* if sorting is involved, then let's buffer all results (and sort them) */
-  if (flags & DIR_FLAG_SORT) {
+  if (req.flags & DIR_FLAG_SORT) {
     /* allocate a memory buffer - try several sizes until one succeeds */
     const unsigned short memsz[] = {65500, 32000, 16000, 8000, 4000, 2000, 1000, 0};
     unsigned short max_dta_bufcount = 0;
@@ -540,7 +559,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     do {
       /* filter out files with uninteresting attributes */
-      if (filter_attribs(dta, attrfilter_must, attrfilter_may) == 0) continue;
+      if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
 
       /* normalize "size" of directories to zero because kernel returns garbage
        * sizes for directories which might confuse the sorting routine later */
@@ -578,15 +597,15 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   for (;;) {
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
-    if (filter_attribs(dta, attrfilter_must, attrfilter_may) == 0) continue;
+    if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
 
     /* turn string lcase (/L) */
-    if (flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
+    if (req.flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
 
     summary_fcount++;
     if ((dta->attr & DOS_ATTR_DIR) == 0) summary_totsz += dta->size;
 
-    switch (format) {
+    switch (req.format) {
       case DIR_OUTPUT_NORM:
         /* print fname-space-extension (unless it's "." or "..", then print as-is) */
         if (dta->fname[0] == '.') {
@@ -647,7 +666,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         break;
     }
 
-    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
 
     /* take next entry, either from buf or disk */
     if (dtabufcount > 0) {
@@ -662,11 +681,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   if (wcolcount != 0) {
     outputnl(""); /* in wide mode make sure to end on a clear row */
-    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
   /* print out summary (unless bare output mode) */
-  if (format != DIR_OUTPUT_BARE) {
+  if (req.format != DIR_OUTPUT_BARE) {
     unsigned short alignpos;
     unsigned char uint32maxlen = 13; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
     if (screenw < 80) uint32maxlen = 10;
@@ -680,7 +699,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     output(buf->buff64 + i + 1);
     output(" ");
     nls_outputnl(37,23); /* "bytes" */
-    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) nls_outputnl_doserr(i);
@@ -690,7 +709,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     output(buf->buff64 + i + 1);
     output(" ");
     nls_outputnl(37,24); /* "bytes free" */
-    if (flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
   /* free the buffer memory (if used) */
