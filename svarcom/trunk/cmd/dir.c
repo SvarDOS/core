@@ -186,14 +186,130 @@ static int filter_attribs(const struct DTA *dta, unsigned char attrfilter_must, 
 }
 
 
+static struct {
+  struct TINYDTA far *dtabuf_root;
+  char order[8]; /* GNESD values (ucase = lower first ; lcase = higher first) */
+} glob_sortcmp_dat;
+
+
+/* translates an order string like "GNE-S" into values fed into the order[]
+ * table of glob_sortcmp_dat. returns 0 on success, non-zero otherwise. */
+static int process_order_directive(const char *ordstring) {
+  const char *gnesd = "gnesd"; /* must be lower case */
+  int ordi, orderi = 0, i;
+
+  /* tabula rasa */
+  glob_sortcmp_dat.order[0] = 0;
+
+  /* parsing */
+  for (ordi = 0; ordstring[ordi] != 0; ordi++) {
+    if (ordstring[ordi] == '-') {
+      if ((ordstring[ordi + 1] == '-') || (ordstring[ordi + 1] == 0)) return(-1);
+      continue;
+    }
+    if (orderi == sizeof(glob_sortcmp_dat.order)) return(-1);
+
+    for (i = 0; gnesd[i] != 0; i++) {
+      if ((ordstring[ordi] | 32) == gnesd[i]) { /* | 32 is lcase-ing the char */
+        if ((ordi > 0) && (ordstring[ordi - 1] == '-')) {
+          glob_sortcmp_dat.order[orderi] = gnesd[i];
+        } else {
+          glob_sortcmp_dat.order[orderi] = gnesd[i] ^ 32;
+        }
+        orderi++;
+        break;
+      }
+    }
+    if (gnesd[i] == 0) return(-1);
+  }
+
+  return(0);
+}
+
+
+static int sortcmp(const void *dtaid1, const void *dtaid2) {
+  struct TINYDTA far *dta1 = &(glob_sortcmp_dat.dtabuf_root[*((unsigned short *)dtaid1)]);
+  struct TINYDTA far *dta2 = &(glob_sortcmp_dat.dtabuf_root[*((unsigned short *)dtaid2)]);
+  char *ordconf = glob_sortcmp_dat.order;
+
+  /* debug stuff
+  {
+    int i;
+    printf("%lu vs %lu | ", dta1->size, dta2->size);
+    for (i = 0; dta1->fname[i] != 0; i++) printf("%c", dta1->fname[i]);
+    printf(" vs ");
+    for (i = 0; dta2->fname[i] != 0; i++) printf("%c", dta2->fname[i]);
+    printf("\n");
+  } */
+
+  for (;;) {
+    int r = -1;
+    if (*ordconf & 32) r = 1;
+
+    switch (*ordconf | 32) {
+      case 'g': /* sort by type (directories first, then files) */
+        if ((dta1->time_sec2 & DOS_ATTR_DIR) > (dta2->time_sec2 & DOS_ATTR_DIR)) return(0 - r);
+        if ((dta1->time_sec2 & DOS_ATTR_DIR) < (dta2->time_sec2 & DOS_ATTR_DIR)) return(r);
+        break;
+      case ' ': /* default (last resort) sort: by name */
+      case 'e': /* sort by extension */
+      case 'n': /* sort by filename */
+      {
+        const char far *f1 = dta1->fname;
+        const char far *f2 = dta2->fname;
+        int i, limit = 12;
+        /* special handling for '.' and '..' entries */
+        if ((f1[0] == '.') && (f2[0] != '.')) return(0 - r);
+        if ((f2[0] == '.') && (f1[0] != '.')) return(r);
+
+        if ((*ordconf | 32) == 'e') {
+          /* fast-forward to extension or end of filename */
+          while ((*f1 != 0) && (*f1 != '.')) f1++;
+          while ((*f2 != 0) && (*f2 != '.')) f2++;
+          limit = 4; /* TINYDTA structs are not nul-terminated */
+        }
+        /* cmp */
+        for (i = 0; i < limit; i++) {
+          if ((*f1 | 32) < (*f2 | 32)) return(0 - r);
+          if ((*f1 | 32) > (*f2 | 32)) return(r);
+          if (*f1 == 0) break;
+          f1++;
+          f2++;
+        }
+      }
+        break;
+      case 's': /* sort by size */
+        if (dta1->size > dta2->size) return(r);
+        if (dta1->size < dta2->size) return(0 - r);
+        break;
+      case 'd': /* sort by date */
+        if (dta1->date_yr < dta2->date_yr) return(0 - r);
+        if (dta1->date_yr > dta2->date_yr) return(r);
+        if (dta1->date_mo < dta2->date_mo) return(0 - r);
+        if (dta1->date_mo > dta2->date_mo) return(r);
+        if (dta1->date_dy < dta2->date_dy) return(0 - r);
+        if (dta1->date_dy > dta2->date_dy) return(r);
+        if (dta1->time_hour < dta2->time_hour) return(0 - r);
+        if (dta1->time_hour > dta2->time_hour) return(r);
+        if (dta1->time_min < dta2->time_min) return(0 - r);
+        if (dta1->time_min > dta2->time_min) return(r);
+        break;
+    }
+
+    if (*ordconf == 0) break;
+    ordconf++;
+  }
+
+  return(0);
+}
+
 
 #define DIR_ATTR_DEFAULT (DOS_ATTR_RO | DOS_ATTR_DIR | DOS_ATTR_ARC)
 
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   const char *filespecptr = NULL;
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
-  struct DTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
-  struct DTA far *dtabuf_root = NULL;
+  struct TINYDTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
   unsigned short dtabufcount = 0;
   unsigned short i;
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
@@ -204,28 +320,32 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     struct nls_patterns nls;
     char buff64[64];
     char path[128];
+    unsigned short orderidx[65535 / sizeof(struct TINYDTA)];
   } *buf = (void *)(p->BUFFER);
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
   unsigned char attrfilter_may = DIR_ATTR_DEFAULT;
   unsigned char attrfilter_must = 0;
-  const char far *order = NULL; /* order string (like "GNE-SD"), this may come
-                                   either from the /O argument or from the
-                                   DIRCMD env variable (NULL = "no sort")
-                                   note 1: the '-' reverse relates only to
-                                   the letter that immediately follows it
-                                   note 2: '/O' is a shorthand for '/OGNE' */
 
   #define DIR_FLAG_PAUSE  1
   #define DIR_FLAG_RECUR  4
   #define DIR_FLAG_LCASE  8
+  #define DIR_FLAG_SORT  16
   unsigned char flags = 0;
 
   #define DIR_OUTPUT_NORM 1
   #define DIR_OUTPUT_WIDE 2
   #define DIR_OUTPUT_BARE 3
   unsigned char format = DIR_OUTPUT_NORM;
+
+  /* make sure there's no risk of buffer overflow */
+  if (sizeof(buf) > p->BUFFERSZ) {
+    outputnl("INTERNAL MEM ERROR IN " __FILE__);
+    return(CMD_FAIL);
+  }
+
+  bzero(&glob_sortcmp_dat, sizeof(glob_sortcmp_dat));
 
   if (cmd_ishlp(p)) {
     nls_outputnl(37,0); /* "Displays a list of files and subdirectories in a directory" */
@@ -300,7 +420,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           break;
         case 'o':
         case 'O':
-          order = arg+1;
+          if (process_order_directive(arg+1) != 0) {
+            nls_output_err(0, 3); /* invalid parameter format */
+            output(": ");
+            outputnl(arg);
+            return(CMD_FAIL);
+          }
+          flags |= DIR_FLAG_SORT;
           break;
         case 'p':
         case 'P':
@@ -380,7 +506,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   /* if sorting is involved, then let's buffer all results (and sort them) */
-  if (order != NULL) {
+  if (flags & DIR_FLAG_SORT) {
     /* allocate a memory buffer - try several sizes until one succeeds */
     const unsigned short memsz[] = {65500, 32000, 16000, 8000, 4000, 2000, 1000, 0};
     unsigned short max_dta_bufcount = 0;
@@ -395,15 +521,19 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     }
 
     /* remember the address so I can free it afterwards */
-    dtabuf_root = dtabuf;
+    glob_sortcmp_dat.dtabuf_root = dtabuf;
 
     /* compute the amount of DTAs I can buffer */
     max_dta_bufcount = memsz[i] / sizeof(struct TINYDTA);
-    printf("max_dta_bufcount = %u\n", max_dta_bufcount);
+    /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
 
     do {
       /* filter out files with uninteresting attributes */
       if (filter_attribs(dta, attrfilter_must, attrfilter_may) == 0) continue;
+
+      /* normalize "size" of directories to zero because kernel returns garbage
+       * sizes for directories which might confuse the sorting routine later */
+      if (dta->attr & DOS_ATTR_DIR) dta->size = 0;
 
       _fmemcpy(&(dtabuf[dtabufcount]), ((char *)dta) + 22, sizeof(struct TINYDTA));
 
@@ -413,6 +543,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
       /* do I have any space left? */
       if (dtabufcount == max_dta_bufcount) {
+        //TODO some kind of user notification might be nice here
         //outputnl("TOO MANY ENTRIES FOR SORTING! LIST IS UNSORTED");
         break;
       }
@@ -420,15 +551,15 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     } while (findnext(dta) == 0);
 
     /* sort the list - the tricky part is that my array is a far address while
-     * qsort works only with near pointers, so I have to use an ugly auxiliary
-     * table */
-    // qsort(dt); TODO
+     * qsort works only with near pointers, so I have to use an ugly (and
+     * global) auxiliary table */
+    for (i = 0; i < dtabufcount; i++) buf->orderidx[i] = i;
+    qsort(buf->orderidx, dtabufcount, 2, &sortcmp);
 
-    /* preload first entry */
-    _fmemcpy(((unsigned char *)dta) + 22, dtabuf, sizeof(struct TINYDTA));
-    dta->attr = dtabuf->time_sec2;
-    dtabuf++;
+    /* preload first entry (last from orderidx, since entries are sorted in reverse) */
     dtabufcount--;
+    _fmemcpy(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
+    dta->attr = dtabuf[buf->orderidx[dtabufcount]].time_sec2; /* restore attr from the abused time_sec2 field */
   }
 
   wcolcount = 0; /* may be used for columns counting with wide mode */
@@ -509,11 +640,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* take next entry, either from buf or disk */
     if (dtabufcount > 0) {
-      /* preload first entry */
-      _fmemcpy(((unsigned char *)dta) + 22, dtabuf, sizeof(struct TINYDTA));
-      dta->attr = dtabuf->time_sec2;
-      dtabuf++;
       dtabufcount--;
+      _fmemcpy(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
+      dta->attr = dtabuf[buf->orderidx[dtabufcount]].time_sec2; /* restore attr from the abused time_sec2 field */
     } else {
       if (findnext(dta) != 0) break;
     }
@@ -554,7 +683,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   /* free the buffer memory (if used) */
-  if (dtabuf_root != NULL) _ffree(dtabuf_root);
+  if (glob_sortcmp_dat.dtabuf_root != NULL) _ffree(glob_sortcmp_dat.dtabuf_root);
 
   return(CMD_OK);
 }

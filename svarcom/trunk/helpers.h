@@ -47,9 +47,10 @@ void nls_output_internal(unsigned short id, unsigned char nl, unsigned char hand
 #define outputnl(x) output_internal(x, 1, hSTDOUT)
 #define nls_output(x,y) nls_output_internal((x << 8) | y, 0, hSTDOUT)
 #define nls_outputnl(x,y) nls_output_internal((x << 8) | y, 1, hSTDOUT)
+#define nls_output_err(x,y) nls_output_internal((x << 8) | y, 0, hSTDERR)
 #define nls_outputnl_err(x,y) nls_output_internal((x << 8) | y, 1, hSTDERR)
 
-/* output DOS error e to stderr */
+/* output DOS error e to stderr, terminated with a CR/LF */
 void nls_outputnl_doserr(unsigned short e);
 
 /*
