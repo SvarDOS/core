@@ -420,6 +420,10 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           break;
         case 'o':
         case 'O':
+          if (neg) {
+            flags &= (0xff ^ DIR_FLAG_SORT);
+            break;
+          }
           if (process_order_directive(arg+1) != 0) {
             nls_output_err(0, 3); /* invalid parameter format */
             output(": ");
