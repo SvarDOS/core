@@ -208,6 +208,9 @@ static int dir_process_order_directive(const char *ordstring) {
     glob_sortcmp_dat.order[2] = 0;
   }
 
+  /* stupid MSDOS compatibility ("DIR /O:GNE") */
+  if (*ordstring == ':') ordstring++;
+
   /* parsing */
   for (ordi = 0; ordstring[ordi] != 0; ordi++) {
     if (ordstring[ordi] == '-') {
