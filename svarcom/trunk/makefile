@@ -31,7 +31,7 @@ command.com: rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodin
 	*wcl $(LDFLAGS) command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj svarlang.lib\svarlngs.lib
 
 deflang.obj: lang\*.txt
-	# GENERATE CODEPAGE-SPECIFIG VERSIONS OUT OF UTF-8 FILES
+	# GENERATE CODEPAGE-SPECIFIC VERSIONS OUT OF UTF-8 FILES
 	CD LANG
 	utf8tocp 850 BR-UTF8.TXT > BR.TXT
 	utf8tocp 850 DE-UTF8.TXT > DE.TXT
