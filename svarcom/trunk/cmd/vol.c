@@ -87,8 +87,8 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
    06h  11 BYTEs   volume label or "NO NAME    " if none present
    11h   8 BYTEs   filesystem type */
   if ((err == 0) && (buff16[1] | buff16[2])) {
-    sprintf(buff + 64, svarlang_str(34,4)/*"Volume Serial Number is %04X-%04X"*/, buff16[2], buff16[1]);
-    outputnl(buff + 64);
+    sprintf(buff + 4, svarlang_str(34,4)/*"Volume Serial Number is %04X-%04X"*/, buff16[2], buff16[1]);
+    outputnl(buff + 4);
   }
 }
 
