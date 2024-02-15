@@ -46,7 +46,7 @@
  * with what I think it is.
  *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***
  *            (or at least whenever RMOD's struct is changed)            */
-#define BYTE_VERSION 4
+#define BYTE_VERSION 5
 
 
 struct config {
@@ -402,6 +402,7 @@ static void cmdtail_to_fcb(char far *fcb1, char far *fcb2, const char *cmdtail) 
 /* a few internal flags */
 #define DELETE_STDIN_FILE 1
 #define CALL_FLAG         2
+#define LOADHIGH_FLAG     4
 
 static void run_as_external(char *buff, const char *cmdline, unsigned short envseg, struct rmod_props far *rmod, struct redir_data *redir, unsigned char flags) {
   char *cmdfile = buff + 512;
@@ -580,6 +581,12 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   rmod_cmdtail[-1] = i;
 
   /* set up rmod to execute the command */
+
+  /* loadhigh? */
+  if (flags & LOADHIGH_FLAG) {
+    unsigned char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_EXEC_LH);
+    *farptr = 1;
+  }
 
   ExecParam->envseg = envseg;
   ExecParam->cmdtail = (unsigned long)MK_FP(rmod->rmodseg, 0x80); /* farptr, must be in PSP format (lenbyte args \r) */
@@ -1156,6 +1163,9 @@ int main(void) {
       /* the distinction is important since it changes the way batch files are processed */
       flags |= CALL_FLAG;
       goto EXEC_CMDLINE;
+    } else if (cmdres == CMD_CHANGED_BY_LH) { /* cmdline changed *specifically* by LH */
+      flags |= LOADHIGH_FLAG;
+      goto EXEC_CMDLINE;
     } else if (cmdres == CMD_NOTFOUND) {
       /* this was not an internal command, try matching an external command */
       run_as_external(BUFFER, cmdline, *rmod_envseg, rmod, &redirprops, flags);
@@ -1173,6 +1183,7 @@ int main(void) {
     /* reset one-time only flags */
     flags &= ~CALL_FLAG;
     flags &= ~FLAG_STEPBYSTEP;
+    flags &= ~LOADHIGH_FLAG;
 
     /* repeat unless /C was asked - but always finish running an ongoing batch
      * file (otherwise only first BAT command would be executed with /C) */

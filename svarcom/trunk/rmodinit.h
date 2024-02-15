@@ -79,8 +79,11 @@ struct rmod_props {
 #define RMOD_OFFSET_STDOUTFILE (0x100 + 0x1EE)
 #define RMOD_OFFSET_STDOUTAPP  (0x100 + 0x26E)
 #define RMOD_OFFSET_STDIN_DEL  (0x100 + 0x270)
-#define RMOD_OFFSET_BRKHANDLER (0x100 + 0x271)
-#define RMOD_OFFSET_ROUTINE    (0x100 + 0x276)
+#define RMOD_OFFSET_EXEC_LH    (0x100 + 0x271)
+#define RMOD_OFFSET_ORIGUMBLNK (0x100 + 0x272)
+#define RMOD_OFFSET_ORIGALLOCS (0x100 + 0x273)
+#define RMOD_OFFSET_BRKHANDLER (0x100 + 0x274)
+#define RMOD_OFFSET_ROUTINE    (0x100 + 0x279)
 
 struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len);
 struct rmod_props far *rmod_find(unsigned short rmodcore_len);

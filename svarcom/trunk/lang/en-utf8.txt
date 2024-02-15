@@ -255,6 +255,12 @@
 39.0:Returns a fully qualified path or filename.
 39.1:TRUENAME [[drive:][path][filename]]
 
+# LOADHIGH
+40.0:Loads a program into the upper memory area.
+40.1:[drive:][path]filename [parameters]
+40.2:parameters: any arguments required by the program you want to load.
+
+
 # DOS ERRORS
 255.1:Function number invalid
 255.2:File not found

@@ -1,7 +1,7 @@
 ;
 ; rmod - resident module of the SvarCOM command interpreter (NASM code)
 ;
-; Copyright (C) 2021-2022 Mateusz Viste
+; Copyright (C) 2021-2024 Mateusz Viste
 ; MIT license
 ;
 ; this is installed in memory by the transient part of SvarCOM. it has only
@@ -65,11 +65,15 @@ REDIR_DEL_STDIN: db 0               ; +270h  indicates that the stdin file
                                     ;        MUST contain the 1st char of
                                     ;        REDIR_INFIL!
 
+EXEC_LH: db 0                       ; +271h  EXECPROG to be loaded high?
+ORIG_UMBLINKSTATE: db 0             ; +272h
+ORIG_ALLOCSTRAT: db 0               ; +273h
+
 ; CTRL+BREAK (int 23h) handler
 ; According to the TechHelp! Manual: "If you want to abort (exit to the parent
 ; process), then set the carry flag and return via a FAR RET. This causes DOS
 ; to perform normal cleanup and exit to the parent." (otherwise use iret)
-BREAK_HANDLER:            ; +271h
+BREAK_HANDLER:            ; +274h
 stc
 retf
 
@@ -78,7 +82,7 @@ INT2E:
 xor ax, ax
 iret
 
-skipsig:                  ; +276h
+skipsig:                  ; +279h
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs
@@ -113,6 +117,30 @@ jz EXEC_COMMAND_COM
 ;mov bx, cs
 ;int 0x21
 
+
+; LOADHIGH?
+cmp [EXEC_LH], byte 0
+je NO_LOADHIGH
+; SAVE CURRENT UMB LINK STATE
+mov ax, 0x5802  ; GET UMB LINK STATE
+int 0x21
+mov [ORIG_UMBLINKSTATE], al
+; SAVE CURRENT ALLOCATION STRATEGY
+mov ax, 0x5800
+int 0x21
+mov [ORIG_ALLOCSTRAT], al
+
+; LOADHIGH: link in the UMB memory chain for enabling high-memory allocation
+;           (and save initial status on stack)
+mov ax, 0x5803  ; SET UMB LINK STATE */
+mov bx, 1
+int 0x21
+; set strategy to 'last fit, try high then low memory'
+mov ax, 0x5801
+mov bx, 0x0082
+int 0x21
+NO_LOADHIGH:
+
 ; exec an application preset (by SvarCOM) in the ExecParamRec
 mov ax, 0x4B00         ; DOS 2+ - load & execute program
 mov dx, EXECPROG       ; DS:DX  - ASCIZ program name (preset at PSP[already)
@@ -120,7 +148,25 @@ mov bx, EXEC_PARAM_REC ; ES:BX  - parameter block pointer
 int 0x21
 mov [cs:EXECPROG], byte 0 ; do not run app again (+DS might have been changed)
 
-jmp short skipsig      ; enforce valid ds/ss/etc (can be lost after int 21,4b)
+; go to start if nothing else to do (this will enforce valid ds/ss/etc)
+cmp [cs:EXEC_LH], byte 0
+je skipsig
+
+; restore UMB link state and alloc strategy to original values (but make sure
+; to base it on CS since DS might have been trashed by the program)
+mov ax, 0x5803
+xor bx, bx
+mov bl, [cs:ORIG_UMBLINKSTATE]
+int 0x21
+; restore original memory allocation strategy
+mov ax, 0x5801
+mov bl, [cs:ORIG_ALLOCSTRAT]
+int 0x21
+; turn off the LH flag
+mov [cs:EXEC_LH], byte 0
+
+
+jmp skipsig      ; enforce valid ds/ss/etc (can be lost after int 21,4b)
 
 EXEC_COMMAND_COM:
 
@@ -135,6 +181,9 @@ mov cx, 14             ; how many times
 mov di, EXEC_PARAM_REC ; ES:DI = destination
 cld                    ; stosb must move forward
 rep stosb              ; repeat cx times
+
+; zero out the LH flag
+mov [EXEC_LH], byte 0
 
 ; preset the default COMSPEC pointer to ES:DX (ES is already set to DS)
 mov dx, COMSPECBOOT

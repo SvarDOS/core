@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,14 @@
 static enum cmd_result cmd_loadhigh(struct cmd_funcparam *p) {
 
   if ((p->argc == 0) || (imatch(p->argv[0], "/?"))) {
-    nls_outputnl(0,9); /* "This command is not implemented" */
+    nls_outputnl(40,0);
+    outputnl("");
+    output("LOADHIGH ");
+    nls_outputnl(40,1);
+    output("LH ");
+    nls_outputnl(40,1);
+    outputnl("");
+    nls_outputnl(40,2);
     return(CMD_OK);
   }
 
@@ -38,5 +45,5 @@ static enum cmd_result cmd_loadhigh(struct cmd_funcparam *p) {
     memmove((void *)p->cmdline, p->cmdline + p->argoffset, strlen(p->cmdline + p->argoffset) + 1);
   }
 
-  return(CMD_CHANGED);
+  return(CMD_CHANGED_BY_LH);
 }

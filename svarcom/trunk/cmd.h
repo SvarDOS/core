@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -29,11 +29,12 @@
 
 /* what cmd_process may return */
 enum cmd_result {
-  CMD_OK,             /* command executed and succeeded */
-  CMD_FAIL,           /* command executed and failed */
-  CMD_NOTFOUND,       /* no such command (not an internal command) */
-  CMD_CHANGED,        /* command-line transformed, please reparse it */
-  CMD_CHANGED_BY_CALL /* command-line transformed by CALL */
+  CMD_OK,              /* command executed and succeeded */
+  CMD_FAIL,            /* command executed and failed */
+  CMD_NOTFOUND,        /* no such command (not an internal command) */
+  CMD_CHANGED,         /* command-line transformed, please reparse it */
+  CMD_CHANGED_BY_CALL, /* command-line transformed by CALL */
+  CMD_CHANGED_BY_LH    /* command-line transformed by LOADHIGH */
 };
 
 /* process internal commands */

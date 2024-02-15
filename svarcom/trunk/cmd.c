@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
  *   CMD_FAIL             command ended in error
  *   CMD_CHANGED          command-line has been modified (used by IF)
  *   CMD_CHANGED_BY_CALL  command-line has been modified by CALL
+ *   CMD_CHANGED_BY_LH    command-line has been modified by LOADHIGH
  *   CMD_NOTFOUND         command unrecognized
  */
 
