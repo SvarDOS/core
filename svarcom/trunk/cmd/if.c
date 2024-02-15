@@ -100,29 +100,27 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
     goto EXEC_S_CMD_IF_NEGFLAG_SET;
   }
 
-  /* IF str1==str2 ? (and if that's not it, then it's a syntax error) */
-  if (strstr(s, "==") != NULL) {
-    /* copy first argument to BUFF, until first '=' or space */
-    for (i = 0; (s[i] != '=') && (s[i] != ' '); i++) p->BUFFER[i] = s[i];
-    /* 1st arg cannot be empty */
-    if (i == 0) goto SYNTAX_ERR;
-    /* terminate buff string and move s forward to the equality char (or space) */
-    p->BUFFER[i++] = 0;
-    s += i;
-    while (*s == ' ') s++;
-    /* if second char is not a '=' then syntax error (equality sign is not
-     * allowed in first string) */
-    if (*s != '=') goto SYNTAX_ERR;
-    /* skip all trailing equality chars (MSDOS accepts many of them, ie all
-     * these are fine: "dupa==dupa", "dupa===dupa", "dupa====dupa", etc) */
-    while (*s == '=') s++;
-    while (*s == ' ') s++; /* skip any leading spaces */
-    /* move along until space or NULL terminator, checking equality */
-    for (i = 0; (p->BUFFER[i] != 0) && (p->BUFFER[i] == s[i]); i++);
-    if ((p->BUFFER[i] == 0) && (s[i] == ' ')) negflag ^= 1;
-    JMP_NEXT_ARG(s);
-    goto EXEC_S_CMD_IF_NEGFLAG_SET;
-  }
+  /* assume "IF str1==str2" and if that's not it then it's a syntax error */
+  /* copy first argument to BUFF, until first '=' or space */
+  for (i = 0; (s[i] != '=') && (s[i] != ' ') && (s[i] != 0); i++) p->BUFFER[i] = s[i];
+  /* 1st arg cannot be empty */
+  if (i == 0) goto SYNTAX_ERR;
+  /* terminate buff string */
+  p->BUFFER[i] = 0;
+  s += i;
+  while (*s == ' ') s++;
+  /* should be two '=' now, otherwise it's a syntax error (equality sign is not
+   * allowed in first string) */
+  if ((s[0] != '=') || (s[1] != '=')) goto SYNTAX_ERR;
+  /* skip all trailing equality chars (MSDOS accepts many of them, ie all
+   * these are fine: "dupa==dupa", "dupa===dupa", "dupa====dupa", etc) */
+  while (*s == '=') s++;
+  while (*s == ' ') s++; /* skip any leading spaces */
+  /* move along until space or NULL terminator, checking equality */
+  for (i = 0; (p->BUFFER[i] != 0) && (p->BUFFER[i] == s[i]); i++);
+  if ((p->BUFFER[i] == 0) && (s[i] == ' ')) negflag ^= 1;
+  JMP_NEXT_ARG(s);
+  goto EXEC_S_CMD_IF_NEGFLAG_SET;
 
   /* invalid syntax */
   SYNTAX_ERR:
