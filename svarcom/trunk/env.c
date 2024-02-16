@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -92,6 +92,17 @@ unsigned short env_allocsz(unsigned short env_seg) {
 }
 
 
+/* return currently used space (length, in bytes) of the environment */
+unsigned short env_getcurlen(unsigned short env_seg) {
+  char far *env = MK_FP(env_seg, 0);
+  unsigned short envlen;
+  for (envlen = 0; env[envlen] != 0; envlen++) {
+    while (env[envlen] != 0) envlen++; /* consume a string */
+  }
+  return(envlen);
+}
+
+
 /* remove a variable from environment, if present. returns 0 on success, non-zero if variable not found */
 int env_dropvar(unsigned short env_seg, const char *varname) {
   unsigned short blocksz, traillen;
@@ -125,7 +136,6 @@ int env_dropvar(unsigned short env_seg, const char *varname) {
  */
 int env_setvar(unsigned short env_seg, const char *v) {
   unsigned short envlen;
-  unsigned short envfree;
   unsigned short vlen, veqpos;
   char far *env = MK_FP(env_seg, 0);
 
@@ -144,18 +154,11 @@ int env_setvar(unsigned short env_seg, const char *v) {
   /* if variable empty, stop here */
   if (veqpos == vlen - 1) return(ENV_SUCCESS);
 
-  /* compute current size of the environment */
-  for (envlen = 0; env[envlen] != 0; envlen++) {
-    while (env[envlen] != 0) envlen++; /* consume a string */
-  }
-
-  /* compute free space available in environment */
-  envfree = env_allocsz(env_seg);
-  envfree -= envlen;
-  envfree -= 1; /* 1 byte for the environment's NULL terminator */
+  /* get length of the current environment */
+  envlen = env_getcurlen(env_seg);
 
   /* do I have enough env space for the new var? */
-  if (envfree < vlen + 1) return(ENV_NOTENOM);
+  if (envlen + vlen + 2 >= env_allocsz(env_seg)) return(ENV_NOTENOM);
 
   /* write the new variable (with its NULL terminator) to environment tail */
   _fmemcpy(env + envlen, v, vlen + 1);

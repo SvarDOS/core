@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -46,6 +46,9 @@ unsigned short env_lookup_valcopy(char *res, unsigned short ressz, unsigned shor
 
 /* returns the size, in bytes, of the allocated environment block */
 unsigned short env_allocsz(unsigned short env_seg);
+
+/* return currently used space (length, in bytes) of the environment */
+unsigned short env_getcurlen(unsigned short env_seg);
 
 /* remove a variable from environment, if present. returns 0 on success, non-zero if variable not found */
 int env_dropvar(unsigned short env_seg, const char *varname);
