@@ -3,8 +3,6 @@
                     === SvarCOM's history / changelog ===
 
 
- (ticket numbers at https://osdn.net/projects/svardos/ticket/ in [] brackets)
-
 
 === ver 2024.2 (xx.xx.2024) ==================================================
 
@@ -14,6 +12,7 @@
    reporting the issue and to ECM for locating the root cause.
    ref: https://github.com/SvarDOS/bugz/issues/67
  - implemented the internal LOADHIGH command
+ - SET command: failure to update an env variable does not delete the variable
 
 
 === ver 2024.1 (17.01.2024) ==================================================

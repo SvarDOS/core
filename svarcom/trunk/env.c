@@ -138,9 +138,8 @@ int env_setvar(unsigned short env_seg, const char *v) {
   unsigned short envlen;
   unsigned short vlen, veqpos;
   char far *env = MK_FP(env_seg, 0);
-
-  /* remove variable from environment, if already set */
-  env_dropvar(env_seg, v);
+  char far *alreadyexists;
+  unsigned short alreadyexistslen;
 
   /* compute v length and find the position of the eq sign */
   veqpos = 0xffff;
@@ -151,14 +150,27 @@ int env_setvar(unsigned short env_seg, const char *v) {
     }
   }
 
-  /* if variable empty, stop here */
-  if (veqpos == vlen - 1) return(ENV_SUCCESS);
-
   /* get length of the current environment */
   envlen = env_getcurlen(env_seg);
 
+  /* does the variable already exist? */
+  alreadyexists = env_lookup(env_seg, v);
+  alreadyexistslen = 0;
+  if (alreadyexists != NULL) {
+    while (alreadyexists[alreadyexistslen] != 0) alreadyexistslen++;
+  }
+
   /* do I have enough env space for the new var? */
-  if (envlen + vlen + 2 >= env_allocsz(env_seg)) return(ENV_NOTENOM);
+  if (envlen + vlen + 3 - alreadyexistslen >= env_allocsz(env_seg)) {
+    return(ENV_NOTENOM);
+  }
+
+  /* remove variable from environment if already set and recompute environment's length */
+  env_dropvar(env_seg, v);
+  envlen = env_getcurlen(env_seg);
+
+  /* if variable empty, stop here */
+  if (veqpos == vlen - 1) return(ENV_SUCCESS);
 
   /* write the new variable (with its NULL terminator) to environment tail */
   _fmemcpy(env + envlen, v, vlen + 1);
