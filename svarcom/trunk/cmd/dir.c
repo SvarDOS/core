@@ -189,6 +189,7 @@ static int filter_attribs(const struct DTA *dta, unsigned char attrfilter_must, 
 static struct {
   struct TINYDTA far *dtabuf_root;
   char order[8]; /* GNESD values (ucase = lower first ; lcase = higher first) */
+  unsigned char sortownia[256]; /* collation table (used for NLS-aware sorts) */
 } glob_sortcmp_dat;
 
 
@@ -280,8 +281,8 @@ static int sortcmp(const void *dtaid1, const void *dtaid2) {
         }
         /* cmp */
         for (i = 0; i < limit; i++) {
-          if ((*f1 | 32) < (*f2 | 32)) return(0 - r);
-          if ((*f1 | 32) > (*f2 | 32)) return(r);
+          if ((glob_sortcmp_dat.sortownia[(unsigned char)(*f1)]) < (glob_sortcmp_dat.sortownia[(unsigned char)(*f2)])) return(0 - r);
+          if ((glob_sortcmp_dat.sortownia[(unsigned char)(*f1)]) > (glob_sortcmp_dat.sortownia[(unsigned char)(*f2)])) return(r);
           if (*f1 == 0) break;
           f1++;
           f2++;
@@ -449,8 +450,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     return(CMD_FAIL);
   }
 
-  bzero(&glob_sortcmp_dat, sizeof(glob_sortcmp_dat));
-
   if (cmd_ishlp(p)) {
     nls_outputnl(37,0); /* "Displays a list of files and subdirectories in a directory" */
     outputnl("");
@@ -471,6 +470,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     nls_outputnl(37,11); /* "/B Uses bare format (no heading information or summary)" */
     nls_outputnl(37,12); /* "/L Uses lowercases" */
     return(CMD_OK);
+  }
+
+  /* zero out glob_sortcmp_dat and init the collation table */
+  bzero(&glob_sortcmp_dat, sizeof(glob_sortcmp_dat));
+  for (i = 0; i < 256; i++) {
+    glob_sortcmp_dat.sortownia[i] = i;
+    /* sorting should be case-insensitive */
+    if ((i >= 'A') && (i <='a')) glob_sortcmp_dat.sortownia[i] |= 32;
   }
 
   i = nls_getpatterns(&(buf->nls));
