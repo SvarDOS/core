@@ -477,7 +477,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   for (i = 0; i < 256; i++) {
     glob_sortcmp_dat.sortownia[i] = i;
     /* sorting should be case-insensitive */
-    if ((i >= 'A') && (i <='a')) glob_sortcmp_dat.sortownia[i] |= 32;
+    if ((i >= 'A') && (i <= 'Z')) glob_sortcmp_dat.sortownia[i] |= 32;
   }
 
   i = nls_getpatterns(&(buf->nls));
