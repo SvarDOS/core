@@ -9,7 +9,7 @@
 #
 
 FEATURES =
-FEATURES += -DVERDBG
+#FEATURES += -DVERDBG
 
 LDFLAGS = -0 -y -wx -mt -lr -we -d0 -ox -fm=command.map
 CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
