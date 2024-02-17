@@ -609,6 +609,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     } while (findnext(dta) == 0);
 
+    /* no match? kein gluck! (this can happen when filtering attribs with /A:xxx
+     * because while findfirst() succeeds, all entries can be rejected) */
+    if (dtabufcount == 0) {
+      nls_outputnl_doserr(2); /* "File not found" */
+      return(CMD_FAIL);
+    }
+
     /* sort the list - the tricky part is that my array is a far address while
      * qsort works only with near pointers, so I have to use an ugly (and
      * global) auxiliary table */
