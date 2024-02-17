@@ -3,7 +3,7 @@
 #
 # Language...: Polish
 # Authors....: Mateusz Viste
-# Last update: 16 Feb 2024
+# Last update: 17 Feb 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
