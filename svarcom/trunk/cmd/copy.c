@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -127,7 +127,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     /* mov dx, [buff] */ /* DX points to buffer already */
     int 0x21       /* CF clear and AX=CX on success */
     jc FAIL
-    cmp ax, cx     /* sould be equal, otherwise failed */
+    cmp ax, cx     /* should be equal, otherwise failed */
     mov ax, 0x08   /* preset to DOS error "Insufficient memory" */
     jne FAIL
     jmp COPY
@@ -140,18 +140,35 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     FAIL:
     mov [errcode], ax
 
+    /* close src and dst, but first take care to clone the timestamp to dst */
     CLOSESRC:
-    /* close src and dst */
     mov bx, [srch]
-    cmp bx, 0xffff
+    cmp bx, 0xffff /* skip if not a file */
     je CLOSEDST
+    mov ax, 0x5700 /* DOS 2+ - GET FILE'S LAST-WRITTEN DATE AND TIME */
+    int 0x21  /* time and date are in CX and DX now */
+    /* proceed with closing the file */
+    /* mov bx, [srch] */
     mov ah, 0x3e   /* DOS 2+ -- close a file handle */
     int 0x21
 
     CLOSEDST:
+    mov ax, bx     /* save src handle, because I'll need it in a moment */
     mov bx, [dsth]
     cmp bx, 0xffff
     je DONE
+    /* set timestamp, unless src was in error or operation was appending */
+    cmp ax, 0xffff /* skip date/time setting if source was not open */
+    je SKIPDATESAVE
+    /* skip timesetting also if appending */
+    xor al, al
+    cmp [appendflag], al
+    jne SKIPDATESAVE
+    /* do the job */
+    mov ax, 0x5701 /* DOS 2+ - SET FILE'S LAST-WRITTEN DATE AND TIME */
+    /* BX=file handle  CX=TIME  DX=DATE */
+    int 0x21
+    SKIPDATESAVE:
     mov ah, 0x3e   /* DOS 2+ -- close a file handle */
     int 0x21
 

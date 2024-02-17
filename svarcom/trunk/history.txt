@@ -8,18 +8,19 @@
 
  - DIR command: added /O support
  - DIR command: %DIRCMD% support
- - command-line parsing modified to work around a DN bug. Thanks to bttr for
-   reporting the issue and to ECM and rr for locating the root cause.
-   ref: https://github.com/SvarDOS/bugz/issues/67
+ - command-line parsing modified to work around a DN bug. Thanks to Robert
+   Riebisch for reporting the issue and to E. C. Masloch locating the root
+   cause. ref: https://github.com/SvarDOS/bugz/issues/67
  - implemented the internal LOADHIGH command
  - SET command: failure to update an env variable does not delete the variable
+ - COPY command: timestamp of copied files is preserved
 
 
 === ver 2024.1 (17.01.2024) ==================================================
 
  - EDR-DOS compatibility fixes: resident module's PSP is being patched with
    cleared JFTs and its parent fields are rewired to SvarCOM. Many thanks to
-   E.C. Masloch (pushbx) for suggesting this.
+   E. C. Masloch (pushbx) for suggesting this.
  - updated SvarLANG.lib to ver 20230730
 
 
