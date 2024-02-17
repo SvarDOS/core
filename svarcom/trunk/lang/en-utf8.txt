@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 12 Mar 2022
+# Last update: 17 Feb 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -255,11 +255,10 @@
 39.0:Returns a fully qualified path or filename.
 39.1:TRUENAME [[drive:][path][filename]]
 
-# LOADHIGH
+# LH / LOADHIGH
 40.0:Loads a program into the upper memory area.
 40.1:[drive:][path]filename [parameters]
 40.2:parameters: any arguments required by the program you want to load.
-
 
 # DOS ERRORS
 255.1:Function number invalid

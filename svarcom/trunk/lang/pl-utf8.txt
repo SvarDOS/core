@@ -2,7 +2,7 @@
 # SvarCOM translation file
 #
 # Language...: Polish
-# Author.....: Mateusz Viste
+# Authors....: Mateusz Viste
 # Last update: 16 Feb 2024
 #
 
@@ -255,11 +255,10 @@
 39.0:Zwraca w pełni kwalifikowaną ścieżkę lub nazwę pliku.
 39.1:TRUENAME [dysk:][ścieżka]nazwapliku
 
-# LOADHIGH
+# LH / LOADHIGH
 40.0:Ładuje program do pamięci wyższej.
 40.1:[dysk:][ścieżka]nazwapliku [parametry]
 40.2:parametry: argumenty wymagane przez program który chcesz załadować.
-
 
 # DOS ERRORS
 255.1:Błędny numer funkcji
