@@ -626,7 +626,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   for (;;) {
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
-    if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
+    if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
 
     /* turn string lcase (/L) */
     if (req.flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
@@ -697,6 +697,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
 
+    NEXT_ENTRY:
     /* take next entry, either from buf or disk */
     if (dtabufcount > 0) {
       dtabufcount--;
