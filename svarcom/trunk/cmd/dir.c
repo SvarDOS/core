@@ -480,6 +480,58 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     if ((i >= 'A') && (i <= 'Z')) glob_sortcmp_dat.sortownia[i] |= 32;
   }
 
+  /* try to replace (or complement) my naive collation table with an NLS-aware
+   * version provided by the kernel (or NLSFUNC) */
+  {
+    _Packed struct nlsseqtab {
+      unsigned char id;
+      unsigned short taboff;
+      unsigned short tabseg;
+    } collat;
+    void *colptr = &collat;
+    unsigned char errflag = 1;
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push di
+      push es
+
+      mov ax, 0x6506  /* DOS 3.3+ - Get collating sequence table */
+      mov bx, 0xffff  /* code page, FFFFh = "current" */
+      mov cx, 5       /* size of buffer at ES:DI */
+      mov dx, 0xffff  /* country id, FFFFh = "current" */
+      push ds
+      pop es          /* ES:DI = address of buffer for the 5-bytes struct */
+      mov di, colptr
+      int 0x21
+      jc FAIL
+      xor al, al
+      mov errflag, al
+      FAIL:
+
+      pop es
+      pop di
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
+
+    if ((errflag == 0) && (collat.id == 6)) {
+      unsigned char far *ptr = MK_FP(collat.tabseg, collat.taboff);
+      unsigned short count = *(unsigned short far *)ptr;
+      /* printf("NLS AT %04X:%04X (%u elements)\n", collat.tabseg, collat.taboff, count); */
+      if (count <= 256) { /* you never know */
+        ptr += 2; /* skip the count header */
+        for (i = 0; i < count; i++) {
+          glob_sortcmp_dat.sortownia[i] = ptr[i];
+        }
+      }
+    }
+  }
+
   i = nls_getpatterns(&(buf->nls));
   if (i != 0) nls_outputnl_doserr(i);
 

@@ -8,8 +8,9 @@
 
  - DIR command: added /O support
  - DIR command: %DIRCMD% support
+ - DIR command: sorting is NLS-aware (uses country-specific collating)
  - command-line parsing modified to work around a DN bug. Thanks to Robert
-   Riebisch for reporting the issue and to E. C. Masloch locating the root
+   Riebisch for reporting the issue and to E. C. Masloch for locating the root
    cause. ref: https://github.com/SvarDOS/bugz/issues/67
  - implemented the internal LH / LOADHIGH command
  - SET command: failure to update an env variable does not delete the variable
