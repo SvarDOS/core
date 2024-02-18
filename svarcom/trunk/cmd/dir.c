@@ -73,6 +73,46 @@ _Packed struct TINYDTA {
 };
 
 
+/* returns current COUNTRY id (1=USA, 7=RU, 33=FR, 48=PL, 49=DE, etc) */
+static unsigned short dir_cur_country(void) {
+  _Packed struct { /* Extended Country Info Block */
+    unsigned char bRecID;   /* Information ID */
+    unsigned short wRecLen; /* size of information */
+    unsigned short wCountryID; /* country code */
+    unsigned short wCodePgID;  /* code page */
+    /* the block structure is much larger, but I only need the fields above */
+  } buff;
+  void *buffptr = &buff;
+
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+    push es
+    push di
+
+    mov ax, 0x6501  /* DOS 3.3+ - Get Extended Country Information */
+    mov bx, 0xffff  /* code page (FFFFh = current) */
+    mov cx, 7       /* sizeof(buff) */
+    mov dx, bx      /* country code (FFFFh = current) */
+    push ds
+    pop es
+    mov di, buffptr
+    int 0x21
+
+    pop di
+    pop es
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+
+  return(buff.wCountryID);
+}
+
+
 /* fills freebytes with free bytes for drv (A=0, B=1, etc)
  * returns DOS ERR code on failure */
 static unsigned short cmd_dir_df(unsigned long *freebytes, unsigned char drv) {
@@ -481,8 +521,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   /* try to replace (or complement) my naive collation table with an NLS-aware
-   * version provided by the kernel (or NLSFUNC) */
-  {
+   * version provided by the kernel (or NLSFUNC)
+   * do this ONLY for COUNTRY codes that are higher than 1, because zero is
+   * invalid and value 1 can mean either "USA" or "undefined".
+   * ref: https://github.com/SvarDOS/bugz/issues/68 */
+  if (dir_cur_country() > 1) {
     _Packed struct nlsseqtab {
       unsigned char id;
       unsigned short taboff;
