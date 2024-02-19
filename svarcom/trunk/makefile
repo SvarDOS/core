@@ -9,7 +9,15 @@
 #
 
 FEATURES =
+
+# hidden (debug-oriented) features:
+
+# display debug data within the "ver" screen
 #FEATURES += -DVERDBG
+
+# dump the NLS collate table to screen at each DIR
+#FEATURES += -DDIR_DUMPNLSCOLLATE
+
 
 LDFLAGS = -0 -y -wx -mt -lr -we -d0 -ox -fm=command.map
 CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
