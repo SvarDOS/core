@@ -4,7 +4,7 @@
 
 
 
-=== ver 2024.2 (xx.xx.2024) ==================================================
+=== ver 2024.2 (20.02.2024) ==================================================
 
  - DIR command: added /O support
  - DIR command: %DIRCMD% support
@@ -13,7 +13,7 @@
    cause. ref: https://github.com/SvarDOS/bugz/issues/67
  - implemented the internal LH / LOADHIGH command
  - SET command: failure to update an env variable does not delete the variable
- - COPY command: timestamp of copied files is preserved
+ - COPY command: timestamps of copied files are preserved
 
 
 === ver 2024.1 (17.01.2024) ==================================================
