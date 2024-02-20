@@ -1,0 +1,297 @@
+#
+# SvarCOM language file
+#
+# Language...: Turkish
+# Authors....: Berki Yenigün
+# Last update: 12 Mar 2022
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Geçersiz sözdizimi
+0.2:Geçersiz seçenek
+0.3:Geçersiz parametre biçimi
+0.4:Çok fazla parametre
+0.5:Yanlış komut veya dosya ismi
+0.6:Geçersiz parametre
+0.7:Gerekli parametre eksik
+0.8:Geçersiz hedef
+?0.9:Bu komut mevcut değil
+
+# the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:EH
+
+# SVARCOM HELP SCREEN
+1.0:SvarCOM komut yorumlayıcısını başlatır.
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] komut]
+1.2:/D      AUTOEXEC.BAT işlenmesini atla (sadece /P ile bir anlamı vardır)
+1.3:/E:nnn  Ortamın boyutunu nnn bayt olarak ayarlar
+1.4:/P      Yeni komut yorumlayıcısını daimi kılar ve AUTOEXEC.BAT'i çalıştırır
+1.5:/C      Belirtilen komutu çalıştırır ve döner
+1.6:/K      Belirtilen komutu çalıştırır ve çalışmaya devam eder
+1.7:/Y      Toplu iş programını adım adım çalıştırır (sadece /P, /K veya /C ile)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:SVARCOM SÜRÜMÜ DEĞİŞTİ. SİSTEM DURDURULDU. BİLGİSAYARINIZI YENİDEN BAŞLATIN.
+2.1:ÖLÜMCÜL HATA: rmod_install() başarısız oldu
+2.2:SvarCOM: yığın taşması tespit edildi, komut tarihçesi silindi (hata değildir)
+
+# CLS
+10.0:Ekranı siler.
+
+# CHCP
+11.0:Etkin kod sayfası sayısını görüntüler veya ayarlar.
+11.1:CHCP [nnn]
+11.2:nnn  Kod sayfası sayısını belirtir
+11.3:Faal kod sayfası sayısını görüntülemek için parametresiz CHCP yazın.
+11.4:Geçersiz kod sayfa sayısı
+11.5:NLSFUNC kurulu değil
+11.6:Kod sayfası değişikliği başarısız oldu
+11.7:Etkin kod sayfası:
+
+# CD / CHDIR
+12.0:Güncel dizinin ismini görüntüler veya onu değiştirir.
+12.1:CHDIR [sürücü:][yol]
+12.2:CHDIR[..]
+12.3:CD [sürücü:][yol]
+12.4:CD[..]
+12.5:.. Üst dizine gitmek istediğinizi belirtir.
+12.6:Belirtilen sürücüde güncel dizini görüntülemek için CD sürücü: yazın.
+12.7:Güncel sürücü ve dizini görüntülemek için parametresiz CD yazın.
+
+# CALL
+13.0:Bir toplu iş dosyasından başka bir toplu iş dosyasını çağırır.
+13.1:CALL [sürücü:][yol]dosyaismi [toplu-iş-parametreleri]
+
+# BREAK
+14.0:Genişletilmiş CTRL+C denetlemesini ayarlar veya temizler.
+14.1:Güncel BREAK ayarını görüntülemek için parametresiz BREAK yazın.
+14.2:BREAK devre dışı
+14.3:BREAK etkin
+
+# PAUSE
+15.0:Bir toplu iş betiğinin çalıştırılmasını askıya alır.
+15.1:Devam etmek için herhangi bir tuşa basın...
+
+# SHIFT
+16.0:Toplu iş dosyalarında argümanların konumunu değiştirir:
+16.1:%1 argümanı %0 olur, %2 argümanı %1 olur, vs.
+
+# GOTO
+17.0:Toplu iş işlemesini toplu iş programında etiketlenen bir satıra yönlendirir.
+17.1:GOTO LABEL
+17.2:LABEL toplu iş programında etiket olarak kullanılan bir dizeyi belirtir.
+17.3:Etiketler kendi satırlarında bulunur ve öncesinde üst üste iki nokta bulunur.
+17.10:Etiket bulunamadı
+
+# FOR
+18.0:Bir dosya dizisinde belirtilen komutu her dosya için çalıştırır.
+18.1:FOR %değişken IN (set) DO komut [parametreler]
+18.2:%değişken   Değiştirilebilir parametre ismi. (tek harf)
+18.3:(set)       Boşlukla ayrılmış desen veya mesajlardan biri.
+18.4:komut       Denkleşen her dosya için çalıştırılacak komut.
+18.5:parametreler Belirtilen komut için parametre veya seçenekler.
+18.6:FOR'u bir toplu iş dosyasında kullanmak için, %değişken yerine %%değişken kullanın.
+18.7:FOR iç içe geçirilemez yani yuvalanamaz
+
+# VERIFY
+19.0:DOS'a dosyaların diske doğru yazılıp yazılmadıklarını denetlemesini belirtir.
+19.1:Güncel ayarını görüntülemek için parametresiz VERIFY yazın.
+19.2:VERIFY devre dışı
+19.3:VERIFY etkin
+19.4:ON veya OFF belirtilmesi gerekir
+
+# VER
+20.0:DOS sürümünü görüntüler.
+20.1:DOS çekirdek sürümü %u.%u
+20.2:SvarCOM kabuk sürümü
+20.3:SvarCOM, MS-DOS 5+ ile uyumlu DOS çekirdekleri için kabuk yorumlayıcısıdır.
+20.4:Bu yazılım MIT lisansı kapsamında yayınlanmıştır.
+20.5:Gözden geçirme %c
+20.6:DOS şuradadır: %s
+20.7:düşük bellek alanı
+20.8:HMA (Yüksek Bellek Alanı)
+20.9:ROM
+20.10:gerçek sürümü %u.%u
+
+# TYPE
+21.0:Metin dosyalarının içeriğini görüntüler.
+21.1:TYPE [sürücü:][yol]dosyaismi
+
+# TIME
+22.0:Sistem zamanını görüntüler veya ayarlar.
+22.1:TIME [saat]
+22.2:Güncel saati görüntülemek ve yeni bir saat girmek için parametresiz TIME\r\nyazın. Saati muhafaza etmek için ENTER'a basın.
+22.3:Güncel saat şudur:
+22.4:Geçersiz saat
+22.5:Yeni saati girin:
+
+# SET
+23.0:DOS ortam değişkenlerini görüntüler, ayarlar veya kaldırır.
+23.1:SET [değişken=[dize]]
+23.2:değişken  Ortam değişkeninin ismini belirtir
+23.3:dize      Değişkene atanacak karakter serisini belirtir
+23.4:Güncel ortam değişkenlerini görüntülemek için parametresiz SET yazın.
+23.5:Ortam bloku içinde yetersiz alan
+
+# RD / RMDIR
+24.0:Dizinleri kaldırır (siler).
+24.1:RMDIR [sürücü:]yol
+24.2:RD [sürücü:]yol
+
+# REN / RENAME
+25.0:Bir dosyayı, dosya kümelerini veya bir dizini tekrar isimlendirir.
+25.1:RENAME [sürücü:][yol]dosyaismi1 dosyaismi2
+25.2:REN [sürücü:][yol]dosyaismi1 dosyaismi2
+25.3:dosyaismi2 için yeni bir sürücü veya yol belirtemeyeceğinizi unutmayın.\r\nBir dizinden başkasına dosya taşımak için MOVE kullanın.
+
+# REM
+26.0:Toplu iş dosyasında yorum (açıklama) kaydeder.
+26.1:REM [yorum]
+
+# PATH
+27.0:Çalıştırılabilir dosyalar için arama yolu görüntüler veya ayarlar.
+27.1:PATH [[sürücü:]yol[;...]]
+27.2:Tüm arama yolu ayarlarını silmek ve DOS'ı sadece güncel dizinde aramaya\r\nyönlendirmek için PATH ; yazın.
+27.3:Güncel yolu görüntülemek için parametresiz PATH yazın.
+27.4:Yol Yok
+
+# MD / MKDIR
+28.0:Dizin oluşturur.
+28.1:MKDIR [sürücü:]yol
+28.2:MD [sürücü:]yol
+
+# LN
+29.0:Çalıştırılabilir bağlantı ekler, siler veya görüntüler.
+29.1:LN ADD bağlantıisimi hedefdizin
+29.2:LN DEL bağlantıismi
+29.3:LN LIST [desen]
+29.4:Belirtilen yolda denkleşen çalıştırılabilir dosya bulunamadı.
+29.5:%DOSDIR% ayarlanmamış
+
+# EXIT
+30.0:COMMAND.COM programından (komut yorumlayıcısı) çıkar.
+
+# ECHO
+31.0:Mesaj görüntüler, komut yankılamasını etkinleştirir veya devre dışı bırakır.
+31.1:ECHO [mesaj]
+31.2:Güncel yankı ayarını görüntülemek için parametresiz ECHO yazın.
+31.3:ECHO etkin
+31.4:ECHO devre dışı
+
+# DATE
+32.0:Sistem tarihini görüntüler veya ayarlar.
+32.1:DATE [tarih]
+32.2:Güncel tarihi görüntülemek ve yeni bir tarih girmek için parametresiz DATE\r\nyazın. Tarihi muhafaza etmek için ENTER'a basın.
+32.3:Geçersiz tarih
+32.4:Güncel tarih şudur
+32.5:Yeni tarihi girin:
+
+# PROMPT
+33.0:DOS komut istemini değiştirir.
+33.1:PROMPT [yeni komut istemi özellikleri]
+
+# VOL
+34.0:Mevcutsa, disk birimi etiketini ve seri numarasını görüntüler.
+34.1:VOL [sürücü:]
+34.2:%c sürücüsündeki birimin etiketi yok
+34.3:%c sürücüsündeki birim şudur %s
+34.4:Birim Seri Numarası şudur: %04X-%04X
+
+# IF
+35.0:Toplu iş programlarında koşullu işleme yapar.
+35.1:IF [NOT] ERRORLEVEL sayı komut
+35.2:IF [NOT] dize1==dize2 komut
+35.3:IF [NOT] EXIST dosyaismi komut
+35.4:NOT               komut sadece koşul mevcut değilse çalıştırılır
+35.5:ERRORLEVEL sayı   koşul: son program şu çıkma kodunu döndürdü: >= sayı
+35.6:dize1==dize2      koşul: iki dizenin eşit olması gerekir
+35.7:EXIST dosyaismi   koşul: dosya ismi mevcut (jokerlere izin verilir)
+35.8:komut             koşul mevcutsa çalıştırılacak komut
+
+# DEL / ERASE
+36.0:Bir veya daha fazla dosyayı siler.
+36.1:DEL [sürücü:][yol]dosyaismi [/P]
+36.2:ERASE [sürücü:][yol]dosyaismi [/P]
+36.3:[sürücü:][yol]dosyaismi  Silinecek dosyaları belirtir.
+36.4:/P  Her dosyayı silemeden önce teyit istemi görüntüler.
+36.5:Dizindeki tüm dosyalar silinecek!
+36.6:Emin misiniz?
+36.7:Silinsin mi?
+
+# DIR
+37.0:Dizinlerdeki dosyaların ve alt dizinlerin listesini görüntüler.
+37.1:DIR [sürücü:][yol][dosyaismi] [/P] [/W] [/A[:]özellikler] [/O[[:]sıralama]]\r\n    [/S] [/B] [/L]
+37.2:/P Her bilgi ekranından sonra duraklar
+37.3:/W Geniş liste biçimini kullanır
+37.4:/A Belirtilen özelliklere sahip dosyaları görüntüler:
+37.5:    D Dizinler               R Salt okunur dosyalar    H Gizli dosyalar
+37.6:    A Arşivlenmeye hazır     S Sistem dosyaları - "hayır" manasına gelen ön ek
+37.7:/O Dosyaları sıralanmış düzende listele:
+37.8:    N ada göre               S boyuta göre           E uzantıya göre
+37.9:    D tarihe göre            G önce dizinleri grupla - sırlamayı tersine çevir
+37.10:/S Belirtilen dizin ve tüm alt dizinlerdeki dosyaları listeler
+37.11:/B Sade biçimi kullanır (başlık bilgisi veya özet görüntülenmez)
+37.12:/L Küçük harfleri kullanır
+37.20:%s unsurunun dizini
+37.21:<DİZİN>
+37.22:dosya
+37.23:bayt
+37.24:bayt boş
+
+# COPY
+38.0:Bir veya daha fazla dosyayı başka bir konuma kopyalar.
+38.1:COPY [/A|/B] kaynak [/A|/B] [+kaynak [/A|/B] [+...]] [hedef [/A|/B]] [/V]
+38.2:kaynak       Kopyalanacak dosya veya dosyaları belirtir
+38.3:/A           ASCII metin dosyası belirtir
+38.4:/B           İkili dosya belirtir
+38.5:hedef        Yeni dosyalar için dizin ve/veya dosya ismini belirtir
+38.6:/V           Yeni dosyaların doğru olarak yazıldığını kontrol eder
+38.7:Dosya eklemek için hedef olarak tek bir dosya belirtin, fakat kaynak için\r\nçoklu (joker veya dosya1+doya2+dosya3 biçimini kullanın).
+38.8:NOT: /A ve /B no-op'tur (yok sayılır), sadece uyumluluk amaçlı bulunurlar.\r\nCOPY daima ikili var sayar.
+38.9:%u dosya kopyalandı
+
+# TRUENAME
+39.0:Tam nitelikli bir yol veya dosya adı döndürür.
+39.1:TRUENAME [[sürücü:][yol][dosyaismi]]
+
+# DOS ERRORS
+255.1:Geçersiz işlev sayısı
+255.2:Dosya bulunamadı
+255.3:Yol bulunamadı
+255.4:Çok fazla açık dosya (tutak yani handle kalmadı)
+255.5:Erişim reddedildi
+255.6:Geçersiz tutak yani handle
+255.7:Bellek kontrol bloku imha edildi
+255.8:Yetersiz bellek
+255.9:Geçersiz bellek blok adresi
+255.10:Geçersiz ortam
+255.11:Geçersiz biçim
+255.12:Geçersiz erişim kodu
+255.13:Geçersiz veri
+255.15:Geçersiz sürücü
+255.16:Güncel dizini silme teşebbüsü
+255.17:Aynı cihaz değil
+255.18:Dosya kalmadı
+255.19:Disk yazmaya karşı korumalı
+255.20:Bilinmeyen birim
+255.21:Sürücü hazır değil
+255.22:Bilinmeyen komut
+255.23:Veri hatası (CRC)
+255.24:Yanlış istek yapı boyutu
+255.25:Arama hatası
+255.26:Bilinmeyen ortam türü (DOS diski değil)
+255.27:Sektör bulunamadı
+255.28:Yazıcıda kağıt kalmadı
+255.29:Yazma hatası
+255.30:Okuma hatası
+255.31:Genel başarısızlık
+255.32:Paylaşım ihlali
+255.33:Kilit ihlali
+255.34:Geçersiz disk değişimi
+255.35:FCB mevcut değil
+255.36:Paylaşım tamponu taşması
+255.37:Kod sayfası uyuşmazlığı
+255.38:Dosya işlemleri tamamlanamaz (EOF / girdi kalmadı)
+255.39:Yetersiz disk alanı
+255.80:Dosya zaten mevcut
