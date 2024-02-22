@@ -758,11 +758,13 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "SET TEMP=C:\\TEMP\r\n");
   fprintf(fd, "SET DOSDIR=C:\\SVARDOS\r\n");
   fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS;.\r\n");
-  fprintf(fd, "SET DIRCMD=/OGNE/P/4\r\n");
+  fprintf(fd, "SET DIRCMD=/O/P\r\n");
   fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
   fprintf(fd, "PATH %%DOSDIR%%\r\n");
   fprintf(fd, "PROMPT $P$G\r\n");
-  fprintf(fd, "FDAPM APMDOS\r\n");
+  fprintf(fd, "\r\n"
+              "REM enable CPU power saving\r\n"
+              "FDAPM APMDOS\r\n");
   fprintf(fd, "\r\n");
   genlocalesconf(fd, locales);
   fprintf(fd, "\r\n");
