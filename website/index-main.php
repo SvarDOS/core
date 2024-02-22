@@ -43,8 +43,8 @@
         }
       ?>
       </ul>
-      </div>
-      <div>
+    </div>
+    <div>
       <h3>English only</h3>
       <ul>
       <?php
@@ -56,8 +56,18 @@
       ?>
       </ul>
     </div>
+    <?php
+      $latestbuild = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
+      if ($latestbuild !== $lastver) {
+        echo "    <div>\n";
+        echo "      <h3>Bleeding edge</h3>\n";
+        echo "      <ul><li><a href=\"?p=files&amp;dir={$latestbuild}\">build {$latestbuild}</a></li></ul>\n";
+        echo "      <p>This is the latest build. It hasn't been tested yet! Try it and let us know how it worked for you.</p>\n";
+        echo "    </div>\n";
+      }
+    ?>
     </div>
 
-    <p>The links above point to the latest stable build of installation images and that's the build we recommend. Archival and staging builds can be found in our <a href="?p=files">files section</a>, but that's only if you like living dangerously.</p>
+    <p>The links above point to the latest builds of installation images. Archival builds can be found in the <a href="?p=files">files section</a>.</p>
 
     <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files and scripts are stored. To pull the sources using the standard subversion client use this:<br>svn co svn://svn.svardos.org/svardos svardos</p>
