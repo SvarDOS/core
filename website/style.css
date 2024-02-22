@@ -58,8 +58,10 @@ body {
 
 div.download {
   display: flex;
-  justify-content; start;
+  justify-content: space-evenly;
   flex-wrap: wrap;
+  gap: 1em 0.5em;
+  margin: 1em 0;
 }
 
 div.download div {
@@ -67,7 +69,7 @@ div.download div {
   flex-direction: column;
   border: 1px #aaa solid;
   border-radius: 0.25em;
-  margin: 0.75em 2.5em 0.75em 0.25em;
+  margin: 0;
   padding: 0.2em 0.75em;
   width: 12em;
 }
