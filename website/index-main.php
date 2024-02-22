@@ -17,7 +17,7 @@
 
     <h2>No "versions"</h2>
 
-    <p>SvarDOS is a "rolling" release, meaning that it doesn't follow the concept of "versions". Once the system is installed, its packages can be kept up-to-date using the SvarDOS online update tools (pkg &amp; pkgnet).</p>
+    <p>SvarDOS is a "rolling release", meaning that it does not follow the concept of "versions". Once the system is installed, its packages can be kept up-to-date using the SvarDOS online update tools (pkg &amp; pkgnet).</p>
 
     <h2>Community and help</h2>
 
@@ -29,7 +29,7 @@
     echo '<h2>Downloads (build ' . $lastver . ')</h2>'
     ?>
 
-    <p>SvarDOS is available in a variety of installation images. Some of the images may be available either in multilingual version or English-only. The English-only versions are smaller because they miss all the translations, this makes them fit on a lower number of floppy disks. You can upgrade an EN-only installation with multilingual support should you change your mind afterwards.</p>
+    <p>SvarDOS is available in a variety of installation images. Some of the images may be available either as multilingual or English-only. The English-only variants are smaller because they miss all the translations, which makes them fit on a lower number of floppy disks. You can always upgrade an EN-only installation to multilingual support should you change your mind afterwards.</p>
 
     <div class="download">
     <div>
