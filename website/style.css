@@ -59,6 +59,7 @@ body {
 div.download {
   display: flex;
   justify-content; start;
+  flex-wrap: wrap;
 }
 
 div.download div {
@@ -66,8 +67,16 @@ div.download div {
   flex-direction: column;
   border: 1px #aaa solid;
   border-radius: 0.25em;
-  margin: 0.75em 3em 0.75em 0.25em;
+  margin: 0.75em 2.5em 0.75em 0.25em;
   padding: 0.2em 0.75em;
+  min-width: 12em;
+}
+
+div.download div h3 {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1em;
+  margin: 0.5em 0 0 0;
 }
 
 div.download div p {

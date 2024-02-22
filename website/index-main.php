@@ -33,7 +33,7 @@
 
     <div class="download">
     <div>
-      <p>Multilingual support</p>
+      <h3>Multilingual support</h3>
       <ul>
       <?php
         $arr = array('cd' => 'CD-ROM ISO', 'floppy-2.88M' => '2.88M floppy disks', 'floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'usb' => 'bootable USB image');
@@ -45,7 +45,7 @@
       </ul>
       </div>
       <div>
-      <p>English only</p>
+      <h3>English only</h3>
       <ul>
       <?php
         $arr = array('floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'floppy-360K' => '360K floppy disks');
