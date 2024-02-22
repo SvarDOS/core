@@ -353,7 +353,6 @@ static int savefile(struct file *db, const char *saveas) {
   if (saveas == NULL) saveas = db->fname;
 
   _asm {
-    push ax
     push cx
     push dx
 
@@ -368,7 +367,6 @@ static int savefile(struct file *db, const char *saveas) {
 
     pop dx
     pop cx
-    pop ax
   }
 
   if (errflag != 0) return(-1);
@@ -673,20 +671,6 @@ static void cursor_down(struct file *db) {
 }
 
 
-static void cursor_left(struct file *db) {
-  if (db->cursorposx > 0) {
-    db->cursorposx -= 1;
-  } else if (db->xoffset > 0) {
-    db->xoffset -= 1;
-    uidirty.from = 0;
-    uidirty.to = 0xff;
-  } else if (db->cursor->prev != NULL) { /* jump to end of line above */
-    cursor_up(db);
-    cursor_eol(db);
-  }
-}
-
-
 static void cursor_home(struct file *db) {
   db->cursorposx = 0;
   if (db->xoffset != 0) {
@@ -709,6 +693,20 @@ static void cursor_right(struct file *db) {
   } else if (db->cursor->next != NULL) { /* jump to start of next line */
     cursor_down(db);
     cursor_home(db);
+  }
+}
+
+
+static void cursor_left(struct file *db) {
+  if (db->cursorposx > 0) {
+    db->cursorposx -= 1;
+  } else if (db->xoffset > 0) {
+    db->xoffset -= 1;
+    uidirty.from = 0;
+    uidirty.to = 0xff;
+  } else if (db->cursor->prev != NULL) { /* jump to end of line above */
+    cursor_up(db);
+    cursor_eol(db);
   }
 }
 
@@ -934,10 +932,10 @@ static int parseargv(struct file *dbarr) {
         mdr_coutraw_str(svarlang_str(1,3)); /* Sved, the SvarDOS editor */
         mdr_coutraw_str(" [");
         mdr_coutraw_str(svarlang_str(1,4)); /* ver */
-        mdr_coutraw_puts(" " PVER "]");
-        mdr_coutraw_puts("Copyright (C) " PDATE " Mateusz Viste");
-        mdr_coutraw_crlf();
-        mdr_coutraw_str("sved [/m] [/t] ");
+        mdr_coutraw_str(" " PVER "]\r\n"
+                         "Copyright (C) " PDATE " Mateusz Viste\n"
+                         "\r\n"
+                         "sved [/m] [/t] ");
         mdr_coutraw_puts(svarlang_str(1,1)); /* args syntax */
         mdr_coutraw_crlf();
         mdr_coutraw_puts(svarlang_str(1,10)); /* /m */
@@ -1082,18 +1080,15 @@ static enum MENU_ACTION ui_menu(void) {
 }
 
 
-static struct file *select_slot(struct file *dbarr, unsigned short curfile) {
+static void new_slot_selected(const struct file *dbarr) {
   uidirty.from = 0;
   uidirty.to = 0xff;
   uidirty.statusbar = 1;
-
-  dbarr = &(dbarr[curfile]);
 
   /* force redraw now, because the main() routine might not if this is exit
    * time and we want to show the user which file has unsaved changes */
   ui_statusbar(dbarr);
   ui_refresh(dbarr);
-  return(dbarr);
 }
 
 
@@ -1328,7 +1323,8 @@ void main(void) {
             unsigned short curfile;
             for (curfile = 0; curfile < 10; curfile++) {
               if (dbarr[curfile].modflag == 0) continue; /* skip unmodified slots */
-              db = select_slot(dbarr, curfile);
+              db = dbarr + curfile;
+              new_slot_selected(db);
               if (ui_confirm_if_unsaved(db) != 0) {
                 quitnow = 0;
                 break;
@@ -1376,7 +1372,8 @@ void main(void) {
       }
 
     } else if ((k >= 0x13b) && (k <= 0x144)) { /* F1..F10 */
-      db = select_slot(dbarr, k - 0x13b);
+      db = dbarr + (k - 0x13b);
+      new_slot_selected(db);
 
     } else if (k == 0x174) { /* CTRL+ArrRight - jump to next word */
       /* if currently cursor is on a non-space, then fast-forward to nearest space or EOL */
