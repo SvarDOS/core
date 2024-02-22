@@ -62,7 +62,7 @@
         echo "    <div>\n";
         echo "      <h3>Bleeding edge</h3>\n";
         echo "      <ul><li><a href=\"?p=files&amp;dir={$latestbuild}\">build {$latestbuild}</a></li></ul>\n";
-        echo "      <p>This is the latest build. It hasn't been tested yet! Try it and let us know how it worked for you.</p>\n";
+        echo "      <p>This build has not been tested yet! Try it and let us know how it worked for you.</p>\n";
         echo "    </div>\n";
       }
     ?>
