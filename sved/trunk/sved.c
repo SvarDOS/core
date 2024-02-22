@@ -1,6 +1,6 @@
 /* Sved, the SvarDOS editor
  *
- * Copyright (C) 2023 Mateusz Viste
+ * Copyright (C) 2023-2024 Mateusz Viste
  *
  * Sved is released under the terms of the MIT license.
  *
@@ -32,8 +32,8 @@
 #include "svarlang\svarlang.h"
 
 
-#define PVER "2023.5"
-#define PDATE "2023"
+#define PVER "2024.0"
+#define PDATE "2023-2024"
 
 /*****************************************************************************
  * global variables and definitions                                          *
@@ -857,10 +857,10 @@ static unsigned char loadfile(struct file *db, const char *fname) {
       eolfound = 0;
     }
 
-    /* append 8 spaces if tab char found */
+    /* tab: append enough spaces to land on next 8-chars boundary */
     if ((consumedbytes < len) && (buffptr[consumedbytes] == '\t') && (glob_tablessmode == 0)) {
       consumedbytes++;
-      if (line_append(db, "        ", 8) != 0) {
+      if (line_append(db, "        ", 8 - (db->cursor->len & 7)) != 0) {
         goto IOERR;
       }
     }
@@ -1368,9 +1368,9 @@ void main(void) {
       char c = k;
       insert_in_line(db, &c, 1);
 
-    } else if (k == 0x009) { /* TAB */
+    } else if (k == 0x009) { /* TAB: fill blanks to next 8-chars boundary */
       if (glob_tablessmode == 0) {
-        insert_in_line(db, "        ", 8);
+        insert_in_line(db, "        ", 8 - ((db->xoffset + db->cursorposx) & 7));
       } else {
         insert_in_line(db, "\t", 1);
       }
