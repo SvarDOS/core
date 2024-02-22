@@ -1,6 +1,6 @@
 #
 # sved's makefile -- requires Open Watcom 1.9 (wmake)
-# Copyright (C) 2023 Mateusz Viste
+# Copyright (C) 2023-2024 Mateusz Viste
 #
 # usage:
 #   wmake            builds the sved.com binary
@@ -10,7 +10,7 @@ CC = wcc
 CFLAGS = -0 -ms -zl -os -wx -we -d0 -bt=dos -I=mdr\inc
 CFLAGS += -s
 
-PVER = 2023.5
+PVER = 2024.0
 
 all: sved.com
 
