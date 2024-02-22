@@ -63,11 +63,6 @@ set -e
 # list of packages to be part of CORE (always installed)
 COREPKGS=`ls -1 'packages-core' | grep -o '^[a-z]*'`
 
-# list of packages to be part of EXTRA (only sometimes installed, typically drivers)
-EXTRAPKGS="pcntpk udvd2"
-
-# all packages
-ALLPKGS="$COREPKGS $EXTRAPKGS"
 
 
 # prepares image for floppy sets of:
@@ -77,16 +72,17 @@ ALLPKGS="$COREPKGS $EXTRAPKGS"
 # $4 size
 # $5 working directory (for temporary files etc)
 # $6 name of the set (eg. "1440k" or "1440k-EN")
-# $7 where to put a copy of the image (optional)
+# $7 list of packages
+# $8 where to put a copy of the image (optional)
 function prep_flop {
   WORKDIR="$5/$6"
+  LIST=$7
   mkdir "$WORKDIR"
   mformat -C -t $1 -h $2 -s $3 -v $CURDATE -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
   mcopy -sQm -i "$WORKDIR/disk1.img" "$FLOPROOT/"* ::/
 
   # now populate the floppies
   curdisk=1
-  LIST=$ALLPKGS
 
   while [ ! -z "$LIST" ] ; do
 
@@ -118,8 +114,8 @@ function prep_flop {
   unix2dos "$WORKDIR/readme.txt"
 
   # make a copy of the image, if requested
-  if [ "x$7" != "x" ] ; then
-    cp "$WORKDIR/disk1.img" $7
+  if [ "x$8" != "x" ] ; then
+    cp "$WORKDIR/disk1.img" $8
   fi
 
   # zip the images (and remove them at the same time)
@@ -151,10 +147,11 @@ for pkg in $COREPKGS ; do
   echo "$pkg" >> "$FLOPROOT/install.lst"
 done
 
-# add EXTRA packages to CDROOT (but not in the list of packages to install)
-for pkg in $EXTRAPKGS ; do
-  cp "$REPOROOT/$pkg.svp" "$CDROOT/"
-done
+# add some extra packages to CDROOT but not in the list of packages to install
+cp "$REPOROOT/pcntpk.svp" "$CDROOT/"
+cp "$REPOROOT/videcdd-2.14.svp" "$CDROOT/videcdd.svp"
+
+#
 
 
 echo
@@ -204,7 +201,7 @@ echo
 USBIMG=$PUBDIR/svardos-usb.img
 cp files/boot-svardos.img $USBIMG
 mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
-for p in $ALLPKGS ; do
+for p in $COREPKGS ; do
   mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
 done
 
@@ -224,10 +221,13 @@ echo
 export MTOOLS_NO_VFAT=1
 
 # prepare images for floppies in different sizes (args are C H S SIZE)
-prep_flop 80 2 36 2880 "$PUBDIR" "2.88M" "$CDROOT/boot.img"
-prep_flop 80 2 18 1440 "$PUBDIR" "1.44M"
-prep_flop 80 2 15 1200 "$PUBDIR" "1.2M"
-prep_flop 80 2  9  720 "$PUBDIR" "720K"
+echo "videcdd" >> "$FLOPROOT/install.lst"
+prep_flop 80 2 36 2880 "$PUBDIR" "2.88M" "$COREPKGS pcntpk videcdd" "$CDROOT/boot.img"
+# no videcdd for non-2.88M images
+sed -i '/^videcdd$/d' "$FLOPROOT/install.lst"
+prep_flop 80 2 18 1440 "$PUBDIR" "1.44M" "$COREPKGS pcntpk"
+prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
+prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
 
 
 echo
@@ -336,11 +336,11 @@ for p in $COREPKGS ; do
   zip -dq "$CDROOT/$p.svp" 'bin/*.lng' 'BIN/*.LNG' 'nls/*' 'NLS/*' || true
 done
 
-prep_flop 80 2 18 1440 "$PUBDIR" "1.44M-EN_ONLY"
+prep_flop 80 2 18 1440 "$PUBDIR" "1.44M-EN_ONLY" "$COREPKGS"
 #prep_flop 80 2 21 1680 "$PUBDIR" "1.44M-DMF-EN_ONLY"
-prep_flop 80 2 15 1200 "$PUBDIR" "1.2M-EN_ONLY"
-prep_flop 80 2  9  720 "$PUBDIR" "720K-EN_ONLY"
-prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY"
+prep_flop 80 2 15 1200 "$PUBDIR" "1.2M-EN_ONLY" "$COREPKGS"
+prep_flop 80 2  9  720 "$PUBDIR" "720K-EN_ONLY" "$COREPKGS"
+prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY" "$COREPKGS"
 
 
 ###############################################################################
