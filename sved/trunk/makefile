@@ -34,6 +34,7 @@ sved.svp: sved.com
 	copy sved.txt doc\sved
 	echo version: $(PVER)> appinfo\sved.lsm
 	echo description: SvarDOS text editor>> appinfo\sved.lsm
+	echo @ECHO There is no EDIT on this system. Use SVED instead.> bin\edit.bat
 	zip -9rkDX -m sved.svp bin appinfo doc
 	rmdir doc\sved
 	rmdir doc
