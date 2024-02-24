@@ -72,6 +72,7 @@ div.download div {
   margin: 0;
   padding: 0.2em 0.75em;
   width: 12em;
+  flex-grow: 1;
 }
 
 div.download div h3 {
