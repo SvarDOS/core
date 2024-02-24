@@ -54,8 +54,8 @@
           echo "<li><a href=\"download/{$lastver}/svardos-{$lastver}-{$l}-EN_ONLY.zip\">{$d}</a></li>\n";
         }
       ?>
-      <p>(no translations, less floppies)</p>
       </ul>
+      <p>(no translations, less floppies)</p>
     </div>
     <?php
       $latestbuild = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
