@@ -19,6 +19,12 @@ sved.com: sved.obj deflang.obj
 	wlink @sved.lnk
 	upx -9 --8086 sved.com
 
+deflang.obj: NLS\*_UTF8.TXT
+	cd nls
+	regen.bat
+	cd ..
+	$(CC) $(CFLAGS) $*.C
+
 .c.obj: .autodepend
 	$(CC) $(CFLAGS) $*.C
 
