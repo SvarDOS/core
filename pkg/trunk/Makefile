@@ -25,7 +25,7 @@ pkg.exe: main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzi
 	wcl $(LDFLAGS) $(LIBS) *.obj
 	upx --8086 -9 pkg.exe
 
-deflang.obj: nls_utf8\pkg_en.txt
+deflang.obj: nls_utf8\pkg_??.txt
 	cd nls_utf8
 	copy pkg_en.txt en.txt
 	utf8tocp 850 pkg_br.txt > br.txt
