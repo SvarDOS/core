@@ -10,7 +10,7 @@ CC = wcc
 CFLAGS = -0 -ms -zl -os -wx -we -d0 -bt=dos -I=mdr\inc
 CFLAGS += -s
 
-PVER = 2024.0
+PVER = 2024.1
 
 all: sved.com
 
