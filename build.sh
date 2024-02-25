@@ -344,6 +344,86 @@ prep_flop 40 2  9  360 "$PUBDIR" "360K-EN_ONLY" "$COREPKGS"
 
 
 ###############################################################################
+# compute the svardos stub, useful for migrating alien DOS systems to SvarDOS #
+###############################################################################
+
+echo
+echo "### generating the pkgstub zip archive"
+
+mkdir "$PUBDIR"/pkgstub
+unzip -jC "$REPOROOTCORE"/pkgnet.svp bin/pkgnet.exe -d "$PUBDIR"/pkgstub
+unzip -jC "$REPOROOTCORE"/pkg.svp bin/pkg.exe -d "$PUBDIR"/pkgstub
+
+cat <<EOF > "$PUBDIR"/pkgstub/readme.txt
+
+        SvarDOS stub, or how to plant a SvarDOS seed in a foreign land
+        --------------------------------------------------------------
+
+This archive contains files that allow to install a SvarDOS stub within
+another DOS system. This makes it possible to use the SvarDOS online repository
+of packages on non-SvarDOS systems, assuming you have a network card connected
+to the internet and a suitable packet driver.
+
+If you do not have internet connectivity, then you will still be able to
+install SvarDOS packages (*.SVP) once you copy them to your PC. You can fetch
+SvarDOS packages at <http://svardos.org>.
+
+Follow the guide now:
+
+=======================================
+MKDIR C:\\SVARDOS
+MKDIR C:\\SVARDOS\\CFG
+
+SET WATTCP.CFG=C:\\SVARDOS\\CFG
+SET DOSDIR=C:\\SVARDOS
+SET LANG=EN
+SET PATH=%PATH%;C:\SVARDOS
+
+COPY *.EXE C:\\SVARDOS\\
+COPY *.CFG C:\\SVARDOS\CFG\\
+=======================================
+
+If in doubt, reach out to us at <http://svardos.org>.
+EOF
+
+cat <<EOF > "$PUBDIR"/pkgstub/wattcp.cfg
+# Rely on DHCP by default
+my_ip = dhcp
+
+# modify (and uncomment) these if you have a fix IP setup:
+#
+#my_ip = 0.0.0.0  ; IP address
+#netmask = 255.255.255.0  ; netmask
+#nameserver = 0.0.0.0  ; primary DNS, mandatory if not using DHCP
+#nameserver = 0.0.0.0  ; secondary DNS, optional
+#gateway = 0.0.0.0  ; default gateway
+EOF
+
+cat <<EOF > "$PUBDIR"/pkgstub/pkg.cfg
+# pkg config file - specifies locations where SvarDOS packages will be installed
+
+# SvarDOS core files
+DIR BIN C:\\SVARDOS\\
+
+# General location for programs
+DIR PROGS C:\\
+
+# Games
+DIR GAMES C:\\
+
+# Drivers
+DIR DRIVERS C:\\DRIVERS\\
+
+# Development tools
+DIR DEVEL C:\\DEVEL\\
+EOF
+
+zip -m -k9jr "$PUBDIR"/svarstub.zip "$PUBDIR"/pkgstub
+rmdir "$PUBDIR"/pkgstub
+
+
+
+###############################################################################
 # cleanup all temporary things                                                #
 ###############################################################################
 
