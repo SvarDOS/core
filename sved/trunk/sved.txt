@@ -68,9 +68,12 @@ and wish to free a bit of disk space.
 
 ### CHANGELOG ################################################################
 
+2024.1 [xx xxx 2024]
+ - fixed tab-less mode (/t), got broken in 2024.0 making sved freeze
+ - updated german translations, courtesy of Robert Riebisch
+
 2024.0 [22 Feb 2024]
  - TAB jumps to nearest 8-chars boundary instead of always inserting 8 blanks
- - updated german translations, courtesy of Robert Riebisch
 
 2023.5 [15 Nov 2023]
 - modified files can be saved at exit time with the space key

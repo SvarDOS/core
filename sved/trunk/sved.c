@@ -816,7 +816,7 @@ static unsigned char loadfile(struct file *db, const char *fname) {
     /* look for nearest \n (also expand tabs) */
     for (consumedbytes = 0;; consumedbytes++) {
 
-      if (buffptr[consumedbytes] == '\t') {
+      if ((buffptr[consumedbytes] == '\t') && (!glob_tablessmode)) {
         llen = consumedbytes;
         break;
       }
