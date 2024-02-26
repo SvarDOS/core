@@ -2,7 +2,7 @@
 
               SVARLANG.LIB - THE SVARDOS TRANSLATION C LIBRARY
 
-                   Copyright (C) 2021-2023 Mateusz Viste
+                   Copyright (C) 2021-2024 Mateusz Viste
 
 
 

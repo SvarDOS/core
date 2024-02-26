@@ -1,7 +1,7 @@
 /* This file is part of the svarlang project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2023 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -76,31 +76,23 @@ const char *svarlang_strid(unsigned short id) {
 
 /* routines below are simplified (dos-based) versions of the libc FILE-related
  * functions. Using them avoids a dependency on FILE, hence makes the binary
- * smaller if the application does not need to pull fopen() and friends */
+ * smaller if the application does not need to pull fopen() and friends
+ * I use pragma aux directives for more compact size. open-watcom only. */
 #ifndef WITHSTDIO
-static unsigned short FOPEN(const char *s) {
-  unsigned short fname_seg = FP_SEG(s);
-  unsigned short fname_off = FP_OFF(s);
-  unsigned short res = 0; /* fd 0 is already used by stdout so it's a good error value */
-  _asm {
-    push dx
-    push ds
 
-    mov ax, fname_seg
-    mov dx, fname_off
-    mov ds, ax
-    mov ax, 0x3d00  /* open file, read-only (fname at DS:DX) */
-    int 0x21
-    pop ds
-    jc ERR
-    mov res, ax
+static unsigned short FOPEN(const char *s);
 
-    ERR:
-    pop dx
-  }
-
-  return(res);
-}
+#pragma aux FOPEN = \
+"push ds" \
+"mov ds, ax" \
+"mov ax, 0x3D00" /* open file, read-only (fname at DS:DX) */ \
+"int 0x21" \
+"jnc DONE" \
+"xor ax, ax" \
+"DONE:" \
+"pop ds" \
+parm [ax dx] \
+value [ax];
 
 
 static void FCLOSE(unsigned short handle) {
