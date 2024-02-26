@@ -116,6 +116,20 @@ unsigned short dos_free(unsigned short segn);
 parm [es] \
 value [ax];
 
+/* mode 0x3C = create or truncate file ; model 0x3D = open for read
+ * returns 0 on failure, file handle otherwise */
+unsigned short dos_fopen(const char *fname, unsigned char mode);
+
+#pragma aux dos_fopen = \
+"xor al, al" \
+"xor cx, cx" \
+"int 0x21" \
+"jnc DONE" \
+"xor ax, ax" \
+"DONE:" \
+parm [dx] [ah] \
+modify [cx] \
+value [ax];
 
 unsigned short dos_fclose(unsigned short handle);
 
@@ -170,6 +184,7 @@ unsigned short dos_fwrite(unsigned short handle, unsigned short count, unsigned 
 "xor ax, ax" \
 "done:" \
 parm [bx] [cx] [di] \
+modify [dx] \
 value [ax]
 
 
@@ -352,24 +367,8 @@ static int savefile(struct file *db, const char *saveas) {
   /* if filename not overloaded then use the fname in db */
   if (saveas == NULL) saveas = db->fname;
 
-  _asm {
-    push cx
-    push dx
-
-    mov ah, 0x3C    /* create or truncate file */
-    xor cx, cx      /* file attributes */
-    mov dx, saveas  /* works only in SMALL/TINY mode */
-    int 0x21
-    jnc DONE
-    mov errflag, ax
-    DONE:
-    mov fd, ax
-
-    pop dx
-    pop cx
-  }
-
-  if (errflag != 0) return(-1);
+  fd = dos_fopen(saveas, 0x3C /* create or truncate file */);
+  if (fd == 0) return(-1);
 
   l = db->cursor;
   while (l->prev) l = l->prev;
@@ -783,23 +782,8 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   mdr_dos_truename(db->fname, fname);
 
   /* fopen file */
-  fd = 0;
-  _asm {
-    push cx
-    push dx
-
-    mov ax, 0x3d00
-    mov dx, fname   // works only in SMALL memory model!
-    xor cl, cl
-    int 0x21
-    mov fd, ax
-    jnc done
-    mov err, al
-    done:
-
-    pop dx
-    pop cx
-  }
+  fd = dos_fopen(fname, 0x3D /* open for read */);
+  if (fd == 0) err = LOADFILE_FILENOTFOUND;
 
   if (err != 0) goto SKIPLOADING;
 
