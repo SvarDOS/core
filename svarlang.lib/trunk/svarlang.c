@@ -95,13 +95,13 @@ parm [ax dx] \
 value [ax];
 
 
-static void FCLOSE(unsigned short handle) {
-  _asm {
-    mov ah, 0x3e
-    mov bx, handle
-    int 0x21
-  }
-}
+static void FCLOSE(unsigned short handle);
+
+#pragma aux FCLOSE = \
+"mov ah, 0x3E" \
+"int 0x21" \
+modify [ax]  /* AX might contain an error code on failure */ \
+parm [bx]
 
 
 static unsigned short FREAD(unsigned short handle, void *buff, unsigned short bytes) {
