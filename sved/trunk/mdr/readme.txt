@@ -1,6 +1,6 @@
 
                              Mateusz' DOS Routines
-                               http://mdr.osdn.io
+                          http://mdrlib.sourceforge.io
 
 
 Mateusz' DOS Routines (MDR) is a C library that contains a variety of routines
