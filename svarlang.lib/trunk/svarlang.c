@@ -80,18 +80,19 @@ const char *svarlang_strid(unsigned short id) {
  * I use pragma aux directives for more compact size. open-watcom only. */
 #ifndef WITHSTDIO
 
-static unsigned short FOPEN(const char *s);
+static unsigned short FOPEN(const char far *s);
 
 #pragma aux FOPEN = \
 "push ds" \
-"mov ds, ax" \
+"push es" \
+"pop ds" \
 "mov ax, 0x3D00" /* open file, read-only (fname at DS:DX) */ \
 "int 0x21" \
 "jnc DONE" \
 "xor ax, ax" \
 "DONE:" \
 "pop ds" \
-parm [ax dx] \
+parm [es dx] \
 value [ax];
 
 
@@ -137,15 +138,15 @@ static unsigned short FREAD(unsigned short handle, void *buff, unsigned short by
 }
 
 
-static void FSEEK(unsigned short handle, unsigned short bytes) {
-  _asm {
-    mov ax, 0x4201  /* move file pointer from cur pos + CX:DX */
-    mov bx, handle
-    xor cx, cx
-    mov dx, bytes
-    int 0x21
-  }
-}
+static void FSEEK(unsigned short handle, unsigned short bytes);
+
+#pragma aux FSEEK = \
+"mov ax, 0x4201"  /* move file pointer from cur pos + CX:DX */ \
+"xor cx, cx" \
+"int 0x21" \
+parm [bx] [dx] \
+modify [ax cx dx]
+
 #endif
 
 
