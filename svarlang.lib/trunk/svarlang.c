@@ -105,37 +105,20 @@ modify [ax]  /* AX might contain an error code on failure */ \
 parm [bx]
 
 
-static unsigned short FREAD(unsigned short handle, void *buff, unsigned short bytes) {
-  unsigned short buff_seg = FP_SEG(buff);
-  unsigned short buff_off = FP_OFF(buff);
-  unsigned short res = 0;
+static unsigned short FREAD(unsigned short handle, void far *buff, unsigned short bytes);
 
-  _asm {
-    push bx
-    push cx
-    push dx
-
-    mov bx, handle
-    mov cx, bytes
-    mov dx, buff_off
-    mov ax, buff_seg
-    push ds
-    mov ds, ax
-    mov ah, 0x3f    /* read cx bytes from file handle bx to DS:DX */
-    int 0x21
-    pop ds
-    jc ERR
-
-    mov res, ax
-    ERR:
-
-    pop dx
-    pop cx
-    pop bx
-  }
-
-  return(res);
-}
+#pragma aux FREAD = \
+"push ds" \
+"push es" \
+"pop ds" \
+"mov ah, 0x3F"    /* read cx bytes from file handle bx to DS:DX */ \
+"int 0x21" \
+"jnc ERR" \
+"xor ax, ax"      /* return 0 on error */ \
+"ERR:" \
+"pop ds" \
+parm [bx] [es dx] [cx] \
+value [ax]
 
 
 static void FSEEK(unsigned short handle, unsigned short bytes);
