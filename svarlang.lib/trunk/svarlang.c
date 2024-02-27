@@ -89,7 +89,7 @@ static unsigned short FOPEN(const char far *s);
 "mov ax, 0x3D00" /* open file, read-only (fname at DS:DX) */ \
 "int 0x21" \
 "jnc DONE" \
-"xor ax, ax" \
+"xor ax, ax"     /* return 0 on error */ \
 "DONE:" \
 "pop ds" \
 parm [es dx] \

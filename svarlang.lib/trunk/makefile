@@ -1,6 +1,6 @@
 #
 # make instructions to build svarlang and tlumacz.exe with OpenWatcom
-# Copyright (C) 2021-2023 Mateusz Viste
+# Copyright (C) 2021-2024 Mateusz Viste
 #
 
 ALLBIN = svarlngs.lib svarlngc.lib svarlngm.lib svarlngl.lib tlumacz.exe

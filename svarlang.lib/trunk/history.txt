@@ -1,5 +1,5 @@
-2024xxxx
-- replaced inline _asm by pragma aux for more compact code (open watcom only)
+20240227
+- replaced inline _asm by pragma aux (more compact code, open watcom only)
 
 20230730
 - dropped svarlang_autoload() (replaced by more specialized functions below)
