@@ -2,7 +2,7 @@
 
 /*
   pkgnet interface
-  Copyright (C) 2021-2022 Mateusz Viste
+  Copyright (C) 2021-2024 Mateusz Viste
 
  === API ===
   ?a=pull&p=PACKAGE[-VER]     downloads the svp archive of PACKAGE (possibly of VER version)
@@ -112,7 +112,10 @@ if ($a != 'checkup') {
   if ($a == 'pull' || $a == 'pullsrc') {
     $pv = explode('-', strtolower($_GET['p']));
     $p = $pv[0];
-    if (!empty($pv[1])) $v = $pv[1];
+    if (!empty($pv[1])) {
+      // space is not a valid character in a version string, if there is any then it must have been a plus sign (as in "1.0+1") but it got changed to a space by the www server because pkgnet does not perform url percent-encoding. So I'm changing it back to a plus here.
+      $v = strtr($pv[1], ' ', '+');
+    }
   } else {
     $p = strtolower($_GET['p']);
   }
