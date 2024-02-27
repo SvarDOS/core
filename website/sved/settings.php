@@ -24,6 +24,6 @@ it a good fit for bootdisks or systems with extremely limited resources.</p>
 </ul>
 ';
 
-$COPYRDATE = '2023';
+$COPYRDATE = '2023-2024';
 
 ?>
