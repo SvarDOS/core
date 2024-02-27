@@ -9,6 +9,6 @@ $LONGHTML = '
 <p>All documentation is available in the distributed archive.</p>
 ';
 
-$COPYRDATE = '2021-2023';
+$COPYRDATE = '2021-2024';
 
 ?>
