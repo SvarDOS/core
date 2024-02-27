@@ -68,10 +68,11 @@ and wish to free a bit of disk space.
 
 ### CHANGELOG ################################################################
 
-2024.1 [xx xxx 2024]
- - fixed tab-less mode (/t), got broken in 2024.0 making sved freeze
+2024.1 [27 Feb 2024]
+ - fixed tab-less mode [/t] (got broken in 2024.0 inducing freezes)
  - fixed a register trashing during file save (potential cause of crash)
  - updated german translations, courtesy of Robert Riebisch
+ - updated the SvarLANG library to ver 20240227
 
 2024.0 [22 Feb 2024]
  - TAB jumps to nearest 8-chars boundary instead of always inserting 8 blanks
