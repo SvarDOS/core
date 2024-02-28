@@ -11,8 +11,10 @@ div.minibb-postheader a {
 
 
 h2.minibb-threadtitle {
-  background: #fff1e2;
+  background: none;
+  border: none;
   color: #000;
+  margin: 1em 0;
 }
 
 div.minibb-trip {
