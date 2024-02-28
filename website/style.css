@@ -88,20 +88,14 @@ div.download div p {
   font-size: 0.9em;
 }
 
-a:link { /* unvisited link */
-  color: #008; text-decoration: none;
-}
-
-a:visited { /* visited link */
-  color: #008; text-decoration: none;
+a:link, a:visited, a:active { /* unvisited, visited link, selected link */
+  color: #00e; text-decoration: none;
 }
 
 a:hover { /* mouse over link */
-  color: #00F; text-decoration: none;
-}
-
-a:active { /* selected link */
-  color: #008; text-decoration: none;
+  color: #00e; text-decoration: none;
+  background-color: #e2faff;
+  border-radius: 0.25em;
 }
 
 a.mateusz {
