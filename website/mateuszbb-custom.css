@@ -1,11 +1,17 @@
 
 div.minibb-postheader {
-  background: #ddd;
+  background: #f5e0d0;
   color: #111;
 }
 
+div.minibb-postheader a {
+  background: none;
+  color: #111;
+}
+
+
 h2.minibb-threadtitle {
-  background: #eee;
+  background: #fff1e2;
   color: #000;
 }
 
