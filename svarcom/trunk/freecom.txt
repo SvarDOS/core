@@ -25,16 +25,16 @@ IBM PC compatible machine. Its resident size is about 2K.
 
 === NLS RESSOURCES ===========================================================
 
-FreeCOM requires custom NLS ressources. While the vast majority of FreeDOS
+FreeCOM requires custom NLS resources. While the vast majority of FreeDOS
 programs use a single "standard" (CATS), FreeCOM uses a different approach
 with NLS strings built into the binary. This makes it necessary to distribute
 as many binary blobs as there are supported languages. Another consequence is
 that FreeCOM is unable to switch its language dynamically (ie. following
 changes made to the LANG environment variable). It also makes the translation
-more difficult.
+process more difficult.
 
-SvarCOM uses CATS-style translations and supports dynamic language changes
-through the %LANG% environment variable.
+SvarCOM uses CATS-style translations (through SvarLANG) and supports dynamic
+language changes through the %LANG% environment variable.
 
 
 === CODE COMPLEXITY ==========================================================
