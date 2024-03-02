@@ -224,6 +224,31 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
 }
 
 
+/* asks DOS to change the current default drive, returns the current drive
+ * (should be the same as d on success) */
+static unsigned char _changedosdrive(unsigned char d);
+#pragma aux _changedosdrive = \
+"mov ah, 0x0e"   /* DOS 1+ - SELECT DRIVE (DL=drive, 00h=A:, 01h=B:, etc) */ \
+"int 0x21" \
+"mov ah, 0x19"     /* DOS 1+ - GET CURRENT DRIVE (drive in al) */ \
+"int 0x21" \
+parm [dl] \
+modify [ah] \
+value [al]
+
+
+/* asks DOS to del a file, returns 0 on success */
+static unsigned short _dosdelfile(const char near *f);
+#pragma aux _dosdelfile = \
+"mov ah, 0x41"  /* delete a file ; DS:DX = filename to delete */ \
+"int 0x21" \
+"jc DONE" \
+"xor ax, ax" \
+"DONE:" \
+parm [dx] \
+value [ax]
+
+
 enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir, unsigned char delstdin) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
@@ -235,24 +260,13 @@ enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg,
   if ((cmdline[0] != 0) && (cmdline[1] == ':') && ((cmdline[2] == ' ') || (cmdline[2] == 0))) {
     if (((cmdline[0] >= 'a') && (cmdline[0] <= 'z')) || ((cmdline[0] >= 'A') && (cmdline[0] <= 'Z'))) {
       unsigned char drive = cmdline[0];
-      unsigned char curdrive = 0;
+      unsigned char curdrive;
       if (drive >= 'a') {
         drive -= 'a';
       } else {
         drive -= 'A';
       }
-      _asm {
-        push ax
-        push dx
-        mov ah, 0x0e     /* DOS 1+ - SELECT DEFAULT DRIVE */
-        mov dl, drive    /* DL = new default drive (00h = A:, 01h = B:, etc) */
-        int 0x21
-        mov ah, 0x19     /* DOS 1+ - GET CURRENT DRIVE */
-        int 0x21
-        mov curdrive, al /* cur drive (0=A, 1=B, etc) */
-        pop dx
-        pop ax
-      }
+      curdrive = _changedosdrive(drive);
       if (curdrive == drive) return(CMD_OK);
       nls_outputnl_doserr(0x0f);
       return(CMD_FAIL);
@@ -282,22 +296,9 @@ enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg,
 
   /* delete stdin temporary file */
   if (delstdin) {
-    const char *fname = redir->stdinfile;
-    unsigned short doserr = 0;
-    _asm {
-      push ax
-      push dx
-      mov ah, 0x41  /* delete a file */
-      mov dx, fname /* DS:DX - filename to delete */
-      int 0x21
-      jnc DONE
-      mov doserr, ax
-      DONE:
-      pop dx
-      pop ax
-    }
+    unsigned short doserr = _dosdelfile(redir->stdinfile);
     if (doserr) {
-      output(fname);
+      output(redir->stdinfile);
       output(": ");
       nls_outputnl_doserr(doserr);
     }

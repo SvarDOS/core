@@ -349,32 +349,12 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
 }
 
 
-static void dos_fname2fcb(char far *fcb, const char *cmd) {
-  unsigned short fcb_seg, fcb_off;
-  fcb_seg = FP_SEG(fcb);
-  fcb_off = FP_OFF(fcb);
-  _asm {
-    push ax
-    push bx
-    push cx
-    push dx
-    push es
-    push si
-
-    mov ax, 0x2900   /* DOS 1+ - parse filename into FCB (DS:SI=fname, ES:DI=FCB) */
-    mov si, cmd
-    mov es, fcb_seg
-    mov di, fcb_off
-    int 0x21
-
-    pop si
-    pop es
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-  }
-}
+static void dos_fname2fcb(char far *fcb, const char near *cmd);
+#pragma aux dos_fname2fcb = \
+"mov ax, 0x2900"   /* DOS 1+ - parse filename into FCB (DS:SI=fname, ES:DI=FCB) */ \
+"int 0x21" \
+parm [es di] [si] \
+modify [ax si]
 
 
 /* parses cmdtail and fills fcb1 and fcb2 with first and second arguments,
@@ -637,52 +617,40 @@ static void set_comspec_to_self(unsigned short envseg) {
 
 
 /* wait for user input */
-static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff) {
-  _asm {
-    push ax
-    push bx
-    push cx
-    push dx
-    push ds
-
-    /* is DOSKEY support present? (INT 2Fh, AX=4800h, returns non-zero in AL if present) */
-    mov ax, 0x4800
-    int 0x2f
-    mov bl, al /* save doskey status in BL */
-
-    /* set up buffered input to inpseg:inpoff */
-    mov ax, inpseg
-    push ax
-    pop ds
-    mov dx, inpoff
-
-    /* execute either DOS input or DOSKEY */
-    test bl, bl /* zf set if no DOSKEY present */
-    jnz DOSKEY
-
-    mov ah, 0x0a
-    int 0x21
-    jmp short DONE
-
-    DOSKEY:
-    mov ax, 0x4810
-    int 0x2f
-
-    DONE:
-    /* terminate command with a CR/LF */
-    mov ah, 0x02 /* display character in dl */
-    mov dl, 0x0d
-    int 0x21
-    mov dl, 0x0a
-    int 0x21
-
-    pop ds
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-  }
-}
+static void cmdline_getinput(unsigned short inpseg, unsigned short inpoff);
+#pragma aux cmdline_getinput = \
+"push ds" \
+/* set up buffered input to inpseg:inpoff */ \
+"push ax" \
+"pop ds" \
+\
+/* is DOSKEY support present? (INT 2Fh, AX=4800h, returns non-zero in AL if present) */ \
+"mov ax, 0x4800" \
+"int 0x2f" \
+\
+/* execute either DOS input or DOSKEY */ \
+"test al, al" /* al=0 if no DOSKEY present */ \
+"jnz DOSKEY" \
+\
+/* buffered string input */ \
+"mov ah, 0x0a" \
+"int 0x21" \
+"jmp short DONE" \
+\
+"DOSKEY:" \
+"mov ax, 0x4810" \
+"int 0x2f" \
+\
+"DONE:" \
+/* terminate command with a CR/LF */ \
+"mov ah, 0x02" /* display character in dl */ \
+"mov dl, 0x0d" \
+"int 0x21" \
+"mov dl, 0x0a" \
+"int 0x21" \
+"pop ds" \
+parm [ax] [dx] \
+modify [ax dl]
 
 
 /* fetches a line from batch file and write it to buff (NULL-terminated),
