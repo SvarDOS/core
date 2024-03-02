@@ -233,6 +233,24 @@ static void parse_argv(struct config *cfg) {
 }
 
 
+/* returns current DOS drive (0 = A: ; 1 = B: etc) */
+static unsigned char _dosgetcurdrive(void);
+#pragma aux _dosgetcurdrive = \
+"mov ah, 0x19"    /* DOS 1+ - GET CURRENT DRIVE */ \
+"int 0x21" \
+modify [ah] \
+value [al]
+
+
+static void _dosgetcurdir(char near *s);
+#pragma aux _dosgetcurdir = \
+"mov ah, 0x47"    /* DOS 2+ - CWD - GET CURRENT DIRECTORY */ \
+"xor dl, dl"      /* DL = drive number (00h = default, 01h = A:, etc) */ \
+"int 0x21" \
+parm [si] \
+modify [ax dl]
+
+
 /* builds the prompt string and displays it. buff is filled with a zero-terminated copy of the prompt. */
 static void build_and_display_prompt(char *buff, unsigned short envseg) {
   char *s = buff;
@@ -268,33 +286,15 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         break;
       case 'P':  /* $P = current drive and path */
       case 'p':
-        _asm {
-          mov ah, 0x19    /* DOS 1+ - GET CURRENT DRIVE */
-          int 0x21
-          mov bx, s
-          mov [bx], al  /* AL = drive (00 = A:, 01 = B:, etc */
-        }
-        *s += 'A';
+        *s = _dosgetcurdrive() + 'A';
         s++;
         *s = ':';
         s++;
         *s = '\\';
         s++;
-        _asm {
-          mov ah, 0x47    /* DOS 2+ - CWD - GET CURRENT DIRECTORY */
-          xor dl,dl       /* DL = drive number (00h = default, 01h = A:, etc) */
-          mov si, s       /* DS:SI -> 64-byte buffer for ASCIZ pathname */
-          int 0x21
-          jc DONE         /* leave path empty on error */
-          /* move s ptr forward to end (0-termintor) of pathname */
-          NEXTBYTE:
-          mov si, s
-          cmp byte ptr [si], 0
-          je DONE
-          inc s
-          jmp NEXTBYTE
-          DONE:
-        }
+        _dosgetcurdir(s);
+        /* move s ptr forward to end (0-termintor) of pathname */
+        while (*s != 0) s++;
         break;
       case 'V':  /* $V = DOS version number */
       case 'v':
@@ -302,13 +302,7 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         break;
       case 'N':  /* $N = current drive */
       case 'n':
-        _asm {
-          mov ah, 0x19    /* DOS 1+ - GET CURRENT DRIVE */
-          int 0x21
-          mov bx, s
-          mov [bx], al  /* AL = drive (00 = A:, 01 = B:, etc */
-        }
-        *s += 'A';
+        *s = _dosgetcurdrive() + 'A';
         s++;
         break;
       case 'G':  /* $G = > (greater-than sign) */
