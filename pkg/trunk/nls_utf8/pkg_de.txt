@@ -72,7 +72,7 @@
 #### unzip ####
 
 10.0:OK
-10.1:FEHLER: Öffnen der Datei fehlgeschlagen
+?10.1:FEHLER: Öffnen der Datei fehlgeschlagen
 10.2:FEHLER: Ungültiges ZIP-Archiv
 10.3:FEHLER: Datei existiert bereits
 10.4:FEHLER: unzip-Fehler (%d)

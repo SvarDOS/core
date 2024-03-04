@@ -71,7 +71,7 @@
 #### unzip ####
 
 10.0:OK
-10.1:BŁĄD: Otwarcie pliku nie powiodło się
+10.1:BŁĄD: Nie znaleziono pliku
 10.2:BŁĄD: Nieprawidłowe archiwum ZIP
 10.3:BŁĄD: Plik już istnieje
 10.4:BŁĄD: błąd unzip (%d)

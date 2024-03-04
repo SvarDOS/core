@@ -125,6 +125,12 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     if ((slen < 4) || (fname[slen - 4] != '.')) strcat(fname, ".SVP");
   }
 
+  /* does the file exist? */
+  if (!fileexists(fname)) {
+    puts(svarlang_str(10, 1)); /* ERROR: File not found */
+    goto RAII;
+  }
+
   /* now let's check the content of the zip file */
 
   *zipfd = fopen(fname, "rb");
