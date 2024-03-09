@@ -464,6 +464,7 @@ foreach ($pkgdb as $pkg => $versions) {
   foreach ($versions as $ver => $meta) {
     $fname = $meta['fname'];
     $desc = $meta['desc'];
+    $url = $meta['url'];
 
     $bsum = file2bsum(realpath($repodir . '/' . $fname));
 
@@ -473,6 +474,7 @@ foreach ($pkgdb as $pkg => $versions) {
     if (!empty($meta['hwreq'])) $meta2['hwreq'] = $meta['hwreq'];
 
     if (empty($db[$pkg]['desc'])) $db[$pkg]['desc'] = $desc;
+    if (empty($db[$pkg]['url'])) $db[$pkg]['url'] = $url;
     if (empty($db[$pkg]['cats'])) {
       $db[$pkg]['cats'] = $meta['cats'];
       $cats = array_unique(array_merge($cats, $meta['cats']));
