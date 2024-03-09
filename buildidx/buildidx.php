@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  10 mar 2024: support for "url" in LSM files
   01 feb 2024: computes the "latest" collection of symlinks
   24 nov 2023: SVED included in the MS-DOS compat list instead of EDIT + support for "release xyz" versions
   25 aug 2023: validation of the hwreq section in LSM files
@@ -41,7 +42,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20230825";
+$PVER = "20240310";
 
 
 // computes the BSD sum of a file and returns it
@@ -432,6 +433,7 @@ foreach ($pkgfiles as $fname) {
   $meta['fname'] = $fname;
   $meta['desc'] = $lsmarray['description'];
   $meta['cats'] = array_unique($catlist);
+  $meta['url'] = $lsmarray['url'];
 
   if (!empty($lsmarray['hwreq'])) {
     $meta['hwreq'] = explode(' ', strtolower($lsmarray['hwreq']));
