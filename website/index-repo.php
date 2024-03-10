@@ -5,7 +5,7 @@
 
 <p>You may also download a CD ISO image that contains the latest version of each package: <a href="repo/sv-repo.iso">SV-REPO.ISO</a> (<?php echo intval(filesize('repo/sv-repo.iso') / 1024 / 1024); ?>M, <a href="repo/sv-repo.iso.md5">md5</a>)</p>
 
-<!-- <p>If you wish to receive notifications about new or updated packages, you may subscribe to the <a href="http://svn.svardos.org/rss.php?repname=SvarDOS&path=%2Fpackages%2F">SvarDOS Packages RSS feed</a>.</p>-->
+<p>If you wish to receive notifications about new or updated packages, you may subscribe to the <a href="http://svn.svardos.org/rss.php?repname=SvarDOS%20Packages&amp;path=%2F&amp;isdir=1">SvarDOS Packages RSS feed</a>.</p>
 
 <?php
   // load the category list
@@ -183,7 +183,9 @@ foreach ($db as $pkg => $meta) {
     $link = '';
     if (!empty($meta['url'])) $link = '<span class="extrainfo"><br><a href="' . htmlspecialchars($meta['url']) . '">' . htmlspecialchars($meta['url']) . '</a></span>';
     echo "<tr><td><a{$hwhint} href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a><span class=\"extrainfo\"><br>";
-    echo htmlspecialchars(implode(', ', $meta['cats']));
+    foreach ($meta['cats'] as $c) {
+      echo '<a href="?p=repo&amp;cat=' . urlencode($c) . '&amp;view=1">' . htmlspecialchars($c) . '</a>';
+    }
     echo "</span></td><td>{$ver}</td><td>{$desc}{$link}</td></tr>\n";
   }
 }
