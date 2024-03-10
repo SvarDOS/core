@@ -168,6 +168,12 @@ td.unsup {
   font-size: 0.9em;
 }
 
+table tr td span.extrainfo, table tr td span.extrainfo a {
+  font-size: 0.9em;
+  font-style: italic;
+  color: #666;
+}
+
 span.helpmsg {
   font-size: 0.7em;
   color: #44e;

@@ -21,6 +21,9 @@
   if (!empty($_GET['hwvid'])) $hw[] = strtolower($_GET['hwvid']);
   if ((!empty($_GET['fpu'])) && ($_GET['fpu'] == 'yes')) $hw[] = 'fpu';
 
+  // view mode (0=simple 1=full)
+  $view = 0;
+  if (!empty($_GET['view'])) $view = intval($_GET['view']);
 ?>
 
 <form action="?" method="get">
@@ -156,7 +159,7 @@ foreach ($db as $pkg => $meta) {
 
   if ((!empty($catfilter)) && (array_search($catfilter, $meta['cats']) === false)) continue;
 
-  $desc = $meta['desc'];
+  $desc = htmlspecialchars($meta['desc']);
   check_next_ver:
   $pref = array_shift($meta['versions']); // get first version (that's the preferred one)
   if (empty($pref)) continue; // no more versions
@@ -174,7 +177,15 @@ foreach ($db as $pkg => $meta) {
   $ver = $pref['ver'];
   $bsum = $pref['bsum'];
 
-  echo "<tr><td><a{$hwhint} href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a></td><td>{$ver}</td><td>{$desc}</td></tr>\n";
+  if ($view === 0) {
+    echo "<tr><td><a{$hwhint} href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a></td><td>{$ver}</td><td>{$desc}</td></tr>\n";
+  } else {
+    $link = '';
+    if (!empty($meta['url'])) $link = '<span class="extrainfo"><br><a href="' . htmlspecialchars($meta['url']) . '">' . htmlspecialchars($meta['url']) . '</a></span>';
+    echo "<tr><td><a{$hwhint} href=\"repo/?a=pull&amp;p={$pkg}\">{$pkg}</a><span class=\"extrainfo\"><br>";
+    echo htmlspecialchars(implode(', ', $meta['cats']));
+    echo "</span></td><td>{$ver}</td><td>{$desc}{$link}</td></tr>\n";
+  }
 }
 echo "</table>\n";
 
