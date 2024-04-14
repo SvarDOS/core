@@ -866,7 +866,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
 
   /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
   fprintf(fd, "COPY \\COMMAND.COM \\CMD.COM\r\n");
-  fprintf(fd, "SET COMSPEC=%c:\\CMD.COM\r\n", targetdrv);
+  fprintf(fd, "SET COMSPEC=C:\\CMD.COM\r\n"); /* POSTINST.BAT is executed after system is rebooted, so the system drive is always C: */
   fprintf(fd, "DEL \\COMMAND.COM\r\n");
 
   /* copy packages */
