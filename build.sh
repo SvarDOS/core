@@ -200,6 +200,7 @@ echo
 # prepare the USB bootable image
 USBIMG=$PUBDIR/svardos-usb.img
 cp files/boot-svardos.img $USBIMG
+mlabel -i "$USBIMG@@32256" ::$CURDATE
 mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
 for p in $COREPKGS ; do
   mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
