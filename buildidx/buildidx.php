@@ -422,7 +422,7 @@ foreach ($pkgfiles as $fname) {
     if ($f === 'games/') continue;
     if (str_head_is($f, "drivers/{$pkgdir}/")) continue;
     if ($f === 'drivers/') continue;
-    if (str_head_is($f, "kernels/{$pkgdir}/")) continue;
+    if (str_head_is($f, "kernel/{$pkgdir}/")) continue;
     echo "WARNING: {$fname} contains a file in an illegal location: {$f}\n";
   }
 
