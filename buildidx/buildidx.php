@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  20 may 2024: directory for alternative kernels changed to "KERNEL"
   10 mar 2024: support for "url" in LSM files
   01 feb 2024: computes the "latest" collection of symlinks
   24 nov 2023: SVED included in the MS-DOS compat list instead of EDIT + support for "release xyz" versions
@@ -42,7 +43,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20240310";
+$PVER = "20240520";
 
 
 // computes the BSD sum of a file and returns it
