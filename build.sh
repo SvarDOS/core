@@ -55,6 +55,10 @@ if [ "x$GENISOIMAGE" == "x" ] ; then
   exit 1
 fi
 
+SED='sed'
+if [ `uname` == "Darwin" ] ; then
+  SED='gsed'
+fi
 
 # abort if anything fails
 set -e
@@ -167,12 +171,13 @@ unzip -CLj "$REPOROOTCORE/display.svp" bin/display.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/fdisk.svp" bin/fdisk.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/format.svp" bin/format.exe -d "$FLOPROOT/"
-unzip -CLj "$REPOROOTCORE/kernel.svp" bin/kernel.sys bin/sys.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/kernel.svp" bin/kernel.sys -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/mem.svp" bin/mem.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/mode.svp" bin/mode.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/more.svp" bin/more.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/sved.svp" bin/sved.com -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/sys.svp" bin/sys.com -d "$FLOPROOT/"
 
 # generate a simple autoexec.bat file
 echo '@ECHO OFF' > "$FLOPROOT/autoexec.bat"
@@ -225,7 +230,7 @@ export MTOOLS_NO_VFAT=1
 echo "videcdd" >> "$FLOPROOT/install.lst"
 prep_flop 80 2 36 2880 "$PUBDIR" "2.88M" "$COREPKGS pcntpk videcdd" "$CDROOT/boot.img"
 # no videcdd for non-2.88M images
-sed -i '/^videcdd$/d' "$FLOPROOT/install.lst"
+$SED -i '/^videcdd$/d' "$FLOPROOT/install.lst"
 prep_flop 80 2 18 1440 "$PUBDIR" "1.44M" "$COREPKGS pcntpk"
 prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
 prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
