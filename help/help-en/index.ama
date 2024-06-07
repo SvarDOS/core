@@ -1,8 +1,10 @@
 
                             %h*** SVARDOS HELP ***
 
- * %lcommands.ama:List of commands
 
+ * %lnewbie.ama:New to SvarDOS? Read this first!
+
+ * %lcommands.ama:List of commands
  * %lnls.ama:Internationalization and NLS overview
  * %lpkg.ama:Packages management (install/remove/update software)
  * %lnetwork.ama:Networking
