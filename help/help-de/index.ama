@@ -1,8 +1,10 @@
 
                             %h*** SVARDOS-HILFE ***
 
- * %lcommands.ama:Liste der Befehle
 
+ * %lnewbie.ama:Neu bei SvarDOS? Lies das zuerst!
+
+ * %lcommands.ama:Liste der Befehle
  * %lpkg.ama:Paketverwaltung (Software installieren/entfernen/aktualisieren)
  * %lnetwork.ama:Verwendung im Netzwerk
  * %lmouse.ama:Mausunterstützung
