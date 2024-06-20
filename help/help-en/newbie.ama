@@ -1,68 +1,80 @@
 Hi Newbies! Congratulations!
 
-You made the first important step in understanding SvarDOS. You found
-the Quick instruction manual for SvarDOS!
-Many of the reported commands also work in Windows and - with
-restrictions - in Linux and Mac OS so that this manual also helps you
-to understand the basics of all these OSes.
+You made the first important step in understanding SvarDOS. You found the
+Quick instruction manual for SvarDOS!
+Many of the reported commands also work in Windows and - with restrictions -
+in Linux and Mac OS so that this manual also helps you to understand the
+basics of all these OSes.
 
 CHAPTER ONE:
 
 Let's start:
+You are at C:\ and have no idea what to do? Simply enter:
 
-You are at C:\ and have no idea what to do?
-Simply enter:
-  "ver" (help is "ver /h") and SvarDOS shows you the version number of
-the Kernel and the Shell (command.com).
+  "ver" (help is "ver /h") and SvarDOS shows you the version number of the
+Kernel and the Shell (command.com).
+
 As a next try:
   "dir" or "dir /p" or "dir /w" or "dir /?"
+
 What happens? This command shows the content of the current "dir"ectory
-(folder) where you actually are. Depending on which option you have
-chosen you see it without sort order, page wise, in lines or you see
-the help to this command which offers much more options. You can do this
-in each folder where you are. The help should be available via:
+(folder) where you actually are. Depending on which option you have chosen
+you see it without sort order, page wise, in lines or you see the help to
+this command which offers much more options. You can do this in each folder
+where you are. The help should be available via:
+
   "command /?" e.g. "dir /?" or in some cases
   "command -h" or
   "command --help"
-for each executable ("*.exe") file so that it is not necessary to open
-the manual for each command. This was step 01.
+for each executable ("*.exe") file so that it is not necessary to open the
+manual for each command.
+
+This was step 01.
+
 
 As you started in C:\ you should see among others:
+
   "kernel.sys",
   "autoexec.bat",
   "config.sys" and maybe
   "command.com" (SvarDOS command.com is different to FreeDOS!).
-The kernel is, what it's name says: the kernel. Without it, the
-OS will not boot. You will hear about "autoexec.bat" and "config.sys"
-later.
+The kernel is, what it's name says: the kernel. Without it, the OS will not
+boot. You will hear about "autoexec.bat" and "config.sys" later.
+
   "command.com" is a very important file. Inside it there are a lot of
-commands that can be executed by simply typing the command's name.
-As they are inside command.com you will not find external .exe files and
-it is recommended to know the names of the important ones by heart.
-As most of these commands also exist in Windows it is not a wasted time
-to know the most important ones of them.
+commands that can be executed by simply typing the command's name. As they
+are inside command.com you will not find external .exe files and it is
+recommended to know the names of the important ones by heart.
+As most of these commands also exist in Windows it is not a wasted time to
+know the most important ones of them.
+
   "dir" with its options is one of them. Other important commands inside
 command.com are:
   "cls", "cd", "copy", "del", "echo", "md", "path", "rd" "ren", "set",
   "ver" and much more.
+
 It makes really sense to keep at least the mentioned commands in mind as
-Windows command line (yes, it still exists!) also uses them and Linux
-also uses commands with other names that do in about the same job.
+Windows command line (yes, it still exists!) also uses them and Linux also
+uses commands with other names that do in about the same job.
+
 This was step 02.
+
 
 Now type:
   "cls" + ENTER
 and you will see that it clears the screen.
+
 Type:
   "md TESTDIR" + ENTER and then
   "dir" + ENTER
-and you will see that a new "dir"ectory (folder) "TESTDIR" has been
-created. You will see that a directory shows a sharp click
+and you will see that a new "dir"ectory (folder) "TESTDIR" has been created.
+You will see that a directory shows a sharp click
   "<TESTDIR>" ("dir") as attachment or the name in square brackets like
   "[TESTDIR]" ("dir /w") depending on which option you used.
-Files show an extension with max 3 characters and - depending on the
-option you have chosen at "dir" - the size and the creation date of the
-file. You created your first folder!!!
+Files show an extension with max 3 characters and - depending on the option
+you have chosen at "dir" - the size and the creation date of the file. You
+created your first folder!!!
+
 Now type:
   "cd TESTDIR" + ENTER
 and you suddenly are in the folder
@@ -70,39 +82,48 @@ and you suddenly are in the folder
   "dir" shows you two symbols:
   "." and "..".
   "." means "current directory" whereas
-  ".." means "there exist directories closer to C:\". Means: with
+  ".." means "there exist directories closer to C:\".
+
+  Means: with
   "cd FOLDERXX" (FOLDERXX is your foldername) you come into the folder.
 With:
   "cd .." you come back one folder closer to C:\.
-Within a folder you can create another folder, e.g. "SUBDIR1" by
-typing:
-  "md SUBDIR1" when you are inside "C:\TESTDIR". With the
+Within a folder you can create another folder, e.g. "SUBDIR1" by typing:
+  "md SUBDIR1" when you are inside "C:\TESTDIR".
+
+With the
   "cd SUBDIR1" you get in, with
-  "cd .." you get out. If you want to move back to "C:\" directly you
-can enter:
+  "cd .." you get out. If you want to move back to "C:\" directly you can
+enter:
   "cd \" or "cd C:\".
-This works with all existing directories and you can crossjump to
-other folders (e.g.: cd C:\SVARDOS\DOC").
-You see that it is simple to move through the hard disk with a few
-commands! This was step 03.
+
+This works with all existing directories and you can crossjump to other fol-
+ders (e.g.: cd C:\SVARDOS\DOC").
+
+You see that it is simple to move through the hard disk with a few commands!
+
+This was step 03.
+
 
 Well, such were the times before graphical user interfaces! But it still
 works on modern systems, maybe the commands change a little.
+
 OK, now we have created a folder:
   "TESTDIR" and a subfolder:
   "SUBDIR1"
 inside. Nobody wants to give folders such a name. After one week nobody
-remembers what it was good for. Please keep in mind that SvarDOS like
-all other DOSes only supports 8.3 which means that the maximum length
-is 8 characters for the file name and 3 characters for ending, e.g.
-  "filename.txt". The ending says something what the file is good for.
+remembers what it was good for. Please keep in mind that SvarDOS like all
+other DOSes only supports 8.3 which means that the maximum length is 8 cha-
+racters for the file name and 3 characters for ending, e.g. "filename.txt".
+The ending says something what the file is good for.
+
 File and folder names are unique in a directory. But you can use the same
 filename with another ending, e.g.:
-  "filename.doc" in the same folder. They can also be used in another
-folder.
-Folders must not be longer than 8 characters. As the folder names are
-nonsense we want to delete the EMPTY folders again. Very simple: You go
-to the subfolder that is most far away from:
+  "filename.doc" in the same folder. They can also be used in another folder.
+
+Folders must not be longer than 8 characters. As the folder names are non-
+sense we want to delete the EMPTY folders again. Very simple: You go to the
+subfolder that is most far away from:
   "C:\" in this case:
   "C:\TESTDIR\SUBDIR1", check if it is empty, (Which command? - correct:
   "dir", more later), go back to:
@@ -110,57 +131,67 @@ to the subfolder that is most far away from:
   "rd SUBDIR1". Check if "TESTDIR" is empty and then go back to:
   "C:\" and enter:
   "rd TESTDIR". Your test directories have gone to NIRVANA!
-In case that there were files inside one of the folders you have to
-delete or move them first. Depending on if you want to delete ALL files
+
+In case that there were files inside one of the folders you have to delete or
+move them first. Depending on if you want to delete ALL files
 (dangerous!) or only a special file you can enter:
   "del *.*" (*.* = wildcard = ALL!) or:
   "del filename.ext".
 You can also use:
-  "*.txt" for ALL text files or "blah*.*"
-for all files starting with "blah". For deleting directories you have
-to move out of the EMPTY folder first, otherwise you would cut the tree
-you are sitting on. So "del" is used for deleting one or more files and
-"rd" for removing EMPTY directories.
+  "*.txt" for ALL text files or "blah*.*" for all files starting with "blah".
+
+For deleting directories you have to move out of the EMPTY folder first,
+otherwise you would cut the tree you are sitting on. So "del" is used for
+deleting one or more files and "rd" for removing EMPTY directories.
+
 This was step 04.
 
-You want to keep the folders "TESTDIR" and "SUBDIR1" because important
-files are inside but don't like the folder name? No problem, rename the
-folders so that you can keep them in mind.
-As you have deleted these folders at the end of step 04, you can now
-check if you kept in mind how you created them. Eeehhmmm? You got it?
-If yes, goto:
+
+You want to keep the folders "TESTDIR" and "SUBDIR1" because important files
+are inside but don't like the folder name? No problem, rename the folders so
+that you can keep them in mind.
+
+As you have deleted these folders at the end of step 04, you can now check if
+you kept in mind how you created them. Eeehhmmm? You got it? If yes, goto:
   "C:\" (Which command? - correct: cd \ or cd C:\) and enter:
-  "ren TESTDIR URGENT" then go to "C:\URGENT" (I am sure you now know
-the command) and enter:
-  "ren SUBDIR1 CONTRACT". Now you should have the folders
+  "ren TESTDIR URGENT" then go to "C:\URGENT" (I am sure you now know the
+  command) and enter:
+  "ren SUBDIR1 CONTRACT". Now you should have the folders:
   "C:\URGENT\CONTRACT" instead of "C:\TESTDIR\SUBDIR".
+
 Let's create a file now. You can use the external SvarDOS command:
   "sved" or another editor to do so.
-SVED works very simple but a little different than modern editors
-like e.g. Windows Notepad. Simply type: "sved", the UI opens, type the
-"ESC" button - and you get a choice "Open file", "Save", "Save as..."
-Close file", "Change EOL" (=end of line in DOS or Linux style) and "Quit".
+SVED works very simple but a little different than modern editors like e.g.
+Windows Notepad. Simply type: "sved", the UI opens, type the "ESC" button -
+and you get a choice "Open file", "Save", "Save as..." Close file", "Change
+EOL" (=end of line in DOS or Linux style) and "Quit".
 You can also run "sved", type a text and save via "ESC".
 Even for a Newbie it should simple to understand. But this can be done by
-everyone. Are we everyone? NO! We test "ECHO"! What will it do? I am sure
-you already heard what happens if you enter:
+everyone.
+
+Are we everyone? NO! We test "ECHO"! What will it do? I am sure you already
+heard what happens if you enter:
   "echo Hello World!" If not, check. Simply type it.
 Now we do not send the result to the monitor but into a file.
   "echo Hello World! > C:\URGENT\CONTRACT\world.txt".
 You can put a second sentence inside by typing:
   "echo I am fine! How are you? >> C:\URGENT\CONTRACT\world.txt."
+  ">" adds the text in the first line.
   ">>" adds the text in a new line.
-You created your first simple text file, guess, where you can find it?
-And how to open it with the "sved" command? Of course, very simple. In
-Windows you can open it by searching the file in a folder and double-
-clicking on the filename. The corresponding program opens automatically.
-In SvarDOS you do nothing else, but vice-versa:
+You created your first simple text file, guess, where you can find it? And
+how to open it with the "sved" command? Of course, very simple. In Windows
+you can open it by searching the file in a folder and doubleclicking on the
+filename. The corresponding program opens automatically. In SvarDOS you do
+nothing else, but vice-versa:
   "sved C:\URGENT\CONTRACT\world.txt"
-Means: You say: use program "sved" and open the file "world.txt" in this
-or that folder.
+
+Means: You say: use program "sved" and open the file "world.txt" in this or
+that folder.
 If this should not work, type:
   "C:\SVARDOS\sved C:\URGENT\CONTRACT\world.txt"
+
 This was step 05.
+
 
 With the command:
   "copy" you can do exactly what the name says. Basic rule:
@@ -168,91 +199,105 @@ You copy a file from source to target, remember where world.txt is now.
   "copy C:\URGENT\CONTRACT\world.txt C:\URGENT" and you have the document
 twice. Instead of "world.txt" you can also use wildcards, e.g.:
   "*.txt" or "world*.*" or "*.*".
-Instead of copying you can move files from one position to another one
-with the EXTERNAL (not in command.com) command:
+
+Instead of copying you can MOVE files from one position to another one with
+the EXTERNAL (not in command.com) command:
   "move". Also, basic rule:
 Move the file from source to target, e.g.:
   "move C:\URGENT\CONTRACT\world.txt C:\URGENT\test2.txt
+Please keep in mind that using "move" means that YOU CREATE NO COPY!
 
-Fantastic! Do you want to know more about this great OS?
-Then do not miss the second chapter of Newbie! Take a short break now!
+Fantastic! Do you want to know more about this great OS? Then do not miss the
+second chapter of Newbie! Take a short break now!
+
 This was step 06.
 
 
 CHAPTER TWO:
 
-You survived chapter one of the Newbies help? And you are still
-interested in SvarDOS? Great!
+You survived chapter one of the Newbies help? And you are still interested in
+SvarDOS? Great!
 
-Maybe you tried to execute some commands in Newbie01 and they did not
-work? There appeared a message: command or filename not found? You are
-too stupid why this happened? What did you make wrong? Nothing! Every-
-thing is correct!
-The reason why this happens is very simple: Without certain commands
-that will follow later, SvarDOS can only execute commands that are in
-your current folder. For example, sved is at:
-  "C:\SVARDOS\" whereas you are at "C:\". SvarDOS looks at "C:\" and
-does not find "sved.com". So it simply says: I do not know this command,
-I have no idea where to find it.
-To fix this and a lot of other things SvarDOS uses two files that
-are at "C:\". They are named:
+Maybe you tried to execute some commands in Newbie01 and they did not work?
+There appeared a message: command or filename not found? You are too stupid
+why this happened? What did you make wrong? Nothing! Everything is correct!
+
+The reason why this happens is very simple: Without certain commands that
+will follow later, SvarDOS can only execute commands that are in your current
+ folder. For example, sved is at:
+  "C:\SVARDOS\" whereas you are at "C:\". SvarDOS looks at "C:\" and does not
+find "sved.com". So it simply says: I do not know this command, I have no
+idea where to find it.
+
+To fix this and a lot of other things SvarDOS uses two files that are at
+  "C:\". They are named:
   "config.sys" and "autoexec.bat".
-The files are written in standard text format so that it is very simple
-to modify them to your needs by using the (guess which command?):
+The files are written in standard text format so that it is very simple to
+modify them to your needs by using the (guess which command?):
   "sved" command, e.g.:
   "sved C:\config.sys" or sved "C:\autoexec.bat"
-"config.sys" is the first file and loaded by the kernel.
+  "config.sys" is the first file and loaded by the kernel.
 By using it you can simply load drivers that are needed to enhance the
-abilities of SvarDOS. For example you can install "himemx" and "emm386"
-(not in SvarDOS!) which allow to use more than 640 KiB RAM, load the
-basic CD-ROM driver, modify screen size (restricted), country settings,
-create a menu where you can choose if you want to start with these or
-those drivers depending on your current needs. One important thing you
-should do in config.sys is to load "command.com" and its ENVIRONMENT
-to be permanent which has a lot of benefits. But that's going to far
-here.
+abilities of SvarDOS. For example you can install "himemx" and "emm386" (not
+in SvarDOS!) which allow to use more than 640 KiB RAM, load the basic CD-ROM
+driver, modify screen size (restricted), country settings, create a menu
+where you can choose if you want to start with these or those drivers depen-
+ding on your current needs. One important thing you should do in config.sys
+is to load "command.com" and its ENVIRONMENT to be permanent which has a lot
+of benefits. More about this in step 08.
+
 This was step 07, one of the most important.
 
-When "config.sys" is loaded the next important file, "command.com" will
-be loaded (depending on the settings you made in config.sys, e.g.:
-  "SHELL=C:\command.com /E:512 /P=C:\autoexec.bat".
-You can use others shells instead of command.com, but this one is
-delivered with SvarCOM.
-  "/P" says which autoexec.bat SvarDOS should use to start. With
-  "/E" you can define the size of the ENVIRONMENT which is very
-helpful as already mentioned on the top of this text.
 
-  "autoexec.bat" is a so called batch file. It is read and interpreted
-line by line. So you can tell SvarDOS that it should change the country
-settings and codepages, load a keyboard driver, a mouse driver, the
-second part of the CD-ROM driver or start a special program / game /
-whatever automatically.
+When "config.sys" is loaded the next important file, "command.com" will be
+loaded (depending on the settings you made in config.sys, e.g.:
+  "SHELL=C:\command.com /E:512 /P=C:\autoexec.bat".
+You can use others shells instead of command.com, but this one is delivered
+with SvarCOM.
+  "/P" says which autoexec.bat SvarDOS should use to start. With
+  "/E" you can define the size of the ENVIRONMENT which is very helpful as
+already mentioned on the top of this text.
+
+  "autoexec.bat" is a so called batch file. It is read and interpreted line
+by line. So you can tell SvarDOS that it should change the country settings
+and codepages, load a keyboard driver, a mouse driver, the second part of the
+CD-ROM driver or start a special program / game / whatever automatically.
+
 With the command:
-  "set" that is built in command.com you can create variables that fill
-up the mentioned ENVIRONMENT, for example with:
-  "set TEMP=C:\TEMP" (folder for temporary files)
+  "set" that is built in command.com you can create variables that fill up
+the mentioned ENVIRONMENT, for example with:
+  "set path=C:\SVARDOS;C:\SVARDOS\NLS" (SVARDOS searches for a command like
+  "sved" at C:\SVARDOS and then C:\SVARDOS\NLS). It opens the first found
+correct hit, all others are ignored. This may cause mistakes if you have
+different files with the same name in these folders!). As the path command is
+also an external command, the following version works too:
+  "path C:\SVARDOS;C:\SVARDOS\NLS" (no set and no =).
+  "set TEMP=C:\TEMP" (folder for temporary files,%TEMP% now means: C:\TEMP)
   "set DOSDIR=C:\SVARDOS" (%DOSDIR% now means: C:\SVARDOS)
-  "set NLSPATH =C:\%DOSDIR%\NLS" (uses "DOSDIR" -> C:\SVARDOS\NLS)
+  "set NLSPATH =%DOSDIR%\NLS" (%NLSPATH now means: C:\SVARDOS\NLS)
   "set TZ=UTC" (for timezone settings) or
   "set LANG=DE" (for language settings) or
   "set OS_VERSION=1.3" and so on.
-To load them automatically, you can write the commands above into
-autoexec.bat.
+To load them automatically to ENVIRONMENT, you can write the commands above
+into autoexec.bat.
 SvarDOS writes these settings into the ENVIRONMENT as variables and keeps
-them as long as it is running. You can add other variables later, but
-please do not use a name that already exists. The command:
+them as long as it is running. You can add other variables later, but please
+do not use a name that already exists. The command:
   "set" without options lists all existing variables,
-  "set variable=" deletes a variable.
-Example:
+  "set variable=" deletes a variable, this is dangerous, see above!
+Example (works in FreeDOS as batch file and command line, but in SvarDOS ONLY
+as a batch file, not in command line!):
   "echo The current version of SvarDOS is: %OS_VERSION%" .
 shows:
   "The current version of SvarDOS is 1.3" ."
-There are more things that can be used by autoexec.bat, but this leads
-too far for a basic introduction.
+There are more things that can be used by autoexec.bat, but this leads too
+far for a basic introduction.
 But now you know how you can modify your SvarDOS OS to work with it.
-I hope I was able to help you with this basic information. Of course,
-I could tell you much more, but this is only a first step into SvarDOS.
+I hope I was able to help you with this basic information. Of course, I could
+tell you much more, but this is only a first step into SvarDOS.
+
 The last step 08 is done!
+
 
 Thank you for reading!
 

@@ -1,71 +1,85 @@
 
 Hallo Newbie! Gratulation!
 
-Du hast den ersten wichtigen Schritt zum Verstehen von SvarDOS gemacht.
-Du hast die Schnellanleitung für SvarDOS gefunden!
-Viele der Befehle, die ich erklären möchte, funktionieren auch unter
-Windows und - mit Einschränkungen - unter Linux und Mac OS, d.h.
-diese Anleitung hilft dir auch dabei, die Grundlagen anderer Betriebs-
-systeme zu verstehen.
+Du hast den ersten wichtigen Schritt zum Verstehen von SvarDOS gemacht. Du
+hast die Schnellanleitung für SvarDOS gefunden!
+Viele der Befehle, die ich erklären möchte, funktionieren auch unter Windows
+und - mit Einschränkungen - unter Linux und Mac OS, d.h. diese Anleitung
+hilft dir auch dabei, die Grundlagen anderer Betriebssysteme zu verstehen.
 
 KAPITEL EINS:
 
-Der Computer läuft und zeigt dir C:\ und du hast keine Ahnung was zu
-tun ist? Tippe einfach mal folgendes ein:
-  "ver" (Hilfe ist "ver /h") und SvarDOS zeigt dir die Versionsnummer
-des Kernels und der Shell (command.com).
+Der Computer läuft und zeigt dir C:\ und du hast keine Ahnung was zu tun ist?
+Tippe einfach mal folgendes ein:
+
+  "ver" (Hilfe ist "ver /h") und SvarDOS zeigt dir die Versionsnummer des
+Kernels und der Shell (command.com).
+
 Probiere als nächstes:
   "dir" oder "dir /p" oder "dir /w" oder "dir /?"
+
 Was passiert? Dieser Befehl zeigt den Inhalt des aktuellen Verzeichnisses
-(englisch: "dir"ectory), in dem du gerade bist. Abhängig von der gewähl-
-ten Option wird es ohne Sortierreihenfolge, seitenweise, bzw. in Zeilen
-angezeigt oder du siehst die Hilfe zu diesem Befehl, der dir noch viel
-mehr Optionen anzeigt. Du kannst "dir" in jedem Verzeichnis, in dem du
-dich befindest, ausführen. Die Hilfe ist für fast alle ausführbaren
-Dateien ("*.exe")verfügbar, es gibt folgende Varianten:
+(englisch: "dir"ectory), in dem du gerade bist. Abhängig von der gewählten
+Option wird es ohne Sortierreihenfolge, seitenweise, bzw. in Zeilen angezeigt
+oder du siehst die Hilfe zu diesem Befehl, die dir noch viel mehr Optionen
+anzeigt. Du kannst "dir" in jedem Verzeichnis, in dem du dich befindest, aus-
+führen. Die Hilfe ist für fast alle ausführbaren Dateien ("*.exe")verfügbar,
+es gibt folgende Varianten:
+
   "Befehl /?" z.B. "dir /?", manchmal auch:
   "Befehl -h" oder
   "Befehl --help",
 d.h. es ist nicht notwendig, für jeden unbekannten Befehl sofort in ein
-Handbuch zu schauen. Das war der erste Schritt.
+Handbuch zu schauen.
+
+Das war der erste Schritt.
+
 
 Da wir momentan bei C:\ sind, solltest du unter anderem folgende Dateien
 sehen:
+
   "kernel.sys",
   "autoexec.bat",
   "config.sys" und vermutlich auch
   "command.com" (command.com von SvarDOS ist nicht identisch mit dem von
-FreeDOS!) Der Kernel ist das, was der Name sagt: Der Kernel. Ohne ihn
-kann das OS nicht booten. Über "autoexec.bat" und "config.sys" sprechen
-wir später.
+FreeDOS!) Der Kernel ist das, was der Name sagt: Der Kernel. Ohne ihn kann
+das OS nicht booten. Über "autoexec.bat" und "config.sys" sprechen wir
+später.
+
   "command.com" ist eine sehr wichtige Datei. In ihr sind eine Menge an
-Befehlen, die ausgeführt werden, wenn man den Befehlsnamen eintippt. Da
-sie sich innerhalb von command.com befinden, wirst du keine .exe Dateien
-mit diesem Namen finden, weshalb es sich empfiehlt, die Namen der wich-
-tigsten im Kopf zu behalten. Da es die meisten dieser Befehle auch unter
-Windows gibt, ist das keine sinnlose Zeitverschwendung.
+Befehlen, die ausgeführt werden, wenn man den Befehlsnamen eintippt. Da sie
+sich innerhalb von command.com befinden, wirst du keine .exe Dateien mit
+diesem Namen finden, weshalb es sich empfiehlt, die Namen der wichtigsten im
+Kopf zu behalten. Da es die meisten dieser Befehle auch unter Windows gibt,
+ist das keine sinnlose Zeitverschwendung.
+
   "dir" mit seinen Optionen ist einer von ihnen. Andere wichtige Befehle
 innerhalb von command.com sind:
-  "cls", "cd", "copy", "del", "echo", "md", "path", "rd", "ren", "set",
-  "ver" und viele andere.
-Es macht wirklich Sinn, wenigstens die obigen Befehle im Kopf zu behalten,
-da die Windows Kommandozeile (ja, es gibt sie!) sie auch verwendet und
-Linux auch ähnliche Befehle mit etwas anderem Namen hat, die den gleichen
-Job machen. Das war der zweite Schritt.
+  "cls", "cd", "copy", "del", "echo", "md", "path", "rd", "ren", "set", "ver"
+und viele andere.
+
+Es macht wirklich Sinn, wenigstens die obigen Befehle im Kopf zu behalten, da
+die Windows Kommandozeile (ja, es gibt sie!) sie auch verwendet und Linux
+auch ähnliche Befehle mit etwas anderem Namen hat, die den gleichen Job
+machen.
+
+Das war der zweite Schritt.
+
 
 Wenn du jetzt:
   "cls" + ENTER
 eingibst, siehst du, daß der Bildschirm "geputzt" wird.
+
 Tippe:
   "md TESTDIR" + ENTER und dann
   "dir" + ENTER
-und du wirst feststellen, daß ein neues Verzeichnis "TESTDIR" erstellt
-wurde. Abhängig davon, welche Option du verwendet hast, wird das Ver-
-zeichnis als "<TESTDIR>" (bei "dir") oder "[TESTDIR]" (bei "dir/w")
-angezeigt.
-Dateien zeigen eine Erweiterung mit maximal 3 Zeichen und - abhängig von
-der Option, die du bei "dir" gewählt hast - die Größe und das Erstell-
-datum der Datei. Du hast dein erstes Verzeichnis ("Ordner") erstellt!!!
+und du wirst feststellen, daß ein neues Verzeichnis "TESTDIR" erstellt wurde.
+Abhängig davon, welche Option du verwendet hast, wird das Verzeichnis als
+  "<TESTDIR>" (bei "dir") oder "[TESTDIR]" (bei "dir/w") angezeigt.
+Dateien zeigen eine Erweiterung mit maximal 3 Zeichen und - abhängig von der
+Option, die du bei "dir" gewählt hast - die Größe und das Erstelldatum der
+Datei. Du hast dein erstes Verzeichnis ("Ordner") erstellt!!!
+
 Tippe jetzt bitte:
   "cd TESTDIR" + ENTER
 und du bist plötzlich in dem Verzeichnis:
@@ -74,211 +88,248 @@ und du bist plötzlich in dem Verzeichnis:
   "." und "..".
   "." steht für das "aktuelle Verzeichnis" während
   ".." bedeutet, daß es "Verzeichnisse gibt, die näher an C:\" sind.
+
 Das bedeutet folgendes:
-  Mit "cd ORDNERXX" (ORDNERXX ist dein Verzeichnisname) kommst du in
-ein Verzeichnis. Mit:
+  Mit "cd ORDNERXX" (ORDNERXX ist dein Verzeichnisname) kommst du in ein
+Verzeichnis. Mit:
   "cd .." kommst du zurück in ein Verzeichnis, welches näher an C:\ ist.
 Du kannst in einem Verzeichnis ein Unterverzeichnis erstellen, z.B.:
   "SUBDIR1" indem du folgendes eintippst:
   "md SUBDIR1" während du dich im Verzeichnis "C:\TESTDIR" befindest.
+
 Mit dem Befehl:
   "cd SUBDIR1" kommst du hinein, mit
   "cd .." kommst du heraus. Wenn du dich direkt zu "C:\" zurückbewegen
 willst, kannst du auch folgende Befehle eingeben:
   "cd \" oder "cd C:\".
+
 Das funktioniert mit allen existierenden Verzeichnissen, d.h. du kannst
 direkt über Kreuz zu anderen Verzeichnissen springen, z.B.:
   "cd C:\SVARDOS\DOC"
-Du siehst, es ist sehr einfach, sich mit einigen wenigen Befehlen quer
-durch die ganze Festplattenverzeichnisstruktur zu bewegen!
+
+Du siehst, es ist sehr einfach, sich mit einigen wenigen Befehlen quer durch
+die ganze Festplattenverzeichnisstruktur zu bewegen!
+
 Das war der dritte Schritt.
 
-Tja, das waren die Zeiten vor den graphischen Benutzeroberflächen. Aber
-es funktioniert auf modernen Systemen immer noch, selbst wenn sich manch-
-mal die Befehlsnamen etwas ändern. OK, wir haben jetzt das Verzeichnis
+
+Tja, das waren die Zeiten vor den graphischen Benutzeroberflächen. Aber es
+funktioniert auf modernen Systemen immer noch, selbst wenn sich manchmal die
+Befehlsnamen etwas ändern.
+
+OK, wir haben jetzt das Verzeichnis:
   "TESTDIR" und dort das Unterverzeichnis "SUBDIR1" erstellt.
-Niemand will so einen Verzeichnisnamen haben. Nach einer Woche weiß
-keiner mehr, wofür dieses Verzeichnis gut ist. Bitte bedenke, daß SvarDOS
-wie alle anderen DOSse nur 8.3 unterstützt, was bedeutet, daß der Datei-
-name maximal 8 Zeichen und die Dateiendung 3 Zeichen lang sein darf, z.B.
+Niemand will so einen Verzeichnisnamen haben. Nach einer Woche weiß keiner
+mehr, wofür dieses Verzeichnis gut ist. Bitte bedenke, daß SvarDOS wie alle
+anderen DOSse nur 8.3 unterstützt, was bedeutet, daß der Dateiname maximal 8
+Zeichen und die Dateiendung 3 Zeichen lang sein darf, z.B.:
   "dateinam.txt". Die Dateiendung sagt aus, wofür die Datei gut ist.
-Datei- oder Unterverzeichnisnamen können in einem Verzeichnis nur einmal
-vergeben werden. Aber du kannst den gleichen Dateinamen mit einer anderen
-Dateiendung vergeben, z.B.:
-  "dateinam.doc". In einem anderen Verzeichnis können sie hingegen noch-
-mals verwendet werden.
-Verzeichnisse dürfen nicht länger als 8 Zeichen lang sein. Da die Ver-
-zeichnisnamen Unsinn sind, wollen wir die LEEREN Verzeichnisse wieder
-löschen. Das geht sehr einfach. Da du nicht den Ast absägen willst, auf
-dem du sitzt, gehst du zuerst in das zu löschende Verzeichnis, welches
-am weitesten von
-  "C:\" entfernt ist, in diesem Fall C:\TESTDIR\SUBDIR1", prüfst, ob es
-leer ist (wie hieß der Befehl? - richtig:
+
+Datei- oder Unterverzeichnisnamen können in einem Verzeichnis nur einmal ver-
+geben werden. Aber du kannst den gleichen Dateinamen mit einer anderen Datei-
+endung vergeben, z.B.:
+  "dateinam.doc". In einem anderen Verzeichnis können sie hingegen nochmals
+verwendet werden.
+
+Verzeichnisse dürfen nicht länger als 8 Zeichen lang sein. Da die Verzeich-
+nisnamen Unsinn sind, wollen wir die LEEREN Verzeichnisse wieder löschen. Das
+geht sehr einfach. Da du nicht den Ast absägen willst, auf dem du sitzt,
+gehst du zuerst in das zu löschende Verzeichnis, welches am weitesten von
+  "C:\" entfernt ist, in diesem Fall C:\TESTDIR\SUBDIR1", prüfst, ob es leer
+ist (wie hieß der Befehl? - richtig:
   "dir", mehr darüber später), gehst zurück zu:
   "C:\TESTDIR" (Welcher Befehl? - richtig: "cd ..") und dann:
   "rd SUBDIR1". Prüfe, ob "TESTDIR" leer ist und gehe dann zurück zu:
   "C:\" und gebe ein:
   "rd TESTDIR". Damit sind deine Testverzeichnisse im "Datennirwana".
-Für den Fall, daß in einem der Verzeichnisse Dateien sind, mußt du sie
-zuerst entweder verschieben oder löschen. Abhängig davon, ob du ALLE
-Dateien (gefährlich!) oder nur spezielle Dateien löschen willst, kannst
-du folgendes eingeben:
+
+Für den Fall, daß in einem der Verzeichnisse Dateien sind, mußt du sie zuerst
+entweder verschieben oder löschen. Abhängig davon, ob du ALLE Dateien
+(gefährlich!) oder nur spezielle Dateien löschen willst, kannst du folgendes
+eingeben:
   "del *.*" (*.* = Wildcard = ALLE!) oder
   "del dateinam.txt" (einzelne Datei).
 Du kannst auch folgendes tun:
   "del *.txt" (löscht alle .txt-Dateien im Verzeichnis) oder "blah*.*"
-alle Dateien, deren Name mit "blah" beginnt. Um Verzeichnisse zu
-löschen, mußt du dich zuerst aus dem LEEREN Verzeichnis herausbewegen,
-andernfalls würdest du dir deinen eigenen Ast abschneiden.
+alle Dateien, deren Name mit "blah" beginnt.
+
+Um Verzeichnisse zu löschen, mußt du dich zuerst aus dem LEEREN Verzeichnis
+herausbewegen, andernfalls würdest du dir deinen eigenen Ast abschneiden.
   "del" wird also zum Löschen ein oder mehrer Dateien verwendet, während
   "rd" zum Löschen LEERER Verzeichnisse benutzt wird.
+
 Das war der vierte Schritt.
 
-Du willst die Verzeichnisse "TESTDIR" und "SUBDIR1" behalten, weil
-wichtige Dateien drin sind, aber du magst die Verzeichnisnamen nicht?
-Kein Problem, benenne die Verzeichnisse so um, daß du dir den Inhalt
-merken kannst.
+
+Du willst die Verzeichnisse "TESTDIR" und "SUBDIR1" behalten, weil wichtige
+Dateien drin sind, aber du magst die Verzeichnisnamen nicht? Kein Problem,
+benenne die Verzeichnisse so um, daß du dir den Inhalt merken kannst.
+
 Nachdem du am Ende des vierten Schritts diese Verzeichnisse gelöscht hast,
-kannst du jetzt prüfen, ob du dich noch daran erinnern kannst, wie du
-sie erstellt hast. Ähm? Weißt du es noch? Wenn ja, gehe zu:
-  "C:\" (Wie hieß der Befehl? - richtig: "cd \" oder "cd C:\" und gib
-  ein: "ren TESTDIR URGENT", dann gehe zu "C:\URGENT" (du weißt sicher
-noch den Befehl) und gib ein:
+kannst du jetzt prüfen, ob du dich noch daran erinnern kannst, wie du sie
+erstellt hast. Ähm? Weißt du es noch? Wenn ja, gehe zu:
+  "C:\" (Wie hieß der Befehl? - richtig: "cd \" oder "cd C:\" und gib ein:
+  "ren TESTDIR URGENT", dann gehe zu "C:\URGENT" (du weißt sicher noch den
+Befehl) und gib ein:
   "ren SUBDIR1 CONTRACT". Jetzt solltest du die Verzeichnisse
   "C:\URGENT\CONTRACT" anstelle von "C:\TESTDIR\SUBDIR" haben.
+
 So, jetzt wollen wir eine Datei erstellen. Das kannst du mit dem externen
 SvarDOS Befehl: "sved" oder einem anderen Editor machen.
-SVED arbeitet sehr einfach aber ein bischen anders als moderne Editoren
-wie z.B. das Windows Notepad. Tippe einfach "sved" ein und die Benutzer-
-oberfläche öffnet sich, tippe auf die "ESC"-Taste und du erhältst die
-Auswahl: "Datei öffnen", "Speichern", "Speichern als..." "Datei
-schließen", "EOL ändern" (= end of line im DOS- oder Linuxstil) und
-"Beenden". Du kannst auch "sved" ausführen, einen Text eingeben und mit
-"ESC" speichern. Das sollte auch für einen Newbie einfach zu verstehen
-sein. Aber das kann ja jeder. Sind wir jeder? NEIN! Wir testen "ECHO"!
-Ich bin mir ziemlich sicher, daß du schon mal davon gehört hast, was
-passiert, wenn du folgendes eingibst:
-  "echo Hello World!" Falls nicht, tippe es einfach ein und schaue es an.
+SVED arbeitet sehr einfach aber ein bischen anders als moderne Editoren wie
+z.B. das Windows Notepad. Tippe einfach "sved" ein und die Benutzerober-
+fläche öffnet sich, tippe auf die "ESC"-Taste und du erhältst die Auswahl:
+  "Datei öffnen", "Speichern", "Speichern als..." "Datei schließen", "EOL
+  ändern" (= end of line im DOS- oder Linuxstil) und "Beenden". Du kannst
+auch "sved" ausführen, einen Text eingeben und mit "ESC" speichern. Das soll-
+te auch für einen Newbie einfach zu verstehen sein. Aber das kann ja jeder.
+
+Sind wir jeder? NEIN! Wir testen "ECHO"! Ich bin mir ziemlich sicher, daß du
+schon mal davon gehört hast, was passiert, wenn du folgendes eingibst:
+  "echo Hello World!" Falls nicht, tippe es einfach ein und schaue es dir an.
 Jetzt schicken wir das Ergebnis nicht an den Monitor sondern in eine
 Datei.
   "echo Hello World!" > C:\URGENT\CONTRACT\world.txt"
 Du kannst einen zweiten oder mehr Sätze hinzufügen, indem du eintippst:
   "echo I am fine! How are you? >> C:\URGENT\CONTRACT\world.txt"
+  ">" fügt den Text in der ersten Zeile hinzu.
   ">>" fügt den Text in einer neuen Zeile hinzu.
-Super, du hast deine erste einfache Textdatei erstellt, rate mal, wo du
-sie findest? Und wie man sie mit dem "sved" Befehl öffnet? Natürlich ganz
-einfach. Unter Windows kannst du sie öffnen, indem du die Datei im
-richtigen Verzeichnis findest und auf den Dateinamen doppelklickst. Das
-korrespondierende Programm öffnet sich automatisch. Unter SvarDOS machst
-du im Prinzip nichts anderes, aber umgekehrt:
+
+Super, du hast deine erste einfache Textdatei erstellt, rate mal, wo du sie
+findest? Und wie man sie mit dem "sved" Befehl öffnet? Natürlich ganz ein-
+fach. Unter Windows kannst du sie öffnen, indem du die Datei im richtigen
+Verzeichnis findest und auf den Dateinamen doppelklickst. Das korrespondie-
+rende Programm öffnet sich automatisch. Unter SvarDOS machst du im Prinzip
+nichts anderes, aber umgekehrt:
   "sved C:\URGENT\CONTRACT\world.txt"
+
 Will heißen: Du sagst: Verwende das Programm "sved" und öffne die Datei
-"world.txt" die sich in diesem oder jenem Ordner befindet. Wenn das nicht
+  "world.txt" die sich in diesem oder jenem Ordner befindet. Wenn das nicht
 funktioniert, tippe:
   "C:\SVARDOS\sved C:\URGENT\CONTRACT\world.txt", ODER, falls du dich in
   "C:\URGENT\CONTRACT" befindest: "C:\SVARDOS\sved world.txt" ODER
   "sved world.txt".
+
 Das war der fünfte Schritt.
 
+
 Mit dem Befehl:
-  "copy" kannst du genau das tun, was der Name sagt: kopieren. Grund-
-legende Regel: Du kopierst eine Datei von der Quelle zum Ziel, vergiß
-dabei nicht, wo die world.txt sich aktuell befindet.
-  "copy C:\URGENT\CONTRACT\world.txt C:\URGENT" - und schon hast du das
-Dokument zweimal. Anstelle von "world.txt" kannst du auch sogenannte
-Wildcards verwenden, z.B.:
+  "copy" kannst du genau das tun, was der Name sagt: kopieren. Grundlegende
+Regel: Du kopierst eine Datei von der Quelle zum Ziel, vergiß dabei nicht,
+wo die world.txt sich aktuell befindet.
+  "copy C:\URGENT\CONTRACT\world.txt C:\URGENT" - und schon hast du das Doku-
+ment zweimal. Anstelle von "world.txt" kannst du auch sogenannte Wildcards
+verwenden, z.B.:
   "*.txt" oder "world*.*" oder "*.*".
+
 Anstatt Dateien zu kopieren kannst du sie auch von einer Position an eine
 andere mit dem EXTERNEN (nicht in der command.com enthalten) Befehl:
-  "move" verschieben. Es gilt die gleiche Grundregel: Verschiebe die
-Datei von der Quelle zum Ziel, z.B.:
+  "move" VERSCHIEBEN. Es gilt die gleiche Grundregel: Verschiebe die Datei
+von der Quelle zum Ziel, z.B.:
   "move C:\URGENT\CONTRACT\world.txt C:\URGENT\test2.txt
+Bitte vergessen nicht, daß der Befehl "move" bedeutet, daß du KEINE KOPIE er-
+stellst!
 
-Fantastisch! Willst du noch mehr über dieses große OS erfahren? Dann
-versäume nicht das zweiter Kapitel von Newbie! Ruh dich jetzt erst mal
-aus! Das war der sechste Schritt.
+Fantastisch! Willst du noch mehr über dieses große OS erfahren? Dann versäume
+nicht das zweiter Kapitel von Newbie! Ruh dich jetzt erst mal aus!
+
+Das war der sechste Schritt.
+
 
 KAPITEL ZWEI:
 
-Du hast Kapitel eins der Newbies Hilfe überlebt? Und du bist immer noch
-an SvarDOS interessiert? Super!
+Du hast Kapitel eins der Newbies Hilfe überlebt? Und du bist immer noch an
+SvarDOS interessiert? Super!
 
-Vielleicht hast du versucht, einige Befehle aus dem Kapitel eins auszu-
-führen und sie haben nicht funktioniert? Es erschien eine Meldung: Befehl
-oder Dateiname nicht gefunden? Du verstehst nicht, warum das passiert
-ist? Was hast du falsch gemacht? Nichts! Alles ist in Ordnung!
-Der Grund dafür ist sehr einfach: Ohne bestimmte Befehle, die ich später
-erklären werde, kann SvarDOS nur Befehle ausführen, die sich in deinem
-aktuellen Verzeichnis befinden. Zum Beispiel befindet sich sved im Ver-
-zeichnis:
+Vielleicht hast du versucht, einige Befehle aus dem Kapitel eins auszuführen
+und sie haben nicht funktioniert? Es erschien eine Meldung: Befehl oder
+Dateiname nicht gefunden? Du verstehst nicht, warum das passiert ist? Was
+hast du falsch gemacht? Nichts! Alles ist in Ordnung!
+
+Der Grund dafür ist sehr einfach: Ohne bestimmte Befehle, die ich später er-
+klären werde, kann SvarDOS nur Befehle ausführen, die sich in deinem aktu-
+ellen Verzeichnis befinden. Zum Beispiel befindet sich sved im Verzeichnis:
   "C:\SVARDOS\" während du dich gerade im Verzeichnis "C:\" befindest.
-SvarDOS schaut unter "C:\" nach und findet dort kein "sved.com". Es sagt
-dann einfach: Ich kenne diesen Befehl nicht und weiß auch nicht, wo ich
-ihn finden könnte.
-Um dies und eine Menge anderer Sachen zu ermöglichen, verwendet SvarDOS
-zwei Dateien, die sich auf "C:\" befinden. Sie heißen:
+SvarDOS schaut unter "C:\" nach und findet dort kein "sved.com". Es sagt dann
+einfach: Ich kenne diesen Befehl nicht und weiß auch nicht, wo ich ihn finden
+könnte.
+
+Um dies und eine Menge anderer Sachen zu ermöglichen, verwendet SvarDOS zwei
+Dateien, die sich auf "C:\" befinden. Sie heißen:
   "config.sys" und "autoexec.bat".
-Der Inhalt dieser Dateien ist in einem les- und schreibbaren Textformat,
-so daß es sehr einfach ist, sie an deine Bedürfnisse anzupassen, indem du
-(rate mal) den
+Der Inhalt dieser Dateien ist in einem les- und schreibbaren Textformat, so
+daß es sehr einfach ist, sie an deine Bedürfnisse anzupassen, indem du (rate
+mal) den
   "sved" Befehl verwendest, z.B.:
   "sved C:\config.sys" oder "sved C:\autoexec.bat".
-  "config.sys" ist die erste Datei, die vom Kernel gestartet wird. Indem
-du sie verwendest, kannst du Treiber laden, die benötigt werden, um die
-Fähigkeiten von SvarDOS zu erweitern. Zum Beispiel kannst du "himemx" und
-"emm386" (nicht bei SvarDOS!) installieren, die es ermöglichen, mehr als
-640 KB RAM zu verwenden. Du kannst dort den grundlegenden CD-ROM-Treiber
-laden, die Bildschirmgröße begrenzt ändern, Ländereinstellungen vor-
-nehmen, aber auch ein Menü erstellen, mit dem du auswählen kannst, ob du
-mit diesem oder jenem Treiber (in Abhängigkeit von den aktuellen
-Bedürfnissen) starten willst. Eine wichtige Einstellung, die du in der
-config.sys vornehmen solltest, ist, "command.com" und seine "ENVIRONMENT"
-(Umgebung) permanent zu laden, da dies viele Vorteile hat. Aber das führt
-hier zu weit. Das war der siebte und ein sehr wichtiger Schritt.
+  "config.sys" ist die erste Datei, die vom Kernel gestartet wird. Indem du
+sie verwendest, kannst du Treiber laden, die benötigt werden, um die Fähig-
+keiten von SvarDOS zu erweitern. Zum Beispiel kannst du "himemx" und "emm386"
+(nicht bei SvarDOS!) installieren, die es ermöglichen, mehr als 640 KB RAM zu
+verwenden. Du kannst dort den grundlegenden CD-ROM-Treiber laden, die Bild-
+schirmgröße begrenzt ändern, Ländereinstellungen vornehmen, aber auch ein
+Menü erstellen, mit dem du auswählen kannst, ob du mit diesem oder jenem
+Treiber (in Abhängigkeit von den aktuellen Bedürfnissen) starten willst. Eine
+wichtige Einstellung, die du in der config.sys vornehmen solltest, ist,
+"command.com" und seine "ENVIRONMENT" (Umgebung) permanent zu laden, da dies
+viele Vorteile hat. Mehr darüber in Schritt 8.
+
+Das war der siebte und ein sehr wichtiger Schritt.
+
 
 Nachdem "config.sys" geladen ist, wird die nächste wichtige Datei,
   "command.com" (in Abhängigkeit von den Einstellungen, die du in der
   "config.sys" getätigt hast, geladen, z.B:
   "SHELL=C:\command.com /E:512 /P=C:\autoexec.bat".
-Du kannst statt command.com auch andere Shells verwenden, aber diese
-Datei wird mit SvarCOM geliefert.
+Du kannst statt command.com auch andere Shells verwenden, aber diese Datei
+wird mit SvarCOM geliefert.
   "/P" sagt, welche autoexec.bat SvarDOS beim Start verwenden soll. Mit
-  "/E" kannst du die Größe der ENVIRONMENT (Umgebung) definieren, was
-sehr hilfreich ist, wie bereits weiter oben erwähnt.
+  "/E" kannst du die Größe der ENVIRONMENT (Umgebung) definieren, was sehr
+hilfreich ist, wie bereits weiter oben erwähnt.
 
   "autoexec.bat" ist eine sogenannte Batchdatei. Sie wird Zeile für Zeile
 gelesen und interpretiert. Damit kannst du SvarDOS z.B. sagen, daß es die
 Ländereinstellungen und Codepages ändern soll, einen Tastaturtreiber und
-einen Maustreiber oder den zweiten Teil des CD-ROM-Treibers laden soll
-oder daß es ein spezielles Programm / Spiel  / was auch immer automatisch
-starten soll.
+einen Maustreiber oder den zweiten Teil des CD-ROM-Treibers laden soll oder
+daß es ein spezielles Programm / Spiel / was auch immer automatisch starten
+soll.
+
 Mit dem Befehl:
-  "set" der in command.com integriert ist, kannst du Variablen erstellen,
-die die bereits erwähnte ENVIRONMENT auffüllen mit z.B.:
-  "set TEMP=C:\TEMP" (Verzeichnis für temporäre Dateien)
+  "set" der in command.com integriert ist, kannst du Variablen erstellen, die
+die bereits erwähnte ENVIRONMENT auffüllen mit z.B.:
+  "set path=C:\SVARDOS;C:\SVARDOS\NLS" (SVARDOS sucht nach einem Befehl wie
+z.B. "sved" in dann C:\SVARDOS und dann C:\SVARDOS\NLS). Es startet den
+ersten korrekten Treffer, alle anderen werden ignoriert. Das kann bei Dateien
+mit gleichen Namen in diesen Verzeichnissen zu Fehlern führen!). Da "path"
+auch ein externer Befehl ist, kann auch
+  "path C:\SVARDOS;C:\SVARDOS\NLS" (ohne set und =) funktionieren!
+
+  "set TEMP=C:\TEMP" (Verz. für temporäre Dateien, %TEMP% steht für C:\TEMP)
   "set DOSDIR=C:\SVARDOS" (%DOSDIR% bedeutet jetzt: C:\SVARDOS)
-  "set NLSPATH =C:\%DOSDIR%\NLS (verwendet DOSDIR -> C:\SVARDOS\NLS)
+  "set NLSPATH =%DOSDIR%\NLS (%NLSPATH% bedeutet jetzt C:\SVARDOS\NLS)
   "set TZ=UTC" (für Zeitzoneneinstellungen) oder
   "set LANG=DE" (für Spracheinstellungen) oder
   "set OS_VERSION=1.3" usw.
 Um sie automatisch zu laden, kannst du obige Befehle in die autoexec.bat
 schreiben.
-SvarDOS schreibt diese Einstellungen als Variablen in die ENVIRONMENT
-und hält sie dort solange es läuft. Du kannst später auch andere Variab-
-len hinzufügen, aber verwende bitte keine Namen, die schon bestehen.
-Der Befehl:
+SvarDOS schreibt diese Einstellungen als Variablen in die ENVIRONMENT und
+hält sie dort solange es läuft. Du kannst später auch andere Variablen hinzu-
+fügen, aber verwende bitte keine Namen, die schon bestehen. Der Befehl:
   "set" ohne Optionen listet alle gesetzten Variablen auf,
-  "set variable=" löscht eine Variable.
-Beispiel:
+  "set variable=" löscht eine Variable, das ist gefährlich, siehe oben!
+Beispiel (funktioniert in FreeDOS als bat-Datei und in der Kommandozeile,
+ aber in SvarDOS NUR in der BATCH):
   "echo Die aktuelle SvarDOS-Version ist: %OS_VERSION ."
 zeigt:
   "Die aktuelle SvarDOS-Version ist: 1.3 ."
 Es gäbe noch viele Dinge, die mit der autoexec.bat gemacht werden können,
-aber das führt für eine Schnellanleitung zu weit. Aber du weißt jetzt,
-wie du dein SvarDOS OS verändern kannst, um damit zu arbeiten.
-Ich könnte noch viel mehr erzählen, aber das ist nur ein erster Schritt
-zu SvarDOS.
+aber das führt für eine Schnellanleitung zu weit. Aber du weißt jetzt, wie du
+dein SvarDOS OS verändern kannst, um damit zu arbeiten.
+Ich könnte noch viel mehr erzählen, aber das ist nur ein erster Schritt zu
+SvarDOS.
+
 Der letzte Schritt acht ist erledigt.
+
 
 Vielen Dank fürs Lesen!
 
