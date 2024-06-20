@@ -304,9 +304,9 @@ mit gleichen Namen in diesen Verzeichnissen zu Fehlern führen!). Da "path"
 auch ein externer Befehl ist, kann auch
   "path C:\SVARDOS;C:\SVARDOS\NLS" (ohne set und =) funktionieren!
 
-  "set TEMP=C:\TEMP" (Verz. für temporäre Dateien, %TEMP% steht für C:\TEMP)
-  "set DOSDIR=C:\SVARDOS" (%DOSDIR% bedeutet jetzt: C:\SVARDOS)
-  "set NLSPATH =%DOSDIR%\NLS (%NLSPATH% bedeutet jetzt C:\SVARDOS\NLS)
+  "set TEMP=C:\TEMP" (Verz. für temporäre Dateien, %%TEMP%% steht für C:\TEMP)
+  "set DOSDIR=C:\SVARDOS" (%%DOSDIR%% bedeutet jetzt: C:\SVARDOS)
+  "set NLSPATH =%%DOSDIR%%\NLS (%%NLSPATH%% bedeutet jetzt C:\SVARDOS\NLS)
   "set TZ=UTC" (für Zeitzoneneinstellungen) oder
   "set LANG=DE" (für Spracheinstellungen) oder
   "set OS_VERSION=1.3" usw.
@@ -319,7 +319,7 @@ fügen, aber verwende bitte keine Namen, die schon bestehen. Der Befehl:
   "set variable=" löscht eine Variable, das ist gefährlich, siehe oben!
 Beispiel (funktioniert in FreeDOS als bat-Datei und in der Kommandozeile,
  aber in SvarDOS NUR in der BATCH):
-  "echo Die aktuelle SvarDOS-Version ist: %OS_VERSION ."
+  "echo Die aktuelle SvarDOS-Version ist: %%OS_VERSION%%."
 zeigt:
   "Die aktuelle SvarDOS-Version ist: 1.3 ."
 Es gäbe noch viele Dinge, die mit der autoexec.bat gemacht werden können,
