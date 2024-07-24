@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # this script looks for the presence of /tmp/svardos_repo_changed.flag file
 # and rebuilds the packages index if it exists (then deletes the flag).
@@ -7,7 +7,8 @@
 #
 # the /tmp/svardos_repo_changed.flag file is expected to be created by an
 # svn post-commit hook whenever something in the svn repo changes.
-
+#
+# bash is required because I use the internal bash "read" command.
 
 REPOFLAGFILE="/tmp/svardos_repo_changed.flag"
 REBUILDFLAGFILE="/tmp/svardos_rebuild_please.flag"
@@ -34,8 +35,19 @@ svn up "$SVNREPODIR"
 rm -rf "$SVNREPODIR/packages/latest"
 php "$SVNREPODIR/buildidx/buildidx.php" "$SVNREPODIR/packages/" > "$SVNREPODIR/packages/_buildidx.log"
 
-# build the ISO that contains all latest packages from the repo
-mkisofs -input-charset cp437 -iso-level 1 -f -V SVARDOS_REPO -o "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR"/packages/latest/*
+
+###############################################################################
+#                                                                             #
+# build the ISO that contains all latest packages from the repo               #
+# (and make it bootable using latest STABLE boot floppy)                      #
+#                                                                             #
+###############################################################################
+
+read -r STABLE < "$SVNREPODIR/website/default_build.txt"
+unzip -o "$SVNREPODIR/website/download/$STABLE/svardos-$STABLE-floppy-2.88M.zip" disk1.img -d /tmp/
+mv /tmp/disk1.img "$SVNREPODIR/packages/latest/boot.img"
+mkisofs -input-charset cp437 -b boot.img -hide boot.img -hide boot.catalog -iso-level 1 -f -V SVARDOS_REPO -o "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR"/packages/latest/*
+rm -f "$SVNREPODIR/packages/latest/boot.img"
 mv "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR/website/repo/sv-repo.iso"
 md5sum "$SVNREPODIR/website/repo/sv-repo.iso" > "$SVNREPODIR/website/repo/sv-repo.iso.md5"
 
