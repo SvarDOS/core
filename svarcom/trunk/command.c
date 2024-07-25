@@ -255,9 +255,11 @@ modify [ax dl]
 /* builds the prompt string and displays it. buff is filled with a zero-terminated copy of the prompt. */
 static void build_and_display_prompt(char *buff, unsigned short envseg) {
   char *s = buff;
+
   /* locate the prompt variable or use the default pattern */
   const char far *fmt = env_lookup_val(envseg, "PROMPT");
   if ((fmt == NULL) || (*fmt == 0)) fmt = "$p$g"; /* fallback to default if empty */
+
   /* build the prompt string based on pattern */
   for (; *fmt != 0; fmt++) {
     if (*fmt != '$') {
@@ -279,12 +281,31 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         break;
       case 'T':  /* $t = current time */
       case 't':
-        s += sprintf(s, "00:00"); /* TODO */
+      {
+        struct nls_patterns nls;
+        unsigned char h, m, sec;
+        if (nls_getpatterns(&nls) != 0) {
+          s += sprintf(s, "ERR");
+        } else {
+          dos_get_time(&h, &m, &sec);
+          s += nls_format_time(s, h, m, sec, &nls);
+        }
         break;
+      }
       case 'D':  /* $D = current date */
       case 'd':
-        s += sprintf(s, "1985-07-29"); /* TODO */
+      {
+        struct nls_patterns nls;
+        unsigned short y;
+        unsigned char m, d;
+        if (nls_getpatterns(&nls) != 0) {
+          s += sprintf(s, "ERR");
+        } else {
+          dos_get_date(&y, &m, &d);
+          s += nls_format_date(s, y, m, d, &nls);
+        }
         break;
+      }
       case 'P':  /* $P = current drive and path */
       case 'p':
         *s = _dosgetcurdrive() + 'A';

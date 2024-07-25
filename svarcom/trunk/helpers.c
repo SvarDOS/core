@@ -38,6 +38,35 @@
 
 
 
+void dos_get_date(unsigned short *y, unsigned char *m, unsigned char *d) {
+  /* get cur date */
+  _asm {
+    mov ah, 0x2a  /* DOS 1+ -- Query DOS Date */
+    int 0x21      /* CX=year DH=month DL=day */
+    mov bx, y
+    mov [bx], cx
+    mov bx, m
+    mov [bx], dh
+    mov bx, d
+    mov [bx], dl
+  }
+}
+
+
+void dos_get_time(unsigned char *h, unsigned char *m, unsigned char *s) {
+  _asm {
+    mov ah, 0x2c  /* DOS 1+ -- Query DOS Time */
+    int 0x21      /* CH=hour CL=minutes DH=seconds DL=1/100sec */
+    mov bx, h
+    mov [bx], ch
+    mov bx, m
+    mov [bx], cl
+    mov bx, s
+    mov [bx], dh
+  }
+}
+
+
 /* case-insensitive comparison of strings, compares up to maxlen characters.
  * returns non-zero on equality. */
 int imatchlim(const char *s1, const char *s2, unsigned short maxlen) {

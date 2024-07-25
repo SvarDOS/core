@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -155,21 +155,8 @@ static enum cmd_result cmd_date(struct cmd_funcparam *p) {
   /* display current date if no args */
   if (p->argc == 0) {
     /* get cur date */
-    _asm {
-      push ax
-      push cx
-      push dx
+    dos_get_date(&year, &mo, &dy);
 
-      mov ah, 0x2a  /* DOS 1+ -- Query DOS Date */
-      int 0x21      /* CX=year DH=month DL=day */
-      mov [year], cx
-      mov [mo], dh
-      mov [dy], dl
-
-      pop dx
-      pop cx
-      pop ax
-    }
     buff[0] = ' ';
     nls_format_date(buff + 1, year, mo, dy, nls);
     nls_output(32,4); /* "Current date is" */

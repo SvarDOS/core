@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -48,7 +48,7 @@ static int cmd_time_get_item(char *buff, const char *s) {
 /* parse a NULL-terminated string int hour, minutes and seconds, returns 0 on success
  * valid inputs: 0, 7, 5:5, 23:23, 17:54:45, 9p, 9:05, ...
  */
-static int cmd_time_parse(const char *s, signed char *ho, signed char *mi, signed char *se, struct nls_patterns *nls) {
+static int cmd_time_parse(const char *s, unsigned char *ho, unsigned char *mi, unsigned char *se, struct nls_patterns *nls) {
   unsigned short i;
   const char *ptrs[2] = {NULL, NULL}; /* minutes, seconds */
   char buff[3];
@@ -129,7 +129,7 @@ static int cmd_time_parse(const char *s, signed char *ho, signed char *mi, signe
   return(0);
 
   FAIL:
-  *ho = -1;
+  *ho = 255;
   return(-1);
 }
 
@@ -138,7 +138,7 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
   struct nls_patterns *nls = (void *)(p->BUFFER);
   char *buff = p->BUFFER + sizeof(*nls);
   unsigned short i;
-  signed char ho = -1, mi = -1, se = -1;
+  unsigned char ho = 255, mi, se;
 
   if (cmd_ishlp(p)) {
     nls_outputnl(22,0); /* "Displays or sets the system time." */
@@ -158,37 +158,22 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
   /* display current time if no args */
   if (p->argc == 0) {
     /* get cur time */
-    _asm {
-      push ax
-      push bx
-      push cx
-      push dx
+    dos_get_time(&ho, &mi, &se);
 
-      mov ah, 0x2c  /* DOS 1+ -- Query DOS Time */
-      int 0x21      /* CH=hour CL=minutes DH=seconds DL=1/100sec */
-      mov [ho], ch
-      mov [mi], cl
-      mov [se], dh
-
-      pop dx
-      pop cx
-      pop bx
-      pop ax
-    }
     buff[0] = ' ';
     nls_format_time(buff + 1, ho, mi, se, nls);
     nls_output(22,3); /* "Current time is" */
     outputnl(buff);
-    ho = -1;
+    ho = 255;
   } else { /* parse time if provided */
     if (cmd_time_parse(p->argv[0], &ho, &mi, &se, nls) != 0) {
       nls_outputnl(22,4); /* "Invalid time" */
-      ho = -1;
+      ho = 255;
     }
   }
 
   /* ask for time if not provided or if input was malformed */
-  while (ho < 0) {
+  while (ho == 255) {
     nls_output(22,5); /* "Enter new time:" */
     output(" ");
     /* collect user input into buff */
@@ -227,7 +212,7 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
     return(CMD_FAIL);
   }
 
-  if (ho >= 0) {
+  if (ho != 255) {
     /* set time */
     _asm {
       push ax

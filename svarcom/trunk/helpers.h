@@ -25,6 +25,12 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
+/* sets y, m, d to current (DOS) date */
+void dos_get_date(unsigned short *y, unsigned char *m, unsigned char *d);
+
+/* sets h, m, s to current (DOS) time */
+void dos_get_time(unsigned char *h, unsigned char *m, unsigned char *s);
+
 /* case-insensitive comparison of strings, compares up to maxlen characters.
  * returns non-zero on equality. */
 int imatchlim(const char *s1, const char *s2, unsigned short maxlen);
