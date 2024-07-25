@@ -971,8 +971,11 @@ int main(void) {
     /* printf("rmod found at %Fp\r\n", rmod); */
     /* if I was spawned by rmod and FLAG_EXEC_AND_QUIT is set, then I should
      * die asap, because the command has been executed already, so I no longer
-     * have a purpose in life */
-    if (rmod->flags & FLAG_EXEC_AND_QUIT) sayonara(rmod);
+     * have a purpose in life, UNLESS I still have a batch file to run or
+     * a FOR loop to execute */
+    if ((rmod->flags & FLAG_EXEC_AND_QUIT) && (rmod->bat == NULL) && (rmod->forloop == NULL)) {
+      sayonara(rmod);
+    }
     /* */
     if (rmod->version != BYTE_VERSION) {
       nls_outputnl_err(2,0);
@@ -1020,6 +1023,7 @@ int main(void) {
       if (forloop_process(cmdlinebuf, rmod->forloop) != 0) {
         rmod_ffree(rmod->forloop);
         rmod->forloop = NULL;
+        continue; /* needed so we quit if the FOR loop was ran through COMMAND/C */
       } else {
         /* output prompt and command on screen if echo on and command is not
          * inhibiting it with the @ prefix */
