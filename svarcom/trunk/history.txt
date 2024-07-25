@@ -4,7 +4,7 @@
 
 
 
-=== ver 2024.3 (xx.xx.xxxx) ==================================================
+=== ver 2024.3 (25.07.2024) ==================================================
 
  - PROMPT: supports $v, $d and $t tags
  - fixed COMMAND/C processing of batch files and FOR loops (bugz #74)
