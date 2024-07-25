@@ -36,6 +36,7 @@
 #include "redir.h"
 #include "rmodinit.h"
 #include "sayonara.h"
+#include "version.h"
 
 #include "rmodcore.h" /* rmod binary inside a BUFFER array */
 
@@ -296,9 +297,9 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         /* move s ptr forward to end (0-termintor) of pathname */
         while (*s != 0) s++;
         break;
-      case 'V':  /* $V = DOS version number */
+      case 'V':  /* $V = version number */
       case 'v':
-        s += sprintf(s, "VER"); /* TODO */
+        s += sprintf(s, PVER);
         break;
       case 'N':  /* $N = current drive */
       case 'n':

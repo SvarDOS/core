@@ -47,6 +47,7 @@
 #include "redir.h"
 #include "rmodinit.h"
 #include "sayonara.h"
+#include "version.h"
 
 #include "cmd.h"
 
