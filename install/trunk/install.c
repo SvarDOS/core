@@ -918,6 +918,7 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   genlocalesconf(fd, locales);
   /* replace autoexec.bat and config.sys now and write some nice message on screen */
   fprintf(fd, "DEL pkg.exe\r\n"
+              "DEL C:\\CONFIG.SYS\r\n"
               "COPY CONFIG.SYS C:\\\r\n"
               "DEL CONFIG.SYS\r\n"
               "DEL C:\\AUTOEXEC.BAT\r\n"
@@ -931,6 +932,14 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   fprintf(fd, svarlang_strid(0x0502), BUILDSTRING); /* "SvarDOS installation is over. Please restart your computer now" */
   fprintf(fd, "\r\n"
               "ECHO.\r\n");
+  fclose(fd);
+
+  /* dummy config.sys with a SHELL directive, EDR does not call command.com
+   * with /P otherwise, see https://github.com/SvarDOS/edrdos/issues/74 */
+  snprintf(buff, sizeof(buff), "%c:\\config.sys", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return(-1);
+  fprintf(fd, "SHELL=C:\\COMMAND.COM /P\r\n");
   fclose(fd);
 
   /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
