@@ -869,6 +869,9 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   fprintf(fd, "SET COMSPEC=C:\\CMD.COM\r\n"); /* POSTINST.BAT is executed after system is rebooted, so the system drive is always C: */
   fprintf(fd, "DEL \\COMMAND.COM\r\n");
 
+  /* delete the temporary KERNEL.SYS - it will be properly installed from the package in a short moment */
+  fprintf(fd, "DEL \\KERNEL.SYS\r\n");
+
   /* copy packages */
   for (i = 0;; i++) {
     RETRY_ENTIRE_LIST:
