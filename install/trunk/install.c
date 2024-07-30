@@ -764,7 +764,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "PROMPT $P$G\r\n");
   fprintf(fd, "\r\n"
               "REM enable CPU power saving\r\n"
-              "FDAPM APMDOS\r\n");
+              "FDAPM ADV:REG\r\n");
   fprintf(fd, "\r\n");
   genlocalesconf(fd, locales);
   fprintf(fd, "\r\n");
