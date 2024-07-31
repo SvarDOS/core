@@ -7,6 +7,9 @@
 ; this is an executable image that can be set up as the critical error handler
 ; interrupt (int 24h). It displays the usual "Abort, retry, fail" prompt.
 ;
+; documentation:
+; http://www.techhelpmanual.com/564-int_24h__critical_error_handler.html
+;
 
 org 0   ; this code does not have a PSP, it is loaded as-is into a memory
         ; segment
@@ -49,6 +52,18 @@ org 0   ; this code does not have a PSP, it is loaded as-is into a memory
 ; A very basic "always fail" handler would be as simple as this:
 ;   mov al, 3
 ;   iret
+;
+;
+; *** DOS CALLS ***
+;
+; Warning! Be careful about using DOS fns in your Critical Error handler.
+;          With DOS 5.0+, ONLY the following fns can be called safely:
+;
+;          01H-0CH (DOS character I/O)
+;          33H (all subfns are OK, including 3306H get DOS version)
+;          50H (set PSP address)
+;          51H and 62H (query PSP address)
+;          59H (get extended error information)
 ; =============================================================================
 
 
