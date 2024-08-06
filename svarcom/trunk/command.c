@@ -967,6 +967,18 @@ int main(void) {
     rmod->flags = cfg.flags | FLAG_ECHOFLAG;
     /* printf("rmod installed at %Fp\r\n", rmod); */
     rmod->version = BYTE_VERSION;
+
+    /* if my environment seg was zeroed, then I am the init process (under DR-DOS and MS-DOS 5 at least) */
+    if (rmod->origenvseg == 0) {
+      rmod->flags |= FLAG_PERMANENT; /* imply /P so AUTOEXEC.BAT is executed */
+
+      /* If I am init then query kernel's private data via INT 21,4458 (DR-DOS).
+       * On success (CF not set) ES:BX contains a pointer to the private data.
+       * Segment of kernel's environment is at offset 12h. This environment may
+       * be terminated by a 1Ah code followed by an boot key scan code to
+       * record F5 or F8 key pressed at boot time. */
+      /* TODO */
+    }
   } else {
     /* printf("rmod found at %Fp\r\n", rmod); */
     /* if I was spawned by rmod and FLAG_EXEC_AND_QUIT is set, then I should
