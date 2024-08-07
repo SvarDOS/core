@@ -103,7 +103,7 @@
 
 # VER
 20.0:Mostra as versões do kernel do DOS e do shell SvarCOM.
-20.1:Versão do kernel DOS %u.%u
+20.1:Versão do kernel DOS %u.%02u
 20.2:Shell SvarCOM ver
 20.3:O SvarCOM é um interpretador shell para kernels do DOS compatível com\r\nMS-DOS 5+.
 20.4:Este software é distribuído nos termos da licença MIT.
@@ -112,7 +112,7 @@
 20.7:memória convencional
 20.8:HMA
 20.9:ROM
-20.10:versão verdadeira %u.%u
+20.10:versão verdadeira %u.%02u
 
 # TYPE
 21.0:Mostra o conteúdo de um arquivo de texto.

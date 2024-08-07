@@ -103,7 +103,7 @@
 
 # VER
 20.0:Affiche la version de DOS.
-20.1:Version du noyau DOS %u.%u
+20.1:Version du noyau DOS %u.%02u
 20.2:Version du shell SvarCOM
 20.3:SvarCOM est un interpréteur pour les noyaux DOS compatibles avec MS-DOS 5+.
 20.4:Ce logiciel est distribué sous les termes de la licence MIT.
@@ -112,7 +112,8 @@
 20.7:mémoire basse
 20.8:HMA (zone mémoire haute)
 20.9:ROM
-20.10:vraie version %u.%u
+20.10:vraie version %u.%02u
+20.11:Version du noyau DR-DOS %02X%02X
 
 # TYPE
 21.0:Affiche le contenu d'un fichier texte.

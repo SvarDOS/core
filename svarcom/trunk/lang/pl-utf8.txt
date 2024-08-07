@@ -103,7 +103,7 @@
 
 # VER
 20.0:Wyświetla wersję DOS.
-20.1:Wersja jądra DOS %u.%u
+20.1:Wersja jądra DOS %u.%02u
 20.2:Wersja powłoki SvarCOM
 20.3:SvarCOM jest interpreterem poleceń dla systemów DOS kompatybilnych z MS-DOS 5+.
 20.4:To oprogramowanie jest udostępniane na zasadach licencji MIT.
@@ -112,7 +112,8 @@
 20.7:pamięci konwencjonalnej
 20.8:HMA
 20.9:ROM
-20.10:prawdziwa wersja %u.%u
+20.10:prawdziwa wersja %u.%02u
+20.11:Wersja jądra DR-DOS %02X%02X
 
 # TYPE
 21.0:Wyświetla zawartość pliku tekstowego.

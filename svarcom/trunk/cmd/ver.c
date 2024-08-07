@@ -158,7 +158,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   }
 
   if (drdosver != 0) {
-    sprintf(buff, "DR-DOS kernel version %02X%02X", drdosver & 0xff, drdosver >> 8);
+    sprintf(buff, svarlang_str(20,11), drdosver & 0xff, drdosver >> 8);
     outputnl(buff);
   }
 
