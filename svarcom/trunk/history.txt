@@ -4,9 +4,10 @@
 
 
 
-=== ver xxxx.x (xx.xx.xxxx) ==================================================
+=== ver 2024.4 (xx.xx.2024) ==================================================
 
  - /P is implied when SvarCOM is the init shell (works in DR-DOS and MS-DOS 5)
+ - DR-DOS compatibility: F5/F8 boot key presses are detected and handled
 
 
 === ver 2024.3 (25.07.2024) ==================================================

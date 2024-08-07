@@ -121,6 +121,76 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
 }
 
 
+/* DR-DOS specific boot processing: check for F5/F8 boot key presses and reset
+ * the wild pointer to DR-DOS kernel (CONFIG.SYS) environment because it is not
+ * allocated memory hence will be overwritten soon.
+ * details: https://github.com/SvarDOS/edrdos/issues/83
+ * this function returns 0, FLAG_SKIP_AUTOEXEC or FLAG_STEPBYSTEP */
+static unsigned char drdos_init(void) {
+  unsigned short kernenvseg = 0;
+  unsigned char far *e;
+  unsigned short far *scancode;
+
+  /* If I am init then query kernel's private data via INT 21,4458 (DR-DOS).
+   * On success (CF not set) ES:BX contains a pointer to the private data.
+   * Segment of kernel's environment is at offset 12h. This environment may
+   * be terminated by a 1Ah code followed by a boot key scan code to record
+   * an F5 or F8 key press during boot time. */
+  _asm {
+    push ax
+    push bx
+    push es
+
+    mov ax, 0x4458       /* DR-DOS 5+ get ptr to internal variable table */
+    int 0x21             /* ES:BX contains the ptr to the var table */
+    jc FAIL              /* not DR-DOS */
+
+    add bx, 0x12
+    mov ax, es:[bx]      /* read the segment of the kernel environment */
+    mov kernenvseg, ax   /* save the kern env segment for later */
+    xor ax, ax
+    mov es:[bx], ax      /* reset the pointer to kernel env as done by DR COMMAND.COM */
+
+    FAIL:
+    pop es
+    pop bx
+    pop ax
+  }
+
+  if (kernenvseg == 0) return(0); /* either not DR-DOS, or kern env was read already or something failed */
+
+  e = MK_FP(kernenvseg, 0);
+
+  /* move forward until the DRDOS' environment 1Ah terminator is found */
+  while (*e != 0x1A) e++;
+  e++;
+
+  /* next I have the boot key press scancode: either 0x0000, 0x3F00 or 0x4200
+   * 0x3F00 means "F5 was pressed" while 0x4200 is for F8 */
+  scancode = (void far *)e;
+  if (*scancode == 0x3F00) return(FLAG_SKIP_AUTOEXEC);
+  if (*scancode == 0x4200) return(FLAG_STEPBYSTEP);
+
+/*
+  printf("kernel env seg is at %04X and starts with bytes 0x%02X 0x%02X 0x%02X 0x%02X\r\n", kernenvseg, e[0], e[1], e[2], e[3]);
+  {
+    int i;
+    printf("=== KERNEL ENV BEGINS ===\r\n");
+    for (i = 0; i < 100; i++) {
+      printf("%c", e[i]);
+    }
+    printf("\r\n=== KERNEL ENV ENDS, DUMP FOLLOWS ===\r\n");
+    for (i = 0; i < 260; i++) {
+      if ((i > 0) && ((i % 26) == 0)) printf("\r\n");
+      printf("%02X ", e[i]);
+    }
+    printf("\r\n=== DUMP ENDS ===\r\n");
+  }
+*/
+  return(0);
+}
+
+
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
   unsigned char *cmdlinelen = (void *)0x80;
@@ -956,8 +1026,16 @@ int main(void) {
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
+
     /* look at command line parameters (in case env size if set there) */
     parse_argv(&cfg);
+
+    /* DR-DOS specific: if I am the init shell (zeroed env seg) then detect F5/F8 now
+     * This must be done BEFORE rmod_install() because DR-DOS's boot environment
+     * is located at an unallocated memory location that is likely to be overwritten
+     * by rmod_install(). */
+    cfg.flags |= drdos_init();
+
     rmod = rmod_install(cfg.envsiz, BUFFER, BUFFER_len);
     if (rmod == NULL) {
       nls_outputnl_err(2,1); /* "FATAL ERROR: rmod_install() failed" */
@@ -970,14 +1048,7 @@ int main(void) {
 
     /* if my environment seg was zeroed, then I am the init process (under DR-DOS and MS-DOS 5 at least) */
     if (rmod->origenvseg == 0) {
-      rmod->flags |= FLAG_PERMANENT; /* imply /P so AUTOEXEC.BAT is executed */
-
-      /* If I am init then query kernel's private data via INT 21,4458 (DR-DOS).
-       * On success (CF not set) ES:BX contains a pointer to the private data.
-       * Segment of kernel's environment is at offset 12h. This environment may
-       * be terminated by a 1Ah code followed by an boot key scan code to
-       * record F5 or F8 key pressed at boot time. */
-      /* TODO */
+      cfg.flags |= FLAG_PERMANENT; /* imply /P so AUTOEXEC.BAT is executed */
     }
   } else {
     /* printf("rmod found at %Fp\r\n", rmod); */
