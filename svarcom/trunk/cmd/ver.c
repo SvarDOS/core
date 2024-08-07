@@ -30,6 +30,8 @@
 static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
   unsigned char maj = 0, min = 0, retcode = 0, truemaj = 0, truemin = 0, rev = 0, verflags = 0;
+  unsigned short drdosver = 0;
+  unsigned short doscrelstrseg = 0, doscrelstroff = 0;
 
   /* help screen */
   if (cmd_ishlp(p)) {
@@ -121,10 +123,43 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     mov [rev], dl      /* DL=revision  DH=kernel_memory_area */
     mov [verflags], dh
 
+    /* get the DR-DOS specific version through INT 21h,4452h */
+    mov ax, 0x4452
+    int 0x21
+    jc NOTDRDOS
+    mov drdosver, ax
+    NOTDRDOS:
+
+    /* get a pointer to the DOS-C style "os_release" via INT 21h,33FFh */
+    mov ax, 0x33ff
+    xor dx, dx
+    int 0x21
+    jc NOTDOSC
+    mov doscrelstrseg, dx
+    mov doscrelstroff, ax
+    NOTDOSC:
+
     pop dx
     pop cx
     pop bx
     pop ax
+  }
+
+  /* look for a DOS-C os_release (FreeDOS, EDR-DOS, RX-DOS...)
+   * https://github.com/SvarDOS/edrdos/issues/77 */
+  if (doscrelstrseg != 0) {
+    char far *osrel = MK_FP(doscrelstrseg, doscrelstroff);
+    unsigned short i;
+    for (i = 0; osrel[i] != 0; i++) {
+      buff[i] = osrel[i];
+    }
+    buff[i] = 0;
+    outputnl(buff);
+  }
+
+  if (drdosver != 0) {
+    sprintf(buff, "DR-DOS kernel version %04X", drdosver);
+    outputnl(buff);
   }
 
   sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
