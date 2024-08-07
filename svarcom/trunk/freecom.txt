@@ -23,7 +23,7 @@ SvarCOM does not rely on XMS and performs runtime swapping that works on any
 IBM PC compatible machine. Its resident size is about 2K.
 
 
-=== NLS RESSOURCES ===========================================================
+=== NLS RESOURCES ============================================================
 
 FreeCOM requires custom NLS resources. While the vast majority of FreeDOS
 programs use a single "standard" (CATS), FreeCOM uses a different approach
