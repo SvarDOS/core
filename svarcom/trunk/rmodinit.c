@@ -285,7 +285,9 @@ void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg) {
   unsigned short far *comspecptr = MK_FP(rmod_seg, RMOD_OFFSET_COMSPECPTR);
   char far *comspecfp = env_lookup_val(env_seg, "COMSPEC");
   if (comspecfp != NULL) {
-    *comspecptr = FP_OFF(comspecfp);
+    /* here I need to translate the comspecfp far pointer into an offset
+     * relative to env_seg */
+    *comspecptr = FP_OFF(comspecfp) + ((FP_SEG(comspecfp) - env_seg) * 16);
   } else {
     *comspecptr = 0;
   }
