@@ -68,12 +68,14 @@ REDIR_DEL_STDIN: db 0               ; +270h  indicates that the stdin file
 EXEC_LH: db 0                       ; +271h  EXECPROG to be loaded high?
 ORIG_UMBLINKSTATE: db 0             ; +272h
 ORIG_ALLOCSTRAT: db 0               ; +273h
+CTRLC_FLAG: db 0                    ; +274h  flag that says "aborted by CTRL+C"
 
 ; CTRL+BREAK (int 23h) handler
 ; According to the TechHelp! Manual: "If you want to abort (exit to the parent
 ; process), then set the carry flag and return via a FAR RET. This causes DOS
 ; to perform normal cleanup and exit to the parent." (otherwise use iret)
-BREAK_HANDLER:            ; +274h
+BREAK_HANDLER:            ; +275h
+mov [CTRLC_FLAG], byte 1  ; checked by SvarCOM to abort BAT files
 stc
 retf
 
@@ -82,7 +84,7 @@ INT2E:
 xor ax, ax
 iret
 
-skipsig:                  ; +279h
+skipsig:                  ; +27Fh
 
 ; set up CS=DS=SS and point SP to my private stack buffer
 mov ax, cs

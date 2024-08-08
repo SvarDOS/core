@@ -47,7 +47,7 @@
  * with what I think it is.
  *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***
  *            (or at least whenever RMOD's struct is changed)            */
-#define BYTE_VERSION 5
+#define BYTE_VERSION 6
 
 
 struct config {
@@ -1059,6 +1059,7 @@ int main(void) {
     if ((rmod->flags & FLAG_EXEC_AND_QUIT) && (rmod->bat == NULL) && (rmod->forloop == NULL)) {
       sayonara(rmod);
     }
+
     /* */
     if (rmod->version != BYTE_VERSION) {
       nls_outputnl_err(2,0);
@@ -1067,6 +1068,16 @@ int main(void) {
         hlt
         jmp HALT
       }
+    }
+  }
+
+  /* if last operation was ended by CTRL+C then make sure to abort any
+   * ongoing BAT file or FOR loop */
+  {
+    char far *ctrlcflag = MK_FP(rmod->rmodseg, RMOD_OFFSET_CTRLCFLAG);
+    if (*ctrlcflag != 0) {
+      outputnl("<last process interrupted through CTRL+C>");
+      *ctrlcflag = 0;
     }
   }
 
