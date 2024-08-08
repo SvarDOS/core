@@ -1090,6 +1090,11 @@ int main(void) {
   /* make COMSPEC point to myself */
   set_comspec_to_self(*rmod_envseg);
 
+  /* update rmod's ptr to COMSPEC so it is always up to date - this needs to be
+   * done early so it is up to date even if this instance of SvarCOM dies
+   * early (for example because of a CTRL+C event) */
+  rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
+
   /* on /P check for the presence of AUTOEXEC.BAT and execute it if found,
    * but skip this check if /D was also passed */
   if ((cfg.flags & (FLAG_PERMANENT | FLAG_SKIP_AUTOEXEC)) == FLAG_PERMANENT) {
@@ -1223,9 +1228,6 @@ int main(void) {
           cmdline[i] = ' ';
       }
     }
-
-    /* update rmod's ptr to COMSPEC so it is always up to date */
-    rmod_updatecomspecptr(rmod->rmodseg, *rmod_envseg);
 
     /* handle redirections (if any) */
     i = redir_parsecmd(&redirprops, cmdline, rmod->awaitingcmd, *rmod_envseg);
