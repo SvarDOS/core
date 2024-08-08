@@ -38,8 +38,8 @@ STACKPTR dw 0
 ; boot drive". this value is patched by the transient part of COMMAND.COM
 COMSPECPTR dw 0  ; +CEh
 
-; fallback COMSPEC string used if no COMSPEC is present in the environment
-; drive. drive is patched by the transient part of COMMAND.COM
+; fallback COMSPEC string used if no COMSPEC is present in the environment.
+; drive is patched by the transient part of COMMAND.COM
 COMSPECBOOT db "@:\COMMAND.COM", 0 ; +D0h
 
 ; exit code of last application
