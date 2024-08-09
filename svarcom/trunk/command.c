@@ -1060,7 +1060,8 @@ int main(void) {
       sayonara(rmod);
     }
 
-    /* */
+    /* halt if RMOD version is not the same as myself - this can happen after
+     * a SvarCOM update */
     if (rmod->version != BYTE_VERSION) {
       nls_outputnl_err(2,0);
       _asm {
