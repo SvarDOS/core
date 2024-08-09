@@ -10,6 +10,7 @@
  - DR-DOS compatibility: F5/F8 boot key presses are detected and handled
  - VER command: provides extended kernel information when available
  - fixed COMSPEC respawning when SvarCOM is aborted through a CTRL+C
+ - when COMMAND.COM respawn fails, the exact path that was tried is displayed
 
 
 === ver 2024.3 (25.07.2024) ==================================================

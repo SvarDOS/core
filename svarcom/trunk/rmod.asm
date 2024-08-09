@@ -217,13 +217,28 @@ int 0x21
 ; if all went well, jump back to start
 jnc skipsig
 
+; save error code into cl
+mov cl, al
+
+; display program name (in DS:DX), but first replace its nul terminator by a $
+mov si, dx
+PARSENEXTBYTE:
+lodsb ; load byte at DS:SI into AL and inc SI (direction flag is clear already)
+test al, al  ; is zero yet?
+jnz PARSENEXTBYTE
+mov [si], byte '$'   ; replace the nul terminator by a $ and display it
+mov ah, 0x09
+int 0x21
+mov [si], byte 0     ; revert the nul terminator back to its place
+
 ; restore DS=CS
 mov bx, cs
 mov ds, bx
 
 ; update error string so it contains the error number
-add al, '0'
-mov [ERRLOAD + 4], al
+mov al, '0'
+add al, cl    ; the exec error code
+mov [ERRLOAD + 6], al
 
 ; display error message
 mov ah, 0x09
@@ -243,7 +258,7 @@ jmp skipsig
 ; this allows multiple copies of SvarCOM to stack upon each other.
 CMDTAIL db 0x01, 0x0A, 0x0D
 
-ERRLOAD db "ERR x, FAILED TO LOAD COMMAND.COM", 13, 10, '$'
+ERRLOAD db ": ERR x, LOAD FAILED", 0x0A, 0x0D, '$'
 
 ; variables used to revert stdin/stdout to their initial state
 OLD_STDOUT dw 0xffff
