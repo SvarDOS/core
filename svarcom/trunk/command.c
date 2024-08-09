@@ -1023,6 +1023,7 @@ int main(void) {
   static enum cmd_result cmdres;
   static unsigned short i; /* general-purpose variable for short-lived things */
   static unsigned char flags;
+  static unsigned char far *rmod_farptr;
 
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
@@ -1071,14 +1072,14 @@ int main(void) {
     }
   }
 
+  /* general (far) pointer to RMOD, useful to check some of its internal fields */
+  rmod_farptr = MK_FP(rmod->rmodseg, 0);
+
   /* if last operation was ended by CTRL+C then make sure to abort any
    * ongoing BAT file or FOR loop */
-  {
-    char far *ctrlcflag = MK_FP(rmod->rmodseg, RMOD_OFFSET_CTRLCFLAG);
-    if (*ctrlcflag != 0) {
-      outputnl("<last process interrupted through CTRL+C>");
-      *ctrlcflag = 0;
-    }
+  if (rmod_farptr[RMOD_OFFSET_CTRLCFLAG] != 0) {
+    outputnl("<last process interrupted through CTRL+C>");
+    rmod_farptr[RMOD_OFFSET_CTRLCFLAG] = 0;
   }
 
   /* install a few guardvals in memory to detect some cases of overflows */
