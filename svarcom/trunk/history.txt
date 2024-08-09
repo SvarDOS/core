@@ -11,6 +11,7 @@
  - VER command: provides extended kernel information when available
  - fixed COMSPEC respawning when SvarCOM is aborted through a CTRL+C
  - when COMMAND.COM respawn fails, the exact path that was tried is displayed
+ - CTRL+C can abort the ongoing batch files or for loop
 
 
 === ver 2024.3 (25.07.2024) ==================================================

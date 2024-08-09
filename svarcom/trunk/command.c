@@ -1083,8 +1083,26 @@ int main(void) {
   /* if last operation was ended by CTRL+C then make sure to abort any
    * ongoing BAT file or FOR loop */
   if (rmod_farptr[RMOD_OFFSET_CTRLCFLAG] != 0) {
-    outputnl("<last process interrupted through CTRL+C>");
+    /* reset the flag */
     rmod_farptr[RMOD_OFFSET_CTRLCFLAG] = 0;
+
+    /* clear up the forloop node */
+    if (rmod->forloop != NULL) {
+      rmod_ffree(rmod->forloop);
+      rmod->forloop = NULL;
+    }
+
+    /* clear up the batch linked list */
+    if (rmod->bat != NULL) {
+      while (rmod->bat != NULL) {
+        struct batctx far *batnode;
+        batnode = rmod->bat;
+        rmod->bat = rmod->bat->parent;
+        rmod_ffree(batnode);
+      }
+      rmod->flags &= ~FLAG_ECHOFLAG;
+      if (rmod->flags & FLAG_ECHO_BEFORE_BAT) rmod->flags |= FLAG_ECHOFLAG;
+    }
   }
 
   /* make COMSPEC point to myself */
