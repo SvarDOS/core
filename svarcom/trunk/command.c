@@ -1075,17 +1075,17 @@ int main(void) {
   /* general (far) pointer to RMOD, useful to check some of its internal fields */
   rmod_farptr = MK_FP(rmod->rmodseg, 0);
 
+  rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
+
+  /* install a few guardvals in memory to detect some cases of overflows */
+  memguard_set(cmdlinebuf);
+
   /* if last operation was ended by CTRL+C then make sure to abort any
    * ongoing BAT file or FOR loop */
   if (rmod_farptr[RMOD_OFFSET_CTRLCFLAG] != 0) {
     outputnl("<last process interrupted through CTRL+C>");
     rmod_farptr[RMOD_OFFSET_CTRLCFLAG] = 0;
   }
-
-  /* install a few guardvals in memory to detect some cases of overflows */
-  memguard_set(cmdlinebuf);
-
-  rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
 
   /* make COMSPEC point to myself */
   set_comspec_to_self(*rmod_envseg);
