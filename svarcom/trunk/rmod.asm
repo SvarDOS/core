@@ -246,7 +246,7 @@ mov dx, ERRLOAD
 int 0x21
 
 ; wait for keypress
-mov ah, 0x08
+mov ah, 0x07    ; use INT 21h,AH=7 instead of AH=8 for CTRL+C immunity
 int 0x21
 
 ; back to program start
