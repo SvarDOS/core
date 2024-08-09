@@ -1015,7 +1015,6 @@ static int forloop_process(char *res, struct forctx far *forloop) {
 int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
-  static unsigned short far *lastexitcode;
   static struct rmod_props far *rmod;
   static char cmdlinebuf[CMDLINE_MAXLEN + 2]; /* 1 extra byte for 0-terminator and another for memguard */
   static char *cmdline;
@@ -1086,7 +1085,6 @@ int main(void) {
   memguard_set(cmdlinebuf);
 
   rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
-  lastexitcode = MK_FP(rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
 
   /* make COMSPEC point to myself */
   set_comspec_to_self(*rmod_envseg);
