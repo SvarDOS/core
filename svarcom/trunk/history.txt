@@ -12,6 +12,7 @@
  - fixed COMSPEC respawning when SvarCOM is aborted through CTRL+C
  - when COMMAND.COM respawn fails, the exact path that was tried is displayed
  - CTRL+C can abort the ongoing batch files or for loop
+ - EDR-DOS kernel ("config") environment is used as the initial (master) env
 
 
 === ver 2024.3 (25.07.2024) ==================================================
