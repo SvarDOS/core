@@ -154,7 +154,7 @@ static unsigned char drdos_init(void) {
      * Seg 0x60 is used since https://github.com/SvarDOS/edrdos/issues/88 and
      * it is safe to be used as it won't be overwritten */
     cmp ax, 0x60
-    jne FAIL
+    ja FAIL
     mov bx, 0x2C         /* environment segment field in my PSP */
     mov [bx], ax
 
