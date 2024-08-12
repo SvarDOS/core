@@ -98,6 +98,11 @@ mov ax, 0x2523  ; set int vector 23h
 mov dx, BREAK_HANDLER
 int 0x21
 
+; set up myself as criterr handler (int 0x24)
+mov ax, 0x2524
+mov dx, HANDLER_24H
+int 0x21
+
 ; set up myself as int 0x2E handler ("pass command to shell")
 mov ax, 0x252E
 mov dx, INT2E ; TODO do something meaningful instead of a no-op
@@ -387,4 +392,133 @@ mov ah, 0x3e           ; close a file handle (handle in BX)
 int 0x21
 NO_STDIN_REDIR:
 ret
-; ----------------------------------------------------------------------------
+
+
+; ****************************************************************************
+; *                                                                          *
+; * INT 24H HANDLER                                                          *
+; *                                                                          *
+; ****************************************************************************
+;
+; this is an executable image that can be set up as the critical error handler
+; interrupt (int 24h). It displays the usual "Abort, retry, fail" prompt.
+;
+; documentation:
+; http://www.techhelpmanual.com/564-int_24h__critical_error_handler.html
+;
+; === CRIT HANDLER DETAILS ====================================================
+;
+; *** ON ENTRY ***
+;
+; upon entry to the INT 24h handler, the registers are as follows:
+;  BP:SI = addr of a "device header" that identifies the failing device
+;     DI = error code in lower 8 bits (only for non-disk errors)
+;     AL = drive number, but only if AH bit 7 is reset
+;     AH = error flags
+;        0x80 = reset if device is a disk, set otherwise
+;           all the following are valid ONLY for disks (0x80 reset):
+;        0x20 = set if "ignore" action allowed
+;        0x10 = set if "retry" action allowed
+;        0x08 = set if "fail" action allowed
+;        0x06 = disk area, 0=sys files, 1=fat, 10=directory, 11=data
+;        0x01 = set if failure is a write, reset if read
+;
+; within the int 24h handler, only these DOS functions are allowed:
+;   01H-0CH (DOS character I/O)
+;   33H (all subfns are OK, including 3306H get DOS version)
+;   50H (set PSP address)
+;   51H and 62H (query PSP address)
+;   59H (get extended error information)
+;
+; *** ON EXIT ***
+;
+; After handling the error, AL should be set with an action code and get back
+; to DOS. Available actions are defined in AH at entry (see above). Possible
+; values on exit are:
+;   AL=0  ignore error (pretend nothing happened)
+;   AL=1  retry operation
+;   AL=2  abort (terminates the failed program via int 23h, like ctrl+break)
+;   AL=3  return to application indicating a failure of the DOS function
+;
+; A very basic "always fail" handler would be as simple as this:
+;   mov al, 3
+;   iret
+;
+; *** DOS CALLS ***
+;
+; Warning! Be careful about using DOS fns in your Critical Error handler.
+;          With DOS 5.0+, ONLY the following fns can be called safely:
+;
+;          01H-0CH (DOS character I/O)
+;          33H (all subfns are OK, including 3306H get DOS version)
+;          50H (set PSP address)
+;          51H and 62H (query PSP address)
+;          59H (get extended error information)
+;
+; =============================================================================
+HANDLER_24H:    ; +46Ch
+
+; save registers so I can restore them later
+push ax
+push bx
+push cx
+push dx
+push ds
+pushf
+
+; set DS to myself
+push cs
+pop ds
+
+; is this a DISK error?
+;test ah, 0x80
+;jz DISKERROR
+; non-disk error: output "CRITICAL ERROR #XXX SYSTEM HALTED" and freeze
+; update the crit string so it contains the proper error code
+mov bx, CRITERR
+mov ax, di
+xor ah, ah
+mov cl, 100
+div cl ; AL = AX / cl     AH = remainder
+add al, '0'
+mov [bx+16], al
+
+mov al, ah
+xor ah, ah
+mov cl, 10
+div cl
+add al, '0'
+add ah, '0'
+mov [bx+17], al
+mov [bx+18], ah
+
+; display the string
+mov ah, 0x09
+mov dx, CRITERR
+int 0x21
+; freeze the system
+HALT:
+sti
+hlt;
+jmp HALT
+
+DISKERROR:
+; disk errors product this message:
+; CRITICAL ERROR - DRIVE A: - READ|WRITE FAILURE
+; (A)bort, (R)etry, (F)ail
+;
+; non-disk errors produce this:
+; CRITICAL ERROR #errno
+
+
+; restore registers and quit the handler
+popf
+pop ds
+pop dx
+pop cx
+pop bx
+pop ax
+
+iret
+
+CRITERR db "CRITICAL ERROR #XXX SYSTEM HALTED$"

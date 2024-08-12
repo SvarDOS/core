@@ -182,15 +182,22 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     owner[1] = 0;
   }
 
-  /* set CTRL+BREAK handler to rmod */
+  /* set CTRL+BREAK and CRITERR handlers to rmod */
   _asm {
     push ax
     push dx
     push ds
-    mov ax, 0x2523
+
     mov ds, rmodseg
+
+    mov ax, 0x2523
     mov dx, RMOD_OFFSET_BRKHANDLER
     int 0x21
+
+    mov ax, 0x2524
+    mov dx, RMOD_OFFSET_CRITHANDLER
+    int 0x21
+
     pop ds
     pop dx
     pop ax
