@@ -471,17 +471,18 @@ push cs
 pop ds
 
 ; is this a DISK error?
-;test ah, 0x80
-;jz DISKERROR
+test ah, 0x80
+jz DISKERROR
 ; non-disk error: output "CRITICAL ERROR #XXX SYSTEM HALTED" and freeze
 ; update the crit string so it contains the proper error code
-mov bx, CRITERR
+mov bx, CRITERRSYST+1
 mov ax, di
 xor ah, ah
 mov cl, 100
 div cl ; AL = AX / cl     AH = remainder
 add al, '0'
-mov [bx+16], al
+mov [bx], al
+inc bx
 
 mov al, ah
 xor ah, ah
@@ -489,12 +490,15 @@ mov cl, 10
 div cl
 add al, '0'
 add ah, '0'
-mov [bx+17], al
-mov [bx+18], ah
+mov [bx], al
+inc bx
+mov [bx], ah
 
 ; display the string
 mov ah, 0x09
 mov dx, CRITERR
+int 0x21
+mov dx, CRITERRSYST
 int 0x21
 ; freeze the system
 HALT:
@@ -503,13 +507,27 @@ hlt;
 jmp HALT
 
 DISKERROR:
-; disk errors product this message:
+; disk errors produce this message:
 ; CRITICAL ERROR - DRIVE A: - READ|WRITE FAILURE
 ; (A)bort, (R)etry, (F)ail
-;
-; non-disk errors produce this:
-; CRITICAL ERROR #errno
-
+mov dh, ah      ; backup AH flags into CH
+add al, 'A'
+mov [CRITERRDISK+6], al
+mov ah, 0x09
+mov dx, CRITERR
+int 0x21
+mov dx, CRITERRDISK
+int 0x21
+; READ / WRITE (test flag 0x01, set = write, read otherwise)
+mov dx, CRITERRDSK_WRITE
+test ch, 1
+jnz WRITE
+mov dx, CRITERRDSK_READ
+WRITE:
+int 0x21
+mov dx, CRITERRDSK_FAIL
+int 0x21
+jmp HALT
 
 ; restore registers and quit the handler
 popf
@@ -521,4 +539,9 @@ pop ax
 
 iret
 
-CRITERR db "CRITICAL ERROR #XXX SYSTEM HALTED$"
+CRITERR db "CRITICAL ERROR - $"
+CRITERRSYST db "#XXX SYSTEM HALTED$"
+CRITERRDISK db "DRIVE @: - $"
+CRITERRDSK_READ db "READ$"
+CRITERRDSK_WRITE db "WRITE$"
+CRITERRDSK_FAIL db " FAILURE$"
