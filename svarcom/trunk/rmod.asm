@@ -459,12 +459,13 @@ ret
 HANDLER_24H:    ; +46Ch
 
 ; save registers so I can restore them later
-push ax
-push bx
-push cx
-push dx
-push ds
-pushf
+; this is not needed, DOS saves it already before calling the int 24h handler
+;push ax
+;push bx
+;push cx
+;push dx
+;push ds
+;pushf
 
 ; set DS to myself
 push cs
@@ -508,14 +509,12 @@ jmp HALT
 
 DISKERROR:
 ; disk errors produce this message:
-; CRITICAL ERROR - DRIVE A: - READ|WRITE FAILURE
-; (A)bort, (R)etry, (F)ail
-mov dh, ah      ; backup AH flags into CH
+; A: - READ|WRITE FAILURE
+; (A)bort, (R)etry, (I)gnore, (F)ail
+mov ch, ah      ; backup AH flags into CH
 add al, 'A'
-mov [CRITERRDISK+6], al
+mov [CRITERRDISK], al
 mov ah, 0x09
-mov dx, CRITERR
-int 0x21
 mov dx, CRITERRDISK
 int 0x21
 ; READ / WRITE (test flag 0x01, set = write, read otherwise)
@@ -525,23 +524,115 @@ jnz WRITE
 mov dx, CRITERRDSK_READ
 WRITE:
 int 0x21
-mov dx, CRITERRDSK_FAIL
+mov dx, CRLF
 int 0x21
-jmp HALT
+; print available options (abort=always, 0x10=retry, 0x20=ignore, 0x08=fail)
+CRITERR_ASKCHOICE:
+mov dx, CRITERR_ABORT
+int 0x21
+; retry?
+test ch, 0x10
+jz NORETRY
+mov dx, CRITERR_COMMA
+int 0x21
+mov dx, CRITERR_RETRY
+int 0x21
+NORETRY:
+; ignore?
+test ch, 0x20
+jz NOIGNORE
+mov dx, CRITERR_COMMA
+int 0x21
+mov dx, CRITERR_IGNOR
+int 0x21
+NOIGNORE:
+; fail?
+test ch, 0x08
+jz NOFAIL
+mov dx, CRITERR_COMMA
+int 0x21
+mov dx, CRITERR_FAIL
+int 0x21
+NOFAIL:
+; output "? "
+mov ah, 0x06
+mov dl, '?'
+int 0x21
+mov dl, ' '
+int 0x21
+
+; wait for user key press and return (iret) with AL set accordingly:
+;   AL=0  ignore
+;   AL=1  retry
+;   AL=2  abort
+;   AL=3  fail
+
+mov ah, 0x07  ; key input, no ctrl+c check
+int 0x21
+and al, 0xdf   ; switch AL to upper-case so key check is case-insensitive
+mov cl, al     ; save pressed key in CL (AL is easily overwritten by DOS calls)
+; print the pressed key
+mov ah, 0x06
+mov dl, cl
+int 0x21
+mov ah, 0x09
+mov dx, CRLF
+int 0x21
+
+; was it abort?
+cmp cl, [CRITERR_KEYS]
+jne SKIP_ABORT
+mov ah, 0x09
+mov dx, CRITERRSYST
+int 0x21
+mov al, 2     ; AL=2 -> "abort"
+iret
+SKIP_ABORT:
+; if retry is allowed - was it retry?
+test ch, 0x10
+jz SKIP_RETRY
+cmp cl, [CRITERR_KEYS+1]
+jne SKIP_RETRY
+mov al, 1     ; AL=1 -> "retry"
+iret
+SKIP_RETRY:
+; if ignore is allowed - was it ignore?
+test ch, 0x20
+jz SKIP_IGN
+cmp cl, [CRITERR_KEYS+2]
+jne SKIP_IGN
+xor al, al    ; AL=0 -> "ignore"
+iret
+SKIP_IGN:
+; if fail is allowed - was it fail?
+test ch, 0x08
+;jz SKIP_FAIL
+cmp cl, [CRITERR_KEYS+3]
+jne SKIP_FAIL
+mov al, 3     ; AL=3 -> "fail"
+iret
+SKIP_FAIL:
+
+jmp CRITERR_ASKCHOICE   ; invalid answer -> ask again
 
 ; restore registers and quit the handler
-popf
-pop ds
-pop dx
-pop cx
-pop bx
-pop ax
+;popf
+;pop ds
+;pop dx
+;pop cx
+;pop bx
+;pop ax
 
-iret
 
-CRITERR db "CRITICAL ERROR - $"
-CRITERRSYST db "#XXX SYSTEM HALTED$"
-CRITERRDISK db "DRIVE @: - $"
-CRITERRDSK_READ db "READ$"
-CRITERRDSK_WRITE db "WRITE$"
-CRITERRDSK_FAIL db " FAILURE$"
+CRITERR db "CRITICAL ERROR $"
+CRITERRSYST db "#XXX - SYSTEM HALTED$"
+CRITERRDISK db "@: - $"
+CRITERRDSK_READ db "READ FAILURE$"
+CRITERRDSK_WRITE db "WRITE FAILURE$"
+CRLF db 0x0A, 0x0D, "$"
+CRITERR_ABORT db "(A)bort$"
+CRITERR_RETRY db "(R)etry$"
+CRITERR_IGNOR db "(I)gnore$"
+CRITERR_FAIL  db "(F)ail$"
+CRITERR_KEYS  db "ARIF"
+CRITERR_COMMA db ", $"
