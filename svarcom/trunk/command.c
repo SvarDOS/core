@@ -324,6 +324,7 @@ static void _dosgetcurdir(char near *s);
 #pragma aux _dosgetcurdir = \
 "mov ah, 0x47"    /* DOS 2+ - CWD - GET CURRENT DIRECTORY */ \
 "xor dl, dl"      /* DL = drive number (00h = default, 01h = A:, etc) */ \
+"mov [si], 0"     /* set empty dir in case of failure (unformatted floppy) */ \
 "int 0x21" \
 parm [si] \
 modify [ax dl]
