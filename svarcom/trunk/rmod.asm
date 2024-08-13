@@ -401,7 +401,7 @@ ret
 ; ****************************************************************************
 ;
 ; this is an executable image that can be set up as the critical error handler
-; interrupt (int 24h). It displays the usual "Abort, retry, fail" prompt.
+; interrupt (int 24h). It displays the usual "Abort, Retry, Fail..." prompt.
 ;
 ; documentation:
 ; http://www.techhelpmanual.com/564-int_24h__critical_error_handler.html
@@ -582,9 +582,6 @@ int 0x21
 ; was it abort?
 cmp cl, [CRITERR_KEYS]
 jne SKIP_ABORT
-mov ah, 0x09
-mov dx, CRITERRSYST
-int 0x21
 mov al, 2     ; AL=2 -> "abort"
 iret
 SKIP_ABORT:
