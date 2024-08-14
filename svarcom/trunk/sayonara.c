@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -41,7 +41,6 @@ void sayonara(struct rmod_props far *rmod) {
   /* detect "I am the origin shell" situations */
   if (rmod->flags & FLAG_PERMANENT) return; /* COMMAND.COM /P */
   if ((rmod->origint22 >> 16) == 0xffff) return; /* original int22h seg set to 0xffff (DOS-C / FreeDOS) */
-  if (rmod->origenvseg == 0) return; /* no original environment (MSDOS 5/6) */
 
   /* set my int 22h handler back to its original value */
   *myint22 = rmod->origint22;
