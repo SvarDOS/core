@@ -480,14 +480,14 @@ int 0x21        ; segment of the original PSP is in BX now
 ; set DS to the original PSP
 mov ds, bx
 
-; load the pointer to the JFT, save it on stack, and set DS to the JFT seg
-lds bx, [0x34]  ; loads offset at [0x34] into BX and segment at [0x36] into DS
-                ; same as "mov bx, [0x34]" + "mov ds, [0x36]", but smaller
+; load the pointer to the original JFT, set DS to the JFT seg and BX to offset
+lds bx, [0x34]  ; same as "mov bx, [0x34]" + "mov ds, [0x36]", but smaller
+
+; save the original process stdin and stdout (at [BX]) on stack, as well as a
+; dword pointer to the original JFT
+push word [bx]  ; original stdin and stdout (from the JFT at DS:BX)
 push ds
 push bx
-
-; save the original process stdin and stdout (at [BX]) on stack
-push word [bx]  ; original stdin and stdout (from the JFT)
 
 ; overwrite the original process stdin and stdout with stderr, in case stdout
 ; or stdin was redirected.
@@ -642,10 +642,9 @@ jmp CRITERR_ASKCHOICE   ; invalid answer -> ask again
 QUIT_WITH_AL_SET:
 
 ; restore original stdin/stdout handlers in the original JFT
-pop dx     ; original process' stdin and stdout handlers
-pop bx     ; original process' JFT offset
-pop ds     ; original process' JFT segment
-mov [bx], dx
+pop bx        ; original process' JFT offset
+pop ds        ; original process' JFT segment
+pop word [bx] ; original process' stdin and stdout handlers
 
 ; restore registers to their original values and quit the handler (AL is
 ; already set to a proper action value and AH does not matter since it was
