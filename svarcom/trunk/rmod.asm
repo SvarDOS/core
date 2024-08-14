@@ -471,27 +471,33 @@ pushf
 
 mov ch, ah      ; backup AH flags into CH
 
-; get the segment to the original process PSP and save it on stack
-; using int 21h,ah=62h should be safe, RBIL says: "This function does not use
-; any of the DOS-internal stacks and may thus be called at any time, even
-; during another INT 21h call."
+; Get the segment to the original process PSP. Using int 21h,ah=62h should be
+; safe, RBIL says: "This function does not use any of the DOS-internal stacks
+; and may thus be called at any time, even during another INT 21h call"
 mov ah, 0x62
-int 0x21
+int 0x21        ; segment of the original PSP is in BX now
+
+; set DS to the original PSP
+mov ds, bx
+
+; load the pointer to the JFT and save it on stack
+mov bx, [0x34] ; offset
+mov dx, [0x36] ; seg
+push dx
 push bx
 
-; set DS to original PSP
-push bx
-pop ds
+; switch DS to the JFT seg
+mov ds, dx
 
 ; save the original process stdin and stdout on stack
-mov dx, [0x18]   ; original stdin and stdout (from the JFT)
+mov dx, [bx]   ; original stdin and stdout (from the JFT)
 push dx
 
 ; overwrite the original process stdin and stdout with stderr, in case stdout
 ; or stdin was redirected.
-mov dl, [0x1a]   ; the process stderr (3rd entry of the JFT in original PSP)
+mov dl, [bx+2]   ; the process stderr (3rd entry of the JFT in original PSP)
 mov dh, dl
-mov [0x18], dx
+mov [bx], dx
 
 ; set DS to myself so I can reach (and display) my messages
 push cs
@@ -639,15 +645,15 @@ jmp CRITERR_ASKCHOICE   ; invalid answer -> ask again
 
 QUIT_WITH_AL_SET:
 
-; restore original stdin/stdout handlers in the original PSP
-; (saved on stack as STDINSTDOUT PSPSEG"
-pop dx    ; original process' stdin and stdout handlers (dh=stdin / dl=stdout)
-pop bx    ; original process' PSP
-push bx
-pop ds    ; set DS to the original process so I can access its PSP
-mov [0x18], dx
+; restore original stdin/stdout handlers in the original JFT
+pop dx     ; original process' stdin and stdout handlers
+pop bx     ; original process' JFT offset
+pop ds     ; original process' JFT segment
+mov [bx], dx
 
-; restore registers and quit the handler
+; restore registers to their original values and quit the handler (AL is
+; already set to a proper action value and AH does not matter since it was
+; changed by the kernel's int 24h calling routine anyway)
 popf
 pop ds
 pop dx
