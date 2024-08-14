@@ -458,14 +458,16 @@ ret
 ; =============================================================================
 HANDLER_24H:    ; +46Ch
 
-; save registers so I can restore them later
-; this is not needed, DOS saves it already before calling the int 24h handler
-;push ax
-;push bx
-;push cx
-;push dx
-;push ds
-;pushf
+; save registers so I can restore them later. AX does not require saving.
+; Microsoft documentation says:
+;  "When it is desired to ignore an error, the same registers must be preserved
+;   as when it is desired to retry the operation (SS,SP,DS,BX,CX,DX)."
+; source: INT24.DOC from MS-DOS 2.0
+push bx
+push cx
+push dx
+push ds
+pushf
 
 ; set DS to myself
 push cs
@@ -583,7 +585,7 @@ int 0x21
 cmp cl, [CRITERR_KEYS]
 jne SKIP_ABORT
 mov al, 2     ; AL=2 -> "abort"
-iret
+jmp short QUIT_WITH_AL_SET
 SKIP_ABORT:
 ; if retry is allowed - was it retry?
 test ch, 0x10
@@ -591,7 +593,7 @@ jz SKIP_RETRY
 cmp cl, [CRITERR_KEYS+1]
 jne SKIP_RETRY
 mov al, 1     ; AL=1 -> "retry"
-iret
+jmp short QUIT_WITH_AL_SET
 SKIP_RETRY:
 ; if ignore is allowed - was it ignore?
 test ch, 0x20
@@ -599,7 +601,7 @@ jz SKIP_IGN
 cmp cl, [CRITERR_KEYS+2]
 jne SKIP_IGN
 xor al, al    ; AL=0 -> "ignore"
-iret
+jmp short QUIT_WITH_AL_SET
 SKIP_IGN:
 ; if fail is allowed - was it fail?
 test ch, 0x08
@@ -607,18 +609,20 @@ test ch, 0x08
 cmp cl, [CRITERR_KEYS+3]
 jne SKIP_FAIL
 mov al, 3     ; AL=3 -> "fail"
-iret
+jmp short QUIT_WITH_AL_SET
 SKIP_FAIL:
 
 jmp CRITERR_ASKCHOICE   ; invalid answer -> ask again
 
+QUIT_WITH_AL_SET:
+
 ; restore registers and quit the handler
-;popf
-;pop ds
-;pop dx
-;pop cx
-;pop bx
-;pop ax
+popf
+pop ds
+pop dx
+pop cx
+pop bx
+iret
 
 
 CRITERR db "CRITICAL ERROR $"
