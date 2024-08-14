@@ -489,7 +489,7 @@ push dx
 
 ; overwrite the original process stdin and stdout with stderr, in case stdout
 ; or stdin was redirected.
-mov dl, [0x1f]   ; the process stderr (3rd entry of the JFT in original PSP)
+mov dl, [0x1a]   ; the process stderr (3rd entry of the JFT in original PSP)
 mov dh, dl
 mov [0x18], dx
 
