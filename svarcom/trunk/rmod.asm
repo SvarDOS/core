@@ -469,12 +469,37 @@ push dx
 push ds
 pushf
 
-; set DS to myself
+mov ch, ah      ; backup AH flags into CH
+
+; get the segment to the original process PSP and save it on stack
+; using int 21h,ah=62h should be safe, RBIL says: "This function does not use
+; any of the DOS-internal stacks and may thus be called at any time, even
+; during another INT 21h call."
+mov ah, 0x62
+int 0x21
+push bx
+
+; set DS to original PSP
+push bx
+pop ds
+
+; save the original process stdin and stdout on stack
+mov dh, [0x18]   ; original stdin (from the JFT)
+mov dl, [0x19]   ; original stdout (from the JFT)
+push dx
+
+; overwrite the original process stdin and stdout with stderr, in case stdout
+; or stdin was redirected.
+mov dl, [0x1f]   ; the process stderr (3rd entry of the JFT in original PSP)
+mov [0x18], dl
+mov [0x19], dl
+
+; set DS to myself so I can reach (and display) my messages
 push cs
 pop ds
 
 ; is this a DISK error?
-test ah, 0x80
+test ch, 0x80
 jz DISKERROR
 ; non-disk error: output "CRITICAL ERROR #XXX SYSTEM HALTED" and freeze
 ; update the crit string so it contains the proper error code
@@ -513,7 +538,6 @@ DISKERROR:
 ; disk errors produce this message:
 ; A: - READ|WRITE FAILURE
 ; (A)bort, (R)etry, (I)gnore, (F)ail
-mov ch, ah      ; backup AH flags into CH
 add al, 'A'
 mov [CRITERRDISK], al
 mov ah, 0x09
@@ -615,6 +639,15 @@ SKIP_FAIL:
 jmp CRITERR_ASKCHOICE   ; invalid answer -> ask again
 
 QUIT_WITH_AL_SET:
+
+; restore original stdin/stdout handlers in the original PSP
+; (saved on stack as STDINSTDOUT PSPSEG"
+pop dx    ; original process' stdin and stdout handlers (dh=stdin / dl=stdout)
+pop bx    ; original process' PSP
+push bx
+pop ds    ; set DS to the original process so I can access its PSP
+mov [0x18], dh
+mov [0x19], dl
 
 ; restore registers and quit the handler
 popf
