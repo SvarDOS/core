@@ -13,7 +13,7 @@
  - when COMMAND.COM respawn fails, the exact path that was tried is displayed
  - CTRL+C can abort the ongoing batch files or for loop
  - EDR-DOS kernel ("config") environment is used as the initial (master) env
- - SvarCOM provides its own INT 24h handler
+ - SvarCOM provides its own INT 24h handler (thank you ECM for all your help!)
 
 
 === ver 2024.3 (25.07.2024) ==================================================

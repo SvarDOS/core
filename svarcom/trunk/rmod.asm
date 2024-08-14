@@ -481,14 +481,13 @@ int 0x21        ; segment of the original PSP is in BX now
 mov ds, bx
 
 ; load the pointer to the JFT, save it on stack, and set DS to the JFT seg
-mov bx, [0x34] ; offset
-mov ds, [0x36] ; seg
+lds bx, [0x34]  ; loads offset at [0x34] into BX and segment at [0x36] into DS
+                ; same as "mov bx, [0x34]" + "mov ds, [0x36]", but smaller
 push ds
 push bx
 
-; save the original process stdin and stdout on stack
-mov dx, [bx]   ; original stdin and stdout (from the JFT)
-push dx
+; save the original process stdin and stdout (at [BX]) on stack
+push word [bx]  ; original stdin and stdout (from the JFT)
 
 ; overwrite the original process stdin and stdout with stderr, in case stdout
 ; or stdin was redirected.
