@@ -480,14 +480,11 @@ int 0x21        ; segment of the original PSP is in BX now
 ; set DS to the original PSP
 mov ds, bx
 
-; load the pointer to the JFT and save it on stack
+; load the pointer to the JFT, save it on stack, and set DS to the JFT seg
 mov bx, [0x34] ; offset
-mov dx, [0x36] ; seg
-push dx
+mov ds, [0x36] ; seg
+push ds
 push bx
-
-; switch DS to the JFT seg
-mov ds, dx
 
 ; save the original process stdin and stdout on stack
 mov dx, [bx]   ; original stdin and stdout (from the JFT)
@@ -496,7 +493,7 @@ push dx
 ; overwrite the original process stdin and stdout with stderr, in case stdout
 ; or stdin was redirected.
 mov dl, [bx+2]   ; the process stderr (3rd entry of the JFT in original PSP)
-mov dh, dl
+mov dh, dl       ; dup DL so I can overwrite stdin and stdout with one write
 mov [bx], dx
 
 ; set DS to myself so I can reach (and display) my messages
