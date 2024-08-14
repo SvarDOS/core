@@ -32,7 +32,7 @@
 
 
 /* returns far pointer to rmod's settings block on success */
-struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len) {
+struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len, unsigned char *cfgflags) {
   char far *myptr, far *mcb;
   unsigned short far *owner;
   const unsigned short sizeof_rmodandprops_paras = (0x100 + rmodcore_len + sizeof(struct rmod_props) + 15) / 16;
@@ -46,8 +46,13 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 
   /* printf("original (PSP) env buffer at %04X\r\n", envseg); */
 
-  /* if envseg is zero, then enforce our own one (MSDOS 5 does not provide a default env) */
-  if ((envseg == 0) && (envsize == 0)) envsize = 256;
+  /* if my environment seg was zeroed, then I am the init process (under DR-DOS and MS-DOS 5 at least) */
+  if (envseg == 0) {
+    *cfgflags |= FLAG_PERMANENT; /* imply /P so AUTOEXEC.BAT is executed */
+
+    /* make sure to enforce our own env (MSDOS 5 does not provide a default env) */
+    if (envsize == 0) envsize = 256;
+  }
 
   /* if custom envsize requested, convert it to number of paragraphs */
   if (envsize != 0) {
@@ -175,11 +180,16 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   *owner = rmodseg;
   _fmemcpy(mcb + 8, "SVARENV", 8);
 
-  /* if env block is newly allocated, fill it with a few NULLs */
+  /* if env block is newly allocated, then:
+   *  if an original env is present then copy it
+   *  otherwise fill the new env with a few NULs */
   if (envsize != 0) {
     owner = MK_FP(envseg, 0);
     owner[0] = 0;
     owner[1] = 0;
+
+    /* do we have an original environment? if yes copy it (envsize is a number of paragraphs) */
+    if (origenvseg != 0) _fmemcpy(owner, MK_FP(origenvseg, 0), envsize * 16);
   }
 
   /* set CTRL+BREAK and CRITERR handlers to rmod */
@@ -215,7 +225,6 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   res = MK_FP(rmodseg, 0x100 + rmodcore_len);
   _fmemset(res, 0, sizeof(*res));  /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
-  res->origenvseg = origenvseg;    /* original environment segment */
 
   /* write env segment to rmod's PSP */
   owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);

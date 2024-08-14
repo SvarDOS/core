@@ -126,7 +126,7 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
  * allocated memory hence will be overwritten soon.
  * details: https://github.com/SvarDOS/edrdos/issues/83
  * this function returns 0, FLAG_SKIP_AUTOEXEC or FLAG_STEPBYSTEP */
-static unsigned char drdos_init(void) {
+static void drdos_init(struct config *cfg) {
   unsigned short kernenvseg = 0;
   unsigned char far *e;
   unsigned short far *scancode;
@@ -154,7 +154,7 @@ static unsigned char drdos_init(void) {
      * Seg 0x60 is used since https://github.com/SvarDOS/edrdos/issues/88 and
      * it is safe to be used as it won't be overwritten */
     cmp ax, 0x60
-    ja FAIL
+    jne FAIL
     mov bx, 0x2C         /* environment segment field in my PSP */
     mov [bx], ax
 
@@ -164,7 +164,14 @@ static unsigned char drdos_init(void) {
     pop ax
   }
 
-  if (kernenvseg == 0) return(0); /* either not DR-DOS, or kern env was read already or something failed */
+  if (kernenvseg == 0) return; /* either not DR-DOS, or kern env was read already or something failed */
+
+  /* now I know that 1) I am running under (E)DR-DOS and 2) I am init, so /P implied */
+  cfg->flags |= FLAG_PERMANENT;
+
+  /* DR-DOS kernel environment present: make sure to ask SvarCOM to alloc its
+   * own environment, because the kernel's environment might vanish eventually */
+  if (cfg->envsiz < 256) cfg->envsiz = 256;
 
   e = MK_FP(kernenvseg, 0);
 
@@ -175,8 +182,11 @@ static unsigned char drdos_init(void) {
   /* next I have the boot key press scancode: either 0x0000, 0x3F00 or 0x4200
    * 0x3F00 means "F5 was pressed" while 0x4200 is for F8 */
   scancode = (void far *)e;
-  if (*scancode == 0x3F00) return(FLAG_SKIP_AUTOEXEC);
-  if (*scancode == 0x4200) return(FLAG_STEPBYSTEP);
+  if (*scancode == 0x3F00) {
+    cfg->flags |= FLAG_SKIP_AUTOEXEC;
+  } else if (*scancode == 0x4200) {
+    cfg->flags |= FLAG_STEPBYSTEP;
+  }
 
 /*
   printf("kernel env seg is at %04X and starts with bytes 0x%02X 0x%02X 0x%02X 0x%02X\r\n", kernenvseg, e[0], e[1], e[2], e[3]);
@@ -194,7 +204,6 @@ static unsigned char drdos_init(void) {
     printf("\r\n=== DUMP ENDS ===\r\n");
   }
 */
-  return(0);
 }
 
 
@@ -1042,9 +1051,9 @@ int main(void) {
      * This must be done BEFORE rmod_install() because DR-DOS's boot environment
      * is located at an unallocated memory location that is likely to be overwritten
      * by rmod_install(). */
-    cfg.flags |= drdos_init();
+    drdos_init(&cfg);
 
-    rmod = rmod_install(cfg.envsiz, BUFFER, BUFFER_len);
+    rmod = rmod_install(cfg.envsiz, BUFFER, BUFFER_len, &(cfg.flags));
     if (rmod == NULL) {
       nls_outputnl_err(2,1); /* "FATAL ERROR: rmod_install() failed" */
       return(1);
@@ -1054,10 +1063,6 @@ int main(void) {
     /* printf("rmod installed at %Fp\r\n", rmod); */
     rmod->version = BYTE_VERSION;
 
-    /* if my environment seg was zeroed, then I am the init process (under DR-DOS and MS-DOS 5 at least) */
-    if (rmod->origenvseg == 0) {
-      cfg.flags |= FLAG_PERMANENT; /* imply /P so AUTOEXEC.BAT is executed */
-    }
   } else {
     /* printf("rmod found at %Fp\r\n", rmod); */
     /* if I was spawned by rmod and FLAG_EXEC_AND_QUIT is set, then I should

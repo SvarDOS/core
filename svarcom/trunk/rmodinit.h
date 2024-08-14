@@ -60,7 +60,6 @@ struct rmod_props {
   unsigned short rmodseg;     /* segment where rmod is loaded */
   unsigned long origint22;    /* original int 22 handler (far ptr) of the shell */
   unsigned short origparent;  /* original parent (PSP's segment) */
-  unsigned short origenvseg;  /* original environment segment */
   unsigned char flags;        /* command line parameters */
   unsigned char version;      /* used to detect mismatch between rmod and SvarCOM */
   char awaitingcmd[130];      /* command to exec next time (if any) */
@@ -87,7 +86,7 @@ struct rmod_props {
 #define RMOD_OFFSET_ROUTINE    (0x100 + 0x27F)
 #define RMOD_OFFSET_CRITHANDLER (0x100 + 0x46C)
 
-struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len);
+struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len, unsigned char *cfgflags);
 struct rmod_props far *rmod_find(unsigned short rmodcore_len);
 void rmod_updatecomspecptr(unsigned short rmod_seg, unsigned short env_seg);
 
