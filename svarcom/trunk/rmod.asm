@@ -484,15 +484,14 @@ push bx
 pop ds
 
 ; save the original process stdin and stdout on stack
-mov dh, [0x18]   ; original stdin (from the JFT)
-mov dl, [0x19]   ; original stdout (from the JFT)
+mov dx, [0x18]   ; original stdin and stdout (from the JFT)
 push dx
 
 ; overwrite the original process stdin and stdout with stderr, in case stdout
 ; or stdin was redirected.
 mov dl, [0x1f]   ; the process stderr (3rd entry of the JFT in original PSP)
-mov [0x18], dl
-mov [0x19], dl
+mov dh, dl
+mov [0x18], dx
 
 ; set DS to myself so I can reach (and display) my messages
 push cs
@@ -646,8 +645,7 @@ pop dx    ; original process' stdin and stdout handlers (dh=stdin / dl=stdout)
 pop bx    ; original process' PSP
 push bx
 pop ds    ; set DS to the original process so I can access its PSP
-mov [0x18], dh
-mov [0x19], dl
+mov [0x18], dx
 
 ; restore registers and quit the handler
 popf
