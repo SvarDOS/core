@@ -14,12 +14,18 @@ release: pkg.exe .symbolic
 	IF EXIST pkg.svp DEL pkg.svp
 	mkdir appinfo
 	mkdir bin
+	mkdir doc
+	mkdir doc\pkg
 	copy pkg.lng bin
+	copy pkg.exe bin
 	copy pkg.lsm appinfo
-	zip -9moDkrX pkg.svp appinfo bin
-	zip -9oDkrX pkg.zip nls_utf8 svarlang.lib zlib *.c *.h pkg.lsm makefile
+	copy pkg.txt doc\pkg
+	zip -9moDkrX pkg.svp appinfo bin doc
+	zip -9oDkrX pkg.zip nls_utf8 svarlang.lib zlib *.c *.h pkg.txt pkg.lsm makefile
 	rmdir appinfo
 	rmdir bin
+	rmdir doc\pkg
+	rmdir doc
 
 pkg.exe: main.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj deflang.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
