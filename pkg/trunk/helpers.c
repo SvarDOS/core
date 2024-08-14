@@ -17,6 +17,19 @@
 #include "helpers.h"
 
 
+/* returns the DOS boot drive */
+static unsigned char GETDOSBOOTDRIVE(void);
+#pragma aux GETDOSBOOTDRIVE = \
+"mov ax, 0x3305" /* int 0x21,AX=3305 - get boot drive (MS-DOS 4.0+) */ \
+"int 0x21" \
+"jnc GOOD" \
+"mov dl, 3"      /* fall back to "C" on error (DOS 3.x...) */ \
+"GOOD:" \
+"add dl, '@'"    /* convert the drive id (A=1, B=2...) into a drive letter */ \
+modify [ax] \
+value [dl]
+
+
 /* change all / to \ in a string */
 void slash2backslash(char *str) {
   int x;
@@ -103,9 +116,9 @@ char *computelocalpath(char *longfilename, char *respath, const char *dosdir, co
       if (firstsep < 0) firstsep = x;
     }
   }
-  /* if it's a file without any directory, then it goes to C:\ (COMMAND.COM, KERNEL.SYS...) */
+  /* if it's a file without any directory, then it goes to BOOTDRIVE:\ (COMMAND.COM, KERNEL.SYS...) */
   if (firstsep < 0) {
-    sprintf(respath, "C:\\");
+    sprintf(respath, "%c:\\", GETDOSBOOTDRIVE());
     return(longfilename);
   }
   /* */
