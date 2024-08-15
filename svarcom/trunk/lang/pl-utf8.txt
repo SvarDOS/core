@@ -36,6 +36,17 @@
 2.1:BŁĄD KRYTYCZNY: rmod_install() nie powiodło się
 2.2:SvarCOM: wykryto przepełnienie stosu, usunięto historię poleceń (to nie bug)
 
+# CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
+3.0:BŁĄD KRYTYCZNY
+3.1:BŁĄD ODCZYTU
+3.2:BŁĄD ZAPISU
+3.3:(P)rzerwij
+3.4:p(O)nów
+3.5:(I)gnoruj
+3.6:(Z)rezygnuj
+# THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
+3.9:POIZ
+
 # CLS
 10.0:Czyści ekran.
 

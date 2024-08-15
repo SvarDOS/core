@@ -33,6 +33,7 @@
 #include "svarlang.lib\svarlang.h"
 
 #include "env.h"
+#include "rmodinit.h"
 
 #include "helpers.h"
 
@@ -675,15 +676,18 @@ void nls_strtoup(char *buff) {
 }
 
 
-/* reload nls ressources from svarcom.lng into svarlang_mem */
-void nls_langreload(char *buff, unsigned short env) {
+/* reload nls ressources from svarcom.lng into svarlang_mem and rmod */
+void nls_langreload(char *buff, unsigned short rmodseg) {
   const char far *dosdir;
   const char far *lang;
   static unsigned short lastlang;
   unsigned short dosdirlen;
+  unsigned short rmodenvseg = *(unsigned short far *)MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
+  unsigned char far *rmodcritmsg = MK_FP(rmodseg, RMOD_OFFSET_CRITMSG);
+  int i;
 
   /* look up the LANG env variable, upcase it and copy to lang */
-  lang = env_lookup_val(env, "LANG");
+  lang = env_lookup_val(rmodenvseg, "LANG");
   if ((lang == NULL) || (lang[0] == 0)) return;
   _fmemcpy(buff, lang, 2);
   buff[2] = 0;
@@ -692,7 +696,7 @@ void nls_langreload(char *buff, unsigned short env) {
   if (memcmp(&lastlang, buff, 2) == 0) return;
 
   buff[4] = 0;
-  dosdir = env_lookup_val(env, "DOSDIR");
+  dosdir = env_lookup_val(rmodenvseg, "DOSDIR");
   if (dosdir == NULL) return;
 
   _fstrcpy(buff + 4, dosdir);
@@ -702,12 +706,23 @@ void nls_langreload(char *buff, unsigned short env) {
 
   /* try loading %DOSDIR%\SVARCOM.LNG */
   if (svarlang_load(buff + 4, buff) != 0) {
-    /* failed! try %DOSDIR%\BIN\SVARCOM.LNG now */
+    /* failed! try %DOSDIR%\BIN\SVARCOM.LNG */
     memcpy(buff + 4 + dosdirlen, "\\BIN\\SVARCOM.LNG", 17);
     if (svarlang_load(buff + 4, buff) != 0) return;
   }
 
   _fmemcpy(&lastlang, lang, 2);
+
+  /* update RMOD's critical handler with new strings */
+  for (i = 0; i < 7; i++) {
+    int len;
+    len = strlen(svarlang_str(3, i));
+    if (len > 15) len = 15;
+    _fmemcpy(rmodcritmsg + (i * 16), svarlang_str(3, i), len);
+    _fmemcpy(rmodcritmsg + (i * 16) + len, "$", 1);
+  }
+  /* The ARIF string is special: always 4 bytes long and no $ terminator */
+  _fmemcpy(rmodcritmsg + (7 * 16), svarlang_str(3,9), 4);
 }
 
 

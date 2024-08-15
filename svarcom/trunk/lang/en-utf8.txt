@@ -36,6 +36,17 @@
 2.1:FATAL ERROR: rmod_install() failed
 2.2:SvarCOM: stack overflow detected, command history flushed (this is not a bug)
 
+# CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
+3.0:CRITICAL ERROR
+3.1:READ FAILURE
+3.2:WRITE FAILURE
+3.3:(A)bort
+3.4:(R)etry
+3.5:(I)gnore
+3.6:(F)ail
+# THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
+3.9:ARIF
+
 # CLS
 10.0:Clears the screen.
 

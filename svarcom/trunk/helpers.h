@@ -193,7 +193,7 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 void nls_strtoup(char *buff);
 
 /* reload nls ressources from svarcom.lng into langblock */
-void nls_langreload(char *buff, unsigned short env);
+void nls_langreload(char *buff, unsigned short rmodseg);
 
 /* locates executable fname in path and fill res with result. returns 0 on success,
  * -1 on failed match and -2 on failed match + "don't even try with other paths"

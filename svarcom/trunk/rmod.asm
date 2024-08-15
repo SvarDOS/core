@@ -504,7 +504,7 @@ test ch, 0x80
 jz DISKERROR
 ; non-disk error: output "CRITICAL ERROR #XXX SYSTEM HALTED" and freeze
 ; update the crit string so it contains the proper error code
-mov bx, CRITERRSYST+1
+mov bx, CRITERRSYST+2
 mov ax, di
 xor ah, ah
 mov cl, 100
@@ -656,16 +656,18 @@ pop cx
 pop bx
 iret
 
-
-CRITERR db "CRITICAL ERROR $"
-CRITERRSYST db "#XXX - SYSTEM HALTED$"
+; translatable messages, each message is stored inside a 16-bytes field.
+; SvarCOM relies on the position and length of these fields to update messages
+; accordingly to the selected language.
+CRITERR db          "CRITICAL ERROR$ "
+CRITERRDSK_READ db  "READ FAILURE$   "
+CRITERRDSK_WRITE db "WRITE FAILURE$  "
+CRITERR_ABORT db    "(A)bort$        "
+CRITERR_RETRY db    "(R)etry$        "
+CRITERR_IGNOR db    "(I)gnore$       "
+CRITERR_FAIL  db    "(F)ail$         "
+CRITERR_KEYS  db    "ARIF"        ; upcase keys for Abort, Retry, Ignore, Fail
+CRITERRSYST db      " #XXX$"
 CRITERRDISK db "@: - $"
-CRITERRDSK_READ db "READ FAILURE$"
-CRITERRDSK_WRITE db "WRITE FAILURE$"
-CRLF db 0x0A, 0x0D, "$"
-CRITERR_ABORT db "(A)bort$"
-CRITERR_RETRY db "(R)etry$"
-CRITERR_IGNOR db "(I)gnore$"
-CRITERR_FAIL  db "(F)ail$"
-CRITERR_KEYS  db "ARIF"
 CRITERR_COMMA db ", $"
+CRLF db 0x0A, 0x0D, "$"

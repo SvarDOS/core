@@ -1146,7 +1146,7 @@ int main(void) {
     cmdline = cmdlinebuf;
 
     /* (re)load translation strings if needed */
-    nls_langreload(BUFFER, *rmod_envseg);
+    nls_langreload(BUFFER, rmod->rmodseg);
 
     /* am I inside a FOR loop? */
     if (rmod->forloop) {
