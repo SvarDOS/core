@@ -96,25 +96,17 @@ static struct flist_t *findfileinlist(struct flist_t *flist, const char *fname) 
 
 /* prepare a package for installation. this is mandatory before installing it!
  * returns a pointer to the zip file's index on success, NULL on failure.
+ * pkgname must be at least 9 bytes long and is filled with the package name.
  * the **zipfd pointer is updated with file descriptor of the open (to be
  * installed) zip file.
  * the returned ziplist is guaranteed to have the APPINFO file as first node
  * the ziplist is also guaranteed not to contain any directory entries */
-struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist) {
+struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist) {
   char fname[256];
-  char appinfofile[32];
-  struct ziplist *appinfoptr;
+  struct ziplist *appinfoptr = NULL;
   char *shortfile;
   struct ziplist *ziplinkedlist = NULL, *curzipnode, *prevzipnode;
   struct flist_t *flist = NULL;
-
-  sprintf(appinfofile, "appinfo\\%s.lsm", pkgname); /* Prepare the appinfo/xxxx.lsm filename string for later use */
-
-  /* check if not already installed, if already here, print a message "you might want to use update instead"
-   * of course this must not be done if we are in the process of upgrading said package */
-  if (((flags & PKGINST_UPDATE) == 0) && (validate_package_not_installed(pkgname, dosdir) != 0)) {
-    return(NULL);
-  }
 
   /* copy zip filename into fname */
   strcpy(fname, zipfile);
@@ -131,42 +123,62 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
     goto RAII;
   }
 
-  /* now let's check the content of the zip file */
-
+  /* open the SVP archive and get the list of files */
   *zipfd = fopen(fname, "rb");
   if (*zipfd == NULL) {
     puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
-    goto RAII;
+    goto RAII_ERR;
   }
   ziplinkedlist = zip_listfiles(*zipfd);
   if (ziplinkedlist == NULL) {
     puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
-    goto RAII;
-  }
-  /* if updating, load the list of files belonging to the current package */
-  if ((flags & PKGINST_UPDATE) != 0) {
-    flist = pkg_loadflist(pkgname, dosdir);
+    goto RAII_ERR;
   }
 
-  /* Verify that there's no collision with existing local files, look for the appinfo presence */
-  appinfoptr = NULL;
+  /* process the entire ziplist and sanitize it + locate the appinfo file so
+   * I know the package name */
   prevzipnode = NULL;
+  curzipnode = ziplinkedlist;
+  while (curzipnode != NULL) {
 
-  for (curzipnode = ziplinkedlist; curzipnode != NULL;) {
     /* change all slashes to backslashes, and switch into all-lowercase */
     slash2backslash(curzipnode->filename);
     strlwr(curzipnode->filename);
-    /* remove 'directory' ZIP entries to avoid false alerts about directory already existing */
-    if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) {
-      curzipnode->filename[0] = 0; /* mark it "empty", will be removed in a short moment */
+
+    /* validate that the file has a valid filename (8+3, no shady chars...) */
+    if (validfilename(curzipnode->filename) != 0) {
+      puts(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
+      printf(" %s\n", curzipnode->filename);
+      goto RAII_ERR;
     }
-    /* is it a "link file"? skip it - link files are no longer supported */
-    if (strstr(curzipnode->filename, "links\\") == curzipnode->filename) {
-      curzipnode->filename[0] = 0; /* in fact, I just mark the file as 'empty' on the filename - see later below */
+
+    /* remove 'directory' ZIP entries to avoid false alerts about directory already existing */
+    if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) goto DELETE_ZIP_NODE;
+
+    /* is it a "link file"? remove it - FreeDOS-style link files are not supported */
+    if (strstr(curzipnode->filename, "links\\") == curzipnode->filename) goto DELETE_ZIP_NODE;
+
+    /* abort if entry is encrypted */
+    if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
+      puts(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
+      printf(" %s\n", curzipnode->filename);
+      goto RAII_ERR;
+    }
+
+    /* abort if file is compressed with an unsupported method */
+    if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
+      kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
+      puts("");
+      printf(" %s\n", curzipnode->filename);
+      goto RAII_ERR;
     }
 
     /* is it the appinfo file? detach it from the list for now */
-    if (strcmp(curzipnode->filename, appinfofile) == 0) {
+    if (strstr(curzipnode->filename, "appinfo\\") == curzipnode->filename) {
+      if (appinfoptr != NULL) {
+        puts(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package" */
+        goto RAII_ERR;
+      }
       appinfoptr = curzipnode;
       curzipnode = curzipnode->nextfile;
       if (prevzipnode == NULL) {
@@ -177,25 +189,62 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       continue;
     }
 
-    if (curzipnode->filename[0] == 0) { /* ignore empty filenames (maybe it was empty originally, or has been emptied because it's a dropped source or link) */
-      if (prevzipnode == NULL) {  /* take the item out of the list */
-        ziplinkedlist = curzipnode->nextfile;
-        free(curzipnode); /* free the item */
-        curzipnode = ziplinkedlist;
-      } else {
-        prevzipnode->nextfile = curzipnode->nextfile;
-        free(curzipnode); /* free the item */
-        curzipnode = prevzipnode->nextfile;
-      }
-      continue; /* go to the next item */
-    }
+    /* all good, move to the next item in the list */
+    prevzipnode = curzipnode;
+    curzipnode = curzipnode->nextfile;
+    continue;
 
-    /* validate that the file has a valid filename (8+3, no shady chars...) */
-    if (validfilename(curzipnode->filename) != 0) {
-      puts(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
-      printf(" %s\n", curzipnode->filename);
+    DELETE_ZIP_NODE:
+    if (prevzipnode == NULL) {  /* take the item out of the list */
+      ziplinkedlist = curzipnode->nextfile;
+      free(curzipnode); /* free the item */
+      curzipnode = ziplinkedlist;
+    } else {
+      prevzipnode->nextfile = curzipnode->nextfile;
+      free(curzipnode); /* free the item */
+      curzipnode = prevzipnode->nextfile;
+    }
+    /* go to the next item */
+  }
+
+  /* if appinfo file not found, this is not a SvarDOS package */
+  if (appinfoptr == NULL) {
+    puts(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package." */
+    goto RAII_ERR;
+  }
+
+  /* attach the appinfo node to the top of the list (installation second stage
+   * relies on this) */
+  appinfoptr->nextfile = ziplinkedlist;
+  ziplinkedlist = appinfoptr;
+
+  /* fill in pkgname based on what was found in APPINFO */
+  {
+    unsigned short i;
+    /* copy and stop at the nearest dot */
+    for (i = 0; i < 8; i++) {
+      if (appinfoptr->filename[8 + i] == '.') break;
+      pkgname[i] = appinfoptr->filename[8 + i];
+    }
+    pkgname[i] = 0;
+    if ((i == 0) || (strcmp(appinfoptr->filename + 8 + i, ".lsm") != 0)) {
+      puts(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package." */
       goto RAII_ERR;
     }
+  }
+
+  /* if updating, load the list of files belonging to the current package */
+  if ((flags & PKGINST_UPDATE) != 0) {
+    flist = pkg_loadflist(pkgname, dosdir);
+  } else {
+    /* if NOT updating, check that package is not installed already */
+    if (validate_package_not_installed(pkgname, dosdir) != 0) goto RAII_ERR;
+  }
+
+  /* Verify that there's no collision with existing local files, but skip the
+   * first entry as it is the appinfo (LSM) file that is handled specially */
+
+  for (curzipnode = ziplinkedlist->nextfile; curzipnode != NULL; curzipnode = curzipnode->nextfile) {
 
     /* look out for collisions with already existing files (unless we are
      * updating the package and the local file belongs to it */
@@ -206,38 +255,7 @@ struct ziplist *pkginstall_preparepackage(const char *pkgname, const char *zipfi
       printf(" %s\n", fname);
       goto RAII_ERR;
     }
-
-    /* abort if any entry is encrypted */
-    if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
-      puts(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
-      printf(" %s\n", curzipnode->filename);
-      goto RAII_ERR;
-    }
-
-    /* abort if any file is compressed with an unsupported method */
-    if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
-      kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
-      puts("");
-      printf(" %s\n", curzipnode->filename);
-      goto RAII_ERR;
-    }
-
-    /* add node to list */
-    prevzipnode = curzipnode;
-    curzipnode = curzipnode->nextfile;
   }
-
-  /* if appinfo file not found, this is not a real SvarDOS package */
-  if (appinfoptr == NULL) {
-    kitten_printf(3, 12, appinfofile); /* "ERROR: Package do not contain the %s file! Not a valid SvarDOS package." */
-    puts("");
-    goto RAII_ERR;
-  }
-
-  /* attach the appinfo node to the top of the list (installation second stage
-   * relies on this) */
-  appinfoptr->nextfile = ziplinkedlist;
-  ziplinkedlist = appinfoptr;
 
   goto RAII;
 

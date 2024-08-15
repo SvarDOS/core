@@ -28,7 +28,7 @@
 3.8:NAPAKA: Neveljavna ZIP datoteka! Paketa ni mogoče namestiti.
 3.9:NAPAKA: Paket vsebuje datoteko, ki že obstaja na tem računalniku:
 3.10:NAPAKA: Ni mogoče ustvariti %s.
-3.12:NAPAKA: Paket ne vsebuje datoteke %s; to ni veljaven SvarDOS paket.
+3.12:NAPAKA: to ni veljaven SvarDOS paket
 3.18:Paket %s je že nameščen! Morda želite uporabiti dejavnost UPDATE.
 3.19:Paket %s nameščen: %ld napak, %ld datotek razširjenih.
 3.20:NAPAKA: paket vsebuje šifrirano datoteko:

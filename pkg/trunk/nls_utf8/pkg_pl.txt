@@ -29,7 +29,7 @@
 3.8:BŁĄD: Nieprawidłowe archiwum zip! Pakiet nie został zainstalowany.
 3.9:BŁĄD: Pakiet zawiera plik który już istnieje lokalnie:
 3.10:BŁĄD: Nie udało się stworzyć %s!
-3.12:BŁĄD: Pakiet nie zawiera pliku %s! Nieprawidłowy pakiet SvarDOS.
+3.12:BŁĄD: To nie jest prawidłowy pakiet SvarDOS
 3.18:Pakiet %s jest już zainstalowany! Zobacz akcję 'update'.
 3.19:Pakiet %s został zainstalowany: %ld błędów, rozpakowano %ld plików.
 3.20:BŁĄD: Pakiet zawiera zaszyfrowany plik:

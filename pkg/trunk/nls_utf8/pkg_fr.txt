@@ -29,7 +29,7 @@
 3.8:ERREUR: archive zip invalide! Le paquet n'a pas été installé.
 3.9:ERREUR: le paquet contient un fichier qui existe déjà localement:
 3.10:ERREUR: impossible de créer %s!
-3.12:ERREUR: le paquet ne contient pas de fichier %s! Ce n'est pas un paquet SvarDOS valide.
+3.12:ERREUR: Ce n'est pas un paquet SvarDOS valide
 3.18:Le paquet %s est déjà installé! Utilisez plutôt l'action "update".
 3.19:Le paquet %s a été installé: %ld erreurs, %ld fichiers extraits.
 3.20:ERREUR: le paquet contient un fichier crypté:

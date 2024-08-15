@@ -30,7 +30,7 @@
 3.8:FEHLER: Ungültiges ZIP-Archiv! Paket nicht installiert.
 3.9:FEHLER: Paket enthält eine Datei, die bereits lokal existiert:
 3.10:FEHLER: Konnte %s nicht erstellen!
-3.12:FEHLER: Ungültiges SvarDOS-Paket! Enthält nicht die Datei %s.
+3.12:FEHLER: Ungültiges SvarDOS-Paket
 3.18:Paket %s ist bereits installiert! Vielleicht möchten Sie die Aktion "update" verwenden.
 3.19:Paket %s installiert: %ld Fehler, %ld Dateien extrahiert.
 3.20:FEHLER: Paket enthält eine verschlüsselte Datei:

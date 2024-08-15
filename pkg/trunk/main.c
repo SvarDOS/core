@@ -96,36 +96,21 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
 
 static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist) {
   char pkgname[9];
-  int t, lastpathdelim = -1, lastdot = -1, res = 1;
+  int res = 1;
   struct ziplist *zipfileidx;
   FILE *zipfilefd;
-  /* copy the filename into pkgname (without path elements and without extension) */
-  for (t = 0; file[t] != 0; t++) {
-    switch (file[t]) {
-      case '/':
-      case '\\':
-        lastpathdelim = t;
-        break;
-      case '.':
-        lastdot = t;
-        break;
-    }
-  }
-  if (lastdot <= lastpathdelim) lastdot = t; /* a dot before last path delimiters is not an extension prefix */
-  t = lastdot - (lastpathdelim + 1);
-  if (t + 1 > sizeof(pkgname)) {
-    puts(svarlang_str(3, 24)); /* "ERROR: package name too long" */
-    return(1);
-  }
-  memcpy(pkgname, file + lastpathdelim + 1, t);
-  pkgname[t] = 0;
-  strlwr(pkgname); /* package name must be all lower-case for further file matching in the zip file */
-  /* prepare the zip file and install it */
+
+  /* prepare the zip file for installation and fetch package's name */
   zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
   if (zipfileidx != NULL) {
+
+    /* package name must be all lower-case for further file matching in the zip file */
+    strlwr(pkgname);
+
     /* remove the old version of the package if we are UPDATING it */
     res = 0;
     if (flags & PKGINST_UPDATE) res = pkgrem(pkgname, dosdir);
+
     if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
     zip_freelist(&zipfileidx);
   }
