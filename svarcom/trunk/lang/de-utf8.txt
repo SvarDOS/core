@@ -38,15 +38,15 @@
 2.2:SvarCOM: Stacküberlauf bemerkt, Befehlsverlauf geleert (Das ist kein Fehler.)
 
 # CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
-?3.0:KRITISCHE FEHLR
-?3.1:LESEN KAPUTT
-?3.2:SCHREIB FEHLER
-?3.3:(A)bbrechen
-?3.4:(W)iederholen
-?3.5:(M)issachten
-?3.6:(S)cheißen
+3.0:KRITISCHER FEHLR
+3.1:LESENFEHLER
+3.2:SCHREIBFEHLER
+3.3:(A)bbrechen
+3.4:(W)iederholen
+3.5:(I)gnorieren
+3.6:(U)ebergehen
 # THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
-?3.9:AWMS
+3.9:AWIU
 
 # CLS
 10.0:Löscht den Bildschirminhalt.
