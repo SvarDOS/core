@@ -37,7 +37,7 @@ If you have access to the advzip pogram, you may use it to squeeze the archive
 slightly more (esp. interesting for CORE packages since these are distributed
 on floppy disks):
 
-  advzip -z -4 -i 100 example-1.2.34.svp
+  advzip -zpk4 -i 100 example-1.2.34.svp
 
 Note: The version in the filename is just an information for packagers so they
 don't need to look into each package to know what version to expect there. In
