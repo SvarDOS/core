@@ -324,8 +324,11 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
 
   /* start by extracting the APPINFO (LSM) file - I need it so I can append the
    * list of files belonging to the packages later */
-  printf(" %s -> %s\n", ziplinkedlist->filename, buff);
+  output(ziplinkedlist->filename);
+  output(" -> ");
+  output(buff);
   unzip_result = zip_unzip(zipfd, ziplinkedlist, buff);
+  puts("");
   if (unzip_result != 0) {
     kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
     puts("");
@@ -356,11 +359,9 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     sprintf(fulldestfilename, "%s%s", buff, shortfile);
 
     /* Now unzip the file */
-    output(" ");
     output(curzipnode->filename);
     output(" -> ");
     output(buff);
-    //printf(" %s -> %s", curzipnode->filename, buff);
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
     puts("");
     if (unzip_result != 0) {
