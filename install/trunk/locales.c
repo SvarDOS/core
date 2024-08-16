@@ -37,7 +37,7 @@ static unsigned int dec2oct(int n) {
 }
 
 
-static void addnew(char *countrycode, char *humanlang, char *keybcode, unsigned short cp, unsigned char egafile, unsigned char keybfile, unsigned int subid) {
+static void addnew(char *countrycode, unsigned short countryid, char *humanlang, char *keybcode, unsigned short cp, unsigned char egafile, unsigned char keybfile, unsigned int subid) {
   static char lastcountry[4] = {0};
   static int curoffset = 0, curcountryoffset = 0;
   /* if new country, declare an offset */
@@ -60,7 +60,7 @@ static void addnew(char *countrycode, char *humanlang, char *keybcode, unsigned 
   }
   /* */
   if (countrycode[0] != 0) {
-    fprintf(fdkeyb, "  \"%s\\0%s\\0\\%d\\%d\\%d\\%d\\%d\\%d\",\r\n", humanlang, keybcode, dec2oct(cp >> 8), dec2oct(cp & 0xff), dec2oct(egafile), dec2oct(keybfile), dec2oct(subid >> 8), dec2oct(subid & 0xff));
+    fprintf(fdkeyb, "  \"%s\\0%s\\0\\%d\\%d\\%d\\%d\\%d\\%d\\%d\\%d\",\r\n", humanlang, keybcode, dec2oct(cp >> 8), dec2oct(cp & 0xff), dec2oct(egafile), dec2oct(keybfile), dec2oct(subid >> 8), dec2oct(subid & 0xff), dec2oct(countryid >> 8), dec2oct(countryid & 0xff));
   } else {
     fprintf(fdkeyb, "  NULL};\r\n");
   }
@@ -78,67 +78,67 @@ int main(void) {
 
   /******************* LAYOUTS LIST START *******************/
 
-  /* addnew(countrycode, humanlang, keybcode, cp, egafile, keybfile, subid) */
+  /* addnew(countrycode, countryid, humanlang, keybcode, cp, egafile, keybfile, subid) */
 
   /* English */
-  addnew("EN", "English (US)", "en", 437, 0, 0, 0);
-  addnew("EN", "English (UK)", "uk", 437, 0, 1, 0);
+  addnew("EN",  1, "English (US)", "en", 437, 0, 0, 0);
+  addnew("EN", 44, "English (UK)", "uk", 437, 0, 1, 0);
 
   /* Armenian */
-  addnew("HY", "Armenian", "hy", 899, 6, 3, 0);
+  addnew("HY", 374, "Armenian", "hy", 899, 6, 3, 0);
 
   /* Brazilian */
-  addnew("BR", "Brazilian", "br", 850, 1, 1, 0);
-  addnew("BR", "Brazilian (US layout)", "br274", 850, 1, 1, 0);
+  addnew("BR", 55, "Brazilian", "br", 850, 1, 1, 0);
+  addnew("BR", 55, "Brazilian (US layout)", "br274", 850, 1, 1, 0);
 
   /* Bulgarian */
-  addnew("BG", "Bulgarian", "bg", 872, 3, 2, 0);
+  addnew("BG", 359, "Bulgarian", "bg", 872, 3, 2, 0);
 
   /* French */
-  addnew("FR", "French (France)", "fr", 858, 1, 1, 0);
-  addnew("FR", "French (Canada, standard)", "cf", 863, 9, 1, 0);
-  addnew("FR", "French (Canada, legacy)", "cf", 863, 9, 1, 501);
-  addnew("FR", "French (Switzerland)", "sf", 858, 1, 1, 0);
+  addnew("FR", 33, "French (France)", "fr", 858, 1, 1, 0);
+  addnew("FR", 1, "French (Canada, standard)", "cf", 863, 9, 1, 0);
+  addnew("FR", 1, "French (Canada, legacy)", "cf", 863, 9, 1, 501);
+  addnew("FR", 41, "French (Switzerland)", "sf", 858, 1, 1, 0);
 
   /* German */
-  addnew("DE", "German", "de", 858, 1, 1, 0);
+  addnew("DE", 49, "German", "de", 858, 1, 1, 0);
 
   /* Hungarian */
-  addnew("HU", "Hungarian", "hu", 852, 1, 1, 208);
+  addnew("HU", 36, "Hungarian", "hu", 852, 1, 1, 208);
 
   /* Italian */
-  addnew("IT", "Italian", "it", 858, 1, 1, 0);
+  addnew("IT", 39, "Italian", "it", 858, 1, 1, 0);
 
   /* Latin-American */
-  addnew("LA", "Latin-American", "la", 437, 0, 1, 0);
+  addnew("LA", 54, "Latin-American", "la", 437, 0, 1, 0);
 
   /* Norvegian */
-  addnew("NO", "Norvegian", "no", 858, 9, 1, 0);
+  addnew("NO", 47, "Norvegian", "no", 858, 9, 1, 0);
 
   /* Polish */
-  addnew("PL", "Polish (Programmer)", "pl", 991, 10, 1, 0);
-  addnew("PL", "Polish (Typewriter)", "pl", 991, 10, 1, 214);
+  addnew("PL", 48, "Polish (Programmer)", "pl", 991, 10, 1, 0);
+  addnew("PL", 48, "Polish (Typewriter)", "pl", 991, 10, 1, 214);
 
   /* Russian */
-  addnew("RU", "Russian (Standard)", "ru", 866, 3, 2, 0);
-  addnew("RU", "Russian (Typewriter)", "ru", 866, 3, 2, 443);
+  addnew("RU", 7, "Russian (Standard)", "ru", 866, 3, 2, 0);
+  addnew("RU", 7, "Russian (Typewriter)", "ru", 866, 3, 2, 443);
 
   /* Slovenian */
-  addnew("SI", "Slovenian", "si", 852, 1, 1, 0);
+  addnew("SI", 386, "Slovenian", "si", 852, 1, 1, 0);
 
   /* Spanish */
-  addnew("ES", "Spanish", "es", 858, 1, 1, 0);
+  addnew("ES", 34, "Spanish", "es", 858, 1, 1, 0);
 
   /* Swedish */
-  addnew("SV", "Swedish", "sv", 858, 1, 1, 0);
+  addnew("SV", 46, "Swedish", "sv", 858, 1, 1, 0);
 
   /* Turkish */
-  addnew("TR", "Turkish", "tr", 857, 1, 2, 0);
+  addnew("TR", 90, "Turkish", "tr", 857, 1, 2, 0);
 
   /******************* LAYOUTS LIST STOP *******************/
 
   /* end of list - DO NOT REMOVE */
-  addnew("", "", "", 0, 0, 0, 0);
+  addnew("", 0, "", "", 0, 0, 0, 0);
 
   /* close files */
   fclose(fdoff);

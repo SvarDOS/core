@@ -70,16 +70,17 @@ static char BUILDSTRING[13];
 struct slocales {
   char lang[4];
   const char *keybcode;
-  unsigned int codepage;
-  int egafile;
-  int keybfile;
-  int keyboff;
-  int keyblen;
-  unsigned int keybid;
+  unsigned short codepage;
+  unsigned char egafile;
+  unsigned char keybfile;
+  short keyboff;
+  short keyblen;
+  unsigned short keybid;
+  unsigned short countryid; /* 1=USA, 33=FR, 48=PL, etc */
 };
 
 
-/* put a string on screen and fill it until w chars with whilte space */
+/* put a string on screen and fill it until w chars with white space */
 static void video_putstringfix(unsigned char y, unsigned char x, unsigned char attr, const char *s, unsigned char w) {
   unsigned char i;
 
@@ -294,6 +295,7 @@ static void newscreen(unsigned char statusbartype) {
   mdr_cout_locate(25,0);
 }
 
+
 /* fills a slocales struct accordingly to the value of its keyboff member */
 static void kblay2slocal(struct slocales *locales) {
   const char *m;
@@ -307,7 +309,9 @@ static void kblay2slocal(struct slocales *locales) {
   locales->egafile = m[3];
   locales->keybfile = m[4];
   locales->keybid = ((unsigned short)m[5] << 8) | m[6];
+  locales->countryid = ((unsigned short)m[7] << 8) | m[8];
 }
+
 
 static int selectlang(struct slocales *locales) {
   int choice, x;
@@ -326,12 +330,6 @@ static int selectlang(struct slocales *locales) {
     NULL
   };
 
-  /* do not ask for language on non-multilang setups */
-  if (!fileexists("INSTALL.LNG")) {
-    choice = 0;
-    goto SkipLangSelect;
-  }
-
   newscreen(1);
   msg = svarlang_strid(0x0100); /* "Welcome to SvarDOS" */
   x = 40 - (strlen(msg) >> 1);
@@ -348,8 +346,6 @@ static int selectlang(struct slocales *locales) {
 
   choice = menuselect(11, 9, langlist, -1);
   if (choice < 0) return(MENUPREV);
-
-  SkipLangSelect:
 
   /* populate locales with default values */
   memset(locales, 0, sizeof(struct slocales));
@@ -444,33 +440,43 @@ static int welcomescreen(void) {
 }
 
 
-/* returns 1 if drive is removable, 0 if not, -1 on error */
-static int isdriveremovable(int drv) {
-  union REGS r;
-  r.x.ax = 0x4408;
-  r.h.bl = drv;
-  int86(0x21, &r, &r);
-  /* CF set on error, AX set to 0 if removable, 1 if fixed */
-  if (r.x.cflag != 0) return(-1);
-  if (r.x.ax == 0) return(1);
-  return(0);
-}
+/* returns 0 if drive is removable, 1 if fixed, -1 on error */
+static int isdriveremovable(unsigned char drv);
+#pragma aux isdriveremovable = \
+"mov ax, 0x4408" \
+"int 0x21" \
+"jnc DONE" \
+"xor ax,ax" \
+"dec ax" \
+"DONE:" \
+parm [bl] \
+value [ax]
 
 
-/* returns total disk space of drive drv (in MiB, max 2048), or -1 if drive invalid */
-static int disksize(int drv) {
-  long res;
-  union REGS r;
-  r.h.ah = 0x36; /* DOS 2+ get free disk space */
-  r.h.dl = drv;  /* A=1, B=2, etc */
-  int86(0x21, &r, &r);
-  if (r.x.ax == 0xffffu) return(-1); /* AX set to FFFFh if drive invalid */
-  res = r.x.ax;  /* sectors per cluster */
-  res *= r.x.dx; /* dx contains total clusters, bx contains free clusters */
-  res *= r.x.cx; /* bytes per sector */
-  res >>= 20;    /* convert bytes to MiB */
-  return(res);
-}
+/* returns total disk space of drive drv (in MiB, max 2048, A=1 B=2 etc), or -1 if drive invalid */
+static int disksize(int drv);
+#pragma aux disksize = \
+"mov ah, 0x36" \
+"int 0x21" \
+"cmp ax, 0xffff" /* AX=FFFFh on error */ \
+"je FAIL" \
+/* AX=sec_per_cluster DX=tot_clusters BX=free_clusters CX=bytes_per_sec */ \
+"mul dx"        /* (DX AX) = AX * DX */ \
+"mov si,ax" \
+"mov di,dx" \
+"mul cx"      /* hi * lo */ \
+"xchg ax, di" /* First mul saved, grab orig DX */ \
+"mul bx"      /* lo * hi */ \
+"add di, ax"  /* top word of result */ \
+"mov ax, si"  /* retrieve original AX */ \
+"mul bx"      /* lo * lo */ \
+"add dx, di"  /* DX:AX has the low 32 bits of the multiplication result */ \
+"mov cl, 4" \
+"shr dx, cl"  /* (DX AX) >> 20 (convert bytes to MiB) */ \
+"FAIL:" \
+parm [dl] \
+modify [ax bx cx dx si di] \
+value [dx]
 
 
 /* returns 0 if disk is empty, non-zero otherwise */
@@ -490,27 +496,14 @@ static int diskempty(int drv) {
   return(res);
 }
 
-#ifdef DEADCODE
-/* set new DOS "current drive" to drv ('A', 'B', etc). returns 0 on success */
-static int set_cur_drive(char drv) {
-  union REGS r;
-  if ((drv < 'A') || (drv > 'Z')) return(-1);
-  r.h.ah = 0x0E; /* DOS 1+ SELECT DEFAULT DRIVE */
-  r.h.dl = drv - 'A';
-  int86(0x21, &r, &r);
-  if (r.h.al < drv - 'A') return(-1);
-  return(0);
-}
-#endif
-
 
 /* get the DOS "current drive" (0=A:, 1=B:, etc) */
-static int get_cur_drive(void) {
-  union REGS r;
-  r.h.ah = 0x19; /* DOS 1+ GET CURRENT DEFAULT DRIVE */
-  int86(0x21, &r, &r);
-  return(r.h.al);
-}
+static unsigned char get_cur_drive(void);
+#pragma aux get_cur_drive = \
+"mov ah, 0x19" /* DOS 1+ GET CURRENT DEFAULT DRIVE */ \
+"int 0x21" \
+modify [ah] \
+value [al]
 
 
 /* tries to write an empty file to drive.
@@ -518,9 +511,10 @@ static int get_cur_drive(void) {
  * gracefully reported - unfortunately this does not work under FreeDOS because
  * the DOS-C kernel does not implement the required flag.
  * returns 0 on success (ie. "disk exists and is writeable"). */
-static unsigned short test_drive_write(char drive, char *buff) {
+static unsigned short test_drive_write(char drive) {
   unsigned short result = 0;
-  sprintf(buff, "%c:\\SVWRTEST.123", drive);
+  char *buff = "@:\\SVWRTEST.123";
+  buff[0] = drive;
   _asm {
     push ax
     push bx
@@ -573,6 +567,16 @@ static int preparedrive(char sourcedrv) {
   cselecteddrive = 'A' + selecteddrive - 1;
   for (;;) {
     driveremovable = isdriveremovable(selecteddrive);
+    if (driveremovable == 0) {
+      newscreen(2);
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0302), cselecteddrive); /* "ERROR: Drive %c: is a removable device */
+      mdr_cout_str(9, 1, buff, COLOR_BODY, 80);
+      putstringnls(11, 2, COLOR_BODY, 0, 5); /* "Press any key..." */
+      mdr_dos_getkey();
+      return(MENUQUIT);
+    }
+
+    /* if C: not found - disk not partitioned? */
     if (driveremovable < 0) {
       const char *list[4];
       newscreen(0);
@@ -607,15 +611,10 @@ static int preparedrive(char sourcedrv) {
       mdr_dos_getkey();
       reboot();
       return(MENUQUIT);
-    } else if (driveremovable > 0) {
-      newscreen(2);
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0302), cselecteddrive); /* "ERROR: Drive %c: is a removable device */
-      mdr_cout_str(9, 1, buff, COLOR_BODY, 80);
-      putstringnls(11, 2, COLOR_BODY, 0, 5); /* "Press any key..." */
-      return(MENUQUIT);
     }
+
     /* if not formatted, propose to format it right away (try to create a directory) */
-    if (test_drive_write(cselecteddrive, buff) != 0) {
+    if (test_drive_write(cselecteddrive) != 0) {
       const char *list[3];
       newscreen(0);
       snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
@@ -702,7 +701,7 @@ static void genlocalesconf(FILE *fd, const struct slocales *locales) {
     if (locales->egafile == 1) {
       fprintf(fd, "MODE CON CP PREPARE=((%u) %%DOSDIR%%\\CPI\\EGA.CPX)\r\n", locales->codepage);
     } else {
-      fprintf(fd, "MODE CON CP PREPARE=((%u) %%DOSDIR%%\\CPI\\EGA%d.CPX)\r\n", locales->codepage, locales->egafile);
+      fprintf(fd, "MODE CON CP PREPARE=((%u) %%DOSDIR%%\\CPI\\EGA%u.CPX)\r\n", locales->codepage, locales->egafile);
     }
     fprintf(fd, "MODE CON CP SELECT=%u\r\n", locales->codepage);
   }
@@ -712,7 +711,7 @@ static void genlocalesconf(FILE *fd, const struct slocales *locales) {
     if (locales->keybfile == 1) {
       fprintf(fd, "KEYBOARD.SYS");
     } else {
-      fprintf(fd, "KEYBRD%d.SYS", locales->keybfile);
+      fprintf(fd, "KEYBRD%u.SYS", locales->keybfile);
     }
     if (locales->keybid != 0) fprintf(fd, " /ID:%d", locales->keybid);
     fprintf(fd, "\r\n");
@@ -744,8 +743,12 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
               "; command interpreter (shell) location and default environment size\r\n"
               "SHELL=C:\\COMMAND.COM /E:512 /P\r\n");
   fprintf(fd, "\r\n"
-              "; NLS configuration\r\n"
-              ";COUNTRY=001,%u,C:\\SVARDOS\\CFG\\COUNTRY.SYS\r\n", locales->codepage);
+              "; NLS configuration\r\n");
+  if (locales != NULL) {
+    fprintf(fd, "COUNTRY=%03u,%u,C:\\SVARDOS\\COUNTRY.SYS\r\n", locales->countryid, locales->codepage);
+  } else {
+    fprintf(fd, "COUNTRY=001,437,C:\\SVARDOS\\COUNTRY.SYS\r\n");
+  }
   fprintf(fd, "\r\n"
               "; CD-ROM driver initialization\r\n"
               ";DEVICE=C:\\DRIVERS\\VIDECDD\\VIDE-CDD.SYS /D:SVCD0001\r\n");
@@ -757,7 +760,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
   fprintf(fd, "@ECHO OFF\r\n");
   fprintf(fd, "SET TEMP=C:\\TEMP\r\n");
   fprintf(fd, "SET DOSDIR=C:\\SVARDOS\r\n");
-  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS;.\r\n");
+  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
   fprintf(fd, "SET DIRCMD=/O/P\r\n");
   fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
   fprintf(fd, "PATH %%DOSDIR%%\r\n");
@@ -766,7 +769,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
               "REM enable CPU power saving\r\n"
               "FDAPM ADV:REG\r\n");
   fprintf(fd, "\r\n");
-  genlocalesconf(fd, locales);
+  if (locales != NULL) genlocalesconf(fd, locales);
   fprintf(fd, "\r\n");
   fprintf(fd, "REM Uncomment the line below for CDROM support\r\n");
   fprintf(fd, "REM SHSUCDX /d:SVCD0001\r\n");
@@ -987,30 +990,21 @@ static void loadcp(const struct slocales *locales) {
   /* below I re-init the video controller - apparently this is required if
    * I want the new glyph symbols to be actually applied, at least some
    * (broken?) BIOSes, like VBox, apply glyphs only at next video mode change */
-  {
-  union REGS r;
-  r.h.ah = 0x0F; /* get current video mode */
-  int86(0x10, &r, &r); /* r.h.al contains the current video mode now */
-  r.h.al |= 128; /* set the high bit of AL to instruct BIOS not to flush VRAM's content (EGA+) */
-  r.h.ah = 0; /* re-set video mode (to whatever is set in AL) */
-  int86(0x10, &r, &r);
+  _asm {
+    push bx
+    mov ah, 0x0F  /* get current video mode */
+    int 0x10      /* al contains the current video mode now */
+    or al, 128    /* set high bit of AL to instruct BIOS not to flush VRAM's content (EGA+) */
+    xor ah, ah    /* re-set video mode (to whatever is set in AL) */
+    int 0x10
+    pop bx
   }
 }
 
 
-#ifdef DEADCODE
-/* checks that drive drv contains SvarDOS packages
- * returns 0 if found, non-zero otherwise */
-static int checkinstsrc(char drv) {
-  char fname[16];
-  snprintf(fname, sizeof(fname), "%c:\\ATTRIB.SVP", drv);
-  return(!fileexists(fname));
-}
-#endif
-
-
 int main(void) {
-  struct slocales locales;
+  struct slocales locales_data;
+  struct slocales *locales = &locales_data;
   int targetdrv;
   int sourcedrv;
   int action;
@@ -1056,29 +1050,33 @@ int main(void) {
     COLOR_SELECTCUR = 0x07;
   }
 
- SelectLang:
-  action = selectlang(&locales); /* welcome to svardos, select your language */
-  if (action != MENUNEXT) goto Quit;
-  loadcp(&locales);
-  svarlang_load("INSTALL.LNG", locales.lang); /* NLS support */
+  /* am I EN-only? */
+  if (!fileexists("INSTALL.LNG")) locales = NULL;
 
-  action = selectkeyb(&locales);  /* what keyb layout should we use? */
+ SelectLang:
+  if (locales == NULL) goto WelcomeScreen;
+  action = selectlang(locales); /* welcome to svardos, select your language */
+  if (action != MENUNEXT) goto Quit;
+  loadcp(locales);
+  svarlang_load("INSTALL.LNG", locales->lang); /* NLS support */
+
+  action = selectkeyb(locales);  /* what keyb layout should we use? */
   if (action == MENUQUIT) goto Quit;
-  if (action == MENUPREV) {
-    if (!fileexists("INSTALL.LNG")) goto Quit;
-    goto SelectLang;
-  }
+  if (action == MENUPREV) goto SelectLang;
 
  WelcomeScreen:
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto Quit;
-  if (action == MENUPREV) goto SelectLang;
+  if (action == MENUPREV) {
+    if (locales == NULL) goto Quit;
+    goto SelectLang;
+  }
 
   targetdrv = preparedrive(sourcedrv); /* what drive should we install from? check avail. space */
   if (targetdrv == MENUQUIT) goto Quit;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
-  bootfilesgen(targetdrv, &locales); /* generate boot files and other configurations */
-  if (installpackages(targetdrv, sourcedrv, &locales) != 0) goto Quit;    /* install packages */
+  bootfilesgen(targetdrv, locales); /* generate boot files and other configurations */
+  if (installpackages(targetdrv, sourcedrv, locales) != 0) goto Quit;    /* install packages */
   /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
   /*netcfg();*/ /* basic networking config */
   finalreboot(); /* remove the CD and reboot */
