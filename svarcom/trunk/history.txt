@@ -4,14 +4,14 @@
 
 
 
-=== ver 2024.4 (xx.xx.2024) ==================================================
+=== ver 2024.4 (16.08.2024) ==================================================
 
  - /P is implied when SvarCOM is the init shell (works in DR-DOS and MS-DOS 5)
  - DR-DOS compatibility: F5/F8 boot key presses are detected and handled
  - VER command: provides extended kernel information when available
  - fixed COMSPEC respawning when SvarCOM is aborted through CTRL+C
  - when COMMAND.COM respawn fails, the exact path that was tried is displayed
- - CTRL+C can abort the ongoing batch files or for loop
+ - CTRL+C can abort the ongoing batch files or FOR loop
  - EDR-DOS kernel ("config") environment is used as the initial (master) env
  - SvarCOM provides its own INT 24h handler (thank you ECM for all your help!)
 

@@ -95,7 +95,8 @@ release: command.com .SYMBOLIC
 	mkdir bin
 	mkdir doc
 	mkdir doc\svarcom
-	copy *.txt doc\svarcom\
+	copy svarcom.txt doc\svarcom\
+	copy history.txt doc\svarcom\
 	copy svarcom.lsm appinfo\
 	copy svarcom.lng bin\
 	upx -9 --8086 command.com
