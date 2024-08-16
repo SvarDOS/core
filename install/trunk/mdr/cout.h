@@ -32,7 +32,7 @@
  * w = screen width
  * h = screen height
  * Any of these arguments may be passed as NULL
- * Returns a color flag (0=mono, non-zero=color) */
+ * Returns a color flag (0=mono, 1=color) */
 unsigned char mdr_cout_init(unsigned char *w, unsigned char *h);
 
 /* get current attribute value under cursor and returns it */
@@ -50,7 +50,7 @@ void mdr_cout_locate(unsigned char row, unsigned char column);
 /* print a single character on screen */
 void mdr_cout_char(unsigned char y, unsigned char x, char c, unsigned char attr);
 
-/* print a single character on screen, repeated count times */
+/* print a single character on screen, repeated count times (count=0 prints nothing) */
 void mdr_cout_char_rep(unsigned char y, unsigned char x, char c, unsigned char attr, unsigned char count);
 
 /* print a nul-terminated string on screen, up to maxlen characters
@@ -60,6 +60,11 @@ unsigned char mdr_cout_str(unsigned char y, unsigned char x, const char *s, unsi
 /* clears screen, filling it with a single color attribute */
 void mdr_cout_cls(unsigned char colattr);
 
+/* provides properties of the current video mode:
+ * termwidth = terminal's width
+ * termheight = terminal's height
+ * colorflag = mono/color flag (0=mono 1=color)
+ * NOTE: all arguments must be valid pointers (NULL not allowed) */
 void mdr_cout_getconprops(unsigned char *termwidth, unsigned char *termheight, unsigned char *colorflag);
 
 

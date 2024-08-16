@@ -1,4 +1,4 @@
-version xxxx (xx xxx xxxx)
+version 2024 (29 Jul 2024)
 - added the OPL driver (Adlib-style OPL2 FM synth) along with IMF playback
 - new mdr_dos_selfexe()
 - new mdr_dos_truename()
@@ -16,6 +16,7 @@ version xxxx (xx xxx xxxx)
 - replaced pcx_convto8bpp() by mdr_pcx_to8bpp()
 - vid12_putscanline() optimizations: 22% faster
 - renamed all the mouse_ functions to mdr_mouse_
+- improved mdr_cout_cursor_hide() so it works well on VirtualBox
 - added mdr_mouse_setcursor()
 - added vid12_waitblank()
 
