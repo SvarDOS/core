@@ -4,7 +4,7 @@
 
 
 
-=== ver 2024.5 (xx.xx.2024) ==================================================
+=== ver 2024.5 (17.08.2024) ==================================================
 
  - Fixed resetting the EDR kernel environment segment after fetching it
 
