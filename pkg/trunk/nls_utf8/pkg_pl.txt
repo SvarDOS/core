@@ -53,6 +53,7 @@
 7.0:BŁĄD: repozytorium '%s' jest skonfigurowane dwa razy!
 7.1:BŁĄD: nie zdołano otworzyć pliku konfiguracyjnego '%s'!
 7.4:Uwaga: token z pustą wartością w linii #%d
+7.5:Uwaga: nieprawidłowy bootdrive w linii #%d
 7.8:Uwaga: Nieznany token '%s' w linii #%d
 7.11:Uwaga: Nieprawidłowe polecenie 'DIR' w linii #%d
 7.15:BŁĄD: katalog specjalny '%s' nie jest prawidłową ścieżką!

@@ -54,6 +54,7 @@
 7.0:ERROR: custom dir '%s' is listed twice!
 7.1:ERROR: Could not open config file '%s'!
 7.4:Warning: token with empty value on line #%d
+7.5:Warning: Invalid bootdrive on line #%d
 7.8:Warning: Unknown token '%s' at line #%d
 7.11:Warning: Invalid 'DIR' directive found at line #%d
 7.15:ERROR: custom dir '%s' is not a valid absolute path!

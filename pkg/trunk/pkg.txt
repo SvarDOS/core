@@ -52,6 +52,9 @@ SOFTWARE.
 # Lines starting with "#" are comments and are ignored by PKG                #
 ##############################################################################
 
+# The system's boot drive, used to install the DOS kernel, COMMAND.COM etc
+BOOTDRIVE C
+
 # Where SvarDOS "CORE" files are to be installed
 DIR BIN C:\SVARDOS
 

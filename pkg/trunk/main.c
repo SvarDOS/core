@@ -98,14 +98,14 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
 }
 
 
-static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist) {
+static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist, char bootdrive) {
   char pkgname[9];
   int res = 1;
   struct ziplist *zipfileidx;
   FILE *zipfilefd;
 
   /* prepare the zip file for installation and fetch package's name */
-  zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist);
+  zipfileidx = pkginstall_preparepackage(pkgname, file, flags, &zipfilefd, dosdir, dirlist, bootdrive);
   if (zipfileidx != NULL) {
 
     /* package name must be all lower-case for further file matching in the zip file */
@@ -115,7 +115,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
     res = 0;
     if (flags & PKGINST_UPDATE) res = pkgrem(pkgname, dosdir);
 
-    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd);
+    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd, bootdrive);
     zip_freelist(&zipfileidx);
   }
 
@@ -160,6 +160,7 @@ int main(int argc, char **argv) {
   enum ACTIONTYPES action;
   const char *dosdir;
   struct customdirs *dirlist;
+  char bootdrive;
 
   svarlang_autoload_exepath(argv[0], getenv("LANG"));   /* NLS init */
 
@@ -188,12 +189,12 @@ int main(int argc, char **argv) {
   }
 
   /* load configuration */
-  if (loadconf(dosdir, &dirlist) != 0) goto GAMEOVER;
+  if (loadconf(dosdir, &dirlist, &bootdrive) != 0) goto GAMEOVER;
 
   switch (action) {
     case ACTION_UPDATE:
     case ACTION_INSTALL:
-      res = pkginst(argv[2], (action == ACTION_UPDATE)?PKGINST_UPDATE:0, dosdir, dirlist);
+      res = pkginst(argv[2], (action == ACTION_UPDATE)?PKGINST_UPDATE:0, dosdir, dirlist, bootdrive);
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);

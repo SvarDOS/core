@@ -101,7 +101,7 @@ static struct flist_t *findfileinlist(struct flist_t *flist, const char *fname) 
  * installed) zip file.
  * the returned ziplist is guaranteed to have the APPINFO file as first node
  * the ziplist is also guaranteed not to contain any directory entries */
-struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist) {
+struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char bootdrive) {
   char fname[256];
   struct ziplist *appinfoptr = NULL;
   char *shortfile;
@@ -154,9 +154,6 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
     /* remove 'directory' ZIP entries to avoid false alerts about directory already existing */
     if ((curzipnode->flags & ZIP_FLAG_ISADIR) != 0) goto DELETE_ZIP_NODE;
-
-    /* is it a "link file"? remove it - FreeDOS-style link files are not supported */
-    if (strstr(curzipnode->filename, "links\\") == curzipnode->filename) goto DELETE_ZIP_NODE;
 
     /* abort if entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
@@ -248,7 +245,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
     /* look out for collisions with already existing files (unless we are
      * updating the package and the local file belongs to it */
-    shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist);
+    shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist, bootdrive);
     strcat(fname, shortfile);
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
       puts(svarlang_str(3, 9)); /* "ERROR: Package contains a file that already exists locally:" */
@@ -312,7 +309,7 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
 
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
-int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd) {
+int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive) {
   char buff[256];
   char fulldestfilename[256];
   char *shortfile;
@@ -349,7 +346,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   for (curzipnode = ziplinkedlist->nextfile; curzipnode != NULL; curzipnode = curzipnode->nextfile) {
 
     /* substitute paths to custom dirs */
-    shortfile = computelocalpath(curzipnode->filename, buff, dosdir, dirlist);
+    shortfile = computelocalpath(curzipnode->filename, buff, dosdir, dirlist, bootdrive);
 
     /* log the filename to LSM metadata file + its CRC */
     fprintf(lsmfd, "%s%s?%08lX\r\n", buff, shortfile, curzipnode->crc32);

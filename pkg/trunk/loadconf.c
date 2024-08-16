@@ -86,11 +86,12 @@ static int addnewdir(struct customdirs **dirlist, const char *name, const char *
 }
 
 
-int loadconf(const char *dosdir, struct customdirs **dirlist) {
+int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
   FILE *fd;
   char *value = NULL;
   char token[512];
   int nline = 0;
+  const char *PKG_CFG = " (PKG.CFG)";
 
   snprintf(token, sizeof(token), "%s\\cfg\\pkg.cfg", dosdir);
   fd = fopen(token, "r");
@@ -101,6 +102,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
   }
 
   *dirlist = NULL;
+  *bootdrive = 'C'; /* default */
 
   /* read the config file line by line */
   while (freadtokval(fd, token, sizeof(token), &value, ' ') == 0) {
@@ -111,7 +113,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
 
     if ((value == NULL) || (value[0] == 0)) {
       kitten_printf(7, 4, nline); /* "Warning: token with empty value on line #%d" */
-      puts("");
+      puts(PKG_CFG);
       continue;
     }
 
@@ -123,7 +125,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
       for (i = 0; (value[i] != ' ') && (value[i] != 0); i++);
       if (value[i] == 0) {
         kitten_printf(7, 11, nline); /* "Warning: Invalid 'DIR' directive found at line #%d" */
-        puts("");
+        puts(PKG_CFG);
         continue;
       }
       value[i] = 0;
@@ -139,6 +141,14 @@ int loadconf(const char *dosdir, struct customdirs **dirlist) {
         freeconf(dirlist);
         fclose(fd);
         return(-1);
+      }
+    } else if (strcasecmp(token, "BOOTDRIVE") == 0) { /* boot drive (used for kernel and command.com installation */
+      *bootdrive = value[0];
+      *bootdrive &= 0xDF; /* upcase it */
+      if ((*bootdrive < 'A') || (*bootdrive > 'Z')) {
+        kitten_printf(7, 5, nline); /* Warning: Invalid bootdrive at line #%d */
+        puts(PKG_CFG);
+        *bootdrive = 'C';
       }
     } else { /* unknown token */
       kitten_printf(7, 8, token, nline); /* "Warning: Unknown token '%s' at line #%d" */

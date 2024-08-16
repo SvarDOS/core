@@ -22,7 +22,7 @@ char *fdnpkg_strcasestr(const char *s, const char *find);
  * ignores the trailing filename if there is one */
 void mkpath(char *dirs);
 
-char *computelocalpath(char *longfilename, char *respath, const char *dosdir, const struct customdirs *dirlist);
+char *computelocalpath(char *longfilename, char *respath, const char *dosdir, const struct customdirs *dirlist, char bootdrive);
 void removeDoubleBackslashes(char *str);
 char *getfext(char *fname);
 int freadtokval(FILE *fd, char *line, size_t maxlen, char **val, char delim);
