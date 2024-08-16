@@ -1,0 +1,73 @@
+
+              PKG - the package manager for the SvarDOS system
+
+
+*** GENERAL INFORMATION ***
+
+PKG installs, updates and removes software *.SVP packages. Such packages are
+distributed with the SvarDOS system and may also be obtained with PKGNET from
+the online SvarDOS repository.
+
+PKG is configured through the %DOSDIR%\CFG\PKG.CFG configuration file. This
+file provides information about the directories where packages have to be
+installed. An example is shown at the bottom of this file below.
+
+PKG can display its messages in a variety of languages. To select its language,
+it looks at the %LANG% environment variable (for example "SET LANG=PL") and
+loads translated messages from its PKG.LNG language file, that should be in the
+same directory as PKG.EXE. If the LNG file cannot be found, or if the %LANG%
+variable points at a language that is not supported by PKG, then all messages
+are displayed in english.
+
+
+*** LICENSE ***
+
+PKG is published under the terms of the MIT license.
+
+Copyright (C) 2016-2024 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+*** EXAMPLE CONFIGURATION FILE ***
+
+##############################################################################
+# EXAMPLE PKG.CFG                                                            #
+# Lines starting with "#" are comments and are ignored by PKG                #
+##############################################################################
+
+# The system's boot drive, used to install the DOS kernel, COMMAND.COM etc
+BOOTDRIVE C
+
+# Where SvarDOS "CORE" files are to be installed
+DIR BIN C:\SVARDOS
+
+# Games
+DIR GAMES C:\GAMES
+
+# Programs, utilities
+DIR PROGS C:\
+
+# Drivers
+DIR DRIVERS C:\DRIVERS
+
+# Development tools (compilers, linkers, disassemblers...)
+DIR DEVEL C:\DEVTOOLS
+
+##############################################################################

@@ -1,0 +1,78 @@
+#
+# PKG language file
+#
+# Language....: Brazilian Portuguese
+# Author......: Luzemário Dantas
+# Last updated: 02 Jul 2022
+#
+
+#### Help ####
+
+1.0:O PKG é o gerenciador de pacotes do SvarDOS.
+1.20:Uso:   pkg install pacote[.svp]
+1.21:       pkg update pacote[.svp]
+1.22:       pkg remove pacote
+1.23:       pkg listfiles pacote
+1.24:       pkg listlocal [filtro]
+1.27:       pkg unzip arquivo.zip
+1.28:       pkg crc32 arquivo
+1.29:       pkg listzip arquivo.zip
+1.40:O PKG é publicado sob a licença MIT.
+1.41:Ele é configurado pelo %DOSDIR%\\CFG\\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% não configurado! Você deve apontá-lo para o diretório principal do SvarDOS.
+2.3:Exemplo: SET DOSDIR=C:\\SVARDOS
+2.14:Sem memória! (%s)
+
+#### Installing package ####
+
+3.8:ERRO: Arquivo zip inválido! Pacote não instalado.
+3.9:ERRO: Pacote contém um arquivo que já existe localmente:
+3.10:ERRO: Impossível criar %s!
+3.12:ERRO: Não é um pacote válido SvarDOS.
+3.18:Pacote %s já está instalado! Você pode querer usar a ação 'update'.
+3.19:Pacote %s instalado: %d erros, %d arquivos extraídos.
+3.20:ERRO: Pacote contém um arquivo encriptado:
+3.23:ERRO: Pacote contém um nome de arquivo inválido:
+3.24:ERRO: Nome do pacote muito longo
+
+#### Removing package ####
+
+4.0:Pacote %s não está instalado, assim não foi removido.
+4.3:Sem memória! Impossível armazenar diretorio %s!
+4.4:removendo %s
+4.5:Pacote %s foi removido.
+
+#### Searching package ####
+
+5.0:Nenhum pacote coincide com a busca.
+
+#### Loading configuration ####
+
+7.0:ERRO: diretório personalizado '%s' está listado duas vezes!
+7.1:ERRO: Impossível abrir arquivo de configuração '%s'!
+7.4:Alerta: token com valor vazio na linha #%d
+7.8:Alerta: Token desconhecido '%s' na linha #%d
+7.11:Alerta: Diretiva 'DIR' inválida encontrada na linha #%d
+7.15:ERRO: diretório personalizado '%s' não é um caminho absoluto válido!
+7.16:ERRO: diretório personalizado '%s' é um nome reservado!
+
+#### Unziping package ####
+
+8.1:assinatura zip desconhecida: 0x%08lx
+8.2:ERRO: Pacote contém um arquivo comprimido com um método não suportado (%d):
+
+#### Handling the local list of installed packages ####
+
+9.0:ERRO: Impossível acessar diretório %s
+9.1:ERRO: Pacote Local '%s' não encontrado
+
+#### unzip ####
+
+10.0:OK
+?10.1:ERRO: Falha ao abrir o arquivo
+10.2:ERRO: Arquivo ZIP inválido
+10.3:ERRO: Arquivo já existe
+10.4:ERRO: Falha na descompactação (%d)
