@@ -454,29 +454,38 @@ value [ax]
 
 
 /* returns total disk space of drive drv (in MiB, max 2048, A=1 B=2 etc), or -1 if drive invalid */
-static int disksize(int drv);
-#pragma aux disksize = \
-"mov ah, 0x36" \
-"int 0x21" \
-"cmp ax, 0xffff" /* AX=FFFFh on error */ \
-"je FAIL" \
-/* AX=sec_per_cluster DX=tot_clusters BX=free_clusters CX=bytes_per_sec */ \
-"mul dx"        /* (DX AX) = AX * DX */ \
-"mov si,ax" \
-"mov di,dx" \
-"mul cx"      /* hi * lo */ \
-"xchg ax, di" /* First mul saved, grab orig DX */ \
-"mul bx"      /* lo * hi */ \
-"add di, ax"  /* top word of result */ \
-"mov ax, si"  /* retrieve original AX */ \
-"mul bx"      /* lo * lo */ \
-"add dx, di"  /* DX:AX has the low 32 bits of the multiplication result */ \
-"mov cl, 4" \
-"shr dx, cl"  /* (DX AX) >> 20 (convert bytes to MiB) */ \
-"FAIL:" \
-parm [dl] \
-modify [ax bx cx dx si di] \
-value [dx]
+static int disksize(unsigned char drv) {
+  unsigned short sec_per_cluster = 0;
+  unsigned short tot_clusters = 0;
+  unsigned short bytes_per_sec = 0;
+  long res;
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+
+    mov ah, 0x36
+    mov dl, drv
+    int 0x21
+    /* AX=sec_per_cluster DX=tot_clusters BX=free_clusters CX=bytes_per_sec */
+    mov sec_per_cluster, ax
+    mov bytes_per_sec, cx
+    mov tot_clusters, dx
+
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+
+  if (sec_per_cluster == 0xffff) return(-1);
+  res = sec_per_cluster;
+  res *= tot_clusters;
+  res *= bytes_per_sec;
+  res >>= 20;
+  return((int)res);
+}
 
 
 /* returns 0 if disk is empty, non-zero otherwise */
@@ -1009,7 +1018,8 @@ int main(void) {
   int sourcedrv;
   int action;
 
-  /* setup the internal int 24h handler ("always fail") */
+  /* setup an internal int 24h handler ("always fail") so DOS does not output
+   * the ugly "abort, retry, fail" messages */
   int24hdl();
 
   /* read the svardos build revision (from floppy label) */
