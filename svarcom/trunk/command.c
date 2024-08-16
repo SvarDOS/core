@@ -148,7 +148,7 @@ static void drdos_init(struct config *cfg) {
     add bx, 0x12
     mov ax, es:[bx]      /* read the segment of the kernel environment */
     mov kernenvseg, ax   /* save the kern env segment for later */
-    mov es:[bx], word ptr 0  /* reset the pointer to kernel env as done by DR COMMAND.COM */
+    mov word ptr [es:bx], 0  /* reset the pointer to kernel env as done by DR COMMAND.COM */
 
     /* if DR-DOS env is at seg 0x60 then overwrite my own env in PSP with this.
      * Seg 0x60 is used since https://github.com/SvarDOS/edrdos/issues/88 and

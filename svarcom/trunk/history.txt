@@ -4,6 +4,11 @@
 
 
 
+=== ver 2024.5 (xx.xx.2024) ==================================================
+
+ - Fixed resetting the EDR kernel environment segment after fetching it
+
+
 === ver 2024.4 (16.08.2024) ==================================================
 
  - /P is implied when SvarCOM is the init shell (works in DR-DOS and MS-DOS 5)
