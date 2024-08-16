@@ -10,6 +10,9 @@
 
 #include "loadconf.h"   /* required for the customdirs struct */
 
+/* outputs a NUL-terminated string to stdout */
+void output(const char *s);
+
 void slash2backslash(char *str);
 
 /* trim CRC from a filename and returns a pointer to the CRC part.

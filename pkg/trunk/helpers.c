@@ -17,6 +17,40 @@
 #include "helpers.h"
 
 
+
+/* outputs a NUL-terminated string to stdout */
+void output(const char *s) {
+  _asm {
+    push ds
+    push es
+    /* get length of s into CX */
+    mov ax, 0x4000 /* ah=DOS "write to file" and AL=0 for NUL matching */
+    lds dx, s      /* set DS:DX to string (required for later) */
+    push ds
+    pop es         /* make sure es=ds (scasb uses es) */
+    mov di, dx     /* set di to string (for NULL matching) */
+    mov cx, 0xffff /* preset cx to 65535 (-1) */
+    cld            /* clear DF so scasb increments DI */
+    repne scasb    /* cmp al, es:[di], inc di, dec cx until match found */
+    /* CX contains (65535 - strlen(s)) now */
+    not cx         /* reverse all bits so I get (strlen(s) + 1) */
+    dec cx         /* this is CX length */
+    jz WRITEDONE   /* do nothing for empty strings */
+
+    /* output by writing to stdout */
+    /* mov ah, 0x40 */  /* DOS 2+ -- write to file via handle */
+    xor bh, bh
+    mov bl, 1 /* set handle (1=stdout 2=stderr) */
+    /* mov cx, xxx */ /* write CX bytes */
+    /* mov dx, s   */ /* DS:DX is the source of bytes to "write" */
+    int 0x21
+    WRITEDONE:
+    pop es
+    pop ds
+  }
+}
+
+
 /* change all / to \ in a string */
 void slash2backslash(char *str) {
   int x;

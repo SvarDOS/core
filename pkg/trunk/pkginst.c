@@ -356,7 +356,11 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     sprintf(fulldestfilename, "%s%s", buff, shortfile);
 
     /* Now unzip the file */
-    printf(" %s -> %s", curzipnode->filename, buff);
+    output(" ");
+    output(curzipnode->filename);
+    output(" -> ");
+    output(buff);
+    //printf(" %s -> %s", curzipnode->filename, buff);
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
     puts("");
     if (unzip_result != 0) {
