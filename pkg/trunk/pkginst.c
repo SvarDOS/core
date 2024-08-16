@@ -327,13 +327,13 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
 
   /* start by extracting the APPINFO (LSM) file - I need it so I can append the
    * list of files belonging to the packages later */
+  printf(" %s -> %s\n", ziplinkedlist->filename, buff);
   unzip_result = zip_unzip(zipfd, ziplinkedlist, buff);
   if (unzip_result != 0) {
-    kitten_printf(8, 3, ziplinkedlist, buff); /* "ERROR: failed extracting '%s' to '%s'!" */
-    printf(" [%d]\n", unzip_result);
+    kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
+    puts("");
     return(-1);
   }
-  printf(" %s -> %s\n", ziplinkedlist->filename, buff);
   filesextractedsuccess++;
 
   /* open the (freshly created) LSM file */
@@ -359,13 +359,14 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     sprintf(fulldestfilename, "%s%s", buff, shortfile);
 
     /* Now unzip the file */
+    printf(" %s -> %s", curzipnode->filename, buff);
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
+    puts("");
     if (unzip_result != 0) {
-      kitten_printf(8, 3, curzipnode->filename, fulldestfilename); /* "ERROR: failed extracting '%s' to '%s'!" */
-      printf(" [%d]\n", unzip_result);
+      kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
+      puts("");
       filesextractedfailure += 1;
     } else {
-      printf(" %s -> %s\n", curzipnode->filename, buff);
       filesextractedsuccess += 1;
     }
   }

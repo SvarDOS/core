@@ -60,7 +60,6 @@
 
 8.1:Neznana vrsta datoteke ZIP: 0x%08x
 8.2:NAPAKA: Paket vsebuje datoteko, ki je stisnjena z nepodprto metodo (%d):
-8.3:NAPAKA med razširjanjem %s v %s!
 
 #### Handling the local list of installed packages ####
 

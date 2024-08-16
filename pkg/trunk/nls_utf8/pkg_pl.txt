@@ -62,7 +62,6 @@
 
 8.1:nieznana sygnatura zip: 0x%08lx
 8.2:BŁĄD: Pakiet zawiera plik skompresowany nieznaną metodę (%d):
-8.3:BŁĄD: rozpakowanie '%s' do '%s' nie powiodło się!
 
 #### Handling the local list of installed packages ####
 

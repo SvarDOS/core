@@ -63,7 +63,6 @@
 
 8.1:assinatura zip desconhecida: 0x%08lx
 8.2:ERRO: Pacote contém um arquivo comprimido com um método não suportado (%d):
-8.3:ERRO: Falha extraindo '%s' para '%s'!
 
 #### Handling the local list of installed packages ####
 

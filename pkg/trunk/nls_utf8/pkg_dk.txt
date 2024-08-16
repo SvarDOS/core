@@ -60,7 +60,6 @@
 
 8.1:ukendt zip signatur: 0x%08x
 8.2:Fejl: Pakkeindhold komprimeret med en ikke understøttet metode (%d):
-8.3:Fejl under udpakning af '%s' til '%s'!
 
 #### Handling the local list of installed packages ####
 

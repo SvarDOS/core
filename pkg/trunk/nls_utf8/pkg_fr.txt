@@ -62,7 +62,6 @@
 
 8.1:signature zip inconnue: 0x%08lx
 8.2:ERREUR: le paquet utilise une méthode de compression non supportée (%d):
-8.3:ERREUR: échec lors de l'extraction de "%s" vers "%s"!
 
 #### Handling the local list of installed packages ####
 

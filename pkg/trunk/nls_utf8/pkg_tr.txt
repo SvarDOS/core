@@ -60,7 +60,6 @@
 
 8.1:bilinmeyen zip imzası: 0x%08lx
 8.2:HATA: Paket desteklenmeyen metotla sıkıştırılmış dosya içeriyor (%d):
-8.3:'%s' unsurunun to '%s' konumuna çıkarılması sırasında hata!
 
 #### Handling the local list of installed packages ####
 

@@ -63,7 +63,6 @@
 
 8.1:unknown zip sig: 0x%08lx
 8.2:ERROR: Package contains a file compressed with an unsupported method (%d):
-8.3:ERROR: failed extracting '%s' to '%s'!
 
 #### Handling the local list of installed packages ####
 

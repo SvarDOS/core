@@ -63,7 +63,6 @@
 
 8.1:Unbekannte ZIP-Signatur: 0x%08lx
 8.2:FEHLER: Paket enthält eine Datei mit nicht unterstützter Komprimierungsmethode (%d):
-8.3:FEHLER: Extrahieren von "%s" nach "%s" fehlgeschlagen!
 
 #### Handling the local list of installed packages ####
 
