@@ -65,7 +65,7 @@ set -e
 
 
 # list of packages to be part of CORE (always installed)
-COREPKGS=`ls -1 'packages-core' | grep -o '^[a-z]*'`
+COREPKGS=`ls -1 'packages-core' | grep -o '^[a-zA-Z0-9]*'`
 
 
 
