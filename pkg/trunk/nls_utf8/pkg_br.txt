@@ -16,6 +16,7 @@
 1.24:       pkg listlocal [filtro]
 1.27:       pkg unzip arquivo.zip
 1.28:       pkg crc32 arquivo
+1.29:       pkg listzip arquivo.zip
 1.40:O PKG é publicado sob a licença MIT.
 1.41:Ele é configurado pelo %DOSDIR%\\CFG\\PKG.CFG
 
