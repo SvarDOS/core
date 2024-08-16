@@ -48,6 +48,7 @@ enum ACTIONTYPES {
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
   ACTION_UNZIP,
+  ACTION_LISTZIP,
   ACTION_CRC32,
   ACTION_HELP
 };
@@ -64,6 +65,7 @@ static int showhelp(void) {
   puts(svarlang_str(1, 23)); /* "       pkg listfiles package" */
   puts(svarlang_str(1, 24)); /* "       pkg listlocal [filter]" */
   puts(svarlang_str(1, 27)); /* "       pkg unzip file.zip" */
+  puts(svarlang_str(1, 29)); /* "       pkg listzip file.zip" */
   puts(svarlang_str(1, 28)); /* "       pkg crc32 file" */
   puts("");
   puts(svarlang_str(1, 40)); /* "PKG is published under the MIT license." */
@@ -86,6 +88,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_LISTLOCAL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
+  } else if ((argc == 3) && (strcasecmp(argv[1], "listzip") == 0)) {
+    return(ACTION_LISTZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "crc32") == 0)) {
     return(ACTION_CRC32);
   } else {
@@ -164,15 +168,15 @@ int main(int argc, char **argv) {
     case ACTION_HELP:
       res = showhelp();
       goto GAMEOVER;
-      break;
     case ACTION_UNZIP:
-      res = unzip(argv[2]);
+      res = unzip(argv[2], 0);
       goto GAMEOVER;
-      break;
+    case ACTION_LISTZIP:
+      res = unzip(argv[2], 1);
+      goto GAMEOVER;
     case ACTION_CRC32:
       res = crcfile(argv[2]);
       goto GAMEOVER;
-      break;
   }
 
   /* read the DOSDIR environment variable */
