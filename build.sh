@@ -64,8 +64,11 @@ fi
 set -e
 
 
-# list of packages to be part of CORE (always installed)
-COREPKGS=`ls -1 'packages-core' | grep -o '^[a-zA-Z0-9]*'`
+# list of packages to be part of CORE (always installed), sort them from
+# biggest to smallest to try utilizing the floppy disk space as efficiently
+# as possible. -L means 'dereference', ie. look at the filesize of the target
+# file, not the symlink.
+COREPKGS=`ls -1LS 'packages-core' | grep -o '^[a-zA-Z0-9]*'`
 
 
 
