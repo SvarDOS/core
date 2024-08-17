@@ -21,6 +21,8 @@
 #include <string.h>
 
 
+static unsigned char EGAFILES_USED[20];
+
 /* global file pointers */
 FILE *fdkeyb, *fdoff;
 
@@ -40,6 +42,12 @@ static unsigned int dec2oct(int n) {
 static void addnew(char *countrycode, unsigned short countryid, char *humanlang, char *keybcode, unsigned short cp, unsigned char egafile, unsigned char keybfile, unsigned int subid) {
   static char lastcountry[4] = {0};
   static int curoffset = 0, curcountryoffset = 0;
+  int i;
+
+  /* remember the EGA file */
+  for (i = 0; (EGAFILES_USED[i] != egafile) && (EGAFILES_USED[i] != 0xff); i++);
+  EGAFILES_USED[i] = egafile;
+
   /* if new country, declare an offset */
   if (strcmp(countrycode, lastcountry) != 0) {
     /* close previous one, if any */
@@ -69,6 +77,10 @@ static void addnew(char *countrycode, unsigned short countryid, char *humanlang,
 
 
 int main(void) {
+
+  /* reset EGAFILES_USED, it will be used to remember which EGA*.CPX files are
+   * required by the SvarDOS installer */
+  memset(EGAFILES_USED, 0xff, sizeof(EGAFILES_USED));
 
   /*** open files ***/
   fdkeyb = fopen("keylay.h", "wb");
@@ -143,6 +155,23 @@ int main(void) {
   /* close files */
   fclose(fdoff);
   fclose(fdkeyb);
+
+  /* report what ega files are needed */
+  {
+    int i, ii;
+    puts("Required EGA files:");
+    for (ii = 0; ii < 20; ii++) {
+      for (i = 0; EGAFILES_USED[i] != 0xff; i++) {
+        if (EGAFILES_USED[i] != ii) continue;
+        if (EGAFILES_USED[i] == 0) {
+          printf("EGA.CPX\r\n");
+        } else {
+          printf("EGA%u.CPX\r\n", EGAFILES_USED[i]);
+        }
+        break;
+      }
+    }
+  }
 
   return(0);
 }
