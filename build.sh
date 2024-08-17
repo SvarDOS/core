@@ -241,6 +241,7 @@ $SED -i '/^videcdd$/d' "$FLOPROOT/install.lst"
 prep_flop 80 2 18 1440 "$PUBDIR" "1.44M" "$COREPKGS pcntpk"
 prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
 prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
+prep_flop 40 2  9  360 "$PUBDIR" "360K" "$COREPKGS"
 
 
 echo
