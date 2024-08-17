@@ -168,7 +168,9 @@ echo
 # prepare the content of the boot (install) floppy, unzipping everything
 # in lowercase (-L) to avoid any case mismatching later in the build process
 cp -r "$CUSTFILES/floppy/"* "$FLOPROOT/"
-unzip -CLj "$REPOROOTCORE/cpidos.svp" 'cpi/ega*.cpx' -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/cpidos.svp" 'cpi/ega.cpx' -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/cpidos.svp" 'cpi/ega?.cpx' -d "$FLOPROOT/"
+unzip -CLj "$REPOROOTCORE/cpidos.svp" 'cpi/ega10.cpx' -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/svarcom.svp" command.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/display.svp" bin/display.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/fdapm.svp" bin/fdapm.com -d "$FLOPROOT/"
