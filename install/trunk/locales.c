@@ -160,10 +160,10 @@ int main(void) {
   {
     int i, ii;
     puts("Required EGA files:");
-    for (ii = 0; ii < 20; ii++) {
+    for (ii = 1; ii < 20; ii++) {
       for (i = 0; EGAFILES_USED[i] != 0xff; i++) {
         if (EGAFILES_USED[i] != ii) continue;
-        if (EGAFILES_USED[i] == 0) {
+        if (EGAFILES_USED[i] == 1) {
           printf("EGA.CPX\r\n");
         } else {
           printf("EGA%u.CPX\r\n", EGAFILES_USED[i]);
