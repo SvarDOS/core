@@ -41,9 +41,6 @@
 #include "keylay.h"
 #include "keyoff.h"
 
-/* prototype of the int24hdl() function defined in int24hdl.asm */
-void int24hdl(void);
-
 
 /* color scheme (preset for color) */
 static unsigned char COLOR_TITLEBAR  = 0x70;
@@ -78,6 +75,30 @@ struct slocales {
   unsigned short keybid;
   unsigned short countryid; /* 1=USA, 33=FR, 48=PL, etc */
 };
+
+
+/* install a dummy int24h handler that always fails. this is to avoid the
+ * annoying "abort, retry, fail... DOS messages. */
+static void install_int24(void) {
+  static unsigned char handler[] = { /* contains machine code instructions */
+    0xB0, 0x03,  /* mov al, 3   ; tell DOS the action has to FAIL   */
+    0xCF};       /* ret         ; return from the interrupt handler */
+  /* install the handler */
+  _asm {
+    push dx
+    mov ax, 0x2524          /* set INT vector 0x24 (to DS:DX)   */
+    mov dx, offset handler  /* DS:DX points at my dummy handler */
+    int 0x21
+    pop dx
+  }
+}
+
+
+static void exec(const char *s) {
+  system(s);
+  install_int24(); /* reinstall my int24 handler, apparently system() reverts
+                      the original (DOS) one */
+}
 
 
 /* put a string on screen and fill it until w chars with white space */
@@ -597,13 +618,13 @@ static int preparedrive(char sourcedrv) {
       switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /PRI:MAX %d", driveid);
-          system(buff);
+          exec(buff);
           break;
         case 1:
           mdr_cout_cls(0x07);
           mdr_cout_locate(0, 0);
           sprintf(buff, "FDISK %d", driveid);
-          system(buff);
+          exec(buff);
           break;
         case 2:
           return(MENUQUIT);
@@ -613,7 +634,7 @@ static int preparedrive(char sourcedrv) {
       /* write a temporary MBR which only skips the drive (in case BIOS would
        * try to boot off the not-yet-ready C: disk) */
       sprintf(buff, "FDISK /LOADIPL %d", driveid);
-      system(buff); /* writes BOOT.MBR into actual MBR */
+      exec(buff); /* writes BOOT.MBR into actual MBR */
       newscreen(2);
       putstringnls(10, 10, COLOR_BODY, 3, 1); /* "Your computer will reboot now." */
       putstringnls(12, 10, COLOR_BODY, 0, 5); /* "Press any key..." */
@@ -640,7 +661,7 @@ static int preparedrive(char sourcedrv) {
       mdr_cout_cls(0x07);
       mdr_cout_locate(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
-      system(buff);
+      exec(buff);
       continue;
     }
     /* check total disk space */
@@ -673,7 +694,7 @@ static int preparedrive(char sourcedrv) {
       mdr_cout_cls(0x07);
       mdr_cout_locate(0, 0);
       snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
-      system(buff);
+      exec(buff);
       continue;
     } else {
       /* final confirmation */
@@ -687,9 +708,9 @@ static int preparedrive(char sourcedrv) {
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
       snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
-      system(buff);
+      exec(buff);
       sprintf(buff, "FDISK /MBR %d", driveid);
-      system(buff);
+      exec(buff);
       snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
       mkdir(buff);
       return(cselecteddrive);
@@ -993,9 +1014,9 @@ static void loadcp(const struct slocales *locales) {
   } else {
     snprintf(buff, sizeof(buff), "MODE CON CP PREP=((%u) EGA%d.CPX) > NUL", locales->codepage, locales->egafile);
   }
-  system(buff);
+  exec(buff);
   snprintf(buff, sizeof(buff), "MODE CON CP SEL=%u > NUL", locales->codepage);
-  system(buff);
+  exec(buff);
   /* below I re-init the video controller - apparently this is required if
    * I want the new glyph symbols to be actually applied, at least some
    * (broken?) BIOSes, like VBox, apply glyphs only at next video mode change */
@@ -1020,7 +1041,7 @@ int main(void) {
 
   /* setup an internal int 24h handler ("always fail") so DOS does not output
    * the ugly "abort, retry, fail" messages */
-  int24hdl();
+  install_int24();
 
   /* read the svardos build revision (from floppy label) */
   {
