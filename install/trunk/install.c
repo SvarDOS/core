@@ -54,7 +54,7 @@ static unsigned char COLOR_SELECTCUR = 0x1F;
 static char BUILDSTRING[13];
 
 /* how much disk space does SvarDOS require (in MiB) */
-#define SVARDOS_DISK_REQ 8
+#define SVARDOS_DISK_REQ 4
 
 /* menu screens can output only one of these: */
 #define MENUNEXT 0
