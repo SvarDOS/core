@@ -852,8 +852,6 @@ static void bootfilesgen(const struct slocales *locales) {
   /*** CREATE DIRECTORY FOR CONFIGURATION FILES ***/
   snprintf(buff, sizeof(buff), "%c:\\SVARDOS", bootdrv);
   mkdir(buff);
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG", bootdrv);
-  mkdir(buff);
 
   /****************
    * PKG.CFG      *
@@ -955,22 +953,6 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
   snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.LNG", targetdrv);
   fcopy(buff, buff + 8, buff, sizeof(buff));
 
-  /* open the post-install autoexec.bat and prepare initial instructions */
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", targetdrv);
-  fd = fopen(buff, "wb");
-  if (fd == NULL) return(-1);
-  fprintf(fd, "@ECHO OFF\r\n"
-              "INSTALL"  /* installer will run in 2nd stage (generating pkg.cfg and stuff) */
-              "ECHO INSTALLING SVARDOS BUILD %s\r\n", BUILDSTRING);
-
-  /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
-  fprintf(fd, "COPY \\COMMAND.COM \\CMD.COM\r\n");
-  fprintf(fd, "SET COMSPEC=\\CMD.COM\r\n"); /* no drive letter because I do not know it */
-  fprintf(fd, "DEL \\COMMAND.COM\r\n");
-
-  /* delete the temporary KERNEL.SYS - it will be properly installed from the package in a short moment */
-  fprintf(fd, "DEL \\KERNEL.SYS\r\n");
-
   /* copy packages */
   for (i = 0;; i++) {
     RETRY_ENTIRE_LIST:
@@ -1005,22 +987,34 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
     if (fcopy(buff, buff + 8, buff, sizeof(buff)) != 0) {
       mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY, 80);
       mdr_dos_getkey();
-      fclose(fd);
       return(-1);
     }
-    /* write install instruction to post-install script */
-    fprintf(fd, "pkg install %s.svp\r\ndel %s.svp\r\n", pkgptr, pkgptr);
     /* jump to next entry or end of list and zero out the pkg name in the process */
     while ((*pkgptr != 0) && (*pkgptr != 0xff)) {
       *pkgptr = 0;
       pkgptr++;
     }
   }
-  /* set up locales so the "installation over" message is nicely displayed */
-  genlocalesconf(fd, locales);
+
+  /* open the post-install autoexec.bat and prepare initial instructions */
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", targetdrv);
+  fd = fopen(buff, "wb");
+  if (fd == NULL) return(-1);
+  fputs(
+    "@ECHO OFF\r\n"
+    "INSTALL\r\n"  /* installer will run in 2nd stage (generating pkg.cfg and stuff) */
+    "ECHO INSTALLING SVARDOS\r\n"
+    "COPY \\COMMAND.COM \\CMD.COM\r\n" /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
+    "SET COMSPEC=\\CMD.COM\r\n" /* no drive letter because I do not know it */
+    "DEL \\COMMAND.COM\r\n"
+    "DEL \\KERNEL.SYS\r\n" /* KERNEL.SYS will be installed from the package in a moment */
+    "FOR %%P IN (*.SVP) DO PKG INSTALL %%P\r\n" /* install packages */
+    "DEL *.SVP\r\n", fd);
+
   /* replace autoexec.bat and config.sys now and write some nice message on screen */
   fprintf(fd, "DEL pkg.exe\r\n"
               "DEL install.com\r\n"
+              "DEL install.lng\r\n"
               "COPY CONFIG.SYS \\\r\n"
               "DEL CONFIG.SYS\r\n"
               "DEL \\AUTOEXEC.BAT\r\n"
@@ -1042,7 +1036,6 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\n"
               "SET DOSDIR=\\SVARDOS\r\n"
-              "SET NLSPATH=%%DOSDIR%%\\NLS\r\n"
               "PATH %%DOSDIR%%\r\n");
   genlocalesconf(fd, locales);
   fprintf(fd, "CD TEMP\r\n"
