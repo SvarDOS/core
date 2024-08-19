@@ -27,9 +27,8 @@
 2.0:Stai per installare SvarDOS: un sistema operativo libero, compatibile con MSDOS, basato sul kernel di FreeDOS. SvarDOS include una varietà di applicazioni di terze parti.\n\nATTENZIONE: Se il tuo PC ha già un altro sistema operativo installato, l'altro sistema operativo potrebbe non essere in grado di ripartire dopo aver installato SvarDOS.
 
 ### DISK SETUP ###
-3.0:ERRORE: L'unità %c: non è stata trovata. Forse perché l'hard disk deve essere prima partizionato. Occorre creare almeno una partizione sull'hard disk per poterci installare SvarDOS. Notare che SvarDOS richiede almeno %d MiB di spazio libero su disco.\n\nPuoi usare lo strumento di partizionamento FDISK per creare la partizione manualmente, o lasciare che il programma di installazione partizioni il disco automaticamente. Puoi anche annullare l'installazione per usare lo strumento di partizionamento che preferisci.
+3.0:ERRORE: L'unità non è stata trovata. Forse perché l'hard disk deve essere prima partizionato. Occorre creare almeno una partizione sull'hard disk per poterci installare SvarDOS. Notare che SvarDOS richiede almeno %d MiB di spazio libero su disco.\n\nPuoi usare lo strumento di partizionamento FDISK per creare la partizione manualmente, o lasciare che il programma di installazione partizioni il disco automaticamente. Puoi anche annullare l'installazione per usare lo strumento di partizionamento che preferisci.
 3.1:Il computer sarà ora riavviato.
-3.2:ERRORE: L'unità %c: è un disco rimovibile. Installazione annullata.
 3.3:ERRORE: L'unità %c: non sembra essere formattata.
 3.4:ERRORE: L'unità %c: non è abbastanza capiente! SvarDOS richiede un disco di almeno %d MiB.
 3.5:ERRORE: L'unità %c: non è vuota. SvarDOS deve essere installato su un disco vuoto.\n\nPuoi formattare il disco adesso, per svuotarlo. Nota che questa operazione CANCELLERA' TUTTI I DATI presenti sul disco.

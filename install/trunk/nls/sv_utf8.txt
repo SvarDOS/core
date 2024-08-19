@@ -44,11 +44,9 @@
 ### DISK SETUP ###
 ### DISKSETUP ###
 #3.0:ERROR: Drive %c: could not be found. Perhaps your hard disk needs to be partitioned first. Please create at least one primary partition on your hard disk, so SvarDOS can be installed on it. Note, that SvarDOS requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice.
-3.0:FEL: Enhet %c: kunde inte hittas. Kanske din hårddisk behöver partitioneras först. Vänligen skapa minst en primär partition på din hårddisk, så SvarDOS kan installeras på den. N.B. att SvarDOS behöver minst %d MiB ledigt diskutrymme.\n\nDu kan använda FDISK-partitioneringsverktyget för att skapa den nödvändiga partitionen manuellt, eller så kan du låta installationsprogrammet partitioner din disk automatiskt. Du kan också avbryta installationen för att använda en annan valfri partitionsmanager.
+3.0:FEL: Enhet kunde inte hittas. Kanske din hårddisk behöver partitioneras först. Vänligen skapa minst en primär partition på din hårddisk, så SvarDOS kan installeras på den. N.B. att SvarDOS behöver minst %d MiB ledigt diskutrymme.\n\nDu kan använda FDISK-partitioneringsverktyget för att skapa den nödvändiga partitionen manuellt, eller så kan du låta installationsprogrammet partitioner din disk automatiskt. Du kan också avbryta installationen för att använda en annan valfri partitionsmanager.
 #3.1:Your computer will reboot now.
 3.1:Din dator kommer att boota om nu.
-#3.2:ERROR: Drive %c: is a removable device. Installation aborted.
-3.2:FEL: Enhet %c: är ett removable device. Installationen avbryts.
 #3.3:ERROR: Drive %c: seems to be unformated. Do you wish to format it?
 3.3:FEL: Enhet %c: verkar vara oformaterad.
 #3.4:ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB.

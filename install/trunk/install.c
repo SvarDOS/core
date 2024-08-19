@@ -604,38 +604,39 @@ static unsigned short test_drive_write(char drive) {
 
 
 static int preparedrive(void) {
-  int driveremovable;
-  int selecteddrive = 3; /* default to 'C:' */
-  int cselecteddrive;
+  int selecteddrive;
+  char cselecteddrive;
   int ds;
   int choice;
-  char buff[1024];
+  char buff[512];
   int driveid = 1; /* fdisk runs on first drive (unless USB boot) */
-  if (selecteddrive == get_cur_drive() + 1) { /* get_cur_drive() returns 0-based values (A=0) while selecteddrive is 1-based (A=1) */
-    selecteddrive = 4; /* use D: if install is run from C: (typically because it was booted from USB?) */
-    driveid = 2; /* primary drive is the emulated USB storage */
-  }
-  cselecteddrive = 'A' + selecteddrive - 1;
+
   for (;;) {
-    driveremovable = isdriveremovable(selecteddrive);
-    if (driveremovable == 0) {
-      newscreen(2);
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0302), cselecteddrive); /* "ERROR: Drive %c: is a removable device */
-      mdr_cout_str(9, 1, buff, COLOR_BODY, 80);
-      putstringnls(11, 2, COLOR_BODY, 0, 5); /* "Press any key..." */
-      mdr_dos_getkey();
-      return(MENUQUIT);
+    char drvlist[4][16]; /* C: [2048 MB] */
+    int i, drvlistlen = 0;
+
+    /* build a menu with all non-removable drives from C to F */
+    for (i = 3; i < 7; i++) {
+      if (isdriveremovable(i) > 0) {
+        unsigned short sz = disksize(i);
+        if (sz == 0xffff) { /* size not avail (probably unformatted disk) */
+          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c:", '@' + i, disksize(i));
+        } else {
+          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB]", '@' + i, disksize(i));
+        }
+        drvlistlen++;
+      }
     }
 
-    /* if C: not found - disk not partitioned? */
-    if (driveremovable < 0) {
+    /* if no drive found - disk not partitioned? */
+    if (drvlistlen == 0) {
       const char *list[4];
       newscreen(0);
       list[0] = svarlang_str(0, 3); /* Create a partition automatically */
       list[1] = svarlang_str(0, 4); /* Run the FDISK tool */
       list[2] = svarlang_str(0, 2); /* Quit to DOS */
       list[3] = NULL;
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0300), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: could not be found. Note, that SvarDOS requires at least %d MiB of available disk space */
+      snprintf(buff, sizeof(buff), svarlang_strid(0x0300), SVARDOS_DISK_REQ); /* "ERROR: No drive could be found. Note, that SvarDOS requires at least %d MiB of available disk space */
       switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
         case 0:
           sprintf(buff, "FDISK /PRI:MAX %d", driveid);
@@ -664,6 +665,27 @@ static int preparedrive(void) {
       return(MENUQUIT);
     }
 
+    /* select the drive from list */
+    {
+      const char *list[16];
+      int i;
+      for (i = 0; i < drvlistlen; i++) list[i] = drvlist[i];
+      list[i++] = svarlang_str(0, 2); /* Quit to DOS */
+      list[i] = NULL;
+      newscreen(0);
+
+      i = menuselect(6 /*ypos*/, i /*height*/, list, -1);
+      if (i < 0) {
+        return(MENUPREV);
+      } else if (i < drvlistlen) {
+        selecteddrive = list[i][0] - '@';
+      } else {
+        return(MENUQUIT);
+      }
+
+      cselecteddrive = '@' + selecteddrive;
+    }
+
     /* if not formatted, propose to format it right away (try to create a directory) */
     if (test_drive_write(cselecteddrive) != 0) {
       const char *list[3];
@@ -685,6 +707,7 @@ static int preparedrive(void) {
       exec(buff);
       continue;
     }
+
     /* check total disk space */
     ds = disksize(selecteddrive);
     if (ds < SVARDOS_DISK_REQ) {
@@ -696,6 +719,7 @@ static int preparedrive(void) {
       mdr_dos_getkey();
       return(MENUQUIT);
     }
+
     /* is the disk empty? */
     newscreen(0);
     if (diskempty(selecteddrive) != 0) {
@@ -820,8 +844,8 @@ static void bootfilesgen(const struct slocales *locales) {
   } else {
     char *autoexec_bat1 =
       "@ECHO OFF\r\n"
-      "SET TEMP=@:\\TEMP\r\n"
-      "SET DOSDIR=@:\\SVARDOS\r\n"
+      "SET TEMP=#:\\TEMP\r\n"
+      "SET DOSDIR=#:\\SVARDOS\r\n"
       "SET NLSPATH=%DOSDIR%\\NLS\r\n"
       "SET DIRCMD=/O/P\r\n"
       "SET WATTCP.CFG=%DOSDIR%\\CFG\r\n"
@@ -837,8 +861,8 @@ static void bootfilesgen(const struct slocales *locales) {
       "\r\n"
       "ECHO.\r\n";
 
-    /* replace all '@' occurences by bootdrive */
-    strtr(autoexec_bat1, '@', bootdrv);
+    /* replace all '#' occurences by bootdrive */
+    strtr(autoexec_bat1, '#', bootdrv);
 
     /* write all to file */
     fputs(autoexec_bat1, fd);
@@ -856,7 +880,7 @@ static void bootfilesgen(const struct slocales *locales) {
   /****************
    * PKG.CFG      *
    ****************/
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\PKG.CFG", bootdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\PKG.CFG", bootdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) {
     return;
@@ -865,7 +889,7 @@ static void bootfilesgen(const struct slocales *locales) {
       "# pkg config file - specifies locations where packages should be installed\r\n"
       "\r\n"
       "# System boot drive\r\n"
-      "bootdrive = @\r\n"
+      "BOOTDRIVE @\r\n"
       "\r\n"
       "# DOS core binaries\r\n"
       "DIR BIN @:\\SVARDOS\r\n"
