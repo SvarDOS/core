@@ -1,0 +1,81 @@
+#
+# PKG language file
+#
+# Language....: English
+# Author......: Mateusz Viste
+# Last updated: 10 Feb 2024
+#
+
+#### Help ####
+
+1.0:PKG is the SvarDOS package manager.
+1.20:Usage: pkg install package[.svp]
+1.21:       pkg update package[.svp]
+1.22:       pkg remove package
+1.23:       pkg listfiles package
+1.24:       pkg listlocal [filter]
+1.27:       pkg unzip file.zip
+1.28:       pkg crc32 file
+1.29:       pkg listzip file.zip
+1.40:PKG is published under the MIT license.
+1.41:It is configured through %DOSDIR%\\PKG.CFG
+
+### General stuff ####
+
+2.2:%DOSDIR% not set! You should make it point to the SvarDOS main directory.
+2.3:Example: SET DOSDIR=C:\\SVARDOS
+2.14:Out of memory! (%s)
+
+#### Installing package ####
+
+3.8:ERROR: Invalid zip archive! Package not installed.
+3.9:ERROR: Package contains a file that already exists locally:
+3.10:ERROR: Could not create %s!
+3.12:ERROR: This is not a valid SvarDOS package
+3.18:Package %s already installed! You may want to use the 'update' action.
+3.19:Package %s installed: %ld errors, %ld files extracted.
+3.20:ERROR: Package contains an encrypted file:
+3.23:ERROR: Package contains an invalid filename:
+3.24:ERROR: package name too long
+
+#### Removing package ####
+
+4.0:Package %s is not installed, so not removed.
+4.3:Out of memory! Could not store directory %s!
+4.4:removing %s
+4.5:Package %s has been removed.
+
+#### Searching package ####
+
+5.0:No package matched the search.
+
+#### Loading configuration ####
+
+7.0:ERROR: custom dir '%s' is listed twice!
+7.1:ERROR: Could not open config file '%s'!
+7.4:Warning: token with empty value on line #%d
+7.5:Warning: Invalid bootdrive on line #%d
+7.8:Warning: Unknown token '%s' at line #%d
+7.11:Warning: Invalid 'DIR' directive found at line #%d
+7.15:ERROR: custom dir '%s' is not a valid absolute path!
+7.16:ERROR: custom dir '%s' is a reserved name!
+7.17:ERROR: PKG.CFG found at %s
+7.18:       Please move it to %DOSDIR%\\PKG.CFG
+
+#### Unziping package ####
+
+8.1:unknown zip sig: 0x%08lx
+8.2:ERROR: Package contains a file compressed with an unsupported method (%d):
+
+#### Handling the local list of installed packages ####
+
+9.0:ERROR: Could not access directory %s
+9.1:ERROR: Local package '%s' not found
+
+#### unzip ####
+
+10.0:OK
+10.1:ERROR: File not found
+10.2:ERROR: Invalid ZIP archive
+10.3:ERROR: File already exists
+10.4:ERROR: unzip failure (%d)
