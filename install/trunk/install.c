@@ -77,6 +77,19 @@ struct slocales {
 };
 
 
+/* returns the DOS boot drive letter ('A', 'B', 'C', etc) */
+static unsigned char GETDOSBOOTDRIVE(void);
+#pragma aux GETDOSBOOTDRIVE = \
+"mov ax, 0x3305" /* int 0x21,AX=3305 - get boot drive (MS-DOS 4.0+) */ \
+"int 0x21" \
+"jnc GOOD" \
+"mov dl, 3"      /* fall back to "C" on error (DOS 3.x...) */ \
+"GOOD:" \
+"add dl, '@'"    /* convert the drive id (A=1, B=2...) into a drive letter */ \
+modify [ax] \
+value [dl]
+
+
 /* install a dummy int24h handler that always fails. this is to avoid the
  * annoying "abort, retry, fail... DOS messages. */
 static void install_int24(void) {
@@ -536,6 +549,14 @@ modify [ah] \
 value [al]
 
 
+/* replace all occurences of char a by char b in s */
+static void strtr(char *s, char a, char b) {
+  for (;*s != 0; s++) {
+    if (*s == a) *s = b;
+  }
+}
+
+
 /* tries to write an empty file to drive.
  * asks DOS to inhibit the int 24h handler for this job, so erros are
  * gracefully reported - unfortunately this does not work under FreeDOS because
@@ -582,7 +603,7 @@ static unsigned short test_drive_write(char drive) {
 }
 
 
-static int preparedrive(char sourcedrv) {
+static int preparedrive(void) {
   int driveremovable;
   int selecteddrive = 3; /* default to 'C:' */
   int cselecteddrive;
@@ -707,7 +728,7 @@ static int preparedrive(char sourcedrv) {
       choice = menuselect(10, 2, list, -1);
       if (choice < 0) return(MENUPREV);
       if (choice == 1) return(MENUQUIT);
-      snprintf(buff, sizeof(buff), "SYS %c: %c: > NUL", sourcedrv, cselecteddrive);
+      snprintf(buff, sizeof(buff), "SYS %c: > NUL", cselecteddrive);
       exec(buff);
       sprintf(buff, "FDISK /MBR %d", driveid);
       exec(buff);
@@ -749,11 +770,16 @@ static void genlocalesconf(FILE *fd, const struct slocales *locales) {
 }
 
 
-static void bootfilesgen(char targetdrv, const struct slocales *locales) {
+/* generates configuration files on the dest drive, this is run once system booted successfully */
+static void bootfilesgen(const struct slocales *locales) {
   char buff[128];
   FILE *fd;
-  /*** CONFIG.SYS ***/
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\CONFIG.SYS", targetdrv);
+  unsigned char bootdrv = GETDOSBOOTDRIVE();
+
+  /****************
+   * CONFIG.SYS ***
+   ****************/
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\CONFIG.SYS", bootdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "; SvarDOS kernel configuration\r\n"
@@ -765,78 +791,112 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
               "FILES=25\r\n");
   fprintf(fd, "\r\n"
               "; XMS memory driver\r\n"
-              "DEVICE=C:\\SVARDOS\\HIMEMX.EXE\r\n");
+              "DEVICE=%c:\\SVARDOS\\HIMEMX.EXE\r\n", bootdrv);
   fprintf(fd, "\r\n"
               "; try moving DOS to upper memory, then to high memory\r\n"
               "DOS=UMB,HIGH\r\n");
   fprintf(fd, "\r\n"
-              "; command interpreter (shell) location and default environment size\r\n"
-              "SHELL=C:\\COMMAND.COM /E:512 /P\r\n");
+              "; command interpreter (shell) location and environment size\r\n"
+              "SHELL=%c:\\COMMAND.COM /E:512 /P\r\n", bootdrv);
   fprintf(fd, "\r\n"
               "; NLS configuration\r\n");
   if (locales != NULL) {
-    fprintf(fd, "COUNTRY=%03u,%u,C:\\SVARDOS\\COUNTRY.SYS\r\n", locales->countryid, locales->codepage);
+    fprintf(fd, "COUNTRY=%03u,%u,%c:\\SVARDOS\\COUNTRY.SYS\r\n", locales->countryid, locales->codepage, bootdrv);
   } else {
-    fprintf(fd, "COUNTRY=001,437,C:\\SVARDOS\\COUNTRY.SYS\r\n");
+    fprintf(fd, "COUNTRY=001,437,%c:\\SVARDOS\\COUNTRY.SYS\r\n", bootdrv);
   }
   fprintf(fd, "\r\n"
               "; CD-ROM driver initialization\r\n"
-              ";DEVICE=C:\\DRIVERS\\VIDECDD\\VIDE-CDD.SYS /D:SVCD0001\r\n");
+              ";DEVICE=%c:\\DRIVERS\\VIDECDD\\VIDE-CDD.SYS /D:SVCD0001\r\n", bootdrv);
   fclose(fd);
-  /*** AUTOEXEC.BAT ***/
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\AUTOEXEC.BAT", targetdrv);
+
+  /****************
+   * AUTOEXEC.BAT *
+   ****************/
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\AUTOEXEC.BAT", bootdrv);
   fd = fopen(buff, "wb");
-  if (fd == NULL) return;
-  fprintf(fd, "@ECHO OFF\r\n");
-  fprintf(fd, "SET TEMP=C:\\TEMP\r\n");
-  fprintf(fd, "SET DOSDIR=C:\\SVARDOS\r\n");
-  fprintf(fd, "SET NLSPATH=%%DOSDIR%%\\NLS\r\n");
-  fprintf(fd, "SET DIRCMD=/O/P\r\n");
-  fprintf(fd, "SET WATTCP.CFG=%%DOSDIR%%\\CFG\r\n");
-  fprintf(fd, "PATH %%DOSDIR%%\r\n");
-  fprintf(fd, "PROMPT $P$G\r\n");
-  fprintf(fd, "\r\n"
-              "REM enable CPU power saving\r\n"
-              "FDAPM ADV:REG\r\n");
-  fprintf(fd, "\r\n");
-  if (locales != NULL) genlocalesconf(fd, locales);
-  fprintf(fd, "\r\n");
-  fprintf(fd, "REM Uncomment the line below for CDROM support\r\n");
-  fprintf(fd, "REM SHSUCDX /d:SVCD0001\r\n");
-  fprintf(fd, "\r\n");
-  fprintf(fd, "ECHO.\r\n");
-  fprintf(fd, "ECHO %s\r\n", svarlang_strid(0x0600)); /* "Welcome to SvarDOS!" */
-  fclose(fd);
+  if (fd == NULL) {
+    return;
+  } else {
+    char *autoexec_bat1 =
+      "@ECHO OFF\r\n"
+      "SET TEMP=@:\\TEMP\r\n"
+      "SET DOSDIR=@:\\SVARDOS\r\n"
+      "SET NLSPATH=%DOSDIR%\\NLS\r\n"
+      "SET DIRCMD=/O/P\r\n"
+      "SET WATTCP.CFG=%DOSDIR%\\CFG\r\n"
+      "PATH %DOSDIR%\r\n"
+      "PROMPT $P$G\r\n"
+      "\r\n"
+      "REM enable CPU power saving\r\n"
+      "FDAPM ADV:REG\r\n"
+      "\r\n";
+    char *autoexec_bat2 =
+      "REM Uncomment the line below for CDROM support\r\n"
+      "REM SHSUCDX /d:SVCD0001\r\n"
+      "\r\n"
+      "ECHO.\r\n";
+
+    /* replace all '@' occurences by bootdrive */
+    strtr(autoexec_bat1, '@', bootdrv);
+
+    /* write all to file */
+    fputs(autoexec_bat1, fd);
+    if (locales != NULL) genlocalesconf(fd, locales);
+    fputs(autoexec_bat2, fd);
+
+    fprintf(fd, "ECHO %s\r\n", svarlang_strid(0x0600)); /* "Welcome to SvarDOS!" */
+    fclose(fd);
+  }
+
   /*** CREATE DIRECTORY FOR CONFIGURATION FILES ***/
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS", bootdrv);
   mkdir(buff);
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG", bootdrv);
   mkdir(buff);
-  /*** PKG.CFG ***/
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\PKG.CFG", targetdrv);
+
+  /****************
+   * PKG.CFG      *
+   ****************/
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\PKG.CFG", bootdrv);
   fd = fopen(buff, "wb");
-  if (fd == NULL) return;
-  fprintf(fd, "# pkg config file - specifies locations where packages should be installed\r\n"
-              "\r\n"
-              "# DOS core binaries\r\n"
-              "DIR BIN C:\\SVARDOS\r\n"
-              "\r\n"
-              "# Programs\r\n"
-              "DIR PROGS C:\\\r\n"
-              "\r\n"
-              "# Games \r\n"
-              "DIR GAMES C:\\\r\n"
-              "\r\n"
-              "# Drivers\r\n"
-              "DIR DRIVERS C:\\DRIVERS\r\n"
-              "\r\n"
-              "# Development tools\r\n"
-              "DIR DEVEL C:\\DEVEL\r\n");
-  fclose(fd);
-  /*** COUNTRY.SYS ***/
+  if (fd == NULL) {
+    return;
+  } else {
+    char *pkg_cfg =
+      "# pkg config file - specifies locations where packages should be installed\r\n"
+      "\r\n"
+      "# System boot drive\r\n"
+      "bootdrive = @\r\n"
+      "\r\n"
+      "# DOS core binaries\r\n"
+      "DIR BIN @:\\SVARDOS\r\n"
+      "\r\n"
+      "# Programs\r\n"
+      "DIR PROGS @:\\\r\n"
+      "\r\n"
+      "# Games \r\n"
+      "DIR GAMES @:\\\r\n"
+      "\r\n"
+      "# Drivers\r\n"
+      "DIR DRIVERS @:\\DRIVERS\r\n"
+      "\r\n"
+      "# Development tools\r\n"
+      "DIR DEVEL @:\\DEVEL\r\n";
+
+    /* replace all @ by the actual boot drive */
+    strtr(pkg_cfg, '@', bootdrv);
+
+    /* write to file */
+    fputs(pkg_cfg, fd);
+    fclose(fd);
+  }
+
   /*** PICOTCP ***/
+  /* TODO (or not? maybe not that useful) */
+
   /*** WATTCP ***/
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\WATTCP.CFG", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\WATTCP.CFG", bootdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "my_ip = dhcp\r\n"
@@ -849,7 +909,7 @@ static void bootfilesgen(char targetdrv, const struct slocales *locales) {
 }
 
 
-static int installpackages(char targetdrv, char srcdrv, const struct slocales *locales) {
+static int copypackages(char targetdrv, const struct slocales *locales) {
   char pkglist[512];
   int i, pkglistlen;
   size_t pkglistflen;
@@ -886,20 +946,26 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
         break;
     }
   }
-  /* copy pkg.exe to the new drive, along with all packages */
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\pkg.exe", targetdrv);
-  snprintf(buff + 64, sizeof(buff) - 64, "%c:\\pkg.exe", srcdrv);
-  fcopy(buff, buff + 64, buff, sizeof(buff));
+
+  /* copy pkg.exe, install.com and install.lng to the new drive, along with all packages */
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\PKG.EXE", targetdrv);
+  fcopy(buff, buff + 8, buff, sizeof(buff));
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.COM", targetdrv);
+  fcopy(buff, buff + 8, buff, sizeof(buff));
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.LNG", targetdrv);
+  fcopy(buff, buff + 8, buff, sizeof(buff));
 
   /* open the post-install autoexec.bat and prepare initial instructions */
-  snprintf(buff, sizeof(buff), "%c:\\temp\\postinst.bat", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
-  fprintf(fd, "@ECHO OFF\r\nECHO INSTALLING SVARDOS BUILD %s\r\n", BUILDSTRING);
+  fprintf(fd, "@ECHO OFF\r\n"
+              "INSTALL"  /* installer will run in 2nd stage (generating pkg.cfg and stuff) */
+              "ECHO INSTALLING SVARDOS BUILD %s\r\n", BUILDSTRING);
 
   /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
   fprintf(fd, "COPY \\COMMAND.COM \\CMD.COM\r\n");
-  fprintf(fd, "SET COMSPEC=C:\\CMD.COM\r\n"); /* POSTINST.BAT is executed after system is rebooted, so the system drive is always C: */
+  fprintf(fd, "SET COMSPEC=\\CMD.COM\r\n"); /* no drive letter because I do not know it */
   fprintf(fd, "DEL \\COMMAND.COM\r\n");
 
   /* delete the temporary KERNEL.SYS - it will be properly installed from the package in a short moment */
@@ -935,8 +1001,8 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
     mdr_cout_str(10, 1, buff, COLOR_BODY, 40);
 
     /* proceed with package copy */
-    sprintf(buff, "%c:\\temp\\%s.svp", targetdrv, pkgptr);
-    if (fcopy(buff, buff + 7, buff, sizeof(buff)) != 0) {
+    sprintf(buff, "%c:\\TEMP\\%s.svp", targetdrv, pkgptr);
+    if (fcopy(buff, buff + 8, buff, sizeof(buff)) != 0) {
       mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY, 80);
       mdr_dos_getkey();
       fclose(fd);
@@ -954,13 +1020,13 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
   genlocalesconf(fd, locales);
   /* replace autoexec.bat and config.sys now and write some nice message on screen */
   fprintf(fd, "DEL pkg.exe\r\n"
-              "DEL C:\\CONFIG.SYS\r\n"
-              "COPY CONFIG.SYS C:\\\r\n"
+              "DEL install.com\r\n"
+              "COPY CONFIG.SYS \\\r\n"
               "DEL CONFIG.SYS\r\n"
-              "DEL C:\\AUTOEXEC.BAT\r\n"
-              "COPY AUTOEXEC.BAT C:\\\r\n"
+              "DEL \\AUTOEXEC.BAT\r\n"
+              "COPY AUTOEXEC.BAT \\\r\n"
               "DEL AUTOEXEC.BAT\r\n"
-              "SET COMSPEC=C:\\COMMAND.COM\r\n"
+              "SET COMSPEC=\\COMMAND.COM\r\n"
               "DEL \\CMD.COM\r\n");
   /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
@@ -970,22 +1036,15 @@ static int installpackages(char targetdrv, char srcdrv, const struct slocales *l
               "ECHO.\r\n");
   fclose(fd);
 
-  /* dummy config.sys with a SHELL directive, EDR does not call command.com
-   * with /P otherwise, see https://github.com/SvarDOS/edrdos/issues/74 */
-  snprintf(buff, sizeof(buff), "%c:\\config.sys", targetdrv);
-  fd = fopen(buff, "wb");
-  if (fd == NULL) return(-1);
-  fprintf(fd, "SHELL=C:\\COMMAND.COM /P\r\n");
-  fclose(fd);
-
   /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
   snprintf(buff, sizeof(buff), "%c:\\autoexec.bat", targetdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\n"
-              "SET DOSDIR=C:\\SVARDOS\r\n"
+              "SET DOSDIR=\\SVARDOS\r\n"
               "SET NLSPATH=%%DOSDIR%%\\NLS\r\n"
               "PATH %%DOSDIR%%\r\n");
+  genlocalesconf(fd, locales);
   fprintf(fd, "CD TEMP\r\n"
               "postinst.bat\r\n");
   fclose(fd);
@@ -1036,12 +1095,25 @@ int main(void) {
   struct slocales locales_data;
   struct slocales *locales = &locales_data;
   int targetdrv;
-  int sourcedrv;
   int action;
 
   /* setup an internal int 24h handler ("always fail") so DOS does not output
    * the ugly "abort, retry, fail" messages */
   install_int24();
+
+  /* init screen and detect mono adapters */
+  if (mdr_cout_init(NULL, NULL) == 0) {
+    /* overload color scheme with mono settings */
+    COLOR_TITLEBAR = 0x70;
+    COLOR_TITLEVER = 0x70;
+    COLOR_BODY = 0x07;
+    COLOR_BODYWARN = 0x07;
+    COLOR_SELECT = 0x70;
+    COLOR_SELECTCUR = 0x07;
+  }
+
+  /* is it stage 2 of the installation? */
+  if (fileexists("postinst.bat")) goto GENCONF;
 
   /* read the svardos build revision (from floppy label) */
   {
@@ -1068,51 +1140,40 @@ int main(void) {
     memcpy(BUILDSTRING, res, 12);
   }
 
-  sourcedrv = get_cur_drive() + 'A';
-
-  /* init screen and detect mono adapters */
-  if (mdr_cout_init(NULL, NULL) == 0) {
-    /* overload color scheme with mono settings */
-    COLOR_TITLEBAR = 0x70;
-    COLOR_TITLEVER = 0x70;
-    COLOR_BODY = 0x07;
-    COLOR_BODYWARN = 0x07;
-    COLOR_SELECT = 0x70;
-    COLOR_SELECTCUR = 0x07;
-  }
-
   /* am I EN-only? */
   if (!fileexists("INSTALL.LNG")) locales = NULL;
 
  SelectLang:
   if (locales == NULL) goto WelcomeScreen;
   action = selectlang(locales); /* welcome to svardos, select your language */
-  if (action != MENUNEXT) goto Quit;
+  if (action != MENUNEXT) goto QUIT;
   loadcp(locales);
   svarlang_load("INSTALL.LNG", locales->lang); /* NLS support */
 
   action = selectkeyb(locales);  /* what keyb layout should we use? */
-  if (action == MENUQUIT) goto Quit;
+  if (action == MENUQUIT) goto QUIT;
   if (action == MENUPREV) goto SelectLang;
 
  WelcomeScreen:
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
-  if (action == MENUQUIT) goto Quit;
+  if (action == MENUQUIT) goto QUIT;
   if (action == MENUPREV) {
-    if (locales == NULL) goto Quit;
+    if (locales == NULL) goto QUIT;
     goto SelectLang;
   }
 
-  targetdrv = preparedrive(sourcedrv); /* what drive should we install from? check avail. space */
-  if (targetdrv == MENUQUIT) goto Quit;
+  targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
+  if (targetdrv == MENUQUIT) goto QUIT;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
-  bootfilesgen(targetdrv, locales); /* generate boot files and other configurations */
-  if (installpackages(targetdrv, sourcedrv, locales) != 0) goto Quit;    /* install packages */
-  /*localcfg();*/ /* show local params (currency, etc), and propose to change them (based on localcfg) */
-  /*netcfg();*/ /* basic networking config */
-  finalreboot(); /* remove the CD and reboot */
+  if (copypackages(targetdrv, locales) != 0) goto QUIT;    /* copy packages to dst drive */
+  finalreboot(); /* remove the install medium and reboot */
 
- Quit:
+  goto QUIT;
+
+ GENCONF: /* second stage of the installation (run from the destination disk) */
+  bootfilesgen(locales); /* generate boot files and other configurations */
+
+ QUIT:
   mdr_cout_locate(0, 0);
   mdr_cout_close();
   return(0);
