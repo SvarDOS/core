@@ -18,7 +18,7 @@
 1.28:       pkg crc32 file
 1.29:       pkg listzip file.zip
 1.40:PKG is published under the MIT license.
-1.41:It is configured through %DOSDIR%\\CFG\\PKG.CFG
+1.41:It is configured through %DOSDIR%\\PKG.CFG
 
 ### General stuff ####
 
@@ -59,6 +59,8 @@
 7.11:Warning: Invalid 'DIR' directive found at line #%d
 7.15:ERROR: custom dir '%s' is not a valid absolute path!
 7.16:ERROR: custom dir '%s' is a reserved name!
+7.17:ERROR: PKG.CFG found at %s
+7.18:       Please move it to %DOSDIR%\\PKG.CFG
 
 #### Unziping package ####
 

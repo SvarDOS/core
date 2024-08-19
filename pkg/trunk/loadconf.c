@@ -9,6 +9,7 @@
 
 #include "helpers.h" /* slash2backslash(), removeDoubleBackslashes()... */
 #include "kprintf.h"
+#include "svarlang.lib\svarlang.h"
 
 #include "loadconf.h"
 
@@ -93,10 +94,20 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
   int nline = 0;
   const char *PKG_CFG = " (PKG.CFG)";
 
-  snprintf(token, sizeof(token), "%s\\cfg\\pkg.cfg", dosdir);
+  /* load config file from %DOSDIR%\PKG.CFG */
+  snprintf(token, sizeof(token), "%s\\pkg.cfg", dosdir);
   fd = fopen(token, "r");
+  /* if not found then try the legacy location at %DOSDIR%\CFG\PKG.CFG */
   if (fd == NULL) {
-    kitten_printf(7, 1, token); /* "ERROR: Could not open config file (%s)!" */
+    snprintf(token, sizeof(token), "%s\\cfg\\pkg.cfg", dosdir);
+    fd = fopen(token, "r");
+    if (fd == NULL) {
+      kitten_printf(7, 1, "%DOSDIR%\\PKG.CFG"); /* "ERROR: Could not open config file (%s)!" */
+    } else {
+      kitten_printf(7, 17, token);  /* "ERROR: PKG.CFG found at %s */
+      puts("");
+      puts(svarlang_str(7, 18));    /* Please move it to %DOSDIR%\PKG.CFG */
+    }
     puts("");
     return(-1);
   }

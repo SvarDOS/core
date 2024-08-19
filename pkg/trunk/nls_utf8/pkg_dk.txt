@@ -15,7 +15,7 @@
 1.24:            pkg listlocal [filter]
 1.27:            pkg unzip file.zip
 1.40:PKG is published under the MIT license.
-1.41:It is configured through %DOSDIR%\\CFG\\PKG.CFG
+1.41:It is configured through %DOSDIR%\\PKG.CFG
 
 ### General stuff ####
 

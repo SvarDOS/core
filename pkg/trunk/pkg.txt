@@ -8,9 +8,9 @@ PKG installs, updates and removes software *.SVP packages. Such packages are
 distributed with the SvarDOS system and may also be obtained with PKGNET from
 the online SvarDOS repository.
 
-PKG is configured through the %DOSDIR%\CFG\PKG.CFG configuration file. This
-file provides information about the directories where packages have to be
-installed. An example is shown at the bottom of this file below.
+PKG is configured through the %DOSDIR%\PKG.CFG configuration file. This file
+provides information about the directories where packages have to be installed.
+An example is shown at the bottom of this file below.
 
 PKG can display its messages in a variety of languages. To select its language,
 it looks at the %LANG% environment variable (for example "SET LANG=PL") and

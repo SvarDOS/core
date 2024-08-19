@@ -17,7 +17,7 @@
 1.28:       pkg crc32 fichier
 1.29:       pkg listzip fichier.zip
 1.40:PKG est publié sous license MIT.
-1.41:Cet outil est configurable via %DOSDIR%\\CFG\\PKG.CFG
+1.41:Cet outil est configurable via %DOSDIR%\\PKG.CFG
 
 ### General stuff ####
 
