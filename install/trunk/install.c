@@ -603,6 +603,190 @@ static unsigned short test_drive_write(char drive) {
 }
 
 
+/* computes a BSD sum of a block of 512 bytes */
+static unsigned short bootsum(void *buff) {
+  unsigned short b, sum = 0;
+  for (b = 0; b < 256; b++) { /* 256 because I read 16 bits at a time */
+    sum <<= 1;
+    sum += ((unsigned short *)buff)[b];
+  }
+  return(sum);
+}
+
+
+/* read one sector from driveid (0x80, 0x81..) at C,H,S into buff */
+static int READSEC_CHS(char *buff, unsigned char driveid, unsigned short cyl, unsigned char head, unsigned char sec);
+#pragma aux READSEC_CHS = \
+"push es" \
+"mov ch, al" \
+"shl ah, 1" \
+"shl ah, 1" \
+"shl ah, 1" \
+"shl ah, 1" \
+"shl ah, 1" \
+"shl ah, 1" \
+"or cl, ah" \
+"mov ax, 0x0201"  /* read 1 sector into memory */ \
+"push ds" \
+"pop es" \
+"int 0x13" \
+"mov ax, 0" /* do not do "xor ax, ax", CF needs to be preserved */ \
+"jnc DONE" \
+"inc ax" \
+"DONE:" \
+"pop es" \
+parm [bx] [dl] [ax] [dh] [cl] \
+modify [cx] \
+value [ax]
+
+
+/*
+ * MBR structure:
+ *
+ * Boot signature (word 0xAA55) is at 0x01FE
+ *
+ * partition entry 1 is at 0x01BE
+ *                 2    at 0x01CE
+ *                 3    at 0x01DE
+ *                 4    at 0x01EE
+ *
+ * a partition entry is:
+ * 0x00  status byte (active is bit 0x80 set)
+ * 0x01  CHS addr of first sector (here: HEAD)
+ * 0x02  CHS addr of first sector (CCSSSSSS) sector in 6 low bits, cylinder high bits in CC
+ * 0x03  CHS addr of furst sector (here: low 8 bits of cylinder)
+ * 0x04  Partition type:
+        0x06/0x08 for CHS FAT16/32
+        0x0E/0x0C for LBA FAT16/32
+ * 0x05  CHS addr of last sector (same format as for 1st sector)
+ * 0x06  CHS addr of last sector (same format as for 1st sector)
+ * 0x07  CHS addr of last sector (same format as for 1st sector)
+ * 0x08  LBA addr of first sector (4 bytes) - used sometimes instead of CHS
+ * 0x0C  number of sectors in partition (4 bytes)
+ */
+
+struct drivelist {
+  union {
+    unsigned long lbasector;
+    struct {
+      unsigned short c;
+      unsigned char h;
+      unsigned char s;
+    } chs;
+  } start;
+  unsigned char active;
+  unsigned char fstype; /* fat16 chs, fat16 lba, fat32 chs, fat32 lba... */
+  unsigned char hd; /* 0x80, 0x81... */
+  unsigned char dos_id;  /* A=1, B=2, C=3, etc... 0 = unknown */
+  unsigned short dos_size; /* size, as provided by DOS (in MiB) */
+  unsigned short bootsum; /* hash-like sum of the bootcode area */
+};
+
+int get_drives_list(char *buff, struct drivelist *drives) {
+  int i;
+  if (READSEC_CHS(buff, 0x80, 0, 0, 1) != 0) return(1);
+
+  /* check boot signature at 0x01fe */
+  if (*(unsigned short *)(buff + 0x01fe) != 0xAA55) return(2);
+
+  /* iterate over the 4 partitions */
+  for (i = 0; i < 4; i++) {
+    unsigned char *entry;
+    bzero(&(drives[i]), sizeof(struct drivelist));
+
+    entry = buff + 0x01BE + (i * 16);
+
+    if ((entry[4] == 0x0E) || (entry[4] == 0x0C)) { /* LBA FAT */
+      drives[i].start.lbasector = ((unsigned long *)entry)[2];
+    } else if ((entry[4] == 0x01) || (entry[4] == 0x06) || (entry[4] == 0x08)) { /* CHS FAT */
+      drives[i].start.chs.c = entry[0x02] & 0xC0;
+      drives[i].start.chs.c <<= 2;
+      drives[i].start.chs.c |= entry[0x03];
+      drives[i].start.chs.h = entry[0x01];
+      drives[i].start.chs.s = entry[0x02] & 63;
+    } else { /* unknown filesystem (non-FAT) */
+      continue;
+    }
+    drives[i].hd = 0x80;
+    drives[i].active = entry[0] >> 7;
+    drives[i].fstype = entry[4];
+  }
+
+  /* load the boot sector of each (valid) partition and compute its sum */
+  for (i = 0; i < 4; i++) {
+    if (drives[i].hd == 0) continue;
+    if ((drives[i].fstype == 0x0E) || (drives[i].fstype == 0x0C)) { /* LBA */
+      printf("LBA!\n");
+    } else { /* CHS */
+      if (READSEC_CHS(buff, 0x80, drives[i].start.chs.c, drives[i].start.chs.h, drives[i].start.chs.s) == 0) {
+        drives[i].bootsum = bootsum(buff);
+      }
+    }
+  }
+
+  /* now iterate over DOS drives and try to match them to an entry in drives[] */
+  for (i = 3; i < 8; i++) {
+    unsigned short err = 0, sum, b;
+    if (isdriveremovable(i) <= 0) {
+      printf("SKIPPED = %u\n", i);
+      continue;
+    }
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push di
+      push si
+      pushf
+
+      mov ax, i
+      dec ax     /* int 25h takes zero-based drive id (A=0, B=1, C=3, ...) */
+      mov cx, 1
+      mov dx, 0
+      mov bx, buff
+      int 0x25
+      jnc GOOD
+      mov err, 1
+      GOOD:
+      pop dx     /* int 25h leaves a word on stack, needs to be POPed */
+
+      /* extensive push/pop saving of registers because according to RBIL
+       * int25h may destroy all registers except segment registers */
+
+      popf
+      pop si
+      pop di
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
+
+    if (err != 0) {
+      printf("INT25 ERR FOR DRV %u!\n", i);
+      continue;
+    }
+
+    /* compute the sum of this sector */
+    sum = bootsum(buff);
+
+    /* try to match the sum to something in drives[] */
+    for (b = 0; b < 4; b++) {
+      if (drives[b].hd == 0) continue;
+      printf("%c: sum = %04X  /  drive[%u].sum = %04X\n", '@' + i, sum, b, drives[b].bootsum);
+      if (drives[b].bootsum == sum) {
+        drives[b].dos_id = i;
+        drives[b].dos_size = disksize(i);
+        break;
+      }
+    }
+  }
+
+  return(0);
+}
+
+
 static int preparedrive(void) {
   int selecteddrive;
   char cselecteddrive;
@@ -610,19 +794,32 @@ static int preparedrive(void) {
   int choice;
   char buff[512];
   int driveid = 1; /* fdisk runs on first drive (unless USB boot) */
+  struct drivelist drives[4];
 
   for (;;) {
-    char drvlist[4][16]; /* C: [2048 MB] */
+    char drvlist[4][32]; /* C: [2048 MB] */
     int i, drvlistlen = 0;
+
+    /* read MBR of first HDD */
+    i = get_drives_list(buff, drives);
+    if (i) {
+      printf("get_drives_list() error = %d", i);
+    }
+
+    sleep(5);
 
     /* build a menu with all non-removable drives from C to F */
     for (i = 3; i < 7; i++) {
-      if (isdriveremovable(i) > 0) {
-        unsigned short sz = disksize(i);
-        if (sz == 0xffff) { /* size not avail (probably unformatted disk) */
-          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c:", '@' + i, disksize(i));
+      if (isdriveremovable(i) >= 0) {
+        unsigned char drvid;
+        /* is it in drives? */
+        for (drvid = 0; drvid < 4; drvid++) if (drives[drvid].dos_id == i) break;
+        if (drvid < 4) {
+          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB, #%u, act=%u]", '@' + i, drives[drvid].dos_size, drvid, drives[drvid].active);
+        } else if (disksize(i) == 0xffff) {
+          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: (unformatted)", '@' + i);
         } else {
-          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB]", '@' + i, disksize(i));
+          continue;
         }
         drvlistlen++;
       }
