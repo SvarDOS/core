@@ -603,30 +603,13 @@ static unsigned short test_drive_write(char drive) {
 }
 
 
-/* computes a BSD sum of a block of 512 bytes */
-static unsigned short bootsum(void *buff) {
-  unsigned short b, sum = 0;
-  for (b = 0; b < 256; b++) { /* 256 because I read 16 bits at a time */
-    sum <<= 1;
-    sum += ((unsigned short *)buff)[b];
-  }
-  return(sum);
-}
-
-
-/* read one sector from driveid (0x80, 0x81..) at C,H,S into buff */
-static int READSEC_CHS(char *buff, unsigned char driveid, unsigned short cyl, unsigned char head, unsigned char sec);
-#pragma aux READSEC_CHS = \
+/* read MBR of driveid (0x80, 0x81..) into buff */
+static int READMBR(char *buff, unsigned char driveid);
+#pragma aux READMBR = \
 "push es" \
-"mov ch, al" \
-"shl ah, 1" \
-"shl ah, 1" \
-"shl ah, 1" \
-"shl ah, 1" \
-"shl ah, 1" \
-"shl ah, 1" \
-"or cl, ah" \
 "mov ax, 0x0201"  /* read 1 sector into memory */ \
+"mov cx, 0x0001"  /* cylinder 0, sector 1 */ \
+"xor dh, dh"      /* head 0 */ \
 "push ds" \
 "pop es" \
 "int 0x13" \
@@ -635,8 +618,8 @@ static int READSEC_CHS(char *buff, unsigned char driveid, unsigned short cyl, un
 "inc ax" \
 "DONE:" \
 "pop es" \
-parm [bx] [dl] [ax] [dh] [cl] \
-modify [cx] \
+parm [bx] [dl] \
+modify [cx dx] \
 value [ax]
 
 
@@ -666,120 +649,97 @@ value [ax]
  */
 
 struct drivelist {
-  union {
-    unsigned long lbasector;
-    struct {
-      unsigned short c;
-      unsigned char h;
-      unsigned char s;
-    } chs;
-  } start;
+  unsigned long start_lba;
+  unsigned long tot_sect; /* size (of partition), in sectors */
+  unsigned short tot_size; /* size in MiB */
   unsigned char active;
-  unsigned char fstype; /* fat16 chs, fat16 lba, fat32 chs, fat32 lba... */
   unsigned char hd; /* 0x80, 0x81... */
-  unsigned char dos_id;  /* A=1, B=2, C=3, etc... 0 = unknown */
-  unsigned short dos_size; /* size, as provided by DOS (in MiB) */
-  unsigned short bootsum; /* hash-like sum of the bootcode area */
+  unsigned char dosid;   /* DOS drive id (A=1, B=2...)*/
 };
 
+
+/* a (very partial) struct mimicking what EDR-DOS uses in int 2Fh,AX=0803h */
+#pragma pack (push)
+#pragma pack (0) /* disable the automatic alignment of struct members */
+struct dos_udsc {
+  unsigned short next_off;   /* offset FFFFh if last */
+  unsigned short next_seg;
+  unsigned char hd;     /* physical unit, as used by int 13h */
+  unsigned char letter; /* DOS letter drive (A=0, B=1, C=2, ...) */
+  unsigned short sectsize; /* bytes per sector */
+  unsigned char unknown[15];
+  unsigned long start_lba; /* LBA address of the partition (only for primary partitions) */
+};
+#pragma pack (pop)
+
+
+/* get the DOS drive data table list */
+static struct dos_udsc far *get_dos_udsc(void)  {
+  unsigned short udsc_seg = 0, udsc_off = 0;
+  _asm {
+    push ds
+    push di
+
+    mov ax, 0x0803
+    int 0x2f
+    /* drive data table list is in DS:DI now */
+    mov udsc_seg, ds
+    mov udsc_off, di
+
+    pop di
+    pop ds
+  }
+  if (udsc_off == 0xffff) return(NULL);
+  return(MK_FP(udsc_seg, udsc_off));
+}
+
+
+/* reads the MBR and matches its entries to DOS drives
+ * see https://github.com/SvarDOS/bugz/issues/89 */
 int get_drives_list(char *buff, struct drivelist *drives) {
   int i;
-  if (READSEC_CHS(buff, 0x80, 0, 0, 1) != 0) return(1);
+  struct dos_udsc far *udsc_root = get_dos_udsc();
+  struct dos_udsc far *udsc_node;
+
+  if (READMBR(buff, 0x80) != 0) return(1);
 
   /* check boot signature at 0x01fe */
   if (*(unsigned short *)(buff + 0x01fe) != 0xAA55) return(2);
 
-  /* iterate over the 4 partitions */
+  /* iterate over the 4 partitions in the MBR */
   for (i = 0; i < 4; i++) {
     unsigned char *entry;
     bzero(&(drives[i]), sizeof(struct drivelist));
 
     entry = buff + 0x01BE + (i * 16);
 
-    if ((entry[4] == 0x0E) || (entry[4] == 0x0C)) { /* LBA FAT */
-      drives[i].start.lbasector = ((unsigned long *)entry)[2];
-    } else if ((entry[4] == 0x01) || (entry[4] == 0x06) || (entry[4] == 0x08)) { /* CHS FAT */
-      drives[i].start.chs.c = entry[0x02] & 0xC0;
-      drives[i].start.chs.c <<= 2;
-      drives[i].start.chs.c |= entry[0x03];
-      drives[i].start.chs.h = entry[0x01];
-      drives[i].start.chs.s = entry[0x02] & 63;
-    } else { /* unknown filesystem (non-FAT) */
+    /* ignore partition if fs is unknown (non-FAT) */
+    if ((entry[4] != 0x0E) && (entry[4] != 0x0C)  /* LBA FAT */
+     && (entry[4] != 0x01) && (entry[4] != 0x06) && (entry[4] != 0x08)) { /* CHS FAT */
       continue;
     }
     drives[i].hd = 0x80;
     drives[i].active = entry[0] >> 7;
-    drives[i].fstype = entry[4];
-  }
+    drives[i].start_lba = ((unsigned long *)entry)[2];
+    drives[i].tot_sect = ((unsigned long *)entry)[3];
 
-  /* load the boot sector of each (valid) partition and compute its sum */
-  for (i = 0; i < 4; i++) {
-    if (drives[i].hd == 0) continue;
-    if ((drives[i].fstype == 0x0E) || (drives[i].fstype == 0x0C)) { /* LBA */
-      printf("LBA!\n");
-    } else { /* CHS */
-      if (READSEC_CHS(buff, 0x80, drives[i].start.chs.c, drives[i].start.chs.h, drives[i].start.chs.s) == 0) {
-        drives[i].bootsum = bootsum(buff);
+    /* now iterate over DOS drives and try to match ont to this MBR entry */
+    udsc_node = udsc_root;
+    while (udsc_node != NULL) {
+      if (udsc_node->hd != 0x80) goto NEXT;
+      if (udsc_node->start_lba != drives[i].start_lba) goto NEXT;
+
+      /* FOUND! */
+      drives[i].dosid = udsc_node->letter + 1;
+      {
+        unsigned long sz = (drives[i].tot_sect * udsc_node->sectsize) >> 20;
+        drives[i].tot_size = (unsigned short)sz;
       }
-    }
-  }
+      break;
 
-  /* now iterate over DOS drives and try to match them to an entry in drives[] */
-  for (i = 3; i < 8; i++) {
-    unsigned short err = 0, sum, b;
-    if (isdriveremovable(i) <= 0) {
-      printf("SKIPPED = %u\n", i);
-      continue;
-    }
-    _asm {
-      push ax
-      push bx
-      push cx
-      push dx
-      push di
-      push si
-      pushf
-
-      mov ax, i
-      dec ax     /* int 25h takes zero-based drive id (A=0, B=1, C=3, ...) */
-      mov cx, 1
-      mov dx, 0
-      mov bx, buff
-      int 0x25
-      jnc GOOD
-      mov err, 1
-      GOOD:
-      pop dx     /* int 25h leaves a word on stack, needs to be POPed */
-
-      /* extensive push/pop saving of registers because according to RBIL
-       * int25h may destroy all registers except segment registers */
-
-      popf
-      pop si
-      pop di
-      pop dx
-      pop cx
-      pop bx
-      pop ax
-    }
-
-    if (err != 0) {
-      printf("INT25 ERR FOR DRV %u!\n", i);
-      continue;
-    }
-
-    /* compute the sum of this sector */
-    sum = bootsum(buff);
-
-    /* try to match the sum to something in drives[] */
-    for (b = 0; b < 4; b++) {
-      if (drives[b].hd == 0) continue;
-      printf("%c: sum = %04X  /  drive[%u].sum = %04X\n", '@' + i, sum, b, drives[b].bootsum);
-      if (drives[b].bootsum == sum) {
-        drives[b].dos_id = i;
-        drives[b].dos_size = disksize(i);
-        break;
-      }
+      NEXT:
+      if (udsc_node->next_off == 0xffff) break;
+      udsc_node = MK_FP(udsc_node->next_seg, udsc_node->next_off);
     }
   }
 
@@ -790,39 +750,29 @@ int get_drives_list(char *buff, struct drivelist *drives) {
 static int preparedrive(void) {
   int selecteddrive;
   char cselecteddrive;
-  int ds;
   int choice;
   char buff[512];
   int driveid = 1; /* fdisk runs on first drive (unless USB boot) */
   struct drivelist drives[4];
 
-  for (;;) {
-    char drvlist[4][32]; /* C: [2048 MB] */
-    int i, drvlistlen = 0;
-
-    /* read MBR of first HDD */
+  /* read MBR of first HDD */
+  {
+    int i;
     i = get_drives_list(buff, drives);
     if (i) {
       printf("get_drives_list() error = %d", i);
     }
+  }
 
-    sleep(5);
+  for (;;) {
+    char drvlist[4][40]; /* C: [2048 MB] */
+    int i, drvlistlen = 0;
 
-    /* build a menu with all non-removable drives from C to F */
-    for (i = 3; i < 7; i++) {
-      if (isdriveremovable(i) >= 0) {
-        unsigned char drvid;
-        /* is it in drives? */
-        for (drvid = 0; drvid < 4; drvid++) if (drives[drvid].dos_id == i) break;
-        if (drvid < 4) {
-          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB, #%u, act=%u]", '@' + i, drives[drvid].dos_size, drvid, drives[drvid].active);
-        } else if (disksize(i) == 0xffff) {
-          snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: (unformatted)", '@' + i);
-        } else {
-          continue;
-        }
-        drvlistlen++;
-      }
+    /* build a menu with all drives */
+    for (i = 0; i < 4; i++) {
+      if (drives[i].hd == 0) continue;
+      snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u, act=%u]", '@' + drives[i].dosid, drives[i].tot_size, 'a' + (drives[i].hd & 127), i, drives[i].active);
+      drvlistlen++;
     }
 
     /* if no drive found - disk not partitioned? */
@@ -906,15 +856,17 @@ static int preparedrive(void) {
     }
 
     /* check total disk space */
-    ds = disksize(selecteddrive);
-    if (ds < SVARDOS_DISK_REQ) {
-      int y = 9;
-      newscreen(2);
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
-      y += putstringwrap(y, 1, COLOR_BODY, buff);
-      putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
-      mdr_dos_getkey();
-      return(MENUQUIT);
+    {
+      int ds = disksize(selecteddrive);
+      if (ds < SVARDOS_DISK_REQ) {
+        int y = 9;
+        newscreen(2);
+        snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
+        y += putstringwrap(y, 1, COLOR_BODY, buff);
+        putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
+        mdr_dos_getkey();
+        return(MENUQUIT);
+      }
     }
 
     /* is the disk empty? */
