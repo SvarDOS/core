@@ -32,6 +32,7 @@
 3.4:ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB.
 3.5:ERROR: Drive %c: is not empty. SvarDOS must be installed on an empty disk.\n\nYou can format the disk now, to make it empty. Note however, that this will ERASE ALL CURRENT DATA on your disk.
 3.6:The installation of SvarDOS to %c: is about to begin.
+3.7:Select the drive where SvarDOS will be installed. You can also return to DOS and use FDISK to partition your disk. SvarDOS may be installed only on a primary partition (ie. not a logical drive).
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"

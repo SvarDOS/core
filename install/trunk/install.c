@@ -794,7 +794,7 @@ static int selectdrive(void) {
 
   newscreen(0);
 
-  snprintf(buff, sizeof(buff), "Select the drive where SvarDOS will be installed. You may also return to DOS and use FDISK to partition your disk. Please note that SvarDOS may be installed only on a primary partition (ie. not a logical drive).");
+  snprintf(buff, sizeof(buff), "%s", svarlang_strid(0x0307));
   i = menuselect(7 + putstringwrap(4, 1, COLOR_BODY, buff) /*ypos*/, 10 /*max-height*/, menulist, -1);
   if (i < 0) {
     return(MENUPREV);

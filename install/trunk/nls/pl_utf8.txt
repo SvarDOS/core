@@ -32,6 +32,7 @@
 3.4:BŁĄD: Dysk %c: jest za mały! SvarDOS wymaga co najmniej %d MiB miejsca.
 3.5:BŁĄD: Dysk %c: nie jest pusty. SvarDOS może być zainstalowany wyłącznie na pustym dysku.\n\nMożesz sformatować dysk teraz, aby go opróżnić. Operacja ta sprawi jednak że WSZYSTKIE OBECNE DANE ZOSTANĄ UTRACONE.
 3.6:Za chwilę rozpocznie się instalacja systemu SvarDOS na dysk %c:.
+3.7:Wybierz dysk na który SvarDOS zostanie zainstalowany. Możesz też wyjść do DOS i użyć narzędzia FDISK aby spartycjonować swój dysk. SvarDOS może zostać zainstalowany wyłącznie na partycji podstawowej (tj. nie na dysku logicznym).
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
