@@ -540,15 +540,6 @@ static int diskempty(char drv) {
 }
 
 
-/* get the DOS "current drive" (0=A:, 1=B:, etc) */
-static unsigned char get_cur_drive(void);
-#pragma aux get_cur_drive = \
-"mov ah, 0x19" /* DOS 1+ GET CURRENT DEFAULT DRIVE */ \
-"int 0x21" \
-modify [ah] \
-value [al]
-
-
 /* replace all occurences of char a by char b in s */
 static void strtr(char *s, char a, char b) {
   for (;*s != 0; s++) {
@@ -603,11 +594,13 @@ static unsigned short test_drive_write(char drive) {
 }
 
 
-/* read MBR of driveid (0x80, 0x81..) into buff */
-static int READMBR(char *buff, unsigned char driveid);
-#pragma aux READMBR = \
+#define MBR_WRITE 3
+#define MBR_READ 2
+/* read (action=2) or write (action=3) MBR of driveid (0x80, 0x81..) into buff */
+static int READ_OR_WRITE_MBR(unsigned char action, char *buff, unsigned char driveid);
+#pragma aux READ_OR_WRITE_MBR = \
 "push es" \
-"mov ax, 0x0201"  /* read 1 sector into memory */ \
+"mov al, 1"       /* read 1 sector into memory */ \
 "mov cx, 0x0001"  /* cylinder 0, sector 1 */ \
 "xor dh, dh"      /* head 0 */ \
 "push ds" \
@@ -618,9 +611,10 @@ static int READMBR(char *buff, unsigned char driveid);
 "inc ax" \
 "DONE:" \
 "pop es" \
-parm [bx] [dl] \
+parm [ah] [bx] [dl] \
 modify [cx dx] \
 value [ax]
+
 
 
 /*
@@ -652,10 +646,9 @@ struct drivelist {
   unsigned long start_lba;
   unsigned long tot_sect;  /* size (of partition), in sectors */
   unsigned short tot_size; /* size in MiB */
-  unsigned char active;
   unsigned char partid;    /* position of the partition in the MBR (0,1,2,3) */
-  unsigned char hd;        /* 0x80, 0x81... */
-  unsigned char dosid;     /* DOS drive id (A=1, B=2...)*/
+  unsigned char hd;        /* 0-3 */
+  unsigned char dosid;     /* DOS drive id (A=0, B=1...)*/
 };
 
 
@@ -663,10 +656,10 @@ struct drivelist {
 #pragma pack (push)
 #pragma pack (0) /* disable the automatic alignment of struct members */
 struct dos_udsc {
-  unsigned short next_off;   /* offset FFFFh if last */
+  unsigned short next_off; /* offset FFFFh if last */
   unsigned short next_seg;
-  unsigned char hd;     /* physical unit, as used by int 13h */
-  unsigned char letter; /* DOS letter drive (A=0, B=1, C=2, ...) */
+  unsigned char hd;        /* physical unit (as in int 13h) */
+  unsigned char letter;    /* DOS letter drive (A=0, B=1, C=2, ...) */
   unsigned short sectsize; /* bytes per sector */
   unsigned char unknown[15];
   unsigned long start_lba; /* LBA address of the partition (only for primary partitions) */
@@ -707,7 +700,7 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
 
   for (drv = 0x80; drv < 0x84; drv++) {
 
-    if (READMBR(buff, drv) != 0) continue;
+    if (READ_OR_WRITE_MBR(MBR_READ, buff, drv) != 0) continue;
 
     /* check boot signature at 0x01fe */
     if (*(unsigned short *)(buff + 0x01fe) != 0xAA55) continue;
@@ -724,9 +717,8 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
         continue;
       }
       bzero(&(drives[listlen]), sizeof(struct drivelist));
-      drives[listlen].hd = drv;
+      drives[listlen].hd = drv & 3;
       drives[listlen].partid = i;
-      drives[listlen].active = entry[0] >> 7;
       drives[listlen].start_lba = ((unsigned long *)entry)[2];
       drives[listlen].tot_sect = ((unsigned long *)entry)[3];
 
@@ -737,7 +729,7 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
         if (udsc_node->start_lba != drives[listlen].start_lba) goto NEXT;
 
         /* FOUND! */
-        drives[listlen].dosid = udsc_node->letter + 1;
+        drives[listlen].dosid = udsc_node->letter;
         {
           unsigned long sz = (drives[listlen].tot_sect * udsc_node->sectsize) >> 20;
           drives[listlen].tot_size = (unsigned short)sz;
@@ -757,8 +749,10 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
 
 
 /* displays a list of drives and asks user to choose one for installation
- * returns a word with DOS drive value in lowest 8 bits (A=1, B=2, etc) and
- * the BIOS drive id in highest 8 bits (1, 2...) */
+ * returns a word with bits HHPPLLLLLLLL where:
+ * HH = hard drive id (0..3)
+ * PP = position of the partition in MBR (0..3)
+ * LL... = drive's DOS id (A=0, B=1, C=2, ...) */
 static int selectdrive(void) {
   char buff[512];
   struct drivelist drives[16];
@@ -809,7 +803,7 @@ static int selectdrive(void) {
 
   /* build a menu with all drives */
   for (i = 0; i < drvlistlen; i++) {
-    snprintf(drvlist[i], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u, act=%u]", '@' + drives[i].dosid, drives[i].tot_size, 'a' + (drives[i].hd & 127), drives[i].partid, drives[i].active);
+    snprintf(drvlist[i], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u]", 'A' + drives[i].dosid, drives[i].tot_size, 'a' + drives[i].hd, drives[i].partid);
     menulist[i] = drvlist[i];
   }
   menulist[i++] = svarlang_str(0, 2); /* Quit to DOS */
@@ -820,25 +814,33 @@ static int selectdrive(void) {
   if (i < 0) {
     return(MENUPREV);
   } else if (i < drvlistlen) {
-    return(((drives[i].hd & 127) << 8) | drives[i].dosid);
+    /* return a bitfield HHPPLLLLLLLL
+     * HH = hard drive id (0..3)
+     * PP = position of the partition in MBR (0..3)
+     * LL... = drive's DOS id (A=0, B=1, C=2, ...) */
+    return((drives[i].partid << 8) | (drives[i].hd << 10) | drives[i].dosid);
   }
 
   return(MENUQUIT);
 }
 
-
+/* hd_drv is a bitfield HHPPLLLLLLLL
+ * HH = hard drive id (0..3)
+ * PP = position of the partition in MBR (0..3)
+ * LL... = drive's DOS id (A=0, B=1, C=2, ...) */
 static int preparedrive(int hd_drv) {
   unsigned char selecteddrive;
-  unsigned char driveid;
+  unsigned char driveid, partid;
   char cselecteddrive;
   int choice;
   char buff[512];
 
   /* decode hd and drive id from hd_drv */
-  selecteddrive = hd_drv & 0xff;
-  driveid = hd_drv >> 8;
+  selecteddrive = hd_drv & 0xff; /* DOS drive letter (A=0. B=1, C=2 etc) */
+  partid = (hd_drv >> 8) & 3;    /* position of partition in MBR (0..3) */
+  driveid = (hd_drv >> 10);      /* HDD identifier (0..3) */
 
-  cselecteddrive = '@' + selecteddrive;
+  cselecteddrive = 'A' + selecteddrive;
 
   TRY_AGAIN:
 
@@ -865,7 +867,7 @@ static int preparedrive(int hd_drv) {
   }
 
   /* check total disk space */
-  if (disksize(selecteddrive) < SVARDOS_DISK_REQ) {
+  if (disksize(selecteddrive+1) < SVARDOS_DISK_REQ) {
     int y = 9;
     newscreen(2);
     snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
@@ -907,13 +909,30 @@ static int preparedrive(int hd_drv) {
     choice = menuselect(10, 2, list, -1);
     if (choice < 0) return(MENUPREV);
     if (choice == 1) return(MENUQUIT);
+
+    /* update the disk's MBR, transfer the boot system, make sure the partition
+     * is ACTIVE and create a TEMP directory to copy SVP files over */
     snprintf(buff, sizeof(buff), "SYS %c: > NUL", cselecteddrive);
     exec(buff);
-    sprintf(buff, "FDISK /MBR %d", driveid);
+    sprintf(buff, "FDISK /MBR %u", driveid + 1);
     exec(buff);
-    snprintf(buff, sizeof(buff), "%c:\\SVARDOS", cselecteddrive);
-    mkdir(buff);
-    snprintf(buff + 3, sizeof(buff), "TEMP");
+
+    if (READ_OR_WRITE_MBR(MBR_READ, buff, driveid | 0x80) == 0) {
+      /* active flags for part 0,1,2,3 are at offsets 0x01BE, 0x01CE, 0x01DE, 0x01EE */
+      unsigned char i, flag_before, changed = 0;
+      unsigned short memoffset = 0x01BE; /* first partition flag is here */
+      for (i = 0; i < 4; i++) {
+        flag_before = buff[memoffset];
+        buff[memoffset] &= 127;
+        if (i == partid) buff[memoffset] |= 0x80;
+        if (flag_before != buff[memoffset]) changed++;
+        memoffset += 16; /* jump to next partition entry */
+      }
+      /* do I need to update the MBR? */
+      if (changed != 0) READ_OR_WRITE_MBR(MBR_WRITE, buff, driveid | 0x80);
+    }
+
+    snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
     mkdir(buff);
     return(0);
   }
@@ -1345,7 +1364,7 @@ int main(void) {
   action = preparedrive(targetdrv); /* what drive should we install to? check avail. space */
   if (action == MENUQUIT) goto QUIT;
   if (action == MENUPREV) goto SelDriveScreen;
-  targetdrv = (targetdrv & 0xff) + '@'; /* convert the hd+drv into a DOS letter */
+  targetdrv = (targetdrv & 0xff) + 'A'; /* convert the part+hd+drv value to a DOS letter */
 
   /* copy packages to dst drive */
   if (copypackages(targetdrv, locales) != 0) goto QUIT;
