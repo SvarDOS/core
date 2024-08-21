@@ -650,11 +650,12 @@ value [ax]
 
 struct drivelist {
   unsigned long start_lba;
-  unsigned long tot_sect; /* size (of partition), in sectors */
+  unsigned long tot_sect;  /* size (of partition), in sectors */
   unsigned short tot_size; /* size in MiB */
   unsigned char active;
-  unsigned char hd; /* 0x80, 0x81... */
-  unsigned char dosid;   /* DOS drive id (A=1, B=2...)*/
+  unsigned char partid;    /* position of the partition in the MBR (0,1,2,3) */
+  unsigned char hd;        /* 0x80, 0x81... */
+  unsigned char dosid;     /* DOS drive id (A=1, B=2...)*/
 };
 
 
@@ -695,55 +696,63 @@ static struct dos_udsc far *get_dos_udsc(void)  {
 
 
 /* reads the MBR and matches its entries to DOS drives
+ * fills the drives array with up to 16 drives (4 partitions * 4 disks)
  * see https://github.com/SvarDOS/bugz/issues/89 */
-int get_drives_list(char *buff, struct drivelist *drives) {
+static int get_drives_list(char *buff, struct drivelist *drives) {
   int i;
+  int listlen = 0;
+  int drv;
   struct dos_udsc far *udsc_root = get_dos_udsc();
   struct dos_udsc far *udsc_node;
 
-  if (READMBR(buff, 0x80) != 0) return(1);
+  for (drv = 0x80; drv < 0x84; drv++) {
 
-  /* check boot signature at 0x01fe */
-  if (*(unsigned short *)(buff + 0x01fe) != 0xAA55) return(2);
+    if (READMBR(buff, drv) != 0) continue;
 
-  /* iterate over the 4 partitions in the MBR */
-  for (i = 0; i < 4; i++) {
-    unsigned char *entry;
-    bzero(&(drives[i]), sizeof(struct drivelist));
+    /* check boot signature at 0x01fe */
+    if (*(unsigned short *)(buff + 0x01fe) != 0xAA55) continue;
 
-    entry = buff + 0x01BE + (i * 16);
+    /* iterate over the 4 partitions in the MBR */
+    for (i = 0; i < 4; i++) {
+      unsigned char *entry;
 
-    /* ignore partition if fs is unknown (non-FAT) */
-    if ((entry[4] != 0x0E) && (entry[4] != 0x0C)  /* LBA FAT */
-     && (entry[4] != 0x01) && (entry[4] != 0x06) && (entry[4] != 0x08)) { /* CHS FAT */
-      continue;
-    }
-    drives[i].hd = 0x80;
-    drives[i].active = entry[0] >> 7;
-    drives[i].start_lba = ((unsigned long *)entry)[2];
-    drives[i].tot_sect = ((unsigned long *)entry)[3];
+      entry = buff + 0x01BE + (i * 16);
 
-    /* now iterate over DOS drives and try to match ont to this MBR entry */
-    udsc_node = udsc_root;
-    while (udsc_node != NULL) {
-      if (udsc_node->hd != 0x80) goto NEXT;
-      if (udsc_node->start_lba != drives[i].start_lba) goto NEXT;
-
-      /* FOUND! */
-      drives[i].dosid = udsc_node->letter + 1;
-      {
-        unsigned long sz = (drives[i].tot_sect * udsc_node->sectsize) >> 20;
-        drives[i].tot_size = (unsigned short)sz;
+      /* ignore partition if fs is unknown (non-FAT) */
+      if ((entry[4] != 0x0E) && (entry[4] != 0x0C)  /* LBA FAT */
+       && (entry[4] != 0x01) && (entry[4] != 0x06) && (entry[4] != 0x08)) { /* CHS FAT */
+        continue;
       }
-      break;
+      bzero(&(drives[listlen]), sizeof(struct drivelist));
+      drives[listlen].hd = drv;
+      drives[listlen].partid = i;
+      drives[listlen].active = entry[0] >> 7;
+      drives[listlen].start_lba = ((unsigned long *)entry)[2];
+      drives[listlen].tot_sect = ((unsigned long *)entry)[3];
 
-      NEXT:
-      if (udsc_node->next_off == 0xffff) break;
-      udsc_node = MK_FP(udsc_node->next_seg, udsc_node->next_off);
-    }
-  }
+      /* now iterate over DOS drives and try to match ont to this MBR entry */
+      udsc_node = udsc_root;
+      while (udsc_node != NULL) {
+        if (udsc_node->hd != drv) goto NEXT;
+        if (udsc_node->start_lba != drives[listlen].start_lba) goto NEXT;
 
-  return(0);
+        /* FOUND! */
+        drives[listlen].dosid = udsc_node->letter + 1;
+        {
+          unsigned long sz = (drives[listlen].tot_sect * udsc_node->sectsize) >> 20;
+          drives[listlen].tot_size = (unsigned short)sz;
+        }
+        listlen++;
+        break;
+
+        NEXT:
+        if (udsc_node->next_off == 0xffff) break;
+        udsc_node = MK_FP(udsc_node->next_seg, udsc_node->next_off);
+      } /* iterate over UDSC nodes */
+    } /* iterate over partition entries of the MBR */
+  } /* iterate over BIOS disks (0x80, 0x81, ...) */
+
+  return(listlen);
 }
 
 
@@ -752,25 +761,14 @@ int get_drives_list(char *buff, struct drivelist *drives) {
  * the BIOS drive id in highest 8 bits (1, 2...) */
 static int selectdrive(void) {
   char buff[512];
-  struct drivelist drives[4];
-  char drvlist[4][32]; /* C: [2048 MB] */
-  int i, drvlistlen = 0;
+  struct drivelist drives[16];
+  char drvlist[16][32]; /* up to 16 drives (4 partitions on 4 disks) */
+  int i, drvlistlen;
   const char *menulist[16];
   unsigned char driveid = 1; /* fdisk runs on first drive (unless USB boot) */
 
   /* read MBR of first HDD */
-  i = get_drives_list(buff, drives);
-  if (i) {
-    printf("get_drives_list() error = %d", i);
-    /* TODO build a proper menu with an explanation about drive not partitioned */
-  }
-
-  /* build a menu with all drives */
-  for (i = 0; i < 4; i++) {
-    if (drives[i].hd == 0) continue;
-    snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u, act=%u]", '@' + drives[i].dosid, drives[i].tot_size, 'a' + (drives[i].hd & 127), i, drives[i].active);
-    drvlistlen++;
-  }
+  drvlistlen = get_drives_list(buff, drives);
 
   /* if no drive found - disk not partitioned? */
   if (drvlistlen == 0) {
@@ -809,17 +807,20 @@ static int selectdrive(void) {
     return(MENUQUIT);
   }
 
-  /* select the drive from list */
-  for (i = 0; i < drvlistlen; i++) menulist[i] = drvlist[i];
+  /* build a menu with all drives */
+  for (i = 0; i < drvlistlen; i++) {
+    snprintf(drvlist[i], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u, act=%u]", '@' + drives[i].dosid, drives[i].tot_size, 'a' + (drives[i].hd & 127), drives[i].partid, drives[i].active);
+    menulist[i] = drvlist[i];
+  }
   menulist[i++] = svarlang_str(0, 2); /* Quit to DOS */
   menulist[i] = NULL;
-  newscreen(0);
 
+  newscreen(0);
   i = menuselect(6 /*ypos*/, i /*height*/, menulist, -1);
   if (i < 0) {
     return(MENUPREV);
   } else if (i < drvlistlen) {
-    return((driveid << 8) | (menulist[i][0] - '@'));
+    return(((drives[i].hd & 127) << 8) | drives[i].dosid);
   }
 
   return(MENUQUIT);
