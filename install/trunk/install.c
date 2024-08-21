@@ -523,12 +523,12 @@ static int disksize(unsigned char drv) {
 
 
 /* returns 0 if disk is empty, non-zero otherwise */
-static int diskempty(int drv) {
+static int diskempty(char drv) {
   unsigned int rc;
   int res;
   char buff[8];
   struct find_t fileinfo;
-  snprintf(buff, sizeof(buff), "%c:\\*.*", 'A' + drv - 1);
+  snprintf(buff, sizeof(buff), "%c:\\*.*", drv);
   rc = _dos_findfirst(buff, _A_NORMAL | _A_SUBDIR | _A_HIDDEN | _A_SYSTEM, &fileinfo);
   if (rc == 0) {
     res = 1; /* call successfull means disk is not empty */
@@ -747,168 +747,174 @@ int get_drives_list(char *buff, struct drivelist *drives) {
 }
 
 
-static int preparedrive(void) {
-  int selecteddrive;
+/* displays a list of drives and asks user to choose one for installation
+ * returns a word with DOS drive value in lowest 8 bits (A=1, B=2, etc) and
+ * the BIOS drive id in highest 8 bits (1, 2...) */
+static int selectdrive(void) {
+  char buff[512];
+  struct drivelist drives[4];
+  char drvlist[4][32]; /* C: [2048 MB] */
+  int i, drvlistlen = 0;
+  const char *menulist[16];
+  unsigned char driveid = 1; /* fdisk runs on first drive (unless USB boot) */
+
+  /* read MBR of first HDD */
+  i = get_drives_list(buff, drives);
+  if (i) {
+    printf("get_drives_list() error = %d", i);
+    /* TODO build a proper menu with an explanation about drive not partitioned */
+  }
+
+  /* build a menu with all drives */
+  for (i = 0; i < 4; i++) {
+    if (drives[i].hd == 0) continue;
+    snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u, act=%u]", '@' + drives[i].dosid, drives[i].tot_size, 'a' + (drives[i].hd & 127), i, drives[i].active);
+    drvlistlen++;
+  }
+
+  /* if no drive found - disk not partitioned? */
+  if (drvlistlen == 0) {
+    const char *list[4];
+    newscreen(0);
+    list[0] = svarlang_str(0, 3); /* Create a partition automatically */
+    list[1] = svarlang_str(0, 4); /* Run the FDISK tool */
+    list[2] = svarlang_str(0, 2); /* Quit to DOS */
+    list[3] = NULL;
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0300), SVARDOS_DISK_REQ); /* "ERROR: No drive could be found. Note, that SvarDOS requires at least %d MiB of available disk space */
+    switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
+      case 0:
+        sprintf(buff, "FDISK /PRI:MAX %u", driveid);
+        exec(buff);
+        break;
+      case 1:
+        mdr_cout_cls(0x07);
+        mdr_cout_locate(0, 0);
+        sprintf(buff, "FDISK %u", driveid);
+        exec(buff);
+        break;
+      case 2:
+        return(MENUQUIT);
+      default:
+        return(-1);
+    }
+    /* write a temporary MBR which only skips the drive (in case BIOS would
+     * try to boot off the not-yet-ready C: disk) */
+    sprintf(buff, "FDISK /LOADIPL %u", driveid);
+    exec(buff); /* writes BOOT.MBR into actual MBR */
+    newscreen(2);
+    putstringnls(10, 10, COLOR_BODY, 3, 1); /* "Your computer will reboot now." */
+    putstringnls(12, 10, COLOR_BODY, 0, 5); /* "Press any key..." */
+    mdr_dos_getkey();
+    reboot();
+    return(MENUQUIT);
+  }
+
+  /* select the drive from list */
+  for (i = 0; i < drvlistlen; i++) menulist[i] = drvlist[i];
+  menulist[i++] = svarlang_str(0, 2); /* Quit to DOS */
+  menulist[i] = NULL;
+  newscreen(0);
+
+  i = menuselect(6 /*ypos*/, i /*height*/, menulist, -1);
+  if (i < 0) {
+    return(MENUPREV);
+  } else if (i < drvlistlen) {
+    return((driveid << 8) | (menulist[i][0] - '@'));
+  }
+
+  return(MENUQUIT);
+}
+
+
+static int preparedrive(int hd_drv) {
+  unsigned char selecteddrive;
+  unsigned char driveid;
   char cselecteddrive;
   int choice;
   char buff[512];
-  int driveid = 1; /* fdisk runs on first drive (unless USB boot) */
-  struct drivelist drives[4];
 
-  /* read MBR of first HDD */
-  {
-    int i;
-    i = get_drives_list(buff, drives);
-    if (i) {
-      printf("get_drives_list() error = %d", i);
-    }
+  /* decode hd and drive id from hd_drv */
+  selecteddrive = hd_drv & 0xff;
+  driveid = hd_drv >> 8;
+
+  cselecteddrive = '@' + selecteddrive;
+
+  TRY_AGAIN:
+
+  /* if not formatted, propose to format it right away (try to create a directory) */
+  if (test_drive_write(cselecteddrive) != 0) {
+    const char *list[3];
+    newscreen(0);
+    snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
+    mdr_cout_str(7, 1, buff, COLOR_BODY, 80);
+
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
+    list[0] = buff;
+    list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
+    list[2] = NULL;
+
+    choice = menuselect(12, 2, list, -1);
+    if (choice < 0) return(MENUPREV);
+    if (choice == 1) return(MENUQUIT);
+    mdr_cout_cls(0x07);
+    mdr_cout_locate(0, 0);
+    snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
+    exec(buff);
+    goto TRY_AGAIN;
   }
 
-  for (;;) {
-    char drvlist[4][40]; /* C: [2048 MB] */
-    int i, drvlistlen = 0;
+  /* check total disk space */
+  if (disksize(selecteddrive) < SVARDOS_DISK_REQ) {
+    int y = 9;
+    newscreen(2);
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
+    y += putstringwrap(y, 1, COLOR_BODY, buff);
+    putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
+    mdr_dos_getkey();
+    return(MENUPREV);
+  }
 
-    /* build a menu with all drives */
-    for (i = 0; i < 4; i++) {
-      if (drives[i].hd == 0) continue;
-      snprintf(drvlist[drvlistlen], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u, act=%u]", '@' + drives[i].dosid, drives[i].tot_size, 'a' + (drives[i].hd & 127), i, drives[i].active);
-      drvlistlen++;
-    }
+  /* is the disk empty? */
+  newscreen(0);
+  if (diskempty(cselecteddrive) != 0) {
+    const char *list[3];
+    int y = 6;
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0305), cselecteddrive); /* "ERROR: Drive %c: not empty" */
+    y += putstringwrap(y, 1, COLOR_BODY, buff);
 
-    /* if no drive found - disk not partitioned? */
-    if (drvlistlen == 0) {
-      const char *list[4];
-      newscreen(0);
-      list[0] = svarlang_str(0, 3); /* Create a partition automatically */
-      list[1] = svarlang_str(0, 4); /* Run the FDISK tool */
-      list[2] = svarlang_str(0, 2); /* Quit to DOS */
-      list[3] = NULL;
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0300), SVARDOS_DISK_REQ); /* "ERROR: No drive could be found. Note, that SvarDOS requires at least %d MiB of available disk space */
-      switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
-        case 0:
-          sprintf(buff, "FDISK /PRI:MAX %d", driveid);
-          exec(buff);
-          break;
-        case 1:
-          mdr_cout_cls(0x07);
-          mdr_cout_locate(0, 0);
-          sprintf(buff, "FDISK %d", driveid);
-          exec(buff);
-          break;
-        case 2:
-          return(MENUQUIT);
-        default:
-          return(-1);
-      }
-      /* write a temporary MBR which only skips the drive (in case BIOS would
-       * try to boot off the not-yet-ready C: disk) */
-      sprintf(buff, "FDISK /LOADIPL %d", driveid);
-      exec(buff); /* writes BOOT.MBR into actual MBR */
-      newscreen(2);
-      putstringnls(10, 10, COLOR_BODY, 3, 1); /* "Your computer will reboot now." */
-      putstringnls(12, 10, COLOR_BODY, 0, 5); /* "Press any key..." */
-      mdr_dos_getkey();
-      reboot();
-      return(MENUQUIT);
-    }
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
+    list[0] = buff;
+    list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
+    list[2] = NULL;
 
-    /* select the drive from list */
-    {
-      const char *list[16];
-      int i;
-      for (i = 0; i < drvlistlen; i++) list[i] = drvlist[i];
-      list[i++] = svarlang_str(0, 2); /* Quit to DOS */
-      list[i] = NULL;
-      newscreen(0);
-
-      i = menuselect(6 /*ypos*/, i /*height*/, list, -1);
-      if (i < 0) {
-        return(MENUPREV);
-      } else if (i < drvlistlen) {
-        selecteddrive = list[i][0] - '@';
-      } else {
-        return(MENUQUIT);
-      }
-
-      cselecteddrive = '@' + selecteddrive;
-    }
-
-    /* if not formatted, propose to format it right away (try to create a directory) */
-    if (test_drive_write(cselecteddrive) != 0) {
-      const char *list[3];
-      newscreen(0);
-      snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
-      mdr_cout_str(7, 1, buff, COLOR_BODY, 80);
-
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
-      list[0] = buff;
-      list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
-      list[2] = NULL;
-
-      choice = menuselect(12, 2, list, -1);
-      if (choice < 0) return(MENUPREV);
-      if (choice == 1) return(MENUQUIT);
-      mdr_cout_cls(0x07);
-      mdr_cout_locate(0, 0);
-      snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
-      exec(buff);
-      continue;
-    }
-
-    /* check total disk space */
-    {
-      int ds = disksize(selecteddrive);
-      if (ds < SVARDOS_DISK_REQ) {
-        int y = 9;
-        newscreen(2);
-        snprintf(buff, sizeof(buff), svarlang_strid(0x0304), cselecteddrive, SVARDOS_DISK_REQ); /* "ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB." */
-        y += putstringwrap(y, 1, COLOR_BODY, buff);
-        putstringnls(++y, 1, COLOR_BODY, 0, 5); /* "Press any key..." */
-        mdr_dos_getkey();
-        return(MENUQUIT);
-      }
-    }
-
-    /* is the disk empty? */
-    newscreen(0);
-    if (diskempty(selecteddrive) != 0) {
-      const char *list[3];
-      int y = 6;
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0305), cselecteddrive); /* "ERROR: Drive %c: not empty" */
-      y += putstringwrap(y, 1, COLOR_BODY, buff);
-
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
-      list[0] = buff;
-      list[1] = svarlang_strid(0x0002); /* "Quit to DOS" */
-      list[2] = NULL;
-
-      choice = menuselect(++y, 2, list, -1);
-      if (choice < 0) return(MENUPREV);
-      if (choice == 1) return(MENUQUIT);
-      mdr_cout_cls(0x07);
-      mdr_cout_locate(0, 0);
-      snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
-      exec(buff);
-      continue;
-    } else {
-      /* final confirmation */
-      const char *list[3];
-      list[0] = svarlang_strid(0x0001); /* Install SvarDOS */
-      list[1] = svarlang_strid(0x0002); /* Quit to DOS */
-      list[2] = NULL;
-      snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
-      mdr_cout_str(7, 40 - (strlen(buff) / 2), buff, COLOR_BODY, 80);
-      choice = menuselect(10, 2, list, -1);
-      if (choice < 0) return(MENUPREV);
-      if (choice == 1) return(MENUQUIT);
-      snprintf(buff, sizeof(buff), "SYS %c: > NUL", cselecteddrive);
-      exec(buff);
-      sprintf(buff, "FDISK /MBR %d", driveid);
-      exec(buff);
-      snprintf(buff, sizeof(buff), "%c:\\TEMP", cselecteddrive);
-      mkdir(buff);
-      return(cselecteddrive);
-    }
+    choice = menuselect(++y, 2, list, -1);
+    if (choice < 0) return(MENUPREV);
+    if (choice == 1) return(MENUQUIT);
+    mdr_cout_cls(0x07);
+    mdr_cout_locate(0, 0);
+    snprintf(buff, sizeof(buff), "FORMAT %c: /Q /U /Z:seriously /V:SVARDOS", cselecteddrive);
+    exec(buff);
+    goto TRY_AGAIN;
+  } else {
+    /* final confirmation */
+    const char *list[3];
+    list[0] = svarlang_strid(0x0001); /* Install SvarDOS */
+    list[1] = svarlang_strid(0x0002); /* Quit to DOS */
+    list[2] = NULL;
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
+    mdr_cout_str(7, 40 - (strlen(buff) / 2), buff, COLOR_BODY, 80);
+    choice = menuselect(10, 2, list, -1);
+    if (choice < 0) return(MENUPREV);
+    if (choice == 1) return(MENUQUIT);
+    snprintf(buff, sizeof(buff), "SYS %c: > NUL", cselecteddrive);
+    exec(buff);
+    sprintf(buff, "FDISK /MBR %d", driveid);
+    exec(buff);
+    snprintf(buff, sizeof(buff), "%c:\\SVARDOS", cselecteddrive);
+    mkdir(buff);
+    snprintf(buff + 3, sizeof(buff), "TEMP");
+    mkdir(buff);
+    return(0);
   }
 }
 
@@ -1080,14 +1086,16 @@ static void bootfilesgen(const struct slocales *locales) {
 }
 
 
-static int copypackages(char targetdrv, const struct slocales *locales) {
+static int copypackages(char drvletter, const struct slocales *locales) {
   char pkglist[512];
   int i, pkglistlen;
   size_t pkglistflen;
   char buff[1024]; /* must be *at least* 1 sector big for efficient file copying */
   FILE *fd = NULL;
   char *pkgptr;
+
   newscreen(3);
+
   /* load pkg list */
   fd = fopen("install.lst", "rb");
   if (fd == NULL) {
@@ -1119,11 +1127,11 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
   }
 
   /* copy pkg.exe, install.com and install.lng to the new drive, along with all packages */
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\PKG.EXE", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\PKG.EXE", drvletter);
   fcopy(buff, buff + 8, buff, sizeof(buff));
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.COM", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.COM", drvletter);
   fcopy(buff, buff + 8, buff, sizeof(buff));
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.LNG", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.LNG", drvletter);
   fcopy(buff, buff + 8, buff, sizeof(buff));
 
   /* copy packages */
@@ -1156,7 +1164,7 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
     mdr_cout_str(10, 1, buff, COLOR_BODY, 40);
 
     /* proceed with package copy */
-    sprintf(buff, "%c:\\TEMP\\%s.svp", targetdrv, pkgptr);
+    sprintf(buff, "%c:\\TEMP\\%s.svp", drvletter, pkgptr);
     if (fcopy(buff, buff + 8, buff, sizeof(buff)) != 0) {
       mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY, 80);
       mdr_dos_getkey();
@@ -1170,7 +1178,7 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
   }
 
   /* open the post-install autoexec.bat and prepare initial instructions */
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", drvletter);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
   fputs(
@@ -1204,7 +1212,7 @@ static int copypackages(char targetdrv, const struct slocales *locales) {
   fclose(fd);
 
   /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
-  snprintf(buff, sizeof(buff), "%c:\\autoexec.bat", targetdrv);
+  snprintf(buff, sizeof(buff), "%c:\\autoexec.bat", drvletter);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\n"
@@ -1328,10 +1336,18 @@ int main(void) {
     goto SelectLang;
   }
 
-  targetdrv = preparedrive(); /* what drive should we install to? check avail. space */
+ SelDriveScreen:
+  targetdrv = selectdrive();
   if (targetdrv == MENUQUIT) goto QUIT;
   if (targetdrv == MENUPREV) goto WelcomeScreen;
-  if (copypackages(targetdrv, locales) != 0) goto QUIT;    /* copy packages to dst drive */
+
+  action = preparedrive(targetdrv); /* what drive should we install to? check avail. space */
+  if (action == MENUQUIT) goto QUIT;
+  if (action == MENUPREV) goto SelDriveScreen;
+  targetdrv = (targetdrv & 0xff) + '@'; /* convert the hd+drv into a DOS letter */
+
+  /* copy packages to dst drive */
+  if (copypackages(targetdrv, locales) != 0) goto QUIT;
   finalreboot(); /* remove the install medium and reboot */
 
   goto QUIT;
