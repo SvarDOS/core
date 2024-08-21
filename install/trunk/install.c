@@ -77,19 +77,6 @@ struct slocales {
 };
 
 
-/* returns the DOS boot drive letter ('A', 'B', 'C', etc) */
-static unsigned char GETDOSBOOTDRIVE(void);
-#pragma aux GETDOSBOOTDRIVE = \
-"mov ax, 0x3305" /* int 0x21,AX=3305 - get boot drive (MS-DOS 4.0+) */ \
-"int 0x21" \
-"jnc GOOD" \
-"mov dl, 3"      /* fall back to "C" on error (DOS 3.x...) */ \
-"GOOD:" \
-"add dl, '@'"    /* convert the drive id (A=1, B=2...) into a drive letter */ \
-modify [ax] \
-value [dl]
-
-
 /* install a dummy int24h handler that always fails. this is to avoid the
  * annoying "abort, retry, fail... DOS messages. */
 static void install_int24(void) {
@@ -302,6 +289,7 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
   }
 }
 
+
 static void newscreen(unsigned char statusbartype) {
   const char *msg;
   mdr_cout_cls(COLOR_BODY);
@@ -472,19 +460,6 @@ static int welcomescreen(void) {
   if (c == 0) return(MENUNEXT);
   return(MENUQUIT);
 }
-
-
-/* returns 0 if drive is removable, 1 if fixed, -1 on error */
-static int isdriveremovable(unsigned char drv);
-#pragma aux isdriveremovable = \
-"mov ax, 0x4408" \
-"int 0x21" \
-"jnc DONE" \
-"xor ax,ax" \
-"dec ax" \
-"DONE:" \
-parm [bl] \
-value [ax]
 
 
 /* returns total disk space of drive drv (in MiB, max 2048, A=1 B=2 etc), or -1 if drive invalid */
@@ -969,16 +944,26 @@ static void genlocalesconf(FILE *fd, const struct slocales *locales) {
 }
 
 
-/* generates configuration files on the dest drive, this is run once system booted successfully */
+/* get the DOS "current drive" (0=A:, 1=B:, etc) */
+static unsigned char get_cur_drive(void);
+#pragma aux get_cur_drive = \
+"mov ah, 0x19" /* DOS 1+ GET CURRENT DEFAULT DRIVE */ \
+"int 0x21" \
+modify [ah] \
+value [al]
+
+
+/* generates configuration files on the dest drive, this is run once system
+ * booted successfully on the dst drive (postinst stage) */
 static void bootfilesgen(const struct slocales *locales) {
   char buff[128];
   FILE *fd;
-  unsigned char bootdrv = GETDOSBOOTDRIVE();
+  unsigned char bootdrv = get_cur_drive() + 'A';
 
   /****************
    * CONFIG.SYS ***
    ****************/
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\CONFIG.SYS", bootdrv);
+  snprintf(buff, sizeof(buff), "%c:\\CONFIG.SYS", bootdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "; SvarDOS kernel configuration\r\n"
@@ -1023,7 +1008,7 @@ static void bootfilesgen(const struct slocales *locales) {
       "SET DOSDIR=#:\\SVARDOS\r\n"
       "SET NLSPATH=%DOSDIR%\\NLS\r\n"
       "SET DIRCMD=/O/P\r\n"
-      "SET WATTCP.CFG=%DOSDIR%\\CFG\r\n"
+      "SET WATTCP.CFG=%DOSDIR%\r\n"
       "PATH %DOSDIR%\r\n"
       "PROMPT $P$G\r\n"
       "\r\n"
@@ -1089,11 +1074,15 @@ static void bootfilesgen(const struct slocales *locales) {
     fclose(fd);
   }
 
-  /*** PICOTCP ***/
+  /****************
+   * PICOTCP      *
+   ****************/
   /* TODO (or not? maybe not that useful) */
 
-  /*** WATTCP ***/
-  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\CFG\\WATTCP.CFG", bootdrv);
+  /****************
+   * WATTCP.CFG   *
+   ****************/
+  snprintf(buff, sizeof(buff), "%c:\\SVARDOS\\WATTCP.CFG", bootdrv);
   fd = fopen(buff, "wb");
   if (fd == NULL) return;
   fprintf(fd, "my_ip = dhcp\r\n"
@@ -1103,6 +1092,45 @@ static void bootfilesgen(const struct slocales *locales) {
               "#nameserver = 192.168.0.2\r\n"
               "#gateway = 192.168.0.1\r\n");
   fclose(fd);
+
+  /****************
+   * POSTINST.BAT *
+   ****************/
+  /* create the postinst.bat file for actual installation of packages */
+  snprintf(buff, sizeof(buff), "POSTINST.BAT");
+  fd = fopen(buff, "wb");
+  if (fd == NULL) {
+    return;
+  }
+  fprintf(fd,
+    "@ECHO OFF\r\n"
+    "SET DOSDIR=%c:\\SVARDOS\r\n"
+    "PATH %%DOSDIR%%\r\n"
+    "ECHO INSTALLING PACKAGES\r\n"
+    "COPY \\COMMAND.COM \\CMD.COM\r\n" /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
+    "SET COMSPEC=%c:\\CMD.COM\r\n"
+    "DEL \\AUTOEXEC.BAT\r\n"
+    "COPY AUTOEXEC.BAT \\\r\n"
+    "DEL \\COMMAND.COM\r\n"
+    "DEL \\KERNEL.SYS\r\n" /* KERNEL.SYS will be installed from the package in a moment */
+    "FOR %%%%P IN (*.SVP) DO PKG INSTALL %%%%P\r\n" /* install packages */
+    "DEL *.SVP\r\n", bootdrv, bootdrv);
+
+  /* restore COMSPEC and do some cleanup */
+  fprintf(fd, "DEL pkg.exe\r\n"
+              "DEL install.com\r\n"
+              "DEL install.lng\r\n"
+              "SET COMSPEC=\\COMMAND.COM\r\n"
+              "DEL \\CMD.COM\r\n");
+  /* print out the "installation over" message (load codepage first, now that MODE is installed) */
+  genlocalesconf(fd, locales);
+  fprintf(fd, "ECHO.\r\n"
+              "ECHO ");
+  fprintf(fd, svarlang_strid(0x0502)); /* "SvarDOS installation is over. Please restart your computer now" */
+  fprintf(fd, "\r\n"
+              "ECHO.\r\n");
+  fclose(fd);
+
 }
 
 
@@ -1197,49 +1225,20 @@ static int copypackages(char drvletter, const struct slocales *locales) {
     }
   }
 
-  /* open the post-install autoexec.bat and prepare initial instructions */
+  /* create an empty postinst.bat file so installer knows it is 2nd stage */
   snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", drvletter);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
-  fputs(
-    "@ECHO OFF\r\n"
-    "INSTALL\r\n"  /* installer will run in 2nd stage (generating pkg.cfg and stuff) */
-    "ECHO INSTALLING SVARDOS\r\n"
-    "COPY \\COMMAND.COM \\CMD.COM\r\n" /* move COMMAND.COM so it does not clashes with the installation of the SVARCOM package */
-    "SET COMSPEC=\\CMD.COM\r\n" /* no drive letter because I do not know it */
-    "DEL \\COMMAND.COM\r\n"
-    "DEL \\KERNEL.SYS\r\n" /* KERNEL.SYS will be installed from the package in a moment */
-    "FOR %%P IN (*.SVP) DO PKG INSTALL %%P\r\n" /* install packages */
-    "DEL *.SVP\r\n", fd);
-
-  /* replace autoexec.bat and config.sys now and write some nice message on screen */
-  fprintf(fd, "DEL pkg.exe\r\n"
-              "DEL install.com\r\n"
-              "DEL install.lng\r\n"
-              "COPY CONFIG.SYS \\\r\n"
-              "DEL CONFIG.SYS\r\n"
-              "DEL \\AUTOEXEC.BAT\r\n"
-              "COPY AUTOEXEC.BAT \\\r\n"
-              "DEL AUTOEXEC.BAT\r\n"
-              "SET COMSPEC=\\COMMAND.COM\r\n"
-              "DEL \\CMD.COM\r\n");
-  /* print out the "installation over" message */
-  fprintf(fd, "ECHO.\r\n"
-              "ECHO ");
-  fprintf(fd, svarlang_strid(0x0502), BUILDSTRING); /* "SvarDOS installation is over. Please restart your computer now" */
-  fprintf(fd, "\r\n"
-              "ECHO.\r\n");
   fclose(fd);
 
-  /* prepare a dummy autoexec.bat that will call temp\postinst.bat */
+  /* prepare a dummy autoexec.bat that will exec install and call temp\postinst.bat */
   snprintf(buff, sizeof(buff), "%c:\\autoexec.bat", drvletter);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\n"
-              "SET DOSDIR=\\SVARDOS\r\n"
               "PATH %%DOSDIR%%\r\n");
-  genlocalesconf(fd, locales);
   fprintf(fd, "CD TEMP\r\n"
+              "install\r\n"   /* installer will run in 2nd stage (generating autoexec.bat, pkg.cfg and stuff) */
               "postinst.bat\r\n");
   fclose(fd);
 

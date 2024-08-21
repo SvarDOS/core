@@ -71,7 +71,7 @@
 #5.1Please make sure to remove the installation media.
 5.1:Vänligen se till att ta bort installationsmediet.
 #5.2:SvarDOS installation is over. Please restart your computer now.
-5.2:SvarDOS-installationen (build %s) är klar. Restart your computer now.
+5.2:SvarDOS-installationen är klar. Restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 ### LOGINVÄLKOMSTTEXT NÄR SYSTEMET ÄR INSTALLERAT ###

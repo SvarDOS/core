@@ -41,7 +41,7 @@
 ### END SCREEN ###
 5.0:Votre ordinateur va maintenant redémarrer.
 5.1:Veuillez enlever le disque d'installation de votre lecteur.
-5.2:SvarDOS (build %s) est installé. Veuillez redémarrer votre ordinateur.
+5.2:SvarDOS est installé. Veuillez redémarrer votre ordinateur.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Bienvenue sur SvarDOS ! Tapez 'HELP' si vous avez besoin d'aide.
