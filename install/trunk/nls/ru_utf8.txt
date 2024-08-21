@@ -34,7 +34,7 @@
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
-4.0:Установка пакета %d/%d: %s
+4.0:Копирование пакета %d/%d: %s
 4.1:*** ВСТАВЬТЕ СЛЕДУЮЩУЮ ДИСКЕТУ И НАЖМИТЕ ЛЮБУЮ КЛАВИШУ ***
 
 ### END SCREEN ###

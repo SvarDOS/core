@@ -35,8 +35,8 @@
 3.7:Wybierz dysk na który SvarDOS zostanie zainstalowany. Możesz też wyjść do DOS i użyć narzędzia FDISK aby spartycjonować swój dysk. SvarDOS może zostać zainstalowany wyłącznie na partycji podstawowej (tj. nie na dysku logicznym).
 
 ### PACKAGES INSTALLATION ###
-# example: "Installing package 4/50: FDISK"
-4.0:Instalacja pakietu %d/%d: %s
+# example: "Copying package 4/50: FDISK"
+4.0:Kopiowanie pakietu %d/%d: %s
 4.1:*** WŁÓŻ NASTĘPNĄ DYSKIETKĘ I NACIŚNIJ DOWOLNY KLAWISZ ***
 
 ### END SCREEN ###

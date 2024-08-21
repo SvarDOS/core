@@ -34,8 +34,8 @@
 3.6:L'installation de SvarDOS sur %c: est sur le point de commencer.
 
 ### PACKAGES INSTALLATION ###
-# example: "Installing package 4/50: FDISK"
-4.0:Installation du paquet %d/%d: %s
+# example: "Copying package 4/50: FDISK"
+4.0:Copie du paquet %d/%d: %s
 4.1:*** INSEREZ LA DISQUETTE SUIVANTE ET APPUYEZ SUR UNE TOUCHE ***
 
 ### END SCREEN ###

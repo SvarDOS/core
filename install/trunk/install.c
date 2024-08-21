@@ -1219,8 +1219,8 @@ static int copypackages(char drvletter, const struct slocales *locales) {
       goto TRY_NEXTPKG;
     }
 
-    /* install the package */
-    snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Installing package %d/%d: %s" */
+    /* copy the package */
+    snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Copying package %d/%d: %s" */
     strcat(buff, "       ");
     mdr_cout_str(10, 1, buff, COLOR_BODY, 40);
 

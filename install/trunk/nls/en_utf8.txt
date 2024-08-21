@@ -35,8 +35,8 @@
 3.7:Select the drive where SvarDOS will be installed. You can also return to DOS and use FDISK to partition your disk. SvarDOS may be installed only on a primary partition (ie. not a logical drive).
 
 ### PACKAGES INSTALLATION ###
-# example: "Installing package 4/50: FDISK"
-4.0:Installing package %d/%d: %s
+# example: "Copying package 4/50: FDISK"
+4.0:Copying package %d/%d: %s
 4.1:*** INSERT THE NEXT FLOPPY DISK AND PRESS ANY KEY ***
 
 ### END SCREEN ###
