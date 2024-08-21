@@ -201,7 +201,7 @@ static int fcopy(const char *f2, const char *f1, void *buff, size_t buffsz) {
 
 /* display a menu with items and return user's choice.
  * ypos: starting line where the menu is drawn
- * height: number of items to display inside the menu
+ * height: max number of items to display inside the menu
  * list: NULL-terminated list of items
  * maxlistlen: limit list to this many items tops */
 static int menuselect(unsigned char ypos, unsigned char height, const char **list, int maxlistlen) {
@@ -214,6 +214,9 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
     if (len > width) width = len;
   }
   width++; /* it's nice to have a small margin to the right of the widest item */
+
+  /* adjust height if there is less items than max height */
+  if (count < height) height = count;
 
   /* if xpos negative, means 'center out' */
   xpos = 39 - (width >> 1);
@@ -264,14 +267,18 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
     if (key == 0x0D) { /* ENTER */
       return(res);
     } else if (key == 0x148) { /* up */
+      UP_AGAIN:
       if (res > 0) {
         res--;
         if (res < offset) offset = res;
+        if (list[res][0] == 0) goto UP_AGAIN;
       }
     } else if (key == 0x150) { /* down */
+      DOWN_AGAIN:
       if (res+1 < count) {
         res++;
         if (res > offset + height - 1) offset = res - (height - 1);
+        if (list[res][0] == 0) goto DOWN_AGAIN;
       }
     } else if (key == 0x147) { /* home */
       res = 0;
@@ -781,11 +788,14 @@ static int selectdrive(void) {
     snprintf(drvlist[i], sizeof(drvlist[0]), "%c: [%u MiB, hd%c%u]", 'A' + drives[i].dosid, drives[i].tot_size, 'a' + drives[i].hd, drives[i].partid);
     menulist[i] = drvlist[i];
   }
+  menulist[i++] = "";
   menulist[i++] = svarlang_str(0, 2); /* Quit to DOS */
   menulist[i] = NULL;
 
   newscreen(0);
-  i = menuselect(6 /*ypos*/, i /*height*/, menulist, -1);
+
+  snprintf(buff, sizeof(buff), "Select the drive where SvarDOS will be installed. You may also return to DOS and use FDISK to partition your disk. Please note that SvarDOS may be installed only on a primary partition (ie. not a logical drive).");
+  i = menuselect(7 + putstringwrap(4, 1, COLOR_BODY, buff) /*ypos*/, 10 /*max-height*/, menulist, -1);
   if (i < 0) {
     return(MENUPREV);
   } else if (i < drvlistlen) {
