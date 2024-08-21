@@ -927,7 +927,6 @@ static int preparedrive(int hd_drv) {
 /* generates locales-related configurations and writes them to file (this
  * is used to compute autoexec.bat content) */
 static void genlocalesconf(FILE *fd, const struct slocales *locales) {
-  if (locales == NULL) return;
 
   fprintf(fd, "SET LANG=%s\r\n", locales->lang);
 
@@ -965,10 +964,19 @@ value [al]
 
 /* generates configuration files on the dest drive, this is run once system
  * booted successfully on the dst drive (postinst stage) */
-static void bootfilesgen(const struct slocales *locales) {
+static void bootfilesgen(void) {
   char buff[128];
   FILE *fd;
   unsigned char bootdrv = get_cur_drive() + 'A';
+  struct slocales locales;
+
+  /* load locales from ZLOCALES.DAT */
+  fd = fopen("ZLOCALES.DAT", "rb");
+  if (fd == NULL) return;
+  fread(&locales, sizeof(struct slocales), 1, fd);
+  fclose(fd);
+
+  svarlang_load("INSTALL.LNG", locales.lang);
 
   /****************
    * CONFIG.SYS ***
@@ -994,11 +1002,7 @@ static void bootfilesgen(const struct slocales *locales) {
               "SHELL=%c:\\COMMAND.COM /E:512 /P\r\n", bootdrv);
   fprintf(fd, "\r\n"
               "; NLS configuration\r\n");
-  if (locales != NULL) {
-    fprintf(fd, "COUNTRY=%03u,%u,%c:\\SVARDOS\\COUNTRY.SYS\r\n", locales->countryid, locales->codepage, bootdrv);
-  } else {
-    fprintf(fd, "COUNTRY=001,437,%c:\\SVARDOS\\COUNTRY.SYS\r\n", bootdrv);
-  }
+  fprintf(fd, "COUNTRY=%03u,%u,%c:\\SVARDOS\\COUNTRY.SYS\r\n", locales.countryid, locales.codepage, bootdrv);
   fprintf(fd, "\r\n"
               "; CD-ROM driver initialization\r\n"
               ";DEVICE=%c:\\DRIVERS\\VIDECDD\\VIDE-CDD.SYS /D:SVCD0001\r\n", bootdrv);
@@ -1036,7 +1040,7 @@ static void bootfilesgen(const struct slocales *locales) {
 
     /* write all to file */
     fputs(autoexec_bat1, fd);
-    if (locales != NULL) genlocalesconf(fd, locales);
+    genlocalesconf(fd, &locales);
     fputs(autoexec_bat2, fd);
 
     fprintf(fd, "ECHO %s\r\n", svarlang_strid(0x0600)); /* "Welcome to SvarDOS!" */
@@ -1107,11 +1111,8 @@ static void bootfilesgen(const struct slocales *locales) {
    * POSTINST.BAT *
    ****************/
   /* create the postinst.bat file for actual installation of packages */
-  snprintf(buff, sizeof(buff), "POSTINST.BAT");
-  fd = fopen(buff, "wb");
-  if (fd == NULL) {
-    return;
-  }
+  fd = fopen("POSTINST.BAT", "wb");
+  if (fd == NULL) return;
   fprintf(fd,
     "@ECHO OFF\r\n"
     "SET DOSDIR=%c:\\SVARDOS\r\n"
@@ -1121,6 +1122,8 @@ static void bootfilesgen(const struct slocales *locales) {
     "SET COMSPEC=%c:\\CMD.COM\r\n"
     "DEL \\AUTOEXEC.BAT\r\n"
     "COPY AUTOEXEC.BAT \\\r\n"
+    "DEL AUTOEXEC.BAT\r\n"
+    "DEL ZLOCALES.DAT\r\n"
     "DEL \\COMMAND.COM\r\n"
     "DEL \\KERNEL.SYS\r\n" /* KERNEL.SYS will be installed from the package in a moment */
     "FOR %%%%P IN (*.SVP) DO PKG INSTALL %%%%P\r\n" /* install packages */
@@ -1133,7 +1136,7 @@ static void bootfilesgen(const struct slocales *locales) {
               "SET COMSPEC=\\COMMAND.COM\r\n"
               "DEL \\CMD.COM\r\n");
   /* print out the "installation over" message (load codepage first, now that MODE is installed) */
-  genlocalesconf(fd, locales);
+  genlocalesconf(fd, &locales);
   fprintf(fd, "ECHO.\r\n"
               "ECHO ");
   fprintf(fd, svarlang_strid(0x0502)); /* "SvarDOS installation is over. Please restart your computer now" */
@@ -1235,10 +1238,11 @@ static int copypackages(char drvletter, const struct slocales *locales) {
     }
   }
 
-  /* create an empty postinst.bat file so installer knows it is 2nd stage */
-  snprintf(buff, sizeof(buff), "%c:\\TEMP\\POSTINST.BAT", drvletter);
+  /* dump locales into ZLOCALES.DAT so the 2nd stage install can get them back */
+  snprintf(buff, sizeof(buff), "%c:\\TEMP\\ZLOCALES.DAT", drvletter);
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
+  fwrite(locales, sizeof(struct slocales), 1, fd);
   fclose(fd);
 
   /* prepare a dummy autoexec.bat that will exec install and call temp\postinst.bat */
@@ -1246,8 +1250,7 @@ static int copypackages(char drvletter, const struct slocales *locales) {
   fd = fopen(buff, "wb");
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\n"
-              "PATH %%DOSDIR%%\r\n");
-  fprintf(fd, "CD TEMP\r\n"
+              "CD TEMP\r\n"
               "install\r\n"   /* installer will run in 2nd stage (generating autoexec.bat, pkg.cfg and stuff) */
               "postinst.bat\r\n");
   fclose(fd);
@@ -1295,8 +1298,7 @@ static void loadcp(const struct slocales *locales) {
 
 
 int main(void) {
-  struct slocales locales_data;
-  struct slocales *locales = &locales_data;
+  struct slocales locales;
   int targetdrv;
   int action;
 
@@ -1316,7 +1318,7 @@ int main(void) {
   }
 
   /* is it stage 2 of the installation? */
-  if (fileexists("postinst.bat")) goto GENCONF;
+  if (fileexists("ZLOCALES.DAT")) goto GENCONF;
 
   /* read the svardos build revision (from floppy label) */
   {
@@ -1343,27 +1345,20 @@ int main(void) {
     memcpy(BUILDSTRING, res, 12);
   }
 
-  /* am I EN-only? */
-  if (!fileexists("INSTALL.LNG")) locales = NULL;
-
  SelectLang:
-  if (locales == NULL) goto WelcomeScreen;
-  action = selectlang(locales); /* welcome to svardos, select your language */
+  action = selectlang(&locales); /* welcome to svardos, select your language */
   if (action != MENUNEXT) goto QUIT;
-  loadcp(locales);
-  svarlang_load("INSTALL.LNG", locales->lang); /* NLS support */
+  loadcp(&locales);
+  svarlang_load("INSTALL.LNG", locales.lang); /* NLS support */
 
-  action = selectkeyb(locales);  /* what keyb layout should we use? */
+  action = selectkeyb(&locales);  /* what keyb layout should we use? */
   if (action == MENUQUIT) goto QUIT;
   if (action == MENUPREV) goto SelectLang;
 
  WelcomeScreen:
   action = welcomescreen(); /* what svardos is, ask whether to run live dos or install */
   if (action == MENUQUIT) goto QUIT;
-  if (action == MENUPREV) {
-    if (locales == NULL) goto QUIT;
-    goto SelectLang;
-  }
+  if (action == MENUPREV) goto SelectLang;
 
  SelDriveScreen:
   targetdrv = selectdrive();
@@ -1376,13 +1371,13 @@ int main(void) {
   targetdrv = (targetdrv & 0xff) + 'A'; /* convert the part+hd+drv value to a DOS letter */
 
   /* copy packages to dst drive */
-  if (copypackages(targetdrv, locales) != 0) goto QUIT;
+  if (copypackages(targetdrv, &locales) != 0) goto QUIT;
   finalreboot(); /* remove the install medium and reboot */
 
   goto QUIT;
 
  GENCONF: /* second stage of the installation (run from the destination disk) */
-  bootfilesgen(locales); /* generate boot files and other configurations */
+  bootfilesgen(); /* generate boot files and other configurations */
 
  QUIT:
   mdr_cout_locate(0, 0);
