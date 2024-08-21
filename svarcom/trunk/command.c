@@ -175,19 +175,6 @@ static void drdos_init(struct config *cfg) {
 
   e = MK_FP(kernenvseg, 0);
 
-  /* move forward until the DRDOS' environment 1Ah terminator is found */
-  while (*e != 0x1A) e++;
-  e++;
-
-  /* next I have the boot key press scancode: either 0x0000, 0x3F00 or 0x4200
-   * 0x3F00 means "F5 was pressed" while 0x4200 is for F8 */
-  scancode = (void far *)e;
-  if (*scancode == 0x3F00) {
-    cfg->flags |= FLAG_SKIP_AUTOEXEC;
-  } else if (*scancode == 0x4200) {
-    cfg->flags |= FLAG_STEPBYSTEP;
-  }
-
 /*
   printf("kernel env seg is at %04X and starts with bytes 0x%02X 0x%02X 0x%02X 0x%02X\r\n", kernenvseg, e[0], e[1], e[2], e[3]);
   {
@@ -204,6 +191,19 @@ static void drdos_init(struct config *cfg) {
     printf("\r\n=== DUMP ENDS ===\r\n");
   }
 */
+
+  /* move forward until the DRDOS' environment 1Ah terminator is found */
+  while (*e != 0x1A) e++;
+  e++;
+
+  /* next I have the boot key press scancode: either 0x0000, 0x3F00 or 0x4200
+   * 0x3F00 means "F5 was pressed" while 0x4200 is for F8 */
+  scancode = (void far *)e;
+  if (*scancode == 0x3F00) {
+    cfg->flags |= FLAG_SKIP_AUTOEXEC;
+  } else if (*scancode == 0x4200) {
+    cfg->flags |= FLAG_STEPBYSTEP;
+  }
 }
 
 
