@@ -47,6 +47,7 @@ enum ACTIONTYPES {
   ACTION_REMOVE,
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
+  ACTION_CHECKHEALTH,
   ACTION_UNZIP,
   ACTION_LISTZIP,
   ACTION_CRC32,
@@ -59,14 +60,17 @@ static int showhelp(void) {
   puts("");
   puts(svarlang_str(1, 0)); /* "PKG is the SvarDOS package manager." */
   puts("");
-  puts(svarlang_str(1, 20)); /* "Usage: pkg install package.svp */
-  puts(svarlang_str(1, 21)); /* "       pkg update package.svp" */
-  puts(svarlang_str(1, 22)); /* "       pkg del package" */
-  puts(svarlang_str(1, 23)); /* "       pkg listfiles package" */
-  puts(svarlang_str(1, 24)); /* "       pkg listlocal [filter]" */
-  puts(svarlang_str(1, 27)); /* "       pkg unzip file.zip" */
-  puts(svarlang_str(1, 29)); /* "       pkg listzip file.zip" */
-  puts(svarlang_str(1, 28)); /* "       pkg crc32 file" */
+  puts(svarlang_str(1, 19)); /* "Usage:" */
+  puts("");
+  puts(svarlang_str(1, 20)); /* "pkg install package.svp */
+  puts(svarlang_str(1, 21)); /* "pkg update package.svp" */
+  puts(svarlang_str(1, 22)); /* "pkg del package" */
+  puts(svarlang_str(1, 23)); /* "pkg listfiles package" */
+  puts(svarlang_str(1, 24)); /* "pkg listlocal [filter]" */
+  puts(svarlang_str(1, 25)); /* "pkg checkhealth [pkg]" */
+  puts(svarlang_str(1, 27)); /* "pkg unzip file.zip" */
+  puts(svarlang_str(1, 29)); /* "pkg listzip file.zip" */
+  puts(svarlang_str(1, 28)); /* "pkg crc32 file" */
   puts("");
   puts(svarlang_str(1, 40)); /* "PKG is published under the MIT license." */
   puts(svarlang_str(1, 41)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
@@ -86,6 +90,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_LISTFILES);
   } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "listlocal") == 0)) {
     return(ACTION_LISTLOCAL);
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "checkhealth") == 0)) {
+    return(ACTION_CHECKHEALTH);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "listzip") == 0)) {
@@ -204,6 +210,10 @@ int main(int argc, char **argv) {
       break;
     case ACTION_LISTLOCAL:
       res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
+      break;
+    case ACTION_CHECKHEALTH:
+      puts("NOT IMPLEMENTED YET");
+      res = 1;
       break;
     default:
       res = showhelp();

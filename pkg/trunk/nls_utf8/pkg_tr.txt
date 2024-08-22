@@ -8,14 +8,6 @@
 #### Help ####
 
 1.0:Bu, SvarDOS için ağ tabanlı bir paket yöneticisidir.
-1.20:Usage: pkg install package[.svp]
-1.21:       pkg update package[.svp]
-1.22:       pkg del package
-1.23:       pkg listfiles package
-1.24:       pkg listlocal [filter]
-1.27:       pkg unzip file.zip
-1.40:PKG is published under the MIT license.
-1.41:It is configured through %DOSDIR%\\PKG.CFG
 
 ### General stuff ####
 
@@ -33,7 +25,6 @@
 3.19:%s paketi kuruldu: %ld hata, %ld dosya çıkarıldı.
 3.20:HATA: paket şifreli bir dosya içermektedir:
 3.23:HATA: paket geçersiz bir dosya ismi içermektedir:
-3.24:HATA: package name too long
 
 #### Removing package ####
 
