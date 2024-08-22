@@ -51,6 +51,12 @@ void output(const char *s) {
 }
 
 
+void outputnl(const char *s) {
+  output(s);
+  output("\r\n");
+}
+
+
 /* change all / to \ in a string */
 void slash2backslash(char *str) {
   int x;
@@ -70,7 +76,7 @@ char *trimfnamecrc(char *fname) {
     }
     fname++;
   }
-  return(0);
+  return(NULL);
 }
 
 

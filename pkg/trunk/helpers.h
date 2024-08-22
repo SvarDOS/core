@@ -12,6 +12,7 @@
 
 /* outputs a NUL-terminated string to stdout */
 void output(const char *s);
+void outputnl(const char *s);
 
 void slash2backslash(char *str);
 

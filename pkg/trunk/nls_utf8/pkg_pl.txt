@@ -15,7 +15,7 @@
 1.22:pkg del pakiet                usuwa pakiet z systemu
 1.23:pkg listfiles pakiet          wyświetla pliki należące do pakietu
 1.24:pkg listlocal [filtr]         wyświetla zainstalowane pakiety
-1.25:pkg checkhealth [pakiet]      sprawdza integralność zainstalowanego pakietu
+1.25:pkg healthcheck [pakiet]      sprawdza integralność zainstalowanego pakietu
 1.27:pkg unzip plik.zip            rozpakowuje archiwum ZIP
 1.28:pkg crc32 plik                oblicza sumę CRC32 pliku
 1.29:pkg listzip plik.zip          wyświetla listę plików w archiwum ZIP

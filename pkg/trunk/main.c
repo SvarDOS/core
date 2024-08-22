@@ -30,6 +30,7 @@
 #include <string.h>   /* strcasecmp() */
 
 #include "svarlang.lib/svarlang.h"
+#include "healthck.h"
 #include "crc32.h"
 #include "helpers.h"
 #include "kprintf.h"
@@ -47,7 +48,7 @@ enum ACTIONTYPES {
   ACTION_REMOVE,
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
-  ACTION_CHECKHEALTH,
+  ACTION_HEALTHCHECK,
   ACTION_UNZIP,
   ACTION_LISTZIP,
   ACTION_CRC32,
@@ -67,7 +68,7 @@ static int showhelp(void) {
   puts(svarlang_str(1, 22)); /* "pkg del package" */
   puts(svarlang_str(1, 23)); /* "pkg listfiles package" */
   puts(svarlang_str(1, 24)); /* "pkg listlocal [filter]" */
-  puts(svarlang_str(1, 25)); /* "pkg checkhealth [pkg]" */
+  puts(svarlang_str(1, 25)); /* "pkg healthcheck [pkg]" */
   puts(svarlang_str(1, 27)); /* "pkg unzip file.zip" */
   puts(svarlang_str(1, 29)); /* "pkg listzip file.zip" */
   puts(svarlang_str(1, 28)); /* "pkg crc32 file" */
@@ -90,8 +91,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_LISTFILES);
   } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "listlocal") == 0)) {
     return(ACTION_LISTLOCAL);
-  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "checkhealth") == 0)) {
-    return(ACTION_CHECKHEALTH);
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "healthcheck") == 0)) {
+    return(ACTION_HEALTHCHECK);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "listzip") == 0)) {
@@ -211,9 +212,8 @@ int main(int argc, char **argv) {
     case ACTION_LISTLOCAL:
       res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
       break;
-    case ACTION_CHECKHEALTH:
-      puts("NOT IMPLEMENTED YET");
-      res = 1;
+    case ACTION_HEALTHCHECK:
+      res = healthcheck((argc == 3)?argv[2]:NULL, dosdir);
       break;
     default:
       res = showhelp();

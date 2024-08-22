@@ -115,11 +115,11 @@ const unsigned long crc32_tab[256] = {
 
 
 unsigned long crc32_init(void) {
-  return(0xFFFFFFFFlu);
+  return(CRC32_INITVAL);
 }
 
 void crc32_feed(unsigned long *crc32val, const unsigned char *s, unsigned int len) {
-  unsigned long i;
+  unsigned int i;
   for (i = 0; i < len; i++) *crc32val = crc32_tab[(*crc32val ^ s[i]) & 0xff] ^ (*crc32val >> 8);
 }
 

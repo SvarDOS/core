@@ -15,7 +15,7 @@
 1.22:pkg del package               uninstalls package
 1.23:pkg listfiles package         lists files belonging to package
 1.24:pkg listlocal [filter]        lists installed packages
-1.25:pkg checkhealth [package]     checks integrity of installed package(s)
+1.25:pkg healthcheck [package]     checks integrity of installed package(s)
 1.27:pkg unzip file.zip            unzips a ZIP archive
 1.28:pkg crc32 file                computes the CRC32 of a file
 1.29:pkg listzip file.zip          lists the files inside a ZIP archive
