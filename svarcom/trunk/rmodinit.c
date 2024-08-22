@@ -192,14 +192,18 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     if (origenvseg != 0) _fmemcpy(owner, MK_FP(origenvseg, 0), envsize * 16);
   }
 
-  /* set CTRL+BREAK and CRITERR handlers to rmod */
   _asm {
     push ax
+    push bx
     push dx
     push ds
 
+    /* preset DS with RMOD's seg since I will work on RMOD fields */
     mov ds, rmodseg
 
+    /***********************************************
+     * set CTRL+BREAK and CRITERR handlers to rmod *
+     ***********************************************/
     mov ax, 0x2523
     mov dx, RMOD_OFFSET_BRKHANDLER
     int 0x21
@@ -208,48 +212,42 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     mov dx, RMOD_OFFSET_CRITHANDLER
     int 0x21
 
-    pop ds
-    pop dx
-    pop ax
-  }
-
-  /* mark the input buffer as empty */
-  myptr = MK_FP(rmodseg, RMOD_OFFSET_INPUTBUF);
-  myptr[0] = 128;  /* max acceptable length */
-  myptr[1] = 0;    /* len of currently stored history string */
-  myptr[2] = '\r'; /* string terminator */
-  myptr[3] = 0xCA; /* signature to detect stack overflow damaging the buffer */
-  myptr[4] = 0xFE; /* 2nd byte of the signature */
-
-  /* prepare result (rmod props) */
-  res = MK_FP(rmodseg, 0x100 + rmodcore_len);
-  _fmemset(res, 0, sizeof(*res));  /* zero out */
-  res->rmodseg = rmodseg;          /* rmod segment */
-
-  /* write env segment to rmod's PSP */
-  owner = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
-  *owner = envseg;
-
-  /* write boot drive to rmod bootdrive field */
-  _asm {
-    push ax
-    push bx
-    push dx
-    push ds
+    /***********************************************
+     * write boot drive to RMOD's bootdrive field  *
+     ***********************************************/
     mov ax, 0x3305 /* DOS 4.0+ - GET BOOT DRIVE */
-    int 0x21 /* boot drive is in DL now (1=A:, 2=B:, etc) */
-    add dl, 'A'-1 /* convert to a proper ASCII letter */
-    /* set DS to rmodseg */
-    mov ax, rmodseg
-    mov ds, ax
+    int 0x21       /* boot drive is in DL now (1=A:, 2=B:, etc) */
+    add dl, '@'    /* convert to a proper ASCII letter */
     /* write boot drive to rmod bootdrive field */
     mov bx, RMOD_OFFSET_BOOTDRIVE
     mov [bx], dl
+
+    /***********************************************
+     * mark command-line history buffer as empty   *
+     ***********************************************/
+    mov bx, RMOD_OFFSET_INPUTBUF
+    mov byte ptr [bx+0], 128     /* max acceptable length */
+    mov byte ptr [bx+1], 0       /* len of currently stored history string */
+    mov byte ptr [bx+2], 0x0D    /* string terminator */
+    mov word ptr [bx+3], 0xFECA  /* signature to detect stack overflow damaging the buffer */
+
+    /***********************************************
+     * write env segment to RMOD's PSP             *
+     ***********************************************/
+    mov bx, RMOD_OFFSET_ENVSEG
+    mov ax, envseg
+    mov [bx], ax
+
     pop ds
     pop dx
     pop bx
     pop ax
   }
+
+  /* prepare result (rmod props) */
+  res = MK_FP(rmodseg, 0x100 + rmodcore_len);
+  _fmemset(res, 0, sizeof(*res));  /* zero out */
+  res->rmodseg = rmodseg;          /* rmod segment */
 
   /* save my original int22h handler and parent in rmod's memory */
   res->origint22 = *((unsigned long *)0x0a); /* original int22h handler seg:off is at 0x0a of my PSP */
