@@ -319,7 +319,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   int unzip_result;
 
   /* create the %DOSDIR%/APPINFO directory, just in case it doesn't exist yet */
-  sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
+  sprintf(buff, "%s\\appinfo\\", dosdir);
   mkpath(buff);
 
   /* start by extracting the APPINFO (LSM) file - I need it so I can append the
@@ -327,6 +327,8 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   output(ziplinkedlist->filename);
   output(" -> ");
   output(buff);
+  strcat(buff, pkgname);
+  strcat(buff, ".lsm");
   unzip_result = zip_unzip(zipfd, ziplinkedlist, buff);
   puts("");
   if (unzip_result != 0) {
