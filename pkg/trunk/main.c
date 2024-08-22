@@ -61,7 +61,7 @@ static int showhelp(void) {
   puts("");
   puts(svarlang_str(1, 20)); /* "Usage: pkg install package.svp */
   puts(svarlang_str(1, 21)); /* "       pkg update package.svp" */
-  puts(svarlang_str(1, 22)); /* "       pkg remove package" */
+  puts(svarlang_str(1, 22)); /* "       pkg del package" */
   puts(svarlang_str(1, 23)); /* "       pkg listfiles package" */
   puts(svarlang_str(1, 24)); /* "       pkg listlocal [filter]" */
   puts(svarlang_str(1, 27)); /* "       pkg unzip file.zip" */
@@ -80,7 +80,7 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_INSTALL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "update") == 0)) {
     return(ACTION_UPDATE);
-  } else if ((argc == 3) && (strcasecmp(argv[1], "remove") == 0)) {
+  } else if ((argc == 3) && (strcasecmp(argv[1], "del") == 0)) {
     return(ACTION_REMOVE);
   } else if ((argc == 3) && (strcasecmp(argv[1], "listfiles") == 0)) {
     return(ACTION_LISTFILES);
