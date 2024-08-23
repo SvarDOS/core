@@ -10,15 +10,16 @@
 
 1.0:Menadżer pakietów dla SvarDOS.
 1.19:Użycie:
-1.20:pkg install pakiet[.svp]      instaluje pakiet
-1.21:pkg update pakiet[.svp]       uaktualnie (lub reinstaluje) pakiet
-1.22:pkg del pakiet                usuwa pakiet z systemu
-1.23:pkg listfiles pakiet          wyświetla pliki należące do pakietu
-1.24:pkg listlocal [filtr]         wyświetla zainstalowane pakiety
-1.25:pkg healthcheck [pakiet]      sprawdza integralność zainstalowanego pakietu
-1.27:pkg unzip plik.zip            rozpakowuje archiwum ZIP
-1.28:pkg crc32 plik                oblicza sumę CRC32 pliku
-1.29:pkg listzip plik.zip          wyświetla listę plików w archiwum ZIP
+1.20:pkg install pakiet[.svp]    instaluje pakiet
+1.21:pkg update pakiet[.svp]     uaktualnie (lub reinstaluje) pakiet
+1.22:pkg rm pakiet               usuwa pakiet z systemu
+1.23:pkg files pakiet            wyświetla pliki należące do pakietu
+1.24:pkg list [filtr]            wyświetla zainstalowane pakiety
+1.25:pkg check [pakiet]          sprawdza integralność plików (exe) pakietu(ów)
+1.26:pkg check+ [pakiet]         j.w. ale sprawdza wszystkie pliki
+1.27:pkg unzip plik.zip          rozpakowuje archiwum ZIP
+1.28:pkg crc32 plik              oblicza sumę CRC32 pliku
+1.29:pkg ziplist plik.zip        wyświetla listę plików w archiwum ZIP
 1.40:PKG jest opublikowany na licencji MIT.
 1.41:Konfiguracja znajduje się w %DOSDIR%\\PKG.CFG
 

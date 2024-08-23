@@ -10,14 +10,6 @@
 
 1.0:O PKG é o gerenciador de pacotes do SvarDOS.
 1.19:Uso:
-1.20:pkg install pacote[.svp]
-1.21:pkg update pacote[.svp]
-1.22:pkg del pacote
-1.23:pkg listfiles pacote
-1.24:pkg listlocal [filtro]
-1.27:pkg unzip arquivo.zip
-1.28:pkg crc32 arquivo
-1.29:pkg listzip arquivo.zip
 1.40:O PKG é publicado sob a licença MIT.
 1.41:Ele é configurado pelo %DOSDIR%\\PKG.CFG
 

@@ -58,24 +58,25 @@ enum ACTIONTYPES {
 
 
 static int showhelp(void) {
-  puts("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
-  puts("");
-  puts(svarlang_str(1, 0)); /* "PKG is the SvarDOS package manager." */
-  puts("");
-  puts(svarlang_str(1, 19)); /* "Usage:" */
-  puts("");
-  puts(svarlang_str(1, 20)); /* "pkg install package.svp */
-  puts(svarlang_str(1, 21)); /* "pkg update package.svp" */
-  puts(svarlang_str(1, 22)); /* "pkg del package" */
-  puts(svarlang_str(1, 23)); /* "pkg listfiles package" */
-  puts(svarlang_str(1, 24)); /* "pkg listlocal [filter]" */
-  puts(svarlang_str(1, 25)); /* "pkg healthcheck [pkg]" */
-  puts(svarlang_str(1, 27)); /* "pkg unzip file.zip" */
-  puts(svarlang_str(1, 29)); /* "pkg listzip file.zip" */
-  puts(svarlang_str(1, 28)); /* "pkg crc32 file" */
-  puts("");
-  puts(svarlang_str(1, 40)); /* "PKG is published under the MIT license." */
-  puts(svarlang_str(1, 41)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
+  outputnl("PKG ver " PVER " Copyright (C) " PDATE " Mateusz Viste");
+  outputnl("");
+  outputnl(svarlang_str(1, 0)); /* "PKG is the SvarDOS package manager." */
+  outputnl("");
+  outputnl(svarlang_str(1, 19)); /* "Usage:" */
+  outputnl("");
+  outputnl(svarlang_str(1, 20)); /* "pkg install package.svp */
+  outputnl(svarlang_str(1, 21)); /* "pkg update package.svp" */
+  outputnl(svarlang_str(1, 22)); /* "pkg rm package" */
+  outputnl(svarlang_str(1, 23)); /* "pkg files package" */
+  outputnl(svarlang_str(1, 24)); /* "pkg list [filter]" */
+  outputnl(svarlang_str(1, 25)); /* "pkg check [pkg]" */
+  outputnl(svarlang_str(1, 26)); /* "pkg check+ [pkg]" */
+  outputnl(svarlang_str(1, 27)); /* "pkg unzip file.zip" */
+  outputnl(svarlang_str(1, 29)); /* "pkg listzip file.zip" */
+  outputnl(svarlang_str(1, 28)); /* "pkg crc32 file" */
+  outputnl("");
+  outputnl(svarlang_str(1, 40)); /* "PKG is published under the MIT license." */
+  outputnl(svarlang_str(1, 41)); /* "It is configured through %DOSDIR%\CFG\PKG.CFG" */
   return(1);
 }
 
@@ -86,19 +87,19 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_INSTALL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "update") == 0)) {
     return(ACTION_UPDATE);
-  } else if ((argc == 3) && (strcasecmp(argv[1], "del") == 0)) {
+  } else if ((argc == 3) && (strcasecmp(argv[1], "rm") == 0)) {
     return(ACTION_REMOVE);
-  } else if ((argc == 3) && (strcasecmp(argv[1], "listfiles") == 0)) {
+  } else if ((argc == 3) && (strcasecmp(argv[1], "files") == 0)) {
     return(ACTION_LISTFILES);
-  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "listlocal") == 0)) {
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "list") == 0)) {
     return(ACTION_LISTLOCAL);
-  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "healthcheck") == 0)) {
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "check") == 0)) {
     return(ACTION_HEALTHCHECK);
-  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "healthcheck+") == 0)) {
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "check+") == 0)) {
     return(ACTION_HEALTHCHECKEXT);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
-  } else if ((argc == 3) && (strcasecmp(argv[1], "listzip") == 0)) {
+  } else if ((argc == 3) && (strcasecmp(argv[1], "ziplist") == 0)) {
     return(ACTION_LISTZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "crc32") == 0)) {
     return(ACTION_CRC32);
