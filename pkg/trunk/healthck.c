@@ -29,7 +29,7 @@ modify [ax bx dx]
 
 /* checks the health of a package (or all packages).
  * Returns 0 on success, non-zero otherwise */
-int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, unsigned char extendedcheck) {
+int healthcheck(unsigned char *buff15k, const char *pkgname, const char *dosdir, unsigned char extendedcheck) {
   char *crc, *ext;
   FILE *flist, *fd;
   unsigned long goodcrc, realcrc;
@@ -38,11 +38,11 @@ int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, 
   struct dirent *ep;
 
   if (pkgname == NULL) {
-    sprintf(buff4k, "%s\\appinfo", dosdir);
-    dp = opendir(buff4k);
+    sprintf(buff15k, "%s\\appinfo", dosdir);
+    dp = opendir(buff15k);
     if (dp == NULL) {
       output(svarlang_str(9, 0)); /* "ERROR: Could not access directory:" */
-      outputnl(buff4k);
+      outputnl(buff15k);
       return(-1);
     }
 
@@ -71,33 +71,34 @@ int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, 
 
   /* open the (legacy) listing file at %DOSDIR%\packages\pkgname.lst
    * if not exists then fall back to appinfo\pkgname.lsm */
-  sprintf(buff4k, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
-  flist = fopen(buff4k, "rb");
+  sprintf(buff15k, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
+  flist = fopen(buff15k, "rb");
   if (flist == NULL) {
-    sprintf(buff4k, svarlang_str(4,0), pkgname); /* "Package %s is not installed, so not removed." */
-    outputnl(buff4k);
+    sprintf(buff15k, svarlang_str(4,0), pkgname); /* "Package %s is not installed, so not removed." */
+    outputnl(buff15k);
     return(-1);
   }
 
   /* iterate over all files listed in pkgname.lsm */
-  while (freadtokval(flist, buff4k, 4096, NULL, 0) == 0) {
+  while (freadtokval(flist, buff15k, 15 * 1024, NULL, 0) == 0) {
 
     /* skip empty lines */
-    if (buff4k[0] == 0) continue;
+    if (buff15k[0] == 0) continue;
 
     /* change all slash to backslash */
-    slash2backslash(buff4k);
+    slash2backslash(buff15k);
 
     /* skip garbage */
-    if ((buff4k[1] != ':') || (buff4k[2] != '\\')) continue;
+    if ((buff15k[1] != ':') || (buff15k[2] != '\\')) continue;
 
     /* trim out CRC information and get the ptr to it (if present) */
-    crc = trimfnamecrc(buff4k);
+    crc = trimfnamecrc(buff15k);
     if (crc == NULL) continue;
 
     goodcrc = strtoul(crc, NULL, 16);
-    ext = getfext(buff4k);
-    strlwr(ext);
+    strlwr(buff15k); /* turn filename lower case - this is needed for aesthetics
+    when printing errors, but also for matching extensions */
+    ext = getfext(buff15k);
 
     /* skip non-executable files (unless healthcheck+) */
     if ((extendedcheck == 0) &&
@@ -113,27 +114,28 @@ int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, 
     output("[");
     output(pkgname);
     output("] ");
-    output(buff4k);
+    output(buff15k);
 
     realcrc = CRC32_INITVAL;
-    fd = fopen(buff4k, "rb");
+    fd = fopen(buff15k, "rb");
     if (fd == NULL) {
-      outputnl(": NOT FOUND");
+      output(" ");
+      outputnl(svarlang_str(11,1));
       continue;
     }
     for (;;) {
       unsigned short bufflen;
-      bufflen = fread(buff4k, 1, 4096, fd);
+      bufflen = fread(buff15k, 1, 15 * 1024, fd);
       if (bufflen == 0) break;
-      crc32_feed(&realcrc, buff4k, bufflen);
+      crc32_feed(&realcrc, buff15k, bufflen);
     }
     fclose(fd);
 
     crc32_finish(&realcrc);
 
     if (goodcrc != realcrc) {
-      sprintf(buff4k, ": %s", "BAD CRC");
-      outputnl(buff4k);
+      output(" ");
+      outputnl(svarlang_str(11,0)); /* BAD CRC */
       errcount++;
       continue;
     }
@@ -152,8 +154,8 @@ int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, 
   if (errcount == 0) {
     outputnl(svarlang_strid(0x0A00));
   } else {
-    sprintf(buff4k, "%u errors.", errcount);
-    outputnl(buff4k);
+    sprintf(buff15k, svarlang_str(11,2), errcount);
+    outputnl(buff15k);
   }
   return(0);
 }

@@ -70,10 +70,16 @@
 9.0:BŁĄD: Dostęp do katalogu nie powiódł się:
 9.1:BŁĄD: Nie znaleziono lokalnego pakietu %s.
 
-#### unzip ####
+#### Unzip ####
 
 10.0:OK
 10.1:BŁĄD: Nie znaleziono pliku
 10.2:BŁĄD: Nieprawidłowe archiwum ZIP
 10.3:BŁĄD: Plik już istnieje
 10.4:BŁĄD: błąd unzip (%d)
+
+#### Health check ####
+
+11.0:BŁĄD CRC
+11.1:BRAKUJĄCY
+11.2:Błędów: %u.

@@ -72,10 +72,16 @@
 9.0:ERROR: Could not access directory:
 9.1:ERROR: Local package '%s' not found
 
-#### unzip ####
+#### Unzip ####
 
 10.0:OK
 10.1:ERROR: File not found
 10.2:ERROR: Invalid ZIP archive
 10.3:ERROR: File already exists
 10.4:ERROR: unzip failure (%d)
+
+#### Health check ####
+
+11.0:BAD CRC
+11.1:MISSING
+11.2:%u error(s).
