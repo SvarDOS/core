@@ -49,6 +49,7 @@ enum ACTIONTYPES {
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
   ACTION_HEALTHCHECK,
+  ACTION_HEALTHCHECKEXT,
   ACTION_UNZIP,
   ACTION_LISTZIP,
   ACTION_CRC32,
@@ -93,6 +94,8 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
     return(ACTION_LISTLOCAL);
   } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "healthcheck") == 0)) {
     return(ACTION_HEALTHCHECK);
+  } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "healthcheck+") == 0)) {
+    return(ACTION_HEALTHCHECKEXT);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "listzip") == 0)) {
@@ -213,7 +216,8 @@ int main(int argc, char **argv) {
       res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
       break;
     case ACTION_HEALTHCHECK:
-      res = healthcheck((argc == 3)?argv[2]:NULL, dosdir);
+    case ACTION_HEALTHCHECKEXT:
+      res = healthcheck((argc == 3)?argv[2]:NULL, dosdir, (action == ACTION_HEALTHCHECKEXT)?1:0);
       break;
     default:
       res = showhelp();
