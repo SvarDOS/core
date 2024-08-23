@@ -301,7 +301,7 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
 
   /* if one or more warn lines have been displayed then close with a delimiter again */
   if (warncount > 0) {
-    for (i = 0; i < 79; i++) putchar('*');
+    for (i = 0; i < 79; i++) output("*");
     outputnl("");
   }
 
