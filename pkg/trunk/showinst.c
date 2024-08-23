@@ -47,11 +47,14 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
 
     /* load the metadata from %DOSDIR\APPINFO\*.lsm */
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
-    readlsm(buff, ver, sizeof(ver));
+    readlsm(buff, "version", ver, sizeof(ver));
+    readlsm(buff, "description", buff, 80 - 2 - strlen(ver) - strlen(ep->d_name));
 
     output(ep->d_name);
     output(" ");
-    outputnl(ver);
+    output(ver);
+    output(" ");
+    outputnl(buff);
     matchfound = 1;
   }
   if (matchfound == 0) outputnl(svarlang_str(5, 0)); /* "No package matched the search." */
