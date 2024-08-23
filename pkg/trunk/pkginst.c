@@ -24,7 +24,7 @@
  * nonzero otherwise. */
 static int validfilename(const char *fname) {
   int i, i2;
-  char *validchars = "!#$%&'()-@^_`{}~";
+  const char *validchars = "!#$%&'()-@^_`{}~";
   int elemlen = 0;
   int elemmaxlen = 8; /* switches from 8 to 3 depending wheter I am analyzing
                          a filename or an extension */
@@ -158,7 +158,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     /* abort if entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
       outputnl(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
-      printf(" %s\n", curzipnode->filename);
+      outputnl(curzipnode->filename);
       goto RAII_ERR;
     }
 
@@ -166,7 +166,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
       kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
       outputnl("");
-      printf(" %s\n", curzipnode->filename);
+      outputnl(curzipnode->filename);
       goto RAII_ERR;
     }
 
@@ -286,7 +286,7 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
         /* print a visual delimiter */
         if (warncount == 0) {
           outputnl("");
-          for (i = 0; i < 79; i++) putchar('*');
+          for (i = 0; i < 79; i++) output("*");
           outputnl("");
         }
         /* there may be more than one "warn" line */
@@ -309,7 +309,7 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
 
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
-int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive) {
+int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive, unsigned char *buff15k) {
   char buff[256];
   char fulldestfilename[256];
   char *shortfile;
@@ -329,7 +329,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   output(buff);
   strcat(buff, pkgname);
   strcat(buff, ".lsm");
-  unzip_result = zip_unzip(zipfd, ziplinkedlist, buff);
+  unzip_result = zip_unzip(zipfd, ziplinkedlist, buff, buff15k);
   outputnl("");
   if (unzip_result != 0) {
     kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
@@ -364,7 +364,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     output(curzipnode->filename);
     output(" -> ");
     output(buff);
-    unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
+    unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename, buff15k);
     outputnl("");
     if (unzip_result != 0) {
       kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */

@@ -28,23 +28,9 @@ parm [cx] \
 modify [ax bx dx]
 
 
-/* converts a CRC32 into a (hex) string */
-/*static char *crc32tostring(char *s, unsigned long val) {
-  signed char i;
-  static char h[] = "0123456789ABCDEF";
-  for (i = 7; i >= 0; i--) {
-    s[i] = h[val & 15];
-    val >>= 4;
-  }
-  s[8] = 0;
-  return(s);
-}*/
-
-
 /* checks the health of a package (or all packages).
  * Returns 0 on success, non-zero otherwise */
-int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedcheck) {
-  char buff[1024];
+int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, unsigned char extendedcheck) {
   char *crc, *ext;
   FILE *flist, *fd;
   unsigned long goodcrc, realcrc;
@@ -53,10 +39,10 @@ int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedc
   struct dirent *ep;
 
   if (pkgname == NULL) {
-    sprintf(buff, "%s\\appinfo", dosdir);
-    dp = opendir(buff);
+    sprintf(buff4k, "%s\\appinfo", dosdir);
+    dp = opendir(buff4k);
     if (dp == NULL) {
-      kitten_printf(9, 0, buff); /* "ERROR: Could not access directory %s" */
+      kitten_printf(9, 0, buff4k); /* "ERROR: Could not access directory %s" */
       outputnl("");
       return(-1);
     }
@@ -86,8 +72,8 @@ int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedc
 
   /* open the (legacy) listing file at %DOSDIR%\packages\pkgname.lst
    * if not exists then fall back to appinfo\pkgname.lsm */
-  sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
-  flist = fopen(buff, "rb");
+  sprintf(buff4k, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
+  flist = fopen(buff4k, "rb");
   if (flist == NULL) {
     kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
     outputnl("");
@@ -95,23 +81,23 @@ int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedc
   }
 
   /* iterate over all files listed in pkgname.lsm */
-  while (freadtokval(flist, buff, sizeof(buff), NULL, 0) == 0) {
+  while (freadtokval(flist, buff4k, 4096, NULL, 0) == 0) {
 
     /* skip empty lines */
-    if (buff[0] == 0) continue;
+    if (buff4k[0] == 0) continue;
 
     /* change all slash to backslash */
-    slash2backslash(buff);
+    slash2backslash(buff4k);
 
     /* skip garbage */
-    if ((buff[1] != ':') || (buff[2] != '\\')) continue;
+    if ((buff4k[1] != ':') || (buff4k[2] != '\\')) continue;
 
     /* trim out CRC information and get the ptr to it (if present) */
-    crc = trimfnamecrc(buff);
+    crc = trimfnamecrc(buff4k);
     if (crc == NULL) continue;
 
     goodcrc = strtoul(crc, NULL, 16);
-    ext = getfext(buff);
+    ext = getfext(buff4k);
     strlwr(ext);
 
     /* skip non-executable files (unless healthcheck+) */
@@ -128,27 +114,27 @@ int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedc
     output("[");
     output(pkgname);
     output("] ");
-    output(buff);
+    output(buff4k);
 
     realcrc = CRC32_INITVAL;
-    fd = fopen(buff, "rb");
+    fd = fopen(buff4k, "rb");
     if (fd == NULL) {
       outputnl(": NOT FOUND");
       continue;
     }
     for (;;) {
       unsigned short bufflen;
-      bufflen = fread(buff, 1, sizeof(buff), fd);
+      bufflen = fread(buff4k, 1, 4096, fd);
       if (bufflen == 0) break;
-      crc32_feed(&realcrc, buff, bufflen);
+      crc32_feed(&realcrc, buff4k, bufflen);
     }
     fclose(fd);
 
     crc32_finish(&realcrc);
 
     if (goodcrc != realcrc) {
-      sprintf(buff, ": %s", "BAD CRC");
-      outputnl(buff);
+      sprintf(buff4k, ": %s", "BAD CRC");
+      outputnl(buff4k);
       errcount++;
       continue;
     }
@@ -167,8 +153,8 @@ int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedc
   if (errcount == 0) {
     outputnl(svarlang_strid(0x0A00));
   } else {
-    sprintf(buff, "%u errors.", errcount);
-    outputnl(buff);
+    sprintf(buff4k, "%u errors.", errcount);
+    outputnl(buff4k);
   }
   return(0);
 }

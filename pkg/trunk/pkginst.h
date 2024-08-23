@@ -12,6 +12,6 @@
 
 int is_package_installed(const char *pkgname, const char *dosdir);
 struct ziplist *pkginstall_preparepackage(char *pkgname, const char *localfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char bootdrive);
-int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive);
+int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive, unsigned char *buff15k);
 
 #endif

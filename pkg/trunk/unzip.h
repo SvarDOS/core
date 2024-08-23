@@ -10,6 +10,6 @@
 #ifndef unzip_h
 #define unzip_h
 
-int unzip(const char *zipfile, unsigned char listonly);
+int unzip(const char *zipfile, unsigned char listonly, unsigned char *buff15k);
 
 #endif

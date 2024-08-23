@@ -17,6 +17,18 @@
 #include "helpers.h"
 
 
+/* converts a CRC32 into a (hex) string */
+char *crc32tostring(char *s, unsigned long val) {
+  signed char i;
+  static char h[] = "0123456789ABCDEF";
+  for (i = 7; i >= 0; i--) {
+    s[i] = h[val & 15];
+    val >>= 4;
+  }
+  s[8] = 0;
+  return(s);
+}
+
 
 /* outputs a NUL-terminated string to stdout */
 void output(const char *s) {

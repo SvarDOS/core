@@ -49,8 +49,9 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
     readlsm(buff, ver, sizeof(ver));
 
-    printf("%s %s", ep->d_name, ver);
-    outputnl("");
+    output(ep->d_name);
+    output(" ");
+    outputnl(ver);
     matchfound = 1;
   }
   if (matchfound == 0) outputnl(svarlang_str(5, 0)); /* "No package matched the search." */

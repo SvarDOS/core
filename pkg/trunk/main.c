@@ -33,7 +33,6 @@
 #include "healthck.h"
 #include "crc32.h"
 #include "helpers.h"
-#include "kprintf.h"
 #include "libunzip.h"
 #include "pkginst.h"
 #include "pkgrem.h"
@@ -109,7 +108,7 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
 }
 
 
-static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist, char bootdrive) {
+static int pkginst(const char *file, int flags, const char *dosdir, const struct customdirs *dirlist, char bootdrive, unsigned char *buff15k) {
   char pkgname[9];
   int res = 1;
   struct ziplist *zipfileidx;
@@ -126,7 +125,7 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
     res = 0;
     if (flags & PKGINST_UPDATE) res = pkgrem(pkgname, dosdir);
 
-    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd, bootdrive);
+    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd, bootdrive, buff15k);
     zip_freelist(&zipfileidx);
   }
 
@@ -136,10 +135,9 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
 
 
 /* pkg crc32 file */
-static int crcfile(const char *fname) {
+static int crcfile(const char *fname, unsigned char *buff4k) {
   FILE *fd;
   unsigned long crc;
-  unsigned char buff[512];
   unsigned int len;
 
   fd = fopen(fname, "rb");
@@ -148,25 +146,26 @@ static int crcfile(const char *fname) {
     return(1);
   }
 
-  crc = crc32_init();
+  crc = CRC32_INITVAL;
 
   for (;;) {
-    len = fread(buff, 1, sizeof(buff), fd);
+    len = fread(buff4k, 1, 4096, fd);
     if (len == 0) break;
-    crc32_feed(&crc, buff, len);
+    crc32_feed(&crc, buff4k, len);
   }
   fclose(fd);
 
   crc32_finish(&crc);
 
-  printf("%08lX", crc);
-  outputnl("");
+  crc32tostring(buff4k, crc);
+  outputnl(buff4k);
 
   return(0);
 }
 
 
 int main(int argc, char **argv) {
+  static unsigned char buff15k[15 * 1024];
   int res = 1;
   enum ACTIONTYPES action;
   const char *dosdir;
@@ -181,13 +180,13 @@ int main(int argc, char **argv) {
       res = showhelp();
       goto GAMEOVER;
     case ACTION_UNZIP:
-      res = unzip(argv[2], 0);
+      res = unzip(argv[2], 0, buff15k);
       goto GAMEOVER;
     case ACTION_LISTZIP:
-      res = unzip(argv[2], 1);
+      res = unzip(argv[2], 1, buff15k);
       goto GAMEOVER;
     case ACTION_CRC32:
-      res = crcfile(argv[2]);
+      res = crcfile(argv[2], buff15k);
       goto GAMEOVER;
   }
 
@@ -205,7 +204,7 @@ int main(int argc, char **argv) {
   switch (action) {
     case ACTION_UPDATE:
     case ACTION_INSTALL:
-      res = pkginst(argv[2], (action == ACTION_UPDATE)?PKGINST_UPDATE:0, dosdir, dirlist, bootdrive);
+      res = pkginst(argv[2], (action == ACTION_UPDATE)?PKGINST_UPDATE:0, dosdir, dirlist, bootdrive, buff15k);
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);
@@ -218,7 +217,7 @@ int main(int argc, char **argv) {
       break;
     case ACTION_HEALTHCHECK:
     case ACTION_HEALTHCHECKEXT:
-      res = healthcheck((argc == 3)?argv[2]:NULL, dosdir, (action == ACTION_HEALTHCHECKEXT)?1:0);
+      res = healthcheck(buff15k, (argc == 3)?argv[2]:NULL, dosdir, (action == ACTION_HEALTHCHECKEXT)?1:0);
       break;
     default:
       res = showhelp();

@@ -10,6 +10,10 @@
 
 #include "loadconf.h"   /* required for the customdirs struct */
 
+/* converts an uint32 into a 8-chars hex string
+ * returns the pointer to s */
+char *crc32tostring(char *s, unsigned long val);
+
 /* outputs a NUL-terminated string to stdout */
 void output(const char *s);
 void outputnl(const char *s);

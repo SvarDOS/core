@@ -164,12 +164,11 @@ struct ziplist *zip_listfiles(FILE *fd) {
 
 
 /* unzips a file. zipfd points to the open zip file, curzipnode to the entry to extract, and fulldestfilename is the destination file where to unzip it. returns 0 on success, non-zero otherwise. */
-int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilename) {
-  #define buffsize (12 * 1024) /* bigger buffer is better, but pkg has to work on a 256K PC so let's not get too crazy with RAM */
+int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilename, unsigned char *buff15k) {
+  #define buffsize (15 * 1024) /* bigger buffer is better, but pkg has to work on a 256K PC so let's not get too crazy with RAM */
   FILE *filefd;
   unsigned long cksum;
   int extract_res;
-  unsigned char *buff;
   struct utimbuf filetimestamp;
 
   /* first of all, check we support the compression method */
@@ -186,16 +185,7 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilen
   filefd = fopen(fulldestfilename, "wb");
   if (filefd == NULL) return(-2);  /* failed to open the dst file */
 
-  /* allocate buffers for data I/O */
-  buff = malloc(buffsize);
-  if (buff == NULL) {
-    fclose(filefd);
-    unlink(fulldestfilename); /* remove the failed file once it is closed */
-    return(-6);
-  }
-
   if (fseek(zipfd, curzipnode->dataoffset, SEEK_SET) != 0) { /* set the reading position inside the zip file */
-    free(buff);
     fclose(filefd);
     unlink(fulldestfilename); /* remove the failed file once it is closed */
     return(-7);
@@ -210,18 +200,17 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilen
     for (i = 0; i < curzipnode->filelen;) {
       toread = curzipnode->filelen - i;
       if (toread > buffsize) toread = buffsize;
-      if (fread(buff, toread, 1, zipfd) != 1) extract_res = -3;   /* read a chunk of data */
-      crc32_feed(&cksum, buff, toread); /* update the crc32 checksum */
-      if (fwrite(buff, toread, 1, filefd) != 1) extract_res = -4; /* write data chunk to dst file */
+      if (fread(buff15k, toread, 1, zipfd) != 1) extract_res = -3;   /* read a chunk of data */
+      crc32_feed(&cksum, buff15k, toread); /* update the crc32 checksum */
+      if (fwrite(buff15k, toread, 1, filefd) != 1) extract_res = -4; /* write data chunk to dst file */
       i += toread;
     }
   } else if (curzipnode->compmethod == 8) {  /* if the file is deflated, inflate it */
     /* use 1/3 of my buffer as input and 2/3 as output */
-    extract_res = inf(zipfd, filefd, buff, buffsize / 3, buff + (buffsize / 3), buffsize / 3 * 2, &cksum, curzipnode->compressedfilelen);
+    extract_res = inf(zipfd, filefd, buff15k, buffsize / 3, buff15k + (buffsize / 3), buffsize / 3 * 2, &cksum, curzipnode->compressedfilelen);
   }
 
   /* clean up memory, close the dst file and terminates crc32 */
-  free(buff);
   fclose(filefd);   /* close the dst file */
   crc32_finish(&cksum);
 

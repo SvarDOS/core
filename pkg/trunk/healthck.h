@@ -6,6 +6,6 @@
 #ifndef checkhealth_sentinel
 #define checkhealth_sentinel
 
-int healthcheck(const char *pkgname, const char *dosdir, unsigned char extendedcheck);
+int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, unsigned char extendedcheck);
 
 #endif
