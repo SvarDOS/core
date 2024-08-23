@@ -144,7 +144,7 @@ static int crcfile(const char *fname) {
 
   fd = fopen(fname, "rb");
   if (fd == NULL) {
-    puts(svarlang_str(10, 1)); /* failed to open file */
+    outputnl(svarlang_str(10, 1)); /* failed to open file */
     return(1);
   }
 
@@ -160,7 +160,7 @@ static int crcfile(const char *fname) {
   crc32_finish(&crc);
 
   printf("%08lX", crc);
-  puts("");
+  outputnl("");
 
   return(0);
 }
@@ -194,8 +194,8 @@ int main(int argc, char **argv) {
   /* read the DOSDIR environment variable */
   dosdir = getenv("DOSDIR");
   if (dosdir == NULL) {
-    puts(svarlang_str(2, 2)); /* "%DOSDIR% not set! You should make it point to the SvarDOS main directory." */
-    puts(svarlang_str(2, 3)); /* "Example: SET DOSDIR=C:\SVARDOS" */
+    outputnl(svarlang_str(2, 2)); /* "%DOSDIR% not set! You should make it point to the SvarDOS main directory." */
+    outputnl(svarlang_str(2, 3)); /* "Example: SET DOSDIR=C:\SVARDOS" */
     goto GAMEOVER;
   }
 

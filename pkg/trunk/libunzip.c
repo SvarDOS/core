@@ -13,6 +13,7 @@
 #include <unistd.h>   /* unlink() */
 
 #include "crc32.h"
+#include "helpers.h"
 #include "kprintf.h"
 #include "inf.h"   /* INFLATE support */
 
@@ -89,7 +90,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
       newentry = calloc(sizeof(struct ziplist) + filenamelen, 1);
       if (newentry == NULL) {
         kitten_printf(2, 14, "libunzip"); /* "Out of memory! (%s)" */
-        puts("");
+        outputnl("");
         zip_freelist(&reslist);
         break;
       }
@@ -150,7 +151,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
       fseek(fd, 12, SEEK_CUR); /* the header is 3x4 bytes (CRC + compressed len + uncompressed len) */
     } else { /* unknown sig */
       kitten_printf(8, 1, entrysig); /* "unknown zip sig: 0x%08lx" */
-      puts("");
+      outputnl("");
       zip_freelist(&reslist);
       break;
     }

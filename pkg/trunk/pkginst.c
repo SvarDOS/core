@@ -77,7 +77,7 @@ int is_package_installed(const char *pkgname, const char *dosdir) {
 static int validate_package_not_installed(const char *pkgname, const char *dosdir) {
   if (is_package_installed(pkgname, dosdir) != 0) {
     kitten_printf(3, 18, pkgname); /* "Package %s is already installed! You might want to use the 'update' action." */
-    puts("");
+    outputnl("");
     return(-1);
   }
   return(0);
@@ -119,19 +119,19 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
   /* does the file exist? */
   if (!fileexists(fname)) {
-    puts(svarlang_str(10, 1)); /* ERROR: File not found */
+    outputnl(svarlang_str(10, 1)); /* ERROR: File not found */
     goto RAII;
   }
 
   /* open the SVP archive and get the list of files */
   *zipfd = fopen(fname, "rb");
   if (*zipfd == NULL) {
-    puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
+    outputnl(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
     goto RAII_ERR;
   }
   ziplinkedlist = zip_listfiles(*zipfd);
   if (ziplinkedlist == NULL) {
-    puts(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
+    outputnl(svarlang_str(3, 8)); /* "ERROR: Invalid zip archive! Package not installed." */
     goto RAII_ERR;
   }
 
@@ -147,7 +147,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
     /* validate that the file has a valid filename (8+3, no shady chars...) */
     if (validfilename(curzipnode->filename) != 0) {
-      puts(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
+      outputnl(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
@@ -157,7 +157,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
     /* abort if entry is encrypted */
     if ((curzipnode->flags & ZIP_FLAG_ENCRYPTED) != 0) {
-      puts(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
+      outputnl(svarlang_str(3, 20)); /* "ERROR: Package contains an encrypted file:" */
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
@@ -165,7 +165,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     /* abort if file is compressed with an unsupported method */
     if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
       kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
-      puts("");
+      outputnl("");
       printf(" %s\n", curzipnode->filename);
       goto RAII_ERR;
     }
@@ -173,7 +173,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     /* is it the appinfo file? detach it from the list for now */
     if (strstr(curzipnode->filename, "appinfo\\") == curzipnode->filename) {
       if (appinfoptr != NULL) {
-        puts(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package" */
+        outputnl(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package" */
         goto RAII_ERR;
       }
       appinfoptr = curzipnode;
@@ -206,7 +206,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
   /* if appinfo file not found, this is not a SvarDOS package */
   if (appinfoptr == NULL) {
-    puts(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package." */
+    outputnl(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package." */
     goto RAII_ERR;
   }
 
@@ -225,7 +225,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     }
     pkgname[i] = 0;
     if ((i == 0) || (strcmp(appinfoptr->filename + 8 + i, ".lsm") != 0)) {
-      puts(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package." */
+      outputnl(svarlang_str(3, 12)); /* "ERROR: This is not a valid SvarDOS package." */
       goto RAII_ERR;
     }
   }
@@ -248,7 +248,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     shortfile = computelocalpath(curzipnode->filename, fname, dosdir, dirlist, bootdrive);
     strcat(fname, shortfile);
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
-      puts(svarlang_str(3, 9)); /* "ERROR: Package contains a file that already exists locally:" */
+      outputnl(svarlang_str(3, 9)); /* "ERROR: Package contains a file that already exists locally:" */
       printf(" %s\n", fname);
       goto RAII_ERR;
     }
@@ -285,12 +285,12 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
       if (strcasecmp(buff, "warn") == 0) {
         /* print a visual delimiter */
         if (warncount == 0) {
-          puts("");
+          outputnl("");
           for (i = 0; i < 79; i++) putchar('*');
-          puts("");
+          outputnl("");
         }
         /* there may be more than one "warn" line */
-        puts(msgptr);
+        outputnl(msgptr);
         warncount++;
       }
     }
@@ -301,7 +301,7 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
   /* if one or more warn lines have been displayed then close with a delimiter again */
   if (warncount > 0) {
     for (i = 0; i < 79; i++) putchar('*');
-    puts("");
+    outputnl("");
   }
 
 }
@@ -330,10 +330,10 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   strcat(buff, pkgname);
   strcat(buff, ".lsm");
   unzip_result = zip_unzip(zipfd, ziplinkedlist, buff);
-  puts("");
+  outputnl("");
   if (unzip_result != 0) {
     kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
-    puts("");
+    outputnl("");
     return(-1);
   }
   filesextractedsuccess++;
@@ -342,7 +342,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   lsmfd = fopen(buff, "ab"); /* opening in APPEND mode so I do not loose the LSM content */
   if (lsmfd == NULL) {
     kitten_printf(3, 10, buff); /* "ERROR: Could not create %s!" */
-    puts("");
+    outputnl("");
     return(-2);
   }
   fprintf(lsmfd, "\r\n"); /* in case the LSM does not end with a clear line already */
@@ -365,10 +365,10 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     output(" -> ");
     output(buff);
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename);
-    puts("");
+    outputnl("");
     if (unzip_result != 0) {
       kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
-      puts("");
+      outputnl("");
       filesextractedfailure += 1;
     } else {
       filesextractedsuccess += 1;
@@ -377,7 +377,7 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   fclose(lsmfd);
 
   kitten_printf(3, 19, pkgname, filesextractedfailure, filesextractedsuccess); /* "Package %s installed: %ld errors, %ld files extracted." */
-  puts("");
+  outputnl("");
 
   /* scan the LSM file for a "warn" message to display */
   display_warn_if_exists(pkgname, dosdir, buff, sizeof(buff));

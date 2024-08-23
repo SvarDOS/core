@@ -31,7 +31,7 @@ static int checkfordoubledirlist(const struct customdirs *dirlist) {
     for (curpos = dirlist->next; curpos != NULL; curpos = curpos->next) {
       if (strcasecmp(curpos->name, dirlist->name) == 0) {
         kitten_printf(7, 0, curpos->name); /* "ERROR: custom dir '%s' is listed twice!" */
-        puts("");
+        outputnl("");
         return(-1);
       }
     }
@@ -46,7 +46,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
     /* the location must be at least 3 characters long to be a valid absolute path (like 'c:\')*/
     if (strlen(dirlist->location) < 3) {
       kitten_printf(7, 15, dirlist->name); /* "ERROR: custom dir '%s' is not a valid absolute path!" */
-      puts("");
+      outputnl("");
       return(-1);
     }
     /* is it a valid absolute path? should start with [a..Z]:\ */
@@ -54,7 +54,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
        ((dirlist->location[2] != '/') && (dirlist->location[2] != '\\')) ||
        (((dirlist->location[0] < 'a') || (dirlist->location[0] > 'z')) && ((dirlist->location[0] < 'A') || (dirlist->location[0] > 'Z')))) {
       kitten_printf(7, 15, dirlist->name); /* "ERROR: custom dir '%s' is not a valid absolute path!" */
-      puts("");
+      outputnl("");
       return(-1);
     }
     /* check for forbidden names */
@@ -64,7 +64,7 @@ static int validatedirlist(const struct customdirs *dirlist) {
         (strcasecmp(dirlist->name, "nls") == 0) ||
         (strcasecmp(dirlist->name, "packages") == 0)) {
       kitten_printf(7, 16, dirlist->name); /* "ERROR: custom dir '%s' is a reserved name!" */
-      puts("");
+      outputnl("");
       return(-1);
     }
   }
@@ -105,10 +105,10 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
       kitten_printf(7, 1, "%DOSDIR%\\PKG.CFG"); /* "ERROR: Could not open config file (%s)!" */
     } else {
       kitten_printf(7, 17, token);  /* "ERROR: PKG.CFG found at %s */
-      puts("");
-      puts(svarlang_str(7, 18));    /* Please move it to %DOSDIR%\PKG.CFG */
+      outputnl("");
+      outputnl(svarlang_str(7, 18));    /* Please move it to %DOSDIR%\PKG.CFG */
     }
-    puts("");
+    outputnl("");
     return(-1);
   }
 
@@ -124,7 +124,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
 
     if ((value == NULL) || (value[0] == 0)) {
       kitten_printf(7, 4, nline); /* "Warning: token with empty value on line #%d" */
-      puts(PKG_CFG);
+      outputnl(PKG_CFG);
       continue;
     }
 
@@ -136,7 +136,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
       for (i = 0; (value[i] != ' ') && (value[i] != 0); i++);
       if (value[i] == 0) {
         kitten_printf(7, 11, nline); /* "Warning: Invalid 'DIR' directive found at line #%d" */
-        puts(PKG_CFG);
+        outputnl(PKG_CFG);
         continue;
       }
       value[i] = 0;
@@ -148,7 +148,7 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
       if (location[strlen(location) - 1] != '\\') strcat(location, "\\"); /* make sure to end dirs with a backslash */
       if (addnewdir(dirlist, value, location) != 0) {
         kitten_printf(2, 14, "addnewdir"); /* "Out of memory! (%s)" */
-        puts("");
+        outputnl("");
         freeconf(dirlist);
         fclose(fd);
         return(-1);
@@ -158,12 +158,12 @@ int loadconf(const char *dosdir, struct customdirs **dirlist, char *bootdrive) {
       *bootdrive &= 0xDF; /* upcase it */
       if ((*bootdrive < 'A') || (*bootdrive > 'Z')) {
         kitten_printf(7, 5, nline); /* Warning: Invalid bootdrive at line #%d */
-        puts(PKG_CFG);
+        outputnl(PKG_CFG);
         *bootdrive = 'C';
       }
     } else { /* unknown token */
       kitten_printf(7, 8, token, nline); /* "Warning: Unknown token '%s' at line #%d" */
-      puts("");
+      outputnl("");
     }
   }
   fclose(fd);

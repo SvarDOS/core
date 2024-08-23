@@ -33,7 +33,7 @@ static struct dirliststruct *rememberdir(struct dirliststruct *dirlist, const ch
   res = malloc(sizeof(struct dirliststruct) + strlen(path));
   if (res == NULL) {  /* out of memory */
     kitten_printf(4, 3, path); /* "Out of memory! Could not store directory %s!" */
-    puts("");
+    outputnl("");
     return(NULL);
   }
   strcpy(res->dirname, path);
@@ -79,7 +79,7 @@ int pkgrem(const char *pkgname, const char *dosdir) {
     flist = fopen(fpath, "rb");
     if (flist == NULL) {
       kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
-      puts("");
+      outputnl("");
       return(-1);
     }
   }
@@ -120,7 +120,7 @@ int pkgrem(const char *pkgname, const char *dosdir) {
 
     /* remove it */
     kitten_printf(4, 4, buff); /* "removing %s" */
-    puts("");
+    outputnl("");
     unlink(buff);
   }
 
@@ -152,10 +152,10 @@ int pkgrem(const char *pkgname, const char *dosdir) {
 
   /* remove the lst file */
   kitten_printf(4, 4, fpath); /* "removing %s" */
-  puts("");
+  outputnl("");
   unlink(fpath);
 
   kitten_printf(4, 5, pkgname); /* "Package %s has been removed." */
-  puts("");
+  outputnl("");
   return(0);
 }

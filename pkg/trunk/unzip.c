@@ -25,13 +25,13 @@ int unzip(const char *zipfile, unsigned char listonly) {
 
   fd = fopen(zipfile, "rb");
   if (fd == NULL) {
-    puts(svarlang_str(10, 1)); /* "ERROR: Failed to open the archive file" */
+    outputnl(svarlang_str(10, 1)); /* "ERROR: Failed to open the archive file" */
     return(1);
   }
 
   zlist = zip_listfiles(fd);
   if (zlist == NULL) {
-    puts(svarlang_str(10, 2)); /* "ERROR: Invalid ZIP archive" */
+    outputnl(svarlang_str(10, 2)); /* "ERROR: Invalid ZIP archive" */
     fclose(fd);
     return(-1);
   }
@@ -39,7 +39,7 @@ int unzip(const char *zipfile, unsigned char listonly) {
   if (listonly != 0) {
     /* just list the files inside the archive */
     for (znode = zlist; znode != NULL; znode = znode->nextfile) {
-      puts(znode->filename);
+      outputnl(znode->filename);
     }
   } else {
     /* examine the list of zipped files - make sure that no file currently
@@ -55,7 +55,7 @@ int unzip(const char *zipfile, unsigned char listonly) {
       if (znode->flags == ZIP_FLAG_ISADIR) goto OK;
       /* file already exists? */
       if (fileexists(znode->filename) != 0) {
-        puts(svarlang_str(10, 3)); /* "ERROR: File already exists" */
+        outputnl(svarlang_str(10, 3)); /* "ERROR: File already exists" */
         r = 1;
         continue;
       }
@@ -63,11 +63,11 @@ int unzip(const char *zipfile, unsigned char listonly) {
       zres = zip_unzip(fd, znode, znode->filename);
       if (zres != 0) {
         kitten_printf(10, 4, "ERROR: unzip failure (%d)", zres);
-        puts("");
+        outputnl("");
         continue;
       }
       OK:
-      puts(svarlang_str(10, 0)); /* "OK" */
+      outputnl(svarlang_str(10, 0)); /* "OK" */
     }
   }
 

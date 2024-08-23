@@ -30,7 +30,7 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
   dp = opendir(buff);
   if (dp == NULL) {
     kitten_printf(9, 0, buff); /* "ERROR: Could not access directory %s" */
-    puts("");
+    outputnl("");
     return(-1);
   }
 
@@ -50,10 +50,10 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
     readlsm(buff, ver, sizeof(ver));
 
     printf("%s %s", ep->d_name, ver);
-    puts("");
+    outputnl("");
     matchfound = 1;
   }
-  if (matchfound == 0) puts(svarlang_str(5, 0)); /* "No package matched the search." */
+  if (matchfound == 0) outputnl(svarlang_str(5, 0)); /* "No package matched the search." */
 
   closedir(dp);
   return(0);
@@ -83,7 +83,7 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
     fd = fopen(buff, "rb");
     if (fd == NULL) {
       kitten_printf(9, 1, pkgname); /* "ERROR: Local package '%s' not found." */
-      puts("");
+      outputnl("");
       return(NULL);
     }
   }
@@ -128,7 +128,7 @@ int listfilesofpkg(const char *pkgname, const char *dosdir) {
   if (flist == NULL) return(-1);
   /* display each filename on screen */
   for (flist_ptr = flist; flist_ptr != NULL; flist_ptr = flist_ptr->next) {
-    puts(flist_ptr->fname);
+    outputnl(flist_ptr->fname);
   }
   /* free the list of files */
   pkg_freeflist(flist);
