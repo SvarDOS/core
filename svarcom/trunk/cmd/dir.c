@@ -717,21 +717,24 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           output(buf->buff64);
         }
         output(" ");
-        /* either <DIR> or right aligned 10-chars byte size */
-        memset(buf->buff64, ' ', 10);
-        if (dta->attr & DOS_ATTR_DIR) {
-          strcpy(buf->buff64 + 10, svarlang_str(37,21));
-        } else {
-          nls_format_number(buf->buff64 + 10, dta->size, &(buf->nls));
+        /* either <DIR> or right aligned 13 or 10 chars byte size, depending
+         * on the presence of a thousands delimiter (max 2'000'000'000) */
+        {
+          unsigned short szlen = 10 + (strlen(buf->nls.thousep) * 3);
+          memset(buf->buff64, ' ', 16);
+          if (dta->attr & DOS_ATTR_DIR) {
+            strcpy(buf->buff64 + szlen, svarlang_str(37,21));
+          } else {
+            nls_format_number(buf->buff64 + 12, dta->size, &(buf->nls));
+          }
+          output(buf->buff64 + strlen(buf->buff64) - szlen);
         }
-        output(buf->buff64 + strlen(buf->buff64) - 10);
-        /* two spaces and NLS DATE */
+        /* one spaces and NLS DATE */
         buf->buff64[0] = ' ';
-        buf->buff64[1] = ' ';
         if (screenw >= 80) {
-          nls_format_date(buf->buff64 + 2, dta->date_yr + 1980, dta->date_mo, dta->date_dy, &(buf->nls));
+          nls_format_date(buf->buff64 + 1, dta->date_yr + 1980, dta->date_mo, dta->date_dy, &(buf->nls));
         } else {
-          nls_format_date(buf->buff64 + 2, (dta->date_yr + 80) % 100, dta->date_mo, dta->date_dy, &(buf->nls));
+          nls_format_date(buf->buff64 + 1, (dta->date_yr + 80) % 100, dta->date_mo, dta->date_dy, &(buf->nls));
         }
         output(buf->buff64);
 
@@ -786,23 +789,26 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* print out summary (unless bare output mode) */
   if (req.format != DIR_OUTPUT_BARE) {
     unsigned short alignpos;
-    unsigned char uint32maxlen = 13; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
+    unsigned short uint32maxlen = 14; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
     if (screenw < 80) uint32maxlen = 10;
-    /* x file(s) */
-    memset(buf->buff64, ' ', uint32maxlen);
-    i = nls_format_number(buf->buff64 + uint32maxlen, summary_fcount, &(buf->nls));
-    alignpos = sprintf(buf->buff64 + uint32maxlen + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
+
+    /* x file(s) (maximum of files in a FAT-32 directory is 65'535) */
+    memset(buf->buff64, ' ', 8);
+    i = nls_format_number(buf->buff64 + 8, summary_fcount, &(buf->nls));
+    alignpos = sprintf(buf->buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
     output(buf->buff64 + i);
     /* xxxx bytes */
+    memset(buf->buff64, ' ', 14);
     i = nls_format_number(buf->buff64 + uint32maxlen, summary_totsz, &(buf->nls));
     output(buf->buff64 + i + 1);
     output(" ");
     nls_outputnl(37,23); /* "bytes" */
     if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) nls_outputnl_doserr(i);
-    alignpos += uint32maxlen * 2;
+    alignpos += 8 + uint32maxlen;
     memset(buf->buff64, ' ', alignpos); /* align the freebytes value to same column as totbytes */
     i = nls_format_number(buf->buff64 + alignpos, summary_totsz, &(buf->nls));
     output(buf->buff64 + i + 1);
