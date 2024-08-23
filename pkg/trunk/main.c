@@ -25,7 +25,7 @@
  */
 
 
-#include <stdio.h>    /* printf() */
+#include <stdio.h>    /* FILE */
 #include <stdlib.h>   /* malloc() and friends */
 #include <string.h>   /* strcasecmp() */
 

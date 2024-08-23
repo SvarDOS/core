@@ -149,7 +149,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     /* validate that the file has a valid filename (8+3, no shady chars...) */
     if (validfilename(curzipnode->filename) != 0) {
       outputnl(svarlang_str(3, 23)); /* "ERROR: Package contains an invalid filename:" */
-      printf(" %s\n", curzipnode->filename);
+      outputnl(curzipnode->filename);
       goto RAII_ERR;
     }
 
@@ -250,7 +250,7 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
     strcat(fname, shortfile);
     if ((findfileinlist(flist, fname) == NULL) && (fileexists(fname) != 0)) {
       outputnl(svarlang_str(3, 9)); /* "ERROR: Package contains a file that already exists locally:" */
-      printf(" %s\n", fname);
+      outputnl(fname);
       goto RAII_ERR;
     }
   }

@@ -48,7 +48,8 @@ int unzip(const char *zipfile, unsigned char listonly, unsigned char *buff15k) {
       int zres;
       /* convert slash to backslash, print filename and create the directories path */
       slash2backslash(znode->filename);
-      printf("%s ", znode->filename);
+      output(znode->filename);
+      output(" ");
       mkpath(znode->filename);
       /* if a dir, we good already */
       if (znode->flags == ZIP_FLAG_ISADIR) goto OK;
