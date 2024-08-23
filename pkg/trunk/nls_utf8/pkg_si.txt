@@ -13,7 +13,7 @@
 
 2.0:Spremenljivka TEMP ni nastavljena! Kaže naj na imenik, kamor se da pisati.
 2.3:Primer: SET DOSDIR=C:\\SVARDOS
-2.14:Ni dovolj spomina! (%s)
+2.14:Ni dovolj spomina!
 
 #### Installing package ####
 
@@ -30,8 +30,7 @@
 #### Removing package ####
 
 4.0:Paket %s ni nameščen, zato ga ni mogoče odstraniti.
-4.3:Ni dovolj spomina. Ni mogoče shraniti imenika %s!
-4.4:odstranjujem %s
+4.4:odstranjujem
 4.5:Paket %s odstranjen.
 
 #### Searching package ####
@@ -45,15 +44,12 @@
 7.4:Warning: token with empty value on line #%d
 7.8:Opozorilo: neznan ukaz "%s" v vrstici %d
 7.11:Opozorilo: Neveljaven ukaz DIR v vrstici %d.
-7.15:NAPAKA: custom dir '%s' is not a valid absolute path!
-7.16:NAPAKA: custom dir '%s' is a reserved name!
 
 #### Unziping package ####
 
-8.1:Neznana vrsta datoteke ZIP: 0x%08x
-8.2:NAPAKA: Paket vsebuje datoteko, ki je stisnjena z nepodprto metodo (%d):
+8.2:NAPAKA: Paket vsebuje datoteko, ki je stisnjena z nepodprto metodo:
 
 #### Handling the local list of installed packages ####
 
-9.0:NAPAKA: Dostop do imenika %s ni mogoč
+9.0:NAPAKA: Dostop do imenika ni mogoč:
 9.1:NAPAKA: Ni mogoče najti lokalnega paketa %s

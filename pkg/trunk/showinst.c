@@ -11,7 +11,6 @@
 #include <direct.h> /* opendir() and friends */
 
 #include "helpers.h"  /* fdnpkg_strcasestr(), slash2backslash()... */
-#include "kprintf.h"
 #include "libunzip.h"  /* zip_freelist()... */
 #include "lsm.h"
 #include "svarlang.lib\svarlang.h"
@@ -29,8 +28,9 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
   sprintf(buff, "%s\\appinfo", dosdir);
   dp = opendir(buff);
   if (dp == NULL) {
-    kitten_printf(9, 0, buff); /* "ERROR: Could not access directory %s" */
-    outputnl("");
+    output(svarlang_str(9,0)); /* "ERROR: Could not access directory */
+    output(" ");
+    outputnl(buff);
     return(-1);
   }
 
@@ -83,8 +83,8 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
     fd = fopen(buff, "rb");
     if (fd == NULL) {
-      kitten_printf(9, 1, pkgname); /* "ERROR: Local package '%s' not found." */
-      outputnl("");
+      sprintf(buff, svarlang_str(9, 1), pkgname); /* "ERROR: Local package '%s' not found." */
+      outputnl(buff);
       return(NULL);
     }
   }
@@ -109,7 +109,7 @@ struct flist_t *pkg_loadflist(const char *pkgname, const char *dosdir) {
     /* add the new node to the result */
     newnode = malloc(sizeof(struct flist_t) + strlen(buff));
     if (newnode == NULL) {
-      kitten_printf(2, 14, "malloc failure"); /* "Out of memory! (%s)" */
+      outputnl(svarlang_str(2,14));  /* "Out of memory!" */
       continue;
     }
     newnode->next = res;

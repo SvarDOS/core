@@ -11,7 +11,7 @@
 #include <direct.h>  /* watcom needs this for the rmdir() prototype */
 
 #include "helpers.h"   /* slash2backslash() */
-#include "kprintf.h"
+#include "svarlang.lib\svarlang.h"
 
 #include "pkgrem.h"
 
@@ -32,8 +32,7 @@ static struct dirliststruct *rememberdir(struct dirliststruct *dirlist, const ch
   /* not in the list yet - add it */
   res = malloc(sizeof(struct dirliststruct) + strlen(path));
   if (res == NULL) {  /* out of memory */
-    kitten_printf(4, 3, path); /* "Out of memory! Could not store directory %s!" */
-    outputnl("");
+    outputnl(svarlang_str(2,14)); /* "Out of memory!" */
     return(NULL);
   }
   strcpy(res->dirname, path);
@@ -78,8 +77,9 @@ int pkgrem(const char *pkgname, const char *dosdir) {
     sprintf(fpath, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
     flist = fopen(fpath, "rb");
     if (flist == NULL) {
-      kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
-      outputnl("");
+      /* "Package %s is not installed, so not removed" */
+      sprintf(buff, svarlang_str(4,0), pkgname);
+      outputnl(buff);
       return(-1);
     }
   }
@@ -119,8 +119,9 @@ int pkgrem(const char *pkgname, const char *dosdir) {
     if (strcasecmp(buff, fpath) == 0) continue;
 
     /* remove it */
-    kitten_printf(4, 4, buff); /* "removing %s" */
-    outputnl("");
+    output(svarlang_str(4,4)); /* removing */
+    output(" ");
+    outputnl(buff);
     unlink(buff);
   }
 
@@ -151,11 +152,12 @@ int pkgrem(const char *pkgname, const char *dosdir) {
   }
 
   /* remove the lst file */
-  kitten_printf(4, 4, fpath); /* "removing %s" */
-  outputnl("");
+  output(svarlang_str(4,4)); /* "removing" */
+  output(" ");
+  outputnl(fpath);
   unlink(fpath);
 
-  kitten_printf(4, 5, pkgname); /* "Package %s has been removed." */
-  outputnl("");
+  sprintf(buff, svarlang_str(4,5), pkgname); /* "Package %s has been removed." */
+  outputnl(buff);
   return(0);
 }

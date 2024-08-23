@@ -12,7 +12,6 @@
 
 #include "helpers.h"   /* slash2backslash() */
 #include "fileexst.h"
-#include "kprintf.h"
 #include "libunzip.h"  /* zip_listfiles()... */
 #include "showinst.h"  /* pkg_loadflist() */
 #include "svarlang.lib\svarlang.h"
@@ -76,8 +75,10 @@ int is_package_installed(const char *pkgname, const char *dosdir) {
 /* checks that pkgname is NOT installed. return 0 on success, non-zero otherwise. */
 static int validate_package_not_installed(const char *pkgname, const char *dosdir) {
   if (is_package_installed(pkgname, dosdir) != 0) {
-    kitten_printf(3, 18, pkgname); /* "Package %s is already installed! You might want to use the 'update' action." */
-    outputnl("");
+    char msg[256];
+    /* "Package %s is already installed! You might want to use the 'update' action." */
+    sprintf(msg, svarlang_str(3,18), pkgname);
+    outputnl(msg);
     return(-1);
   }
   return(0);
@@ -164,8 +165,8 @@ struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, in
 
     /* abort if file is compressed with an unsupported method */
     if ((curzipnode->compmethod != ZIP_METH_STORE) && (curzipnode->compmethod != ZIP_METH_DEFLATE)) { /* unsupported compression method */
-      kitten_printf(8, 2, curzipnode->compmethod); /* "ERROR: Package contains a file compressed with an unsupported method (%d):" */
-      outputnl("");
+      /* "ERROR: Package contains a file compressed with an unsupported method:" */
+      outputnl(svarlang_str(8,2));
       outputnl(curzipnode->filename);
       goto RAII_ERR;
     }
@@ -332,8 +333,8 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   unzip_result = zip_unzip(zipfd, ziplinkedlist, buff, buff15k);
   outputnl("");
   if (unzip_result != 0) {
-    kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
-    outputnl("");
+    sprintf(buff, svarlang_str(10,4), unzip_result); /* "ERROR: unzip failure (%d)" */
+    outputnl(buff);
     return(-1);
   }
   filesextractedsuccess++;
@@ -341,8 +342,9 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   /* open the (freshly created) LSM file */
   lsmfd = fopen(buff, "ab"); /* opening in APPEND mode so I do not loose the LSM content */
   if (lsmfd == NULL) {
-    kitten_printf(3, 10, buff); /* "ERROR: Could not create %s!" */
-    outputnl("");
+    /* "ERROR: Could not create %s!" */
+    sprintf(buff15k, svarlang_str(3,10), buff);
+    outputnl(buff15k);
     return(-2);
   }
   fprintf(lsmfd, "\r\n"); /* in case the LSM does not end with a clear line already */
@@ -367,8 +369,8 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename, buff15k);
     outputnl("");
     if (unzip_result != 0) {
-      kitten_printf(10, 4, unzip_result); /* "ERROR: unzip failure (%d)" */
-      outputnl("");
+      sprintf(buff, svarlang_str(10,4), unzip_result); /* "ERROR: unzip failure (%d)" */
+      outputnl(buff);
       filesextractedfailure += 1;
     } else {
       filesextractedsuccess += 1;
@@ -376,8 +378,9 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   }
   fclose(lsmfd);
 
-  kitten_printf(3, 19, pkgname, filesextractedfailure, filesextractedsuccess); /* "Package %s installed: %ld errors, %ld files extracted." */
-  outputnl("");
+  /* "Package %s installed: %ld errors, %ld files extracted." */
+  sprintf(buff15k, svarlang_str(3, 19), pkgname, filesextractedfailure, filesextractedsuccess);
+  outputnl(buff15k);
 
   /* scan the LSM file for a "warn" message to display */
   display_warn_if_exists(pkgname, dosdir, buff, sizeof(buff));

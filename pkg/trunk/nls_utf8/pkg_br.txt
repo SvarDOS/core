@@ -17,7 +17,7 @@
 
 2.2:%DOSDIR% não configurado! Você deve apontá-lo para o diretório principal do SvarDOS.
 2.3:Exemplo: SET DOSDIR=C:\\SVARDOS
-2.14:Sem memória! (%s)
+2.14:Sem memória!
 
 #### Installing package ####
 
@@ -34,8 +34,7 @@
 #### Removing package ####
 
 4.0:Pacote %s não está instalado, assim não foi removido.
-4.3:Sem memória! Impossível armazenar diretorio %s!
-4.4:removendo %s
+4.4:removendo
 4.5:Pacote %s foi removido.
 
 #### Searching package ####
@@ -49,17 +48,14 @@
 7.4:Alerta: token com valor vazio na linha #%d
 7.8:Alerta: Token desconhecido '%s' na linha #%d
 7.11:Alerta: Diretiva 'DIR' inválida encontrada na linha #%d
-7.15:ERRO: diretório personalizado '%s' não é um caminho absoluto válido!
-7.16:ERRO: diretório personalizado '%s' é um nome reservado!
 
 #### Unziping package ####
 
-8.1:assinatura zip desconhecida: 0x%08lx
-8.2:ERRO: Pacote contém um arquivo comprimido com um método não suportado (%d):
+8.2:ERRO: Pacote contém um arquivo comprimido com um método não suportado:
 
 #### Handling the local list of installed packages ####
 
-9.0:ERRO: Impossível acessar diretório %s
+9.0:ERRO: Impossível acessar diretório:
 9.1:ERRO: Pacote Local '%s' não encontrado
 
 #### unzip ####

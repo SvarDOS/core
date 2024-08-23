@@ -13,7 +13,7 @@
 
 2.2:%DOSDIR% ayarlanmamış! Onun SvarDOS ana dizinine işaret etmesi gerekir.
 2.3:Örnek: SET DOSDIR=C:\\SVARDOS
-2.14:Bellek yetersiz! (%s)
+2.14:Bellek yetersiz!
 
 #### Installing package ####
 
@@ -29,8 +29,7 @@
 #### Removing package ####
 
 4.0:%s paketi kurulu değildir, dolayısıyla kaldırılmamıştır.
-4.3:Yetersiz bellek! %s dizini kaydedilemedi!
-4.4:%s kaldırılıyor
+4.4:kaldırılıyor
 4.5:%s paketi kaldırıldı.
 
 #### Searching package ####
@@ -44,15 +43,12 @@
 7.4:İkaz: #%d satırında boş değerli bir belirteç
 7.8:İkaz: #%d satırında bilinmeyen '%s' belirteci
 7.11:İkaz: #%d satırında  geçersiz 'DIR' yönergesi bulundu
-7.15:HATA: özel dizin '%s' geçerli bir mutlak yol değildir!
-7.16:HATA: özel dizin '%s' ayrılmış bir isimdir!
 
 #### Unziping package ####
 
-8.1:bilinmeyen zip imzası: 0x%08lx
-8.2:HATA: Paket desteklenmeyen metotla sıkıştırılmış dosya içeriyor (%d):
+8.2:HATA: Paket desteklenmeyen metotla sıkıştırılmış dosya içeriyor:
 
 #### Handling the local list of installed packages ####
 
-9.0:Hata: %s dizinine erişilemedi.
+9.0:Hata: dizinine erişilemedi:
 9.1:Hata: %s yerel paketi bulunamadı.

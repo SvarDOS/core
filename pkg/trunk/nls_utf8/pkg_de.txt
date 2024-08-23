@@ -17,7 +17,7 @@
 
 2.2:%DOSDIR% nicht gesetzt! Sie sollten es auf das SvarDOS-Hauptverzeichnis verweisen lassen.
 2.3:Beispiel: SET DOSDIR=C:\\SVARDOS
-2.14:Arbeitsspeicher erschöpft! (%s)
+2.14:Arbeitsspeicher erschöpft!
 
 #### Installing package ####
 
@@ -34,8 +34,7 @@
 #### Removing package ####
 
 4.0:Paket %s ist nicht installiert, daher nicht entfernt.
-4.3:Arbeitsspeicher erschöpft! Konnte das Verzeichnis %s nicht speichern!
-4.4:Entferne %s
+4.4:Entferne
 4.5:Paket %s wurde entfernt.
 
 #### Searching package ####
@@ -49,17 +48,14 @@
 7.4:Warnung: Token mit leerem Wert in Zeile #%d
 7.8:Warnung: Unbekanntes Token "%s" in Zeile #%d
 7.11:Warnung: Ungültige "DIR"-Anweisung in Zeile #%d gefunden
-7.15:FEHLER: Benutzerdefiniertes Verzeichnis "%s" ist kein gültiger absoluter Pfad!
-7.16:FEHLER: Benutzerdefiniertes Verzeichnis "%s" ist ein reservierter Name!
 
 #### Unziping package ####
 
-8.1:Unbekannte ZIP-Signatur: 0x%08lx
-8.2:FEHLER: Paket enthält eine Datei mit nicht unterstützter Komprimierungsmethode (%d):
+8.2:FEHLER: Paket enthält eine Datei mit nicht unterstützter Komprimierungsmethode:
 
 #### Handling the local list of installed packages ####
 
-9.0:FEHLER: Konnte nicht auf das Verzeichnis %s zugreifen
+9.0:FEHLER: Konnte nicht auf das Verzeichnis zugreifen:
 9.1:FEHLER: Lokales Paket %s nicht gefunden
 
 #### unzip ####

@@ -14,7 +14,7 @@
 
 2.2:%DOSDIR% ikke sat! DOSDIR skal pege på SvarDOS hoved biblioteket.
 2.3:Eksempel: SET DOSDIR=C:\\SVARDOS
-2.14:Hukommelse opbrugt! (%s)
+2.14:Hukommelse opbrugt!
 
 #### Installing package ####
 
@@ -29,8 +29,7 @@
 #### Removing package ####
 
 4.0:Pakken %s er ikke installeret, og kan derfor ikke slettes.
-4.3:Hukommelse opbrugt! Kan ikke gemme biblioteket %s!
-4.4:sletter %s
+4.4:sletter
 4.5:Pakken %s er slettet.
 
 #### Searching package ####
@@ -44,15 +43,12 @@
 7.4:Advarsel: tomt udtryk i linje #%d
 7.8:Advarsel: Ukendt udtryk '%s' i linje #%d
 7.11:Advarsel: Ugyldigt 'DIR' direktiv fundet i linje #%d
-7.15:Fejl: tilpasset bib '%s' er ikke en gyldig og fuldstændig sti!
-7.16:Fejl: tilpasset bib '%s' er et reserveret navn!
 
 #### Unziping package ####
 
-8.1:ukendt zip signatur: 0x%08x
-8.2:Fejl: Pakkeindhold komprimeret med en ikke understøttet metode (%d):
+8.2:Fejl: Pakkeindhold komprimeret med en ikke understøttet metode:
 
 #### Handling the local list of installed packages ####
 
-9.0:Fejl: Kan ikke få adgang til %s biblioteket.
+9.0:Fejl: Kan ikke få adgang til biblioteket:
 9.1:Fejl: Lokal pakke %s ikke fundet.

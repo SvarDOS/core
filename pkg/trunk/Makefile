@@ -25,7 +25,7 @@ release: pkg.exe .symbolic
 	rmdir bin
 	rmdir doc
 
-pkg.exe: main.obj healthck.obj crc32.obj fileexst.obj helpers.obj inf.obj kprintf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj deflang.obj
+pkg.exe: main.obj healthck.obj crc32.obj fileexst.obj helpers.obj inf.obj libunzip.obj loadconf.obj lsm.obj pkginst.obj pkgrem.obj trim.obj showinst.obj unzip.obj deflang.obj
 	wcl $(LDFLAGS) $(LIBS) *.obj
 	upx --8086 -9 pkg.exe
 
@@ -63,9 +63,6 @@ helpers.obj: helpers.c
 
 inf.obj: inf.c
 	wcc $(CFLAGS) inf.c
-
-kprintf.obj: kprintf.c
-	wcc $(CFLAGS) kprintf.c
 
 libunzip.obj: libunzip.c
 	wcc $(CFLAGS) libunzip.c

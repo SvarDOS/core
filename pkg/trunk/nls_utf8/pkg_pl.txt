@@ -27,7 +27,7 @@
 
 2.2:%DOSDIR% nie ustawione! Ustaw by wskazywało na katalog instalacji SvarDOS.
 2.3:Przykład: SET DOSDIR=C:\\SVARDOS
-2.14:Brak pamięci! (%s)
+2.14:Brak pamięci!
 
 #### Installing package ####
 
@@ -44,8 +44,7 @@
 #### Removing package ####
 
 4.0:Pakiet %s nie jest zainstalowany, więc nie wykasowany.
-4.3:Brak pamięci! Nie zapamiętano katalogu %s!
-4.4:usuwanie %s
+4.4:usuwanie
 4.5:Pakiet %s został usunięty.
 
 #### Searching package ####
@@ -60,17 +59,15 @@
 7.5:Uwaga: nieprawidłowy bootdrive w linii #%d
 7.8:Uwaga: Nieznany token '%s' w linii #%d
 7.11:Uwaga: Nieprawidłowe polecenie 'DIR' w linii #%d
-7.15:BŁĄD: katalog specjalny '%s' nie jest prawidłową ścieżką!
-7.16:BŁĄD: katalog specjalny '%s' jest zarezerwowaną nazwą!
+7.15:BŁĄD: nieprawidłowy katalog specjalny:
 
 #### Unziping package ####
 
-8.1:nieznana sygnatura zip: 0x%08lx
-8.2:BŁĄD: Pakiet zawiera plik skompresowany nieznaną metodę (%d):
+8.2:BŁĄD: Pakiet zawiera plik skompresowany nieznaną metodę:
 
 #### Handling the local list of installed packages ####
 
-9.0:BŁĄD: Dostęp do katalogu %s nie powiódł się.
+9.0:BŁĄD: Dostęp do katalogu nie powiódł się:
 9.1:BŁĄD: Nie znaleziono lokalnego pakietu %s.
 
 #### unzip ####

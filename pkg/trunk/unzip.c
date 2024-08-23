@@ -11,14 +11,13 @@
 
 #include "fileexst.h"
 #include "helpers.h"
-#include "kprintf.h"
 #include "libunzip.h"
 #include "svarlang.lib\svarlang.h"
 
 #include "unzip.h"
 
 
-int unzip(const char *zipfile, unsigned char listonly) {
+int unzip(const char *zipfile, unsigned char listonly, unsigned char *buff15k) {
   struct ziplist *zlist, *znode;
   FILE *fd;
   int r = 0;
@@ -60,10 +59,10 @@ int unzip(const char *zipfile, unsigned char listonly) {
         continue;
       }
       /* uncompress */
-      zres = zip_unzip(fd, znode, znode->filename);
+      zres = zip_unzip(fd, znode, znode->filename, buff15k);
       if (zres != 0) {
-        kitten_printf(10, 4, "ERROR: unzip failure (%d)", zres);
-        outputnl("");
+        sprintf(buff15k, svarlang_str(10,4), zres);
+        outputnl(buff15k);
         continue;
       }
       OK:

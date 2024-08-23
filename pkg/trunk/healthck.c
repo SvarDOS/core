@@ -10,7 +10,6 @@
 
 #include "crc32.h"
 #include "helpers.h"
-#include "kprintf.h"
 #include "svarlang.lib\svarlang.h"
 
 #include "healthck.h"
@@ -42,8 +41,8 @@ int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, 
     sprintf(buff4k, "%s\\appinfo", dosdir);
     dp = opendir(buff4k);
     if (dp == NULL) {
-      kitten_printf(9, 0, buff4k); /* "ERROR: Could not access directory %s" */
-      outputnl("");
+      output(svarlang_str(9, 0)); /* "ERROR: Could not access directory:" */
+      outputnl(buff4k);
       return(-1);
     }
 
@@ -75,8 +74,8 @@ int healthcheck(unsigned char *buff4k, const char *pkgname, const char *dosdir, 
   sprintf(buff4k, "%s\\appinfo\\%s.lsm", dosdir, pkgname);
   flist = fopen(buff4k, "rb");
   if (flist == NULL) {
-    kitten_printf(4, 0, pkgname); /* "Package %s is not installed, so not removed." */
-    outputnl("");
+    sprintf(buff4k, svarlang_str(4,0), pkgname); /* "Package %s is not installed, so not removed." */
+    outputnl(buff4k);
     return(-1);
   }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of pkg (SvarDOS)
- * Copyright (C) 2012-2021 Mateusz Viste.
+ * Copyright (C) 2012-2024 Mateusz Viste.
  *
  * Simple library providing functions to unzip files from zip archives.
  */
@@ -14,8 +14,8 @@
 
 #include "crc32.h"
 #include "helpers.h"
-#include "kprintf.h"
 #include "inf.h"   /* INFLATE support */
+#include "svarlang.lib\svarlang.h"
 
 #include "libunzip.h"  /* include self for control */
 
@@ -89,8 +89,7 @@ struct ziplist *zip_listfiles(FILE *fd) {
       /* create new entry and link it into the list */
       newentry = calloc(sizeof(struct ziplist) + filenamelen, 1);
       if (newentry == NULL) {
-        kitten_printf(2, 14, "libunzip"); /* "Out of memory! (%s)" */
-        outputnl("");
+        outputnl(svarlang_str(2,14)); /* Out of memory! */
         zip_freelist(&reslist);
         break;
       }
@@ -150,8 +149,6 @@ struct ziplist *zip_listfiles(FILE *fd) {
       /* no need to read the header we just have to skip it */
       fseek(fd, 12, SEEK_CUR); /* the header is 3x4 bytes (CRC + compressed len + uncompressed len) */
     } else { /* unknown sig */
-      kitten_printf(8, 1, entrysig); /* "unknown zip sig: 0x%08lx" */
-      outputnl("");
       zip_freelist(&reslist);
       break;
     }
