@@ -43,14 +43,11 @@
 
 enum ACTIONTYPES {
   ACTION_INSTALL,
-  ACTION_UPDATE,
   ACTION_REMOVE,
   ACTION_LISTFILES,
   ACTION_LISTLOCAL,
   ACTION_HEALTHCHECK,
-  ACTION_HEALTHCHECKEXT,
   ACTION_UNZIP,
-  ACTION_LISTZIP,
   ACTION_CRC32,
   ACTION_HELP
 };
@@ -80,12 +77,15 @@ static int showhelp(void) {
 }
 
 
-static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
+static enum ACTIONTYPES parsearg(int argc, char * const *argv, unsigned char *flags) {
+  *flags = 0;
+
   /* look for valid actions */
   if ((argc == 3) && (strcasecmp(argv[1], "install") == 0)) {
     return(ACTION_INSTALL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "update") == 0)) {
-    return(ACTION_UPDATE);
+    *flags = PKGINST_UPDATE;
+    return(ACTION_INSTALL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "rm") == 0)) {
     return(ACTION_REMOVE);
   } else if ((argc == 3) && (strcasecmp(argv[1], "files") == 0)) {
@@ -95,11 +95,13 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv) {
   } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "check") == 0)) {
     return(ACTION_HEALTHCHECK);
   } else if ((argc >= 2) && (argc <= 3) && (strcasecmp(argv[1], "check+") == 0)) {
-    return(ACTION_HEALTHCHECKEXT);
+    *flags = 1; /* extended check */
+    return(ACTION_HEALTHCHECK);
   } else if ((argc == 3) && (strcasecmp(argv[1], "unzip") == 0)) {
     return(ACTION_UNZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "ziplist") == 0)) {
-    return(ACTION_LISTZIP);
+    *flags = 1; /* list only */
+    return(ACTION_UNZIP);
   } else if ((argc == 3) && (strcasecmp(argv[1], "crc32") == 0)) {
     return(ACTION_CRC32);
   } else {
@@ -168,22 +170,20 @@ int main(int argc, char **argv) {
   static unsigned char buff15k[15 * 1024];
   int res = 1;
   enum ACTIONTYPES action;
+  unsigned char actionflags;
   const char *dosdir;
   struct customdirs *dirlist;
   char bootdrive;
 
   svarlang_autoload_exepath(argv[0], getenv("LANG"));   /* NLS init */
 
-  action = parsearg(argc, argv);
+  action = parsearg(argc, argv, &actionflags);
   switch (action) {
     case ACTION_HELP:
       res = showhelp();
       goto GAMEOVER;
     case ACTION_UNZIP:
-      res = unzip(argv[2], 0, buff15k);
-      goto GAMEOVER;
-    case ACTION_LISTZIP:
-      res = unzip(argv[2], 1, buff15k);
+      res = unzip(argv[2], actionflags, buff15k);
       goto GAMEOVER;
     case ACTION_CRC32:
       res = crcfile(argv[2], buff15k);
@@ -202,9 +202,8 @@ int main(int argc, char **argv) {
   if (loadconf(dosdir, &dirlist, &bootdrive) != 0) goto GAMEOVER;
 
   switch (action) {
-    case ACTION_UPDATE:
     case ACTION_INSTALL:
-      res = pkginst(argv[2], (action == ACTION_UPDATE)?PKGINST_UPDATE:0, dosdir, dirlist, bootdrive, buff15k);
+      res = pkginst(argv[2], actionflags, dosdir, dirlist, bootdrive, buff15k);
       break;
     case ACTION_REMOVE:
       res = pkgrem(argv[2], dosdir);
@@ -216,8 +215,7 @@ int main(int argc, char **argv) {
       res = showinstalledpkgs((argc == 3)?argv[2]:NULL, dosdir);
       break;
     case ACTION_HEALTHCHECK:
-    case ACTION_HEALTHCHECKEXT:
-      res = healthcheck(buff15k, (argc == 3)?argv[2]:NULL, dosdir, (action == ACTION_HEALTHCHECKEXT)?1:0);
+      res = healthcheck(buff15k, (argc == 3)?argv[2]:NULL, dosdir, actionflags);
       break;
     default:
       res = showhelp();
