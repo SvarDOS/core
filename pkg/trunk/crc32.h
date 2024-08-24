@@ -14,10 +14,8 @@
 #ifndef CRC32_H_SENTINEL
 #define CRC32_H_SENTINEL
 
-/* instead of calling crc32_init() you can just assign this value */
+/* always initialize your crc32 with this value before any computation */
 #define CRC32_INITVAL (0xFFFFFFFFlu)
-
-unsigned long crc32_init(void);
 
 /* This computes a 32 bit CRC of the data in the buffer, and returns the
    CRC.  The polynomial used is 0xedb88320. */

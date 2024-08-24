@@ -189,7 +189,7 @@ int zip_unzip(FILE *zipfd, struct ziplist *curzipnode, const char *fulldestfilen
   }
   extract_res = -255;
 
-  cksum = crc32_init(); /* init the crc32 */
+  cksum = CRC32_INITVAL; /* init the crc32 */
 
   if (curzipnode->compmethod == 0) { /* if the file is stored, copy it over */
     long i, toread;
