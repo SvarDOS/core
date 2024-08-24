@@ -102,7 +102,7 @@ static struct flist_t *findfileinlist(struct flist_t *flist, const char *fname) 
  * installed) zip file.
  * the returned ziplist is guaranteed to have the APPINFO file as first node
  * the ziplist is also guaranteed not to contain any directory entries */
-struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, int flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char bootdrive) {
+struct ziplist *pkginstall_preparepackage(char *pkgname, const char *zipfile, unsigned char flags, FILE **zipfd, const char *dosdir, const struct customdirs *dirlist, char bootdrive) {
   char fname[256];
   struct ziplist *appinfoptr = NULL;
   char *shortfile;
@@ -310,7 +310,7 @@ static void display_warn_if_exists(const char *pkgname, const char *dosdir, char
 
 /* install a package that has been prepared already. returns 0 on success,
  * or a negative value on error, or a positive value on warning */
-int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive, unsigned char *buff15k) {
+int pkginstall_installpackage(const char *pkgname, const char *dosdir, const struct customdirs *dirlist, struct ziplist *ziplinkedlist, FILE *zipfd, char bootdrive, unsigned char *buff15k, unsigned char flags) {
   char buff[256];
   char fulldestfilename[256];
   char *shortfile;
@@ -395,7 +395,9 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   outputnl(buff15k);
 
   /* scan the LSM file for a "warn" message to display */
-  display_warn_if_exists(pkgname, dosdir, buff, sizeof(buff));
+  if ((flags & PKGINST_HIDEWARN) == 0) {
+    display_warn_if_exists(pkgname, dosdir, buff, sizeof(buff));
+  }
 
   return(filesextractedfailure);
 }

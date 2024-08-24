@@ -83,6 +83,11 @@ static enum ACTIONTYPES parsearg(int argc, char * const *argv, unsigned char *fl
   /* look for valid actions */
   if ((argc == 3) && (strcasecmp(argv[1], "install") == 0)) {
     return(ACTION_INSTALL);
+  } else if ((argc == 3) && (strcasecmp(argv[1], "inowarn") == 0)) {
+    /* hidden action used by the SvarDOS installer to avoid onscreen warnings
+     * during system installation */
+    *flags = PKGINST_HIDEWARN;
+    return(ACTION_INSTALL);
   } else if ((argc == 3) && (strcasecmp(argv[1], "update") == 0)) {
     *flags = PKGINST_UPDATE;
     return(ACTION_INSTALL);
@@ -127,11 +132,12 @@ static int pkginst(const char *file, int flags, const char *dosdir, const struct
     res = 0;
     if (flags & PKGINST_UPDATE) res = pkgrem(pkgname, dosdir);
 
-    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd, bootdrive, buff15k);
+    if (res == 0) res = pkginstall_installpackage(pkgname, dosdir, dirlist, zipfileidx, zipfilefd, bootdrive, buff15k, flags);
     zip_freelist(&zipfileidx);
+
+    fclose(zipfilefd);
   }
 
-  fclose(zipfilefd);
   return(res);
 }
 
