@@ -1126,7 +1126,7 @@ static void bootfilesgen(void) {
     "DEL ZLOCALES.DAT\r\n"
     "DEL \\COMMAND.COM\r\n"
     "DEL \\KERNEL.SYS\r\n" /* KERNEL.SYS will be installed from the package in a moment */
-    "FOR %%%%P IN (*.SVP) DO PKG INSTALL %%%%P\r\n" /* install packages */
+    "FOR %%%%P IN (*.SVP) DO PKG INOWARN %%%%P\r\n" /* install packages (with warnings muted) */
     "DEL *.SVP\r\n", bootdrv, bootdrv);
 
   /* restore COMSPEC and do some cleanup */
