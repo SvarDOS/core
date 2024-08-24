@@ -334,7 +334,12 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
   outputnl("");
   if (unzip_result != 0) {
     sprintf(buff, svarlang_str(10,4), unzip_result); /* "ERROR: unzip failure (%d)" */
-    outputnl(buff);
+    output(buff);
+    if (unzip_result == -4) {
+      output(" [");
+      output(svarlang_str(2,14)); /* "Out of memory" */
+      output("]");
+    }
     return(-1);
   }
   filesextractedsuccess++;
