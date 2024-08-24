@@ -45,16 +45,23 @@ int showinstalledpkgs(const char *filterstr, const char *dosdir) {
       if (fdnpkg_strcasestr(ep->d_name, filterstr) == NULL) continue; /* skip if not matching the non-NULL filter */
     }
 
+    output(ep->d_name);
+
     /* load the metadata from %DOSDIR\APPINFO\*.lsm */
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
     readlsm(buff, "version", ver, sizeof(ver));
-    readlsm(buff, "description", buff, 80 - 2 - strlen(ver) - strlen(ep->d_name));
 
-    output(ep->d_name);
     output(" ");
     output(ver);
-    output(" ");
-    outputnl(buff);
+
+    {
+      unsigned short l = strlen(ver) + strlen(ep->d_name);
+      readlsm(buff, "description", buff+1, 62);
+      buff[0] = ' ';
+      while (l++ < 16) output(" ");
+      outputnl(buff);
+    }
+
     matchfound = 1;
   }
   if (matchfound == 0) outputnl(svarlang_str(5, 0)); /* "No package matched the search." */
