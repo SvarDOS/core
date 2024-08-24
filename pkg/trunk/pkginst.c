@@ -368,12 +368,19 @@ int pkginstall_installpackage(const char *pkgname, const char *dosdir, const str
     output(buff);
     unzip_result = zip_unzip(zipfd, curzipnode, fulldestfilename, buff15k);
     outputnl("");
-    if (unzip_result != 0) {
-      sprintf(buff, svarlang_str(10,4), unzip_result); /* "ERROR: unzip failure (%d)" */
-      outputnl(buff);
-      filesextractedfailure += 1;
-    } else {
+    if (unzip_result == 0) {
       filesextractedsuccess += 1;
+    } else {
+      /* "ERROR: unzip failure (%d)" */
+      sprintf(buff, svarlang_str(10,4), unzip_result);
+      output(buff);
+      if (unzip_result == -4) {
+        output(" [");
+        output(svarlang_str(2,14)); /* "Out of memory" */
+        output("]");
+      }
+      outputnl("");
+      filesextractedfailure += 1;
     }
   }
   fclose(lsmfd);
