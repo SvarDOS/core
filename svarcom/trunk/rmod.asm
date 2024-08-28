@@ -196,7 +196,7 @@ mov [EXEC_LH], byte 0
 mov dx, COMSPECBOOT
 
 ; do I have a valid COMSPEC?
-or [COMSPECPTR], word 0
+test [COMSPECPTR], word 0xffff
 jz USEDEFAULTCOMSPEC
 ; set ES:DX to actual COMSPEC (in env segment)
 mov es, [PSP_ENVSEG]
@@ -208,6 +208,9 @@ mov ax, [PSP_ENVSEG]
 mov [EXEC_PARAM_REC], ax
 mov [EXEC_PARAM_REC+2], word CMDTAIL
 mov [EXEC_PARAM_REC+4], cs
+
+mov si, dx             ; preset si to command in case I will display it in the
+                       ; err message (DX might be destroyed by int 21h,AH=4Bh)
 
 ; execute command.com
 mov ax, 0x4B00         ; DOS 2+ - load & execute program
@@ -226,7 +229,7 @@ jnc skipsig
 mov cl, al
 
 ; display program name (in DS:DX), but first replace its nul terminator by a $
-mov si, dx
+;mov si, dx           ; done already before the exec attempt
 PARSENEXTBYTE:
 lodsb ; load byte at DS:SI into AL and inc SI (direction flag is clear already)
 test al, al  ; is zero yet?
@@ -456,7 +459,7 @@ ret
 ;          59H (get extended error information)
 ;
 ; =============================================================================
-HANDLER_24H:    ; +46Ch
+HANDLER_24H:    ; +46Dh
 
 ; save registers so I can restore them later. AX does not require saving.
 ; Microsoft documentation says:
