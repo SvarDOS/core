@@ -38,6 +38,8 @@ char far *env_lookup(unsigned short env_seg, const char *varname) {
   char far *env = MK_FP(env_seg, 0);
   int i;
   for (;;) {
+    /* end of environment block? */
+    if (*env == 0) return(NULL);
     /* is this it? */
     for (i = 0;; i++) {
       if ((varname[i] == '=') || (varname[i] == 0)) {
@@ -48,9 +50,8 @@ char far *env_lookup(unsigned short env_seg, const char *varname) {
     }
     /* move env to end of current string */
     while (*env != 0) env++;
-    /* if there's another trailing zero, then that is the end of environment */
+    /* move to next variable */
     env++;
-    if (*env == 0) return(NULL);
   }
 }
 
