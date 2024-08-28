@@ -825,10 +825,7 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
 
   /* fetch %DOSDIR% */
   pathlen = env_lookup_valcopy(fname, 128, env_seg, "DOSDIR");
-  if (pathlen == 0) {
-    nls_outputnl(29,5); /* "%DOSDIR% not defined" */
-    return(-1);
-  }
+  if (pathlen == 0) return(-1);
 
   /* prep filename: %DOSDIR%\LINKS\PKG.LNK */
   if (fname[pathlen - 1] == '\\') pathlen--;

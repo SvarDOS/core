@@ -239,6 +239,11 @@ static enum cmd_result cmd_ln(struct cmd_funcparam *p) {
     return(CMD_OK);
   }
 
+  if (env_lookup(p->env_seg, "DOSDIR") == NULL) {
+    nls_outputnl(29,5); /* "%DOSDIR% not defined" */
+    return(CMD_FAIL);
+  }
+
   /* detect what subfunction the user wants */
   if ((imatch(p->argv[0], "add")) && (p->argc == 3)) return(cmd_lnadd(p->BUFFER, p->argv[1], p->argv[2], p->env_seg));
   if ((imatch(p->argv[0], "del")) && (p->argc == 2)) return(cmd_lndel(p->BUFFER, p->argv[1], p->env_seg));
