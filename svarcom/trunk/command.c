@@ -47,7 +47,7 @@
  * with what I think it is.
  *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***
  *            (or at least whenever RMOD's struct is changed)            */
-#define BYTE_VERSION 6
+#define BYTE_VERSION 7
 
 
 struct config {
