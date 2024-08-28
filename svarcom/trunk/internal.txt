@@ -18,7 +18,7 @@ necessary contextual data is kept in a resident, RMOD-owned memory structure.
 
 SvarCOM can output information in many languages. To do so, it relies on a
 precompiled resource file named SVARCOM.LNG. When SvarCOM starts, it looks
-for this file in the %NLSPATH% directory and loads from it the part that
+for this file in the %DOSDIR% directory and loads from it the part that
 contains the %LANG% language. All this is done by nls_langreload().
 
 The SVARCOM.LNG file is compiled by TLUMACZ (from the SvarLANG.lib suite). It
