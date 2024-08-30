@@ -53,7 +53,11 @@
  * NOTE: Multiple /A are not supported - only the last one is significant.
  */
 
-#define WCOLWIDTH 15  /* width of a column in wide mode output */
+
+/* width of a column in wide mode output: 15 chars is the MINIMUM because
+ * directories are enclosed in [BRACKETS] and they may have an extension, too.
+ * Hence "[12345678.123]" is the longest we can get. Plus a delimiter space. */
+#define WCOLWIDTH 15
 
 
 /* a "tiny" DTA is a DTA that is stripped from bytes that are not needed for
