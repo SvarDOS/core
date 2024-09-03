@@ -4,6 +4,11 @@
 
 
 
+=== ver XXXX.X (XX.XX.XXXX) ==================================================
+
+ - COPY returns "insufficient disk space" on write error (was: "insuff. mem")
+
+
 === ver 2024.6 (28.08.2024) ==================================================
 
  - DIR: size of files larger than 100M is displayed correctly

@@ -128,7 +128,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     int 0x21       /* CF clear and AX=CX on success */
     jc FAIL
     cmp ax, cx     /* should be equal, otherwise failed */
-    mov ax, 0x08   /* preset to DOS error "Insufficient memory" */
+    mov ax, 0x39   /* preset to DOS error "Insufficient disk space" */
     jne FAIL
     jmp COPY
 
