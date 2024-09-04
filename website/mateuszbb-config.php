@@ -63,7 +63,7 @@ $EDIT_ALLOWED_MINUTES = 240;
 $TRIP_SALT = trim(file_get_contents($DATADIR . 'tripsalt.txt'));
 
 // the maximum number of posts an IP address is allowed to submit within 24h
-$MAXDAILYPOSTS = 10;
+$MAXDAILYPOSTS = 20;
 
 $SEARCH_API_URL = 'https://www.googleapis.com/customsearch/v1/siterestrict?key=AIzaSyCxLEZe7_LdeOBtPzs4LEbwXmr1bGERfDE&cx=8928515a857418bb5&q=';
 
