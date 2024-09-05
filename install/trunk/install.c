@@ -671,7 +671,7 @@ static struct dos_udsc far *get_dos_udsc(void)  {
 
 
 /* returns 0 if fsid is a valid (recognized) filesystem for SvarDOS install  */
-static int is_fstype_valid(char fsid) {
+static int is_fstype_valid(unsigned char fsid) {
   switch (fsid) {
     case 0x01: /* FAT-12 in first 32M of disk                                */
     case 0x04: /* FAT-16 partition that resides within first 32M of disk     */
