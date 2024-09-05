@@ -670,6 +670,22 @@ static struct dos_udsc far *get_dos_udsc(void)  {
 }
 
 
+/* returns 0 if fsid is a valid (recognized) filesystem for SvarDOS install  */
+static int is_fstype_valid(char fsid) {
+  switch (fsid) {
+    case 0x01: /* FAT-12 in first 32M of disk                                */
+    case 0x04: /* FAT-16 partition that resides within first 32M of disk     */
+    case 0x06: /* FAT-16B with 64K+ sectors, must be within first 8G of disk */
+    case 0x0B: /* FAT-32 with CHS addressing                                 */
+    case 0x0C: /* FAT-32 with LBA addressing                                 */
+    case 0x0E: /* FAT-16B with LBA addressing                                */
+      return(0);
+    default:
+      return(-1);
+  }
+}
+
+
 /* reads the MBR and matches its entries to DOS drives
  * fills the drives array with up to 16 drives (4 partitions * 4 disks)
  * see https://github.com/SvarDOS/bugz/issues/89 */
@@ -694,10 +710,8 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
       entry = buff + 0x01BE + (i * 16);
 
       /* ignore partition if fs is unknown (non-FAT) */
-      if ((entry[4] != 0x0E) && (entry[4] != 0x0C)  /* LBA FAT */
-       && (entry[4] != 0x01) && (entry[4] != 0x06) && (entry[4] != 0x08)) { /* CHS FAT */
-        continue;
-      }
+      if (is_fstype_valid(entry[4]) != 0) continue;
+
       bzero(&(drives[listlen]), sizeof(struct drivelist));
       drives[listlen].hd = drv & 3;
       drives[listlen].partid = i;
