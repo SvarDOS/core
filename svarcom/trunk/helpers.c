@@ -224,15 +224,28 @@ unsigned short findnext(struct DTA *dta) {
 }
 
 
+static unsigned char _dos_getkey_noecho(void);
+#pragma aux _dos_getkey_noecho = \
+"mov ax, 0x0c08" /* clear input buffer and execute getchar (INT 21h,AH=8) */  \
+"int 0x21"                                                                    \
+"test al, al"    /* if AL == 0 then this is an extended character */          \
+"jnz GOTCHAR"                                                                 \
+"mov ah, 0x08"   /* read again to flush extended char from input buffer */    \
+"int 0x21"                                                                    \
+"xor al, al"     /* all extended chars are ignored */                         \
+"GOTCHAR:"       /* received key is in AL now */                              \
+modify [ah]                                                                   \
+value [al]
+
+
 /* print s string and wait for a single key press from stdin. accepts only
  * key presses defined in the c ASCIIZ string. returns offset of pressed key
- * in string. keys in c MUST BE UPPERCASE! */
+ * in string. keys in c MUST BE UPPERCASE! ENTER chooses the FIRST choice */
 unsigned short askchoice(const char *s, const char *c) {
   unsigned short res;
   char cstr[2] = {0,0};
   char key = 0;
 
-  AGAIN:
   output(s);
   output(" ");
   output("(");
@@ -243,37 +256,22 @@ unsigned short askchoice(const char *s, const char *c) {
   }
   output(") ");
 
-  _asm {
-    push ax
-    push dx
-
-    mov ax, 0x0c01 /* clear input buffer and execute getchar (INT 21h,AH=1) */
-    int 0x21
-    /* if AL == 0 then this is an extended character */
-    test al, al
-    jnz GOTCHAR
-    mov ah, 0x08   /* read again to flush extended char from input buffer */
-    int 0x21
-    xor al, al     /* all extended chars are ignored */
-    GOTCHAR:       /* received key is in AL now */
-    mov [key], al  /* save key */
-
-    /* print a cr/lf */
-    mov ah, 0x02
-    mov dl, 0x0D
-    int 0x21
-    mov dl, 0x0A
-    int 0x21
-
-    pop dx
-    pop ax
-  }
+  AGAIN:
+  key = _dos_getkey_noecho();
+  if (key == '\r') key = c[0]; /* ENTER is synonym for the first key */
 
   /* ucase() result */
   if ((key >= 'a') && (key <= 'z')) key -= ('a' - 'A');
 
   /* is there a match? */
-  for (res = 0; c[res] != 0; res++) if (c[res] == key) return(res);
+  for (res = 0; c[res] != 0; res++) {
+    if (c[res] == key) {
+      cstr[0] = key;
+      output(cstr);
+      output("\r\n");
+      return(res);
+    }
+  }
 
   goto AGAIN;
 }

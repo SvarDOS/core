@@ -7,6 +7,7 @@
 === ver XXXX.X (XX.XX.XXXX) ==================================================
 
  - COPY returns "insufficient disk space" on write error (was: "insuff. mem")
+ - batch execution in step-by-step mode accepts the RETURN key as "Yes"
 
 
 === ver 2024.6 (28.08.2024) ==================================================
