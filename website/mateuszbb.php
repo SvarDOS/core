@@ -2,7 +2,7 @@
 //
 // mateuszbb - minimalist bulletin board forum. MIT license.
 //
-// VERSION 20240429
+// VERSION 20240906
 //
 // Copyright (C) 2021-2024 Mateusz Viste
 //
@@ -226,10 +226,21 @@ function mateuszbb_rss() {
   echo "<description>" . htmlspecialchars($RSS_TITLE, ENT_XML1) . "</description>\n";
 
   while ($row = $sqlres->fetchArray()) {
+    // TITLE
     $rawtitle = file_get_contents($DATADIR . 'threads/' . $row['thread'] . '/title.txt');
     if (empty($rawtitle)) continue;
     $title = htmlspecialchars($rawtitle, ENT_XML1, 'UTF-8');
+
+    // AUTHOR
     $author = htmlspecialchars($row['author'], ENT_XML1, 'UTF-8');
+
+    // CONTENT
+    $rawcontent = loadmsg($row['thread'], $row['msgid'])['msg'];
+    $rawcontent_shorter =  mb_substr($rawcontent, 0, 256);
+    if (strlen($rawcontent) > strlen($rawcontent_shorter)) $rawcontent_shorter .= " (...)";
+    $content = htmlspecialchars($rawcontent_shorter, ENT_XHTML, 'UTF-8');
+
+    // LINK
     if ($NICE_URLS) {
       $link = selfurl();
       if (substr($link, -1) !== '/') $link .= '/';
@@ -238,10 +249,12 @@ function mateuszbb_rss() {
       $link = selfurl('thread=' . $row['thread']);
     }
     $link .= '#' . $row['msgid'];
+
+    // RSS
     echo "<item>\n";
     echo "<title>{$author} @ '{$title}'</title>\n";
     echo "<link>" . htmlspecialchars($link, ENT_XML1) . "</link>\n";
-    echo "<description>{$author} @ '{$title}'</description>\n";
+    echo "<description>{$content}</description>\n";
     echo "<pubDate>" . date('r', $row['msgid']) . "</pubDate>\n";
     echo "<guid>" . htmlspecialchars($link, ENT_XML1) . "</guid>\n";
     echo "</item>\n";
