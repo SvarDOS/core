@@ -2,7 +2,7 @@
 //
 // mateuszbb - minimalist bulletin board forum. MIT license.
 //
-// VERSION 20240123
+// VERSION 20240429
 //
 // Copyright (C) 2021-2024 Mateusz Viste
 //
@@ -743,7 +743,7 @@ if ((empty($action)) && ($thread >= 0)) {
     $bodyprocessed = preg_replace('~^(\[img\])(.*)(\[/img\])~m', '$2', $bodyprocessed);
 
     // dodaj podgląd pod linki do obrazków, ale tylko jeśli link jest sam w linijce
-    $bodyprocessed = preg_replace('~^(http[s]?://[^<>[:space:]]+[[:alnum:]/]\.(jpg|png))($|[\r\n]{1,2})~m', "$1\n<img src=\"$1\">\n", $bodyprocessed);
+    $bodyprocessed = preg_replace('~^(http[s]?://[^<>[:space:]]+[[:alnum:]/]\.(jpg|jpeg|png))($|[\r\n]{1,2})~m', "$1\n<img src=\"$1\">\n", $bodyprocessed);
 
     // olinkuj linki
     $bodyprocessed = preg_replace("~([^\"]|^)(http[s]?://[^<>[:space:]]+[[:alnum:]/=])~", "$1<a href=\"$2\">$2</a>", $bodyprocessed);
