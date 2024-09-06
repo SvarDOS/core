@@ -521,7 +521,7 @@ DONE:
 
 function mateuszbb_tytulwatku($id) {
   global $DATADIR;
-  return file_get_contents($DATADIR . 'threads/' . $id . '/title.txt');
+  return(trim(file_get_contents($DATADIR . 'threads/' . $id . '/title.txt')));
 }
 
 
@@ -703,10 +703,10 @@ if ($archiveyear > 0) {
   foreach ($threads as $t) {
     if (!preg_match('/^[0-9][0-9]*$/', $t)) continue; // skip anything that is not a thread id
     if (intval(gmdate('Y', $t)) != $archiveyear) continue; // skip threads out of the targeted year
-    $title = file_get_contents($DATADIR . 'threads/' . $t . '/title.txt');
+    $title = mateuszbb_tytulwatku($t);
     $link = $t;
     if (! $NICE_URLS) $link = selfurl("thread={$t}");
-    echo '<span style="font-family: monospace;">[' . gmdate("Y-m-d", $t) . "]</span> <a href=\"{$link}\">{$title}</a><br>\n";
+    echo '<span style="font-family: monospace;">[' . gmdate("Y-m-d", $t) . "]</span> <a href=\"{$link}\">". htmlspecialchars($title) . "</a><br>\n";
   }
   goto DONE;
 }
