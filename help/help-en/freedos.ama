@@ -43,11 +43,4 @@ included in SvarDOS. The only exception is for the "core" system (ie. the
 operating system itself), which must be based exclusively on free/libre
 software. Read more about %lpkgrules.ama:SvarDOS package inclusion rules%t.
 
-%hFreeDOS included!
-
-It must be noted, that although the goals of SvarDOS and FreeDOS may be
-slightly different, SvarDOS wouldn't exist without FreeDOS. Indeed, SvarDOS
-uses the excellent FreeDOS kernel, as well as a few other utilities borrowed
-from the FreeDOS ecosystem.
-
 Read also: %lhistory.ama:SvarDOS origins

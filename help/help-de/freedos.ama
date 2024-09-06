@@ -45,11 +45,4 @@ SvarDOS aufgenommen werden. Die einzige Ausnahme ist das "Kernsystem" (d.h.
 das Betriebssystem selbst), das ausschließlich auf freier Software basiert.
 Lesen Sie mehr über %lpkgrules.ama:SvarDOS-Regeln für die Einbeziehung von Paketen%t.
 
-%hFreeDOS inbegriffen!
-
-Es muss angemerkt werden, dass obwohl sich die Ziele von SvarDOS und FreeDOS
-etwas unterscheiden, SvarDOS ohne FreeDOS nicht existieren würde. In der Tat
-verwendet SvarDOS den exzellenten FreeDOS-Kernel, sowie einige andere
-Programme aus dem FreeDOS-Ökosystem.
-
 Lesen Sie auch: %lhistory.ama:Ursprünge von SvarDOS
