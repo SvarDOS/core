@@ -1,0 +1,49 @@
+#
+# PKGNET TRANSLATION FILE
+#
+# LANG  : TR
+# AUTHOR: Berki Yenigün
+#
+
+###############################################################################
+# HELP SCREEN                                                                 #
+###############################################################################
+
+1.0:pkgnet, SvarDOS için paket indirmeye yarar.
+1.1:usage:  pkgnet search <terim>
+1.2:        pkgnet pull <paket>
+1.3:        pkgnet pull <paket>-<sürüm>
+1.4:        pkgnet pullsrc <paket>
+1.5:        pkgnet pullsrc <paket>-<sürüm>
+1.6:        pkgnet checkup
+1.7:eylemler:
+1.8:search   - uzaktaki sunucudan eşleşen paketlerin listesini ister
+1.9:pull     - paketi güncel dizine indirir
+1.10:pullsrc  - paketin kaynak kod arşivini indirir
+1.11:checkup  - sisteminiz için mevcut güncellemeleri listeler
+
+
+###############################################################################
+# OPERATIONS                                                                  #
+###############################################################################
+
+2.0:%ld KiB %s konumuna indirildi (BSUM: %04X)
+
+
+###############################################################################
+# ERROR MESSAGES                                                              #
+###############################################################################
+
+9.0:HATA: %DOSDIR% değişkeni ayarlanmamış
+9.1:HATA: %DOSDIR%\\APPINFO dizinine erişilemedi
+9.2:HATA: %s ile bağlantı kurulamadı
+9.3:HATA: uzaktaki sunucuya HTTP sorgusu gönderilemedi
+9.4:HATA: uzaktaki sunucuya POST verileri gönderilemedi
+9.5:HATA: TCP iletişim hatası #%d
+9.6:HATA: %s dosyası oluşturulamadı
+9.7:HATA: %ld bayt sonrası %s dosyasına veri yazılamadı
+9.8:HATA: veri beklerken zaman aşımı
+9.9:HATA: bellek yetersiz
+9.10:HATA: %s dosyası zaten mevcut
+9.11:HATA: ağ alt sisteminin başlatılması başarısız oldu
+9.12:HATA: DNS çözümlemesi başarısız oldu

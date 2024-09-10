@@ -1,0 +1,49 @@
+#
+# PKGNET TRANSLATION FILE
+#
+# LANG  : FR
+# AUTHOR: Berki Yenigün
+#
+
+###############################################################################
+# HELP SCREEN                                                                 #
+###############################################################################
+
+1.0:pkgnet sert à télécharger des paquets pour SvarDOS.
+1.1:utilisation :  pkgnet search <terme>
+1.2:               pkgnet pull <paquet>
+1.3:               pkgnet pull <paquet>-<version>
+1.4:               pkgnet pullsrc <paquet>
+1.5:               pkgnet pullsrc <paquet>-<version>
+1.6:               pkgnet checkup
+1.7:actions :
+1.8:search   - demande au dépôt distant la liste des paquets correspondants
+1.9:pull     - télécharge le paquet dans le répertoire actuel
+1.10:pullsrc  - télécharge l'archive de code source du paquet
+1.11:checkup  - liste les mises à jour disponibles pour votre système
+
+
+###############################################################################
+# OPERATIONS                                                                  #
+###############################################################################
+
+2.0:%ld KiB téléchargés dans %s (BSUM : %04X)
+
+
+###############################################################################
+# ERROR MESSAGES                                                              #
+###############################################################################
+
+9.0:ERREUR : la variable %DOSDIR% n'est pas réglée
+9.1:ERREUR : impossible d'accéder au répertoire %DOSDIR%\\APPINFO
+9.2:ERREUR : échec de la connexion à %s
+9.3:ERREUR : échec de l'envoi d'une requête HTTP au serveur distant
+9.4:ERREUR : échec de l'envoi de données POST au serveur distant
+9.5:ERREUR : erreur de communication TCP #%d
+9.6:ERREUR : échec de la création du fichier %s
+9.7:ERREUR : échec de l'écriture de données sur le fichier %s au bout de %ld octets
+9.8:ERREUR : dépassement du délai d'attente lors de l'attente pour les données
+9.9:ERREUR : mémoire insuffisante
+9.10:ERREUR : le fichier %s existe déjà
+9.11:ERREUR : échec de l'initialisation du sous-système réseau
+9.12:ERREUR : échec de la résolution DNS
