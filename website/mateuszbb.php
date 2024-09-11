@@ -2,7 +2,7 @@
 //
 // mateuszbb - minimalist bulletin board forum. MIT license.
 //
-// VERSION 20240906
+// VERSION 20240909
 //
 // Copyright (C) 2021-2024 Mateusz Viste
 //
@@ -72,6 +72,7 @@ $STR['en']['captcha'][2]  = 'check the MIDDLE box';
 $STR['en']['captcha'][3]  = 'check the LAST box';
 $STR['en']['captcha'][4]  = 'check the FIRST and LAST boxes';
 $STR['en']['captcha'][5]  = 'check the TWO LAST boxes';
+$STR['en']['msglimit'] = "At most {$MAXDAILYPOSTS} messages are allowed from any single IP address for a period of 24h. This limit has been reached for your IP address. Please try again later.";
 
 // DE translations by Robert Riebisch
 $STR['de']['opnewthread'] = 'Neues Thema eröffnen';
@@ -132,6 +133,7 @@ $STR['pl']['captcha'][2]  = 'zaznacz ŚRODKOWE pole';
 $STR['pl']['captcha'][3]  = 'zaznacz OSTATNIE pole';
 $STR['pl']['captcha'][4]  = 'zaznacz PIERWSZE i OSTATNIE pole';
 $STR['pl']['captcha'][5]  = 'zaznacz DWA OSTATNIE pola';
+$STR['pl']['msglimit'] = "Dopuszcza się maksymalnie {$MAXDAILYPOSTS} postów w ciągu 24h. Ten limit został już osiągnięty dla twojego adresu IP. Spróbuj ponownie za jakiś czas.";
 
 // pt-BR translations courtesty of Luzemário Dantas
 $STR['pt']['opnewthread'] = 'abrir novo tópico';
@@ -216,7 +218,7 @@ function mateuszbb_rss() {
     return false;
   }
 
-  header('content-type: application/rss+xml');
+  header('content-type: text/xml');
 
   echo '<?xml version="1.0" encoding="utf-8" ?>' . "\n";
   echo '<rss version="2.0">' . "\n";
@@ -236,9 +238,18 @@ function mateuszbb_rss() {
 
     // CONTENT
     $rawcontent = loadmsg($row['thread'], $row['msgid'])['msg'];
+    // remove all quoted lines
+    $rawcontent = preg_replace('/^>.*/m', '(...)', $rawcontent);
+    // trim out whitespaces
+    $rawcontent = trim($rawcontent);
+    // shorten the message to 256 chars
     $rawcontent_shorter =  mb_substr($rawcontent, 0, 256);
     if (strlen($rawcontent) > strlen($rawcontent_shorter)) $rawcontent_shorter .= " (...)";
+    // escape xml chars
     $content = htmlspecialchars($rawcontent_shorter, ENT_XHTML, 'UTF-8');
+    // remove all newlines (replace by a space)
+    $content = str_replace(array("\r\n", "\r"), "\n", $content);
+    $content = str_replace(array("\n\n\n\n", "\n\n\n", "\n\n"), ' ', $content);
 
     // LINK
     if ($NICE_URLS) {
@@ -414,7 +425,7 @@ if (($action === 'createthread') || ($action === 'newpost')) {
     $count24h = intval($db->querySingle("SELECT count(*) FROM ip_msg_counters24h WHERE ipaddr = '{$_SERVER['REMOTE_ADDR']}'"));
     $db->close();
     if ($count24h >= $MAXDAILYPOSTS) {
-      $ERRSTR = "BŁĄD: Z TWOJEGO ADRESU NAPISANO JUŻ {$count24h} WIADOMOŚCI W PRZECIĄGU OSTATNICH 24H. SPRÓBUJ PONOWNIE ZA JAKIŚ CZAS.";
+      $ERRSTR = $STR[$LANG]['msglimit'];
       $action = '';
     }
   }
@@ -533,7 +544,11 @@ function mateuszbb_getactivethreads($n, $maxinact = -1) {
   global $DATADIR;
   $result = array();
 
-  $db = new SQLite3($DATADIR . 'mateuszbb.sqlite3', SQLITE3_OPEN_READONLY);
+  try { /* some versions of sqlite throw an exception if db does not exist, while other versions simply return false */
+    $db = new SQLite3($DATADIR . 'mateuszbb.sqlite3', SQLITE3_OPEN_READONLY);
+  } catch (Exception $e) {
+    return(false);
+  }
   if (! $db) return(false);
 
   $minupdatedate = 0;
@@ -604,7 +619,13 @@ if (!empty($TZ)) date_default_timezone_set($TZ);
 if (!empty($ERRSTR)) {
   echo "<p class=\"minibb-errstr\">{$ERRSTR}</p>\n";
   $action = '';
-  echo '<p><a href="./">Wróć do głównej strony</a></p>' . "\n";
+  goto DONE;
+}
+
+// upewnij się że sqlite3 jest dostępny
+if (!extension_loaded('sqlite3')) {
+  echo "<p class=\"minibb-errstr\">SQLITE3 extension not found</p>\n";
+  $action = '';
   goto DONE;
 }
 
