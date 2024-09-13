@@ -1,4 +1,0 @@
-localcfg history file
-
-* localcfg v0.90 [02 June 2015]
- - first public release
