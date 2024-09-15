@@ -1,3 +1,6 @@
+20240915
+- fixed svarlang_strid() when id=0 and string does not exist (Bernd Boeckmann)
+
 20240227
 - replaced inline _asm by pragma aux (more compact code, open watcom only)
 
