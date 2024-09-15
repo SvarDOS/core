@@ -64,10 +64,10 @@ const char *svarlang_strid(unsigned short id) {
     if (id == v) return(svarlang_mem + svarlang_dict[x * 2 + 1]);
 
     if (id > v) {
-      if (left < 65535) left = x + 1;
+      if (x < 65535) left = x + 1;
       else goto not_found;
     } else {
-      if (right > 0) right = x - 1;
+      if (x > 0) right = x - 1;
       else goto not_found;
     }
   }
