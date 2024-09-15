@@ -64,12 +64,15 @@ const char *svarlang_strid(unsigned short id) {
     if (id == v) return(svarlang_mem + svarlang_dict[x * 2 + 1]);
 
     if (id > v) {
-      left = x + 1;
+      if (left < 65535) left = x + 1;
+      else goto not_found;
     } else {
-      right = x - 1;
+      if (right > 0) right = x - 1;
+      else goto not_found;
     }
   }
 
+not_found:
   return("");
 }
 
