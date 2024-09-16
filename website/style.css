@@ -88,6 +88,10 @@ div.download div p {
   font-size: 0.9em;
 }
 
+div.download div ul {
+  margin: 1em auto;
+}
+
 a:link, a:visited, a:active { /* unvisited, visited link, selected link */
   color: #00e; text-decoration: none;
 }
