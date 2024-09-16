@@ -33,7 +33,7 @@
 
     <h2>Downloads</h2>
 
-    <p>SvarDOS is available in a variety of installation images. Some may be available as multilingual and English-only. The EN-only variants are smaller because they miss all the translations, which makes them fit on a lower number of floppy disks. You can always upgrade an EN-only installation to multilingual support simply by upgrading its packages.</p>
+    <p>SvarDOS is available in a variety of installation images for different sizes of floppy disks. The CD image presented below contains only a virtual floppy to install the bare-bone SvarDOS system. If you'd like a CD image that contains lots of extra packages, you may want to look <a href="http://svardos.org/?p=repo">here</a>.</p>
 
     <div class="download">
     <div>
