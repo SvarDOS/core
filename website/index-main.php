@@ -23,20 +23,24 @@
 
     <p>Need to get in touch? Wish to submit some packages, translate SvarDOS to your language, or otherwise contribute? Or maybe you'd like some information about SvarDOS? Come visit the <a href="?p=forum">SvarDOS community forum</a>. You may also wish to take a look at the project's <a href="https://github.com/SvarDOS/bugz/issues">bug tracker</a>.</p>
 
-    <?php // the "default" build proposed on the main page is read from default_build.txt
-    $lastver = trim(file_get_contents('default_build.txt'));
-
-    echo '<h2>Downloads (build ' . $lastver . ')</h2>'
+    <?php
+      // the "default" build proposed on the main page is read from the
+      // default_build.txt file, while "bleeding edge" is the latest entry
+      // available in the download dir
+      $lastver = trim(file_get_contents('default_build.txt'));
+      $latestbuild = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
     ?>
+
+    <h2>Downloads</h2>
 
     <p>SvarDOS is available in a variety of installation images. Some may be available as multilingual and English-only. The EN-only variants are smaller because they miss all the translations, which makes them fit on a lower number of floppy disks. You can always upgrade an EN-only installation to multilingual support simply by upgrading its packages.</p>
 
     <div class="download">
     <div>
-      <h3>International edition</h3>
+      <h3>Stable build (<?php echo $lastver; ?>)</h3>
       <ul>
       <?php
-        $arr = array('cd' => 'CD-ROM ISO', 'floppy-2.88M' => '2.88M floppy disk', 'floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'usb' => 'bootable USB image');
+        $arr = array('cd' => 'CD-ROM ISO', 'floppy-1.44M' => '1.44M floppy disks', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'floppy-360K' => '360K floppy disks', 'usb' => 'bootable USB image');
 
         foreach ($arr as $l => $d) {
           echo "<li><a href=\"download/{$lastver}/svardos-{$lastver}-{$l}.zip\">{$d}</a></li>\n";
@@ -44,21 +48,7 @@
       ?>
       </ul>
     </div>
-    <div>
-      <h3>English only</h3>
-      <ul>
-      <?php
-        $arr = array('floppy-1.44M' => '1.44M floppy disk', 'floppy-1.2M' => '1.2M floppy disks', 'floppy-720K' => '720K floppy disks', 'floppy-360K' => '360K floppy disks');
-
-        foreach ($arr as $l => $d) {
-          echo "<li><a href=\"download/{$lastver}/svardos-{$lastver}-{$l}-EN_ONLY.zip\">{$d}</a></li>\n";
-        }
-      ?>
-      </ul>
-      <p>(no translations, less floppies)</p>
-    </div>
     <?php
-      $latestbuild = scandir('download/', SCANDIR_SORT_DESCENDING)[0];
       if ($latestbuild !== $lastver) {
         echo "    <div>\n";
         echo "      <h3>Bleeding edge</h3>\n";
