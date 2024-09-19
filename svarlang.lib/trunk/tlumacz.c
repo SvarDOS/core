@@ -458,7 +458,7 @@ int main(int argc, char **argv) {
   int ecode = 0;
   int i, output_format = C_OUTPUT;
   unsigned short biggest_langsz = 0;
-  struct svl_lang *lang, *reflang = NULL;
+  struct svl_lang *lang = NULL, *reflang = NULL;
 
   if (argc < 2) {
     puts("tlumacz ver " SVARLANGVER " - this tool is part of the SvarLANG project.");
@@ -495,7 +495,7 @@ int main(int argc, char **argv) {
     if (strlen(argv[i]) != 2) {
       fprintf(stderr, "INVALID LANG SPECIFIED: %s\r\n", argv[i]);
       ecode = 1;
-      break;
+      goto exit_main;
     }
     id[0] = argv[i][0];
     id[1] = argv[i][1];
@@ -503,14 +503,15 @@ int main(int argc, char **argv) {
 
     if ((lang = svl_lang_new(id, DICT_CAP, STRINGS_CAP)) == NULL) {
       fprintf(stderr, "OUT OF MEMORY\r\n");
-      return(1);
+      ecode = 1;
+      goto exit_main;
     }
 
     sz = svl_lang_from_cats_file(lang, reflang);
     if (sz == 0) {
       fprintf(stderr, "ERROR COMPUTING LANG '%s'\r\n", id);
       ecode = 1;
-      break;
+      goto exit_main;
     } else {
       printf("computed %s lang block of %u bytes\r\n", id, sz);
       if (sz > biggest_langsz) biggest_langsz = sz;
@@ -522,7 +523,7 @@ int main(int argc, char **argv) {
       if (!svl_write_header(lang->num_strings, fd)) {
         fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
         ecode = 1;
-        break;
+        goto exit_main;
       }
     }
 
@@ -531,7 +532,7 @@ int main(int argc, char **argv) {
     if (!svl_write_lang(lang, fd)) {
       fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
       ecode = 1;
-      break;
+      goto exit_main;
     }
 
     /* remember reference data for other languages */
@@ -543,11 +544,10 @@ int main(int argc, char **argv) {
     }
   }
 
-  if (ecode) return ecode;
-
   if (!reflang) {
     fprintf(stderr, "ERROR: NO LANGUAGE GIVEN\r\n");
-    return 1;
+    ecode = 1;
+    goto exit_main;
   }
 
   /* compute the deflang file containing a dump of the reference block */
@@ -563,8 +563,17 @@ int main(int argc, char **argv) {
     }
   }
 
-  svl_lang_free(reflang);
-  reflang = NULL;
+exit_main:
+  if (lang && lang != reflang) {
+    svl_lang_free(lang);
+  }
+  if (reflang) {
+    svl_lang_free(reflang);
+    reflang = NULL;
+    lang = NULL;    
+  }
+
+  fclose(fd);
 
   return(ecode);
 }
