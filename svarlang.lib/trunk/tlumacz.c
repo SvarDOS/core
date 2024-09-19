@@ -422,7 +422,7 @@ static int svl_write_asm_source(const struct svl_lang *l, const char *fn, unsign
   if (strings_bytes > 0) fprintf(fd, "db ");
 
   for (i = 0; i < strings_bytes; i++) {
-    if (!fprintf(fd, "%02xh", l->strings[i])) {
+    if (!fprintf(fd, "%u", l->strings[i])) {
       fclose(fd);
       return(0);
     }
@@ -441,7 +441,7 @@ static int svl_write_asm_source(const struct svl_lang *l, const char *fn, unsign
   fprintf(fd, "\r\n%s svarlang_dict\r\n", public);
   fprintf(fd, "svarlang_dict:\r\n");
   for (i = 0; i < l->num_strings; i++) {
-    if (!fprintf(fd, "dw %04xh,%04xh\r\n", l->dict[i].id, l->dict[i].offset)) {
+    if (!fprintf(fd, "dw %u,%u\r\n", l->dict[i].id, l->dict[i].offset)) {
       fclose(fd);
       return(0);
     }
