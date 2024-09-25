@@ -2,9 +2,6 @@
 
   TREE - Graphically displays the directory structure of a drive or path
 
-  Written to work with FreeDOS (and other DOS variants)
-  Win32(c) console and DOS with LFN support.
-
 ****************************************************************************/
 
 #define VERSION "1.04"
@@ -38,13 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 ****************************************************************************/
 
-/**
- * Define the appropriate target here or within your compiler
- */
-/* #define WIN32 */    /** Win32 console version **/
-/* #define DOS */      /** DOS version           **/
-/* #define UNIX */
-
 
 /* Include files */
 #include <stdlib.h>
@@ -57,44 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include "stack.h"
 
 
-/* Platform (OS) specific definitions */
-
-#ifdef WIN32       /* windows specific     */
-
-#ifndef _WIN32_WINNT         /* NT 4.0 or higher features */
-#define _WIN32_WINNT 0x0400
-#endif
-
-#include <windows.h>
-#include <winbase.h>
-
-/* converts from Ansi to OEM (IBM extended )    */
-#define charToDisplayChar(x) CharToOemA((x), (x))
-/* For wide character conversion, charToDisplayChar
-   must be a function that provides its own buffer
-   to CharToOemW and copies the results back into x
-   as CharToOemA is inplace safe, but CharToOemW is not.
-*/
-
-/* These are defined in w32fDOS.h for DOS and enable /
-   disable use of DOS extended int21h API for LFNs,
-   on Windows we use it to force using short name when
-   both a long and short name are available
-   (note, LFNs may still be shown when no SFN exists)
-*/
-#define LFN_ENABLE 1
-#define LFN_DISABLE 0
-int LFN_Enable_Flag = LFN_ENABLE;
-
-/* DOS compiler treats L"" as a char * */
-#define UDOT L"."
-#define UDOTDOT L".."
-
-
-/* Stream display is only supported for Win32, specifically Windows NT */
-#include "streams.c"
-
-#else                   /* DOS specific         */
 /* Win32 File compability stuff */
 #include "w32fDOS.h"
 #include "wincon.h"
@@ -106,20 +58,14 @@ int LFN_Enable_Flag = LFN_ENABLE;
 const WORD UDOT[]    = { 0x2E, 0x00 };        //   L"."
 const WORD UDOTDOT[] = { 0x2E, 0x2E, 0x00 };  //   L".."
 
-#endif
 
 
 /* Define getdrive so it returns current drive, 0=A,1=B,...           */
-#if defined _MSC_VER || defined __MSC /* MS Visual C/C++ 5 */
-#define getdrive() (_getdrive() - 1)
-#else /* #ifdef __BORLANDC__ || __TURBOC__ */
 #define getdrive() getdisk()
-#endif
 
 #include <conio.h>  /* for getch()   */
 
 
-/* End Platform (OS) specific sections */
 
 
 /* The default extended forms of the lines used. */
@@ -1178,17 +1124,11 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
       {
         if (entry.nFileSizeHigh)
         {
-#ifdef WIN32  /* convert to a 64bit value, then round to nearest KB */
-          __int64 fsize = entry.nFileSizeHigh * ((__int64)ULONG_MAX + 1i64);
-          fsize = (fsize + entry.nFileSizeLow + 512i64) / 1024i64;
-          pprintf("%8I64uKB ", fsize);
-#else
           pprintf("******** ");  /* error exceed max value we can display, > 4GB */
-#endif
         }
         else
         {
-          if (entry.nFileSizeLow < 1048576)  /* if less than a MB, display in bytes */
+          if (entry.nFileSizeLow < 1048576l)  /* if less than a MB, display in bytes */
             pprintf("%10lu ", entry.nFileSizeLow);
           else                               /* otherwise display in KB */
             pprintf("%8luKB ", entry.nFileSizeLow/1024UL);
@@ -1213,48 +1153,6 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
 
       /* print filename */
       pprintf("%s\n", entry.cFileName);
-
-#ifdef WIN32  /* streams are only available on NTFS systems with NT API */
-      if (dspStreams)
-      {
-        FILE_STREAM_INFORMATION *fsi;
-
-        /* build full path to this filename */
-        strcpy(buffer, path);
-        strcat(buffer, entry.cFileName);
-
-        /* try to get all streams associated with this file */
-        fsi = getFileStreamInfo(buffer);
-
-        while (fsi != NULL)
-        {
-          /* check and ignore default $DATA stream */
-#if 1
-          if ((fsi->StreamNameLength != DefaultStreamNameLengthBytes) ||
-              (memcmp(fsi->StreamName, DefaultStreamName, DefaultStreamNameLengthBytes)!=0))
-#endif
-          {
-            /* print lead padding and spacing so fall under name */
-            pprintf("%s", padding);
-            if (dspAttr) pprintf("           ");
-            if (dspSize) pprintf("           ");
-            pprintf("  ");  /* extra spacing so slightly indented from filename */
-
-            /* convert to UTF8 (really should convert to OEM or UTF8 as indicated) */
-            convertUTF16toUTF8(fsi->StreamName, buffer, MAXBUF);
-
-            /* and display it */
-            pprintf("%s\n", buffer);
-          }
-
-          /* either proceed to next entry or mark end */
-          if (fsi->NextEntryOffset)
-            fsi = (FILE_STREAM_INFORMATION *)(((byte *)fsi) + fsi->NextEntryOffset);
-          else
-            fsi = NULL;  /* end of available data */
-        }
-      }
-#endif /* WIN32 */
 
       filesShown++;
     }
@@ -1640,32 +1538,6 @@ void loadAllMessages(void)
 }
 
 
-/* Initialize function pointers for Win32 API functions not always available */
-void initFuncPtrs(void)
-{
-#ifdef WIN32
-  /* Attempt to get Unicode version of Win32 APIs
-   * Because they are in Kernel32, we assume it's always loaded
-   * and so don't need to use LoadLibrary/FreeLibrary to maintain a reference count.
-   */
-  HMODULE hKERNEL32 = GetModuleHandle("KERNEL32");
-  if (hKERNEL32 == NULL) printf("ERROR: unable to get KERNEL32 handle, %i\n", GetLastError());
-
-  pFindFirstFileExA = (fFindFirstFileExA)GetProcAddress(hKERNEL32, "FindFirstFileExA");
-  if (pFindFirstFileExA == NULL)  printf("WARNING: unable to get FindFirstFileExA, %i\n", GetLastError());
-  if (pFindFirstFileExA == NULL) pFindFirstFileExA = myFindFirstFileExA;
-
-  if (charSet == UNICODECHARS)
-  {
-    pFindFirstFileExW = (fFindFirstFileExW)GetProcAddress(hKERNEL32, "FindFirstFileExW");
-    if (pFindFirstFileExW == NULL)  printf("WARNING: unable to get FindFirstFileExW, %i\n", GetLastError());
-  }
-
-  /* also for stream support; it uses NTDLL.DLL, which we also assume always loaded if available */
-  initStreamSupport();
-#endif
-}
-
 int main(int argc, char *argv[])
 {
   char serial[SERIALLEN]; /* volume serial #  0000:0000 */
@@ -1679,9 +1551,6 @@ int main(int argc, char *argv[])
 
   /* Initialize screen size, may reset pause to NOPAUSE if redirected */
   getConsoleSize();
-
-  /* Initialize function pointers for Win32 API functions not always available */
-  initFuncPtrs();
 
   /* Unicode mode only, Output BOM for UTF-8 signature */
   if (charSet == UNICODECHARS)  pprintf("%s", UMARKER);
