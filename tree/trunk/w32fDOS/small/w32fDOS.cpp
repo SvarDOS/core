@@ -142,11 +142,10 @@ lfnerror:
 
   /* if pathname ends in \* convert to \*.* */
   strcpy(path, pathname);
-  int eos = strlen(path);
-  eos--;
-  if (path[eos] == '*')
-    if (path[eos-1] == '\\')
-      strcat(path, ".*");
+  {
+  int eos = strlen(path) - 1;
+  if ((path[eos] == '*') && (path[eos - 1] == '\\')) strcat(path, ".*");
+  }
 
   asm {
     MOV AH, 2Fh                    //; Get Current DTA

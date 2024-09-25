@@ -41,6 +41,8 @@ DWORD GetFileAttributes(const char *pathname)
 {
   union REGS r;
   struct SREGS s;
+  char buffer[260];
+  int slen;
 
   /* 1st try LFN - Extended get/set attributes (in case LFN used) */
   if (LFN_Enable_Flag)
@@ -67,8 +69,7 @@ DWORD GetFileAttributes(const char *pathname)
   }
 
   /* we must remove any slashes from end */
-  int slen = strlen(pathname) - 1;  /* Warning, assuming pathname is not ""   */
-  char buffer[260];
+  slen = strlen(pathname) - 1;  /* Warning, assuming pathname is not ""   */
   strcpy(buffer, pathname);
   if ((buffer[slen] == '\\') || (buffer[slen] == '/')) /* ends in a slash */
   {

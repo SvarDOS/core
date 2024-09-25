@@ -717,6 +717,7 @@ long hasSubdirectories(char *path, DIRDATA *ddata)
 SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
 {
   int parentLen, subdirLen;
+  SUBDIRINFO *temp;
 
   /* Get length of parent directory */
   if (parent == NULL)
@@ -729,7 +730,7 @@ SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
   if ((subdirLen < 1) || ( (*(subdir+subdirLen-1) != '\\') && (*(subdir+subdirLen-1) != '/') ) )
     subdirLen++;
 
-  SUBDIRINFO *temp = (SUBDIRINFO *)malloc(sizeof(SUBDIRINFO));
+  temp = (SUBDIRINFO *)malloc(sizeof(SUBDIRINFO));
   if (temp == NULL)
   {
     showOutOfMemory(subdir);
@@ -997,19 +998,19 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
  * are found, at which point it closes the FindFile search handle and
  * return INVALID_HANDLE_VALUE.  If successful, returns FindFile handle.
  */
-HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH &entry, char *subdir, char *dsubdir)
+HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH *entry, char *subdir, char *dsubdir)
 {
   /* cycle through directory until 1st non . or .. directory is found. */
   do
   {
     /* skip files & hidden or system directories */
-    if ((((entry.ad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
-         ((entry.ad.dwFileAttributes &
+    if ((((entry->ad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
+         ((entry->ad.dwFileAttributes &
           (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) != 0  && !dspAll) ) ||
-        ((strcmp(entry.ad.cFileName, ".") == 0) ||
-         (strcmp(entry.ad.cFileName, "..") == 0)) )
+        ((strcmp(entry->ad.cFileName, ".") == 0) ||
+         (strcmp(entry->ad.cFileName, "..") == 0)) )
     {
-      if (FindNextFile(findnexthnd, &entry.ad) == 0)
+      if (FindNextFile(findnexthnd, &(entry->ad)) == 0)
       {
         FindClose(findnexthnd);      // prevent resource leaks
         return INVALID_HANDLE_VALUE; // no subdirs found
@@ -1018,13 +1019,13 @@ HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH &entry, char *s
     else
     {
       /* set display name */
-      strcpy(dsubdir, entry.ad.cFileName);
+      strcpy(dsubdir, entry->ad.cFileName);
 
       /* set canical name to use for further FindFile calls */
       /* use short file name if exists as lfn may contain unicode values converted
        * to default character (eg. ?) and so not a valid path.
        */
-      strcpy(subdir, entry.ad.cFileName);
+      strcpy(subdir, entry->ad.cFileName);
       strcat(subdir, "\\");
     }
   } while (!*subdir); // while (subdir is still blank)
@@ -1065,7 +1066,7 @@ HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
   /* clear result path */
   strcpy(subdir, "");
 
-  return cycleFindResults(dir, findSubdir_entry, subdir, dsubdir);
+  return cycleFindResults(dir, &findSubdir_entry, subdir, dsubdir);
 }
 
 /**
@@ -1083,7 +1084,7 @@ int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir)
 
   if (FindNextFile(findnexthnd, &findSubdir_entry.ad) == 0) return 1; // no subdirs found
 
-  if (cycleFindResults(findnexthnd, findSubdir_entry, subdir, dsubdir) == INVALID_HANDLE_VALUE)
+  if (cycleFindResults(findnexthnd, &findSubdir_entry, subdir, dsubdir) == INVALID_HANDLE_VALUE)
     return 1;
   else
     return 0;
