@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  Win32 File compatibility for DOS. 
+  Win32 File compatibility for DOS.
   [This version does support LFNs, if available.]
 
   Written by: Kenneth J. Davis
@@ -52,7 +52,7 @@ DEALINGS IN THE SOFTWARE.
 
 /* These two are used by FindFirstFileEx, NT specific */
 typedef enum FINDEX_INFO_LEVELS { FindExInfoStandard, FindExInfoMaxInfoLevel } FINDEX_INFO_LEVELS;
-typedef enum FINDEX_SEARCH_OPS 
+typedef enum FINDEX_SEARCH_OPS
 {
   FindExSearchNameMatch,
   FindExSearchLimitToDirectories,
@@ -66,7 +66,7 @@ typedef unsigned short WORD;
 typedef unsigned long DWORD;
 
 typedef struct FILETIME   /* should correspond to a quad word */
-{ 
+{
   WORD ldw[2];  /* LowDoubleWord  */
   DWORD hdw;    /* HighDoubleWord */
 } FILETIME;
@@ -117,8 +117,8 @@ typedef struct FFDTA  /* same format as a ffblk struct */
 
 typedef union FHND  /* Stores either a handle (LFN) or FFDTA (oldstyle) */
 {
-  WORD handle;       
-  FFDTA *ffdtaptr;   
+  WORD handle;
+  FFDTA *ffdtaptr;
 } FHND;
 
 typedef struct FindFileStruct
@@ -135,9 +135,6 @@ HANDLE STDCALL FindFirstFileA(const char *pathname, WIN32_FIND_DATAA *findData);
 int STDCALL FindNextFileA(HANDLE hnd, WIN32_FIND_DATAA *findData);
 void STDCALL FindClose(HANDLE hnd);
 
-HANDLE STDCALL FindFirstFileW(const WORD *pathname, WIN32_FIND_DATAW *findData);
-BOOL STDCALL FindNextFileW(HANDLE hnd, WIN32_FIND_DATAW *findData);
-
 #define FindFirstFile FindFirstFileA
 #define FindNextFile FindNextFileA
 
@@ -150,7 +147,7 @@ int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
   char *lpFileSystemNameBuffer, DWORD nFileSystemNameSize);
 
 
-/* If this variable is nonzero then will 1st attempt LFN findfirst 
+/* If this variable is nonzero then will 1st attempt LFN findfirst
  * (findfirst calls sets flag, so findnext/findclose know proper method to continue)
  * else if 0 then only attempt old 0x4E findfirst.
  * This is mostly a debugging tool, may be useful during runtime.
@@ -195,7 +192,7 @@ HANDLE GetStdHandle(DWORD nStdHnd);
 /* Returns file type.
  * Input, an opened file handle.
  * Output, one of predefined values above indicating if
- *         handle refers to file (FILE_TYPE_DISK), a 
+ *         handle refers to file (FILE_TYPE_DISK), a
  *         device such as CON (FILE_TYPE_CHAR), a
  *         pipe (FILE_TYPE_PIPE), or unknown.
  * On errors or unspecified input, FILE_TYPE_UNKNOWN
@@ -203,41 +200,5 @@ HANDLE GetStdHandle(DWORD nStdHnd);
  * via a temp file, so FILE_TYPE_PIPE is never returned.
  */
 DWORD GetFileType(HANDLE hFile);
-
-
-/* should be moved to winnls.h */
-#define CP_ACP        0      // default ANSI code page
-#define CP_OEMCP      1      // default OEM (DOS e.g. cp437) code page
-#define CP_MACCP      2      // default MAC code page
-#define CP_THREAD_ACP 3      // ANSI code page for current thread
-#define CP_SYMBOL     42     //
-#define CP_UTF7       65000  // Unicode using UTF-7 format
-#define CP_UTF8       65001  // Unicode using UTF-8 format
-
-/* Convert src from given codepage to UTF-16, 
- * returns nonzero on success, 0 on any error
- * cp is the codepage of source string, should be either CP_ACP (ansi)
- * or CP_OEMCP (DOS, e.g. cp437).
- * TODO: implement proper for DOS, 
- *       presently will only work correctly for 7bit ASCII strings
- */
-int MultiByteToWideChar(unsigned int cp, DWORD dwFlags, const char *src, int srcLen, WORD *dst, int dstSize);
-
-/* Convert src from UTF-16 to given codepage,
- * returns nonzero on success, 0 on any error
- * cp is the codepage of source string, should be either CP_ACP (ansi)
- * or CP_OEMCP (DOS, e.g. cp437).
- * TODO: implement proper for DOS, 
- *       presently will only work correctly for values mapping to 7bit ASCII strings
- */
-int WideCharToMultiByte(unsigned int cp, DWORD dwFlags, const WORD *src, int srcLen, char *dst, int dstSize, char *defaultChar, BOOL *flgUsedDefCh);
-
-
-/* Normally in standard C libraries <string.h> or <wchar.h> */
-/* compares UTF-16 strings, 
- * no character specific processing is done, returns difference
- * of first WORDs that differ or 0 if same up until first (WORD)0.
- */
-WORD wcscmp(const WORD *s1, const WORD *s2);
 
 #endif

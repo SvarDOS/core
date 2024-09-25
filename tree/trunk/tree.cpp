@@ -609,8 +609,6 @@ typedef union WIN32_FIND_DATA_BOTH
 #endif
 
 typedef HANDLE ( STDCALL * fFindFirstFileExA)(const char *, FINDEX_INFO_LEVELS, void *, FINDEX_SEARCH_OPS, void *, DWORD);
-typedef HANDLE ( STDCALL * fFindFirstFileExW)(const WORD *, FINDEX_INFO_LEVELS, void *, FINDEX_SEARCH_OPS, void *, DWORD);
-typedef BOOL ( STDCALL * fFindNextFileW)(HANDLE, WIN32_FIND_DATAW *);
 
 /* FindFirstFileExA is only available on NT systems, so on Win9x & DOS use plain FindFirstFile */
 HANDLE STDCALL myFindFirstFileExA(const char *fname, FINDEX_INFO_LEVELS, void * ffd, FINDEX_SEARCH_OPS, void *, DWORD)
@@ -619,7 +617,6 @@ HANDLE STDCALL myFindFirstFileExA(const char *fname, FINDEX_INFO_LEVELS, void * 
 }
 
 fFindFirstFileExA pFindFirstFileExA = &myFindFirstFileExA;
-fFindFirstFileExW pFindFirstFileExW = NULL;  // &FindFirstFileExW
 
 /**
  * Stores directory information obtained from FindFirst/Next that
@@ -1067,7 +1064,6 @@ static WIN32_FIND_DATA_BOTH findSubdir_entry; /* current directory entry info   
 HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
 {
   static char buffer[MAXBUF];
-  static WORD ubuf[MAXBUF];
   HANDLE dir;         /* Current directory entry working with      */
 
   /* get handle for files in current directory (using wildcard spec) */
