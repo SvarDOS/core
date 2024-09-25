@@ -239,7 +239,7 @@ int pprintf(const char *msg, ...)
   {
     char * l = buffer;
     /* cycle through counting newlines and lines > cols */
-    for (register char *t = strchr(l, '\n'); t != NULL; t = strchr(l, '\n'))
+    for (char *t = strchr(l, '\n'); t != NULL; t = strchr(l, '\n'))
     {
       t++;             /* point to character after newline */
       char c = *t;     /* store current value */
@@ -365,8 +365,8 @@ void showBufferOverrun(WORD maxSize)
  */
 void splitpath(char *fullpath, char *drive, char *path)
 {
-  register char *src = fullpath;
-  register char oldchar;
+  char *src = fullpath;
+  char oldchar;
 
   /* If either network share or path only starting at root directory */
   if ( (*src == '\\') || (*src == '/') )
@@ -467,7 +467,7 @@ void getProperPath(char *fullpath)
 /* Parses the command line and sets global variables. */
 void parseArguments(int argc, char *argv[])
 {
-  register int i;     /* temp loop variable */
+  int i;     /* temp loop variable */
 
   /* if no drive specified on command line, use current */
   sprintf(path, "%c:.", 'A'+ getdrive());
@@ -548,8 +548,8 @@ void parseArguments(int argc, char *argv[])
         showBufferOverrun(MAXBUF);
 
       /* copy path over, making all caps to look prettier, can be strcpy */
-      register char *dptr = path;
-      for (register char *cptr = argv[i]; *cptr != '\0'; cptr++, dptr++)
+      char *dptr = path;
+      for (char *cptr = argv[i]; *cptr != '\0'; cptr++, dptr++)
         *dptr = toupper(*cptr);
       *dptr = '\0';
 
@@ -727,7 +727,7 @@ long hasSubdirectories(char *path, DIRDATA *ddata = NULL)
  */
 SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
 {
-  register int parentLen, subdirLen;
+  int parentLen, subdirLen;
 
   /* Get length of parent directory */
   if (parent == NULL)
@@ -810,7 +810,7 @@ char * addPadding(char *padding, int moreSubdirsFollow)
  */
 char * removePadding(char *padding)
 {
-  register size_t len = strlen(padding);
+  size_t len = strlen(padding);
 
   if (len < 4) return padding;
   *(padding + len - 4) = '\0';
@@ -826,7 +826,7 @@ char * removePadding(char *padding)
 char *fixPathForDisplay(char *path)
 {
   static char buffer[MAXBUF];
-  register int pathlen;
+  int pathlen;
 
   strcpy(buffer, path);
   pathlen = strlen(buffer);
@@ -1122,7 +1122,7 @@ long traverseTree(char *initialpath)
   char padding[MAXPADLEN] = "";
   char subdir[MAXBUF];
   char dsubdir[MAXBUF];
-  register SUBDIRINFO *sdi;
+  SUBDIRINFO *sdi;
 
   STACK s;
   stackDefaults(&s);
@@ -1221,7 +1221,7 @@ long traverseTree(char *initialpath)
 char *processLine(char *line)
 {
   static char buffer[MAXLINE+MAXLINE];
-  register char *src = line, *dst = buffer;
+  char *src = line, *dst = buffer;
 
   if (line == NULL) return NULL;
 
