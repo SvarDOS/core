@@ -223,12 +223,13 @@ void getConsoleSize(void)
 #include <stdarg.h>  /* va_list, va_start, va_end */
 int pprintf(const char *msg, ...)
 {
-  static int lineCnt = rows;
+  static int lineCnt = -1;
   static int lineCol = 0;
-
   va_list argptr;
   int cnt;
   char buffer[MAXBUF];
+
+  if (lineCnt == -1) lineCnt = rows;
 
   va_start(argptr, msg);
   cnt = vsprintf(buffer, msg, argptr);
@@ -236,12 +237,14 @@ int pprintf(const char *msg, ...)
 
   if (pause == PAUSE)
   {
-    char * l = buffer;
+    char *l = buffer;
+    char *t;
     /* cycle through counting newlines and lines > cols */
-    for (char *t = strchr(l, '\n'); t != NULL; t = strchr(l, '\n'))
+    for (t = strchr(l, '\n'); t != NULL; t = strchr(l, '\n'))
     {
+      char c;
       t++;             /* point to character after newline */
-      char c = *t;     /* store current value */
+      c = *t;          /* store current value */
       *t = '\0';       /* mark as end of string */
 
       /* print all but last line of a string that wraps across rows */
@@ -540,13 +543,15 @@ void parseArguments(int argc, char *argv[])
     }
     else /* should be a drive/path */
     {
-      if (strlen(argv[i]) > MAXBUF)
-        showBufferOverrun(MAXBUF);
+      char *dptr = path;
+      char *cptr;
+
+      if (strlen(argv[i]) > MAXBUF) showBufferOverrun(MAXBUF);
 
       /* copy path over, making all caps to look prettier, can be strcpy */
-      char *dptr = path;
-      for (char *cptr = argv[i]; *cptr != '\0'; cptr++, dptr++)
+      for (cptr = argv[i]; *cptr != '\0'; cptr++, dptr++) {
         *dptr = toupper(*cptr);
+      }
       *dptr = '\0';
 
       /* Converts given path to full path */
@@ -606,13 +611,6 @@ typedef union WIN32_FIND_DATA_BOTH
 
 typedef HANDLE ( STDCALL * fFindFirstFileExA)(const char *, FINDEX_INFO_LEVELS, void *, FINDEX_SEARCH_OPS, void *, DWORD);
 
-/* FindFirstFileExA is only available on NT systems, so on Win9x & DOS use plain FindFirstFile */
-HANDLE STDCALL myFindFirstFileExA(const char *fname, FINDEX_INFO_LEVELS, void * ffd, FINDEX_SEARCH_OPS, void *, DWORD)
-{
-  return FindFirstFileA(fname, (WIN32_FIND_DATAA *)ffd);
-}
-
-fFindFirstFileExA pFindFirstFileExA = &myFindFirstFileExA;
 
 /**
  * Stores directory information obtained from FindFirst/Next that
@@ -649,7 +647,7 @@ typedef struct SUBDIRINFO
  * Stores additional directory data in ddata if non-NULL
  * and path is valid.
  */
-long hasSubdirectories(char *path, DIRDATA *ddata = NULL)
+long hasSubdirectories(char *path, DIRDATA *ddata)
 {
   static WIN32_FIND_DATA findData;
   HANDLE hnd;
@@ -664,7 +662,7 @@ long hasSubdirectories(char *path, DIRDATA *ddata = NULL)
    * Allows us to limit returned results to just directories
    * if supported by underlying filesystem.
    */
-  hnd = pFindFirstFileExA(buffer, FindExInfoStandard, &findData, FindExSearchLimitToDirectories, NULL, 0);
+  hnd = FindFirstFileA(buffer, &findData);
   if (hnd == INVALID_HANDLE_VALUE)
   {
     showInvalidPath(path); /* Display error message */
@@ -1066,8 +1064,7 @@ HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
-  dir = pFindFirstFileExA(buffer, FindExInfoStandard, &findSubdir_entry.ad, FindExSearchLimitToDirectories, NULL, 0);
-
+  dir = FindFirstFileA(buffer, &findSubdir_entry.ad);
   if (dir == INVALID_HANDLE_VALUE)
   {
     showInvalidPath(currentpath);
