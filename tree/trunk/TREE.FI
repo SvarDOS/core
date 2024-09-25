@@ -1,0 +1,75 @@
+# Language: Finnish (CP850)
+# Translated by Sampo Hippel„inen
+# Last update: 21 Dec 2020
+#
+# Messages used by pdTree v1 and FreeDOS tree 3.6
+# Each line is limited to 159 characters unless MAXLINE is changed,
+# but if possible should be limited to 79 per line, with a \n
+# added to indicate go to next line, max 2 lines.
+# The messages are split into sets,
+# where each set corresponds to a given function in pdTree.
+# Set 1, is for main and common strings.
+# Many of the strings are used directly by printf,
+# so when a %? appears, be sure any changes also include the %?
+# where ? is a variable identifier and format.
+# Note: only \\, \n, \r, \t are supported (and a single slash must use \\).
+#
+# common to many functions [Set 1]
+1.1:\n
+# main [Set 1] 
+1.2:Levyn polkujen luettelo\n
+# Must include %s for label 
+1.3:Levyn %s polkujen luettelo\n
+# Must include %s for serial #  
+1.4:Taltion sarjanumero on %s\n
+1.5:Ei alihakemistoja\n\n
+1.6: --- Paina n„pp„int„ jatkaaksesi ---\n
+# showUsage [Set 2] 
+2.1:Esitt„„ aseman tai polun hakemistorakenteen graafisesti.\n
+# Each %c below will be replaced with proper switch/option
+2.2:TREE [asema:][polku] [%c%c] [%c%c]\n
+2.3:   %c%c   N„ytt„„ jokaisen hakemiston tiedostojen nimet.\n
+2.4:   %c%c   K„ytt„„ ASCII:ta laajennettujen merkkien asemesta.\n
+# showInvalidUsage [Set 3] 
+# Must include the %s for option given.
+3.1:Virheellinen valitsin - %s\n
+# The %c will be replaced with the primary switch (default is /)
+3.2:Kirjoita TREE %c? saadaksesi lis„tietoja.\n
+#showTooManyOptions
+3.3:Liikaa parametreja - %s\n
+# showVersionInfo [Set 4] 
+# also uses treeDescription, message 2.1
+4.1:Kirjoitettu toimimaan FreeDOS:lla\n
+4.2:Win32(c)-konsolilla ja DOS:lla LFN-tuella.\n
+# Must include the %s for version string. 
+4.3:Versio %s\n
+4.4:Tekij„:       Kenneth J. Davis\n
+4.5:P„iv„ys:      2000, 2001, 2004\n
+4.6:Yhteystiedot: jeremyd@computer.org\n
+4.7:(c): Public domain [Yhdysvaltain m„„ritelm„ll„]\n
+#4.8 is only used when cats support is compiled in.
+4.8:K„ytt„„ Jim Hallin <jhall@freedos.org> Cats-kirjastoa\n  versio 3.8 (C) 1999,2000 Jim Hall\n
+#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
+#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
+4.20:(C) 1995, 2000 Dave Dunfield - vapaasti jaettava (2000 GPL-lisenssill„).\n
+# showInvalidDrive [Set 5] 
+5.1:Virheellinen asemam„„rittely\n
+# showInvalidPath [Set 6] 
+# Must include %s for the invalid path given. 
+6.1:Virheellinen polku - %s\n
+# misc error conditions [Set 7]
+# showBufferOverrun
+# %u required to show what the buffer's current size is. 
+7.1:Virhe: Tiedostopolku ei mahdu puskuriin = %u tavua\n
+# showOutOfMemory
+# %s required to display what directory we were processing when ran out of memory.
+7.2:Muisti loppui alihakemistossa: %s\n
+#
+# deprecated [Set 8]
+# 8.1 - 8.10 reserved for option selection characters in earlier releases.
+# parseArguments [Set 8] contains the Character[s] used for
+#   argument processing.  Only the 1st character on a line is used.
+# Primary character used to determine option follows, default is '-'
+8.1:/
+# Secondary character used to determine option follows, default is '/'
+8.2:-

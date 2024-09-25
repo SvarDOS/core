@@ -1,0 +1,56 @@
+files.lst    This file, file listing for pdTree v1.03
+pdTree.lsm   LSM file for pdTree v1
+readme.1st   Any extra info you should read first.
+readme.txt   General info about this version of tree.
+changes.txt  Changelog for pdTree v1.
+bugs.txt     Information about known bugs and reporting problems.
+tree.cpp     Main tree source. Compiles with just this file under win32.
+
+w32fdos\     Directory with large and small versions of w32fdos.cpp.
+w32fDOS.h    Header file for Win32 File compatibility under DOS.
+w32fDOS.cpp  Implementation [with LFN support] for w32fDOS.h (small & large versions)
+wincon.h     Header file for Win32 console compatibility under DOS.
+w32api.cpp   Win32 API compatibility functions (memory model neutral)
+
+tree.en      Message catalog containing same text that is hard coded.
+tree.es      Message catalog containing spanish text, special thanks to Aitor Santamaria Merino.
+tree.tr      Message catalog containing Turkish text, Emir SARI <bitigchi@me.com>
+tree.htm     Help file (based on and) for Joe Cosentino's <jayc17@mediaone.net> HTML Help.
+
+stack.h      Public domain stack functions written by Andrew Clarke (1995,96), header file
+stack.c      implementation (slightly modified)
+
+stream.c     Public domain NT streams functions based on streams.cpp by Felix Kasza (1998?)
+
+tree.def     A definition file created and deleted when compiling with Borland's BCC55
+             and specifying a STUB file.  Should be deleted if exists.
+
+compile.txt  Instructions for compiling tree.
+makedos.bat  Batch file to compile the DOS version of tree. Edit to use BCC instead of TCC.
+makwinvc.bat Batch file to compile the Win32 Console version of tree. VC 5.
+makwinbc.bat Batch file to compile the Win32 Console version of tree. Borland BCC55.
+make.bat     Batch file to build Win32 Console with DOS stub version of tree.
+yes.txt      A file with a Y and an Enter, used in the Batch files to avoid prompts.
+
+extra\       Source and executable for PD program to update DOS stub's exe header
+exehdr.h     Defines describing exe header used by fixstub.c
+fixstub.c    Source to fixstub.exe
+fixstub.exe  Win32/DOS executable to update a DOS stub's exe header to be PE compatible
+vidmode.c    Determine size of current video mode, returns # of rows on screen.
+
+tree.exe     Tree - Win32 Console version with DOS version as stub.
+             This version should run the w32 version under Windows (copyright Microsoft)
+             and the DOS version under DOS (FreeDOS, MSDOS, PCDOS, DRDOS, ...,
+             copyright respective owners)
+
+
+
+The original cats38s.zip file is available as a separate download, however for
+             convenience the License and required files are included.
+cats38s.zip  Optional Cats support. Jim Halls LGPL cats for DOS unmodified. (Available separately.)
+LGPL.txt     The license for cats (note pdTree is a public domain tree implementation).
+CATGETS.C    Unmodified cats v3.8 implementation.
+CATGETS.H    Unmodified header for catgets.
+DB.C         Unmodified used by CATGETS.C
+DB.H         Unmodified used by CATGETS.C and DB.C
+GET_LINE.C   Unmodified used by Cats.
