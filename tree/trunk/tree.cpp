@@ -39,17 +39,11 @@ DEALINGS IN THE SOFTWARE.
 ****************************************************************************/
 
 /**
- * Define the appropriate target here or within your compiler 
+ * Define the appropriate target here or within your compiler
  */
 /* #define WIN32 */    /** Win32 console version **/
 /* #define DOS */      /** DOS version           **/
 /* #define UNIX */
-
-/** 
- * Used to determine whether catgets (LGPL under Win32 & DOS) is used or not.
- * Undefine, ie comment out, to use hard coded strings only.
- */
-/* #define USE_CATGETS */
 
 
 /* Include files */
@@ -85,7 +79,7 @@ DEALINGS IN THE SOFTWARE.
 /* These are defined in w32fDOS.h for DOS and enable /
    disable use of DOS extended int21h API for LFNs,
    on Windows we use it to force using short name when
-   both a long and short name are available 
+   both a long and short name are available
    (note, LFNs may still be shown when no SFN exists)
 */
 #define LFN_ENABLE 1
@@ -112,7 +106,7 @@ int LFN_Enable_Flag = LFN_ENABLE;
 const WORD UDOT[]    = { 0x2E, 0x00 };        //   L"."
 const WORD UDOTDOT[] = { 0x2E, 0x2E, 0x00 };  //   L".."
 
-#endif                  
+#endif
 
 
 /* Define getdrive so it returns current drive, 0=A,1=B,...           */
@@ -124,11 +118,6 @@ const WORD UDOTDOT[] = { 0x2E, 0x2E, 0x00 };  //   L".."
 
 #include <conio.h>  /* for getch()   */
 
-
-/* include support for message files */
-#ifdef USE_CATGETS
-#include "catgets.h"
-#endif /* USE_CATGETS */
 
 /* End Platform (OS) specific sections */
 
@@ -144,7 +133,7 @@ const char *UMARKER = "\xEF\xBB\xBF";   /* 0xFEFF, Indicate UTF-8 Unicode */
 #define UTBAR_HORZBAR_STR "\xE2\x94\x9C\xE2\x94\x80\xE2\x94\x80\xE2\x94\x80"    /* +--- */
 #define UCBAR_HORZBAR_STR "\xE2\x94\x94\xE2\x94\x80\xE2\x94\x80\xE2\x94\x80"    /* \--- */
 /*
-const unichar UVERTBAR_STR[]      = { 0x2502, 0x20, 0x20, 0x20 };       
+const unichar UVERTBAR_STR[]      = { 0x2502, 0x20, 0x20, 0x20 };
 const unichar UTBAR_HORZBAR_STR[] = { 0x251C, 0x2500, 0x2500, 0x2500 };
 const unichar UCBAR_HORZBAR_STR[] = { 0x2514, 0x2500, 0x2500, 0x2500 };
 */
@@ -180,14 +169,10 @@ unsigned long totalSubDirCnt = 0;
 
 /* text window size, used to determine when to pause,
    Note: rows is total rows available - 2
-   1 is for pause message and then one to prevent auto scroll up 
+   1 is for pause message and then one to prevent auto scroll up
 */
 short cols=80, rows=23;   /* determined these on startup (when possible)  */
 
-
-#ifdef USE_CATGETS
-  char *catsFile = "tree";   /* filename of our message catalog           */
-#endif /* USE_CATGETS */
 
 
 /* Global constants */
@@ -228,9 +213,6 @@ char writtenBy[MAXLINE] =     "Written by: Kenneth J. Davis\n";
 char writtenDate[MAXLINE] =   "Date:       2000, 2001, 2004\n";
 char contact[MAXLINE] =       "Contact:    jeremyd@computer.org\n";
 char copyright[MAXLINE] =     "Copyright (c): Public Domain [United States Definition]\n";
-#ifdef USE_CATGETS
-char catsCopyright[MAXLINE] = "Uses Jim Hall's <jhall@freedos.org> Cats Library\n  version 3.8 Copyright (C) 1999,2000 Jim Hall\n";
-#endif
 
 /* showInvalidDrive [Set 5] */
 char invalidDrive[MAXLINE] = "Invalid drive specification\n";
@@ -268,7 +250,7 @@ const char OptSort[2]      = { 'O', 'o' };  /* sort Output */
 
 /* Procedures */
 
-/* Convert src from given codepage to UTF-16, 
+/* Convert src from given codepage to UTF-16,
  * returns nonzero on success, 0 on any error
  * cp is the codepage of source string, should be either CP_ACP (ansi)
  * or CP_OEM (DOS, e.g. cp437).
@@ -496,9 +478,6 @@ void showVersionInfo(void)
   printf(version, VERSION);
   printf("%s%s%s%s%s", writtenBy, writtenDate, contact, newLine, newLine);
   printf("%s%s", copyright, newLine);
-#ifdef USE_CATGETS
-  printf("%s%s", catsCopyright, newLine);
-#endif
   exit(1);
 }
 
@@ -763,10 +742,10 @@ void parseArguments(int argc, char *argv[])
 /**
  * Fills in the serial and volume variables with the serial #
  * and volume found using path.
- * If there is an error getting the volume & serial#, then an 
+ * If there is an error getting the volume & serial#, then an
  * error message is displayed and the program exits.
  * Volume and/or serial # returned may be blank if the path specified
- * does not contain them, or an error retrieving 
+ * does not contain them, or an error retrieving
  * (ie UNC paths under DOS), but path is valid.
  */
 void GetVolumeAndSerial(char *volume, char *serial, char *path)
@@ -899,7 +878,7 @@ long hasSubdirectories(char *path, DIRDATA *ddata = NULL)
     /* The root directory of a volume (including non root paths
        corresponding to mount points) may not have a current (.) and
        parent (..) entry.  So we can't get attributes for initial
-       path in above loop from the FindFile call as it may not show up 
+       path in above loop from the FindFile call as it may not show up
        (no . entry).  So instead we explicitly get them here.
     */
     if ((ddata->dwDirAttributes = GetFileAttributes(path)) == (DWORD)-1)
@@ -941,7 +920,7 @@ SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
     subdirLen++;
 
   SUBDIRINFO *temp = (SUBDIRINFO *)malloc(sizeof(SUBDIRINFO));
-  if (temp == NULL) 
+  if (temp == NULL)
   {
     showOutOfMemory(subdir);
     return NULL;
@@ -980,7 +959,7 @@ SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
 /**
  * Extends the padding with the necessary 4 characters.
  * Returns the pointer to the padding.
- * padding should be large enough to hold the additional 
+ * padding should be large enough to hold the additional
  * characters and '\0', moreSubdirsFollow specifies if
  * this is the last subdirectory in a given directory
  * or if more follow (hence if a | is needed).
@@ -1122,7 +1101,7 @@ void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DI
 }
 
 
-/** 
+/**
  * Displays summary information about directory.
  * Expects to be called after displayFiles (optionally called)
  */
@@ -1148,7 +1127,7 @@ void displaySummary(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddat
   removePadding(padding);
 }
 
-/** 
+/**
  * Displays files in directory specified by path.
  * Path must end in slash \ or /
  * Returns -1 on error,
@@ -1172,7 +1151,7 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
   addPadding(padding, hasMoreSubdirs);
 
   /* cycle through directory printing out files. */
-  do 
+  do
   {
     /* print padding followed by filename */
     if ( ((entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) &&
@@ -1332,7 +1311,7 @@ HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH &entry, char *s
         /* set display name */
         if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.ud.cAlternateFileName[0] != '\0') )
           convertUTF16toUTF8(entry.ud.cAlternateFileName, dsubdir, MAXBUF);
-        else 
+        else
           convertUTF16toUTF8(entry.ud.cFileName, dsubdir, MAXBUF);
 
         /* set canical name to use for further FindFile calls */
@@ -1376,7 +1355,7 @@ HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH &entry, char *s
           else
             strcpy(dsubdir, entry.ad.cAlternateFileName);
         }
-        else 
+        else
         {
           if (charSet == UNICODECHARS)
             charToUTF8(CP_ACP, entry.ad.cFileName, dsubdir, MAXBUF);
@@ -1453,7 +1432,7 @@ HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
 }
 
 /**
- * Given a search HANDLE, will find the next subdirectory, 
+ * Given a search HANDLE, will find the next subdirectory,
  * setting subdir to the found directory name.
  * dsubdir is the name to display (lfn or sfn as appropriate)
  * currentpath must end in \
@@ -1653,107 +1632,9 @@ void FixOptionText(void)
 }
 
 
-/* Loads all messages from the message catalog.
- * If USE_CATGETS is undefined or failure finding catalog then
- * hard coded strings are used
- */
+/* Loads all messages from the message catalog. */
 void loadAllMessages(void)
 {
-  #ifdef USE_CATGETS
-    nl_catd cat;              /* store id of our message catalog global       */
-    char buffer[MAXLINE];
-    char *bufPtr;
-
-    /* Open the message catalog, keep hard coded values on error. */
-    if ((cat = catopen (catsFile, MCLoadAll)) == -1) 
-    {
-      FixOptionText(); /* Changes %c in certain lines with default option characters. */
-      return;
-    }
-
-    /* common to many functions [Set 1] */
-    bufPtr = catgets (cat, 1, 1, newLine);
-    if (bufPtr != newLine) strcpy(newLine, processLine(bufPtr));
-
-    /* main [Set 1] */
-    bufPtr = catgets (cat, 1, 2, pathListingNoLabel);
-    if (bufPtr != pathListingNoLabel) strcpy(pathListingNoLabel, processLine(bufPtr));
-    bufPtr = catgets (cat, 1, 3, pathListingWithLabel);
-    if (bufPtr != pathListingWithLabel) strcpy(pathListingWithLabel, processLine(bufPtr));
-    bufPtr = catgets (cat, 1, 4, serialNumber);
-    if (bufPtr != serialNumber) strcpy(serialNumber, processLine(bufPtr));
-    bufPtr = catgets (cat, 1, 5, noSubDirs);
-    if (bufPtr != noSubDirs) strcpy(noSubDirs, processLine(bufPtr));
-    bufPtr = catgets (cat, 1, 6, pauseMsg);
-    if (bufPtr != pauseMsg) strcpy(pauseMsg, processLine(bufPtr));
-
-    /* showUsage [Set 2] */
-    bufPtr = catgets (cat, 2, 1, treeDescription);
-    if (bufPtr != treeDescription) strcpy(treeDescription, processLine(bufPtr));
-    bufPtr = catgets (cat, 2, 2, treeUsage);
-    if (bufPtr != treeUsage) strcpy(treeUsage, processLine(bufPtr));
-    bufPtr = catgets (cat, 2, 3, treeFOption);
-    if (bufPtr != treeFOption) strcpy(treeFOption, processLine(bufPtr));
-    bufPtr = catgets (cat, 2, 4, treeAOption);
-    if (bufPtr != treeAOption) strcpy(treeAOption, processLine(bufPtr));
-
-    /* showInvalidUsage [Set 3] */
-    bufPtr = catgets (cat, 3, 1, invalidOption);
-    if (bufPtr != invalidOption) strcpy(invalidOption, processLine(bufPtr));
-    bufPtr = catgets (cat, 3, 2, useTreeHelp);
-    if (bufPtr != useTreeHelp) strcpy(useTreeHelp, processLine(bufPtr));
-
-    /* showVersionInfo [Set 4] */
-    /* also uses treeDescription from Set 2 */
-    bufPtr = catgets (cat, 4, 1, treeGoal);
-    if (bufPtr != treeGoal) strcpy(treeGoal, processLine(bufPtr));
-    bufPtr = catgets (cat, 4, 2, treePlatforms);
-    if (bufPtr != treePlatforms) strcpy(treePlatforms, processLine(bufPtr));
-    bufPtr = catgets (cat, 4, 3, version);
-    if (bufPtr != version) strcpy(version, processLine(bufPtr));
-    bufPtr = catgets (cat, 4, 4, writtenBy);
-    if (bufPtr != writtenBy) strcpy(writtenBy, processLine(bufPtr));
-    bufPtr = catgets (cat, 4, 5, writtenDate);
-    if (bufPtr != writtenDate) strcpy(writtenDate, processLine(bufPtr));
-    bufPtr = catgets (cat, 4, 6, contact);
-    if (bufPtr != contact) strcpy(contact, processLine(bufPtr));
-    bufPtr = catgets (cat, 4, 7, copyright);
-    if (bufPtr != copyright) strcpy(copyright, processLine(bufPtr));
-//ifdef USE_CATGETS
-    bufPtr = catgets (cat, 4, 8, catsCopyright);
-    if (bufPtr != catsCopyright) strcpy(catsCopyright, processLine(bufPtr));
-//endif
-
-    /* showInvalidDrive [Set 5] */
-    bufPtr = catgets (cat, 5, 1, invalidDrive);
-    if (bufPtr != invalidDrive) strcpy(invalidDrive, processLine(bufPtr));
-
-    /* showInvalidPath [Set 6] */
-    bufPtr = catgets (cat, 6, 1, invalidPath);
-    if (bufPtr != invalidPath) strcpy(invalidPath, processLine(bufPtr));
-
-    /* Misc Error messages [Set 7] */
-    /* showBufferOverrun */
-    /* %u required to show what the buffer's current size is. */
-    bufPtr = catgets (cat, 7, 1, bufferToSmall);
-    if (bufPtr != bufferToSmall) strcpy(bufferToSmall, processLine(bufPtr));
-    /* showOutOfMemory */
-    /* %s required to display what directory we were processing when ran out of memory. */
-    bufPtr = catgets (cat, 7, 2, outOfMemory);
-    if (bufPtr != outOfMemory) strcpy(outOfMemory, processLine(bufPtr));
-
-    /* parseArguments - options [Set 8] */
-    /* Note all of these are single characters (only 1st character used) */
-    bufPtr = catgets (cat, 8, 1, NULL);
-    if (bufPtr != NULL) optionchar1 = bufPtr[0];
-    bufPtr = catgets (cat, 8, 2, NULL);
-    if (bufPtr != NULL) optionchar2 = bufPtr[0];
-    bufPtr = catgets (cat, 8, 3, NULL);
-
-    /* close the message catalog */
-    catclose (cat);
-  #endif
-
   /* Changes %c in certain lines with proper option characters. */
   FixOptionText();
 }
@@ -1763,7 +1644,7 @@ void loadAllMessages(void)
 void initFuncPtrs(void)
 {
 #ifdef WIN32
-  /* Attempt to get Unicode version of Win32 APIs 
+  /* Attempt to get Unicode version of Win32 APIs
    * Because they are in Kernel32, we assume it's always loaded
    * and so don't need to use LoadLibrary/FreeLibrary to maintain a reference count.
    */
