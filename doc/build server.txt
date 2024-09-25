@@ -102,23 +102,27 @@ with all its history. To achieve such mirror, one needs to create an empty
 svn repository:
 
 $ svnadmin create /srv/svardos-mirror
-$ svnsync init file:///srv/svardos-mirror svn://svn.svardos.org/svardos
 
-Then make this repository to accept modifications of revision properties, this
-is mandatory so it can import historical data:
+Then make this repository accept modifications of revision properties, you need
+to create a hook. This is mandatory so it can import historical data:
 
 $ echo '#!/bin/sh' > /srv/svardos-mirror/hooks/pre-revprop-change
-$ echo 'exi 0' >> /srv/svardos-mirror/hooks/pre-revprop-change
+$ echo 'exit 0' >> /srv/svardos-mirror/hooks/pre-revprop-change
+$ chmod +x /srv/svardos-mirror/hooks/pre-revprop-change
 
-Finally, populate your mirror using svnsync (this operation has to be performed
-periodically to keep your mirror up to date):
+Now initialize your empty repository so it knows it is a SvarDOS mirror:
 
-$ svn up /srv/svardos-mirror
+$ svnsync init file:///srv/svardos-mirror svn://svn.svardos.org/svardos
+
+Finally, populate your mirror using svnsync. This operation has to be performed
+periodically to keep your mirror up to date:
+
+$ svnsync sync file:///srv/svardos-mirror
 
 The same procedure can be used to migrate the SvarDOS build system from one
 server to another.
 
-NOTE: Such mirror server must not be used to send commits to. The only process
+NOTE: Such mirror server must not be used to send commits to! The only process
       that should write to it is svnsync.
 
 
