@@ -51,14 +51,6 @@ DEALINGS IN THE SOFTWARE.
 #include "w32fDOS.h"
 #include "wincon.h"
 
-/* currently no mapping required */
-#define charToDisplayChar(x)
-
-/* DOS compiler treats L"" as a char * */
-const WORD UDOT[]    = { 0x2E, 0x00 };        //   L"."
-const WORD UDOTDOT[] = { 0x2E, 0x2E, 0x00 };  //   L".."
-
-
 
 /* Define getdrive so it returns current drive, 0=A,1=B,...           */
 #define getdrive() getdisk()
@@ -66,30 +58,15 @@ const WORD UDOTDOT[] = { 0x2E, 0x2E, 0x00 };  //   L".."
 #include <conio.h>  /* for getch()   */
 
 
-
-
 /* The default extended forms of the lines used. */
 #define VERTBAR_STR  "\xB3   "                 /* |    */
 #define TBAR_HORZBAR_STR "\xC3\xC4\xC4\xC4"    /* +--- */
 #define CBAR_HORZBAR_STR "\xC0\xC4\xC4\xC4"    /* \--- */
 
-/* Unicode forms of the lines used. */
-const char *UMARKER = "\xEF\xBB\xBF";   /* 0xFEFF, Indicate UTF-8 Unicode */
-#define UVERTBAR_STR  "\xE2\x94\x82   "                                         /* |    */
-#define UTBAR_HORZBAR_STR "\xE2\x94\x9C\xE2\x94\x80\xE2\x94\x80\xE2\x94\x80"    /* +--- */
-#define UCBAR_HORZBAR_STR "\xE2\x94\x94\xE2\x94\x80\xE2\x94\x80\xE2\x94\x80"    /* \--- */
-/*
-const unichar UVERTBAR_STR[]      = { 0x2502, 0x20, 0x20, 0x20 };
-const unichar UTBAR_HORZBAR_STR[] = { 0x251C, 0x2500, 0x2500, 0x2500 };
-const unichar UCBAR_HORZBAR_STR[] = { 0x2514, 0x2500, 0x2500, 0x2500 };
-*/
-
-
 /* Global flags */
 #define SHOWFILESON    1  /* Display names of files in directories       */
 #define SHOWFILESOFF   0  /* Don't display names of files in directories */
 
-#define UNICODECHARS   2  /* Use Unicode (UTF8) characters               */
 #define ASCIICHARS     1  /* Use ASCII [7bit] characters                 */
 #define EXTENDEDCHARS  0  /* Use extended ASCII [8bit] characters        */
 
@@ -186,7 +163,6 @@ char optionchar1 = '/';  /* Primary character used to determine option follows  
 char optionchar2 = '-';  /* Secondary character used to determine option follows  */
 const char OptShowFiles[2] = { 'F', 'f' };  /* Show files */
 const char OptUseASCII[2]  = { 'A', 'a' };  /* Use ASCII only */
-const char OptUnicode[2]   = { 'U', 'u' };  /* Use Unicode (16bit) output */
 const char OptVersion[2]   = { 'V', 'v' };  /* Version information */
 const char OptSFNs[2]      = { 'S', 's' };  /* Shortnames only (disable LFN support) */
 const char OptPause[2]     = { 'P', 'p' };  /* Pause after each page (screenfull) */
@@ -195,105 +171,6 @@ const char OptSort[2]      = { 'O', 'o' };  /* sort Output */
 
 
 /* Procedures */
-
-/* Convert src from given codepage to UTF-16,
- * returns nonzero on success, 0 on any error
- * cp is the codepage of source string, should be either CP_ACP (ansi)
- * or CP_OEM (DOS, e.g. cp437).
- */
-#define convertCPtoUTF16(cp, src, dst, dstsize) \
-  MultiByteToWideChar(cp, 0/*MB_PRECOMPOSED|MB_USEGLYPHCHARS*/, src, -1, dst, dstsize)
-
-/* Convert from UTF-16 to UTF-8 */
-#if 0   // Can use on Win 98+, NT4+, or Win95 with MSLU
-        // as Win95 does not support CP_UTF8 conversion
-#define convertUTF16toUTF8(src, dst, dstsize) \
-        WideCharToMultiByte(CP_UTF8, 0, src, -1, dst, dstsize, NULL, NULL)
-
-#else
-/* Transforms a UTF-16 string to a UTF-8 one, does not support surrogate pairs,
- * see http://en.wikipedia.org/wiki/UTF-8 for conversion chart
- * returns 0 on error, nonzero if conversion completed.
- */
-int convertUTF16toUTF8(const WORD *src, char *dst, unsigned dstsize)
-{
-  if (!dstsize) return 0;
-  dstsize--;  // reserve room for terminating '\0'
-
-  const WORD *s = src;
-  unsigned char *d = (unsigned char *)dst;
-  for (register WORD ch = *s ; ch && dstsize; ch = *s)
-  {
-    // determine how many bytes this UTF-16 char is in UTF-8 format
-    // Note: for values >= 0x10000 (MAXWORD+1)
-    // a surrogate is needed and UTF-8 requires 4 bytes
-    register unsigned short cnt = (ch < 0x80)? 1 : (ch < 0x800)? 2 : 3;
-
-    // ensure enough room in dst buffer for it, break early if not
-    if (dstsize < cnt) break;
-    dstsize -= cnt;
-
-    switch(cnt) // write out each byte needed
-    {
-      case 1:
-      {
-        *d = (unsigned char)ch;  // 0xxx xxxx == (ch & 0x7F)
-        break;
-      }
-      case 2:
-      { // 110x xxxx 10xx xxxx
-        *d = (unsigned char)(0xC0 | ((ch >> 6) & 0x1F)); // top 5 bits
-        *(d+1) = (unsigned char)(0x80 | (ch & 0x3F));        // lower 6 bits
-        break;
-      }
-      case 3:
-      { // 1110 xxxx 10xx xxxx 10xx xxxx
-        *d = (unsigned char)(0xE0 | ((ch >> 12) & 0x0F)); // top 4 bits
-        *(d+1) = (unsigned char)(0x80 | ((ch >> 6)  & 0x3F)); // mid 6 bits
-        *(d+2) = (unsigned char)(0x80 | (ch & 0x3F));         // lower 6 bits
-        break;
-      }
-    }
-
-    // increment source and destination pointers
-    s++;
-    d+=cnt;
-  }
-  *d = '\0';  // force result string to be '\0' terminated
-
-  if (*s && dstsize) // not all values converted
-    return 0;
-  else
-    return 1;
-}
-#endif
-
-
-/*
- * Converts src string (assumed windows ANSI or OEM cp) to UTF8 string.
- * src and dst may be same, but dst may be truncated if exceeds maxlen
- * cp is the codepage of source string, should be either CP_ACP (ansi)
- * or CP_OEM (DOS, e.g. cp437).
- * returns zero if src or dst is NULL or error in conversion
- * otherwise returns nonzero for success
- * WARNING: mapping may be incorrect under DOS as it ignores cp.
- */
-BOOL charToUTF8(unsigned int cp, const char *src, char *dst, int maxlen)
-{
-  static char buffer[MAXBUF];
-  if (src == NULL || dst == NULL || maxlen < 1) return 0;
-
-  /* convert from ANSI/OEM cp to UTF-16 then to UTF-8 */
-  WORD ubuf[MAXBUF];
-
-  if (!convertCPtoUTF16(cp, src, ubuf, MAXBUF) ||
-      !convertUTF16toUTF8(ubuf, buffer, MAXBUF))
-    return 0;
-
-  memcpy(dst, buffer, maxlen);
-
-  return 1;
-}
 
 
 /* sets rows & cols to size of actual console window
@@ -661,8 +538,6 @@ void parseArguments(int argc, char *argv[])
           LFN_Enable_Flag = LFN_DISABLE;         /* force shortnames only */
         else if ((argv[i][1] == OptPause[0]) || (argv[i][1] == OptPause[1]))
           pause = PAUSE;     /* wait for keypress after each page (pause) */
-        else if ((argv[i][1] == OptUnicode[0]) || (argv[i][1] == OptUnicode[1]))
-          charSet = UNICODECHARS;   /* indicate output Unicode text */
         else /* Invalid or unknown option */
           showInvalidUsage(argv[i]);
       }
@@ -722,7 +597,7 @@ void GetVolumeAndSerial(char *volume, char *serial, char *path)
 }
 
 
-/* FindFile stuff to support optional NT & Unicode API variants */
+/* FindFile stuff to support optional NT API variant */
 typedef union WIN32_FIND_DATA_BOTH
 {
  WIN32_FIND_DATAW ud;
@@ -910,9 +785,6 @@ SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
  * this is the last subdirectory in a given directory
  * or if more follow (hence if a | is needed).
  * padding must not be NULL
- * Warning: if charSet == UNICODECHARS, then padding
- *          will be a fixed 6 bytes (instead of 4)
- *          as the leading | is encoded in 3 bytes.
  */
 char * addPadding(char *padding, int moreSubdirsFollow)
 {
@@ -921,8 +793,6 @@ char * addPadding(char *padding, int moreSubdirsFollow)
       /* 1st char is | or a vertical bar */
       if (charSet == EXTENDEDCHARS)
         strcat(padding, VERTBAR_STR);
-      else if (charSet == UNICODECHARS)
-        strcat(padding, UVERTBAR_STR);
       else
         strcat(padding, "|   ");
     }
@@ -933,9 +803,8 @@ char * addPadding(char *padding, int moreSubdirsFollow)
 }
 
 /**
- * Removes the last padding added (last 4 characters added,
- * or last 6 characters added if charSet == UNICODECHARS).
- * Does nothing if less than 4|6 characters in string.
+ * Removes the last padding added (last 4 characters added).
+ * Does nothing if less than 4 characters in string.
  * padding must not be NULL
  * Returns the pointer to padding.
  */
@@ -943,18 +812,8 @@ char * removePadding(char *padding)
 {
   register size_t len = strlen(padding);
 
-  if (charSet == UNICODECHARS && padding[len-4] != ' ')
-  {
-    if (len < 6) return padding;
-
-    *(padding + len - 6) = '\0';
-  }
-  else
-  {
-    if (len < 4) return padding;
-
-    *(padding + len - 4) = '\0';
-  }
+  if (len < 4) return padding;
+  *(padding + len - 4) = '\0';
 
   return padding;
 }
@@ -977,11 +836,6 @@ char *fixPathForDisplay(char *path)
     if ((buffer[pathlen] == '\\') || (buffer[pathlen] == '/'))
       buffer[pathlen] = '\0'; // strip off trailing slash on end
   }
-
-  if (charSet == UNICODECHARS)
-    charToUTF8((LFN_Enable_Flag == LFN_DISABLE)?CP_OEMCP:CP_ACP, buffer, buffer, MAXBUF);
-  else
-    charToDisplayChar(buffer);
 
   return buffer;
 }
@@ -1012,13 +866,6 @@ void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DI
         pprintf("%s", TBAR_HORZBAR_STR);
       else
         pprintf("%s", CBAR_HORZBAR_STR);
-    }
-    else if (charSet == UNICODECHARS)
-    {
-      if (moreSubdirsFollow)
-        pprintf("%s", UTBAR_HORZBAR_STR);
-      else
-        pprintf("%s", UCBAR_HORZBAR_STR);
     }
     else
     {
@@ -1138,17 +985,7 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
       /* process filename, convert to utf or OEM codepage, etc */
       if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.cAlternateFileName[0] != '\0') )
       {
-        if (charSet == UNICODECHARS)
-          charToUTF8(CP_OEMCP, entry.cAlternateFileName, entry.cFileName, _MAX_PATH);
-        else
-          strcpy(entry.cFileName, entry.cAlternateFileName);
-      }
-      else
-      {
-        if (charSet == UNICODECHARS)
-          charToUTF8(CP_ACP, entry.cFileName, entry.cFileName, _MAX_PATH);
-        else
-          charToDisplayChar(entry.cFileName);
+        strcpy(entry.cFileName, entry.cAlternateFileName);
       }
 
       /* print filename */
@@ -1186,97 +1023,45 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
  */
 HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH &entry, char *subdir, char *dsubdir)
 {
-  if ( (charSet == UNICODECHARS) && (pFindFirstFileExW != NULL) )
+  /* cycle through directory until 1st non . or .. directory is found. */
+  do
   {
-    /* cycle through directory until 1st non . or .. directory is found. */
-    do
+    /* skip files & hidden or system directories */
+    if ((((entry.ad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
+         ((entry.ad.dwFileAttributes &
+          (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) != 0  && !dspAll) ) ||
+        ((strcmp(entry.ad.cFileName, ".") == 0) ||
+         (strcmp(entry.ad.cFileName, "..") == 0)) )
     {
-      /* skip files & hidden or system directories */
-      if ((((entry.ud.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
-           ((entry.ud.dwFileAttributes &
-            (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) != 0  && !dspAll) ) ||
-          ((wcscmp(entry.ud.cFileName, UDOT    /* L"." */) == 0) ||
-           (wcscmp(entry.ud.cFileName, UDOTDOT /* L".." */) == 0)) )
+      if (FindNextFile(findnexthnd, &entry.ad) == 0)
       {
-        if (FindNextFileW(findnexthnd, &entry.ud) == 0)
-        {
-          FindClose(findnexthnd);      // prevent resource leaks
-          return INVALID_HANDLE_VALUE; // no subdirs found
-        }
+        FindClose(findnexthnd);      // prevent resource leaks
+        return INVALID_HANDLE_VALUE; // no subdirs found
+      }
+    }
+    else
+    {
+      /* set display name */
+      if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.ad.cAlternateFileName[0] != '\0') )
+      {
+        strcpy(dsubdir, entry.ad.cAlternateFileName);
       }
       else
       {
-        /* set display name */
-        if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.ud.cAlternateFileName[0] != '\0') )
-          convertUTF16toUTF8(entry.ud.cAlternateFileName, dsubdir, MAXBUF);
-        else
-          convertUTF16toUTF8(entry.ud.cFileName, dsubdir, MAXBUF);
+        strcpy(dsubdir, entry.ad.cFileName);
+      }
 
-        /* set canical name to use for further FindFile calls */
-        /* use short file name if exists as lfn may contain unicode values converted
-         * to default character (eg. ?) and so not a valid path.
-         * Note: if using unicode API and strings, this is not necessary.
-         */
-        if (entry.ud.cAlternateFileName[0] != '\0')
-          WideCharToMultiByte(CP_ACP, 0, entry.ud.cAlternateFileName, -1, subdir, MAXBUF, NULL, NULL);
-        else
-          WideCharToMultiByte(CP_ACP, 0, entry.ud.cFileName, -1, subdir, MAXBUF, NULL, NULL);
-        strcat(subdir, "\\");
-      }
-    } while (!*subdir); // while (subdir is still blank)
-  }
-  else
-  {
-    /* cycle through directory until 1st non . or .. directory is found. */
-    do
-    {
-      /* skip files & hidden or system directories */
-      if ((((entry.ad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
-           ((entry.ad.dwFileAttributes &
-            (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) != 0  && !dspAll) ) ||
-          ((strcmp(entry.ad.cFileName, ".") == 0) ||
-           (strcmp(entry.ad.cFileName, "..") == 0)) )
-      {
-        if (FindNextFile(findnexthnd, &entry.ad) == 0)
-        {
-          FindClose(findnexthnd);      // prevent resource leaks
-          return INVALID_HANDLE_VALUE; // no subdirs found
-        }
-      }
+      /* set canical name to use for further FindFile calls */
+      /* use short file name if exists as lfn may contain unicode values converted
+       * to default character (eg. ?) and so not a valid path.
+       */
+      if (entry.ad.cAlternateFileName[0] != '\0')
+        strcpy(subdir, entry.ad.cAlternateFileName);
       else
-      {
-        /* set display name */
-        if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.ad.cAlternateFileName[0] != '\0') )
-        {
-          if (charSet == UNICODECHARS)
-            charToUTF8(CP_OEMCP, entry.ad.cAlternateFileName, dsubdir, MAXBUF);
-          else
-            strcpy(dsubdir, entry.ad.cAlternateFileName);
-        }
-        else
-        {
-          if (charSet == UNICODECHARS)
-            charToUTF8(CP_ACP, entry.ad.cFileName, dsubdir, MAXBUF);
-          else
-          {
-            strcpy(dsubdir, entry.ad.cFileName);
-            charToDisplayChar(dsubdir);
-          }
-        }
-
-        /* set canical name to use for further FindFile calls */
-        /* use short file name if exists as lfn may contain unicode values converted
-         * to default character (eg. ?) and so not a valid path.
-         * Note: if using unicode API and strings, this is not necessary.
-         */
-        if (entry.ad.cAlternateFileName[0] != '\0')
-          strcpy(subdir, entry.ad.cAlternateFileName);
-        else
-          strcpy(subdir, entry.ad.cFileName);
-        strcat(subdir, "\\");
-      }
-    } while (!*subdir); // while (subdir is still blank)
-  }
+        strcpy(subdir, entry.ad.cFileName);
+      strcat(subdir, "\\");
+    }
+  } while (!*subdir); // while (subdir is still blank)
 
   return findnexthnd;
 }
@@ -1305,17 +1090,7 @@ HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
-  if ( (charSet == UNICODECHARS) && (pFindFirstFileExW != NULL) )
-  {
-    if (!convertCPtoUTF16(CP_ACP, buffer, ubuf, MAXBUF))
-    {
-      printf("ERR: codepage to utf-16\n");
-      return INVALID_HANDLE_VALUE;
-    }
-    dir = pFindFirstFileExW(ubuf, FindExInfoStandard, &findSubdir_entry.ud, FindExSearchLimitToDirectories, NULL, 0);
-  }
-  else
-    dir = pFindFirstFileExA(buffer, FindExInfoStandard, &findSubdir_entry.ad, FindExSearchLimitToDirectories, NULL, 0);
+  dir = pFindFirstFileExA(buffer, FindExInfoStandard, &findSubdir_entry.ad, FindExSearchLimitToDirectories, NULL, 0);
 
   if (dir == INVALID_HANDLE_VALUE)
   {
@@ -1342,16 +1117,7 @@ int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir)
   /* clear result path */
   strcpy(subdir, "");
 
-  if ( (charSet == UNICODECHARS) && (pFindFirstFileExW != NULL) )
-  {
-    if (FindNextFileW(findnexthnd, &findSubdir_entry.ud) == 0)
-      return 1; // no subdirs found
-  }
-  else
-  {
-    if (FindNextFile(findnexthnd, &findSubdir_entry.ad) == 0)
-      return 1; // no subdirs found
-  }
+  if (FindNextFile(findnexthnd, &findSubdir_entry.ad) == 0) return 1; // no subdirs found
 
   if (cycleFindResults(findnexthnd, findSubdir_entry, subdir, dsubdir) == INVALID_HANDLE_VALUE)
     return 1;
@@ -1551,10 +1317,6 @@ int main(int argc, char *argv[])
 
   /* Initialize screen size, may reset pause to NOPAUSE if redirected */
   getConsoleSize();
-
-  /* Unicode mode only, Output BOM for UTF-8 signature */
-  if (charSet == UNICODECHARS)  pprintf("%s", UMARKER);
-
 
   /* Get Volume & Serial Number */
   GetVolumeAndSerial(volume, serial, path);
