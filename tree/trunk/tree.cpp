@@ -83,7 +83,6 @@ short dspAll = 0;  /* if nonzero includes HIDDEN & SYSTEM files in output */
 short dspSize = 0; /* if nonzero displays filesizes                       */
 short dspAttr = 0; /* if nonzero displays file attributes [DACESHRBP]     */
 short dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
-short dspStreams = 0; /* if nonzero tries to display nondefault streams   */
 
 
 /* maintains total count, for > 4billion dirs, use a __int64 */
@@ -493,9 +492,6 @@ void parseArguments(int argc, char *argv[])
             break;
           case 'R' :       /*  /DR  display results at end */
             dspSumDirs = 1;
-            break;
-          case 'S' :       /*  /DS  display alternate file streams */
-            dspStreams = 1;
             break;
           default:
             showInvalidUsage(argv[i]);
