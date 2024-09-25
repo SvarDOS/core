@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  Win32 File compatibility for DOS. 
+  Win32 File compatibility for DOS.
   [This version does support LFNs, if available.]
 
   Written by: Kenneth J. Davis
@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #define searchAttr ( FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | \
    FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_ARCHIVE )
 
-/* If this variable is nonzero then will 1st attempt LFN findfirst 
+/* If this variable is nonzero then will 1st attempt LFN findfirst
  * (findfirst calls sets flag, so findnext/findclose know proper method to continue)
  * else if 0 then only attempt old 0x4E findfirst.
  * This is mostly a debugging tool, may be useful during runtime.
@@ -47,8 +47,8 @@ DEALINGS IN THE SOFTWARE.
 int LFN_Enable_Flag = LFN_ENABLE;
 
 
-/* copy old style findfirst data FFDTA to a WIN32_FIND_DATA 
- * NOTE: does not map exactly.  
+/* copy old style findfirst data FFDTA to a WIN32_FIND_DATA
+ * NOTE: does not map exactly.
  * internal to this module only.
  */
 static void copyFileData(WIN32_FIND_DATAA *findData, FFDTA *finfo)
@@ -71,7 +71,6 @@ static void copyFileData(WIN32_FIND_DATAA *findData, FFDTA *finfo)
   findData->nFileSizeLow = (DWORD)finfo->ff_fsize;
   findData->dwReserved0 = 0;
   findData->dwReserved1 = 0;
-  findData->cAlternateFileName[0] = '\0';
 }
 
 HANDLE FindFirstFileA(const char *pathname, WIN32_FIND_DATAA *findData)
@@ -275,7 +274,7 @@ void FindClose(HANDLE hnd)
     /* See if its for the new or old style findfirst */
     if (hnd->flag == FINDFILEOLD) /* Just free memory allocated */
     {
-      if (hnd->fhnd.ffdtaptr != NULL)  
+      if (hnd->fhnd.ffdtaptr != NULL)
         free(hnd->fhnd.ffdtaptr);
       hnd->fhnd.ffdtaptr = NULL;
     }
@@ -333,12 +332,12 @@ int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
   } media;
 
   /* buffer to store file system name in lfn get volume information */
-  char fsystem[32]; 
+  char fsystem[32];
 
   /* Stores the root path we use. */
   char pathname[260];
 
-  /* Used to determine if drive valid (success/failure of this function) 
+  /* Used to determine if drive valid (success/failure of this function)
    * 0 = success
    * 1 = failure
    * 2 = LFN api unsupported (tentative failure)
@@ -486,7 +485,7 @@ cleanup:
         cflag = 0;       /* so assume valid drive  */
 
 
-      /* Get Serial Number, only supports drives mapped to letters */  
+      /* Get Serial Number, only supports drives mapped to letters */
       media.serial = 0;         /* set to 0, stays 0 on an error */
 
       _BX = (pathname[0] & '\xDF') - 'A' + 1; /* Clear BH, drive in BL */
@@ -498,7 +497,7 @@ cleanup:
       }
 
 /***************** Replaced with 'documented' version of Get Serial Number *********************/
-      /* NT2000pro does NOT set or clear the carry for int21h subfunction 6900h 
+      /* NT2000pro does NOT set or clear the carry for int21h subfunction 6900h
        *   if an error occurs, it leaves media unchanged.
        */
 //      asm {
@@ -519,7 +518,7 @@ cleanup:
         *lpVolumeSerialNumber = 0x0;
     }
   }
-  
+
   /* If there was an error getting the validating drive return failure) */
   if (cflag)    /* cflag is nonzero on any errors */
     return 0;   /* zero means error! */

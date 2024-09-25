@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  Win32 File compatibility for DOS. 
+  Win32 File compatibility for DOS.
   [This version does support LFNs, if available.]
 
   Written by: Kenneth J. Davis
@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #define searchAttr ( FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | \
    FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_ARCHIVE )
 
-/* If this variable is nonzero then will 1st attempt LFN findfirst 
+/* If this variable is nonzero then will 1st attempt LFN findfirst
  * (findfirst calls sets flag, so findnext/findclose know proper method to continue)
  * else if 0 then only attempt old 0x4E findfirst.
  * This is mostly a debugging tool, may be useful during runtime.
@@ -48,8 +48,8 @@ DEALINGS IN THE SOFTWARE.
 int LFN_Enable_Flag = LFN_ENABLE;
 
 
-/* copy old style findfirst data FFDTA to a WIN32_FIND_DATA 
- * NOTE: does not map exactly.  
+/* copy old style findfirst data FFDTA to a WIN32_FIND_DATA
+ * NOTE: does not map exactly.
  * internal to this module only.
  */
 static void copyFileData(WIN32_FIND_DATAA *findData, FFDTA *finfo)
@@ -72,7 +72,6 @@ static void copyFileData(WIN32_FIND_DATAA *findData, FFDTA *finfo)
   findData->nFileSizeLow = (DWORD)finfo->ff_fsize;
   findData->dwReserved0 = 0;
   findData->dwReserved1 = 0;
-  findData->cAlternateFileName[0] = '\0';
 }
 
 HANDLE FindFirstFileA(const char *pathname, WIN32_FIND_DATAA *findData)
@@ -407,7 +406,7 @@ int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
       INT 21h
       POP ES                   //; restore Borland's registers
       POP DS
-      POP DI 
+      POP DI
       JC getvolerror           //; on any error skip storing any info
     }
     /* store stuff

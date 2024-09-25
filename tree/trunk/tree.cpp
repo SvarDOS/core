@@ -982,12 +982,6 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
         }
       }
 
-      /* process filename, convert to utf or OEM codepage, etc */
-      if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.cAlternateFileName[0] != '\0') )
-      {
-        strcpy(entry.cFileName, entry.cAlternateFileName);
-      }
-
       /* print filename */
       pprintf("%s\n", entry.cFileName);
 
@@ -1042,23 +1036,13 @@ HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH &entry, char *s
     else
     {
       /* set display name */
-      if ((LFN_Enable_Flag == LFN_DISABLE) && (entry.ad.cAlternateFileName[0] != '\0') )
-      {
-        strcpy(dsubdir, entry.ad.cAlternateFileName);
-      }
-      else
-      {
-        strcpy(dsubdir, entry.ad.cFileName);
-      }
+      strcpy(dsubdir, entry.ad.cFileName);
 
       /* set canical name to use for further FindFile calls */
       /* use short file name if exists as lfn may contain unicode values converted
        * to default character (eg. ?) and so not a valid path.
        */
-      if (entry.ad.cAlternateFileName[0] != '\0')
-        strcpy(subdir, entry.ad.cAlternateFileName);
-      else
-        strcpy(subdir, entry.ad.cFileName);
+      strcpy(subdir, entry.ad.cFileName);
       strcat(subdir, "\\");
     }
   } while (!*subdir); // while (subdir is still blank)
