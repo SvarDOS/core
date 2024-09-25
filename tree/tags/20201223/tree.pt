@@ -1,0 +1,74 @@
+# Mensagens usadas por pdTree v1 e FreeDOS tree 3.6
+# Cada linha ‚ limitada a 159 caracteres, a menos que MAXLINE seja alterado.
+# Mas, se poss¡vel, deve ser limitada a 79 por linha, com um \n
+# adicionado para indicar ir para a pr¢xima linha, no m ximo 2 linhas.
+# As mensagens s„o divididas em conjuntos,
+# onde cada conjunto corresponde a uma determinada fun‡„o em pdTree.
+# O conjunto 1 ‚ para strings principais e comuns.
+# Muitas das strings s„o usadas diretamente por printf,
+# ent„o, quando um %? for exibido, certifique-se de que todas as altera‡”es
+# tamb‚m incluam o %?. Onde ? ‚ um identificador e formato de vari vel.
+# Nota: apenas \\, \n, \r e \t s„o suportados (e uma £nica barra deve-se usar \\).
+#
+# Tradu‡„o do inglˆs para o portuguˆs feita por:
+# Francesco Sacco (francesco_sacco@hotmail.com)
+#
+# Comum a muitas fun‡”es [Conjunto 1]
+1.1:\n
+# Principal [Conjunto 1] 
+1.2:Lista de PATH do diret¢rio.\n
+# Deve incluir %s para o r¢tulo.
+1.3:Lista de PATH do diret¢rio para o Volume %s\n
+# Deve incluir %s para o n£mero de s‚rie
+1.4:O n£mero de s‚rie do volume ‚ %s\n
+1.5:N„o existem subdiret¢rios\n\n
+1.6: --- Pressione qualquer tecla para continuar ---\n
+# showUsage [Conjunto 2] 
+2.1:Exibe graficamente a estrutura de diret¢rio de uma unidade ou caminho.\n
+# Cada %c abaixo ser  substitu¡do pela chave/op‡„o adequada
+2.2:TREE [unidade:][caminho] [%c%c] [%c%c]\n
+2.3:   %c%c   Exibe os nomes dos arquivos em cada diret¢rio.\n
+2.4:   %c%c   Use ASCII em vez de caracteres estendidos.\n
+# showInvalidUsage [Conjunto 3] 
+# Deve incluir o %s para a op‡„o fornecida.
+3.1:Op‡„o inv lida - %s\n
+# O %c ser  substitu¡do pela op‡„o principal (o padr„o ‚ /)
+3.2:Use TREE %c? para obter informa‡”es de uso.\n
+#showTooManyOptions
+3.3:Muitos parƒmetros - %s\n
+# showVersionInfo [Conjunto 4] 
+# tamb‚m usa treeDescription, mensagen 2.1
+4.1:Escrito para trabalhar com FreeDOS\n
+4.2:Console Win32(c) e DOS com suporte a LFN.\n
+# Precisa incluir o %s para o texto de vers„o. 
+4.3:Vers„o %s\n
+4.4:Escrito por: Kenneth J. Davis\n
+4.5:Data:        2000, 2001, 2004\n
+4.6:Contato:    jeremyd@computer.org\n
+4.7:Copyright (c): Dominio P£blico [Defini‡„o dos Estados Unidos]\n
+#4.8 s¢ ‚ usado quando o suporte … biblioteca Cats ‚ compilado.
+4.8:Utiliza a biblioteca Cats de Jim Hall's <jhall@freedos.org>\n  vers„o 3.8 Copyright (C) 1999,2000 Jim Hall\n
+#4.20 20-30 reservado para a  rvore do FreeDOS, derivada da  rvore de Dave Dunfield.
+#4.20:Copyright 1995 Dave Dunfield - Livremente distribu¡vel.\n
+4.20:Copyright 1995, 2000 Dave Dunfield - Livremente distribu¡vel (2000 released GPL).\n
+# showInvalidDrive [Conjunto 5] 
+5.1:Especifica‡„o de unidade inv lida\n
+# showInvalidPath [Conjunto 6] 
+# Precisa incluir %s para o caminho inv lido fornecido. 
+6.1:Caminho inv lido - %s\n
+# v rias condi‡”es de erro [Conjunto 7]
+# showBufferOverrun
+# %u necess rio para mostrar qual ‚ o tamanho atual do buffer. 
+7.1:Erro: o caminho do arquivo especificado excede o buffer m ximo = %u bytes\n
+# showOutOfMemory
+# %s ‚ necess rio para exibir qual diret¢rio est vamos processando quando ficou sem mem¢ria.
+7.2:Sem mem¢ria no subdiret¢rio: %s\n
+#
+# descontinuado [Conjunto 8]
+# 8.1 - 8.10 reservado para caracteres de sele‡„o de op‡„o em vers”es anteriores.
+# parseArguments [Conjunto 8] cont‚m o(s) caracter(es) usados ??para
+# processamento do argumento. Apenas o primeiro caractere em uma linha ‚ usado.
+# O caractere prim rio usado para determinar a op‡„o segue, o padr„o ‚ '-'.
+8.1:/
+# O caractere secund rio usado para determinar a op‡„o a seguir, o padr„o ‚ '/'.
+8.2:-

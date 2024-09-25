@@ -1,0 +1,88 @@
+Below is pseudo code for a non-recursive tree.
+pdTree v1.01 uses this algorithm slighty modified to properly mimic
+the display behavior of MS and PC DOS versions of tree, but the actual
+directory tree traversal is the same.
+
+It has the properties that there is no function level recursion,
+  hence the only stack usage is to pass parameters to 1 level deep functions.
+It stores the handle/DTA for each subdirectory as it proceeds deeper into
+  the tree, so as it returns it can continue from where it left off, but
+  does not store the complete subdirectory listing of each subdirectory
+  along the way.  This means a given directory can have as many subdirectories
+  as it wants, and this will handle them.  However this comes at some cost
+  of speed, as each directory is scanned twice (once for count of subdirectories,
+  and once to display each subdirectory) and the start/stop of the second
+  scanning will probably not be using sequential reads.
+  [Note: this implementation is limited to 2^31 subdirectories in a given dir.]
+This can handle as many subdirectories deep as their is memory to store the
+  subdirinfo structures.  Each structure is potentially MAXPATH+1 + sizeof(long) +
+  sizeof(HANDLE).  (A handle is probably sizeof(void ptr) or sizeof(DTA).)
+  The actual implementation has a depth limit defined by maximum path length,
+  which is about 260 for DOS.
+This can handle any number of files in a directory.  If files are displayed,
+  when each subdirectory is 1st entered (thus there is only a single additional
+  search of the directory for showing files) the directory is searched and all
+  files matching the search attribute criteria are shown.
+Note: a faster approach would be to add all the subdirectories in a given 
+  directory when we 1st process it, then pop the top one off, display it and
+  possibly its files, repeat [scan for its subdirectories, adding any we find].
+  However, this limits the recursion to how many subdirectory names can be
+  stored in memory (a directory with many subdirectories will take up a lot
+  of space reducing maximum depth). This is what the current FreeDOS tree
+  (v 3.2-3.6) does, except it has hard coded maximum subdirectory count and
+  maximum depth.
+
+
+struct subdirinfo { string currentpath; long subdircnt; HANDLE findnexthnd; }
+
+subdirinfo * newsubdirinfo(string currentpath)
+{
+  subdirinfo *temp = new subdirinfo;
+  temp->currentpath = currentpath;
+  temp->subdircnt = getsubdircnt(currentpath);
+  temp->findnexthnd = NULL;
+
+  return temp;
+}
+
+nonrecurse(string initialpath, bool showfiles)
+{
+  stack s = empty;
+
+  subdirinfo initialsdi = newsubdirinfo(initialpath);
+  s.push(initialsdi);
+
+  do
+  {
+    subdirinfo sdi = s.pop();
+
+    if (sdi.findnexthnd == NULL)  // findfirst not called yet
+    {
+      // 1st time this subdirectory processed, so display its name & possibly files
+      showpath(sdi.currentpath);
+      if (showfiles) displayfiles(sdi.currentpath);
+    }
+
+    if (sdi.subdircnt > 0)
+    {
+      sdi.subdircnt--;
+
+      string newcurrentpath;
+      if (sdi.findnexthnd == NULL)
+        sdi.findnexthnd = findfirstsubdir(sdi.currentpath, newcurrentpath);
+      else
+        newcurrentpath = findnextsubdir(sdi.findnexthnd);
+
+      s.push(sdi);
+
+      subdirinfo sdi = newsubdirinfo(newcurrentpath);
+      s.push(sdi);
+    }
+    else
+    {
+      findclose(sdi.findnexthnd);
+      free sdi;
+    }
+  } while (! s.empty())
+}
+    

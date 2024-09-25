@@ -1,0 +1,26 @@
+pdTree Bugs
+-----------
+
+Known Bugs
+----------
+Filenames output when Unicode (UTF-8) mode is enabled using DOS (not Win32)
+executable may not be correct, as proper codepage to Unicode mapping is not done.
+
+No other known bugs.
+
+
+Known Quirks
+------------
+Ctrl-C does not work to kill tree, use Ctrl-Break instead.
+
+Unicode filenames that can not map to current ANSI/OEM codepages
+may not be displayed correctly.  This mimics Microsoft's tree implementation.
+On Windows NT systems (or ones that implement the Unicode Win32 API),
+use the /U option while redirecting the output to a file.  The file
+should load in Unicode aware applications (such as Wordpad) and display
+proper Unicode filenames, assuming a proper font is selected.
+
+
+Bug Reports
+-----------
+Please report any bugs to Kenneth J. Davis <jeremyd@computer.org>.
