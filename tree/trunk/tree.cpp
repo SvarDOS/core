@@ -609,8 +609,6 @@ typedef union WIN32_FIND_DATA_BOTH
 #define STDCALL __stdcall
 #endif
 
-typedef HANDLE ( STDCALL * fFindFirstFileExA)(const char *, FINDEX_INFO_LEVELS, void *, FINDEX_SEARCH_OPS, void *, DWORD);
-
 
 /**
  * Stores directory information obtained from FindFirst/Next that
@@ -869,15 +867,12 @@ void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DI
 
   /* optional display data */
   if (dspAttr)  /* attributes */
-    pprintf("[%c%c%c%c%c%c%c%c] ",
+    pprintf("[%c%c%c%c%c] ",
       (ddata->dwDirAttributes & FILE_ATTRIBUTE_DIRECTORY)?'D':' ',  /* keep this one? its always true */
       (ddata->dwDirAttributes & FILE_ATTRIBUTE_ARCHIVE)?'A':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_COMPRESSED)?'C':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_ENCRYPTED)?'E':' ',
       (ddata->dwDirAttributes & FILE_ATTRIBUTE_SYSTEM)?'S':' ',
       (ddata->dwDirAttributes & FILE_ATTRIBUTE_HIDDEN)?'H':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_READONLY)?'R':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_REPARSE_POINT)?'M':' '  /* often a mount point */
+      (ddata->dwDirAttributes & FILE_ATTRIBUTE_READONLY)?'R':' '
     );
 
   /* display directory name */
@@ -947,15 +942,11 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
 
       /* optional display data */
       if (dspAttr)  /* file attributes */
-        pprintf("[%c%c%c%c%c%c%c%c] ",
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE)?'0':' ',
+        pprintf("[%c%c%c%c] ",
           (entry.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)?'A':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED)?'C':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED)?'E':' ',
           (entry.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)?'S':' ',
           (entry.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)?'H':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_READONLY)?'R':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)?'M':' '
+          (entry.dwFileAttributes & FILE_ATTRIBUTE_READONLY)?'R':' '
         );
 
       if (dspSize)  /* file size */

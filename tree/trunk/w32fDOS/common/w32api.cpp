@@ -88,8 +88,7 @@ DWORD GetFileAttributes(const char *pathname)
 
   //if (r.x.cflag) printf("ERROR getting std attributes of %s, DOS err %i\n", buffer, r.x.ax);
   if (r.x.cflag) return (DWORD)-1;  /* error obtaining attributes           */
-  if (r.x.cx) return (DWORD)(0x3F & r.x.cx); /* mask off any DRDOS bits     */
-  else return (DWORD)FILE_ATTRIBUTE_NORMAL;  /* no other attributes set     */
+  return (DWORD)(0x3F & r.x.cx); /* mask off any DRDOS bits     */
 }
 
 

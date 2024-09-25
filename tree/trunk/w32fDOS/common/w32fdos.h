@@ -40,26 +40,6 @@ DEALINGS IN THE SOFTWARE.
 #define FILE_ATTRIBUTE_DIRECTORY 0x0010
 #define FILE_ATTRIBUTE_ARCHIVE   0x0020
 
-#define FILE_ATTRIBUTE_DEVICE               0x0040
-#define FILE_ATTRIBUTE_NORMAL               0x0080
-#define FILE_ATTRIBUTE_TEMPORARY            0x0100
-#define FILE_ATTRIBUTE_SPARSE_FILE          0x0200
-#define FILE_ATTRIBUTE_REPARSE_POINT        0x0400
-#define FILE_ATTRIBUTE_COMPRESSED           0x0800
-#define FILE_ATTRIBUTE_OFFLINE              0x1000
-#define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED  0x2000
-#define FILE_ATTRIBUTE_ENCRYPTED            0x4000
-
-/* These two are used by FindFirstFileEx, NT specific */
-typedef enum FINDEX_INFO_LEVELS { FindExInfoStandard, FindExInfoMaxInfoLevel } FINDEX_INFO_LEVELS;
-typedef enum FINDEX_SEARCH_OPS
-{
-  FindExSearchNameMatch,
-  FindExSearchLimitToDirectories,
-  FindExSearchLimitToDevices,
-  FindExSearchMaxSearchOp
-} FINDEX_SEARCH_OPS;
-
 typedef short BOOL;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
