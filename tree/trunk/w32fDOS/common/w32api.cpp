@@ -34,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 #include <dos.h>      /* REGS and intdos */
 #include <stdio.h>
 
-/* retrieve attributes (ReadOnly/System/...) about file or directory 
+/* retrieve attributes (ReadOnly/System/...) about file or directory
  * returns (DWORD)-1 on error
  */
 DWORD GetFileAttributes(const char *pathname)
@@ -129,7 +129,7 @@ HANDLE GetStdHandle(DWORD nStdHnd)
 /* Returns file type.
  * Input, an opened file handle.
  * Output, one of predefined values above indicating if
- *         handle refers to file (FILE_TYPE_DISK), a 
+ *         handle refers to file (FILE_TYPE_DISK), a
  *         device such as CON (FILE_TYPE_CHAR), a
  *         pipe (FILE_TYPE_PIPE), or unknown.
  * On errors or unspecified input, FILE_TYPE_UNKNOWN
@@ -166,15 +166,14 @@ DWORD GetFileType(HANDLE hFile)
 
 /*
   Returns information about the console.
-  Input: 
-       hCon is the HANDLE (such as returned by GetStdHandle()) to the console buffer to obtain info about
+  Input:
        pConScrBufInfo is a pointer to a CONSOLE_SCREEN_BUFFER_INFO struct that is filled in.
   Output:
        returns 0 (FALSE) on any error.
        The origin is at (0,0); so width = right-left+1 and height = bottom-top+1.
        Note: current implementation only sets srWindow field).
 */
-BOOL GetConsoleScreenBufferInfo(HANDLE hCon, PCONSOLE_SCREEN_BUFFER_INFO pConScrBufInfo)
+BOOL GetConsoleScreenBufferInfo(PCONSOLE_SCREEN_BUFFER_INFO pConScrBufInfo)
 {
   /*
    The word (2bytes) at memory address 0x0040:004A contains the # of cols of current display mode.
@@ -228,11 +227,11 @@ BOOL STDCALL FindNextFileW(HANDLE hnd, WIN32_FIND_DATAW *findData)
   return 0;
 }
 
-/* Convert src from given codepage to UTF-16, 
+/* Convert src from given codepage to UTF-16,
  * returns nonzero on success, 0 on any error
  * cp is the codepage of source string, should be either CP_ACP (ansi)
  * or CP_OEMCP (DOS, e.g. cp437).
- * TODO: implement proper for DOS, 
+ * TODO: implement proper for DOS,
  *       presently will only work correctly for 7bit ASCII strings
  */
 int MultiByteToWideChar(unsigned int cp, DWORD dwFlags, const char *src, int srcLen, WORD *dst, int dstsize)
@@ -258,7 +257,7 @@ int MultiByteToWideChar(unsigned int cp, DWORD dwFlags, const char *src, int src
  * returns nonzero on success, 0 on any error
  * cp is the codepage of source string, should be either CP_ACP (ansi)
  * or CP_OEMCP (DOS, e.g. cp437).
- * TODO: implement proper for DOS, 
+ * TODO: implement proper for DOS,
  *       presently will only work correctly for values mapping to 7bit ASCII strings
  */
 int WideCharToMultiByte(unsigned int cp, DWORD dwFlags, const WORD *src, int srcLen, char *dst, int dstsize, char *defaultChar, BOOL *flgUsedDefCh)
@@ -294,7 +293,7 @@ int WideCharToMultiByte(unsigned int cp, DWORD dwFlags, const WORD *src, int src
 
 
 /* Normally in standard C libraries <string.h> or <wchar.h> */
-/* compares UTF-16 strings, 
+/* compares UTF-16 strings,
  * no character specific processing is done, returns difference
  * of first WORDs that differ or 0 if same up until first (WORD)0.
  */

@@ -323,7 +323,7 @@ void getConsoleSize(void)
       /*case #define FILE_TYPE_REMOTE:*/
       default:
       {
-        if (GetConsoleScreenBufferInfo(h, &csbi))
+        if (GetConsoleScreenBufferInfo(&csbi))
         {
           /* rows = window size - 2, where -2 neccessary to keep screen from scrolling */
           rows = csbi.srWindow.Bottom - csbi.srWindow.Top - 1;
@@ -1051,7 +1051,7 @@ void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DI
  * Displays summary information about directory.
  * Expects to be called after displayFiles (optionally called)
  */
-void displaySummary(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
+static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata)
 {
   addPadding(padding, hasMoreSubdirs);
 
@@ -1404,7 +1404,7 @@ long traverseTree(char *initialpath)
       }
 
       if (showFiles == SHOWFILESON)  displayFiles(sdi->currentpath, padding, (sdi->subdircnt > 0L)?1 : 0, &(sdi->ddata));
-      displaySummary(sdi->currentpath, padding, (sdi->subdircnt > 0L)?1 : 0, &(sdi->ddata));
+      displaySummary(padding, (sdi->subdircnt > 0L)?1 : 0, &(sdi->ddata));
     }
 
     if (sdi->subdircnt > 0) /* if (there are more subdirectories to process) */

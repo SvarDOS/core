@@ -53,11 +53,10 @@ typedef CONSOLE_SCREEN_BUFFER_INFO * PCONSOLE_SCREEN_BUFFER_INFO;
 
 /*
   Returns information about the console.
-  Input: 
-       hCon is the HANDLE (such as returned by GetStdHandle()) to the console buffer to obtain info about
+  Input:
        pConScrBufInfo is a pointer to a CONSOLE_SCREEN_BUFFER_INFO struct that is filled in.
 */
-BOOL GetConsoleScreenBufferInfo(HANDLE hCon, PCONSOLE_SCREEN_BUFFER_INFO pConScrBufInfo);
+BOOL GetConsoleScreenBufferInfo(PCONSOLE_SCREEN_BUFFER_INFO pConScrBufInfo);
 
 
 #endif /* WINCON_H */
