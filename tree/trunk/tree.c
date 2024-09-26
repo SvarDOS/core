@@ -1158,59 +1158,6 @@ static long traverseTree(char *initialpath) {
 }
 
 
-/**
- * Process strings, converting \\, \n, \r, and \t to actual chars.
- * This method is used to allow the message catalog to use \\, \n, \r, and \t
- * returns a pointer to its internal buffer, so strcpy soon after use.
- * Can only handle lines up to MAXLINE chars.
- * This is required because most messages are passed as
- * string arguments to printf, and not actually parsed by it.
- */
-static char *processLine(char *line) {
-  static char buffer[MAXLINE+MAXLINE];
-  char *src = line, *dst = buffer;
-
-  if (line == NULL) return NULL;
-
-  /* cycle through copying characters, except when a \ is encountered. */
-  for ( ; *src != '\0'; src++, dst++)
-  {
-    if (*src == '\\')
-    {
-      src++;
-      switch (*src)
-      {
-	  case '\0': /* a slash ends a line, ignore the slash. */
-		  src--; /* next time through will see the '\0'    */
-		  break;
-	  case '\\': /* a single slash */
-		  *dst = '\\';
-		  break;
-	  case 'n': /* a newline */
-		  *dst = '\n';
-		  break;
-	  case 'r': /* a carriage return */
-		  *dst = '\r';
-		  break;
-	  case 't': /* a horizontal tab */
-		  *dst = '\t';
-		  break;
-	  default: /* just copy over the letter */
-		  *dst = *src;
-		  break;
-      }
-    }
-    else
-      *dst = *src;
-  }
-
-  /* ensure '\0' terminated */
-  *dst = '\0';
-
-  return buffer;
-}
-
-
 static void FixOptionText(void) {
   char buffer[MAXLINE];  /* sprintf can have problems with src==dest */
 
