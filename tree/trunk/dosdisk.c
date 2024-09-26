@@ -31,9 +31,11 @@ DEALINGS IN THE SOFTWARE.
 
 /*** Expects Pointers to be near (Tiny, Small, and Medium models ONLY) ***/
 
-#include "dosdisk.h"
+#include <dos.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "dosdisk.h"
 
 #define searchAttr ( FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | \
    FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_ARCHIVE )
@@ -51,11 +53,11 @@ int LFN_Enable_Flag = LFN_ENABLE;
  * NOTE: does not map exactly.
  * internal to this module only.
  */
-static void copyFileData(struct WIN32_FIND_DATA *findData, FFDTA *finfo)
+static void copyFileData(struct WIN32_FIND_DATA *findData, const struct FFDTA *finfo)
 {
   /* Copy requried contents over into required structure */
   strcpy(findData->cFileName, finfo->ff_name);
-  findData->dwFileAttributes = (DWORD)finfo->ff_attrib;
+  findData->dwFileAttributes = (DWORD)finfo->ff_attr;
 
   /* copy over rest (not quite properly) */
   findData->ftCreationTime.ldw[0] = finfo->ff_ftime;
@@ -134,7 +136,7 @@ lfnerror:
   hnd->flag = FINDFILEOLD;
 
   /* allocate memory for the FFDTA */
-  if ((hnd->fhnd.ffdtaptr = (FFDTA *)malloc(sizeof(struct FFDTA))) == NULL)
+  if ((hnd->fhnd.ffdtaptr = (struct FFDTA *)malloc(sizeof(struct FFDTA))) == NULL)
   {
     free(hnd);
     return INVALID_HANDLE_VALUE;
@@ -319,7 +321,7 @@ int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
   char *lpFileSystemNameBuffer, DWORD nFileSystemNameSize)
 {
   /* File info for getting  Volume Label (using directory entry) */
-  FFDTA finfo;
+  struct FFDTA finfo;
 
   /* Using DOS interrupt to get serial number */
   struct media_info
@@ -437,7 +439,7 @@ endgetvol:
       }
 success:                        //; True volume entry only has volume attribute set [MS' LFNspec]
       asm {                     //;     But they may also have archive bit set!!!
-	LEA BX, finfo.ff_attrib   //; Load address of file's attributes returned by findfirst/next
+	LEA BX, finfo.ff_attr   //; Load address of file's attributes returned by findfirst/next
 	MOV AL, BYTE PTR [BX]     //; Looking for a BYTE that is FILE_ATTRIBUTE_LABEL only
       AND AL, 0xDF              //; Ignore Archive bit
 	CMP AL, FILE_ATTRIBUTE_LABEL
@@ -525,3 +527,60 @@ cleanup:
     return 1;   /* Success (drive exists we think anyway) */
 }
 
+
+/* retrieve attributes (ReadOnly/System/...) about file or directory
+ * returns (DWORD)-1 on error
+ */
+DWORD GetFileAttributes(const char *pathname) {
+  union REGS r;
+  struct SREGS s;
+  char buffer[260];
+  int slen;
+
+  /* 1st try LFN - Extended get/set attributes (in case LFN used) */
+  if (LFN_Enable_Flag)
+  {
+    r.x.ax = 0x7143;                  /* LFN API, Extended Get/Set Attributes */
+    r.x.bx = 0x00;                    /* BL=0, get file attributes            */
+    r.x.dx = FP_OFF(pathname);        /* DS:DX points to ASCIIZ filename      */
+
+    segread(&s);                      /* load with current segment values     */
+    s.ds = FP_SEG(pathname);          /* get Segment of our filename pointer  */
+
+    r.x.cflag = 1;                    /* should be set when unsupported ***   */
+    asm stc;                          /* but clib usually ignores on entry    */
+
+    /* Actually perform the call, carry should be set on error or unuspported */
+    intdosx(&r, &r, &s);         /* Clib function to invoke DOS int21h call   */
+
+    if (!r.x.cflag)              /* if carry not set then cx has desired info */
+      return (DWORD)r.x.cx;
+    /* else error other than unsupported LFN api or invalid function [FreeDOS]*/
+    else if ((r.x.ax != 0x7100) || (r.x.ax != 0x01))
+      return (DWORD)-1;
+    /* else fall through to standard get/set file attribute call */
+  }
+
+  /* we must remove any slashes from end */
+  slen = strlen(pathname) - 1;  /* Warning, assuming pathname is not ""   */
+  strcpy(buffer, pathname);
+  if ((buffer[slen] == '\\') || (buffer[slen] == '/')) /* ends in a slash */
+  {
+    /* don't remove from root directory (slen == 0),
+     * ignore UNC paths as SFN doesn't handle them anyway
+     * if slen == 2, then check if drive given (e.g. C:\)
+     */
+    if (slen && !(slen == 2 &&  buffer[1] == ':'))
+      buffer[slen] = '\0';
+  }
+  /* return standard attributes */
+  r.x.ax = 0x4300;                  /* standard Get/Set File Attributes */
+  r.x.dx = FP_OFF(buffer);          /* DS:DX points to ASCIIZ filename      */
+  segread(&s);                      /* load with current segment values     */
+  s.ds = FP_SEG(buffer);            /* get Segment of our filename pointer  */
+  intdosx(&r, &r, &s);              /* invoke the DOS int21h call           */
+
+  //if (r.x.cflag) printf("ERROR getting std attributes of %s, DOS err %i\n", buffer, r.x.ax);
+  if (r.x.cflag) return (DWORD)-1;  /* error obtaining attributes           */
+  return (DWORD)(0x3F & r.x.cx); /* mask off any DRDOS bits     */
+}

@@ -65,15 +65,14 @@ struct WIN32_FIND_DATA {
 };
 
 
-typedef struct FFDTA  /* same format as a ffblk struct */
-{
+struct FFDTA { /* same format as a ffblk struct */
   BYTE reserved[21]; /* dos positioning info */
-  BYTE ff_attrib;    /* file attributes */
+  BYTE ff_attr;      /* file attributes */
   WORD ff_ftime;     /* time when file created/modified */
   WORD ff_fdate;     /* date when file created/modified */
   DWORD ff_fsize;    /* low word followed by high word */
   BYTE ff_name[13];  /* file name, not space padded, period, '\0' terminated, wildcards replaced */
-} FFDTA;
+};
 
 
 #define FINDFILELFN 1
@@ -82,7 +81,7 @@ typedef struct FFDTA  /* same format as a ffblk struct */
 typedef union FHND  /* Stores either a handle (LFN) or FFDTA (oldstyle) */
 {
   WORD handle;
-  FFDTA *ffdtaptr;
+  struct FFDTA *ffdtaptr;
 } FHND;
 
 typedef struct FindFileStruct
