@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef W32FDOS_H
 #define W32FDOS_H
 
-#define INVALID_HANDLE_VALUE ((HANDLE)-1)
+#define INVALID_HANDLE_VALUE (NULL)
 
 #define FILE_ATTRIBUTE_READONLY  0x0001
 #define FILE_ATTRIBUTE_HIDDEN    0x0002
@@ -75,26 +75,9 @@ _Packed struct FFDTA { /* same format as a ffblk struct */
 };
 
 
-#define FINDFILELFN 1
-#define FINDFILEOLD 0
-
-typedef union FHND  /* Stores either a handle (LFN) or FFDTA (oldstyle) */
-{
-  WORD handle;
-  struct FFDTA *ffdtaptr;
-} FHND;
-
-typedef struct FindFileStruct
-{
-  short flag;        /* indicates whether this is for the old or new style find file & thus contents */
-  FHND fhnd;         /* The data stored */
-} FindFileStruct;
-
-typedef FindFileStruct *HANDLE;
-
-HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData);
-int FindNextFile(HANDLE hnd, struct WIN32_FIND_DATA *findData);
-void FindClose(HANDLE hnd);
+struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData);
+int FindNextFile(struct FFDTA *hnd, struct WIN32_FIND_DATA *findData);
+void FindClose(struct FFDTA *hnd);
 
 DWORD GetFileAttributes(const char *pathname);
 

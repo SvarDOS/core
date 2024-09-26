@@ -67,10 +67,10 @@ static void copyFileData(struct WIN32_FIND_DATA *findData, const struct FFDTA *f
   findData->dwReserved1 = 0;
 }
 
-HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
+struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
 {
   static char path[1024];
-  HANDLE hnd;
+  struct FFDTA *hnd;
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
 
   /* verify findData is valid */
@@ -78,25 +78,14 @@ HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
     return INVALID_HANDLE_VALUE;
 
   /* allocate memory for the handle */
-  if ((hnd = (HANDLE)malloc(sizeof(struct FindFileStruct))) == NULL)
-    return INVALID_HANDLE_VALUE;
+  if ((hnd = malloc(sizeof(*hnd))) == NULL) return INVALID_HANDLE_VALUE;
 
   /* initialize structure (clear) */
   /* hnd->handle = 0;  hnd->ffdtaptr = NULL; */
-  memset(hnd, 0, sizeof(struct FindFileStruct));
+  memset(hnd, 0, sizeof(*hnd));
 
   /* Clear findData, this is to fix a glitch under NT, with 'special' $???? files */
   memset(findData, 0, sizeof(struct WIN32_FIND_DATA));
-
-  /* Use DOS (0x4E) findfirst, returning if error */
-  hnd->flag = FINDFILEOLD;
-
-  /* allocate memory for the FFDTA */
-  if ((hnd->fhnd.ffdtaptr = (struct FFDTA *)malloc(sizeof(struct FFDTA))) == NULL)
-  {
-    free(hnd);
-    return INVALID_HANDLE_VALUE;
-  }
 
   /* if pathname ends in \* convert to \*.* */
   strcpy(path, pathname);
@@ -109,8 +98,8 @@ HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
     unsigned short ffdta_seg, ffdta_off;
     unsigned short path_seg, path_off;
     unsigned short sattr = searchAttr;
-    ffdta_seg = FP_SEG((*hnd).fhnd.ffdtaptr);
-    ffdta_off = FP_OFF((*hnd).fhnd.ffdtaptr);
+    ffdta_seg = FP_SEG(hnd);
+    ffdta_off = FP_OFF(hnd);
     path_seg = FP_SEG(path);
     path_off = FP_OFF(path);
 
@@ -156,26 +145,23 @@ success:
   }
   }
 
-  if (cflag)
-  {
-    free(hnd->fhnd.ffdtaptr);
+  if (cflag) {
     free(hnd);
     return INVALID_HANDLE_VALUE;
   }
 
   /* copy its results over */
-  copyFileData(findData, hnd->fhnd.ffdtaptr);
+  copyFileData(findData, hnd);
 
   return hnd;
 }
 
 
-int FindNextFile(HANDLE hnd, struct WIN32_FIND_DATA *findData)
-{
+int FindNextFile(struct FFDTA *hnd, struct WIN32_FIND_DATA *findData) {
   short cflag = 0;  /* used to indicate if dos findnext succesful or not */
 
   /* if bad handle given return */
-  if ((hnd == NULL) || (hnd == INVALID_HANDLE_VALUE)) return 0;
+  if (hnd == NULL) return 0;
 
   /* verify findData is valid */
   if (findData == NULL) return 0;
@@ -183,45 +169,9 @@ int FindNextFile(HANDLE hnd, struct WIN32_FIND_DATA *findData)
   /* Clear findData, this is to fix a glitch under NT, with 'special' $???? files */
   memset(findData, 0, sizeof(struct WIN32_FIND_DATA));
 
-  /* Flag indicate if using LFN DOS (0x714F) or not */
-  if (hnd->flag == FINDFILELFN)
-  {
-    unsigned short handle = hnd->fhnd.handle;
-    unsigned char cf = 0;
-    _asm {
-      push ax
-      push bx
-      push cx
-      push dx
-      push es
-      push si
-      push di
-
-      mov bx, handle               //; Move the Handle returned by prev findfirst into BX
-      stc                          //; In case not supported
-      mov si, 1                    //; same format as when old style used, set to 0 for 64bit value
-      mov ax, ds                   //; Set address of findData into ES:DI
-      mov es, ax
-      mov di, [findData]
-      mov ax, 0x714F               //; LFN version of FindNext
-      int 0x21                     //; Execute interrupt
-      jnc DONE
-      mov cf, 1
-      DONE:
-
-      pop di
-      pop si
-      pop es
-      pop dx
-      pop cx
-      pop bx
-      pop ax
-    }
-    if (cf == 0) return 1;   /* success */
-    return 0;   /* Any errors here, no other option but to return error/no more files */
-  } else { /* Use DOS (0x4F) findnext, returning if error */
-    unsigned short dta_seg = FP_SEG((*hnd).fhnd.ffdtaptr);
-    unsigned short dta_off = FP_OFF((*hnd).fhnd.ffdtaptr);
+  { /* Use DOS (0x4F) findnext, returning if error */
+    unsigned short dta_seg = FP_SEG(hnd);
+    unsigned short dta_off = FP_OFF(hnd);
     _asm {
       push ax
       push bx
@@ -257,50 +207,22 @@ success:
       pop bx
       pop ax
     }
+  }
 
   if (cflag) return 0;
 
   /* copy its results over */
-  copyFileData(findData, hnd->fhnd.ffdtaptr);
+  copyFileData(findData, hnd);
 
   return 1;
-  }
 }
 
 
 /* free resources to prevent memory leaks */
-void FindClose(HANDLE hnd)
-{
+void FindClose(struct FFDTA *hnd) {
   /* 1st check if valid handle given */
-  if ((hnd != NULL) && (hnd != INVALID_HANDLE_VALUE))
-  {
-    /* See if its for the new or old style findfirst */
-    if (hnd->flag == FINDFILEOLD) /* Just free memory allocated */
-    {
-      if (hnd->fhnd.ffdtaptr != NULL)
-        free(hnd->fhnd.ffdtaptr);
-      hnd->fhnd.ffdtaptr = NULL;
-    }
-    else /* must call LFN findclose */
-    {
-      unsigned short handle = hnd->fhnd.handle;
-      _asm {
-        push ax
-        push bx
-
-        mov bx, handle            /* Move handle returned from findfirst into BX */
-        stc
-        mov ax, 0x71A1
-        int 0x21                  /* carry set on error */
-
-        pop bx
-        pop ax
-      }
-      hnd->fhnd.handle = 0;
-    }
-
-    free(hnd);                    /* Free memory used for the handle itself */
-  }
+  if (hnd == NULL) return;
+  free(hnd);                    /* Free memory used for the handle itself */
 }
 
 #include <stdio.h>

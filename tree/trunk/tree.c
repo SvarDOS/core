@@ -618,7 +618,7 @@ typedef struct SUBDIRINFO
   char *subdir;         /* points to last subdir within currentpath           */
   char *dsubdir;        /* Stores a display ready directory name              */
   long subdircnt;       /* Initially a count of how many subdirs in this dir  */
-  HANDLE findnexthnd;   /* The handle returned by findfirst, used in findnext */
+  struct FFDTA *findnexthnd; /* The handle returned by findfirst, used in findnext */
   struct DIRDATA ddata; /* Maintain directory information, eg attributes      */
 } SUBDIRINFO;
 
@@ -632,7 +632,7 @@ typedef struct SUBDIRINFO
  */
 static long hasSubdirectories(char *path, DIRDATA *ddata) {
   static struct WIN32_FIND_DATA findData;
-  HANDLE hnd;
+  struct FFDTA *hnd;
   static char buffer[MAXBUF];
   int hasSubdirs = 0;
 
@@ -645,8 +645,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
    * if supported by underlying filesystem.
    */
   hnd = FindFirstFile(buffer, &findData);
-  if (hnd == INVALID_HANDLE_VALUE)
-  {
+  if (hnd == INVALID_HANDLE_VALUE) {
     showInvalidPath(path); /* Display error message */
     return -1L;
   }
@@ -891,7 +890,7 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
 static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   static char buffer[MAXBUF];
   struct WIN32_FIND_DATA entry; /* current directory entry info    */
-  HANDLE dir;         /* Current directory entry working with      */
+  struct FFDTA *dir;         /* Current directory entry working with      */
   unsigned long filesShown = 0;
 
   /* get handle for files in current directory (using wildcard spec) */
@@ -971,7 +970,7 @@ static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *
  * are found, at which point it closes the FindFile search handle and
  * return INVALID_HANDLE_VALUE.  If successful, returns FindFile handle.
  */
-static HANDLE cycleFindResults(HANDLE findnexthnd, struct WIN32_FIND_DATA *entry, char *subdir, char *dsubdir) {
+static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct WIN32_FIND_DATA *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
   do
   {
@@ -1015,17 +1014,16 @@ static struct WIN32_FIND_DATA findSubdir_entry; /* current directory entry info 
  * Returns INVALID_HANDLE_VALUE on error.
  * currentpath must end in \
  */
-static HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
+static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
   static char buffer[MAXBUF];
-  HANDLE dir;         /* Current directory entry working with      */
+  struct FFDTA *dir;         /* Current directory entry working with      */
 
   /* get handle for files in current directory (using wildcard spec) */
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
   dir = FindFirstFile(buffer, &findSubdir_entry);
-  if (dir == INVALID_HANDLE_VALUE)
-  {
+  if (dir == INVALID_HANDLE_VALUE) {
     showInvalidPath(currentpath);
     return INVALID_HANDLE_VALUE;
   }
@@ -1044,7 +1042,7 @@ static HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
  * If a subdirectory is found, returns 0, otherwise returns 1
  * (either error or no more files).
  */
-static int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir) {
+static int findNextSubdir(struct FFDTA *findnexthnd, char *subdir, char *dsubdir) {
   /* clear result path */
   strcpy(subdir, "");
 
