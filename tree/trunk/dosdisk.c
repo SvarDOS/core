@@ -51,7 +51,7 @@ int LFN_Enable_Flag = LFN_ENABLE;
  * NOTE: does not map exactly.
  * internal to this module only.
  */
-static void copyFileData(WIN32_FIND_DATAA *findData, FFDTA *finfo)
+static void copyFileData(struct WIN32_FIND_DATA *findData, FFDTA *finfo)
 {
   /* Copy requried contents over into required structure */
   strcpy(findData->cFileName, finfo->ff_name);
@@ -73,7 +73,7 @@ static void copyFileData(WIN32_FIND_DATAA *findData, FFDTA *finfo)
   findData->dwReserved1 = 0;
 }
 
-HANDLE FindFirstFileA(const char *pathname, WIN32_FIND_DATAA *findData)
+HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
 {
   char path[1024];
   HANDLE hnd;
@@ -190,7 +190,7 @@ success:
 }
 
 
-int FindNextFileA(HANDLE hnd, WIN32_FIND_DATAA *findData)
+int FindNextFile(HANDLE hnd, struct WIN32_FIND_DATA *findData)
 {
   short cflag = 0;  /* used to indicate if dos findnext succesful or not */
 

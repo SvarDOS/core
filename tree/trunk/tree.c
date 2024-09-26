@@ -692,7 +692,7 @@ typedef struct SUBDIRINFO
  * and path is valid.
  */
 static long hasSubdirectories(char *path, DIRDATA *ddata) {
-  static WIN32_FIND_DATA findData;
+  static struct WIN32_FIND_DATA findData;
   HANDLE hnd;
   static char buffer[MAXBUF];
   int hasSubdirs = 0;
@@ -705,7 +705,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
    * Allows us to limit returned results to just directories
    * if supported by underlying filesystem.
    */
-  hnd = FindFirstFileA(buffer, &findData);
+  hnd = FindFirstFile(buffer, &findData);
   if (hnd == INVALID_HANDLE_VALUE)
   {
     showInvalidPath(path); /* Display error message */
@@ -951,7 +951,7 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
  */
 static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   static char buffer[MAXBUF];
-  WIN32_FIND_DATA entry; /* current directory entry info    */
+  struct WIN32_FIND_DATA entry; /* current directory entry info    */
   HANDLE dir;         /* Current directory entry working with      */
   unsigned long filesShown = 0;
 
@@ -1032,7 +1032,7 @@ static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *
  * are found, at which point it closes the FindFile search handle and
  * return INVALID_HANDLE_VALUE.  If successful, returns FindFile handle.
  */
-static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATAA *entry, char *subdir, char *dsubdir) {
+static HANDLE cycleFindResults(HANDLE findnexthnd, struct WIN32_FIND_DATA *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
   do
   {
@@ -1068,7 +1068,7 @@ static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATAA *entry, char
 
 
 /* FindFile buffer used by findFirstSubdir and findNextSubdir only */
-static WIN32_FIND_DATAA findSubdir_entry; /* current directory entry info    */
+static struct WIN32_FIND_DATA findSubdir_entry; /* current directory entry info    */
 
 /**
  * Given the current path, find the 1st subdirectory.
@@ -1088,7 +1088,7 @@ static HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
-  dir = FindFirstFileA(buffer, &findSubdir_entry);
+  dir = FindFirstFile(buffer, &findSubdir_entry);
   if (dir == INVALID_HANDLE_VALUE)
   {
     showInvalidPath(currentpath);

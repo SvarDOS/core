@@ -51,8 +51,7 @@ typedef struct FILETIME   /* should correspond to a quad word */
   DWORD hdw;    /* HighDoubleWord */
 } FILETIME;
 
-typedef struct  WIN32_FIND_DATAA
-{
+struct WIN32_FIND_DATA {
   DWORD dwFileAttributes;
   FILETIME ftCreationTime;
   FILETIME ftLastAccessTime;
@@ -63,10 +62,8 @@ typedef struct  WIN32_FIND_DATAA
   DWORD    dwReserved1;
   char cFileName[ 260 ];
   char cAlternateFileName[ 14 ];
-} WIN32_FIND_DATAA;
+};
 
-
-#define WIN32_FIND_DATA WIN32_FIND_DATAA
 
 typedef struct FFDTA  /* same format as a ffblk struct */
 {
@@ -96,14 +93,9 @@ typedef struct FindFileStruct
 
 typedef FindFileStruct *HANDLE;
 
-#define STDCALL
-
-HANDLE STDCALL FindFirstFileA(const char *pathname, WIN32_FIND_DATAA *findData);
-int STDCALL FindNextFileA(HANDLE hnd, WIN32_FIND_DATAA *findData);
-void STDCALL FindClose(HANDLE hnd);
-
-#define FindFirstFile FindFirstFileA
-#define FindNextFile FindNextFileA
+HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData);
+int FindNextFile(HANDLE hnd, struct WIN32_FIND_DATA *findData);
+void FindClose(HANDLE hnd);
 
 DWORD GetFileAttributes(const char *pathname);
 
