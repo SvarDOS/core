@@ -165,7 +165,6 @@ const char OptVersion[2]   = { 'V', 'v' };  /* Version information */
 const char OptSFNs[2]      = { 'S', 's' };  /* Shortnames only (disable LFN support) */
 const char OptPause[2]     = { 'P', 'p' };  /* Pause after each page (screenfull) */
 const char OptDisplay[2]   = { 'D', 'd' };  /* modify Display settings */
-const char OptSort[2]      = { 'O', 'o' };  /* sort Output */
 
 
 /* Procedures */
@@ -573,25 +572,6 @@ static void parseArguments(int argc, char *argv[]) {
           default:
             showInvalidUsage(argv[i]);
         }
-      }
-      else if ((argv[i][1] == OptSort[0]) || (argv[i][1] == OptSort[1]))
-      {
-#if 1  // not yet supported
-        showInvalidUsage(argv[i]);
-#else
-        int reverse = (argv[i][3] == '-')?1:0;  /* invert sort if suffixed with - */
-        switch (argv[i][2] & 0xDF)
-        {
-          case 'F' :       /*  /Of  sort by Filesize   */
-            break;
-          case 'N' :       /*  /On  sort by fileName   */
-            break;
-          case 'E' :       /*  /Oe  sort by Extension  */
-            break;
-          default:
-            showInvalidUsage(argv[i]);
-        }
-#endif
       }
       else /* a 1 character option (or invalid) */
       {
