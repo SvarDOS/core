@@ -306,8 +306,7 @@ static DWORD GetFileAttributes(const char *pathname) {
    any newlines (but this should not occur in tree).
 */
 #include <stdarg.h>  /* va_list, va_start, va_end */
-int pprintf(const char *msg, ...)
-{
+static int pprintf(const char *msg, ...) {
   static int lineCnt = -1;
   static int lineCol = 0;
   va_list argptr;
@@ -364,8 +363,7 @@ int pprintf(const char *msg, ...)
 
 
 /* Displays to user valid options then exits program indicating no error */
-void showUsage(void)
-{
+static void showUsage(void) {
   printf("%s%s%s%s", treeDescription, newLine, treeUsage, newLine);
   printf("%s%s%s", treeFOption, treeAOption, newLine);
   exit(1);
@@ -373,8 +371,7 @@ void showUsage(void)
 
 
 /* Displays error message then exits indicating error */
-void showInvalidUsage(char * badOption)
-{
+static void showInvalidUsage(char * badOption) {
   printf(invalidOption, badOption);
   printf("%s%s", useTreeHelp, newLine);
   exit(1);
@@ -382,8 +379,7 @@ void showInvalidUsage(char * badOption)
 
 
 /* Displays author, copyright, etc info, then exits indicating no error. */
-void showVersionInfo(void)
-{
+static void showVersionInfo(void) {
   printf("%s%s%s%s%s", treeDescription, newLine, treeGoal, treePlatforms, newLine);
   printf(version, VERSION);
   printf("%s%s%s%s%s", writtenBy, writtenDate, contact, newLine, newLine);
@@ -393,26 +389,24 @@ void showVersionInfo(void)
 
 
 /* Displays error messge for invalid drives and exits */
-void showInvalidDrive(void)
-{
+static void showInvalidDrive(void) {
   printf(invalidDrive);
   exit(1);
 }
 
 
 /* Takes a fullpath, splits into drive (C:, or \\server\share) and path */
-void splitpath(char *fullpath, char *drive, char *path);
+static void splitpath(char *fullpath, char *drive, char *path);
 
 /**
  * Takes a given path, strips any \ or / that may appear on the end.
  * Returns a pointer to its static buffer containing path
  * without trailing slash and any necessary display conversions.
  */
-char *fixPathForDisplay(char *path);
+static char *fixPathForDisplay(char *path);
 
 /* Displays error message for invalid path; Does NOT exit */
-void showInvalidPath(char *path)
-{
+static void showInvalidPath(char *path) {
   char partialPath[MAXBUF], dummy[MAXBUF];
 
   pprintf("%s\n", path);
@@ -421,14 +415,12 @@ void showInvalidPath(char *path)
 }
 
 /* Displays error message for out of memory; Does NOT exit */
-void showOutOfMemory(char *path)
-{
+static void showOutOfMemory(char *path) {
   pprintf(outOfMemory, path);
 }
 
 /* Displays buffer exceeded message and exits */
-void showBufferOverrun(WORD maxSize)
-{
+static void showBufferOverrun(WORD maxSize) {
   printf(bufferToSmall, maxSize);
   exit(1);
 }
@@ -450,8 +442,7 @@ void showBufferOverrun(WORD maxSize)
  * None of these may be NULL, and drive and path must be large
  * enough to hold fullpath.
  */
-void splitpath(char *fullpath, char *drive, char *path)
-{
+static void splitpath(char *fullpath, char *drive, char *path) {
   char *src = fullpath;
   char oldchar;
 
@@ -522,8 +513,7 @@ void splitpath(char *fullpath, char *drive, char *path)
 
 
 /* Converts given path to full path */
-void getProperPath(char *fullpath)
-{
+static void getProperPath(char *fullpath) {
   char drive[MAXBUF];
   char path[MAXBUF];
 
@@ -552,8 +542,7 @@ void getProperPath(char *fullpath)
 
 
 /* Parses the command line and sets global variables. */
-void parseArguments(int argc, char *argv[])
-{
+static void parseArguments(int argc, char *argv[]) {
   int i;     /* temp loop variable */
 
   /* if no drive specified on command line, use current */
@@ -655,8 +644,7 @@ void parseArguments(int argc, char *argv[])
  * does not contain them, or an error retrieving
  * (ie UNC paths under DOS), but path is valid.
  */
-void GetVolumeAndSerial(char *volume, char *serial, char *path)
-{
+static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
   char rootPath[MAXBUF];
   char dummy[MAXBUF];
   union serialNumber {
@@ -730,8 +718,7 @@ typedef struct SUBDIRINFO
  * Stores additional directory data in ddata if non-NULL
  * and path is valid.
  */
-long hasSubdirectories(char *path, DIRDATA *ddata)
-{
+static long hasSubdirectories(char *path, DIRDATA *ddata) {
   static WIN32_FIND_DATA findData;
   HANDLE hnd;
   static char buffer[MAXBUF];
@@ -799,8 +786,7 @@ long hasSubdirectories(char *path, DIRDATA *ddata)
  * if subdir does not end in slash, one is added to stored subdir
  * dsubdir is subdir already modified so ready to display to user
  */
-SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
-{
+static SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir) {
   int parentLen, subdirLen;
   SUBDIRINFO *temp;
 
@@ -861,20 +847,19 @@ SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir)
  * or if more follow (hence if a | is needed).
  * padding must not be NULL
  */
-char * addPadding(char *padding, int moreSubdirsFollow)
-{
-    if (moreSubdirsFollow)
-    {
-      /* 1st char is | or a vertical bar */
-      if (charSet == EXTENDEDCHARS)
-        strcat(padding, VERTBAR_STR);
-      else
-        strcat(padding, "|   ");
+static char * addPadding(char *padding, int moreSubdirsFollow) {
+  if (moreSubdirsFollow) {
+    /* 1st char is | or a vertical bar */
+    if (charSet == EXTENDEDCHARS) {
+      strcat(padding, VERTBAR_STR);
+    } else {
+      strcat(padding, "|   ");
     }
-    else
-      strcat(padding, "    ");
+  } else {
+    strcat(padding, "    ");
+  }
 
-    return padding;
+  return(padding);
 }
 
 /**
@@ -883,8 +868,7 @@ char * addPadding(char *padding, int moreSubdirsFollow)
  * padding must not be NULL
  * Returns the pointer to padding.
  */
-char * removePadding(char *padding)
-{
+static char *removePadding(char *padding) {
   size_t len = strlen(padding);
 
   if (len < 4) return padding;
@@ -898,18 +882,17 @@ char * removePadding(char *padding)
  * Returns a pointer to its static buffer containing path
  * without trailing slash and any necessary display conversions.
  */
-char *fixPathForDisplay(char *path)
-{
+static char *fixPathForDisplay(char *path) {
   static char buffer[MAXBUF];
   int pathlen;
 
   strcpy(buffer, path);
   pathlen = strlen(buffer);
-  if (pathlen > 1)
-  {
+  if (pathlen > 1) {
     pathlen--;
-    if ((buffer[pathlen] == '\\') || (buffer[pathlen] == '/'))
+    if ((buffer[pathlen] == '\\') || (buffer[pathlen] == '/')) {
       buffer[pathlen] = '\0'; // strip off trailing slash on end
+    }
   }
 
   return buffer;
@@ -927,8 +910,7 @@ char *fixPathForDisplay(char *path)
  * padding is an ASCIIZ string to display prior to entry.
  * moreSubdirsFollow is -1 for initial path else >= 0.
  */
-void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DIRDATA *ddata)
-{
+static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DIRDATA *ddata) {
   if (padding != NULL)
     pprintf("%s", padding);
 
@@ -941,9 +923,7 @@ void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DI
         pprintf("%s", TBAR_HORZBAR_STR);
       else
         pprintf("%s", CBAR_HORZBAR_STR);
-    }
-    else
-    {
+    } else {
       if (moreSubdirsFollow)
         pprintf("+---");
       else
@@ -970,14 +950,11 @@ void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DI
  * Displays summary information about directory.
  * Expects to be called after displayFiles (optionally called)
  */
-static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata)
-{
+static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   addPadding(padding, hasMoreSubdirs);
 
-  if (dspSumDirs)
-  {
-    if (showFiles == SHOWFILESON)
-    {
+  if (dspSumDirs) {
+    if (showFiles == SHOWFILESON) {
       /* print File summary with lead padding, add filesize to it */
       pprintf("%s%lu files\n", padding, ddata->fileCnt);
     }
@@ -999,8 +976,7 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata)
  *          0 if no files, but no errors either,
  *      or  1 if files displayed, no errors.
  */
-int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
-{
+static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   static char buffer[MAXBUF];
   WIN32_FIND_DATA entry; /* current directory entry info    */
   HANDLE dir;         /* Current directory entry working with      */
@@ -1083,8 +1059,7 @@ int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata)
  * are found, at which point it closes the FindFile search handle and
  * return INVALID_HANDLE_VALUE.  If successful, returns FindFile handle.
  */
-HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH *entry, char *subdir, char *dsubdir)
-{
+static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
   do
   {
@@ -1132,8 +1107,7 @@ static WIN32_FIND_DATA_BOTH findSubdir_entry; /* current directory entry info   
  * Returns INVALID_HANDLE_VALUE on error.
  * currentpath must end in \
  */
-HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
-{
+static HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
   static char buffer[MAXBUF];
   HANDLE dir;         /* Current directory entry working with      */
 
@@ -1162,8 +1136,7 @@ HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir)
  * If a subdirectory is found, returns 0, otherwise returns 1
  * (either error or no more files).
  */
-int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir)
-{
+static int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir) {
   /* clear result path */
   strcpy(subdir, "");
 
@@ -1182,8 +1155,7 @@ int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir)
  * if it does not already end in one.
  * Returns the count of subdirs in initialpath.
  */
-long traverseTree(char *initialpath)
-{
+static long traverseTree(char *initialpath) {
   long subdirsInInitialpath;
   char padding[MAXPADLEN] = "";
   char subdir[MAXBUF];
@@ -1284,8 +1256,7 @@ long traverseTree(char *initialpath)
  * This is required because most messages are passed as
  * string arguments to printf, and not actually parsed by it.
  */
-char *processLine(char *line)
-{
+static char *processLine(char *line) {
   static char buffer[MAXLINE+MAXLINE];
   char *src = line, *dst = buffer;
 
@@ -1330,8 +1301,7 @@ char *processLine(char *line)
 }
 
 
-void FixOptionText(void)
-{
+static void FixOptionText(void) {
   char buffer[MAXLINE];  /* sprintf can have problems with src==dest */
 
   /* Handle %c for options within messages using Set 8 */
@@ -1347,15 +1317,13 @@ void FixOptionText(void)
 
 
 /* Loads all messages from the message catalog. */
-void loadAllMessages(void)
-{
+static void loadAllMessages(void) {
   /* Changes %c in certain lines with proper option characters. */
   FixOptionText();
 }
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char **argv) {
   char serial[SERIALLEN]; /* volume serial #  0000:0000 */
   char volume[VOLLEN];    /* volume name (label), possibly none */
 
