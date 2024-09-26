@@ -311,15 +311,11 @@ void FindClose(HANDLE hnd)
 *** Currently trying to find a way to get a \\server\share 's serial & volume if LFN available ***
 */
 
-/* Only the 1st 4 arguments are used, returns zero on failure,
- * If lpRootPathName is NULL or "" we use current default drive.
- */
-#pragma argsused
-int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
-  DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber,
-  DWORD *lpMaximumComponentLength, DWORD *lpFileSystemFlags,
-  char *lpFileSystemNameBuffer, DWORD nFileSystemNameSize)
-{
+/* returns zero on failure, if lpRootPathName is NULL or "" we use current
+ * default drive. */
+int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
+  DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber) {
+
   /* File info for getting  Volume Label (using directory entry) */
   struct FFDTA finfo;
 
@@ -362,9 +358,9 @@ int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
       INC BX
       MOV BYTE PTR [BX], 0    //; Most importantly the '\0' terminator
     }
-  }
-  else
+  } else {
     strcpy(pathname, lpRootPathName);
+  }
 
   /* Flag indicate if using LFN DOS or not */
   if (LFN_Enable_Flag)

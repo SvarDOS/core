@@ -581,9 +581,9 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
   splitpath(path, rootPath, dummy);
   strcat(rootPath, "\\");
 
-  if (GetVolumeInformation(rootPath, volume, VOLLEN,
-      &serialNum.serialFull, NULL, NULL, NULL, 0) == 0)
-	showInvalidDrive();
+  if (GetVolumeInformation(rootPath, volume, VOLLEN, &serialNum.serialFull) == 0) {
+    showInvalidDrive();
+  }
 
   if (serialNum.serialFull == 0)
     serial[0] = '\0';
@@ -591,11 +591,6 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
     sprintf(serial, "%04X:%04X",
       serialNum.serialParts.b, serialNum.serialParts.a);
 }
-
-
-#ifndef STDCALL
-#define STDCALL __stdcall
-#endif
 
 
 /**

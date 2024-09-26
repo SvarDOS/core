@@ -99,10 +99,8 @@ void FindClose(HANDLE hnd);
 DWORD GetFileAttributes(const char *pathname);
 
 /* Only the 1st 4 arguments are used and returns zero on error */
-int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
-  DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber,
-  DWORD *lpMaximumComponentLength, DWORD *lpFileSystemFlags,
-  char *lpFileSystemNameBuffer, DWORD nFileSystemNameSize);
+int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
+  DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber);
 
 
 /* If this variable is nonzero then will 1st attempt LFN findfirst
