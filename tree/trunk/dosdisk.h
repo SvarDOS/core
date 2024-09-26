@@ -102,15 +102,4 @@ DWORD GetFileAttributes(const char *pathname);
 int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
   DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber);
 
-
-/* If this variable is nonzero then will 1st attempt LFN findfirst
- * (findfirst calls sets flag, so findnext/findclose know proper method to continue)
- * else if 0 then only attempt old 0x4E findfirst.
- * This is mostly a debugging tool, may be useful during runtime.
- * Default is LFN_ENABLE.
- */
-#define LFN_ENABLE 1
-#define LFN_DISABLE 0
-extern int LFN_Enable_Flag;
-
 #endif

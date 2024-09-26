@@ -158,7 +158,6 @@ char optionchar2 = '-';  /* Secondary character used to determine option follows
 const char OptShowFiles[2] = { 'F', 'f' };  /* Show files */
 const char OptUseASCII[2]  = { 'A', 'a' };  /* Use ASCII only */
 const char OptVersion[2]   = { 'V', 'v' };  /* Version information */
-const char OptSFNs[2]      = { 'S', 's' };  /* Shortnames only (disable LFN support) */
 const char OptPause[2]     = { 'P', 'p' };  /* Pause after each page (screenfull) */
 const char OptDisplay[2]   = { 'D', 'd' };  /* modify Display settings */
 
@@ -534,8 +533,6 @@ static void parseArguments(int argc, char *argv[]) {
           showUsage();             /* show usage info and exit            */
         else if ((argv[i][1] == OptVersion[0]) || (argv[i][1] == OptVersion[1]))
           showVersionInfo();       /* show version info and exit          */
-        else if ((argv[i][1] == OptSFNs[0]) || (argv[i][1] == OptSFNs[1]))
-          LFN_Enable_Flag = LFN_DISABLE;         /* force shortnames only */
         else if ((argv[i][1] == OptPause[0]) || (argv[i][1] == OptPause[1]))
           pause = PAUSE;     /* wait for keypress after each page (pause) */
         else /* Invalid or unknown option */
@@ -996,10 +993,6 @@ static HANDLE cycleFindResults(HANDLE findnexthnd, struct WIN32_FIND_DATA *entry
       /* set display name */
       strcpy(dsubdir, entry->cFileName);
 
-      /* set canical name to use for further FindFile calls */
-      /* use short file name if exists as lfn may contain unicode values converted
-       * to default character (eg. ?) and so not a valid path.
-       */
       strcpy(subdir, entry->cFileName);
       strcat(subdir, "\\");
     }
@@ -1046,7 +1039,7 @@ static HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
 /**
  * Given a search HANDLE, will find the next subdirectory,
  * setting subdir to the found directory name.
- * dsubdir is the name to display (lfn or sfn as appropriate)
+ * dsubdir is the name to display
  * currentpath must end in \
  * If a subdirectory is found, returns 0, otherwise returns 1
  * (either error or no more files).
