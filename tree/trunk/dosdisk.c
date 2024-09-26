@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 
 /*** Expects Pointers to be near (Tiny, Small, and Medium models ONLY) ***/
 
-#include "w32fDOS.h"
+#include "dosdisk.h"
 #include <stdlib.h>
 #include <string.h>
 

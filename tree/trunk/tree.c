@@ -47,9 +47,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include "stack.h"
 
-
-/* Win32 File compability stuff */
-#include "w32fDOS.h"
+/* DOS disk accesses */
+#include "dosdisk.h"
 
 
 /* Define getdrive so it returns current drive, 0=A,1=B,...           */
