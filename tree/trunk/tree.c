@@ -671,13 +671,6 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
 }
 
 
-/* FindFile stuff to support optional NT API variant */
-typedef union WIN32_FIND_DATA_BOTH
-{
- WIN32_FIND_DATAW ud;
- WIN32_FIND_DATAA ad;
-} WIN32_FIND_DATA_BOTH;
-
 #ifndef STDCALL
 #define STDCALL __stdcall
 #endif
@@ -1059,18 +1052,18 @@ static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *
  * are found, at which point it closes the FindFile search handle and
  * return INVALID_HANDLE_VALUE.  If successful, returns FindFile handle.
  */
-static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH *entry, char *subdir, char *dsubdir) {
+static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATAA *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
   do
   {
     /* skip files & hidden or system directories */
-    if ((((entry->ad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
-         ((entry->ad.dwFileAttributes &
+    if ((((entry->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
+         ((entry->dwFileAttributes &
           (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) != 0  && !dspAll) ) ||
-        ((strcmp(entry->ad.cFileName, ".") == 0) ||
-         (strcmp(entry->ad.cFileName, "..") == 0)) )
+        ((strcmp(entry->cFileName, ".") == 0) ||
+         (strcmp(entry->cFileName, "..") == 0)) )
     {
-      if (FindNextFile(findnexthnd, &(entry->ad)) == 0)
+      if (FindNextFile(findnexthnd, entry) == 0)
       {
         FindClose(findnexthnd);      // prevent resource leaks
         return INVALID_HANDLE_VALUE; // no subdirs found
@@ -1079,13 +1072,13 @@ static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH *entry, 
     else
     {
       /* set display name */
-      strcpy(dsubdir, entry->ad.cFileName);
+      strcpy(dsubdir, entry->cFileName);
 
       /* set canical name to use for further FindFile calls */
       /* use short file name if exists as lfn may contain unicode values converted
        * to default character (eg. ?) and so not a valid path.
        */
-      strcpy(subdir, entry->ad.cFileName);
+      strcpy(subdir, entry->cFileName);
       strcat(subdir, "\\");
     }
   } while (!*subdir); // while (subdir is still blank)
@@ -1095,7 +1088,7 @@ static HANDLE cycleFindResults(HANDLE findnexthnd, WIN32_FIND_DATA_BOTH *entry, 
 
 
 /* FindFile buffer used by findFirstSubdir and findNextSubdir only */
-static WIN32_FIND_DATA_BOTH findSubdir_entry; /* current directory entry info    */
+static WIN32_FIND_DATAA findSubdir_entry; /* current directory entry info    */
 
 /**
  * Given the current path, find the 1st subdirectory.
@@ -1115,7 +1108,7 @@ static HANDLE findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
-  dir = FindFirstFileA(buffer, &findSubdir_entry.ad);
+  dir = FindFirstFileA(buffer, &findSubdir_entry);
   if (dir == INVALID_HANDLE_VALUE)
   {
     showInvalidPath(currentpath);
@@ -1140,7 +1133,7 @@ static int findNextSubdir(HANDLE findnexthnd, char *subdir, char *dsubdir) {
   /* clear result path */
   strcpy(subdir, "");
 
-  if (FindNextFile(findnexthnd, &findSubdir_entry.ad) == 0) return 1; // no subdirs found
+  if (FindNextFile(findnexthnd, &findSubdir_entry) == 0) return 1; // no subdirs found
 
   if (cycleFindResults(findnexthnd, &findSubdir_entry, subdir, dsubdir) == INVALID_HANDLE_VALUE)
     return 1;

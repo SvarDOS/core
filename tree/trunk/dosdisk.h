@@ -65,19 +65,6 @@ typedef struct  WIN32_FIND_DATAA
   char cAlternateFileName[ 14 ];
 } WIN32_FIND_DATAA;
 
-typedef struct  WIN32_FIND_DATAW
-{
-  DWORD dwFileAttributes;
-  FILETIME ftCreationTime;
-  FILETIME ftLastAccessTime;
-  FILETIME ftLastWriteTime;
-  DWORD    nFileSizeHigh;
-  DWORD    nFileSizeLow;
-  DWORD    dwReserved0;
-  DWORD    dwReserved1;
-  WORD cFileName[ 130 /* 260 */ ];        /* Correct values are 260 & 14, but as Unicode */
-  WORD cAlternateFileName[ 7 /* 14 */ ];  /* is unsupported, make size same as Ansi one  */
-} WIN32_FIND_DATAW;
 
 #define WIN32_FIND_DATA WIN32_FIND_DATAA
 
