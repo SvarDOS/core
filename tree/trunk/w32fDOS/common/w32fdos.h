@@ -137,48 +137,4 @@ int GetVolumeInformation(char *lpRootPathName,char *lpVolumeNameBuffer,
 #define LFN_DISABLE 0
 extern int LFN_Enable_Flag;
 
-
-/* The functions below are to aid in determining if output is redirected */
-
-#define STD_INPUT_HANDLE  ((DWORD)-10)
-#define STD_OUTPUT_HANDLE ((DWORD)-11)
-#define STD_ERROR_HANDLE  ((DWORD)-12)
-
-/* returns the handle to specified standard device (standard input,
- * standard output, or standard error).
- * Input: one of the predefined values STD_INPUT_HANDLE,
- *        STD_OUTPUT_HANDLE, or STD_ERROR_HANDLE.
- * Ouput: a file HANDLE to specified device.
- *
- * Current implementation simply returns standard DOS handle #,
- * and does not ensure it is valid -- however, the handle returned
- * should be opened and in r/w mode [though if redirected may
- * wait indefinitely for data] if program exec'd via normal DOS
- * routine and not purposely closed prior to invoking this function.
- * TODO: should actually open CON device and return that handle.
- * WARNING: this handle should only be passed to GetFileType or
- * a DOS function that takes a file handle, it is NOT compatible
- * the HANDLE used with FindFile functions above.  Cast to int.
- */
-HANDLE GetStdHandle(DWORD nStdHnd);
-
-
-#define FILE_TYPE_UNKNOWN 0x0000
-#define FILE_TYPE_DISK    0x0001
-#define FILE_TYPE_CHAR    0x0002
-#define FILE_TYPE_PIPE    0x0003
-#define FILE_TYPE_REMOTE  0x8000
-
-/* Returns file type.
- * Input, an opened file handle.
- * Output, one of predefined values above indicating if
- *         handle refers to file (FILE_TYPE_DISK), a
- *         device such as CON (FILE_TYPE_CHAR), a
- *         pipe (FILE_TYPE_PIPE), or unknown.
- * On errors or unspecified input, FILE_TYPE_UNKNOWN
- * is returned.  Under DOS, piped output is implemented
- * via a temp file, so FILE_TYPE_PIPE is never returned.
- */
-DWORD GetFileType(HANDLE hFile);
-
 #endif

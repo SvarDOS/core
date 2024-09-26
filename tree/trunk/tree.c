@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 /* Include files */
+#include <dos.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -49,7 +50,6 @@ DEALINGS IN THE SOFTWARE.
 
 /* Win32 File compability stuff */
 #include "w32fDOS.h"
-#include "wincon.h"
 
 
 /* Define getdrive so it returns current drive, 0=A,1=B,...           */
@@ -172,45 +172,131 @@ const char OptSort[2]      = { 'O', 'o' };  /* sort Output */
 /* Procedures */
 
 
+#define FILE_TYPE_UNKNOWN 0x00
+#define FILE_TYPE_DISK    0x01
+#define FILE_TYPE_CHAR    0x02
+#define FILE_TYPE_PIPE    0x03
+#define FILE_TYPE_REMOTE  0x80
+
+/* Returns file type of stdout.
+ * Output, one of predefined values above indicating if
+ *         handle refers to file (FILE_TYPE_DISK), a
+ *         device such as CON (FILE_TYPE_CHAR), a
+ *         pipe (FILE_TYPE_PIPE), or unknown.
+ * On errors or unspecified input, FILE_TYPE_UNKNOWN
+ * is returned. */
+static unsigned char GetStdoutType(void) {
+  union REGS r;
+
+  r.x.ax = 0x4400;                 /* DOS 2+, IOCTL Get Device Info */
+  r.x.bx = 0x0001;                 /* file handle (stdout) */
+
+  /* We assume hFile is an opened DOS handle, & if invalid call should fail. */
+  intdos(&r, &r);     /* Clib function to invoke DOS int21h call   */
+
+  /* error? */
+  if (r.x.cflag != 0) return(FILE_TYPE_UNKNOWN);
+
+  /* if bit 7 is set it is a char dev */
+  if (r.x.dx & 0x80) return(FILE_TYPE_CHAR);
+
+  /* file is remote */
+  if (r.x.dx & 0x8000) return(FILE_TYPE_REMOTE);
+
+  /* assume valid file handle */
+  return(FILE_TYPE_DISK);
+}
+
+
 /* sets rows & cols to size of actual console window
  * force NOPAUSE if appears output redirected to a file or
  * piped to another program
  * Uses hard coded defaults and leaves pause flag unchanged
  * if unable to obtain information.
  */
-void getConsoleSize(void)
-{
-  CONSOLE_SCREEN_BUFFER_INFO csbi;
+static void getConsoleSize(void) {
+  unsigned short far *bios_cols = (unsigned short far *)MK_FP(0x40,0x4A);
+  unsigned short far *bios_size = (unsigned short far *)MK_FP(0x40,0x4C);
 
-  HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-  if (h != INVALID_HANDLE_VALUE)
-  {
-    switch (GetFileType(h))
-    {
-      case FILE_TYPE_PIPE:  /* e.g. piped to more, tree | more */
-      case FILE_TYPE_DISK:  /* e.g. redirected to a file, tree > filelist.txt */
-      {
-         /* Output to a file or program, so no screen to fill (no max cols or rows) */
-         pause = NOPAUSE;   /* so ignore request to pause */
-         break;
+  switch (GetStdoutType()) {
+    case FILE_TYPE_DISK: /* e.g. redirected to a file, tree > filelist.txt */
+      /* Output to a file or program, so no screen to fill (no max cols or rows) */
+      pause = NOPAUSE;   /* so ignore request to pause */
+      break;
+    case FILE_TYPE_CHAR:  /* e.g. the console */
+    case FILE_TYPE_UNKNOWN:  /* else at least attempt to get proper limits */
+    case FILE_TYPE_REMOTE:
+    default:
+      if ((*bios_cols == 0) || (*bios_size == 0)) { /* MDA does not report size */
+        cols = 80;
+        rows = 23;
+      } else {
+        cols = *bios_cols;
+        rows = *bios_size / cols / 2;
+        if (rows > 2) rows -= 2; /* necessary to keep screen from scrolling */
       }
-      case FILE_TYPE_CHAR:  /* e.g. the console */
-      case FILE_TYPE_UNKNOWN:  /* else at least attempt to get proper limits */
-      /*case #define FILE_TYPE_REMOTE:*/
-      default:
-      {
-        if (GetConsoleScreenBufferInfo(&csbi))
-        {
-          /* rows = window size - 2, where -2 neccessary to keep screen from scrolling */
-          rows = csbi.srWindow.Bottom - csbi.srWindow.Top - 1;
-          cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-        }
-        /* else use hard coded defaults of 80x23 assuming 80x25 sized screen */
-        break;
-      }
-    }
+      break;
   }
 }
+
+
+/* retrieve attributes (ReadOnly/System/...) about file or directory
+ * returns (DWORD)-1 on error
+ */
+static DWORD GetFileAttributes(const char *pathname) {
+  union REGS r;
+  struct SREGS s;
+  char buffer[260];
+  int slen;
+
+  /* 1st try LFN - Extended get/set attributes (in case LFN used) */
+  if (LFN_Enable_Flag)
+  {
+    r.x.ax = 0x7143;                  /* LFN API, Extended Get/Set Attributes */
+    r.x.bx = 0x00;                    /* BL=0, get file attributes            */
+    r.x.dx = FP_OFF(pathname);        /* DS:DX points to ASCIIZ filename      */
+
+    segread(&s);                      /* load with current segment values     */
+    s.ds = FP_SEG(pathname);          /* get Segment of our filename pointer  */
+
+    r.x.cflag = 1;                    /* should be set when unsupported ***   */
+    asm stc;                          /* but clib usually ignores on entry    */
+
+    /* Actually perform the call, carry should be set on error or unuspported */
+    intdosx(&r, &r, &s);         /* Clib function to invoke DOS int21h call   */
+
+    if (!r.x.cflag)              /* if carry not set then cx has desired info */
+      return (DWORD)r.x.cx;
+    /* else error other than unsupported LFN api or invalid function [FreeDOS]*/
+    else if ((r.x.ax != 0x7100) || (r.x.ax != 0x01))
+      return (DWORD)-1;
+    /* else fall through to standard get/set file attribute call */
+  }
+
+  /* we must remove any slashes from end */
+  slen = strlen(pathname) - 1;  /* Warning, assuming pathname is not ""   */
+  strcpy(buffer, pathname);
+  if ((buffer[slen] == '\\') || (buffer[slen] == '/')) /* ends in a slash */
+  {
+    /* don't remove from root directory (slen == 0),
+     * ignore UNC paths as SFN doesn't handle them anyway
+     * if slen == 2, then check if drive given (e.g. C:\)
+     */
+    if (slen && !(slen == 2 &&  buffer[1] == ':'))
+      buffer[slen] = '\0';
+  }
+  /* return standard attributes */
+  r.x.ax = 0x4300;                  /* standard Get/Set File Attributes */
+  r.x.dx = FP_OFF(buffer);          /* DS:DX points to ASCIIZ filename      */
+  segread(&s);                      /* load with current segment values     */
+  s.ds = FP_SEG(buffer);            /* get Segment of our filename pointer  */
+  intdosx(&r, &r, &s);              /* invoke the DOS int21h call           */
+
+  //if (r.x.cflag) printf("ERROR getting std attributes of %s, DOS err %i\n", buffer, r.x.ax);
+  if (r.x.cflag) return (DWORD)-1;  /* error obtaining attributes           */
+  return (DWORD)(0x3F & r.x.cx); /* mask off any DRDOS bits     */
+}
+
 
 /* when pause == NOPAUSE then identical to printf,
    otherwise counts lines printed and pauses as needed.
