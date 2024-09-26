@@ -77,7 +77,7 @@ static void copyFileData(struct WIN32_FIND_DATA *findData, const struct FFDTA *f
 
 HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
 {
-  char path[1024];
+  static char path[1024];
   HANDLE hnd;
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
 
@@ -99,34 +99,56 @@ HANDLE FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
   /* First try DOS LFN (0x714E) findfirst, going to old (0x4E) if error */
   if (LFN_Enable_Flag)
   {
+    unsigned short attr = searchAttr;
+    unsigned short varax = 0xffff;
+    unsigned short finddata_seg = FP_SEG(findData);
+    unsigned short finddata_off = FP_OFF(findData);
+    unsigned char cf = 1;
+    unsigned short pathname_seg = FP_SEG(pathname);
+    unsigned short pathname_off = FP_OFF(pathname);
     hnd->flag = FINDFILELFN;
 
-    asm {
-      STC                          //; In case not supported
-      PUSH SI                      //; Ensure borlands registers unmodified
-      PUSH DI
-      MOV SI, 1                    //; same format as when old style used, set to 0 for 64bit value
-      MOV AX, DS                   //; Set address of findData into ES:DI
-      MOV ES, AX
-      MOV DI, [findData]
-      MOV AX, 714Eh                //; LFN version of FindFirst
-      MOV DX, [pathname]           //; Load DS:DX with pointer to path for Findfirt
-    }
-    _CX = searchAttr;
-    asm {
-      INT 21h                      //; Execute interrupt
-      POP DI                       //; Restore DI
-      POP SI                       //; Restore SI
-      JC lfnerror
-    }
-    hnd->fhnd.handle = _AX;  /* store handle finally :) */
-    return hnd;
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push es
+      push si
+      push di
 
-lfnerror:
+      stc                          //; In case not supported
+      mov si, 1                    //; same format as when old style used, set to 0 for 64bit value
+      mov di, finddata_off         //; Set address of findData into ES:DI
+      mov es, finddata_seg
+      mov ax, 0x714E               //; LFN version of FindFirst
+      mov cx, attr
+      mov dx, pathname_off         //; Load DS:DX with pointer to path for Findfirst
+      push ds
+      mov ds, pathname_seg
+      int 0x21                     //; Execute interrupt
+      pop ds
+      jc lfnerror
+      mov cf, 0
+      mov varax, ax
+      lfnerror:
+
+      pop di
+      pop si
+      pop es
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
+    if (cf == 0) {
+      hnd->fhnd.handle = varax;  /* store handle finally :) */
+      return hnd;
+    }
+
     /* AX is supposed to contain 7100h if function not supported, else real error */
     /* However, FreeDOS returns AX = 1 = Invalid function number instead.         */
-    if ((_AX != 0x7100) && (_AX != 0x0001))
-    {
+    if ((varax != 0x7100) && (varax != 0x0001)) {
       free(hnd);
       return INVALID_HANDLE_VALUE;
     }
@@ -149,33 +171,55 @@ lfnerror:
   if ((path[eos] == '*') && (path[eos - 1] == '\\')) strcat(path, ".*");
   }
 
-  asm {
-    MOV AH, 2Fh                    //; Get Current DTA
-    INT 21h                        //; Execute interrupt, returned in ES:BX
-    PUSH BX                        //; Store its Offset, then Segment
-    PUSH ES
-    MOV AH, 1Ah                    //; Set Current DTA to our buffer, DS:DX
- }
-    _DX = (WORD)(*hnd).fhnd.ffdtaptr;   //; Load our buffer for new DTA.
- asm {
-    INT 21h                        //; Execute interrupt
-    MOV AX, 4E00h                  //; Actual findfirst call
-    LEA DX, path                   //; Load DS:DX with pointer to path for Findfirt
-  }
-    _CX = searchAttr;
-  asm {
-    INT 21h                        //; Execute interrupt
-    JNC success                    //; If carry is not set then succesful
-    MOV [cflag], AX                //; Set flag with error.
-  }
+  {
+    unsigned short ffdta_seg, ffdta_off;
+    unsigned short path_seg, path_off;
+    unsigned short sattr = searchAttr;
+    ffdta_seg = FP_SEG((*hnd).fhnd.ffdtaptr);
+    ffdta_off = FP_OFF((*hnd).fhnd.ffdtaptr);
+    path_seg = FP_SEG(path);
+    path_off = FP_OFF(path);
+
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+    push es
+
+    mov ah, 0x2F                   //; Get Current DTA
+    int 0x21                       //; Execute interrupt, returned in ES:BX
+    push bx                        //; Store its Offset, then Segment
+    push es
+    mov ah, 0x1A                   //; Set Current DTA to our buffer, DS:DX
+    mov dx, ffdta_off
+    push ds
+    mov ds, ffdta_seg
+    int 0x21                       //; Execute interrupt
+    pop ds
+    mov ax, 0x4E00                 //; Actual findfirst call
+    mov cx, sattr
+    mov dx, path_off               //; Load DS:DX with pointer to path for Findfirt
+    push ds
+    mov ds, path_seg
+    int 0x21                       //; Execute interrupt
+    pop ds
+    jnc success                    //; If carry is not set then succesful
+    mov [cflag], ax                //; Set flag with error.
 success:
-  asm {
-    MOV AH, 1Ah               //; Set Current DTA back to original, DS:DX
-    MOV DX, DS                //; Store DS, must be preserved
-    POP DS                    //; Popping ES into DS since thats where we need it.
-    POP BX                    //; Now DS:BX points to original DTA
-    INT 21h                   //; Execute interrupt to restore.
-    MOV DS, DX                //; Restore DS
+    mov ah, 0x1A              //; Set Current DTA back to original, DS:DX
+    mov dx, ds                //; Store DS, must be preserved
+    pop ds                    //; Popping ES into DS since thats where we need it.
+    pop bx                    //; Now DS:BX points to original DTA
+    int 0x21                  //; Execute interrupt to restore.
+    mov ds, dx                //; Restore DS
+
+    pop es
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
   }
 
   if (cflag)
@@ -208,55 +252,79 @@ int FindNextFile(HANDLE hnd, struct WIN32_FIND_DATA *findData)
   /* Flag indicate if using LFN DOS (0x714F) or not */
   if (hnd->flag == FINDFILELFN)
   {
-    _BX = hnd->fhnd.handle;        //; Move the Handle returned by previous findfirst into BX
-    asm {
-      STC                          //; In case not supported
-      PUSH SI                      //; Ensure borlands registers unmodified
-      PUSH DI
-      MOV SI, 1                    //; same format as when old style used, set to 0 for 64bit value
-      MOV AX, DS                   //; Set address of findData into ES:DI
-      MOV ES, AX
-      MOV DI, [findData]
-      MOV AX, 714Fh                //; LFN version of FindNext
-      INT 21h                      //; Execute interrupt
-      POP DI                       //; Restore DI
-      POP SI                       //; Restore SI
-      JC lfnerror
-    }
-    return 1;   /* success */
+    unsigned short handle = hnd->fhnd.handle;
+    unsigned char cf = 0;
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push es
+      push si
+      push di
 
-lfnerror:
+      mov bx, handle               //; Move the Handle returned by prev findfirst into BX
+      stc                          //; In case not supported
+      mov si, 1                    //; same format as when old style used, set to 0 for 64bit value
+      mov ax, ds                   //; Set address of findData into ES:DI
+      mov es, ax
+      mov di, [findData]
+      mov ax, 0x714F               //; LFN version of FindNext
+      int 0x21                     //; Execute interrupt
+      jnc DONE
+      mov cf, 1
+      DONE:
+
+      pop di
+      pop si
+      pop es
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
+    if (cf == 0) return 1;   /* success */
     return 0;   /* Any errors here, no other option but to return error/no more files */
-  }
-  else  /* Use DOS (0x4F) findnext, returning if error */
-  {
-    asm {
-      MOV AH, 2Fh                   //; Get Current DTA
-      INT 21h                       //; Execute interrupt, returned in ES:BX
-      PUSH BX                       //; Store its Offset, then Segment
-      PUSH ES
-    }
-    _DX = (WORD)(*hnd).fhnd.ffdtaptr;    //; Load our buffer for new DTA.
-    asm {
-      MOV AX, 1A00h                 //; Set Current DTA to our buffer, DS:DX
-      INT 21h                       //; Execute interrupt
-      MOV AX, 4F00h                 //; Actual findnext call
-      INT 21h                       //; Execute interrupt
+  } else { /* Use DOS (0x4F) findnext, returning if error */
+    unsigned short dta_seg = FP_SEG((*hnd).fhnd.ffdtaptr);
+    unsigned short dta_off = FP_OFF((*hnd).fhnd.ffdtaptr);
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push es
+
+      mov ah, 0x2F                  //; Get Current DTA
+      int 0x21                      //; Execute interrupt, returned in ES:BX
+      push bx                       //; Store its Offset, then Segment
+      push es
+      mov ax, 0x1A00                //; Set Current DTA to our buffer, DS:DX
+      mov dx, dta_off
+      push ds
+      mov ds, dta_seg
+      int 0x21                      //; Execute interrupt
+      pop ds
+      mov ax, 0x4F00                //; Actual findnext call
+      int 0x21                      //; Execute interrupt
       JNC success                   //; If carry is not set then succesful
-      MOV [cflag], AX               //; Set flag with error.
-    }
+      mov [cflag], ax               //; Set flag with error.
 success:
-    asm {
-      MOV AH, 1Ah                   //; Set Current DTA back to original, DS:DX
-      MOV DX, DS                    //; Store DS, must be preserved
-      POP DS                        //; Popping ES into DS since thats where we need it.
-      POP BX                        //; Now DS:BX points to original DTA
-      INT 21h                       //; Execute interrupt to restore.
-      MOV DS, DX                    //; Restore DS
+      mov ah, 0x1A                  //; Set Current DTA back to original, DS:DX
+      MOV dx, ds                    //; Store DS, must be preserved
+      pop ds                        //; Popping ES into DS since thats where we need it.
+      pop bx                        //; Now DS:BX points to original DTA
+      int 0x21                      //; Execute interrupt to restore.
+      mov ds, dx                    //; Restore DS
+
+      pop es
+      pop dx
+      pop cx
+      pop bx
+      pop ax
     }
 
-  if (cflag)
-    return 0;
+  if (cflag) return 0;
 
   /* copy its results over */
   copyFileData(findData, hnd->fhnd.ffdtaptr);
@@ -281,11 +349,18 @@ void FindClose(HANDLE hnd)
     }
     else /* must call LFN findclose */
     {
-      _BX = hnd->fhnd.handle;     /* Move handle returned from findfirst into BX */
-      asm {
-        STC
-        MOV AX, 71A1h
-        INT 21h                   /* carry set on error */
+      unsigned short handle = hnd->fhnd.handle;
+      _asm {
+        push ax
+        push bx
+
+        mov bx, handle            /* Move handle returned from findfirst into BX */
+        stc
+        mov ax, 0x71A1
+        int 0x21                  /* carry set on error */
+
+        pop bx
+        pop ax
       }
       hnd->fhnd.handle = 0;
     }
@@ -316,12 +391,8 @@ void FindClose(HANDLE hnd)
 int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
   DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber) {
 
-  /* File info for getting  Volume Label (using directory entry) */
-  struct FFDTA finfo;
-
   /* Using DOS interrupt to get serial number */
-  struct media_info
-  {
+  struct media_info {
     short dummy;
     DWORD serial;
     char volume[11];
@@ -342,21 +413,26 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
   int cflag=2;
 
   /* validate root path to obtain info on, NULL or "" means use current */
-  if ((lpRootPathName == NULL) || (*lpRootPathName == '\0'))
-  {
+  if ((lpRootPathName == NULL) || (*lpRootPathName == '\0')) {
     /* Assume if NULL user wants current drive, eg C:\ */
-    asm {
-      MOV AH, 19h             //; Get Current Default Drive
-      INT 21h                 //; returned in AL, 0=A, 1=B,...
-      LEA BX, pathname        //; load pointer to our buffer
-      ADD AL, 'A'             //; Convert #returned to a letter
-      MOV [BX], AL            //; Store drive letter
-      INC BX                  //; point to next character
-      MOV BYTE PTR [BX], ':'  //; Store the colon
-      INC BX
-      MOV BYTE PTR [BX], '\'  //; and the \ (this gets converted correctly as a single \
-      INC BX
-      MOV BYTE PTR [BX], 0    //; Most importantly the '\0' terminator
+    _asm {
+      push ax
+      push bx
+
+      mov ah, 0x19            //; Get Current Default Drive
+      int 0x21                //; returned in AL, 0=A, 1=B,...
+      lea bx, pathname        //; load pointer to our buffer
+      add al, 'A'             //; Convert #returned to a letter
+      mov [bx], al            //; Store drive letter
+      inc bx                  //; point to next character
+      mov byte ptr [bx], ':'  //; Store the colon
+      inc bx
+      mov byte ptr [bx], '\'  //; this gets converted correctly as a single bkslsh
+      inc bx
+      mov byte ptr [bx], 0    //; Most importantly the '\0' terminator
+
+      pop bx
+      pop ax
     }
   } else {
     strcpy(pathname, lpRootPathName);
@@ -365,46 +441,61 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
   /* Flag indicate if using LFN DOS or not */
   if (LFN_Enable_Flag)
   {
-    asm {
-      MOV AX, 71A0h            //; LFN GetVolumeInformation
-      PUSH DI                  //; Preserve DI for borland
-      MOV DX, DS               //; Load buffer for file system name into ES:DI
-      MOV ES, DX
-      LEA DI, fsystem
-      MOV CX, 32               //; size of ES:DI buffer
-      LEA DX, pathname         //; Load root name into DS:DX
-      STC                      //; in case LFN api unsupported
-      INT 21h
-      POP DI                   //; restore Borland's register
-      JC getvolerror           //; on any error skip storing any info
-    }
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push es
+      push di
+
+      mov ax, 0x71A0           //; LFN GetVolumeInformation
+      mov dx, ds               //; Load buffer for file system name into ES:DI
+      MOV es, dx
+      lea di, fsystem
+      mov cx, 32               //; size of ES:DI buffer
+      lea dx, pathname         //; Load root name into DS:DX
+      stc                      //; in case LFN api unsupported
+      int 0x21
+      jc getvolerror           //; on any error skip storing any info
+      mov cflag, 0             //; indicate no error
+      jmp endgetvol
     /* store stuff
-	    BX = file system flags (see #01783)
-	    CX = maximum length of file name [usually 255]
-	    DX = maximum length of path [usually 260]
-	    fsystem buffer filled (ASCIZ, e.g. "FAT","NTFS","CDFS")
+       BX = file system flags (see #01783)
+       CX = maximum length of file name [usually 255]
+       DX = maximum length of path [usually 260]
+       fsystem buffer filled (ASCIZ, e.g. "FAT","NTFS","CDFS")
     */
-    cflag = 0;                 //; indicate no error
-    goto endgetvol;
-
 getvolerror:
-    asm {
-      CMP AX, 7100h            //; see if real error or unsupported
-      JE endgetvol             //; if so skip ahead
-      CMP AX, 0001h            //; FreeDOS returns AX = 1 = Invalid function number
-      JE endgetvol
-    }
-    cflag = 1;                 //; indicate failure
-
+      cmp ax, 0x7100           //; see if real error or unsupported
+      je endgetvol             //; if so skip ahead
+      cmp ax, 0x0001           //; FreeDOS returns AX = 1 = Invalid function number
+      je endgetvol
+      mov cflag, 1             //; indicate failure
 endgetvol:
+
+      pop di
+      pop es
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
   }
 
 
   if (cflag != 1)  /* if no error validating volume info or LFN getVolInfo unsupported */
   {
     /* if a drive, test if valid, get volume, and possibly serial # */
-    if (pathname[1] == ':')
-    {
+    if (pathname[1] == ':') {
+      struct FFDTA finfo;
+      unsigned short attr_seg = FP_SEG(finfo.ff_attr);
+      unsigned short attr_off = FP_OFF(finfo.ff_attr);
+      unsigned short finfo_seg = FP_SEG(&finfo);
+      unsigned short finfo_off = FP_OFF(&finfo);
+      unsigned short pathname_seg = FP_SEG(pathname);
+      unsigned short pathname_off = FP_OFF(pathname);
+
       /* assume these calls will succeed, change on an error */
       cflag = 0;
 
@@ -417,42 +508,59 @@ endgetvol:
       /* Search for volume using old findfirst, as LFN version (NT5 DOS box) does
        * not recognize FILE_ATTRIBUTE_LABEL = 0x0008 as label attribute.
        */
-      asm {
-	MOV AH, 2Fh               //; Get Current DTA
-	INT 21h                   //; Execute interrupt, returned in ES:BX
-	PUSH BX                   //; Store its Offset, then Segment
-	PUSH ES
-	MOV AH, 1Ah               //; Set Current DTA to our buffer, DS:DX
-	LEA DX, finfo       	    //; Load our buffer for new DTA.
-	INT 21h                   //; Execute interrupt
-	MOV AX, 4E00h             //; Actual findfirst call
-	LEA DX, pathname          //; Load DS:DX with pointer to modified RootPath for Findfirt
-	MOV CX, FILE_ATTRIBUTE_LABEL
-	INT 21h                   //; Execute interrupt, Carry set on error, unset on success
-	JNC success               //; If carry is not set then succesful
-	MOV [cflag], AX           //; Set flag with error.
-	JMP cleanup               //; Restore DTA
-      }
+      _asm {
+        push ax
+        push bx
+        push cx
+        push dx
+        push es
+
+        mov ah, 0x2F              //; Get Current DTA
+        int 0x21                  //; Execute interrupt, returned in ES:BX
+        push bx                   //; Store its Offset, then Segment
+        push es
+        mov ah, 0x1A              //; Set Current DTA to our buffer, DS:DX
+        mov dx, finfo_off         //; Load our buffer for new DTA.
+        push ds
+        mov ds, finfo_seg
+        int 0x21                  //; Execute interrupt
+        pop ds
+        mov ax, 0x4E00            //; Actual findfirst call
+        mov cx, FILE_ATTRIBUTE_LABEL
+        mov dx, pathname_off      //; Load DS:DX with pointer to modified RootPath for Findfirt
+        push ds
+        mov ds, pathname_seg
+        int 0x21                  //; Execute interrupt, Carry set on error, unset on success
+        pop ds
+        jnc success               //; If carry is not set then succesful
+        mov [cflag], ax           //; Set flag with error.
+        jmp cleanup               //; Restore DTA
 success:                        //; True volume entry only has volume attribute set [MS' LFNspec]
-      asm {                     //;     But they may also have archive bit set!!!
-	LEA BX, finfo.ff_attr   //; Load address of file's attributes returned by findfirst/next
-	MOV AL, BYTE PTR [BX]     //; Looking for a BYTE that is FILE_ATTRIBUTE_LABEL only
-      AND AL, 0xDF              //; Ignore Archive bit
-	CMP AL, FILE_ATTRIBUTE_LABEL
-	JE cleanup                //; They match, so should be true volume entry.
-	MOV AX, 4F00h             //; Otherwise keep looking (findnext)
-	INT 21h                   //; Execute interrupt
-	JNC success               //; If carry is not set then succesful
-	MOV [cflag], AX           //; Set flag with error.
-      }
+        mov bx, attr_off
+        push es
+        mov es, attr_seg
+        mov al, [es:bx]              //; Looking for a BYTE that is FILE_ATTRIBUTE_LABEL only
+        pop es
+        and al, 0xDF              //; Ignore Archive bit
+        cmp al, FILE_ATTRIBUTE_LABEL
+        je cleanup                //; They match, so should be true volume entry.
+        mov ax, 0x4F00            //; Otherwise keep looking (findnext)
+        int 0x21                  //; Execute interrupt
+        jnc success               //; If carry is not set then succesful
+        mov [cflag], ax           //; Set flag with error.
 cleanup:
-      asm {
-	MOV AH, 1Ah               //; Set Current DTA back to original, DS:DX
-	MOV DX, DS                //; Store DS, must be preserved
-	POP DS                    //; Popping ES into DS since thats where we need it.
-	POP BX                    //; Now DS:BX points to original DTA
-	INT 21h                   //; Execute interrupt to restore.
-	MOV DS, DX                //; Restore DS
+        mov ah, 0x1A              //; Set Current DTA back to original, DS:DX
+        mov dx, ds                //; Store DS, must be preserved
+        pop ds                    //; Popping ES into DS since thats where we need it.
+        pop bx                    //; Now DS:BX points to original DTA
+        int 0x21                  //; Execute interrupt to restore.
+        mov ds, dx                //; Restore DS
+
+        pop es
+        pop dx
+        pop cx
+        pop bx
+        pop ax
       }
       /* copy over volume label, if buffer given */
       if (lpVolumeNameBuffer != NULL)
@@ -484,13 +592,31 @@ cleanup:
 
       /* Get Serial Number, only supports drives mapped to letters */
       media.serial = 0;         /* set to 0, stays 0 on an error */
+      {
+        unsigned short media_off = FP_OFF(&media);
+        unsigned short media_seg = FP_SEG(&media);
+        unsigned char drv = (pathname[0] & 0xDF) - 'A' + 1;
+      _asm {
+        push ax
+        push bx
+        push cx
+        push dx
 
-      _BX = (pathname[0] & '\xDF') - 'A' + 1; /* Clear BH, drive in BL */
-      asm {
-        LEA DX, media           //; DS:DX pointer to media structure
-        MOV CX, 0866h           //; CH=disk drive, CL=Get Serial #
-        MOV AX, 440Dh           //; Generic IOCTL
-        INT 21h
+        xor bh, bh
+        mov bl, drv             //; Clear BH, drive in BL
+        mov cx, 0x0866          //; CH=disk drive, CL=Get Serial #
+        mov ax, 0x440D          //; Generic IOCTL
+        mov dx, media_off       //; DS:DX pointer to media structure
+        push ds
+        mov ds, media_seg
+        int 0x21
+        pop ds
+
+        pop dx
+        pop cx
+        pop bx
+        pop ax
+      }
       }
 
 /***************** Replaced with 'documented' version of Get Serial Number *********************/
@@ -544,7 +670,7 @@ DWORD GetFileAttributes(const char *pathname) {
     s.ds = FP_SEG(pathname);          /* get Segment of our filename pointer  */
 
     r.x.cflag = 1;                    /* should be set when unsupported ***   */
-    asm stc;                          /* but clib usually ignores on entry    */
+    _asm stc;                          /* but clib usually ignores on entry    */
 
     /* Actually perform the call, carry should be set on error or unuspported */
     intdosx(&r, &r, &s);         /* Clib function to invoke DOS int21h call   */

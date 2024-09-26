@@ -65,7 +65,7 @@ struct WIN32_FIND_DATA {
 };
 
 
-struct FFDTA { /* same format as a ffblk struct */
+_Packed struct FFDTA { /* same format as a ffblk struct */
   BYTE reserved[21]; /* dos positioning info */
   BYTE ff_attr;      /* file attributes */
   WORD ff_ftime;     /* time when file created/modified */

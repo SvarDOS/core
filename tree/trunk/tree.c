@@ -50,10 +50,6 @@ DEALINGS IN THE SOFTWARE.
 /* DOS disk accesses */
 #include "dosdisk.h"
 
-
-/* Define getdrive so it returns current drive, 0=A,1=B,...           */
-#define getdrive() getdisk()
-
 #include <conio.h>  /* for getch()   */
 
 
@@ -168,6 +164,15 @@ const char OptDisplay[2]   = { 'D', 'd' };  /* modify Display settings */
 
 
 /* Procedures */
+
+
+/* returns the current drive (A=0, B=1, etc) */
+static unsigned char getdrive(void);
+#pragma aux getdrive = \
+"mov ah, 0x19" \
+"int 0x21" \
+modify [ah] \
+value [al]
 
 
 #define FILE_TYPE_UNKNOWN 0x00
