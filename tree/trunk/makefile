@@ -3,11 +3,11 @@
 #
 
 CC=wcl
-CFLAGS=-ms -0 -ox -d0 -wx -we
+CFLAGS=-mt -s -0 -ox -d0 -wx -we -fm=tree.map
 
-all: tree.exe
+all: tree.com
 
-tree.exe: tree.c deflang.c stack.c
+tree.com: tree.c deflang.c stack.c
 	$(CC) $(CFLAGS) tree.c deflang.c stack.c svarlang\svarlngs.lib
 
 deflang.c: nls\*.txt
@@ -30,7 +30,7 @@ deflang.c: nls\*.txt
 	cd ..
 
 clean: .symbolic
-	del tree.exe
+	del tree.com
 	del tree.lng
 	del deflang.c
 	del *.obj
