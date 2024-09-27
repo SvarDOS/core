@@ -645,11 +645,10 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
    * if supported by underlying filesystem.
    */
   hnd = FindFirstFile(buffer, &findData);
-  if (hnd == INVALID_HANDLE_VALUE) {
+  if (hnd == NULL) {
     showInvalidPath(path); /* Display error message */
-    return -1L;
+    return(-1);
   }
-
 
   /*  cycle through entries counting directories found until no more entries */
   do {
@@ -742,10 +741,11 @@ static SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir
     free(temp);
     return NULL;
   }
-  temp->findnexthnd = INVALID_HANDLE_VALUE;
+  temp->findnexthnd = NULL;
 
   return temp;
 }
+
 
 /**
  * Extends the padding with the necessary 4 characters.
@@ -895,8 +895,7 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
   strcpy(buffer, path);
   strcat(buffer, "*");
   dir = FindFirstFile(buffer, &entry);
-  if (dir == INVALID_HANDLE_VALUE)
-    return -1;
+  if (dir == NULL) return(-1);
 
   addPadding(padding, hasMoreSubdirs);
 
@@ -965,7 +964,7 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
  * was found, and if so copies appropriate data into subdir and dsubdir.
  * It will repeat until a valid subdirectory is found or no more
  * are found, at which point it closes the FindFile search handle and
- * return INVALID_HANDLE_VALUE.  If successful, returns FindFile handle.
+ * return NULL.  If successful, returns FindFile handle.
  */
 static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct WIN32_FIND_DATA *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
@@ -976,14 +975,11 @@ static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct WIN32_FI
          ((entry->attrib &
           (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
         (entry->cFileName[0] == '.')) {
-      if (FindNextFile(findnexthnd, entry) == 0)
-      {
+      if (FindNextFile(findnexthnd, entry) == 0) {
         FindClose(findnexthnd);      // prevent resource leaks
-        return INVALID_HANDLE_VALUE; // no subdirs found
+        return(NULL); // no subdirs found
       }
-    }
-    else
-    {
+    } else {
       /* set display name */
       strcpy(dsubdir, entry->cFileName);
 
@@ -1006,7 +1002,7 @@ static struct WIN32_FIND_DATA findSubdir_entry; /* current directory entry info 
  * Returns the findfirst search HANDLE, which should be passed to
  * findclose when directory has finished processing, and can be
  * passed to findnextsubdir to find subsequent subdirectories.
- * Returns INVALID_HANDLE_VALUE on error.
+ * Returns NULL on error.
  * currentpath must end in \
  */
 static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
@@ -1018,9 +1014,9 @@ static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsub
   strcat(buffer, "*");
 
   dir = FindFirstFile(buffer, &findSubdir_entry);
-  if (dir == INVALID_HANDLE_VALUE) {
+  if (dir == NULL) {
     showInvalidPath(currentpath);
-    return INVALID_HANDLE_VALUE;
+    return(NULL);
   }
 
   /* clear result path */
@@ -1043,10 +1039,10 @@ static int findNextSubdir(struct FFDTA *findnexthnd, char *subdir, char *dsubdir
 
   if (FindNextFile(findnexthnd, &findSubdir_entry) == 0) return 1; // no subdirs found
 
-  if (cycleFindResults(findnexthnd, &findSubdir_entry, subdir, dsubdir) == INVALID_HANDLE_VALUE)
+  if (cycleFindResults(findnexthnd, &findSubdir_entry, subdir, dsubdir) == NULL) {
     return 1;
-  else
-    return 0;
+  }
+  return 0;
 }
 
 /**
@@ -1067,8 +1063,9 @@ static long traverseTree(char *initialpath) {
   stackDefaults(&s);
   stackInit(&s);
 
-  if ( (sdi = newSubdirInfo(NULL, initialpath, initialpath)) == NULL)
-    return 0L;
+  if ( (sdi = newSubdirInfo(NULL, initialpath, initialpath)) == NULL) {
+    return(0);
+  }
   stackPushItem(&s, sdi);
 
   /* Store count of subdirs in initial path so can display message if none. */
@@ -1078,8 +1075,7 @@ static long traverseTree(char *initialpath) {
   {
     sdi = (SUBDIRINFO *)stackPopItem(&s);
 
-    if (sdi->findnexthnd == INVALID_HANDLE_VALUE)  // findfirst not called yet
-    {
+    if (sdi->findnexthnd == NULL) { // findfirst not called yet
       // 1st time this subdirectory processed, so display its name & possibly files
       if (sdi->parent == NULL) // if initial path
       {
@@ -1099,13 +1095,10 @@ static long traverseTree(char *initialpath) {
     if (sdi->subdircnt > 0) /* if (there are more subdirectories to process) */
     {
       int flgErr;
-      if (sdi->findnexthnd == INVALID_HANDLE_VALUE)
-      {
+      if (sdi->findnexthnd == NULL) {
         sdi->findnexthnd = findFirstSubdir(sdi->currentpath, subdir, dsubdir);
-        flgErr = (sdi->findnexthnd == INVALID_HANDLE_VALUE);
-      }
-      else
-      {
+        flgErr = (sdi->findnexthnd == NULL);
+      } else {
         flgErr = findNextSubdir(sdi->findnexthnd, subdir, dsubdir);
       }
 

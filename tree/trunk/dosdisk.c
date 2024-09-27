@@ -73,10 +73,11 @@ struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findDa
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
 
   /* verify findData is valid */
-  if (findData == NULL) return INVALID_HANDLE_VALUE;
+  if (findData == NULL) return(NULL);
 
   /* allocate memory for the handle */
-  if ((hnd = malloc(sizeof(*hnd))) == NULL) return INVALID_HANDLE_VALUE;
+  hnd = malloc(sizeof(*hnd));
+  if (hnd == NULL) return(NULL);
 
   /* initialize structure (clear) */
   /* hnd->handle = 0;  hnd->ffdtaptr = NULL; */
@@ -145,7 +146,7 @@ success:
 
   if (cflag) {
     free(hnd);
-    return INVALID_HANDLE_VALUE;
+    return(NULL);
   }
 
   /* copy its results over */
