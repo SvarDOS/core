@@ -1,5 +1,5 @@
 # Language: Finnish (CP850)
-# Translated by Sampo Hippel„inen
+# Translated by Sampo HippelÃ¤inen
 # Last update: 21 Dec 2020
 #
 # Messages used by pdTree v1 and FreeDOS tree 3.6
@@ -23,18 +23,18 @@
 # Must include %s for serial #  
 1.4:Taltion sarjanumero on %s\n
 1.5:Ei alihakemistoja\n\n
-1.6: --- Paina n„pp„int„ jatkaaksesi ---\n
+1.6: --- Paina nÃ¤ppÃ¤intÃ¤ jatkaaksesi ---\n
 # showUsage [Set 2] 
-2.1:Esitt„„ aseman tai polun hakemistorakenteen graafisesti.\n
+2.1:EsittÃ¤Ã¤ aseman tai polun hakemistorakenteen graafisesti.\n
 # Each %c below will be replaced with proper switch/option
 2.2:TREE [asema:][polku] [%c%c] [%c%c]\n
-2.3:   %c%c   N„ytt„„ jokaisen hakemiston tiedostojen nimet.\n
-2.4:   %c%c   K„ytt„„ ASCII:ta laajennettujen merkkien asemesta.\n
+2.3:   %c%c   NÃ¤yttÃ¤Ã¤ jokaisen hakemiston tiedostojen nimet.\n
+2.4:   %c%c   KÃ¤yttÃ¤Ã¤ ASCII:ta laajennettujen merkkien asemesta.\n
 # showInvalidUsage [Set 3] 
 # Must include the %s for option given.
 3.1:Virheellinen valitsin - %s\n
 # The %c will be replaced with the primary switch (default is /)
-3.2:Kirjoita TREE %c? saadaksesi lis„tietoja.\n
+3.2:Kirjoita TREE %c? saadaksesi lisÃ¤tietoja.\n
 #showTooManyOptions
 3.3:Liikaa parametreja - %s\n
 # showVersionInfo [Set 4] 
@@ -43,17 +43,17 @@
 4.2:Win32(c)-konsolilla ja DOS:lla LFN-tuella.\n
 # Must include the %s for version string. 
 4.3:Versio %s\n
-4.4:Tekij„:       Kenneth J. Davis\n
-4.5:P„iv„ys:      2000, 2001, 2004\n
+4.4:TekijÃ¤:       Kenneth J. Davis\n
+4.5:PÃ¤ivÃ¤ys:      2000, 2001, 2004\n
 4.6:Yhteystiedot: jeremyd@computer.org\n
-4.7:(c): Public domain [Yhdysvaltain m„„ritelm„ll„]\n
+4.7:(c): Public domain [Yhdysvaltain mÃ¤Ã¤ritelmÃ¤llÃ¤]\n
 #4.8 is only used when cats support is compiled in.
-4.8:K„ytt„„ Jim Hallin <jhall@freedos.org> Cats-kirjastoa\n  versio 3.8 (C) 1999,2000 Jim Hall\n
+4.8:KÃ¤yttÃ¤Ã¤ Jim Hallin <jhall@freedos.org> Cats-kirjastoa\n  versio 3.8 (C) 1999,2000 Jim Hall\n
 #4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
 #4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:(C) 1995, 2000 Dave Dunfield - vapaasti jaettava (2000 GPL-lisenssill„).\n
+4.20:(C) 1995, 2000 Dave Dunfield - vapaasti jaettava (2000 GPL-lisenssillÃ¤).\n
 # showInvalidDrive [Set 5] 
-5.1:Virheellinen asemam„„rittely\n
+5.1:Virheellinen asemamÃ¤Ã¤rittely\n
 # showInvalidPath [Set 6] 
 # Must include %s for the invalid path given. 
 6.1:Virheellinen polku - %s\n

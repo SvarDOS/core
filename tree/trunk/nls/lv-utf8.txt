@@ -4,53 +4,53 @@
 # common to many functions [Set 1]
 1.1:\n
 # main [Set 1] 
-1.2:Katalogu CEêA saraksts\n
+1.2:Katalogu CEÄ»A saraksts\n
 # Must include %s for label 
-1.3:Katalogu CEêA saraksts s‰jumam %s\n
+1.3:Katalogu CEÄ»A saraksts sÄ“jumam %s\n
 # Must include %s for serial #  
-1.4:S‰juma s‰rijas numurs ir %s\n
-1.5:ApakÕkatalogi neeksist‰\n\n
+1.4:SÄ“juma sÄ“rijas numurs ir %s\n
+1.5:ApakÅ¡katalogi neeksistÄ“\n\n
 1.6: --- Press any key to continue ---\n
 # showUsage [Set 2]
-2.1:Grafiski parƒda diska vai ceëa katalogu strukt×ru.\n
+2.1:Grafiski parÄda diska vai ceÄ¼a katalogu struktÅ«ru.\n
 # Each %c below will be replaced with proper switch/option
-2.2:TREE [disks:][ceëÕ] [%c%c] [%c%c]\n
-2.3:   %c%c   IzvadŒt failu nosaukumus katrƒ katalogƒ.\n
-2.4:   %c%c   Izmantot ASCII paplaÕinƒto simbolu vietƒ.\n
+2.2:TREE [disks:][ceÄ¼Å¡] [%c%c] [%c%c]\n
+2.3:   %c%c   IzvadÄ«t failu nosaukumus katrÄ katalogÄ.\n
+2.4:   %c%c   Izmantot ASCII paplaÅ¡inÄto simbolu vietÄ.\n
 # showInvalidUsage [Set 3] 
 # Must include the %s for option given.
-3.1:Nepareiza atsl‰ga - %s\n
+3.1:Nepareiza atslÄ“ga - %s\n
 # The %c will be replaced with the primary switch (default is /)
-3.2:Lietojiet TREE %c? lai ieg×tu lietoÕanas informƒciju.\n
+3.2:Lietojiet TREE %c? lai iegÅ«tu lietoÅ¡anas informÄciju.\n
 #showTooManyOptions
-3.3:Pƒrƒk daudz parametru - %s\n
+3.3:PÄrÄk daudz parametru - %s\n
 # showVersionInfo [Set 4] 
 # also uses treeDescription, message 2.1
-4.1:SarakstŒts lai darbotos ar FreeDOS\n
+4.1:SarakstÄ«ts lai darbotos ar FreeDOS\n
 4.2:Win32(c) console and DOS with LFN support.\n
 # Must include the %s for version string. 
 4.3:Versija %s\n
-4.4:SarakstŒjis:   Kenneth J. Davis\n
-4.5:Datums:        Augusts/Septembris/Oktobris/Novembris, 2000; Janvƒris, 2001\n
-4.6:Saziìa:        jeremyd@computer.org\n
-4.7:AutortiesŒbas: sabiedrŒbas ŒpaÕums [ASV definŒcijƒ]\n
+4.4:SarakstÄ«jis:   Kenneth J. Davis\n
+4.5:Datums:        Augusts/Septembris/Oktobris/Novembris, 2000; JanvÄris, 2001\n
+4.6:SaziÅ†a:        jeremyd@computer.org\n
+4.7:AutortiesÄ«bas: sabiedrÄ«bas Ä«paÅ¡ums [ASV definÄ«cijÄ]\n
 #4.8 is only used when cats support is compiled in.
-4.8:Izmanto Jim Hall <jhall@freedos.org> Cats bibliot‰ku\n  AutortiesŒbas (C) 1999,2000,2001 Jim Hall\n
+4.8:Izmanto Jim Hall <jhall@freedos.org> Cats bibliotÄ“ku\n  AutortiesÄ«bas (C) 1999,2000,2001 Jim Hall\n
 #4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
 #4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:AutortiesŒbas 1995, 2000 Dave Dunfield - brŒvi izplatƒms (kopÕ 2000 zem VPL).\n
+4.20:AutortiesÄ«bas 1995, 2000 Dave Dunfield - brÄ«vi izplatÄms (kopÅ¡ 2000 zem VPL).\n
 # showInvalidDrive [Set 5] 
-5.1:Kë×daini norƒdŒta diskiekƒrta\n
+5.1:KÄ¼Å«daini norÄdÄ«ta diskiekÄrta\n
 # showInvalidPath [Set 6] 
 # Must include %s for the invalid path given. 
-6.1:Kë×dains ceëÕ - %s\n
+6.1:KÄ¼Å«dains ceÄ¼Å¡ - %s\n
 # misc error conditions [Set 7]
 # showBufferOverrun
 # %u required to show what the buffer's current size is. 
-7.1:Kë×da: Faila ceëÕ pƒrsniedz maksimƒlo buferi = %u baitus\n
+7.1:KÄ¼Å«da: Faila ceÄ¼Å¡ pÄrsniedz maksimÄlo buferi = %u baitus\n
 # showOutOfMemory
 # %s required to display what directory we were processing when ran out of memory.
-7.2:Pietr×kst atmiìas apakÕkatalogƒ: %s\n
+7.2:PietrÅ«kst atmiÅ†as apakÅ¡katalogÄ: %s\n
 #
 # parseArguments [Set 8] contains the Character[s] used for
 #   argument processing.  Only the 1st character on a line is used.

@@ -15,51 +15,51 @@
 # main [Set 1] 
 1.2:Dizin PATH listelemesi\n
 # Must include %s for label 
-1.3:%s disk b”lm i‡in dizin PATH listelemesi\n
+1.3:%s disk bÃ¶lÃ¼mÃ¼ iÃ§in dizin PATH listelemesi\n
 # Must include %s for serial #  
-1.4:B”lm seri numaras %s\n
-1.5:Alt dizin mevcut de§il\n\n
-1.6: --- Srdrmek i‡in bir d§meye basn ---\n
+1.4:BÃ¶lÃ¼m seri numarasÄ± %s\n
+1.5:Alt dizin mevcut deÄŸil\n\n
+1.6: --- SÃ¼rdÃ¼rmek iÃ§in bir dÃ¼ÄŸmeye basÄ±n ---\n
 # showUsage [Set 2] 
-2.1:Bir disk b”lmnn veya yolun dizin yapsn grafik bi‡iminde g”rntler.\n
+2.1:Bir disk bÃ¶lÃ¼mÃ¼nÃ¼n veya yolun dizin yapÄ±sÄ±nÄ± grafik biÃ§iminde gÃ¶rÃ¼ntÃ¼ler.\n
 # Each %c below will be replaced with proper switch/option
-2.2:TREE [src:][yol] [%c%c] [%c%c]\n
-2.3:   %c%c   Her bir dizindeki dosya adlarn g”rntler.\n
-2.4:   %c%c   GeniŸletilmiŸ karakterler yerine ASCII kullanr.\n
+2.2:TREE [sÃ¼rÃ¼cÃ¼:][yol] [%c%c] [%c%c]\n
+2.3:   %c%c   Her bir dizindeki dosya adlarÄ±nÄ± gÃ¶rÃ¼ntÃ¼ler.\n
+2.4:   %c%c   GeniÅŸletilmiÅŸ karakterler yerine ASCII kullanÄ±r.\n
 # showInvalidUsage [Set 3] 
 # Must include the %s for option given.
-3.1:Ge‡ersiz anahtar - %s\n
+3.1:GeÃ§ersiz anahtar - %s\n
 # The %c will be replaced with the primary switch (default is /)
-3.2:Kullanm bilgisi i‡in TREE %c? yazn.\n
+3.2:KullanÄ±m bilgisi iÃ§in TREE %c? yazÄ±n.\n
 #showTooManyOptions
-3.3:€ok fazla parametre - %s\n
+3.3:Ã‡ok fazla parametre - %s\n
 # showVersionInfo [Set 4] 
 # also uses treeDescription, message 2.1
-4.1:FreeDOS ile ‡alŸmak zere yazlmŸtr.\n
-4.2:LFN deste§i ile Win32(c) konsol ve DOS srm.\n
+4.1:FreeDOS ile Ã§alÄ±ÅŸmak Ã¼zere yazÄ±lmÄ±ÅŸtÄ±r.\n
+4.2:LFN desteÄŸi ile Win32(c) konsol ve DOS sÃ¼rÃ¼mÃ¼.\n
 # Must include the %s for version string. 
-4.3:Srm %s\n
+4.3:SÃ¼rÃ¼m %s\n
 4.4:Yazan:       Kenneth J. Davis\n
 4.5:Tarih:       2000, 2001, 2004\n
-4.6:˜letiŸim:    jeremyd@computer.org\n
-4.7:Telif hakk (c): Kamusal alan [BirleŸik Devletler tanm]\n
+4.6:Ä°letiÅŸim:    jeremyd@computer.org\n
+4.7:Telif hakkÄ± (c): Kamusal alan [BirleÅŸik Devletler tanÄ±mÄ±]\n
 #4.8 is only used when cats support is compiled in.
-4.8:Jim Hall'un <jhall@freedos.org> Cats kitapl§n kullanr\n  srm 3.8 Telif hakk (C) 1999,2000 Jim Hall\n
+4.8:Jim Hall'un <jhall@freedos.org> Cats kitaplÄ±ÄŸÄ±nÄ± kullanÄ±r\n  sÃ¼rÃ¼m 3.8 Telif hakkÄ± (C) 1999,2000 Jim Hall\n
 #4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
 #4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:Telif hakk 1995, 2000 Dave Dunfield - ™zgrce da§tlabilir (2000 GPL).\n
+4.20:Telif hakkÄ± 1995, 2000 Dave Dunfield - Ã–zgÃ¼rce daÄŸÄ±tÄ±labilir (2000 GPL).\n
 # showInvalidDrive [Set 5] 
-5.1:Ge‡ersiz src belirtimi\n
+5.1:GeÃ§ersiz sÃ¼rÃ¼cÃ¼ belirtimi\n
 # showInvalidPath [Set 6] 
 # Must include %s for the invalid path given. 
-6.1:Ge‡ersiz yol - %s\n
+6.1:GeÃ§ersiz yol - %s\n
 # misc error conditions [Set 7]
 # showBufferOverrun
 # %u required to show what the buffer's current size is. 
-7.1:Hata: Belirtilen dosya yolu olabilecek en byk arabelle§i aŸyor (%u bayt)\n
+7.1:Hata: Belirtilen dosya yolu olabilecek en bÃ¼yÃ¼k arabelleÄŸi aÅŸÄ±yor (%u bayt)\n
 # showOutOfMemory
 # %s required to display what directory we were processing when ran out of memory.
-7.2:u altdizinde bellek yetersiz: %s\n
+7.2:Åu altdizinde bellek yetersiz: %s\n
 #
 # deprecated [Set 8]
 # 8.1 - 8.10 reserved for option selection characters in earlier releases.

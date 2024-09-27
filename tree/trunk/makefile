@@ -14,11 +14,19 @@ deflang.c: nls\*.txt
 	if exist del deflang.c
 	if exist tree.lng del tree.lng
 	cd nls
-	..\svarlang\tlumacz en es
+	utf8tocp 437 en-utf8.txt en.txt
+	utf8tocp 850 es-utf8.txt es.txt
+	utf8tocp 850 fi-utf8.txt fi.txt
+	utf8tocp 775 lv-utf8.txt lv.txt
+	utf8tocp 850 pt-utf8.txt pt.txt
+	utf8tocp 866 ru-utf8.txt ru.txt
+	utf8tocp 857 tr-utf8.txt tr.txt
+	..\svarlang\tlumacz en es fi lv pt ru tr
 	copy out.lng ..\tree.lng
 	copy deflang.c ..
 	del out.lng
 	del deflang.c
+	del ??.txt
 	cd ..
 
 clean: .symbolic
