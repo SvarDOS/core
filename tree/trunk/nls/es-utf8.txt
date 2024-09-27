@@ -14,9 +14,11 @@
 
 # MostrarUso [Conjunto 2]
 2.1:Visualiza gráficamente la estructura de directorios de un disco o ruta.
-2.2:TREE [unidad:][ruta] [/F] [/A]
-2.3:   /F   Visualiza los nombres de los archivos en cada directorio.
-2.4:   /A   Utiliza el ASCII en vez de caracteres extendidos.
+2.2:.
+2.3:TREE [unidad:][ruta] [/F] [/A]
+2.4:.
+2.5:  /F  Visualiza los nombres de los archivos en cada directorio.
+2.6:  /A  Utiliza el ASCII en vez de caracteres extendidos.
 
 # Mostrar Uso no válido [Conjunto 3]
 # Debe incluir el %s para la opción dada.

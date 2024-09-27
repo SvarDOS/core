@@ -22,9 +22,11 @@
 
 # showUsage [Set 2]
 2.1:Bir disk bölümünün veya yolun dizin yapısını grafik biçiminde görüntüler.
-2.2:TREE [sürücü:][yol] [/F] [/A]
-2.3:   /F   Her bir dizindeki dosya adlarını görüntüler.
-2.4:   /A   Genişletilmiş karakterler yerine ASCII kullanır.
+2.2:.
+2.3:TREE [sürücü:][yol] [/F] [/A]
+2.4:.
+2.5:  /F  Her bir dizindeki dosya adlarını görüntüler.
+2.6:  /A  Genişletilmiş karakterler yerine ASCII kullanır.
 
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.

@@ -22,18 +22,16 @@
 
 # showUsage [Set 2]
 2.1:Графическое представление структуры диска или каталога.
-2.2:TREE [диск:][путь] [/F] [/A]
-2.3:   /F   Отображать имена файлов в каждом каталоге.
-2.4:   /A   Использовать ASCII вместо Extended ASCII.
+2.2:.
+2.3:TREE [диск:][путь] [/F] [/A]
+2.4:.
+2.5:  /F  Отображать имена файлов в каждом каталоге.
+2.6:  /A  Использовать ASCII вместо Extended ASCII.
 
 # showInvalidUsage [Set 3]
-
 # Must include the %s for option given.
-
 3.1:Некорректный ключ - %s\n
-
 # The %c will be replaced with the primary switch (default is /)
-
 3.2:Использовать TREE %c? для использования информации.\n
 
 #showTooManyOptions

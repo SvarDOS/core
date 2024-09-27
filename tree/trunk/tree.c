@@ -306,12 +306,16 @@ static int pprintf(const char *msg, ...) {
 
 /* Displays to user valid options then exits program indicating no error */
 static void showUsage(void) {
-  puts(svarlang_strid(0x0201));
-  puts("");
-  puts(svarlang_strid(0x0202));
-  puts("");
-  puts(svarlang_strid(0x0203));
-  puts(svarlang_strid(0x0204));
+  unsigned short i;
+  for (i = 0x0200; i < 0x0209; i++) {
+    const char *s = svarlang_strid(i);
+    if (s[0] == 0) continue;
+    if (s[0] == '.') {
+      puts("");
+    } else {
+      puts(s);
+    }
+  }
   exit(1);
 }
 

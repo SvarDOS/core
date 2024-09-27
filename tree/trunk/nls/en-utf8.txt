@@ -20,11 +20,13 @@
 1.5:No subdirectories exist\n\n
 1.6: --- Press any key to continue ---\n
 
-# showUsage [Set 2]
+# show Usage
 2.1:Graphically displays the directory structure of a drive or path.
-2.2:TREE [drive:][path] [/F] [/A]
-2.3:   /F   Display the names of the files in each directory.
-2.4:   /A   Use ASCII instead of extended characters.
+2.2:.
+2.3:TREE [drive:][path] [/F] [/A]
+2.4:.
+2.5:  /F  Display the names of the files in each directory.
+2.6:  /A  Use ASCII instead of extended characters.
 
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.

@@ -22,11 +22,15 @@
 1.4:O número de série do volume é %s\n
 1.5:Näo existem subdiretórios\n\n
 1.6: --- Pressione qualquer tecla para continuar ---\n
+
 # showUsage [Conjunto 2]
 2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.
-2.2:TREE [unidade:][caminho] [/F] [/A]
-2.3:   /F   Exibe os nomes dos arquivos em cada diretório.
-2.4:   /A   Use ASCII em vez de caracteres estendidos.
+2.2:.
+2.3:TREE [unidade:][caminho] [/F] [/A]
+2.4:.
+2.5:  /F  Exibe os nomes dos arquivos em cada diretório.
+2.6:  /A  Use ASCII em vez de caracteres estendidos.
+
 # showInvalidUsage [Conjunto 3]
 # Deve incluir o %s para a opçäo fornecida.
 3.1:Opçäo inválida - %s\n
