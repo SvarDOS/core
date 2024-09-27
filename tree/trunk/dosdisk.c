@@ -37,8 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "dosdisk.h"
 
-#define searchAttr ( FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | \
-   FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_ARCHIVE )
+#define searchAttr ( FILE_A_DIR | FILE_A_HIDDEN | FILE_A_SYSTEM | FILE_A_READONLY | FILE_A_ARCH )
 
 
 /* copy old style findfirst data FFDTA to a WIN32_FIND_DATA
@@ -49,7 +48,7 @@ static void copyFileData(struct WIN32_FIND_DATA *findData, const struct FFDTA *f
 {
   /* Copy requried contents over into required structure */
   strcpy(findData->cFileName, finfo->ff_name);
-  findData->dwFileAttributes = (DWORD)finfo->ff_attr;
+  findData->attrib = finfo->ff_attr;
 
   /* copy over rest (not quite properly) */
   findData->ftCreationTime.ldw[0] = finfo->ff_ftime;
@@ -74,8 +73,7 @@ struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findDa
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
 
   /* verify findData is valid */
-  if (findData == NULL)
-    return INVALID_HANDLE_VALUE;
+  if (findData == NULL) return INVALID_HANDLE_VALUE;
 
   /* allocate memory for the handle */
   if ((hnd = malloc(sizeof(*hnd))) == NULL) return INVALID_HANDLE_VALUE;
@@ -299,7 +297,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
   }
 
   /* Search for volume using old findfirst, as LFN version (NT5 DOS box) does
-   * not recognize FILE_ATTRIBUTE_LABEL = 0x0008 as label attribute.
+   * not recognize FILE_A_VOL = 0x0008 as label attribute.
    */
   {
     struct FFDTA finfo;
@@ -328,7 +326,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
       int 0x21                  //; Execute interrupt
       pop ds
       mov ax, 0x4E00            //; Actual findfirst call
-      mov cx, FILE_ATTRIBUTE_LABEL
+      mov cx, FILE_A_VOL
       mov dx, pathname_off      //; Load DS:DX with pointer to modified RootPath for Findfirt
       push ds
       mov ds, pathname_seg
@@ -344,7 +342,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
       mov al, [es:bx]              //; Looking for a BYTE that is FILE_ATTRIBUTE_LABEL only
       pop es
       and al, 0xDF              //; Ignore Archive bit
-      cmp al, FILE_ATTRIBUTE_LABEL
+      cmp al, FILE_A_VOL
       je cleanup                //; They match, so should be true volume entry.
       mov ax, 0x4F00            //; Otherwise keep looking (findnext)
       int 0x21                  //; Execute interrupt
@@ -435,7 +433,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
 /* retrieve attributes (ReadOnly/System/...) about file or directory
  * returns (DWORD)-1 on error
  */
-DWORD GetFileAttributes(const char *pathname) {
+int GetFileAttributes(unsigned short *attr, const char *pathname) {
   union REGS r;
   struct SREGS s;
   char buffer[260];
@@ -460,6 +458,7 @@ DWORD GetFileAttributes(const char *pathname) {
   intdosx(&r, &r, &s);              /* invoke the DOS int21h call           */
 
   //if (r.x.cflag) printf("ERROR getting std attributes of %s, DOS err %i\n", buffer, r.x.ax);
-  if (r.x.cflag) return (DWORD)-1;  /* error obtaining attributes           */
-  return (DWORD)(0x3F & r.x.cx); /* mask off any DRDOS bits     */
+  if (r.x.cflag) return(-1);  /* error obtaining attributes           */
+  *attr = (0x3F & r.x.cx); /* mask off any DRDOS bits     */
+  return(0);
 }

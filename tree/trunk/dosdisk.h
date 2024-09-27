@@ -33,12 +33,12 @@ DEALINGS IN THE SOFTWARE.
 
 #define INVALID_HANDLE_VALUE (NULL)
 
-#define FILE_ATTRIBUTE_READONLY  0x0001
-#define FILE_ATTRIBUTE_HIDDEN    0x0002
-#define FILE_ATTRIBUTE_SYSTEM    0x0004
-#define FILE_ATTRIBUTE_LABEL     0x0008
-#define FILE_ATTRIBUTE_DIRECTORY 0x0010
-#define FILE_ATTRIBUTE_ARCHIVE   0x0020
+#define FILE_A_READONLY  0x0001
+#define FILE_A_HIDDEN    0x0002
+#define FILE_A_SYSTEM    0x0004
+#define FILE_A_VOL       0x0008
+#define FILE_A_DIR       0x0010
+#define FILE_A_ARCH      0x0020
 
 typedef short BOOL;
 typedef unsigned char BYTE;
@@ -52,7 +52,7 @@ typedef struct FILETIME   /* should correspond to a quad word */
 } FILETIME;
 
 struct WIN32_FIND_DATA {
-  DWORD dwFileAttributes;
+  unsigned short attrib;
   FILETIME ftCreationTime;
   FILETIME ftLastAccessTime;
   FILETIME ftLastWriteTime;
@@ -79,7 +79,7 @@ struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findDa
 int FindNextFile(struct FFDTA *hnd, struct WIN32_FIND_DATA *findData);
 void FindClose(struct FFDTA *hnd);
 
-DWORD GetFileAttributes(const char *pathname);
+int GetFileAttributes(unsigned short *attr, const char *pathname);
 
 /* Only the 1st 4 arguments are used and returns zero on error */
 int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,

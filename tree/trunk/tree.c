@@ -604,7 +604,7 @@ typedef struct DIRDATA
 {
   DWORD subdirCnt;          /* how many subdirectories we have */
   DWORD fileCnt;            /* how many [normal] files we have */
-  DWORD dwDirAttributes;    /* Directory attributes            */
+  unsigned short attrib;    /* Directory attributes            */
 } DIRDATA;
 
 /**
@@ -653,13 +653,12 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
 
   /*  cycle through entries counting directories found until no more entries */
   do {
-    if (((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) &&
-	((findData.dwFileAttributes &
-	 (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) == 0 || dspAll) )
-    {
-      if ( (strcmp(findData.cFileName, ".") != 0) && /* ignore initial [current] path */
-           (strcmp(findData.cFileName, "..") != 0) ) /* and ignore parent path */
+    if (((findData.attrib & FILE_A_DIR) != 0) &&
+        ((findData.attrib &
+         (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0 || dspAll) ) {
+      if (findData.cFileName[0] != '.') { /* ignore '.' and '..' */
         hasSubdirs++;      /* subdir of initial path found, so increment counter */
+      }
     }
   } while(FindNextFile(hnd, &findData) != 0);
 
@@ -674,10 +673,9 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
        path in above loop from the FindFile call as it may not show up
        (no . entry).  So instead we explicitly get them here.
     */
-    if ((ddata->dwDirAttributes = GetFileAttributes(path)) == (DWORD)-1)
-    {
+    if (GetFileAttributes(&(ddata->attrib), path) != 0) {
       //printf("ERROR: unable to get file attr, %i\n", GetLastError());
-      ddata->dwDirAttributes = 0;
+      ddata->attrib = 0;
     }
 
     /* a curiosity, for showing sum of directories process */
@@ -845,11 +843,11 @@ static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFol
   /* optional display data */
   if (dspAttr)  /* attributes */
     pprintf("[%c%c%c%c%c] ",
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_DIRECTORY)?'D':' ',  /* keep this one? its always true */
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_ARCHIVE)?'A':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_SYSTEM)?'S':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_HIDDEN)?'H':' ',
-      (ddata->dwDirAttributes & FILE_ATTRIBUTE_READONLY)?'R':' '
+      (ddata->attrib & FILE_A_DIR)?'D':' ',  /* keep this one? its always true */
+      (ddata->attrib & FILE_A_ARCH)?'A':' ',
+      (ddata->attrib & FILE_A_SYSTEM)?'S':' ',
+      (ddata->attrib & FILE_A_HIDDEN)?'H':' ',
+      (ddata->attrib & FILE_A_READONLY)?'R':' '
     );
 
   /* display directory name */
@@ -887,7 +885,7 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
  *          0 if no files, but no errors either,
  *      or  1 if files displayed, no errors.
  */
-static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
+static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   static char buffer[MAXBUF];
   struct WIN32_FIND_DATA entry; /* current directory entry info    */
   struct FFDTA *dir;         /* Current directory entry working with      */
@@ -906,9 +904,8 @@ static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *
   do
   {
     /* print padding followed by filename */
-    if ( ((entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) &&
-         ( ((entry.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN |
-         FILE_ATTRIBUTE_SYSTEM)) == 0)  || dspAll) )
+    if ( ((entry.attrib & FILE_A_DIR) == 0) &&
+         ( ((entry.attrib & (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0)  || dspAll) )
     {
       /* print lead padding */
       pprintf("%s", padding);
@@ -916,10 +913,10 @@ static int displayFiles(char *path, char *padding, int hasMoreSubdirs, DIRDATA *
       /* optional display data */
       if (dspAttr)  /* file attributes */
         pprintf("[%c%c%c%c] ",
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)?'A':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)?'S':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)?'H':' ',
-          (entry.dwFileAttributes & FILE_ATTRIBUTE_READONLY)?'R':' '
+          (entry.attrib & FILE_A_ARCH)?'A':' ',
+          (entry.attrib & FILE_A_SYSTEM)?'S':' ',
+          (entry.attrib & FILE_A_HIDDEN)?'H':' ',
+          (entry.attrib & FILE_A_READONLY)?'R':' '
         );
 
       if (dspSize)  /* file size */
@@ -975,12 +972,10 @@ static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct WIN32_FI
   do
   {
     /* skip files & hidden or system directories */
-    if ((((entry->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) ||
-         ((entry->dwFileAttributes &
-          (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) != 0  && !dspAll) ) ||
-        ((strcmp(entry->cFileName, ".") == 0) ||
-         (strcmp(entry->cFileName, "..") == 0)) )
-    {
+    if ((((entry->attrib & FILE_A_DIR) == 0) ||
+         ((entry->attrib &
+          (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
+        (entry->cFileName[0] == '.')) {
       if (FindNextFile(findnexthnd, entry) == 0)
       {
         FindClose(findnexthnd);      // prevent resource leaks
