@@ -87,7 +87,7 @@ short cols=80, rows=23;   /* determined these on startup (when possible)  */
 #define SERIALLEN 16      /* Defines max size of volume & serial number   */
 #define VOLLEN 16
 
-char path[PATH_MAX];      /* Path to begin search from, default=current   */
+static char path[PATH_MAX];   /* Path to begin search from, default=current   */
 
 #define MAXPADLEN (PATH_MAX*2) /* Must be large enough to hold the maximum padding */
 /* (PATH_MAX/2)*4 == (max path len / min 2chars dirs "?\") * 4chars per padding    */
@@ -140,14 +140,6 @@ char serialNumber[MAXLINE] = "Volume serial number is %s\n"; /* Must include %s 
 char noSubDirs[MAXLINE] = "No subdirectories exist\n\n";
 char pauseMsg[MAXLINE]  = " --- Press any key to continue ---\n";
 
-/* Option Processing - parseArguments [Set 8]      */
-char optionchar1 = '/';  /* Primary character used to determine option follows  */
-char optionchar2 = '-';  /* Secondary character used to determine option follows  */
-const char OptShowFiles[2] = { 'F', 'f' };  /* Show files */
-const char OptUseASCII[2]  = { 'A', 'a' };  /* Use ASCII only */
-const char OptVersion[2]   = { 'V', 'v' };  /* Version information */
-const char OptPause[2]     = { 'P', 'p' };  /* Pause after each page (screenfull) */
-const char OptDisplay[2]   = { 'D', 'd' };  /* modify Display settings */
 
 
 /* Procedures */
@@ -392,7 +384,7 @@ static void showInvalidPath(char *path) {
 }
 
 /* Displays error message for out of memory; Does NOT exit */
-static void showOutOfMemory(char *path) {
+static void showOutOfMemory(const char *path) {
   pprintf(outOfMemory, path);
 }
 
@@ -453,7 +445,7 @@ static void splitpath(char *fullpath, char *drive, char *path) {
     else /* path only starting at root directory */
     {
       /* no drive, so set path to same as fullpath */
-      strcpy(drive, "");
+      drive[0] = 0;
       strcpy(path, fullpath);
     }
   }
@@ -476,7 +468,7 @@ static void splitpath(char *fullpath, char *drive, char *path) {
     else
     {
       /* no drive, so set path to same as fullpath */
-      strcpy(drive, "");
+      drive[0] = 0;
       strcpy(path, fullpath);
     }
   }
@@ -484,59 +476,63 @@ static void splitpath(char *fullpath, char *drive, char *path) {
 
 
 /* Parses the command line and sets global variables. */
-static void parseArguments(int argc, char *argv[]) {
-  int i;     /* temp loop variable */
+static void parseArguments(int argc, char **argv) {
+  int i;
 
   /* if no drive specified on command line, use current */
   if (truename(path, ".") != 0) showInvalidDrive();
 
-  for (i = 1; i < argc; i++)
-  {
-    /* Check if user is giving an option or drive/path */
-    if ((argv[i][0] == optionchar1) || (argv[i][0] == optionchar2) )
-    {
-      /* check multi character options 1st */
-      if ((argv[i][1] == OptDisplay[0]) || (argv[i][1] == OptDisplay[1]))
-      {
-        switch (argv[i][2] & 0xDF)
-        {
-          case 'A' :       /*  /DA  display attributes */
-            dspAttr = 1;
-            break;
-          case 'F' :       /*  /DF  display filesizes  */
-            dspSize = 1;
-            break;
-          case 'H' :       /*  /DH  display hidden & system files (normally not shown) */
-            dspAll = 1;
-            break;
-          case 'R' :       /*  /DR  display results at end */
-            dspSumDirs = 1;
-            break;
-          default:
-            showInvalidUsage(argv[i]);
-        }
-      }
-      else /* a 1 character option (or invalid) */
-      {
-        if (argv[i][2] != '\0')
-          showInvalidUsage(argv[i]);
+  for (i = 1; i < argc; i++) {
 
-        /* Must check both uppercase and lowercase                        */
-        if ((argv[i][1] == OptShowFiles[0]) || (argv[i][1] == OptShowFiles[1]))
-          showFiles = SHOWFILESON; /* set file display flag appropriately */
-        else if ((argv[i][1] == OptUseASCII[0]) || (argv[i][1] == OptUseASCII[1]))
-          charSet = ASCIICHARS;    /* set charset flag appropriately      */
-        else if (argv[i][1] == '?')
-          showUsage();             /* show usage info and exit            */
-        else if ((argv[i][1] == OptVersion[0]) || (argv[i][1] == OptVersion[1]))
-          showVersionInfo();       /* show version info and exit          */
-        else if ((argv[i][1] == OptPause[0]) || (argv[i][1] == OptPause[1]))
-          pause = PAUSE;     /* wait for keypress after each page (pause) */
-        else /* Invalid or unknown option */
+    /* Check if user is giving an option or drive/path */
+    if ((argv[i][0] != '/') && (argv[i][0] != '-') ) {
+      if (truename(path, argv[i]) != 0) showInvalidPath(argv[i]);
+      continue;
+    }
+
+    /* must be an option then */
+    /* check multi character options 1st */
+    if (argv[i][1] & 0xDF == 'D') {
+      switch(argv[i][2] & 0xDF) {
+        case 'A' :       /*  /DA  display attributes */
+          dspAttr = 1;
+          break;
+        case 'F' :       /*  /DF  display filesizes  */
+          dspSize = 1;
+          break;
+        case 'H' :       /*  /DH  display hidden & system files (normally not shown) */
+          dspAll = 1;
+          break;
+        case 'R' :       /*  /DR  display results at end */
+          dspSumDirs = 1;
+          break;
+        default:
           showInvalidUsage(argv[i]);
       }
-    } else { /* should be a drive/path */
-      if (truename(path, argv[i]) != 0) showInvalidDrive();
+      continue;
+    }
+
+    /* a 1 character option (or invalid) */
+    if (argv[i][2] != 0) showInvalidUsage(argv[i]);
+
+    switch(argv[i][1] & 0xDF) { /* upcase */
+      case 'F': /* show files */
+        showFiles = SHOWFILESON; /* set file display flag appropriately */
+        break;
+      case 'A': /* use ASCII only (7-bit) */
+        charSet = ASCIICHARS;    /* set charset flag appropriately      */
+        break;
+      case 'V': /* Version information */
+        showVersionInfo();       /* show version info and exit          */
+        break;
+      case 'P': /* wait for keypress after each page (pause) */
+        pause = PAUSE;
+        break;
+      case '?':
+        showUsage();             /* show usage info and exit            */
+        break;
+      default: /* Invalid or unknown option */
+        showInvalidUsage(argv[i]);
     }
   }
 }
@@ -1085,13 +1081,13 @@ static void FixOptionText(void) {
 
   /* Handle %c for options within messages using Set 8 */
   strcpy(buffer, treeUsage);
-  sprintf(treeUsage, buffer, optionchar1, OptShowFiles[0], optionchar1, OptUseASCII[0]);
+  sprintf(treeUsage, buffer, '/', 'f', '/', 'a');
   strcpy(buffer, treeFOption);
-  sprintf(treeFOption, buffer, optionchar1, OptShowFiles[0]);
+  sprintf(treeFOption, buffer, '/', 'f');
   strcpy(buffer, treeAOption);
-  sprintf(treeAOption, buffer, optionchar1, OptUseASCII[0]);
+  sprintf(treeAOption, buffer, '/', 'a');
   strcpy(buffer, useTreeHelp);
-  sprintf(useTreeHelp, buffer, optionchar1);
+  sprintf(useTreeHelp, buffer, '/');
 }
 
 
