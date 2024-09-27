@@ -43,6 +43,8 @@ DEALINGS IN THE SOFTWARE.
 #include <string.h>
 
 #include "stack.h"
+#include "svarlang/svarlang.h"
+
 
 /* The default extended forms of the lines used. */
 #define VERTBAR_STR  "\xB3   "                 /* |    */
@@ -100,46 +102,6 @@ static char path[PATH_MAX];   /* Path to begin search from, default=current   */
 
 /* common to many functions [Set 1] */
 char newLine[MAXLINE] = "\n";
-
-/* showUsage [Set 2] - Each %c will be replaced with proper switch/option */
-char treeDescription[MAXLINE] = "Graphically displays the directory structure of a drive or path.\n";
-char treeUsage[MAXLINE] =       "TREE [drive:][path] [%c%c] [%c%c]\n";
-char treeFOption[MAXLINE] =     "   %c%c   Display the names of the files in each directory.\n";
-char treeAOption[MAXLINE] =     "   %c%c   Use ASCII instead of extended characters.\n";
-
-/* showInvalidUsage [Set 3] */
-char invalidOption[MAXLINE] = "Invalid switch - %s\n";  /* Must include the %s for option given. */
-char useTreeHelp[MAXLINE] =   "Use TREE %c? for usage information.\n"; /* %c replaced with switch */
-
-/* showVersionInfo [Set 4] */
-/* also uses treeDescription */
-char treeGoal[MAXLINE] =      "Written to work with FreeDOS\n";
-char treePlatforms[MAXLINE] = "Win32(c) console and DOS with LFN support.\n";
-char version[MAXLINE] =       "Version %s\n"; /* Must include the %s for version string. */
-char writtenBy[MAXLINE] =     "Written by: Kenneth J. Davis\n";
-char writtenDate[MAXLINE] =   "Date:       2000, 2001, 2004\n";
-char contact[MAXLINE] =       "Contact:    jeremyd@computer.org\n";
-char copyright[MAXLINE] =     "Copyright (c): Public Domain [United States Definition]\n";
-
-/* showInvalidDrive [Set 5] */
-char invalidDrive[MAXLINE] = "Invalid drive specification\n";
-
-/* showInvalidPath [Set 6] */
-char invalidPath[MAXLINE] = "Invalid path - %s\n"; /* Must include %s for the invalid path given. */
-
-/* Misc Error messages [Set 7] */
-
-/* showOutOfMemory */
-/* %s required to display what directory we were processing when ran out of memory. */
-char outOfMemory[MAXLINE] = "Out of memory on subdirectory: %s\n";
-
-/* main [Set 1] */
-char pathListingNoLabel[MAXLINE] = "Directory PATH listing\n";
-char pathListingWithLabel[MAXLINE] = "Directory PATH listing for Volume %s\n"; /* %s for label */
-char serialNumber[MAXLINE] = "Volume serial number is %s\n"; /* Must include %s for serial #   */
-char noSubDirs[MAXLINE] = "No subdirectories exist\n\n";
-char pauseMsg[MAXLINE]  = " --- Press any key to continue ---\n";
-
 
 
 /* Procedures */
@@ -311,7 +273,7 @@ static int pprintf(const char *msg, ...) {
         l += cols-lineCol;
 
         lineCnt--;  lineCol = 0;
-        if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", pauseMsg);  waitkey(); }
+        if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", svarlang_strid(0x0106));  waitkey(); }
       }
 
       printf("%s", l); /* print out this line */
@@ -319,7 +281,7 @@ static int pprintf(const char *msg, ...) {
       l = t;           /* mark beginning of next line */
 
       lineCnt--;  lineCol = 0;
-      if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", pauseMsg);  waitkey(); }
+      if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", svarlang_strid(0x0106));  waitkey(); }
     }
     printf("%s", l);   /* print rest of string that lacks newline */
     lineCol = strlen(l);
@@ -333,33 +295,37 @@ static int pprintf(const char *msg, ...) {
 
 /* Displays to user valid options then exits program indicating no error */
 static void showUsage(void) {
-  printf("%s%s%s%s", treeDescription, newLine, treeUsage, newLine);
-  printf("%s%s%s", treeFOption, treeAOption, newLine);
+  printf(svarlang_strid(0x0201));
+  printf(svarlang_strid(0x0202));
+  puts("");
+  printf(svarlang_strid(0x0203));
+  printf(svarlang_strid(0x0204));
   exit(1);
 }
 
 
 /* Displays error message then exits indicating error */
 static void showInvalidUsage(char * badOption) {
-  printf(invalidOption, badOption);
-  printf("%s%s", useTreeHelp, newLine);
+  printf(svarlang_strid(0x0301), badOption); /* invalid switch - ... */
+  printf("%s%s", svarlang_strid(0x0302), newLine); /* use TREE /? for usage info */
   exit(1);
 }
 
 
 /* Displays author, copyright, etc info, then exits indicating no error. */
 static void showVersionInfo(void) {
-  printf("%s%s%s%s%s", treeDescription, newLine, treeGoal, treePlatforms, newLine);
-  printf(version, VERSION);
-  printf("%s%s%s%s%s", writtenBy, writtenDate, contact, newLine, newLine);
-  printf("%s%s", copyright, newLine);
+  printf(svarlang_strid(0x0201));
+  printf(svarlang_strid(0x0202));
+  printf(svarlang_strid(0x0403), VERSION);
+  printf(svarlang_strid(0x0404));
+  printf(svarlang_strid(0x0407));
   exit(1);
 }
 
 
 /* Displays error messge for invalid drives and exits */
 static void showInvalidDrive(void) {
-  printf(invalidDrive);
+  printf(svarlang_strid(0x0501)); /* invalid drive spec */
   exit(1);
 }
 
@@ -374,12 +340,12 @@ static char *fixPathForDisplay(char *path);
 /* Displays error message for invalid path; Does NOT exit */
 static void showInvalidPath(const char *badpath) {
   pprintf("%s\n", badpath);
-  pprintf(invalidPath, badpath);
+  pprintf(svarlang_strid(0x0601), badpath); /* invalid path - ... */
 }
 
 /* Displays error message for out of memory; Does NOT exit */
 static void showOutOfMemory(const char *path) {
-  pprintf(outOfMemory, path);
+  pprintf(svarlang_strid(0x0702), path); /* out of memory on subdir ... */
 }
 
 
@@ -436,7 +402,7 @@ static void parseArguments(int argc, char **argv) {
       case 'P': /* wait for keypress after each page (pause) */
         pause = PAUSE;
         break;
-      case '?':
+      case '?' & 0xDF:
         showUsage();             /* show usage info and exit            */
         break;
       default: /* Invalid or unknown option */
@@ -964,34 +930,12 @@ static long traverseTree(char *initialpath) {
 }
 
 
-static void FixOptionText(void) {
-  char buffer[MAXLINE];  /* sprintf can have problems with src==dest */
-
-  /* Handle %c for options within messages using Set 8 */
-  strcpy(buffer, treeUsage);
-  sprintf(treeUsage, buffer, '/', 'f', '/', 'a');
-  strcpy(buffer, treeFOption);
-  sprintf(treeFOption, buffer, '/', 'f');
-  strcpy(buffer, treeAOption);
-  sprintf(treeAOption, buffer, '/', 'a');
-  strcpy(buffer, useTreeHelp);
-  sprintf(useTreeHelp, buffer, '/');
-}
-
-
-/* Loads all messages from the message catalog. */
-static void loadAllMessages(void) {
-  /* Changes %c in certain lines with proper option characters. */
-  FixOptionText();
-}
-
-
 int main(int argc, char **argv) {
   char serial[SERIALLEN]; /* volume serial #  0000:0000 */
   char volume[VOLLEN];    /* volume name (label), possibly none */
 
-  /* Load all text from message catalog (or uses hard coded text) */
-  loadAllMessages();
+  /* load translation strings */
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));
 
   /* Parse any command line arguments, obtain path */
   parseArguments(argc, argv);
@@ -1001,18 +945,21 @@ int main(int argc, char **argv) {
 
   /* Get Volume & Serial Number */
   GetVolumeAndSerial(volume, serial, path);
-  if (strlen(volume) == 0)
-    pprintf(pathListingNoLabel);
-  else
-    pprintf(pathListingWithLabel, volume);
-  if (serial[0] != '\0')  /* Don't print anything if no serial# found */
-    pprintf(serialNumber, serial);
+  if (volume[0] == 0) {
+    pprintf(svarlang_strid(0x0102)); /* Dir PATH listing */
+  } else {
+    pprintf(svarlang_strid(0x0103), volume); /* Dir PATH listing for volume ... */
+  }
+  if (serial[0] != '\0') {  /* Don't print anything if no serial# found */
+    pprintf(svarlang_strid(0x0104), serial); /* vol serial num is ... */
+  }
 
   /* now traverse & print tree, returns nonzero if has subdirectories */
-  if (traverseTree(path) == 0)
-    pprintf(noSubDirs);
-  else if (dspSumDirs) /* show count of directories processed */
+  if (traverseTree(path) == 0) {
+    pprintf(svarlang_strid(0x0105)); /* no subdirs exist */
+  } else if (dspSumDirs) { /* show count of directories processed */
     pprintf("\n    %lu total directories\n", totalSubDirCnt+1);
+  }
 
-  return 0;
+  return(0);
 }
