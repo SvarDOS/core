@@ -16,32 +16,32 @@
 #
 # common to many functions [Set 1]
 1.1:\n
-# main [Set 1] 
+# main [Set 1]
 1.2:Levyn polkujen luettelo\n
-# Must include %s for label 
+# Must include %s for label
 1.3:Levyn %s polkujen luettelo\n
-# Must include %s for serial #  
+# Must include %s for serial #
 1.4:Taltion sarjanumero on %s\n
 1.5:Ei alihakemistoja\n\n
 1.6: --- Paina näppäintä jatkaaksesi ---\n
-# showUsage [Set 2] 
+# showUsage [Set 2]
 2.1:Esittää aseman tai polun hakemistorakenteen graafisesti.\n
 # Each %c below will be replaced with proper switch/option
-2.2:TREE [asema:][polku] [%c%c] [%c%c]\n
-2.3:   %c%c   Näyttää jokaisen hakemiston tiedostojen nimet.\n
-2.4:   %c%c   Käyttää ASCII:ta laajennettujen merkkien asemesta.\n
-# showInvalidUsage [Set 3] 
+2.2:TREE [asema:][polku] [/F] [/A]\n
+2.3:   /F   Näyttää jokaisen hakemiston tiedostojen nimet.\n
+2.4:   /A   Käyttää ASCII:ta laajennettujen merkkien asemesta.\n
+# showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Virheellinen valitsin - %s\n
 # The %c will be replaced with the primary switch (default is /)
 3.2:Kirjoita TREE %c? saadaksesi lisätietoja.\n
 #showTooManyOptions
 3.3:Liikaa parametreja - %s\n
-# showVersionInfo [Set 4] 
+# showVersionInfo [Set 4]
 # also uses treeDescription, message 2.1
 4.1:Kirjoitettu toimimaan FreeDOS:lla\n
 4.2:Win32(c)-konsolilla ja DOS:lla LFN-tuella.\n
-# Must include the %s for version string. 
+# Must include the %s for version string.
 4.3:Versio %s\n
 4.4:Tekijä:       Kenneth J. Davis\n
 4.5:Päiväys:      2000, 2001, 2004\n
@@ -52,14 +52,14 @@
 #4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
 #4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
 4.20:(C) 1995, 2000 Dave Dunfield - vapaasti jaettava (2000 GPL-lisenssillä).\n
-# showInvalidDrive [Set 5] 
+# showInvalidDrive [Set 5]
 5.1:Virheellinen asemamäärittely\n
-# showInvalidPath [Set 6] 
-# Must include %s for the invalid path given. 
+# showInvalidPath [Set 6]
+# Must include %s for the invalid path given.
 6.1:Virheellinen polku - %s\n
 # misc error conditions [Set 7]
 # showBufferOverrun
-# %u required to show what the buffer's current size is. 
+# %u required to show what the buffer's current size is.
 7.1:Virhe: Tiedostopolku ei mahdu puskuriin = %u tavua\n
 # showOutOfMemory
 # %s required to display what directory we were processing when ran out of memory.

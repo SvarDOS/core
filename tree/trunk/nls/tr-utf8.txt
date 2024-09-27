@@ -12,32 +12,32 @@
 #
 # common to many functions [Set 1]
 1.1:\n
-# main [Set 1] 
+# main [Set 1]
 1.2:Dizin PATH listelemesi\n
-# Must include %s for label 
+# Must include %s for label
 1.3:%s disk bölümü için dizin PATH listelemesi\n
-# Must include %s for serial #  
+# Must include %s for serial #
 1.4:Bölüm seri numarası %s\n
 1.5:Alt dizin mevcut değil\n\n
 1.6: --- Sürdürmek için bir düğmeye basın ---\n
-# showUsage [Set 2] 
+# showUsage [Set 2]
 2.1:Bir disk bölümünün veya yolun dizin yapısını grafik biçiminde görüntüler.\n
 # Each %c below will be replaced with proper switch/option
-2.2:TREE [sürücü:][yol] [%c%c] [%c%c]\n
-2.3:   %c%c   Her bir dizindeki dosya adlarını görüntüler.\n
-2.4:   %c%c   Genişletilmiş karakterler yerine ASCII kullanır.\n
-# showInvalidUsage [Set 3] 
+2.2:TREE [sürücü:][yol] [/F] [/A]\n
+2.3:   /F   Her bir dizindeki dosya adlarını görüntüler.\n
+2.4:   /A   Genişletilmiş karakterler yerine ASCII kullanır.\n
+# showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Geçersiz anahtar - %s\n
 # The %c will be replaced with the primary switch (default is /)
 3.2:Kullanım bilgisi için TREE %c? yazın.\n
 #showTooManyOptions
 3.3:Çok fazla parametre - %s\n
-# showVersionInfo [Set 4] 
+# showVersionInfo [Set 4]
 # also uses treeDescription, message 2.1
 4.1:FreeDOS ile çalışmak üzere yazılmıştır.\n
 4.2:LFN desteği ile Win32(c) konsol ve DOS sürümü.\n
-# Must include the %s for version string. 
+# Must include the %s for version string.
 4.3:Sürüm %s\n
 4.4:Yazan:       Kenneth J. Davis\n
 4.5:Tarih:       2000, 2001, 2004\n
@@ -48,14 +48,14 @@
 #4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
 #4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
 4.20:Telif hakkı 1995, 2000 Dave Dunfield - Özgürce dağıtılabilir (2000 GPL).\n
-# showInvalidDrive [Set 5] 
+# showInvalidDrive [Set 5]
 5.1:Geçersiz sürücü belirtimi\n
-# showInvalidPath [Set 6] 
-# Must include %s for the invalid path given. 
+# showInvalidPath [Set 6]
+# Must include %s for the invalid path given.
 6.1:Geçersiz yol - %s\n
 # misc error conditions [Set 7]
 # showBufferOverrun
-# %u required to show what the buffer's current size is. 
+# %u required to show what the buffer's current size is.
 7.1:Hata: Belirtilen dosya yolu olabilecek en büyük arabelleği aşıyor (%u bayt)\n
 # showOutOfMemory
 # %s required to display what directory we were processing when ran out of memory.

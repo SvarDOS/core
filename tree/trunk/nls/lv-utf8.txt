@@ -3,32 +3,32 @@
 #
 # common to many functions [Set 1]
 1.1:\n
-# main [Set 1] 
+# main [Set 1]
 1.2:Katalogu CEĻA saraksts\n
-# Must include %s for label 
+# Must include %s for label
 1.3:Katalogu CEĻA saraksts sējumam %s\n
-# Must include %s for serial #  
+# Must include %s for serial #
 1.4:Sējuma sērijas numurs ir %s\n
 1.5:Apakškatalogi neeksistē\n\n
 1.6: --- Press any key to continue ---\n
 # showUsage [Set 2]
 2.1:Grafiski parāda diska vai ceļa katalogu struktūru.\n
 # Each %c below will be replaced with proper switch/option
-2.2:TREE [disks:][ceļš] [%c%c] [%c%c]\n
-2.3:   %c%c   Izvadīt failu nosaukumus katrā katalogā.\n
-2.4:   %c%c   Izmantot ASCII paplašināto simbolu vietā.\n
-# showInvalidUsage [Set 3] 
+2.2:TREE [disks:][ceļš] [/F] [/A]\n
+2.3:   /F   Izvadīt failu nosaukumus katrā katalogā.\n
+2.4:   /A   Izmantot ASCII paplašināto simbolu vietā.\n
+# showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Nepareiza atslēga - %s\n
 # The %c will be replaced with the primary switch (default is /)
 3.2:Lietojiet TREE %c? lai iegūtu lietošanas informāciju.\n
 #showTooManyOptions
 3.3:Pārāk daudz parametru - %s\n
-# showVersionInfo [Set 4] 
+# showVersionInfo [Set 4]
 # also uses treeDescription, message 2.1
 4.1:Sarakstīts lai darbotos ar FreeDOS\n
 4.2:Win32(c) console and DOS with LFN support.\n
-# Must include the %s for version string. 
+# Must include the %s for version string.
 4.3:Versija %s\n
 4.4:Sarakstījis:   Kenneth J. Davis\n
 4.5:Datums:        Augusts/Septembris/Oktobris/Novembris, 2000; Janvāris, 2001\n
@@ -39,14 +39,14 @@
 #4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
 #4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
 4.20:Autortiesības 1995, 2000 Dave Dunfield - brīvi izplatāms (kopš 2000 zem VPL).\n
-# showInvalidDrive [Set 5] 
+# showInvalidDrive [Set 5]
 5.1:Kļūdaini norādīta diskiekārta\n
-# showInvalidPath [Set 6] 
-# Must include %s for the invalid path given. 
+# showInvalidPath [Set 6]
+# Must include %s for the invalid path given.
 6.1:Kļūdains ceļš - %s\n
 # misc error conditions [Set 7]
 # showBufferOverrun
-# %u required to show what the buffer's current size is. 
+# %u required to show what the buffer's current size is.
 7.1:Kļūda: Faila ceļš pārsniedz maksimālo buferi = %u baitus\n
 # showOutOfMemory
 # %s required to display what directory we were processing when ran out of memory.

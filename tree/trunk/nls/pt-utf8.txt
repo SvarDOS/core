@@ -15,7 +15,7 @@
 #
 # Comum a muitas funçöes [Conjunto 1]
 1.1:\n
-# Principal [Conjunto 1] 
+# Principal [Conjunto 1]
 1.2:Lista de PATH do diretório.\n
 # Deve incluir %s para o rótulo.
 1.3:Lista de PATH do diretório para o Volume %s\n
@@ -23,24 +23,24 @@
 1.4:O número de série do volume é %s\n
 1.5:Näo existem subdiretórios\n\n
 1.6: --- Pressione qualquer tecla para continuar ---\n
-# showUsage [Conjunto 2] 
+# showUsage [Conjunto 2]
 2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.\n
 # Cada %c abaixo será substituído pela chave/opçäo adequada
-2.2:TREE [unidade:][caminho] [%c%c] [%c%c]\n
-2.3:   %c%c   Exibe os nomes dos arquivos em cada diretório.\n
-2.4:   %c%c   Use ASCII em vez de caracteres estendidos.\n
-# showInvalidUsage [Conjunto 3] 
+2.2:TREE [unidade:][caminho] [/F] [/A]\n
+2.3:   /F   Exibe os nomes dos arquivos em cada diretório.\n
+2.4:   /A   Use ASCII em vez de caracteres estendidos.\n
+# showInvalidUsage [Conjunto 3]
 # Deve incluir o %s para a opçäo fornecida.
 3.1:Opçäo inválida - %s\n
 # O %c será substituído pela opçäo principal (o padräo é /)
 3.2:Use TREE %c? para obter informaçöes de uso.\n
 #showTooManyOptions
 3.3:Muitos parâmetros - %s\n
-# showVersionInfo [Conjunto 4] 
+# showVersionInfo [Conjunto 4]
 # também usa treeDescription, mensagen 2.1
 4.1:Escrito para trabalhar com FreeDOS\n
 4.2:Console Win32(c) e DOS com suporte a LFN.\n
-# Precisa incluir o %s para o texto de versäo. 
+# Precisa incluir o %s para o texto de versäo.
 4.3:Versäo %s\n
 4.4:Escrito por: Kenneth J. Davis\n
 4.5:Data:        2000, 2001, 2004\n
@@ -51,14 +51,14 @@
 #4.20 20-30 reservado para a árvore do FreeDOS, derivada da árvore de Dave Dunfield.
 #4.20:Copyright 1995 Dave Dunfield - Livremente distribuível.\n
 4.20:Copyright 1995, 2000 Dave Dunfield - Livremente distribuível (2000 released GPL).\n
-# showInvalidDrive [Conjunto 5] 
+# showInvalidDrive [Conjunto 5]
 5.1:Especificaçäo de unidade inválida\n
-# showInvalidPath [Conjunto 6] 
-# Precisa incluir %s para o caminho inválido fornecido. 
+# showInvalidPath [Conjunto 6]
+# Precisa incluir %s para o caminho inválido fornecido.
 6.1:Caminho inválido - %s\n
 # várias condiçöes de erro [Conjunto 7]
 # showBufferOverrun
-# %u necessário para mostrar qual é o tamanho atual do buffer. 
+# %u necessário para mostrar qual é o tamanho atual do buffer.
 7.1:Erro: o caminho do arquivo especificado excede o buffer máximo = %u bytes\n
 # showOutOfMemory
 # %s é necessário para exibir qual diretório estávamos processando quando ficou sem memória.
