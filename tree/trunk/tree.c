@@ -570,16 +570,15 @@ typedef struct DIRDATA {
  * Contains the information stored in a Stack necessary to allow
  * non-recursive function to display directory tree.
  */
-typedef struct SUBDIRINFO
-{
-  struct SUBDIRINFO * parent; /* points to parent subdirectory                */
+struct SUBDIRINFO {
+  struct SUBDIRINFO *parent; /* points to parent subdirectory                */
   char *currentpath;    /* Stores the full path this structure represents     */
   char *subdir;         /* points to last subdir within currentpath           */
   char *dsubdir;        /* Stores a display ready directory name              */
   long subdircnt;       /* Initially a count of how many subdirs in this dir  */
   struct find_t *findnexthnd; /* The handle returned by findfirst, used in findnext */
   struct DIRDATA ddata; /* Maintain directory information, eg attributes      */
-} SUBDIRINFO;
+};
 
 
 /**
@@ -647,9 +646,9 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
  * if subdir does not end in slash, one is added to stored subdir
  * dsubdir is subdir already modified so ready to display to user
  */
-static SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir) {
+static struct SUBDIRINFO *newSubdirInfo(struct SUBDIRINFO *parent, char *subdir, char *dsubdir) {
   int parentLen, subdirLen;
-  SUBDIRINFO *temp;
+  struct SUBDIRINFO *temp;
 
   /* Get length of parent directory */
   if (parent == NULL)
@@ -662,9 +661,8 @@ static SUBDIRINFO *newSubdirInfo(SUBDIRINFO *parent, char *subdir, char *dsubdir
   if ((subdirLen < 1) || ( (*(subdir+subdirLen-1) != '\\') && (*(subdir+subdirLen-1) != '/') ) )
     subdirLen++;
 
-  temp = (SUBDIRINFO *)malloc(sizeof(SUBDIRINFO));
-  if (temp == NULL)
-  {
+  temp = malloc(sizeof(struct SUBDIRINFO));
+  if (temp == NULL) {
     showOutOfMemory(subdir);
     return NULL;
   }
@@ -995,7 +993,7 @@ static long traverseTree(char *initialpath) {
   char padding[MAXPADLEN] = "";
   char subdir[PATH_MAX];
   char dsubdir[PATH_MAX];
-  SUBDIRINFO *sdi;
+  struct SUBDIRINFO *sdi;
 
   STACK s;
   stackDefaults(&s);
@@ -1011,7 +1009,7 @@ static long traverseTree(char *initialpath) {
 
   do
   {
-    sdi = (SUBDIRINFO *)stackPopItem(&s);
+    sdi = (struct SUBDIRINFO *)stackPopItem(&s);
 
     if (sdi->findnexthnd == NULL) { // findfirst not called yet
       // 1st time this subdirectory processed, so display its name & possibly files
