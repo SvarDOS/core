@@ -43,25 +43,6 @@ typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 
-typedef struct FILETIME   /* should correspond to a quad word */
-{
-  WORD ldw[2];  /* LowDoubleWord  */
-  DWORD hdw;    /* HighDoubleWord */
-} FILETIME;
-
-struct WIN32_FIND_DATA {
-  unsigned short attrib;
-  FILETIME ftCreationTime;
-  FILETIME ftLastAccessTime;
-  FILETIME ftLastWriteTime;
-  DWORD    nFileSizeHigh;
-  DWORD    nFileSizeLow;
-  DWORD    dwReserved0;
-  DWORD    dwReserved1;
-  char cFileName[ 260 ];
-  char cAlternateFileName[ 14 ];
-};
-
 
 _Packed struct FFDTA { /* same format as a ffblk struct */
   BYTE reserved[21]; /* dos positioning info */
@@ -73,8 +54,8 @@ _Packed struct FFDTA { /* same format as a ffblk struct */
 };
 
 
-struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData);
-int FindNextFile(struct FFDTA *hnd, struct WIN32_FIND_DATA *findData);
+struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *findData);
+int FindNextFile(struct FFDTA *hnd, struct FFDTA *findData);
 void FindClose(struct FFDTA *hnd);
 
 int GetFileAttributes(unsigned short *attr, const char *pathname);

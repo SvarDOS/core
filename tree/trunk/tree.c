@@ -596,7 +596,7 @@ typedef struct SUBDIRINFO
  * and path is valid.
  */
 static long hasSubdirectories(char *path, DIRDATA *ddata) {
-  static struct WIN32_FIND_DATA findData;
+  static struct FFDTA findData;
   struct FFDTA *hnd;
   static char buffer[MAXBUF];
   int hasSubdirs = 0;
@@ -617,10 +617,10 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
 
   /*  cycle through entries counting directories found until no more entries */
   do {
-    if (((findData.attrib & FILE_A_DIR) != 0) &&
-        ((findData.attrib &
+    if (((findData.ff_attr & FILE_A_DIR) != 0) &&
+        ((findData.ff_attr &
          (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0 || dspAll) ) {
-      if (findData.cFileName[0] != '.') { /* ignore '.' and '..' */
+      if (findData.ff_name[0] != '.') { /* ignore '.' and '..' */
         hasSubdirs++;      /* subdir of initial path found, so increment counter */
       }
     }
@@ -852,8 +852,8 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
  */
 static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   static char buffer[MAXBUF];
-  struct WIN32_FIND_DATA entry; /* current directory entry info    */
-  struct FFDTA *dir;         /* Current directory entry working with      */
+  struct FFDTA entry;   /* current directory entry info    */
+  struct FFDTA *dir;    /* Current directory entry working with      */
   unsigned long filesShown = 0;
 
   /* get handle for files in current directory (using wildcard spec) */
@@ -868,8 +868,8 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
   do
   {
     /* print padding followed by filename */
-    if ( ((entry.attrib & FILE_A_DIR) == 0) &&
-         ( ((entry.attrib & (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0)  || dspAll) )
+    if ( ((entry.ff_attr & FILE_A_DIR) == 0) &&
+         ( ((entry.ff_attr & (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0)  || dspAll) )
     {
       /* print lead padding */
       pprintf("%s", padding);
@@ -877,29 +877,21 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
       /* optional display data */
       if (dspAttr)  /* file attributes */
         pprintf("[%c%c%c%c] ",
-          (entry.attrib & FILE_A_ARCH)?'A':' ',
-          (entry.attrib & FILE_A_SYSTEM)?'S':' ',
-          (entry.attrib & FILE_A_HIDDEN)?'H':' ',
-          (entry.attrib & FILE_A_READONLY)?'R':' '
+          (entry.ff_attr & FILE_A_ARCH)?'A':' ',
+          (entry.ff_attr & FILE_A_SYSTEM)?'S':' ',
+          (entry.ff_attr & FILE_A_HIDDEN)?'H':' ',
+          (entry.ff_attr & FILE_A_READONLY)?'R':' '
         );
 
-      if (dspSize)  /* file size */
-      {
-        if (entry.nFileSizeHigh)
-        {
-          pprintf("******** ");  /* error exceed max value we can display, > 4GB */
-        }
-        else
-        {
-          if (entry.nFileSizeLow < 1048576l)  /* if less than a MB, display in bytes */
-            pprintf("%10lu ", entry.nFileSizeLow);
-          else                               /* otherwise display in KB */
-            pprintf("%8luKB ", entry.nFileSizeLow/1024UL);
-        }
+      if (dspSize) { /* file size */
+        if (entry.ff_fsize < 1048576ul)  /* if less than a MB, display in bytes */
+          pprintf("%10lu ", entry.ff_fsize);
+        else                               /* otherwise display in KB */
+          pprintf("%8luKB ", entry.ff_fsize / 1024ul);
       }
 
       /* print filename */
-      pprintf("%s\n", entry.cFileName);
+      pprintf("%s\n", entry.ff_name);
 
       filesShown++;
     }
@@ -931,24 +923,24 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
  * are found, at which point it closes the FindFile search handle and
  * return NULL.  If successful, returns FindFile handle.
  */
-static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct WIN32_FIND_DATA *entry, char *subdir, char *dsubdir) {
+static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct FFDTA *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
   do
   {
     /* skip files & hidden or system directories */
-    if ((((entry->attrib & FILE_A_DIR) == 0) ||
-         ((entry->attrib &
+    if ((((entry->ff_attr & FILE_A_DIR) == 0) ||
+         ((entry->ff_attr &
           (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
-        (entry->cFileName[0] == '.')) {
+        (entry->ff_name[0] == '.')) {
       if (FindNextFile(findnexthnd, entry) == 0) {
         FindClose(findnexthnd);      // prevent resource leaks
         return(NULL); // no subdirs found
       }
     } else {
       /* set display name */
-      strcpy(dsubdir, entry->cFileName);
+      strcpy(dsubdir, entry->ff_name);
 
-      strcpy(subdir, entry->cFileName);
+      strcpy(subdir, entry->ff_name);
       strcat(subdir, "\\");
     }
   } while (!*subdir); // while (subdir is still blank)
@@ -958,7 +950,7 @@ static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct WIN32_FI
 
 
 /* FindFile buffer used by findFirstSubdir and findNextSubdir only */
-static struct WIN32_FIND_DATA findSubdir_entry; /* current directory entry info    */
+static struct FFDTA findSubdir_entry; /* current directory entry info    */
 
 /**
  * Given the current path, find the 1st subdirectory.

@@ -40,34 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #define searchAttr ( FILE_A_DIR | FILE_A_HIDDEN | FILE_A_SYSTEM | FILE_A_READONLY | FILE_A_ARCH )
 
 
-/* copy old style findfirst data FFDTA to a WIN32_FIND_DATA
- * NOTE: does not map exactly.
- * internal to this module only.
- */
-static void copyFileData(struct WIN32_FIND_DATA *findData, const struct FFDTA *finfo)
-{
-  /* Copy requried contents over into required structure */
-  strcpy(findData->cFileName, finfo->ff_name);
-  findData->attrib = finfo->ff_attr;
-
-  /* copy over rest (not quite properly) */
-  findData->ftCreationTime.ldw[0] = finfo->ff_ftime;
-  findData->ftLastAccessTime.ldw[0] = finfo->ff_ftime;
-  findData->ftLastWriteTime.ldw[0] = finfo->ff_ftime;
-  findData->ftCreationTime.ldw[1] = finfo->ff_fdate;
-  findData->ftLastAccessTime.ldw[1] = finfo->ff_fdate;
-  findData->ftLastWriteTime.ldw[1] = finfo->ff_fdate;
-  findData->ftCreationTime.hdw = 0;
-  findData->ftLastAccessTime.hdw = 0;
-  findData->ftLastWriteTime.hdw = 0;
-  findData->nFileSizeHigh = 0;
-  findData->nFileSizeLow = (DWORD)finfo->ff_fsize;
-  findData->dwReserved0 = 0;
-  findData->dwReserved1 = 0;
-}
-
-struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findData)
-{
+struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *findData) {
   static char path[1024];
   struct FFDTA *hnd;
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
@@ -82,9 +55,6 @@ struct FFDTA *FindFirstFile(const char *pathname, struct WIN32_FIND_DATA *findDa
   /* initialize structure (clear) */
   /* hnd->handle = 0;  hnd->ffdtaptr = NULL; */
   memset(hnd, 0, sizeof(*hnd));
-
-  /* Clear findData, this is to fix a glitch under NT, with 'special' $???? files */
-  memset(findData, 0, sizeof(struct WIN32_FIND_DATA));
 
   /* if pathname ends in \* convert to \*.* */
   strcpy(path, pathname);
@@ -150,13 +120,13 @@ success:
   }
 
   /* copy its results over */
-  copyFileData(findData, hnd);
+  memcpy(findData, hnd, sizeof(struct FFDTA));
 
   return hnd;
 }
 
 
-int FindNextFile(struct FFDTA *hnd, struct WIN32_FIND_DATA *findData) {
+int FindNextFile(struct FFDTA *hnd, struct FFDTA *findData) {
   short cflag = 0;  /* used to indicate if dos findnext succesful or not */
 
   /* if bad handle given return */
@@ -164,9 +134,6 @@ int FindNextFile(struct FFDTA *hnd, struct WIN32_FIND_DATA *findData) {
 
   /* verify findData is valid */
   if (findData == NULL) return 0;
-
-  /* Clear findData, this is to fix a glitch under NT, with 'special' $???? files */
-  memset(findData, 0, sizeof(struct WIN32_FIND_DATA));
 
   { /* Use DOS (0x4F) findnext, returning if error */
     unsigned short dta_seg = FP_SEG(hnd);
@@ -211,7 +178,7 @@ success:
   if (cflag) return 0;
 
   /* copy its results over */
-  copyFileData(findData, hnd);
+  memcpy(findData, hnd, sizeof(struct FFDTA));
 
   return 1;
 }
@@ -224,7 +191,6 @@ void FindClose(struct FFDTA *hnd) {
   free(hnd);                    /* Free memory used for the handle itself */
 }
 
-#include <stdio.h>
 
 /**
  Try LFN getVolumeInformation 1st
