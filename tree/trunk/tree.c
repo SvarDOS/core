@@ -380,7 +380,7 @@ static void parseArguments(int argc, char **argv) {
 
     /* must be an option then */
     /* check multi character options 1st */
-    if (argv[i][1] & 0xDF == 'D') {
+    if ((argv[i][1] & 0xDF) == 'D') {
       switch(argv[i][2] & 0xDF) {
         case 'A' :       /*  /DA  display attributes */
           dspAttr = 1;
