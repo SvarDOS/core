@@ -537,10 +537,10 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
   char rootPath[MAXBUF];
   char dummy[MAXBUF];
   union serialNumber {
-    DWORD serialFull;
+    unsigned long serialFull;
     struct {
-      WORD a;
-      WORD b;
+      unsigned short a;
+      unsigned short b;
     } serialParts;
   } serialNum;
 
@@ -552,11 +552,11 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
     showInvalidDrive();
   }
 
-  if (serialNum.serialFull == 0)
+  if (serialNum.serialFull == 0) {
     serial[0] = '\0';
-  else
-    sprintf(serial, "%04X:%04X",
-      serialNum.serialParts.b, serialNum.serialParts.a);
+  } else {
+    sprintf(serial, "%04X:%04X", serialNum.serialParts.b, serialNum.serialParts.a);
+  }
 }
 
 
@@ -565,10 +565,9 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
  * we may wish to make use of when displaying directory entry.
  * e.g. attribute, dates, etc.
  */
-typedef struct DIRDATA
-{
-  DWORD subdirCnt;          /* how many subdirectories we have */
-  DWORD fileCnt;            /* how many [normal] files we have */
+typedef struct DIRDATA {
+  unsigned long subdirCnt;  /* how many subdirectories we have */
+  unsigned long fileCnt;    /* how many [normal] files we have */
   unsigned short attrib;    /* Directory attributes            */
 } DIRDATA;
 

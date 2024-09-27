@@ -38,30 +38,26 @@ DEALINGS IN THE SOFTWARE.
 #define FILE_A_DIR       0x0010
 #define FILE_A_ARCH      0x0020
 
-typedef short BOOL;
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef unsigned long DWORD;
-
 
 _Packed struct FFDTA { /* same format as a ffblk struct */
-  BYTE reserved[21]; /* dos positioning info */
-  BYTE ff_attr;      /* file attributes */
-  WORD ff_ftime;     /* time when file created/modified */
-  WORD ff_fdate;     /* date when file created/modified */
-  DWORD ff_fsize;    /* low word followed by high word */
-  BYTE ff_name[13];  /* file name, not space padded, period, '\0' terminated, wildcards replaced */
+  char reserved[21];        /* dos positioning info */
+  unsigned char ff_attr;    /* file attributes */
+  unsigned short ff_ftime;  /* time when file created/modified */
+  unsigned short ff_fdate;  /* date when file created/modified */
+  unsigned long ff_fsize;   /* low word followed by high word */
+  char ff_name[13];  /* file name, not space padded, period, '\0' terminated, wildcards replaced */
 };
 
 
 struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *findData);
+
 int FindNextFile(struct FFDTA *hnd, struct FFDTA *findData);
+
 void FindClose(struct FFDTA *hnd);
 
 int GetFileAttributes(unsigned short *attr, const char *pathname);
 
 /* Only the 1st 4 arguments are used and returns zero on error */
-int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
-  DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber);
+int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer, size_t nVolumeNameSize, unsigned long *lpVolumeSerialNumber);
 
 #endif

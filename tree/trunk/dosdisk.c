@@ -210,12 +210,12 @@ void FindClose(struct FFDTA *hnd) {
 /* returns zero on failure, if lpRootPathName is NULL or "" we use current
  * default drive. */
 int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
-  DWORD nVolumeNameSize, DWORD *lpVolumeSerialNumber) {
+  size_t nVolumeNameSize, unsigned long *lpVolumeSerialNumber) {
 
   /* Using DOS interrupt to get serial number */
   struct media_info {
     short dummy;
-    DWORD serial;
+    unsigned long serial;
     char volume[11];
     short ftype[8];
   } media;
@@ -398,7 +398,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
 
 
 /* retrieve attributes (ReadOnly/System/...) about file or directory
- * returns (DWORD)-1 on error
+ * returns -1 on error
  */
 int GetFileAttributes(unsigned short *attr, const char *pathname) {
   union REGS r;
