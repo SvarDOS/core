@@ -22,11 +22,17 @@
 
 # show Usage
 2.1:Graphically displays the directory structure of a drive or path.
-2.2:.
+2.2:\t
 2.3:TREE [drive:][path] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Display the names of the files in each directory.
 2.6:  /A  Use ASCII instead of extended characters.
+2.7:  /P  Pause after each page
+2.8:  /V  Show version information
+2.10:  /DF  Display file sizes
+2.11:  /DA  Display file attributes
+2.12:  /DH  Display hidden and system files (normally not shown)
+2.13:  /DR  Display results at end
 
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
@@ -35,21 +41,12 @@
 3.2:Use TREE %c? for usage information.\n
 #showTooManyOptions
 3.3:Too many parameters - %s\n
-# showVersionInfo [Set 4]
-# also uses treeDescription, message 2.1
-4.1:Written to work with FreeDOS\n
-4.2:Win32(c) console and DOS with LFN support.\n
-# Must include the %s for version string.
-4.3:Version %s\n
-4.4:Written by: Kenneth J. Davis\n
-4.5:Date:       2000, 2001, 2004\n
-4.6:Contact:    jeremyd@computer.org\n
-4.7:Copyright (c): Public Domain [United States Definition]\n
-#4.8 is only used when cats support is compiled in.
-4.8:Uses Jim Hall's <jhall@freedos.org> Cats Library\n  version 3.8 Copyright (C) 1999,2000 Jim Hall\n
-#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
-#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:Copyright 1995, 2000 Dave Dunfield - Freely distributable (2000 released GPL).\n
+
+# showVersionInfo
+4.0:Origin: pdTREE by Kenneth J. Davis (2000-2004)
+4.1:Forked and adapted to SvarDOS by Mateusz Viste (2024)
+4.2:Copyright (c): Public Domain [United States Definition]
+
 # showInvalidDrive [Set 5]
 5.1:Invalid drive specification\n
 # showInvalidPath [Set 6]

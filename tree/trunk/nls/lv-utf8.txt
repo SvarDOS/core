@@ -13,9 +13,9 @@
 
 # showUsage [Set 2]
 2.1:Grafiski parāda diska vai ceļa katalogu struktūru.
-2.2:.
+2.2:\t
 2.3:TREE [disks:][ceļš] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Izvadīt failu nosaukumus katrā katalogā.
 2.6:  /A  Izmantot ASCII paplašināto simbolu vietā.
 
@@ -26,21 +26,9 @@
 3.2:Lietojiet TREE %c? lai iegūtu lietošanas informāciju.\n
 #showTooManyOptions
 3.3:Pārāk daudz parametru - %s\n
+
 # showVersionInfo [Set 4]
-# also uses treeDescription, message 2.1
-4.1:Sarakstīts lai darbotos ar FreeDOS\n
-4.2:Win32(c) console and DOS with LFN support.\n
-# Must include the %s for version string.
-4.3:Versija %s\n
-4.4:Sarakstījis:   Kenneth J. Davis\n
-4.5:Datums:        Augusts/Septembris/Oktobris/Novembris, 2000; Janvāris, 2001\n
-4.6:Saziņa:        jeremyd@computer.org\n
-4.7:Autortiesības: sabiedrības īpašums [ASV definīcijā]\n
-#4.8 is only used when cats support is compiled in.
-4.8:Izmanto Jim Hall <jhall@freedos.org> Cats bibliotēku\n  Autortiesības (C) 1999,2000,2001 Jim Hall\n
-#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
-#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:Autortiesības 1995, 2000 Dave Dunfield - brīvi izplatāms (kopš 2000 zem VPL).\n
+
 # showInvalidDrive [Set 5]
 5.1:Kļūdaini norādīta diskiekārta\n
 # showInvalidPath [Set 6]

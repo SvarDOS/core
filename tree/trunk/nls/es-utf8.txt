@@ -14,9 +14,9 @@
 
 # MostrarUso [Conjunto 2]
 2.1:Visualiza gráficamente la estructura de directorios de un disco o ruta.
-2.2:.
+2.2:\t
 2.3:TREE [unidad:][ruta] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Visualiza los nombres de los archivos en cada directorio.
 2.6:  /A  Utiliza el ASCII en vez de caracteres extendidos.
 
@@ -26,21 +26,9 @@
 3.2:Utilice TREE %c? para ver la información sobre su uso.\n
 #showTooManyOptions
 3.3:Demasiados parámetros - %s\n
+
 # Mostrar información sobre la versión [Conjunto 4]
-# También utiliza el mensaje 2.1 de treeDescription.
-4.1:Escrito para ejecutarse bajo FreeDOS\n
-4.2:Ventana de Win32(c) y DOS con soporte para LFN.\n
-# Debe incluir el %s para la cadena de la versión.
-4.3:Versión %s\n
-4.4:Escrito por:   Kenneth J. Davis\n
-4.5:Fecha:         Agosto/Septiembre/Octubre/Noviembre, 2000; Enero 2001\n
-4.6:Contacto:      jeremyd@computer.org\n
-4.7:Copyright (c): Dominio Público [Definición De Estados Unidos]\n
-#4.8 is only used when cats support is compiled in.
-4.8:Utiliza la biblioteca Cats de Jim Hall <jhall@freedos.org> \n  version 3.8 Copyright (C) 1999,2000 Jim Hall\n
-#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
-#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:Copyright 1995, 2000 Dave Dunfield - De libre distribución (bajo GPL en el 2000).\n
+
 # MostrarUnidadNoVálida [Conjunto 5]
 5.1:El disco especificado no es válido.\n
 # MuestraRutaNoVálida [Fije 6]

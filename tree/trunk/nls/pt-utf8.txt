@@ -25,9 +25,9 @@
 
 # showUsage [Conjunto 2]
 2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.
-2.2:.
+2.2:\t
 2.3:TREE [unidade:][caminho] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Exibe os nomes dos arquivos em cada diretório.
 2.6:  /A  Use ASCII em vez de caracteres estendidos.
 
@@ -38,21 +38,9 @@
 3.2:Use TREE %c? para obter informaçöes de uso.\n
 #showTooManyOptions
 3.3:Muitos parâmetros - %s\n
+
 # showVersionInfo [Conjunto 4]
-# também usa treeDescription, mensagen 2.1
-4.1:Escrito para trabalhar com FreeDOS\n
-4.2:Console Win32(c) e DOS com suporte a LFN.\n
-# Precisa incluir o %s para o texto de versäo.
-4.3:Versäo %s\n
-4.4:Escrito por: Kenneth J. Davis\n
-4.5:Data:        2000, 2001, 2004\n
-4.6:Contato:    jeremyd@computer.org\n
-4.7:Copyright (c): Dominio Público [Definiçäo dos Estados Unidos]\n
-#4.8 só é usado quando o suporte à biblioteca Cats é compilado.
-4.8:Utiliza a biblioteca Cats de Jim Hall's <jhall@freedos.org>\n  versäo 3.8 Copyright (C) 1999,2000 Jim Hall\n
-#4.20 20-30 reservado para a árvore do FreeDOS, derivada da árvore de Dave Dunfield.
-#4.20:Copyright 1995 Dave Dunfield - Livremente distribuível.\n
-4.20:Copyright 1995, 2000 Dave Dunfield - Livremente distribuível (2000 released GPL).\n
+
 # showInvalidDrive [Conjunto 5]
 5.1:Especificaçäo de unidade inválida\n
 # showInvalidPath [Conjunto 6]

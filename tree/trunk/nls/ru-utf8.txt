@@ -22,9 +22,9 @@
 
 # showUsage [Set 2]
 2.1:Графическое представление структуры диска или каталога.
-2.2:.
+2.2:\t
 2.3:TREE [диск:][путь] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Отображать имена файлов в каждом каталоге.
 2.6:  /A  Использовать ASCII вместо Extended ASCII.
 
@@ -40,48 +40,15 @@
 
 # showVersionInfo [Set 4]
 
-# also uses treeDescription, message 2.1
-
-4.1:Написано для работы под FreeDOS,\n
-
-4.2:командной строки Win32(c) и DOS с поддержкой LFN.\n
-
-# Must include the %s for version string.
-
-4.3:Версия %s\n
-
-4.4:Автор: Kenneth J. Davis\n
-
-4.5:Дата:       Август/Сентябрь/Октябрь/Ноябрь, 2000; Январь, 2001\n
-
-4.6:Контакты:    jeremyd@computer.org\n
-
-4.7:Copyright (c): Public Domain [United States Definition]\n
-
-#4.8 is only used when cats support is compiled in.
-
-4.8:Uses Jim Hall's <jhall@freedos.org> Cats Library\n  Copyright (C) 1999,2000,2001 Jim Hall\n
-
-#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
-
-#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-
-4.20:Copyright 1995, 2000 Dave Dunfield - Freely distributable (2000 released GPL).\n
-
 # showInvalidDrive [Set 5]
-
 5.1:Недопустимое имя диска\n
 
 # showInvalidPath [Set 6]
-
 # Must include %s for the invalid path given.
-
 6.1:Некорректный путь - %s\n
 
 # misc error conditions [Set 7]
-
 # showBufferOverrun
-
 # %u required to show what the buffer's current size is.
 
 7.1:Ошибка: Указанный путь к файлу превышает максимальный буфер = %u bytes\n

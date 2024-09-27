@@ -307,14 +307,10 @@ static int pprintf(const char *msg, ...) {
 /* Displays to user valid options then exits program indicating no error */
 static void showUsage(void) {
   unsigned short i;
-  for (i = 0x0200; i < 0x0209; i++) {
+  for (i = 0x0200; i < 0x021F; i++) {
     const char *s = svarlang_strid(i);
     if (s[0] == 0) continue;
-    if (s[0] == '.') {
-      puts("");
-    } else {
-      puts(s);
-    }
+    puts(s);
   }
   exit(1);
 }
@@ -323,18 +319,20 @@ static void showUsage(void) {
 /* Displays error message then exits indicating error */
 static void showInvalidUsage(char * badOption) {
   printf(svarlang_strid(0x0301), badOption); /* invalid switch - ... */
-  printf("%s%s", svarlang_strid(0x0302), newLine); /* use TREE /? for usage info */
+  puts(svarlang_strid(0x0302)); /* use TREE /? for usage info */
   exit(1);
 }
 
 
 /* Displays author, copyright, etc info, then exits indicating no error. */
 static void showVersionInfo(void) {
-  printf(svarlang_strid(0x0201));
-  printf(svarlang_strid(0x0202));
-  printf(svarlang_strid(0x0403), VERSION);
-  printf(svarlang_strid(0x0404));
-  printf(svarlang_strid(0x0407));
+  unsigned short i;
+  puts("SvarDOS TREE " VERSION);
+  puts("");
+  for (i = 0x0400; i < 0x0409; i++) {
+    if (svarlang_strid(i)[0] == 0) continue;
+    puts(svarlang_strid(i));
+  }
   exit(1);
 }
 

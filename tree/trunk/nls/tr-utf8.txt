@@ -22,9 +22,9 @@
 
 # showUsage [Set 2]
 2.1:Bir disk bölümünün veya yolun dizin yapısını grafik biçiminde görüntüler.
-2.2:.
+2.2:\t
 2.3:TREE [sürücü:][yol] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Her bir dizindeki dosya adlarını görüntüler.
 2.6:  /A  Genişletilmiş karakterler yerine ASCII kullanır.
 
@@ -35,21 +35,9 @@
 3.2:Kullanım bilgisi için TREE %c? yazın.\n
 #showTooManyOptions
 3.3:Çok fazla parametre - %s\n
+
 # showVersionInfo [Set 4]
-# also uses treeDescription, message 2.1
-4.1:FreeDOS ile çalışmak üzere yazılmıştır.\n
-4.2:LFN desteği ile Win32(c) konsol ve DOS sürümü.\n
-# Must include the %s for version string.
-4.3:Sürüm %s\n
-4.4:Yazan:       Kenneth J. Davis\n
-4.5:Tarih:       2000, 2001, 2004\n
-4.6:İletişim:    jeremyd@computer.org\n
-4.7:Telif hakkı (c): Kamusal alan [Birleşik Devletler tanımı]\n
-#4.8 is only used when cats support is compiled in.
-4.8:Jim Hall'un <jhall@freedos.org> Cats kitaplığını kullanır\n  sürüm 3.8 Telif hakkı (C) 1999,2000 Jim Hall\n
-#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
-#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:Telif hakkı 1995, 2000 Dave Dunfield - Özgürce dağıtılabilir (2000 GPL).\n
+
 # showInvalidDrive [Set 5]
 5.1:Geçersiz sürücü belirtimi\n
 # showInvalidPath [Set 6]

@@ -26,9 +26,9 @@
 
 # showUsage [Set 2]
 2.1:Esittää aseman tai polun hakemistorakenteen graafisesti.
-2.2:.
+2.2:\t
 2.3:TREE [asema:][polku] [/F] [/A]
-2.4:.
+2.4:\t
 2.5:  /F  Näyttää jokaisen hakemiston tiedostojen nimet.
 2.6:  /A  Käyttää ASCII:ta laajennettujen merkkien asemesta.
 
@@ -39,21 +39,9 @@
 3.2:Kirjoita TREE %c? saadaksesi lisätietoja.\n
 #showTooManyOptions
 3.3:Liikaa parametreja - %s\n
+
 # showVersionInfo [Set 4]
-# also uses treeDescription, message 2.1
-4.1:Kirjoitettu toimimaan FreeDOS:lla\n
-4.2:Win32(c)-konsolilla ja DOS:lla LFN-tuella.\n
-# Must include the %s for version string.
-4.3:Versio %s\n
-4.4:Tekijä:       Kenneth J. Davis\n
-4.5:Päiväys:      2000, 2001, 2004\n
-4.6:Yhteystiedot: jeremyd@computer.org\n
-4.7:(c): Public domain [Yhdysvaltain määritelmällä]\n
-#4.8 is only used when cats support is compiled in.
-4.8:Käyttää Jim Hallin <jhall@freedos.org> Cats-kirjastoa\n  versio 3.8 (C) 1999,2000 Jim Hall\n
-#4.20 20-30 reserved for FreeDOS tree derived from Dave Dunfield's tree
-#4.20:Copyright 1995 Dave Dunfield - Freely distributable.\n
-4.20:(C) 1995, 2000 Dave Dunfield - vapaasti jaettava (2000 GPL-lisenssillä).\n
+
 # showInvalidDrive [Set 5]
 5.1:Virheellinen asemamäärittely\n
 # showInvalidPath [Set 6]
