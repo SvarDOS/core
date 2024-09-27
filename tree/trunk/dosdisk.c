@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #define searchAttr ( FILE_A_SUBDIR | FILE_A_HIDDEN | FILE_A_SYSTEM | FILE_A_RDONLY | FILE_A_ARCH )
 
 
-struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *hnd) {
+int FindFirstFile(const char *pathname, struct FFDTA *hnd) {
   char path[PATH_MAX];
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
 
@@ -107,9 +107,7 @@ success:
   }
   }
 
-  if (cflag) return(NULL);
-
-  return hnd;
+  return(cflag);
 }
 
 
@@ -159,9 +157,7 @@ success:
     }
   }
 
-  if (cflag) return 0;
-
-  return 1;
+  return(cflag);
 }
 
 

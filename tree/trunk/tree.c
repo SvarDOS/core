@@ -606,7 +606,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
    * Allows us to limit returned results to just directories
    * if supported by underlying filesystem.
    */
-  if (FindFirstFile(buffer, &findData) == NULL) {
+  if (FindFirstFile(buffer, &findData) != 0) {
     showInvalidPath(path); /* Display error message */
     return(-1);
   }
@@ -620,7 +620,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
         hasSubdirs++;      /* subdir of initial path found, so increment counter */
       }
     }
-  } while(FindNextFile(&findData) != 0);
+  } while(FindNextFile(&findData) == 0);
 
   /* prevent resource leaks, close the handle. */
   FindClose(&findData);
@@ -854,7 +854,7 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
   /* get handle for files in current directory (using wildcard spec) */
   strcpy(buffer, path);
   strcat(buffer, "*");
-  if (FindFirstFile(buffer, &entry) == NULL) return(-1);
+  if (FindFirstFile(buffer, &entry) != 0) return(-1);
 
   addPadding(padding, hasMoreSubdirs);
 
@@ -889,7 +889,7 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
 
       filesShown++;
     }
-  } while(FindNextFile(&entry) != 0);
+  } while(FindNextFile(&entry) == 0);
 
   if (filesShown)
   {
@@ -921,7 +921,7 @@ static struct FFDTA *cycleFindResults(struct FFDTA *entry, char *subdir, char *d
          ((entry->attrib &
           (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
         (entry->name[0] == '.')) {
-      if (FindNextFile(entry) == 0) {
+      if (FindNextFile(entry) != 0) {
         FindClose(entry);      // prevent resource leaks
         return(NULL); // no subdirs found
       }
@@ -960,7 +960,7 @@ static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsub
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
-  if (FindFirstFile(buffer, dir) == NULL) {
+  if (FindFirstFile(buffer, dir) != 0) {
     showInvalidPath(currentpath);
     return(NULL);
   }
@@ -983,7 +983,7 @@ static int findNextSubdir(struct FFDTA *findnexthnd, char *subdir, char *dsubdir
   /* clear result path */
   subdir[0] = 0;
 
-  if (FindNextFile(findnexthnd) == 0) return 1; // no subdirs found
+  if (FindNextFile(findnexthnd) != 0) return(1); // no subdirs found
 
   if (cycleFindResults(findnexthnd, subdir, dsubdir) == NULL) {
     return 1;
