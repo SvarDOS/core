@@ -183,30 +183,19 @@ static void waitkey(void);
 modify [ax]
 
 
-#define FILE_TYPE_UNKNOWN 0x00
-#define FILE_TYPE_DISK    0x01
-#define FILE_TYPE_CHAR    0x02
-#define FILE_TYPE_PIPE    0x03
-#define FILE_TYPE_REMOTE  0x80
-
 /* checks if stdout appears to be redirected. returns 0 if not, non-zero otherwise. */
-static unsigned char is_stdout_redirected(void) {
-  union REGS r;
-
-  r.x.ax = 0x4400;                 /* DOS 2+, IOCTL Get Device Info */
-  r.x.bx = 0x0001;                 /* file handle (stdout) */
-
-  intdos(&r, &r);     /* Clib function to invoke DOS int21h call   */
-
-  /* error? */
-  if (r.x.cflag != 0) return(FILE_TYPE_UNKNOWN);
-
-  /* if bit 7 is set it is a char dev (not redirected to disk) */
-  if (r.x.dx & 0x80) return(0);
-
-  /* assume valid file handle */
-  return(1);
-}
+static unsigned char is_stdout_redirected(void);
+#pragma aux is_stdout_redirected = \
+"mov ax, 0x4400"    /* DOS 2+, IOCTL Get Device Info */            \
+"mov bx, 0x0001"    /* file handle (stdout) */                     \
+"int 0x21" \
+"jc DONE"           /* on error AL contains a non-zero err code */ \
+"and dl, 0x80"      /* bit 7 of DL is the "CHAR" flag */           \
+"xor dl, 0x80"      /* return 0 if CHAR bit is set */              \
+"mov al, dl" \
+"DONE:" \
+modify [ax bx dx] \
+value [al]
 
 
 /* sets rows & cols to size of actual console window
