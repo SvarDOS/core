@@ -32,6 +32,7 @@ DEALINGS IN THE SOFTWARE.
 /*** Expects Pointers to be near (Tiny, Small, and Medium models ONLY) ***/
 
 #include <dos.h>
+#include <stdio.h>   /* PATH_MAX */
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,17 +41,9 @@ DEALINGS IN THE SOFTWARE.
 #define searchAttr ( FILE_A_DIR | FILE_A_HIDDEN | FILE_A_SYSTEM | FILE_A_READONLY | FILE_A_ARCH )
 
 
-struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *findData) {
-  static char path[1024];
-  struct FFDTA *hnd;
+struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *hnd) {
+  char path[PATH_MAX];
   short cflag = 0;  /* used to indicate if findfirst is succesful or not */
-
-  /* verify findData is valid */
-  if (findData == NULL) return(NULL);
-
-  /* allocate memory for the handle */
-  hnd = malloc(sizeof(*hnd));
-  if (hnd == NULL) return(NULL);
 
   /* initialize structure (clear) */
   /* hnd->handle = 0;  hnd->ffdtaptr = NULL; */
@@ -114,26 +107,17 @@ success:
   }
   }
 
-  if (cflag) {
-    free(hnd);
-    return(NULL);
-  }
-
-  /* copy its results over */
-  memcpy(findData, hnd, sizeof(struct FFDTA));
+  if (cflag) return(NULL);
 
   return hnd;
 }
 
 
-int FindNextFile(struct FFDTA *hnd, struct FFDTA *findData) {
+int FindNextFile(struct FFDTA *hnd) {
   short cflag = 0;  /* used to indicate if dos findnext succesful or not */
 
   /* if bad handle given return */
   if (hnd == NULL) return 0;
-
-  /* verify findData is valid */
-  if (findData == NULL) return 0;
 
   { /* Use DOS (0x4F) findnext, returning if error */
     unsigned short dta_seg = FP_SEG(hnd);
@@ -177,9 +161,6 @@ success:
 
   if (cflag) return 0;
 
-  /* copy its results over */
-  memcpy(findData, hnd, sizeof(struct FFDTA));
-
   return 1;
 }
 
@@ -188,7 +169,6 @@ success:
 void FindClose(struct FFDTA *hnd) {
   /* 1st check if valid handle given */
   if (hnd == NULL) return;
-  free(hnd);                    /* Free memory used for the handle itself */
 }
 
 

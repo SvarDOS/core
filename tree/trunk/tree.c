@@ -594,9 +594,8 @@ typedef struct SUBDIRINFO
  * and path is valid.
  */
 static long hasSubdirectories(char *path, DIRDATA *ddata) {
-  static struct FFDTA findData;
-  struct FFDTA *hnd;
-  static char buffer[PATH_MAX + 2];
+  struct FFDTA findData;
+  char buffer[PATH_MAX + 2];
   int hasSubdirs = 0;
 
   /* get the handle to start with (using wildcard spec) */
@@ -607,8 +606,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
    * Allows us to limit returned results to just directories
    * if supported by underlying filesystem.
    */
-  hnd = FindFirstFile(buffer, &findData);
-  if (hnd == NULL) {
+  if (FindFirstFile(buffer, &findData) == NULL) {
     showInvalidPath(path); /* Display error message */
     return(-1);
   }
@@ -622,10 +620,10 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
         hasSubdirs++;      /* subdir of initial path found, so increment counter */
       }
     }
-  } while(FindNextFile(hnd, &findData) != 0);
+  } while(FindNextFile(&findData) != 0);
 
   /* prevent resource leaks, close the handle. */
-  FindClose(hnd);
+  FindClose(&findData);
 
   if (ddata != NULL)  // don't bother if user doesn't want them
   {
@@ -851,14 +849,12 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
 static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   char buffer[PATH_MAX + 2];
   struct FFDTA entry;   /* current directory entry info    */
-  struct FFDTA *dir;    /* Current directory entry working with      */
   unsigned long filesShown = 0;
 
   /* get handle for files in current directory (using wildcard spec) */
   strcpy(buffer, path);
   strcat(buffer, "*");
-  dir = FindFirstFile(buffer, &entry);
-  if (dir == NULL) return(-1);
+  if (FindFirstFile(buffer, &entry) == NULL) return(-1);
 
   addPadding(padding, hasMoreSubdirs);
 
@@ -893,16 +889,12 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
 
       filesShown++;
     }
-  } while(FindNextFile(dir, &entry) != 0);
+  } while(FindNextFile(&entry) != 0);
 
   if (filesShown)
   {
     pprintf("%s\n", padding);
   }
-
-  /* cleanup directory search */
-  FindClose(dir);
-  /* dir = NULL; */
 
   removePadding(padding);
 
@@ -921,17 +913,16 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
  * are found, at which point it closes the FindFile search handle and
  * return NULL.  If successful, returns FindFile handle.
  */
-static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct FFDTA *entry, char *subdir, char *dsubdir) {
+static struct FFDTA *cycleFindResults(struct FFDTA *entry, char *subdir, char *dsubdir) {
   /* cycle through directory until 1st non . or .. directory is found. */
-  do
-  {
+  for (;;) {
     /* skip files & hidden or system directories */
     if ((((entry->ff_attr & FILE_A_DIR) == 0) ||
          ((entry->ff_attr &
           (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
         (entry->ff_name[0] == '.')) {
-      if (FindNextFile(findnexthnd, entry) == 0) {
-        FindClose(findnexthnd);      // prevent resource leaks
+      if (FindNextFile(entry) == 0) {
+        FindClose(entry);      // prevent resource leaks
         return(NULL); // no subdirs found
       }
     } else {
@@ -940,15 +931,13 @@ static struct FFDTA *cycleFindResults(struct FFDTA *findnexthnd, struct FFDTA *e
 
       strcpy(subdir, entry->ff_name);
       strcat(subdir, "\\");
+      return(entry);
     }
-  } while (!*subdir); // while (subdir is still blank)
+  }
 
-  return findnexthnd;
+  return entry;
 }
 
-
-/* FindFile buffer used by findFirstSubdir and findNextSubdir only */
-static struct FFDTA findSubdir_entry; /* current directory entry info    */
 
 /**
  * Given the current path, find the 1st subdirectory.
@@ -964,12 +953,14 @@ static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsub
   char buffer[PATH_MAX];
   struct FFDTA *dir;         /* Current directory entry working with      */
 
+  dir = malloc(sizeof(struct FFDTA));
+  if (dir == NULL) return(NULL);
+
   /* get handle for files in current directory (using wildcard spec) */
   strcpy(buffer, currentpath);
   strcat(buffer, "*");
 
-  dir = FindFirstFile(buffer, &findSubdir_entry);
-  if (dir == NULL) {
+  if (FindFirstFile(buffer, dir) == NULL) {
     showInvalidPath(currentpath);
     return(NULL);
   }
@@ -977,7 +968,7 @@ static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsub
   /* clear result path */
   strcpy(subdir, "");
 
-  return cycleFindResults(dir, &findSubdir_entry, subdir, dsubdir);
+  return cycleFindResults(dir, subdir, dsubdir);
 }
 
 /**
@@ -990,11 +981,11 @@ static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsub
  */
 static int findNextSubdir(struct FFDTA *findnexthnd, char *subdir, char *dsubdir) {
   /* clear result path */
-  strcpy(subdir, "");
+  subdir[0] = 0;
 
-  if (FindNextFile(findnexthnd, &findSubdir_entry) == 0) return 1; // no subdirs found
+  if (FindNextFile(findnexthnd) == 0) return 1; // no subdirs found
 
-  if (cycleFindResults(findnexthnd, &findSubdir_entry, subdir, dsubdir) == NULL) {
+  if (cycleFindResults(findnexthnd, subdir, dsubdir) == NULL) {
     return 1;
   }
   return 0;

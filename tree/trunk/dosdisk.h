@@ -49,9 +49,9 @@ _Packed struct FFDTA { /* same format as a ffblk struct */
 };
 
 
-struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *findData);
+struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *dta);
 
-int FindNextFile(struct FFDTA *hnd, struct FFDTA *findData);
+int FindNextFile(struct FFDTA *hnd);
 
 void FindClose(struct FFDTA *hnd);
 
