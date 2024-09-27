@@ -364,9 +364,6 @@ static void showInvalidDrive(void) {
 }
 
 
-/* Takes a fullpath, splits into drive (C:, or \\server\share) and path */
-static void splitpath(char *fullpath, char *drive, char *path);
-
 /**
  * Takes a given path, strips any \ or / that may appear on the end.
  * Returns a pointer to its static buffer containing path
@@ -375,103 +372,14 @@ static void splitpath(char *fullpath, char *drive, char *path);
 static char *fixPathForDisplay(char *path);
 
 /* Displays error message for invalid path; Does NOT exit */
-static void showInvalidPath(char *path) {
-  char partialPath[PATH_MAX], dummy[PATH_MAX];
-
-  pprintf("%s\n", path);
-  splitpath(path, dummy, partialPath);
-  pprintf(invalidPath, fixPathForDisplay(partialPath));
+static void showInvalidPath(const char *badpath) {
+  pprintf("%s\n", badpath);
+  pprintf(invalidPath, badpath);
 }
 
 /* Displays error message for out of memory; Does NOT exit */
 static void showOutOfMemory(const char *path) {
   pprintf(outOfMemory, path);
-}
-
-
-/**
- * Takes a fullpath, splits into drive (C:, or \\server\share) and path
- * It assumes a colon as the 2nd character means drive specified,
- * a double slash \\ (\\, //, \/, or /\) specifies network share.
- * If neither drive nor network share, then assumes whole fullpath
- * is path, and sets drive to "".
- * If drive specified, then set drive to it and colon, eg "C:", with
- * the rest of fullpath being set in path.
- * If network share, the slash slash followed by the server name,
- * another slash and either the rest of fullpath or up to, but not
- * including, the next slash are placed in drive, eg "\\KJD\myshare";
- * the rest of the fullpath including the slash are placed in
- * path, eg "\mysubdir"; where fullpath is "\\KJD\myshare\mysubdir".
- * None of these may be NULL, and drive and path must be large
- * enough to hold fullpath.
- */
-static void splitpath(char *fullpath, char *drive, char *path) {
-  char *src = fullpath;
-  char oldchar;
-
-  /* If either network share or path only starting at root directory */
-  if ( (*src == '\\') || (*src == '/') )
-  {
-    src++;
-
-    if ( (*src == '\\') || (*src == '/') ) /* network share */
-    {
-      src++;
-
-      /* skip past server name */
-      while ( (*src != '\\') && (*src != '/') && (*src != '\0') )
-        src++;
-
-      /* skip past slash (\ or /) separating  server from share */
-      if (*src != '\0') src++;
-
-      /* skip past share name */
-      while ( (*src != '\\') && (*src != '/') && (*src != '\0') )
-        src++;
-
-      /* src points to start of path, either a slash or '\0' */
-      oldchar = *src;
-      *src = '\0';
-
-      /* copy server name to drive */
-      strcpy(drive, fullpath);
-
-      /* restore character used to mark end of server name */
-      *src = oldchar;
-
-      /* copy path */
-      strcpy(path, src);
-    }
-    else /* path only starting at root directory */
-    {
-      /* no drive, so set path to same as fullpath */
-      drive[0] = 0;
-      strcpy(path, fullpath);
-    }
-  }
-  else
-  {
-    if (*src != '\0') src++;
-
-    /* Either drive and path or path only */
-    if (*src == ':')
-    {
-      /* copy drive specified */
-      *drive = *fullpath;  drive++;
-      *drive = ':';        drive++;
-      *drive = '\0';
-
-      /* copy path */
-      src++;
-      strcpy(path, src);
-    }
-    else
-    {
-      /* no drive, so set path to same as fullpath */
-      drive[0] = 0;
-      strcpy(path, fullpath);
-    }
-  }
 }
 
 
@@ -735,26 +643,6 @@ static char *removePadding(char *padding) {
   return padding;
 }
 
-/**
- * Takes a given path, strips any \ or / that may appear on the end.
- * Returns a pointer to its static buffer containing path
- * without trailing slash and any necessary display conversions.
- */
-static char *fixPathForDisplay(char *path) {
-  static char buffer[PATH_MAX];
-  int pathlen;
-
-  strcpy(buffer, path);
-  pathlen = strlen(buffer);
-  if (pathlen > 1) {
-    pathlen--;
-    if ((buffer[pathlen] == '\\') || (buffer[pathlen] == '/')) {
-      buffer[pathlen] = '\0'; // strip off trailing slash on end
-    }
-  }
-
-  return buffer;
-}
 
 /**
  * Displays the current path, with necessary padding before it.
