@@ -55,8 +55,6 @@ int FindNextFile(struct FFDTA *hnd, struct FFDTA *findData);
 
 void FindClose(struct FFDTA *hnd);
 
-int GetFileAttributes(unsigned short *attr, const char *pathname);
-
 /* Only the 1st 4 arguments are used and returns zero on error */
 int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer, size_t nVolumeNameSize, unsigned long *lpVolumeSerialNumber);
 

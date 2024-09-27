@@ -567,7 +567,7 @@ static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
 typedef struct DIRDATA {
   unsigned long subdirCnt;  /* how many subdirectories we have */
   unsigned long fileCnt;    /* how many [normal] files we have */
-  unsigned short attrib;    /* Directory attributes            */
+  unsigned int attrib;      /* Directory attributes            */
 } DIRDATA;
 
 /**
@@ -635,7 +635,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
        path in above loop from the FindFile call as it may not show up
        (no . entry).  So instead we explicitly get them here.
     */
-    if (GetFileAttributes(&(ddata->attrib), path) != 0) {
+    if (_dos_getfileattr(path, &(ddata->attrib)) != 0) {
       //printf("ERROR: unable to get file attr, %i\n", GetLastError());
       ddata->attrib = 0;
     }

@@ -395,37 +395,3 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
     return 1;   /* Success (drive exists we think anyway) */
   }
 }
-
-
-/* retrieve attributes (ReadOnly/System/...) about file or directory
- * returns -1 on error
- */
-int GetFileAttributes(unsigned short *attr, const char *pathname) {
-  union REGS r;
-  struct SREGS s;
-  char buffer[260];
-  int slen;
-
-  /* we must remove any slashes from end */
-  slen = strlen(pathname) - 1;  /* Warning, assuming pathname is not ""   */
-  strcpy(buffer, pathname);
-  if ((buffer[slen] == '\\') || (buffer[slen] == '/')) { /* ends in a slash */
-    /* don't remove from root directory (slen == 0),
-     * ignore UNC paths as SFN doesn't handle them anyway
-     * if slen == 2, then check if drive given (e.g. C:\)
-     */
-    if (slen && !(slen == 2 &&  buffer[1] == ':'))
-      buffer[slen] = '\0';
-  }
-  /* return standard attributes */
-  r.x.ax = 0x4300;                  /* standard Get/Set File Attributes */
-  r.x.dx = FP_OFF(buffer);          /* DS:DX points to ASCIIZ filename      */
-  segread(&s);                      /* load with current segment values     */
-  s.ds = FP_SEG(buffer);            /* get Segment of our filename pointer  */
-  intdosx(&r, &r, &s);              /* invoke the DOS int21h call           */
-
-  //if (r.x.cflag) printf("ERROR getting std attributes of %s, DOS err %i\n", buffer, r.x.ax);
-  if (r.x.cflag) return(-1);  /* error obtaining attributes           */
-  *attr = (0x3F & r.x.cx); /* mask off any DRDOS bits     */
-  return(0);
-}
