@@ -89,13 +89,12 @@ short cols=80, rows=23;   /* determined these on startup (when possible)  */
 
 /* Global constants */
 #define SERIALLEN 16      /* Defines max size of volume & serial number   */
-#define VOLLEN 128
+#define VOLLEN 16
 
-#define MAXBUF 1024       /* Must be larger than max file path length     */
-char path[MAXBUF];        /* Path to begin search from, default=current   */
+char path[PATH_MAX];      /* Path to begin search from, default=current   */
 
-#define MAXPADLEN (MAXBUF*2) /* Must be large enough to hold the maximum padding */
-/* (MAXBUF/2)*4 == (max path len / min 2chars dirs "?\") * 4chars per padding    */
+#define MAXPADLEN (PATH_MAX*2) /* Must be large enough to hold the maximum padding */
+/* (PATH_MAX/2)*4 == (max path len / min 2chars dirs "?\") * 4chars per padding    */
 
 /* The maximum size any line of text output can be, including room for '\0'*/
 #define MAXLINE 160        /* Increased to fit two lines for translations  */
@@ -270,7 +269,7 @@ static int pprintf(const char *msg, ...) {
   static int lineCol = 0;
   va_list argptr;
   int cnt;
-  char buffer[MAXBUF];
+  char buffer[MAXLINE];
 
   if (lineCnt == -1) lineCnt = rows;
 
@@ -366,7 +365,7 @@ static char *fixPathForDisplay(char *path);
 
 /* Displays error message for invalid path; Does NOT exit */
 static void showInvalidPath(char *path) {
-  char partialPath[MAXBUF], dummy[MAXBUF];
+  char partialPath[PATH_MAX], dummy[PATH_MAX];
 
   pprintf("%s\n", path);
   splitpath(path, dummy, partialPath);
@@ -534,8 +533,8 @@ static void parseArguments(int argc, char *argv[]) {
  * (ie UNC paths under DOS), but path is valid.
  */
 static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
-  char rootPath[MAXBUF];
-  char dummy[MAXBUF];
+  char rootPath[PATH_MAX];
+  char dummy[PATH_MAX];
   union serialNumber {
     unsigned long serialFull;
     struct {
@@ -597,7 +596,7 @@ typedef struct SUBDIRINFO
 static long hasSubdirectories(char *path, DIRDATA *ddata) {
   static struct FFDTA findData;
   struct FFDTA *hnd;
-  static char buffer[MAXBUF];
+  static char buffer[PATH_MAX + 2];
   int hasSubdirs = 0;
 
   /* get the handle to start with (using wildcard spec) */
@@ -756,7 +755,7 @@ static char *removePadding(char *padding) {
  * without trailing slash and any necessary display conversions.
  */
 static char *fixPathForDisplay(char *path) {
-  static char buffer[MAXBUF];
+  static char buffer[PATH_MAX];
   int pathlen;
 
   strcpy(buffer, path);
@@ -850,7 +849,7 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
  *      or  1 if files displayed, no errors.
  */
 static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
-  static char buffer[MAXBUF];
+  char buffer[PATH_MAX + 2];
   struct FFDTA entry;   /* current directory entry info    */
   struct FFDTA *dir;    /* Current directory entry working with      */
   unsigned long filesShown = 0;
@@ -962,7 +961,7 @@ static struct FFDTA findSubdir_entry; /* current directory entry info    */
  * currentpath must end in \
  */
 static struct FFDTA *findFirstSubdir(char *currentpath, char *subdir, char *dsubdir) {
-  static char buffer[MAXBUF];
+  char buffer[PATH_MAX];
   struct FFDTA *dir;         /* Current directory entry working with      */
 
   /* get handle for files in current directory (using wildcard spec) */
@@ -1011,8 +1010,8 @@ static int findNextSubdir(struct FFDTA *findnexthnd, char *subdir, char *dsubdir
 static long traverseTree(char *initialpath) {
   long subdirsInInitialpath;
   char padding[MAXPADLEN] = "";
-  char subdir[MAXBUF];
-  char dsubdir[MAXBUF];
+  char subdir[PATH_MAX];
+  char dsubdir[PATH_MAX];
   SUBDIRINFO *sdi;
 
   STACK s;
