@@ -591,7 +591,7 @@ struct SUBDIRINFO {
 static long hasSubdirectories(char *path, DIRDATA *ddata) {
   struct find_t findData;
   char buffer[PATH_MAX + 4];
-  int hasSubdirs = 0;
+  unsigned short hasSubdirs = 0;
 
   /* get the handle to start with (using wildcard spec) */
   strcpy(buffer, path);
@@ -604,12 +604,14 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
 
   /*  cycle through entries counting directories found until no more entries */
   do {
-    if (((findData.attrib & _A_SUBDIR) != 0) &&
-        ((findData.attrib &
-         (_A_HIDDEN | _A_SYSTEM)) == 0 || dspAll) ) {
-      if (findData.name[0] != '.') { /* ignore '.' and '..' */
-        hasSubdirs++;      /* subdir of initial path found, so increment counter */
-      }
+    if ((findData.attrib & _A_SUBDIR) == 0) continue; /* not a DIR */
+      /* filter out system and hidden files, unless dspAll is on */
+    if (dspAll == 0) {
+      if (findData.attrib & _A_HIDDEN) continue;
+      if (findData.attrib & _A_SYSTEM) continue;
+    }
+    if (findData.name[0] != '.') { /* ignore '.' and '..' */
+      hasSubdirs++;      /* subdir of initial path found, so increment counter */
     }
   } while(_dos_findnext(&findData) == 0);
 
