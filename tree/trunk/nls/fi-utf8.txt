@@ -14,8 +14,7 @@
 # where ? is a variable identifier and format.
 # Note: only \\, \n, \r, \t are supported (and a single slash must use \\).
 #
-# common to many functions [Set 1]
-1.1:\n
+
 # main [Set 1]
 1.2:Levyn polkujen luettelo\n
 # Must include %s for label
@@ -25,11 +24,10 @@
 1.5:Ei alihakemistoja\n\n
 1.6: --- Paina näppäintä jatkaaksesi ---\n
 # showUsage [Set 2]
-2.1:Esittää aseman tai polun hakemistorakenteen graafisesti.\n
-# Each %c below will be replaced with proper switch/option
-2.2:TREE [asema:][polku] [/F] [/A]\n
-2.3:   /F   Näyttää jokaisen hakemiston tiedostojen nimet.\n
-2.4:   /A   Käyttää ASCII:ta laajennettujen merkkien asemesta.\n
+2.1:Esittää aseman tai polun hakemistorakenteen graafisesti.
+2.2:TREE [asema:][polku] [/F] [/A]
+2.3:   /F   Näyttää jokaisen hakemiston tiedostojen nimet.
+2.4:   /A   Käyttää ASCII:ta laajennettujen merkkien asemesta.
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Virheellinen valitsin - %s\n

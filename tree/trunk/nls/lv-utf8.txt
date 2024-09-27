@@ -1,8 +1,7 @@
 # Latvian translation of pdTree v1 and FreeDOS tree 3.6
 # by Kristaps Kaupe <neons@hackers.lv>
 #
-# common to many functions [Set 1]
-1.1:\n
+
 # main [Set 1]
 1.2:Katalogu CEĻA saraksts\n
 # Must include %s for label
@@ -12,11 +11,10 @@
 1.5:Apakškatalogi neeksistē\n\n
 1.6: --- Press any key to continue ---\n
 # showUsage [Set 2]
-2.1:Grafiski parāda diska vai ceļa katalogu struktūru.\n
-# Each %c below will be replaced with proper switch/option
-2.2:TREE [disks:][ceļš] [/F] [/A]\n
-2.3:   /F   Izvadīt failu nosaukumus katrā katalogā.\n
-2.4:   /A   Izmantot ASCII paplašināto simbolu vietā.\n
+2.1:Grafiski parāda diska vai ceļa katalogu struktūru.
+2.2:TREE [disks:][ceļš] [/F] [/A]
+2.3:   /F   Izvadīt failu nosaukumus katrā katalogā.
+2.4:   /A   Izmantot ASCII paplašināto simbolu vietā.
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Nepareiza atslēga - %s\n

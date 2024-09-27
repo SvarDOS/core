@@ -13,8 +13,7 @@
 # Traduçäo do inglês para o português feita por:
 # Francesco Sacco (francesco_sacco@hotmail.com)
 #
-# Comum a muitas funçöes [Conjunto 1]
-1.1:\n
+
 # Principal [Conjunto 1]
 1.2:Lista de PATH do diretório.\n
 # Deve incluir %s para o rótulo.
@@ -24,11 +23,10 @@
 1.5:Näo existem subdiretórios\n\n
 1.6: --- Pressione qualquer tecla para continuar ---\n
 # showUsage [Conjunto 2]
-2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.\n
-# Cada %c abaixo será substituído pela chave/opçäo adequada
-2.2:TREE [unidade:][caminho] [/F] [/A]\n
-2.3:   /F   Exibe os nomes dos arquivos em cada diretório.\n
-2.4:   /A   Use ASCII em vez de caracteres estendidos.\n
+2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.
+2.2:TREE [unidade:][caminho] [/F] [/A]
+2.3:   /F   Exibe os nomes dos arquivos em cada diretório.
+2.4:   /A   Use ASCII em vez de caracteres estendidos.
 # showInvalidUsage [Conjunto 3]
 # Deve incluir o %s para a opçäo fornecida.
 3.1:Opçäo inválida - %s\n

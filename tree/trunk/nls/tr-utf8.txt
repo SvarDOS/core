@@ -10,8 +10,7 @@
 # where ? is a variable identifier and format.
 # Note: only \\, \n, \r, \t are supported (and a single slash must use \\).
 #
-# common to many functions [Set 1]
-1.1:\n
+
 # main [Set 1]
 1.2:Dizin PATH listelemesi\n
 # Must include %s for label
@@ -20,12 +19,13 @@
 1.4:Bölüm seri numarası %s\n
 1.5:Alt dizin mevcut değil\n\n
 1.6: --- Sürdürmek için bir düğmeye basın ---\n
+
 # showUsage [Set 2]
-2.1:Bir disk bölümünün veya yolun dizin yapısını grafik biçiminde görüntüler.\n
-# Each %c below will be replaced with proper switch/option
-2.2:TREE [sürücü:][yol] [/F] [/A]\n
-2.3:   /F   Her bir dizindeki dosya adlarını görüntüler.\n
-2.4:   /A   Genişletilmiş karakterler yerine ASCII kullanır.\n
+2.1:Bir disk bölümünün veya yolun dizin yapısını grafik biçiminde görüntüler.
+2.2:TREE [sürücü:][yol] [/F] [/A]
+2.3:   /F   Her bir dizindeki dosya adlarını görüntüler.
+2.4:   /A   Genişletilmiş karakterler yerine ASCII kullanır.
+
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Geçersiz anahtar - %s\n

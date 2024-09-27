@@ -306,11 +306,12 @@ static int pprintf(const char *msg, ...) {
 
 /* Displays to user valid options then exits program indicating no error */
 static void showUsage(void) {
-  printf(svarlang_strid(0x0201));
-  printf(svarlang_strid(0x0202));
+  puts(svarlang_strid(0x0201));
   puts("");
-  printf(svarlang_strid(0x0203));
-  printf(svarlang_strid(0x0204));
+  puts(svarlang_strid(0x0202));
+  puts("");
+  puts(svarlang_strid(0x0203));
+  puts(svarlang_strid(0x0204));
   exit(1);
 }
 

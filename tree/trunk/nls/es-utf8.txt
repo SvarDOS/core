@@ -3,7 +3,6 @@
 # Mensajes usados por pdTree v1 y FreeDOS tree v3.6
 
 # campo común a muchas funciones [Conjunto 1]
-1.1:\n
 # Principal [Conjunto 1]
 1.2:Listado de las RUTAS de directorios\n
 # Debe incluir %s para la etiqueta de volumen
@@ -12,11 +11,13 @@
 1.4:El número de serie del volumen es %s\n
 1.5:No existen subdirectorios\n\n
 1.6: --- Press any key to continue ---\n
+
 # MostrarUso [Conjunto 2]
-2.1:Visualiza gráficamente la estructura de directorios de un disco o ruta.\n
-2.2:TREE [unidad:][ruta] [/F] [/A]\n
-2.3:   /F   Visualiza los nombres de los archivos en cada directorio.\n
-2.4:   /A   Utiliza el ASCII en vez de caracteres extendidos.\n
+2.1:Visualiza gráficamente la estructura de directorios de un disco o ruta.
+2.2:TREE [unidad:][ruta] [/F] [/A]
+2.3:   /F   Visualiza los nombres de los archivos en cada directorio.
+2.4:   /A   Utiliza el ASCII en vez de caracteres extendidos.
+
 # Mostrar Uso no válido [Conjunto 3]
 # Debe incluir el %s para la opción dada.
 3.1:La opción es no válida - %s\n

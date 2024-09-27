@@ -10,8 +10,7 @@
 # where ? is a variable identifier and format.
 # Note: only \\, \n, \r, \t are supported (and a single slash must use \\).
 #
-# common to many functions [Set 1]
-1.1:\n
+
 # main [Set 1]
 1.2:Directory PATH listing\n
 # Must include %s for label
@@ -20,12 +19,13 @@
 1.4:Volume serial number is %s\n
 1.5:No subdirectories exist\n\n
 1.6: --- Press any key to continue ---\n
+
 # showUsage [Set 2]
-2.1:Graphically displays the directory structure of a drive or path.\n
-# Each %c below will be replaced with proper switch/option
-2.2:TREE [drive:][path] [/F] [/A]\n
-2.3:   /F   Display the names of the files in each directory.\n
-2.4:   /A   Use ASCII instead of extended characters.\n
+2.1:Graphically displays the directory structure of a drive or path.
+2.2:TREE [drive:][path] [/F] [/A]
+2.3:   /F   Display the names of the files in each directory.
+2.4:   /A   Use ASCII instead of extended characters.
+
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Invalid switch - %s\n
