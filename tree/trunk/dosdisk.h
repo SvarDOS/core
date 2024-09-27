@@ -31,21 +31,21 @@ DEALINGS IN THE SOFTWARE.
 #ifndef W32FDOS_H
 #define W32FDOS_H
 
-#define FILE_A_READONLY  0x0001
+#define FILE_A_RDONLY    0x0001
 #define FILE_A_HIDDEN    0x0002
 #define FILE_A_SYSTEM    0x0004
-#define FILE_A_VOL       0x0008
-#define FILE_A_DIR       0x0010
+#define FILE_A_VOLID     0x0008
+#define FILE_A_SUBDIR    0x0010
 #define FILE_A_ARCH      0x0020
 
 
 _Packed struct FFDTA { /* same format as a ffblk struct */
   char reserved[21];        /* dos positioning info */
-  unsigned char ff_attr;    /* file attributes */
-  unsigned short ff_ftime;  /* time when file created/modified */
-  unsigned short ff_fdate;  /* date when file created/modified */
-  unsigned long ff_fsize;   /* low word followed by high word */
-  char ff_name[13];  /* file name, not space padded, period, '\0' terminated, wildcards replaced */
+  unsigned char attrib;     /* file attributes */
+  unsigned short wr_ftime;  /* time when file created/modified */
+  unsigned short wr_fdate;  /* date when file created/modified */
+  unsigned long size;       /* low word followed by high word */
+  char name[13];  /* file name, not space padded, period, '\0' terminated, wildcards replaced */
 };
 
 

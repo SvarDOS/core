@@ -613,10 +613,10 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
 
   /*  cycle through entries counting directories found until no more entries */
   do {
-    if (((findData.ff_attr & FILE_A_DIR) != 0) &&
-        ((findData.ff_attr &
+    if (((findData.attrib & FILE_A_SUBDIR) != 0) &&
+        ((findData.attrib &
          (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0 || dspAll) ) {
-      if (findData.ff_name[0] != '.') { /* ignore '.' and '..' */
+      if (findData.name[0] != '.') { /* ignore '.' and '..' */
         hasSubdirs++;      /* subdir of initial path found, so increment counter */
       }
     }
@@ -804,11 +804,11 @@ static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFol
   /* optional display data */
   if (dspAttr)  /* attributes */
     pprintf("[%c%c%c%c%c] ",
-      (ddata->attrib & FILE_A_DIR)?'D':' ',  /* keep this one? its always true */
+      (ddata->attrib & FILE_A_SUBDIR)?'D':' ',  /* keep this one? its always true */
       (ddata->attrib & FILE_A_ARCH)?'A':' ',
       (ddata->attrib & FILE_A_SYSTEM)?'S':' ',
       (ddata->attrib & FILE_A_HIDDEN)?'H':' ',
-      (ddata->attrib & FILE_A_READONLY)?'R':' '
+      (ddata->attrib & FILE_A_RDONLY)?'R':' '
     );
 
   /* display directory name */
@@ -862,8 +862,8 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
   do
   {
     /* print padding followed by filename */
-    if ( ((entry.ff_attr & FILE_A_DIR) == 0) &&
-         ( ((entry.ff_attr & (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0)  || dspAll) )
+    if ( ((entry.attrib & FILE_A_SUBDIR) == 0) &&
+         ( ((entry.attrib & (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0)  || dspAll) )
     {
       /* print lead padding */
       pprintf("%s", padding);
@@ -871,21 +871,21 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
       /* optional display data */
       if (dspAttr)  /* file attributes */
         pprintf("[%c%c%c%c] ",
-          (entry.ff_attr & FILE_A_ARCH)?'A':' ',
-          (entry.ff_attr & FILE_A_SYSTEM)?'S':' ',
-          (entry.ff_attr & FILE_A_HIDDEN)?'H':' ',
-          (entry.ff_attr & FILE_A_READONLY)?'R':' '
+          (entry.attrib & FILE_A_ARCH)?'A':' ',
+          (entry.attrib & FILE_A_SYSTEM)?'S':' ',
+          (entry.attrib & FILE_A_HIDDEN)?'H':' ',
+          (entry.attrib & FILE_A_RDONLY)?'R':' '
         );
 
       if (dspSize) { /* file size */
-        if (entry.ff_fsize < 1048576ul)  /* if less than a MB, display in bytes */
-          pprintf("%10lu ", entry.ff_fsize);
+        if (entry.size < 1048576ul)  /* if less than a MB, display in bytes */
+          pprintf("%10lu ", entry.size);
         else                               /* otherwise display in KB */
-          pprintf("%8luKB ", entry.ff_fsize / 1024ul);
+          pprintf("%8luKB ", entry.size / 1024ul);
       }
 
       /* print filename */
-      pprintf("%s\n", entry.ff_name);
+      pprintf("%s\n", entry.name);
 
       filesShown++;
     }
@@ -917,19 +917,19 @@ static struct FFDTA *cycleFindResults(struct FFDTA *entry, char *subdir, char *d
   /* cycle through directory until 1st non . or .. directory is found. */
   for (;;) {
     /* skip files & hidden or system directories */
-    if ((((entry->ff_attr & FILE_A_DIR) == 0) ||
-         ((entry->ff_attr &
+    if ((((entry->attrib & FILE_A_SUBDIR) == 0) ||
+         ((entry->attrib &
           (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
-        (entry->ff_name[0] == '.')) {
+        (entry->name[0] == '.')) {
       if (FindNextFile(entry) == 0) {
         FindClose(entry);      // prevent resource leaks
         return(NULL); // no subdirs found
       }
     } else {
       /* set display name */
-      strcpy(dsubdir, entry->ff_name);
+      strcpy(dsubdir, entry->name);
 
-      strcpy(subdir, entry->ff_name);
+      strcpy(subdir, entry->name);
       strcat(subdir, "\\");
       return(entry);
     }

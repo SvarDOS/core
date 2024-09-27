@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "dosdisk.h"
 
-#define searchAttr ( FILE_A_DIR | FILE_A_HIDDEN | FILE_A_SYSTEM | FILE_A_READONLY | FILE_A_ARCH )
+#define searchAttr ( FILE_A_SUBDIR | FILE_A_HIDDEN | FILE_A_SYSTEM | FILE_A_RDONLY | FILE_A_ARCH )
 
 
 struct FFDTA *FindFirstFile(const char *pathname, struct FFDTA *hnd) {
@@ -201,7 +201,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
   } media;
 
   /* Stores the root path we use. */
-  char pathname[260];
+  char pathname[PATH_MAX + 5];
 
   unsigned short cflag;
 
@@ -248,8 +248,8 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
    */
   {
     struct FFDTA finfo;
-    unsigned short attr_seg = FP_SEG(finfo.ff_attr);
-    unsigned short attr_off = FP_OFF(finfo.ff_attr);
+    unsigned short attr_seg = FP_SEG(finfo.attrib);
+    unsigned short attr_off = FP_OFF(finfo.attrib);
     unsigned short finfo_seg = FP_SEG(&finfo);
     unsigned short finfo_off = FP_OFF(&finfo);
     unsigned short pathname_seg = FP_SEG(pathname);
@@ -273,7 +273,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
       int 0x21                  //; Execute interrupt
       pop ds
       mov ax, 0x4E00            //; Actual findfirst call
-      mov cx, FILE_A_VOL
+      mov cx, FILE_A_VOLID
       mov dx, pathname_off      //; Load DS:DX with pointer to modified RootPath for Findfirt
       push ds
       mov ds, pathname_seg
@@ -289,7 +289,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
       mov al, [es:bx]              //; Looking for a BYTE that is FILE_ATTRIBUTE_LABEL only
       pop es
       and al, 0xDF              //; Ignore Archive bit
-      cmp al, FILE_A_VOL
+      cmp al, FILE_A_VOLID
       je cleanup                //; They match, so should be true volume entry.
       mov ax, 0x4F00            //; Otherwise keep looking (findnext)
       int 0x21                  //; Execute interrupt
@@ -315,7 +315,7 @@ int GetVolumeInformation(const char *lpRootPathName, char *lpVolumeNameBuffer,
       if (cflag != 0) {  /* error or no label */
         lpVolumeNameBuffer[0] = '\0';
       } else {                      /* copy up to buffer's size of label */
-        strncpy(lpVolumeNameBuffer, finfo.ff_name, nVolumeNameSize);
+        strncpy(lpVolumeNameBuffer, finfo.name, nVolumeNameSize);
         lpVolumeNameBuffer[nVolumeNameSize-1] = '\0';
         /* slide characters over if longer than 8 to remove . */
         if (lpVolumeNameBuffer[8] == '.') {
