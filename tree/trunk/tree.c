@@ -50,8 +50,6 @@ DEALINGS IN THE SOFTWARE.
 /* DOS disk accesses */
 #include "dosdisk.h"
 
-#include <conio.h>  /* for getch()   */
-
 
 /* The default extended forms of the lines used. */
 #define VERTBAR_STR  "\xB3   "                 /* |    */
@@ -174,6 +172,17 @@ modify [ah] \
 value [al]
 
 
+/* waits for a keypress, flushes keyb buffer, returns nothing */
+static void waitkey(void);
+#pragma aux waitkey = \
+"mov ah, 0x08" \
+"int 0x21" \
+/* flush keyb buffer in case it was an extended key */ \
+"mov ax, 0x0C0B" \
+"int 0x21" \
+modify [ax]
+
+
 #define FILE_TYPE_UNKNOWN 0x00
 #define FILE_TYPE_DISK    0x01
 #define FILE_TYPE_CHAR    0x02
@@ -287,7 +296,7 @@ static int pprintf(const char *msg, ...) {
         l += cols-lineCol;
 
         lineCnt--;  lineCol = 0;
-        if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", pauseMsg);  getch(); }
+        if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", pauseMsg);  waitkey(); }
       }
 
       printf("%s", l); /* print out this line */
@@ -295,7 +304,7 @@ static int pprintf(const char *msg, ...) {
       l = t;           /* mark beginning of next line */
 
       lineCnt--;  lineCol = 0;
-      if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", pauseMsg);  getch(); }
+      if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", pauseMsg);  waitkey(); }
     }
     printf("%s", l);   /* print rest of string that lacks newline */
     lineCol = strlen(l);
