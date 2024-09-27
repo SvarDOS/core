@@ -35,9 +35,7 @@
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Virheellinen valitsin - %s\n
-# The %c will be replaced with the primary switch (default is /)
-3.2:Kirjoita TREE %c? saadaksesi lisätietoja.\n
-#showTooManyOptions
+3.2:Kirjoita TREE /? saadaksesi lisätietoja.
 3.3:Liikaa parametreja - %s\n
 
 # showVersionInfo [Set 4]

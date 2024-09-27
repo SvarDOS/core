@@ -34,9 +34,7 @@
 # showInvalidUsage [Conjunto 3]
 # Deve incluir o %s para a opçäo fornecida.
 3.1:Opçäo inválida - %s\n
-# O %c será substituído pela opçäo principal (o padräo é /)
-3.2:Use TREE %c? para obter informaçöes de uso.\n
-#showTooManyOptions
+3.2:Use TREE /? para obter informaçöes de uso.
 3.3:Muitos parâmetros - %s\n
 
 # showVersionInfo [Conjunto 4]

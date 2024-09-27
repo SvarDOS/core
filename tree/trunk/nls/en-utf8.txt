@@ -37,9 +37,7 @@
 # showInvalidUsage [Set 3]
 # Must include the %s for option given.
 3.1:Invalid switch - %s\n
-# The %c will be replaced with the primary switch (default is /)
-3.2:Use TREE %c? for usage information.\n
-#showTooManyOptions
+3.2:Use TREE /? for usage information.
 3.3:Too many parameters - %s\n
 
 # showVersionInfo

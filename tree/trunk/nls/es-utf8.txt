@@ -21,10 +21,8 @@
 2.6:  /A  Utiliza el ASCII en vez de caracteres extendidos.
 
 # Mostrar Uso no válido [Conjunto 3]
-# Debe incluir el %s para la opción dada.
 3.1:La opción es no válida - %s\n
-3.2:Utilice TREE %c? para ver la información sobre su uso.\n
-#showTooManyOptions
+3.2:Utilice TREE /? para ver la información sobre su uso.
 3.3:Demasiados parámetros - %s\n
 
 # Mostrar información sobre la versión [Conjunto 4]
