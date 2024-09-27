@@ -41,9 +41,6 @@ DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <direct.h>
-#include <ctype.h>
-#include <limits.h>
 
 #include "stack.h"
 
@@ -136,9 +133,7 @@ char invalidDrive[MAXLINE] = "Invalid drive specification\n";
 char invalidPath[MAXLINE] = "Invalid path - %s\n"; /* Must include %s for the invalid path given. */
 
 /* Misc Error messages [Set 7] */
-/* showBufferOverrun */
-/* %u required to show what the buffer's current size is. */
-char bufferToSmall[MAXLINE] = "Error: File path specified exceeds maximum buffer = %u bytes\n";
+
 /* showOutOfMemory */
 /* %s required to display what directory we were processing when ran out of memory. */
 char outOfMemory[MAXLINE] = "Out of memory on subdirectory: %s\n";
@@ -196,6 +191,42 @@ static unsigned char is_stdout_redirected(void);
 "DONE:" \
 modify [ax bx dx] \
 value [al]
+
+
+static int truename(char *path, const char *origpath) {
+  unsigned short origpath_seg = FP_SEG(origpath);
+  unsigned short origpath_off = FP_OFF(origpath);
+  unsigned short dstpath_seg = FP_SEG(path);
+  unsigned short dstpath_off = FP_OFF(path);
+  unsigned char cflag = 0;
+
+  /* resolve path with truename */
+  _asm {
+    push ax
+    push si
+    push di
+    push es
+    push ds
+
+    mov ah, 0x60          /* AH = 0x60 -> TRUENAME */
+    mov di, dstpath_off   /* ES:DI -> dst buffer */
+    mov es, dstpath_seg
+    mov si, origpath_off  /* DS:SI -> src path */
+    mov ds, origpath_seg
+    int 0x21
+    jnc DONE
+    mov cflag, 1
+    DONE:
+
+    pop ds
+    pop es
+    pop di
+    pop si
+    pop ax
+  }
+
+  return(cflag);
+}
 
 
 /* sets rows & cols to size of actual console window
@@ -347,12 +378,6 @@ static void showOutOfMemory(char *path) {
   pprintf(outOfMemory, path);
 }
 
-/* Displays buffer exceeded message and exits */
-static void showBufferOverrun(WORD maxSize) {
-  printf(bufferToSmall, maxSize);
-  exit(1);
-}
-
 
 /**
  * Takes a fullpath, splits into drive (C:, or \\server\share) and path
@@ -440,41 +465,12 @@ static void splitpath(char *fullpath, char *drive, char *path) {
 }
 
 
-/* Converts given path to full path */
-static void getProperPath(char *fullpath) {
-  char drive[MAXBUF];
-  char path[MAXBUF];
-
-  splitpath(fullpath, drive, path);
-
-  /* if no drive specified use current */
-  if (drive[0] == '\0')
-  {
-    sprintf(fullpath, "%c:%s", 'A'+ getdrive(), path);
-  }
-  else if (path[0] == '\0') /* else if drive but no path specified */
-  {
-    if ((drive[0] == '\\') || (drive[0] == '/'))
-    {
-      /* if no path specified and network share, use root   */
-      sprintf(fullpath, "%s%s", drive, "\\");
-    }
-    else
-    {
-      /* if no path specified and drive letter, use current path */
-      sprintf(fullpath, "%s%s", drive, ".");
-    }
-  }
-  /* else leave alone, it has both a drive and path specified */
-}
-
-
 /* Parses the command line and sets global variables. */
 static void parseArguments(int argc, char *argv[]) {
   int i;     /* temp loop variable */
 
   /* if no drive specified on command line, use current */
-  sprintf(path, "%c:.", 'A'+ getdrive());
+  if (truename(path, ".") != 0) showInvalidDrive();
 
   for (i = 1; i < argc; i++)
   {
@@ -521,22 +517,8 @@ static void parseArguments(int argc, char *argv[]) {
         else /* Invalid or unknown option */
           showInvalidUsage(argv[i]);
       }
-    }
-    else /* should be a drive/path */
-    {
-      char *dptr = path;
-      char *cptr;
-
-      if (strlen(argv[i]) > MAXBUF) showBufferOverrun(MAXBUF);
-
-      /* copy path over, making all caps to look prettier, can be strcpy */
-      for (cptr = argv[i]; *cptr != '\0'; cptr++, dptr++) {
-        *dptr = toupper(*cptr);
-      }
-      *dptr = '\0';
-
-      /* Converts given path to full path */
-      getProperPath(path);
+    } else { /* should be a drive/path */
+      if (truename(path, argv[i]) != 0) showInvalidDrive();
     }
   }
 }
