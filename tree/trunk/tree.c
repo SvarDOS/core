@@ -150,19 +150,30 @@ static _Packed struct {
   short fstype[8];
 } glob_drv_info;
 
+
 /* drv is 1-based (A=1, B=2, ...) */
-static void getdrvserial(unsigned char drv);
-#pragma aux getdrvserial = \
-"push ds" \
-"xor bh, bh" \
-"mov dx, offset glob_drv_info" \
-"mov ax, seg glob_drv_info" \
-"mov ds, ax" \
-"mov ax, 0x6900" \
-"int 0x21" \
-"pop ds" \
-parm [bl] \
-modify [ax bx dx]
+static void getdrvserial(unsigned char drv) {
+  unsigned short drvinfo_seg = FP_SEG(&glob_drv_info);
+
+  _asm {
+    push ax
+    push bx
+    push dx
+
+    mov ax, 0x6900
+    xor bh, bh
+    mov bl, drv
+    mov dx, offset glob_drv_info
+    push ds
+    mov ds, drvinfo_seg
+    int 0x21
+    pop ds
+
+    pop dx
+    pop bx
+    pop ax
+  }
+}
 
 
 static int truename(char *path, const char *origpath) {
