@@ -22,6 +22,7 @@ void stackDefaults(STACK * p_stack)
 // place any extra stack initialization here
 void stackInit(STACK * p_stack)
 {
+    (void)p_stack;
 }
 
 // ensures stack is empty and all allocated memory freed
