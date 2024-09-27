@@ -189,33 +189,23 @@ modify [ax]
 #define FILE_TYPE_PIPE    0x03
 #define FILE_TYPE_REMOTE  0x80
 
-/* Returns file type of stdout.
- * Output, one of predefined values above indicating if
- *         handle refers to file (FILE_TYPE_DISK), a
- *         device such as CON (FILE_TYPE_CHAR), a
- *         pipe (FILE_TYPE_PIPE), or unknown.
- * On errors or unspecified input, FILE_TYPE_UNKNOWN
- * is returned. */
-static unsigned char GetStdoutType(void) {
+/* checks if stdout appears to be redirected. returns 0 if not, non-zero otherwise. */
+static unsigned char is_stdout_redirected(void) {
   union REGS r;
 
   r.x.ax = 0x4400;                 /* DOS 2+, IOCTL Get Device Info */
   r.x.bx = 0x0001;                 /* file handle (stdout) */
 
-  /* We assume hFile is an opened DOS handle, & if invalid call should fail. */
   intdos(&r, &r);     /* Clib function to invoke DOS int21h call   */
 
   /* error? */
   if (r.x.cflag != 0) return(FILE_TYPE_UNKNOWN);
 
-  /* if bit 7 is set it is a char dev */
-  if (r.x.dx & 0x80) return(FILE_TYPE_CHAR);
-
-  /* file is remote */
-  if (r.x.dx & 0x8000) return(FILE_TYPE_REMOTE);
+  /* if bit 7 is set it is a char dev (not redirected to disk) */
+  if (r.x.dx & 0x80) return(0);
 
   /* assume valid file handle */
-  return(FILE_TYPE_DISK);
+  return(1);
 }
 
 
@@ -229,24 +219,19 @@ static void getConsoleSize(void) {
   unsigned short far *bios_cols = (unsigned short far *)MK_FP(0x40,0x4A);
   unsigned short far *bios_size = (unsigned short far *)MK_FP(0x40,0x4C);
 
-  switch (GetStdoutType()) {
-    case FILE_TYPE_DISK: /* e.g. redirected to a file, tree > filelist.txt */
-      /* Output to a file or program, so no screen to fill (no max cols or rows) */
+  if (is_stdout_redirected() != 0) {
+    /* e.g. redirected to a file, tree > filelist.txt */
+    /* Output to a file or program, so no screen to fill (no max cols or rows) */
       pause = NOPAUSE;   /* so ignore request to pause */
-      break;
-    case FILE_TYPE_CHAR:  /* e.g. the console */
-    case FILE_TYPE_UNKNOWN:  /* else at least attempt to get proper limits */
-    case FILE_TYPE_REMOTE:
-    default:
-      if ((*bios_cols == 0) || (*bios_size == 0)) { /* MDA does not report size */
-        cols = 80;
-        rows = 23;
-      } else {
-        cols = *bios_cols;
-        rows = *bios_size / cols / 2;
-        if (rows > 2) rows -= 2; /* necessary to keep screen from scrolling */
-      }
-      break;
+  } else { /* e.g. the console */
+    if ((*bios_cols == 0) || (*bios_size == 0)) { /* MDA does not report size */
+      cols = 80;
+      rows = 23;
+    } else {
+      cols = *bios_cols;
+      rows = *bios_size / cols / 2;
+      if (rows > 2) rows -= 2; /* necessary to keep screen from scrolling */
+    }
   }
 }
 
