@@ -44,10 +44,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include "stack.h"
 
-/* DOS disk accesses */
-#include "dosdisk.h"
-
-
 /* The default extended forms of the lines used. */
 #define VERTBAR_STR  "\xB3   "                 /* |    */
 #define TBAR_HORZBAR_STR "\xC3\xC4\xC4\xC4"    /* +--- */
@@ -190,6 +186,29 @@ static unsigned char is_stdout_redirected(void);
 "DONE:" \
 modify [ax bx dx] \
 value [al]
+
+
+static _Packed struct {
+  unsigned short infolevel;
+  unsigned short serial2;
+  unsigned short serial1;
+  char label[11];
+  short fstype[8];
+} glob_drv_info;
+
+/* drv is 1-based (A=1, B=2, ...) */
+static void getdrvserial(unsigned char drv);
+#pragma aux getdrvserial = \
+"push ds" \
+"xor bh, bh" \
+"mov dx, offset glob_drv_info" \
+"mov ax, seg glob_drv_info" \
+"mov ds, ax" \
+"mov ax, 0x6900" \
+"int 0x21" \
+"pop ds" \
+parm [bl] \
+modify [ax bx dx]
 
 
 static int truename(char *path, const char *origpath) {
@@ -526,36 +545,13 @@ static void parseArguments(int argc, char *argv[]) {
 /**
  * Fills in the serial and volume variables with the serial #
  * and volume found using path.
- * If there is an error getting the volume & serial#, then an
- * error message is displayed and the program exits.
- * Volume and/or serial # returned may be blank if the path specified
- * does not contain them, or an error retrieving
- * (ie UNC paths under DOS), but path is valid.
  */
 static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
-  char rootPath[PATH_MAX];
-  char dummy[PATH_MAX];
-  union serialNumber {
-    unsigned long serialFull;
-    struct {
-      unsigned short a;
-      unsigned short b;
-    } serialParts;
-  } serialNum;
+  getdrvserial((path[0] & 0xDF) - '@');
+  memcpy(volume, glob_drv_info.label, 12);
+  volume[11] = 0;
 
-  /* get drive letter or share server\name */
-  splitpath(path, rootPath, dummy);
-  strcat(rootPath, "\\");
-
-  if (GetVolumeInformation(rootPath, volume, VOLLEN, &serialNum.serialFull) == 0) {
-    showInvalidDrive();
-  }
-
-  if (serialNum.serialFull == 0) {
-    serial[0] = '\0';
-  } else {
-    sprintf(serial, "%04X:%04X", serialNum.serialParts.b, serialNum.serialParts.a);
-  }
+  sprintf(serial, "%04X:%04X", glob_drv_info.serial1, glob_drv_info.serial2);
 }
 
 
@@ -609,9 +605,9 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
 
   /*  cycle through entries counting directories found until no more entries */
   do {
-    if (((findData.attrib & FILE_A_SUBDIR) != 0) &&
+    if (((findData.attrib & _A_SUBDIR) != 0) &&
         ((findData.attrib &
-         (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0 || dspAll) ) {
+         (_A_HIDDEN | _A_SYSTEM)) == 0 || dspAll) ) {
       if (findData.name[0] != '.') { /* ignore '.' and '..' */
         hasSubdirs++;      /* subdir of initial path found, so increment counter */
       }
@@ -800,11 +796,11 @@ static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFol
   /* optional display data */
   if (dspAttr)  /* attributes */
     pprintf("[%c%c%c%c%c] ",
-      (ddata->attrib & FILE_A_SUBDIR)?'D':' ',  /* keep this one? its always true */
-      (ddata->attrib & FILE_A_ARCH)?'A':' ',
-      (ddata->attrib & FILE_A_SYSTEM)?'S':' ',
-      (ddata->attrib & FILE_A_HIDDEN)?'H':' ',
-      (ddata->attrib & FILE_A_RDONLY)?'R':' '
+      (ddata->attrib & _A_SUBDIR)?'D':' ',  /* keep this one? its always true */
+      (ddata->attrib & _A_ARCH)?'A':' ',
+      (ddata->attrib & _A_SYSTEM)?'S':' ',
+      (ddata->attrib & _A_HIDDEN)?'H':' ',
+      (ddata->attrib & _A_RDONLY)?'R':' '
     );
 
   /* display directory name */
@@ -858,8 +854,8 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
   do
   {
     /* print padding followed by filename */
-    if ( ((entry.attrib & FILE_A_SUBDIR) == 0) &&
-         ( ((entry.attrib & (FILE_A_HIDDEN | FILE_A_SYSTEM)) == 0)  || dspAll) )
+    if ( ((entry.attrib & _A_SUBDIR) == 0) &&
+         ( ((entry.attrib & (_A_HIDDEN | _A_SYSTEM)) == 0)  || dspAll) )
     {
       /* print lead padding */
       pprintf("%s", padding);
@@ -867,10 +863,10 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
       /* optional display data */
       if (dspAttr)  /* file attributes */
         pprintf("[%c%c%c%c] ",
-          (entry.attrib & FILE_A_ARCH)?'A':' ',
-          (entry.attrib & FILE_A_SYSTEM)?'S':' ',
-          (entry.attrib & FILE_A_HIDDEN)?'H':' ',
-          (entry.attrib & FILE_A_RDONLY)?'R':' '
+          (entry.attrib & _A_ARCH)?'A':' ',
+          (entry.attrib & _A_SYSTEM)?'S':' ',
+          (entry.attrib & _A_HIDDEN)?'H':' ',
+          (entry.attrib & _A_RDONLY)?'R':' '
         );
 
       if (dspSize) { /* file size */
@@ -913,9 +909,9 @@ static struct find_t *cycleFindResults(struct find_t *entry, char *subdir, char 
   /* cycle through directory until 1st non . or .. directory is found. */
   for (;;) {
     /* skip files & hidden or system directories */
-    if ((((entry->attrib & FILE_A_SUBDIR) == 0) ||
+    if ((((entry->attrib & _A_SUBDIR) == 0) ||
          ((entry->attrib &
-          (FILE_A_HIDDEN | FILE_A_SYSTEM)) != 0  && !dspAll) ) ||
+          (_A_HIDDEN | _A_SYSTEM)) != 0  && !dspAll) ) ||
         (entry->name[0] == '.')) {
       if (_dos_findnext(entry) != 0) {
         _dos_findclose(entry);      // prevent resource leaks
