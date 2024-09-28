@@ -41,9 +41,9 @@
 3.3:Zu viele Parameter - %s\n
 
 # showVersionInfo
-4.0:basiert auf pdTREE von Kenneth J. Davis (2000-2004)
-4.1:weiterentwickelt und angepasst an SvarDOS von Mateusz Viste (2024)
-4.2:Copyright (c): Public Domain [United States Definition]
+4.0:Basiert auf pdTREE von Kenneth J. Davis (2000-2004)
+4.1:Weiterentwickelt und angepasst an SvarDOS von Mateusz Viste (2024)
+4.2:Urheberrecht: Public Domain [gemäß US-amerikanischer Definition]
 
 # showInvalidDrive [Set 5]
 5.1:Ungültige Laufwerksspezifikation\n
