@@ -23,13 +23,14 @@ deflang.c: nls/*.txt
 	cd nls
 	rm -f ??.txt
 	utf8tocp 437 en-utf8.txt en.txt
+	utf8tocp 850 de-utf8.txt de.txt
 	utf8tocp 850 es-utf8.txt es.txt
 	utf8tocp 850 fi-utf8.txt fi.txt
 	utf8tocp 775 lv-utf8.txt lv.txt
 	utf8tocp 850 pt-utf8.txt pt.txt
 	utf8tocp 866 ru-utf8.txt ru.txt
 	utf8tocp 857 tr-utf8.txt tr.txt
-	..$(SEP)svarlang$(SEP)tlumacz en es fi lv pt ru tr
+	..$(SEP)svarlang$(SEP)tlumacz en de es fi lv pt ru tr
 	$(CP) out.lng ..$(SEP)tree.lng
 	$(CP) deflang.c ..
 	rm -f out.lng
