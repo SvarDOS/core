@@ -166,18 +166,58 @@ int svarlang_load(const char *fname, const char *lang) {
     }
 
     /* is it the lang I am looking for? */
-    if (buff16[0] == langid) break;
+    if ((buff16[0] & 0x7FFF) == langid) break; /* compare without highest bit - it is a flag for compression */
 
     /* skip to next lang (in two steps to avoid a potential uint16 overflow) */
     FSEEK(fd, svarlang_string_count * 4);
     FSEEK(fd, buff16[1]);
   }
 
-  /* load dictionary & strings, but only if I have enough memory space */
-  if ((buff16[1] >= svarlang_memsz)
-   || (FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4)
-   || (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
+  /* load the index (dict) */
+  if (FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) {
     exitcode = -4;
+    goto FCLOSE_AND_EXIT;
+  }
+
+  /* is the lang block compressed? then uncompress it */
+  if (buff16[0] & 0x8000) {
+    unsigned short compressedsize = buff16[1] / 2;
+    unsigned short i;
+    char *dst = svarlang_mem;
+    for (i = 0; i < compressedsize; i++) {
+      /* read a word token */
+      if (FREAD(fd, buff16, 2) != 2) {
+        exitcode = -5;
+        goto FCLOSE_AND_EXIT;
+      }
+
+      /* token format is LLLL OOOO OOOO OOOO, where:
+       * OOOO OOOO OOOO is the back reference offset (number of bytes to rewind)
+       * LLLL is the number of bytes that have to be copied from the offset
+       * if the token is > 256 then it represents a literal (single) byte
+       */
+
+      /* literal byte? */
+      if ((buff16[0] & 0xFF00) == 0) {
+        *dst = buff16[0];
+        dst++;
+      } else { /* backreference */
+        char *src = dst - (buff16[0] & 0x0FFF);
+        buff16[0] >>= 12;
+        while (buff16[0]) {
+          *dst = *src;
+          dst++;
+          src++;
+          buff16[0]--;
+        }
+      }
+    }
+    goto FCLOSE_AND_EXIT;
+  }
+
+  /* lang block not compressed - load as is */
+  if (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1]) {
+    exitcode = -6;
   }
 
   FCLOSE_AND_EXIT:

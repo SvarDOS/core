@@ -1,12 +1,28 @@
 /*
- * Copyright (C) 2021-2023 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Dictionary-based lookups contributed by Bernd Boeckmann, 2023
  *
  * usage: tlumacz en fr pl etc
  *
- * computes an out.lng file that contains all language resources.
+ * computes:
+ * OUT.LNG -> contains all language resources.
+ * OUTC.LNG -> same as OUT.LNG but with compressed strings (slower to load).
  *
+ * === COMPRESSION ===========================================================
+ * The compression scheme is very simple. It is applied only to strings (ie.
+ * not the dictionnary) and it is basically a stream of 16-bit values (WORDs),
+ * where each WORD value contains the following bits "LLLL OOOO OOOO OOOO":
+ *
+ * OOOO OOOO OOOO = a backreference offset ("look that many bytes back")
+ * LLLL = the number of bytes to copy from the backreference
+ *
+ * Special case: a WORD that is smaller than 256 represents a single literal
+ * byte.
+ *
+ * To recognize a compressed lang block one has to look at the id of the block
+ * (16-bit language id). If its highest bit is set (0x8000) then the lang block
+ * is compressed.
  */
 
 
@@ -334,13 +350,73 @@ static int svl_write_header(unsigned short num_strings, FILE *fd) {
 }
 
 
-static int svl_write_lang(const struct svl_lang *l, FILE *fd) {
-  unsigned short strings_bytes = svl_strings_bytes(l);
+/* mvcomp applies the MV-COMPRESSION algorithm to data and returns the compressed size */
+static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) {
+  unsigned short complen = 0;
+  unsigned short *dst = (void *)dstbuf;
+  unsigned short bytesprocessed = 0;
 
-  return((fwrite(&l->id, 1, 2, fd) == 2) &&
+  /* read src byte by byte, len times, each time look for a match of 15,14,13..2 chars in the back buffer */
+  while (len > 0) {
+    unsigned short matchlen;
+    unsigned short offset;
+    matchlen = 15;
+    if (len < matchlen) matchlen = len;
+
+    for (; matchlen > 1; matchlen--) {
+      /* start at offset - 4095 and try to match something */
+      offset = 4095;
+      if (offset > bytesprocessed) offset = bytesprocessed;
+
+      for (; offset > matchlen; offset--) {
+        if (memcmp(src, src - offset, matchlen) == 0) {
+          printf("Found match of %u bytes at offset -%u: '%c%c%c...'\n", matchlen, offset, src[0], src[1], src[2]);
+          goto FOUND;
+        }
+      }
+    }
+
+    /* if here: no match found, write a literal byte */
+    *dst = *src;
+    dst++;
+    src++;
+    bytesprocessed++;
+    len--;
+    complen += 2;
+    continue;
+
+    FOUND: /* found a match of matchlen bytes at -offset */
+    *dst = (matchlen << 12) | offset;
+    dst++;
+    src += matchlen;
+    bytesprocessed += matchlen;
+    len -= matchlen;
+    complen += 2;
+  }
+
+  return(complen);
+}
+
+
+/* write the language block (id, dict, strings) into the LNG file.
+ * strings are compressed if compflag != 0 */
+static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag) {
+  unsigned short strings_bytes = svl_strings_bytes(l);
+  unsigned short langid = *((unsigned short *)(&l->id));
+  const char *stringsptr = l->strings;
+
+  /* if compressed then do the magic */
+  if (compflag) {
+    static char compstrings[65000];
+    langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
+    strings_bytes = mvcomp(compstrings, l->strings, strings_bytes);
+    stringsptr = compstrings;
+  }
+
+  return((fwrite(&langid, 1, 2, fd) == 2) &&
          (fwrite(&strings_bytes, 1, 2, fd) == 2) &&
          (fwrite(l->dict, 1, svl_dict_bytes(l), fd) == svl_dict_bytes(l)) &&
-         (fwrite(l->strings, 1, svl_strings_bytes(l), fd) == svl_strings_bytes(l)));
+         (fwrite(stringsptr, 1, strings_bytes, fd) == strings_bytes));
 }
 
 
@@ -454,7 +530,7 @@ static int svl_write_asm_source(const struct svl_lang *l, const char *fn, unsign
 
 
 int main(int argc, char **argv) {
-  FILE *fd;
+  FILE *fd, *fdc;
   int ecode = 0;
   int i, output_format = C_OUTPUT;
   unsigned short biggest_langsz = 0;
@@ -472,6 +548,12 @@ int main(int argc, char **argv) {
   fd = fopen("out.lng", "wb");
   if (fd == NULL) {
     fprintf(stderr, "ERROR: FAILED TO CREATE OR OPEN OUT.LNG");
+    return(1);
+  }
+  fdc = fopen("outc.lng", "wb");
+  if (fd == NULL) {
+    fclose(fd);
+    puts("ERR: failed to open or create OUTC.LNG");
     return(1);
   }
 
@@ -525,12 +607,25 @@ int main(int argc, char **argv) {
         ecode = 1;
         goto exit_main;
       }
+      if (!svl_write_header(lang->num_strings, fdc)) {
+        fprintf(stderr, "ERROR WRITING TO OUTPUT (COMPRESSED) FILE\r\n");
+        ecode = 1;
+        break;
+      }
     }
 
     /* write lang ID to file, followed string table size, and then
        the dictionary and string table for current language */
-    if (!svl_write_lang(lang, fd)) {
+    if (!svl_write_lang(lang, fd, 0)) { /* UNCOMPRESSED */
       fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
+      ecode = 1;
+      goto exit_main;
+    }
+
+    /* write lang ID to file, followed string table size, and then
+       the dictionary and string table for current language */
+    if (!svl_write_lang(lang, fdc, 1)) { /* COMPRESSED */
+      fprintf(stderr, "ERROR WRITING TO OUTPUT (COMPRESSED) FILE\r\n");
       ecode = 1;
       goto exit_main;
     }
@@ -555,7 +650,7 @@ int main(int argc, char **argv) {
     if (!svl_write_c_source(reflang, "deflang.c", biggest_langsz)) {
       fprintf(stderr, "ERROR: FAILED TO OPEN OR CREATE DEFLANG.C\r\n");
       ecode = 1;
-    }    
+    }
   } else {
     if (!svl_write_asm_source(reflang, "deflang.inc", biggest_langsz, output_format)) {
       fprintf(stderr, "ERROR: FAILED TO OPEN OR CREATE DEFLANG.INC\r\n");
@@ -570,7 +665,7 @@ exit_main:
   if (reflang) {
     svl_lang_free(reflang);
     reflang = NULL;
-    lang = NULL;    
+    lang = NULL;
   }
 
   fclose(fd);
