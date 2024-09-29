@@ -360,12 +360,12 @@ static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) 
   while (len > 0) {
     unsigned short matchlen;
     unsigned short offset;
-    matchlen = 15;
+    matchlen = 16;
     if (len < matchlen) matchlen = len;
 
     for (; matchlen > 1; matchlen--) {
-      /* start at offset - 4095 and try to match something */
-      offset = 4095;
+      /* start at offset - 4096 and try to match something */
+      offset = 4096;
       if (offset > bytesprocessed) offset = bytesprocessed;
 
       for (; offset > matchlen; offset--) {
@@ -386,7 +386,7 @@ static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) 
     continue;
 
     FOUND: /* found a match of matchlen bytes at -offset */
-    *dst = (matchlen << 12) | offset;
+    *dst = ((matchlen - 1) << 12) | (offset - 1);
     dst++;
     src += matchlen;
     bytesprocessed += matchlen;

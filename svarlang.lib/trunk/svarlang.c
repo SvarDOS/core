@@ -192,8 +192,8 @@ int svarlang_load(const char *fname, const char *lang) {
       }
 
       /* token format is LLLL OOOO OOOO OOOO, where:
-       * OOOO OOOO OOOO is the back reference offset (number of bytes to rewind)
-       * LLLL is the number of bytes that have to be copied from the offset
+       * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
+       * LLLL is the number of bytes (-1) that have to be copied from the offset
        * if the token is > 256 then it represents a literal (single) byte
        */
 
@@ -202,12 +202,13 @@ int svarlang_load(const char *fname, const char *lang) {
         *dst = buff16[0];
         dst++;
       } else { /* backreference */
-        char *src = dst - (buff16[0] & 0x0FFF);
+        char *src = dst - (buff16[0] & 0x0FFF) - 1;
         buff16[0] >>= 12;
-        while (buff16[0]) {
+        for (;;) {
           *dst = *src;
           dst++;
           src++;
+          if (buff16[0] == 0) break;
           buff16[0]--;
         }
       }
