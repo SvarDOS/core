@@ -552,7 +552,7 @@ int main(int argc, char **argv) {
     puts("file that contains a properly sized buffer pre-filled with the first");
     puts("(reference) language.");
     puts("");
-    puts("usage: tlumacz [/c | /asm | /nasm] [/nocomp] en fr pl ...");
+    puts("usage: tlumacz [/c | /asm | /nasm] [/nocomp] [/excref] en fr pl ...");
     puts("");
     puts("/c        generates deflang.c (default)");
     puts("/asm      deflang ASM output");
@@ -634,6 +634,8 @@ int main(int argc, char **argv) {
         ecode = 1;
         goto exit_main;
       }
+    } else {
+      puts("ref language NOT saved in the LNG file (/excref)");
     }
 
     /* remember reference data for other languages */

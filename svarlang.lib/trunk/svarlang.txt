@@ -103,7 +103,7 @@ Language =
     lang_id       : Char[2]
     len_strings   : U16 := SizeOf(strings)
     dictionary    : StringDict
-    strings       : array[File.num_strings] of StringZ
+    strings       : array[File.num_strings] of StringZ (possibly compressed)
 
 StringDict =
     elements : array[File.num_strings] of DictEntry
