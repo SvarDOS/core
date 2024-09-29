@@ -364,13 +364,13 @@ static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) 
     if (len < matchlen) matchlen = len;
 
     for (; matchlen > 1; matchlen--) {
-      /* start at offset - 4096 and try to match something */
-      offset = 4096;
-      if (offset > bytesprocessed) offset = bytesprocessed;
+      /* start at -matchlen and try to match something moving backward */
+      unsigned short maxoffset = 4096;
+      if (maxoffset > bytesprocessed) maxoffset = bytesprocessed;
 
-      for (; offset > matchlen; offset--) {
+      for (offset = matchlen; offset <= maxoffset; offset++) {
         if (memcmp(src, src - offset, matchlen) == 0) {
-          printf("Found match of %u bytes at offset -%u: '%c%c%c...'\n", matchlen, offset, src[0], src[1], src[2]);
+          //printf("Found match of %u bytes at offset -%u: '%c%c%c...'\n", matchlen, offset, src[0], src[1], src[2]);
           goto FOUND;
         }
       }
