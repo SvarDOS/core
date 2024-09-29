@@ -408,9 +408,16 @@ static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag) {
   /* if compressed then do the magic */
   if (compflag) {
     static char compstrings[65000];
-    langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
-    strings_bytes = mvcomp(compstrings, l->strings, strings_bytes);
-    stringsptr = compstrings;
+    unsigned short comp_bytes;
+    comp_bytes = mvcomp(compstrings, l->strings, strings_bytes);
+    if (comp_bytes < strings_bytes) {
+      printf("lang %c%c mvcomp-ressed (%u bytes -> %u bytes)\n", l->id[0], l->id[1], strings_bytes, comp_bytes);
+      langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
+      strings_bytes = comp_bytes;
+      stringsptr = compstrings;
+    } else {
+      printf("lang %c%c left UNCOMPRESSED (uncomp=%u bytes ; mvcomp=%u bytes)\n", l->id[0], l->id[1], strings_bytes, comp_bytes);
+    }
   }
 
   return((fwrite(&langid, 1, 2, fd) == 2) &&
