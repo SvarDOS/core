@@ -537,9 +537,10 @@ static int svl_write_asm_source(const struct svl_lang *l, const char *fn, unsign
 
 
 int main(int argc, char **argv) {
-  FILE *fd, *fdc;
+  FILE *fd;
   int ecode = 0;
   int i, output_format = C_OUTPUT;
+  int mvcomp_enabled = 0;
   unsigned short biggest_langsz = 0;
   struct svl_lang *lang = NULL, *reflang = NULL;
 
@@ -548,19 +549,13 @@ int main(int argc, char **argv) {
     puts("converts a set of CATS-style translations in files EN.TXT, PL.TXT, etc");
     puts("into a single resource file (OUT.LNG).");
     puts("");
-    puts("usage: tlumacz [/c|/asm|/nasm] en fr pl ...");
+    puts("usage: tlumacz [/c | /asm | /nasm] [/comp] en fr pl ...");
     return(1);
   }
 
   fd = fopen("out.lng", "wb");
   if (fd == NULL) {
     fprintf(stderr, "ERROR: FAILED TO CREATE OR OPEN OUT.LNG");
-    return(1);
-  }
-  fdc = fopen("outc.lng", "wb");
-  if (fd == NULL) {
-    fclose(fd);
-    puts("ERR: failed to open or create OUTC.LNG");
     return(1);
   }
 
@@ -572,12 +567,14 @@ int main(int argc, char **argv) {
     if (!strcmp(argv[i], "/c")) {
       output_format = C_OUTPUT;
       continue;
-    }
-    else if (!strcmp(argv[i], "/asm")) {
+    } else if (!strcmp(argv[i], "/asm")) {
       output_format = ASM_OUTPUT;
       continue;
     } else if(!strcmp(argv[i], "/nasm")) {
       output_format = NASM_OUTPUT;
+      continue;
+    } else if(!strcmp(argv[i], "/comp")) {
+      mvcomp_enabled = 1;
       continue;
     }
 
@@ -608,31 +605,18 @@ int main(int argc, char **argv) {
     svl_compact_lang(lang);
 
     /* write header if first (reference) language */
-    if (i == 1) {
+    if (!reflang) {
       if (!svl_write_header(lang->num_strings, fd)) {
         fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
         ecode = 1;
         goto exit_main;
       }
-      if (!svl_write_header(lang->num_strings, fdc)) {
-        fprintf(stderr, "ERROR WRITING TO OUTPUT (COMPRESSED) FILE\r\n");
-        ecode = 1;
-        break;
-      }
     }
 
     /* write lang ID to file, followed string table size, and then
        the dictionary and string table for current language */
-    if (!svl_write_lang(lang, fd, 0)) { /* UNCOMPRESSED */
+    if (!svl_write_lang(lang, fd, mvcomp_enabled)) {
       fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
-      ecode = 1;
-      goto exit_main;
-    }
-
-    /* write lang ID to file, followed string table size, and then
-       the dictionary and string table for current language */
-    if (!svl_write_lang(lang, fdc, 1)) { /* COMPRESSED */
-      fprintf(stderr, "ERROR WRITING TO OUTPUT (COMPRESSED) FILE\r\n");
       ecode = 1;
       goto exit_main;
     }
