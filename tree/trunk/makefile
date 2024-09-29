@@ -30,7 +30,7 @@ deflang.c: nls/*.txt
 	utf8tocp 850 pt-utf8.txt pt.txt
 	utf8tocp 866 ru-utf8.txt ru.txt
 	utf8tocp 857 tr-utf8.txt tr.txt
-	..$(SEP)svarlang$(SEP)tlumacz en de es fi lv pt ru tr
+	..$(SEP)svarlang$(SEP)tlumacz /excref en de es fi lv pt ru tr > tlumacz.log
 	$(CP) out.lng ..$(SEP)tree.lng
 	$(CP) deflang.c ..
 	rm -f out.lng
