@@ -1,0 +1,6 @@
+0.5:Wiadomosc Zero Piec
+0.8:Wiadomosc Zero Osiem
+0.10:Witaj Swiecie - 10!
+0.11:Witaj Swiecie - 11!
+0.12:Witaj Swiecie - 12!
+0.13:Wiadomosc koncowa. Zero Zero Siedem wylogowany.
