@@ -1,5 +1,5 @@
 2024xxxx
-- LNG strings may be optionally compressed
+- LNG strings may be optionally compressed (/comp)
 
 20240915
 - fixed svarlang_strid() when id=0 and string does not exist (Bernd Boeckmann)
