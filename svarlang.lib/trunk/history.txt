@@ -1,5 +1,6 @@
-2024xxxx
-- LNG strings may be optionally compressed (/comp)
+20240929
+- LNG strings may be optionally compressed (can be disabled with /nocomp)
+- reference language can be excluded from the LNG file (/excref)
 
 20240915
 - fixed svarlang_strid() when id=0 and string does not exist (Bernd Boeckmann)

@@ -541,20 +541,24 @@ int main(int argc, char **argv) {
   int ecode = 0;
   int i, output_format = C_OUTPUT;
   int mvcomp_enabled = 1;
+  int excref = 0;
   unsigned short biggest_langsz = 0;
   struct svl_lang *lang = NULL, *reflang = NULL;
 
   if (argc < 2) {
     puts("tlumacz ver " SVARLANGVER " - this tool is part of the SvarLANG project.");
     puts("converts a set of CATS-style translations in files EN.TXT, PL.TXT, etc");
-    puts("into a single resource file (OUT.LNG).");
+    puts("into a single resource file (OUT.LNG). Also generates a deflang source");
+    puts("file that contains a properly sized buffer pre-filled with the first");
+    puts("(reference) language.");
     puts("");
     puts("usage: tlumacz [/c | /asm | /nasm] [/nocomp] en fr pl ...");
     puts("");
-    puts("/c      - generates deflang.c (default)");
-    puts("/asm    - deflang ASM output");
-    puts("/nasm   - deflang NASM output");
-    puts("/nocomp - disables compression of strings in the LNG file");
+    puts("/c        generates deflang.c (default)");
+    puts("/asm      deflang ASM output");
+    puts("/nasm     deflang NASM output");
+    puts("/nocomp   disables compression of strings in the LNG file");
+    puts("/excref   excludes ref lang from the LNG file (inserted to deflang only)");
     return(1);
   }
 
@@ -580,6 +584,9 @@ int main(int argc, char **argv) {
       continue;
     } else if(!strcmp(argv[i], "/nocomp")) {
       mvcomp_enabled = 0;
+      continue;
+    } else if(!strcmp(argv[i], "/excref")) {
+      excref = 1;
       continue;
     }
 
@@ -619,11 +626,14 @@ int main(int argc, char **argv) {
     }
 
     /* write lang ID to file, followed string table size, and then
-       the dictionary and string table for current language */
-    if (!svl_write_lang(lang, fd, mvcomp_enabled)) {
-      fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
-      ecode = 1;
-      goto exit_main;
+       the dictionary and string table for current language
+       skip this for reference language if /excref given */
+    if ((reflang != NULL) || (excref == 0)) {
+      if (!svl_write_lang(lang, fd, mvcomp_enabled)) {
+        fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
+        ecode = 1;
+        goto exit_main;
+      }
     }
 
     /* remember reference data for other languages */
