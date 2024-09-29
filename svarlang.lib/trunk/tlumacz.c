@@ -540,7 +540,7 @@ int main(int argc, char **argv) {
   FILE *fd;
   int ecode = 0;
   int i, output_format = C_OUTPUT;
-  int mvcomp_enabled = 0;
+  int mvcomp_enabled = 1;
   unsigned short biggest_langsz = 0;
   struct svl_lang *lang = NULL, *reflang = NULL;
 
@@ -549,7 +549,12 @@ int main(int argc, char **argv) {
     puts("converts a set of CATS-style translations in files EN.TXT, PL.TXT, etc");
     puts("into a single resource file (OUT.LNG).");
     puts("");
-    puts("usage: tlumacz [/c | /asm | /nasm] [/comp] en fr pl ...");
+    puts("usage: tlumacz [/c | /asm | /nasm] [/nocomp] en fr pl ...");
+    puts("");
+    puts("/c      - generates deflang.c (default)");
+    puts("/asm    - deflang ASM output");
+    puts("/nasm   - deflang NASM output");
+    puts("/nocomp - disables compression of strings in the LNG file");
     return(1);
   }
 
@@ -573,8 +578,8 @@ int main(int argc, char **argv) {
     } else if(!strcmp(argv[i], "/nasm")) {
       output_format = NASM_OUTPUT;
       continue;
-    } else if(!strcmp(argv[i], "/comp")) {
-      mvcomp_enabled = 1;
+    } else if(!strcmp(argv[i], "/nocomp")) {
+      mvcomp_enabled = 0;
       continue;
     }
 
