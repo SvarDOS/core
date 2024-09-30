@@ -15,16 +15,16 @@ install.com: keylay.h install.c deflang.c
 
 deflang.c:
 	cd nls
-	utf8tocp 437 en_utf8.txt > en.txt
-	utf8tocp 850 br_utf8.txt > br.txt
-	utf8tocp 858 de_utf8.txt > de.txt
-	utf8tocp 858 fr_utf8.txt > fr.txt
-	utf8tocp 858 it_utf8.txt > it.txt
-	utf8tocp maz pl_utf8.txt > pl.txt
-	utf8tocp 866 ru_utf8.txt > ru.txt
-	utf8tocp 852 si_utf8.txt > si.txt
-	utf8tocp 858 sv_utf8.txt > sv.txt
-	utf8tocp 857 tr_utf8.txt > tr.txt
+	utf8tocp 437 en_utf8.txt en.txt
+	utf8tocp 850 br_utf8.txt br.txt
+	utf8tocp 858 de_utf8.txt de.txt
+	utf8tocp 858 fr_utf8.txt fr.txt
+	utf8tocp 858 it_utf8.txt it.txt
+	utf8tocp maz pl_utf8.txt pl.txt
+	utf8tocp 866 ru_utf8.txt ru.txt
+	utf8tocp 852 si_utf8.txt si.txt
+	utf8tocp 858 sv_utf8.txt sv.txt
+	utf8tocp 857 tr_utf8.txt tr.txt
 	..\svarlang.lib\tlumacz en br de fr it pl ru si sv tr > tlumacz.log
 	if exist ..\deflang.c del ..\deflang.c
 	if exist ..\install.lng del ..\install.lng
