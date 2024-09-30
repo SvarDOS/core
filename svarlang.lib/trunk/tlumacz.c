@@ -47,6 +47,7 @@
 
 enum {                      /* DEFLANG output format */
   C_OUTPUT,
+  NO_OUTPUT,
   ASM_OUTPUT,
   NASM_OUTPUT
 };
@@ -624,11 +625,12 @@ int main(int argc, char **argv) {
     puts("file that contains a properly sized buffer pre-filled with the first");
     puts("(reference) language.");
     puts("");
-    puts("usage: tlumacz [/c | /asm | /nasm] [/nocomp] [/excref] en fr pl ...");
+    puts("usage: tlumacz [/c|/asm|/nasm|/nodef] [/nocomp] [/excref] en fr pl ...");
     puts("");
     puts("/c        generates deflang.c (default)");
     puts("/asm      deflang ASM output");
     puts("/nasm     deflang NASM output");
+    puts("/nodef    does NOT generate a deflang source file (only an LNG file)");
     puts("/nocomp   disables compression of strings in the LNG file");
     puts("/excref   excludes ref lang from the LNG file (inserted to deflang only)");
     return(1);
@@ -656,6 +658,9 @@ int main(int argc, char **argv) {
       continue;
     } else if(!strcmp(argv[i], "/nocomp")) {
       mvcomp_enabled = 0;
+      continue;
+    } else if(!strcmp(argv[i], "/nodef")) {
+      output_format = NO_OUTPUT;
       continue;
     } else if(!strcmp(argv[i], "/excref")) {
       excref = 1;
@@ -725,13 +730,13 @@ int main(int argc, char **argv) {
     goto exit_main;
   }
 
-  /* compute the deflang file containing a dump of the reference block */
+  /* compute the deflang file containing a dump of the reference lang block */
   if (output_format == C_OUTPUT) {
     if (!svl_write_c_source(reflang, "deflang.c", biggest_langsz)) {
       fprintf(stderr, "ERROR: FAILED TO OPEN OR CREATE DEFLANG.C\r\n");
       ecode = 1;
     }
-  } else {
+  } else if ((output_format == ASM_OUTPUT) || (output_format == NASM_OUTPUT)) {
     if (!svl_write_asm_source(reflang, "deflang.inc", biggest_langsz, output_format)) {
       fprintf(stderr, "ERROR: FAILED TO OPEN OR CREATE DEFLANG.INC\r\n");
       ecode = 1;
@@ -739,7 +744,7 @@ int main(int argc, char **argv) {
   }
 
 exit_main:
-  if (lang && lang != reflang) {
+  if (lang && (lang != reflang)) {
     svl_lang_free(lang);
   }
   if (reflang) {

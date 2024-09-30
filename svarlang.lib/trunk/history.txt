@@ -1,5 +1,9 @@
+xxxxxxxx
+- improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
+- added /nodef to TLUMACZ (skips deflang generation)
+
 20240929
-- LNG strings may be optionally compressed (can be disabled with /nocomp)
+- LNG strings may be optionally MVCOMP-compressed (disabled with /nocomp)
 - reference language can be excluded from the LNG file (/excref)
 
 20240915
