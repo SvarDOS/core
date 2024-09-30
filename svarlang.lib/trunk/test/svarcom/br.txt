@@ -1,0 +1,298 @@
+#
+# SvarCOM translation file
+#
+# Language...: Portuguese Brazil
+# Authors....: Luzem†rio Dantas
+# Last update: 17 Feb 2023
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Sintaxe Inv†lida
+0.2:Opá∆o onv†lida
+0.3:Formato de parÉmetro inv†lido
+0.4:Excesso de parÉmetros
+0.5:Comando ou nome de arquivo inv†lido
+0.6:ParÉmetro inv†lido
+0.7:ParÉmero obrigat¢rio ausente
+0.8:Destino inv†lido
+0.9:Este comando n∆o foi implementado
+
+# the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:SN
+
+# SVARCOM HELP SCREEN
+1.0:Inicia o interpretador de comandos SvarCOM.
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] commando]
+1.2:/D      Pula o processamento do AUTOEXEC.BAT (faz sentido s¢ com /P)
+1.3:/E:nnn  define o tamanho do ambiente para nnn bytes
+1.4:/P      Torna o novo interpretador de comandos permanente e roda o AUTOEXEC.BAT
+1.5:/C      Executa o comando especificado e retorna
+1.6:/K      Executa o comando especificado e continua rodando
+1.7:/Y      Executa o programa em lote passo a passo (s¢ com /P, /K or /C)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:A VERS«O DO SVARCOM MUDOU. SISTEMA INTERROMPIDO. POR FAVOR REINICIE SEU COMPUTADOR.
+2.1:ERRO FATAL: rmod_install() falhou
+2.2:SvarCOM: estouro de pilha detectado, hist¢rico de comandos esvaziado (isso\r\nn∆o Ç um bug)
+
+# CLS
+10.0:Limpa a tela.
+
+# CHCP
+11.0:Mostra ou define o n£mero de p†gina de c¢digo ativo.
+11.1:CHCP [nnn]
+11.2:nnn  Especifica um n£mero de p†gina de c¢digo
+11.3:Digite CHCP sem parÉmetros para mostrar o n£mero de p†gina de c¢digo atual.
+11.4:N£mero de p†gina de c¢digo inv†lido
+11.5:NLSFUNC n∆o instalado
+11.6:Falha na mudanáa de p†gina de c¢digo
+11.7:P†gina de c¢digo ativa:
+
+# CD / CHDIR
+12.0:Mostra o nome ou muda o diret¢rio atual.
+12.1:CHDIR [drive:][caminho]
+12.2:CHDIR[..]
+12.3:CD [drive:][caminho]
+12.4:CD[..]
+12.5:.. Especifica que vocà quer mudar para o diret¢rio pai (anterior).
+12.6:Digite CD drive: para motrar o diret¢rio atual no disco especificado.
+12.7:Digite CD sem parÉmetros para mostrar o drive e diret¢rio atuais.
+
+# CALL
+13.0:Chama um programa em lote Ö partir de outro.
+13.1:CALL [drive:][caminho]arquivo [parÉmetros-do-arquivo-batch]
+
+# BREAK
+14.0:Ativa ou desativa a verificaá∆o extendida de CTRL+C.
+14.1:Digite BREAK sem parÉmetros para mostrar o status atual.
+14.2:BREAK est† desligado
+14.3:BREAK est† ligado
+
+# PAUSE
+15.0:Suspende a execuá∆o de um arquivo de comandos em lote.
+15.1:Pressione qualquer tecla para continuar...
+
+# SHIFT
+16.0:Muda a posiá∆o dos argumentos em um arquivo de comandos em lote:
+16.1:Argumento %1 se torna %0, argumento %2 se torna %1, etc.
+
+# GOTO
+17.0:Direciona o processamento de comandos em lote para uma linha com um r¢tulo\r\nno programa.
+17.1:GOTO LABEL
+17.2:LABEL especifica uma sequància de texto useda no programa em lote como se\r\nfosse um r¢tulo.
+17.3:Um r¢tulo fica sozinho na linha e deve ser precedido por dois pontos ":".
+17.10:R¢tulo n∆o encontrado
+
+# FOR
+18.0:Roda um comando especificado para cada elemento em uma lista.
+18.1:FOR %vari†vel IN (lista) DO comando [parÉmetros]
+18.2:%vari†vel   Vari†vel de £nica letra (a-z ou A-Z).
+18.3:(lista)     Uma ou mais sequàncias separadas por espaáos ou curingas de\r\nnomes de arquivos.
+18.4:comando     O comando para executar para cada elemento. %vari†vel\r\npermitida.
+18.5:parÉmetros  ParÉmetros ou opá‰es para o comando especificado.
+18.6:Para usar o FOR em um programa de lote, use %%vari†vel invÇs de %vari†vel
+18.7:O FOR n∆o pode ser aninhado (dentro de outro FOR)
+
+# VERIFY
+19.0:Diz ao DOS se deve verificar se os arquivos foram corretamente gravados no\r\ndisco.
+19.1:Digite VERIFY sem parÉmetros para mostrar o status atual.
+19.2:VERIFY est† desligado
+19.3:VERIFY est† ligado
+19.4:ê necess†rio especificar ON ou OFF
+
+# VER
+20.0:Mostra as vers‰es do kernel do DOS e do shell SvarCOM.
+20.1:Vers∆o do kernel DOS %u.%02u
+20.2:Shell SvarCOM ver
+20.3:O SvarCOM Ç um interpretador shell para kernels do DOS compat°vel com\r\nMS-DOS 5+.
+20.4:Este software Ç distribu°do nos termos da licenáa MIT.
+20.5:Revis∆o %c
+20.6:O DOS est† em %s
+20.7:mem¢ria convencional
+20.8:HMA
+20.9:ROM
+20.10:vers∆o verdadeira %u.%02u
+
+# TYPE
+21.0:Mostra o conte£do de um arquivo de texto.
+21.1:TYPE [drive:][caminho]arquivo
+
+# TIME
+22.0:Mostra ou define as horas no rel¢gio do sistema.
+22.1:TIME [horas]
+22.2:Digite TIME sem parÉmetros para mostrar a hora atual e um prompt para uma\r\nnova hora. Pressione ENTER para manter a hora atual.
+22.3:A hora atual Ç
+22.4:Hora inv†lida
+22.5:Entre a nova hora:
+
+# SET
+23.0:Mostra, define, ou remove vari†veis de ambiente do DOS.
+23.1:SET [vari†vel=[string]]
+23.2:vari†vel  Especifica o nome da vari†vel de ambiente
+23.3:string    Especifica uma sequància de caracteres para atribuir Ö vari†vel
+23.4:Digite SET sem parÉmetros para mostrar as vari†veis de ambiente atuais.
+23.5:N∆o h† mais espaáo dispon°vel no bloco de ambiente
+
+# RD / RMDIR
+24.0:Remove (apaga) um diret¢rio.
+24.1:RMDIR [drive:]caminho
+24.2:RD [drive:]caminho
+
+# REN / RENAME
+25.0:Renomeia um ou mais arquivos ou diret¢rios.
+25.1:RENAME [drive:][caminho]nomevelho nomenovo
+25.2:REN [drive:][caminho]nomevelho nomenovo
+25.3:Note que vocà n∆o pode especificar um novo drive ou caminho para nomenovo.\r\nUse MOVE para mover arquivos de um diret¢rio para outro.
+
+# REM
+26.0:Salva coment†rios (lembretes) em um arquivo de comandos em lote.
+26.1:REM [coment†rio]
+
+# PATH
+27.0:Mostra ou define um caminho de pesquisa para arquivos execut†veis.
+27.1:PATH [[drive:]caminho[;...]]
+27.2:Digite PATH ; para apagar todas as configuraá‰es de pesquisa de caminho e\r\ndirecionar o DOS para pesquisar somente no diret¢rio atual.
+27.3:Digite PATH sem parÉmetros para mostrar o caminho atual.
+27.4:Nenhum caminho
+
+# MD / MKDIR
+28.0:Cria um diret¢rio.
+28.1:MKDIR [drive:]caminho
+28.2:MD [drive:]caminho
+
+# LN
+29.0:Adiciona, apaga ou mostra links execut†veis.
+29.1:LN ADD nomedolink diret¢riodestino
+29.2:LN DEL nomedolink
+29.3:LN LIST [padr∆o]
+29.4:Nenhum execut†vel correspondente encontrado no caminho fornecido.
+29.5:%DOSDIR% n∆o definido
+
+# EXIT
+30.0:Sai do programa COMMAND.COM (interpretador de comandos).
+
+# ECHO
+31.0:Mostra mensagens, ou liga e desliga o eco de comandos.
+31.1:ECHO [mensagem]
+31.2:Digite ECHO sem parÉmetros para mostrar a configuraá∆o atual.
+31.3:ECHO est† ligado
+31.4:ECHO est† desligado
+
+# DATE
+32.0:Mostra ou define a data do sistema.
+32.1:DATE [data]
+32.2:Digite DATE sem parÉmetros para mostrar a data atual e um prompt para uma\r\nnova data. Pressione ENTER para manter a data atual.
+32.3:Data inv†lida
+32.4:A data atual Ç
+32.5:Entre nova data:
+
+# PROMPT
+33.0:Muda o prompt de comando do DOS.
+33.1:PROMPT [nova especificaá∆o de prompt de comando]
+
+# VOL
+34.0:Mostra o r¢tulo do volume do disco e o n£mero de sÇrie, se existir.
+34.1:VOL [drive:]
+34.2:O volume no drive %c n∆o tem nome
+34.3:O volume no drive %c Ç %s
+34.4:O n£mero de sÇrie do volume Ç %04X-%04X
+
+# IF
+35.0:Executa processamento condicional em programas de lote.
+35.1:IF [NOT] ERRORLEVEL n£mero comando
+35.2:IF [NOT] string1==string2 comando
+35.3:IF [NOT] EXIST arquivo comando
+35.4:NOT               o comando Ç executado somente se a condiá∆o N«O for\r\nsatisfeita
+35.5:ERRORLEVEL num    condiá∆o: o £ltimo programa retornou um c¢digo de sa°da\r\n>= n£mero
+35.6:string1==string2  condiá∆o: ambos os  strings tem de ser iguais
+35.7:EXIST arquivo     condiá∆o: o nome do arquivo existe (curingas aceitos)
+35.8:comando           comando para executar se a condiá∆o for satisfeita
+
+# DEL / ERASE
+36.0:Remove (apaga) um ou mais arquivos.
+36.1:DEL [drive:][caminho]arquivo [/P]
+36.2:ERASE [drive:][caminho]arquivo [/P]
+36.3:[drive:][caminho]arquivo  Especifica os arquivos a apagar.
+36.4:/P  Pergunta confirmaá∆o antes de apagar cada arquivo.
+36.5:Todos os arquivos no diret¢rio ser∆o apagados!
+36.6:Tem certeza?
+36.7:Apagar?
+
+# DIR
+37.0:Mostra uma lista de arquivos e subdiret¢rios em um diret¢rio.
+37.1:DIR [drive:][caminho][arquivo] [/P] [/W] [/A[:]atributos] [/O[[:]ordem]]\r\n    [/S] [/B] [/L]
+37.2:/P Pausa ap¢s cada preenchimento da tela
+37.3:/W Usa formato de lista longo
+37.4:/A Mostra arquivos com atributos espec°ficos:
+37.5:    D Diret¢rios             R Arquivos s¢ leitura    H Arquivos ocultos
+37.6:    A Pronto para arquivar   S Arquivos de sistema    - prefixo "n∆o"
+37.7:/O Lista arquivos com ordenaá∆o:
+37.8:    N por nome               S por tamanho            E por extens∆o
+37.9:    D por data               G agrupa dirs primeiro   - inverter a ordem
+37.10:/S Mostra arquivos no diret¢rio especificado e todos os subdiret¢rios
+37.11:/B Usa formato simples (sem cabeáalho ou sum†rio)
+37.12:/L Usa min£sculas
+37.20:Diret¢rio de %s
+37.21:<DIR>
+37.22:arquivo(s)
+37.23:bytes
+37.24:bytes livres
+
+# COPY
+38.0:Copia um ou mais arquivos para outro lugar.
+38.1:COPY [/A|/B] origem [/A|/B] [+origem [/A|/B] [+...]] [destino [/A|/B]] [/V]
+38.2:origem       Especifica o arquivo ou arquivos para copiar
+38.3:/A           Indica um arquivo de texto ASCII
+38.4:/B           Indica um arquivo bin†rio
+38.5:destino		  Especifica o diret¢rio e/ou arquivo para os novos arquivo(s)
+38.6:/V           Verifica se os novos arquivos s∆o gravados corretamente
+38.7:Para concatenar arquivos, especifique um £nico arquivo para o destino, mas\r\nm£ltiplos arquivos de origem (usando curingas ou o formato\r\narquivo1+arquivo2+arquivo3).
+38.8:NOTE: /A e /B n∆o s∆o opá‰es v†lidas (s∆o ignoradas), providos somente\r\npor motivos de compatibilidade. COPY sempre assume que os arquivos s∆o bin†rios.
+38.9:%u arquivos(s) copiado(s)
+
+# TRUENAME
+39.0:Returna um caminho ou nome de arquivo totalmente qualificado.
+39.1:TRUENAME [[drive:][caminho][arquivo]]
+
+# DOS ERRORS
+255.1:N£mero de funá∆o inv†lida
+255.2:Arquivo n∆o encontrado
+255.3:Caminho n∆o encontrado
+255.4:Excesso de arquivos abertos (sem manipuladores dispon°veis)
+255.5:Acesso negado
+255.6:Manipulador inv†lido
+255.7:Bloco de Controle de Mem¢ria destru°do
+255.8:Mem¢ria insuficiente
+255.9:Endereáo de bloco de mem¢ria inv†lido
+255.10:Ambiente inv†lido
+255.11:Formato inv†lido
+255.12:C¢digo de acesso inv†lido
+255.13:Dados inv†lidos
+255.15:Drive inv†lido
+255.16:Tentativa de remover o diret¢rio atual
+255.17:N∆o Ç o mesmo dispositivo
+255.18:N∆o h† mais arquivos
+255.19:Disco protegido contra gravaá∆o
+255.20:Unidade desconhecida
+255.21:Drive n∆o pronto
+255.22:Comando desconhecido
+255.23:Erro de dados (CRC)
+255.24:Tamanho da estrutura de solicitaá∆o errada
+255.25:Erro de busca
+255.26:Tipo de m°dia desconhecido (disco n∆o-DOS)
+255.27:Setor n∆o encontrado
+255.28:Impressora sem papel
+255.29:Falha de gravaá∆o
+255.30:Falha de leitura
+255.31:Falha geral
+255.32:Volaá∆o de compartilhamento
+255.33:Violaá∆o de bloqueio
+255.34:Mudanáa de disco inv†lida
+255.35:FCB indispon°vel
+255.36:Overflow no buffer de compartilhamento
+255.37:P†gina de c¢digo errada
+255.38:Imposs°vel completar operaá‰es de arquivo (EOF / fora da entrada)
+255.39:Espaáo em disco insuficiente
+255.80:Arquivo j† existe
+

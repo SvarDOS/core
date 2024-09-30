@@ -1,0 +1,314 @@
+#
+# SvarCOM translation file
+#
+# Language...: Polish
+# Authors....: Mateusz Viste
+# Last update: 17 Feb 2024
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Nieprawidíowa skíadnia
+0.2:Nieprawidíowy przeíÜcznik
+0.3:Nieprawidíowy format parametru
+0.4:Zbyt dußa iloûç parametr¢w
+0.5:Zíe polecenie lub nazwa pliku
+0.6:Nieprawidíowy parametr
+0.7:Brak wymaganego parametru
+0.8:Nieprawidíowy cel
+0.9:To polecenie nie jest dostëpne
+
+# the message below MUST be a two-letter upper-case string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:TN
+
+# SVARCOM HELP SCREEN
+1.0:Uruchamia interpreter polece§ SvarCOM.
+1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] polecenie]
+1.2:/D      Ignoruje AUTOEXEC.BAT (ma sens tylko przy /P)
+1.3:/E:nnn  Ustawia rozmiar ûrodowiska na nnn bajt¢w
+1.4:/P      Ustala nowy interpreter polece§ i wykonuje AUTOEXEC.BAT
+1.5:/C      Wykonuje podane polecenie i ko§czy sië
+1.6:/K      Wykonuje podane polecenie i dziaía dalej
+1.7:/Y      Wykonuje program wsadowy krok po kroku (tylko z /P, /K lub /C)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:WERSJA SVARCOM ULEGúA ZMIANIE. SYSTEM ZATRZYMANY. ZRESTARTUJ KOMPUTER.
+2.1:BúèD KRYTYCZNY: rmod_install() nie powiodío sië
+2.2:SvarCOM: wykryto przepeínienie stosu, usuniëto historië polece§ (to nie bug)
+
+# CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
+3.0:BúèD KRYTYCZNY
+3.1:BúèD ODCZYTU
+3.2:BúèD ZAPISU
+3.3:(P)rzerwij
+3.4:p(O)n¢w
+3.5:(I)gnoruj
+3.6:(Z)rezygnuj
+# THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
+3.9:POIZ
+
+# CLS
+10.0:Czyûci ekran.
+
+# CHCP
+11.0:Wyûwietla lub ustawia aktywnÜ stronë kodowÜ.
+11.1:CHCP [nnn]
+11.2:nnn  Numer strony kodowej
+11.3:Uruchom CHCP bez parametr¢w aby wyûwietliç numer bießÜcej strony kodowej.
+11.4:Nieprawidíowy numer strony kodowej
+11.5:NLSFUNC nie jest zainstalowany
+11.6:Nie zdoíano zmieniç strony kodowej
+11.7:Aktualna strona kodowa:
+
+# CD / CHDIR
+12.0:Wyûwietla lub zmienia bießÜcy katalog.
+12.1:CHDIR [dysk:][ûcießka]
+12.2:CHDIR[..]
+12.3:CD [dysk:][ûcießka]
+12.4:CD[..]
+12.5:.. Wskazuje, ße chcesz przejûç do katalogu nadrzëdnego.
+12.6:Wpisz CD dysk: to display the current directory in the specified drive.
+12.7:Wpisz CD bez parametr¢w aby wyûwietliç bießÜcy dysk i katalog.
+
+# CALL
+13.0:Wywoíuje program wsadowy (bat) z innego programu wsadowego.
+13.1:CALL [dysk:][ûcießka]nazwapliku [parametry-batch]
+
+# BREAK
+14.0:WíÜcza lub wyíÜcza rozszerzone sprawdzanie CTRL+C.
+14.1:Wpisz BREAK bez parametru aby wyûwietliç aktualne ustawienie BREAK.
+14.2:BREAK jest wyíÜczone
+14.3:BREAK jest wíÜczone
+
+# PAUSE
+15.0:Wstrzymuje przetwarzanie pliku wsadowego.
+15.1:Naciûnij dowolny klawisz aby kontynuowaç...
+
+# SHIFT
+16.0:Zmienia pozycjë argument¢w w pliku wsadowym:
+16.1:Argument %1 staje sië %0, argument %2 staje sië %1, itd.
+
+# GOTO
+17.0:Kieruje przetwarzanie programu wsadowego do wiersza o okreûlonej etykiecie.
+17.1:GOTO ETYKIETA
+17.2:ETYKIETA to ciÜg znak¢w wykorzystany przez program wsadowy jako etykieta.
+17.3:Etykieta znajduje sië w osobnym wierszu i jest poprzedzona dwukropkiem.
+17.10:Nie znaleziono etykiety
+
+# FOR
+18.0:Wykonuje okreûlone polecenie na kaßdym pliku sposr¢d zestawu plik¢w.
+18.1:FOR %zmienna IN (zestaw) DO polecenie [parametry]
+18.2:%zmienna    nazwa zmiennej.
+18.3:(zestaw)    Jeden lub wiëcej wzor¢w plik¢w lub komunikat¢w, oddzielone spacjÜ.
+18.4:polecenie   polecenie do wykonania na kaßdym z pasujÜcych plik¢w.
+18.5:parametry   parametry lub przeíÜczniki dla okreûlonego polecenia.
+18.6:Aby ußyç FOR w programie wsadowym, ußyj %%zmienna zamiast %zmienna.
+18.7:FOR nie moße byç zagnießdßone
+
+# VERIFY
+19.0:WíÜcza lub wyíÜcza sprawdzanie poprawnoûci zapisu plik¢w przez DOS.
+19.1:Wpisz VERIFY bez parametru aby wyûwietliç aktualne ustawienie.
+19.2:VERIFY jest wyíÜczone
+19.3:VERIFY jest wíÜczone
+19.4:Naleßy podaç ON lub OFF
+
+# VER
+20.0:Wyûwietla wersjë DOS.
+20.1:Wersja jÜdra DOS %u.%02u
+20.2:Wersja powíoki SvarCOM
+20.3:SvarCOM jest interpreterem polece§ dla system¢w DOS kompatybilnych z MS-DOS 5+.
+20.4:To oprogramowanie jest udostëpniane na zasadach licencji MIT.
+20.5:Rewizja %c
+20.6:DOS jest w %s
+20.7:pamiëci konwencjonalnej
+20.8:HMA
+20.9:ROM
+20.10:prawdziwa wersja %u.%02u
+20.11:Wersja jÜdra DR-DOS %02X%02X
+
+# TYPE
+21.0:Wyûwietla zawartoûç pliku tekstowego.
+21.1:TYPE [dysk:][ûcießka]nazwapliku
+
+# TIME
+22.0:Wyûwietla lub ustawia czas systemowy.
+22.1:TIME [czas]
+22.2:Wpisz TIME bez parametr¢w aby wyûwietliç aktualnÜ godzinë, wraz z zapytaniem\r\no podanie nowej. Wciûnij ENTER aby zachowaç bießÜcÜ godzinë.
+22.3:Aktualna godzina to
+22.4:Nieprawidíowy czas
+22.5:Podaj nowÜ godzinë:
+
+# SET
+23.0:Wyûwietla, ustawia lub usuwa zmiennÜ ûrodowiskowÜ DOS.
+23.1:SET [zmienna=[ciÜg znak¢w]]
+23.2:zmienna   Nazwa zmiennej ûrodowiskowej
+23.3:ciÜg zn.  CiÜg znak¢w przypisany do zmiennej
+23.4:Wpisz SET bez parametr¢w aby wyûwietliç obecne zmienne ûrodowiskowe.
+23.5:Brak miejsca w bloku pamiëci ûrodowiskowej
+
+# RD / RMDIR
+24.0:Usuwa (kasuje) katalog.
+24.1:RMDIR [dysk:]ûcießka
+24.2:RD [dysk:]ûcießka
+
+# REN / RENAME
+25.0:Zmienia nazwë jednego lub wielu plik¢w bÜd¶ katalogu.
+25.1:RENAME [dysk:][ûcießka]plik1 plik2
+25.2:REN [dysk:][ûcießka]plik1 plik2
+25.3:Uwaga: nie moßesz podaç nowego dysku lub ûcießki dla pliku2\r\nUßyj MOVE aby przenieûç pliki do innego katalogu.
+
+# REM
+26.0:Pozwala zapisaç komentarze (uwagi) w pliku wsadowym.
+26.1:REM [komentarz]
+
+# PATH
+27.0:Wyûwietla lub ustawia ûcießkë wyszukiwania plik¢w wykonywalnych.
+27.1:PATH [[dysk:]ûcießka[;...]]
+27.2:Wpisz PATH ; aby wyczyûciç ustawienia ûcießek wyszukiwania. DOS bëdzie\r\nw¢wczas przeszukiwaí wyíÜcznie bießÜcy katalog.
+27.3:Wpisz PATH bez parametr¢w, aby wyûwietliç bießÜcÜ ûcießkë.
+27.4:Brak ûcießki PATH
+
+# MD / MKDIR
+28.0:Tworzy katalog.
+28.1:MKDIR [dysk:]ûcießka
+28.2:MD [dysk:]ûcießka
+
+# LN
+29.0:Dodaje, usuwa lub wyûwietla wykonywalne linki.
+29.1:LN ADD nazwalinku katalogdocelowy
+29.2:LN DEL nazwalinku
+29.3:LN LIST [wz¢r]
+29.4:Nie znaleziono pasujÜcego pliku wykonywalnego w podanej ûcießce.
+29.5:%DOSDIR% nie jest ustawione
+
+# EXIT
+30.0:Ko§czy program COMMAND.COM (interpreter polece§).
+
+# ECHO
+31.0:Wyûwietla komunikaty lub wíÜcza bÜd¶ wyíÜcza wyûwietlanie wykonywanych polece§.
+31.1:ECHO [komunikat]
+31.2:Wpisz ECHO bez parametr¢w, aby wyûwietliç bießÜce ustawienie echa.
+31.3:ECHO jest wíÜczone
+31.4:ECHO jest wyíÜczone
+
+# DATE
+32.0:Wyûwietla lub ustawia datë systemowÜ.
+32.1:DATE [data]
+32.2:Wpisz DATE bez parametr¢w, aby wyûwietliç bießÜcÜ datë i zapytanie o nowÜ datë.\r\nNaciûnij ENTER, aby zachowaç të samÜ datë.
+32.3:Nieprawidíowa data
+32.4:Aktualna data to
+32.5:Podaj nowÜ datë:
+
+# PROMPT
+33.0:Zmienia znak zachëty polece§ systemu DOS.
+33.1:PROMPT [specyfikacja nowego znaku zachëty polece§]
+
+# VOL
+34.0:Wyûwietla etykietë woluminu dysku i numer seryjny, jeûli istniejÜ.
+34.1:VOL [dysk:]
+34.2:Wolumin w napëdzie %c nie ma etykiety
+34.3:Wolumin w napëdzie %c to %s
+34.4:Numer seryjny woluminu to %04X-%04X
+
+# IF
+35.0:Wykonuje przetwarzanie warunkowe w programach wsadowych.
+35.1:IF [NOT] ERRORLEVEL n polecenie
+35.2:IF [NOT] ciÜg1=ciÜg2 polecenie
+35.3:IF [NOT] EXIST nazwapliku
+35.4:NOT               wykonaj polecenie tylko jeûli warunek NIE jest speíniony
+35.5:ERRORLEVEL n      warunek: ostatni program zwr¢cií kod zako§czenia >= n
+35.6:ciÜg1==ciÜg2      warunek: ciÜgi muszÜ byç takie same
+35.7:EXIST nazwapliku  warunek: plik istnieje (dozwolone symbole wieloznaczne)
+35.8:polecenie         polecenie do wykonania, jeûli warunek jest speíniony
+
+# DEL / ERASE
+36.0:Usuwa jeden lub wiëcej plik¢w.
+36.1:DEL [dysk:][ûcießka]nazwapliku [/P]
+36.2:ERASE [dysk:][ûcießka]nazwapliku [/P]
+36.3:[dyske:][ûcießka]nazwapliku  Okreûla plik(i) do skasowania.
+36.4:/P  Prosi o potwierdzenie przed usuniëciem kaßdego pliku.
+36.5:Wszystkie pliki w katalogu zostanÜ usuniëte!
+36.6:Czy na pewno?
+36.7:UsunÜç?
+
+# DIR
+37.0:Wyûwietla listë plik¢w i podkatalog¢w w katalogu.
+37.1:DIR [dysk:][ûcießka][nazwapliku] [/P] [/W] [/A[:]atrybuty] [/O[:]sortowanie]]\r\n    [/S] [/B] [/L]
+37.2:/P Zatrzymuje sië po kaßdej informacji na ekranie
+37.3:/W Ußywa formatu szerokiej listy
+37.4:/A Wyûwietla pliki z okreûlonymi atrybutami:
+37.5:    D Katalogi                R Pliki tylko do odczytu   H Pliki ukryte
+37.6:    A Pliki do archiwizacji   S Pliki systemowe          - przedrostek negujÜcy
+37.7:/O Listuje pliki w posortowanej kolejnoûci:
+37.8:    N wedíug nazwy   S wedíug rozmiaru     E wedíug rozszerzenia
+37.9:    D wedíug daty    G najpierw katalogi   - przedrostek odwracajÜcy kolejnoûç
+37.10:/S Wyûwietla pliki w podanym katalogu i wszystkich podkatalogach
+37.11:/B Ußywa uproszczonego formatu (bez nagí¢wka i podsumowania)
+37.12:/L Ußywa maíych liter
+37.20:Katalog %s
+37.21:<KAT>
+37.22:plik(i)
+37.23:bajty
+37.24:bajty wolne
+
+# COPY
+38.0:Kopiuje jeden lub wiëcej plik¢w do innej lokalizacji.
+38.1:COPY [/A|/B] ¶r¢dío [/A|/B] [+¶r¢dío [/A|/B] [+...]] [cel [/A|/B]] [/V]
+38.2:¶r¢dío     Okreûla plik lub pliki, kt¢re majÜ byç skopiowane
+38.3:/A         Wskazuje plik tekstowy ASCII
+38.4:/B         Wskazuje plik binarny
+38.5:cel        Okreûla katalog i/lub nazwë nowego pliku(¢w)
+38.6:/V         Sprawdza, czy nowe pliki zostaíy poprawnie zapisane
+38.7:Aby poíÜczaç pliki, naleßy podaç pojedynczy plik jako cel, ale wiele plik¢w\r\n¶r¢díowych (ußywajÜc symboli wieloznacznych lub formatu plik1+plik2+plik3).
+38.8:UWAGA: /A i /B sÜ ignorowane, podane tylko ze wzglëdu na kompatybilnoûç.\r\nCOPY zakíada zawsze binaria.
+38.9:skopiowano %u plik(i)
+
+# TRUENAME
+39.0:Zwraca w peíni kwalifikowanÜ ûcießkë lub nazwë pliku.
+39.1:TRUENAME [dysk:][ûcießka]nazwapliku
+
+# LH / LOADHIGH
+40.0:úaduje program do pamiëci wyßszej.
+40.1:[dysk:][ûcießka]nazwapliku [parametry]
+40.2:parametry: argumenty wymagane przez program kt¢ry chcesz zaíadowaç.
+
+# DOS ERRORS
+255.1:Bíëdny numer funkcji
+255.2:Nie znaleziono pliku
+255.3:Nie znaleziono ûcießki
+255.4:Zbyt wiele otwartych plik¢w (brak dostëpnych uchwyt¢w)
+255.5:Brak dostëpu
+255.6:Nieprawidíowy uchwyt
+255.7:Zniszczony blok kontroli pamiëci
+255.8:NiewystarczajÜca pamiëç
+255.9:Nieprawidíowy adres bloku pamiëci
+255.10:Nieprawidíowe ûrodowisko
+255.11:Nieprawidíowy format
+255.12:Nieprawidíowy kod dostepu
+255.13:Nieprawidíowe dane
+255.15:Nieprawidíowy napëd
+255.16:Dokonano pr¢by usuniëcia bießÜcego katalogu
+255.17:Nie to samo urzÜdzenie
+255.18:Brak dalszych plik¢w
+255.19:Dysk chroniony przed zapisem
+255.20:Nieznana jednostka
+255.21:Napëd nie jest gotowy
+255.22:Nieznane polecenie
+255.23:BíÜd danych (CRC)
+255.24:Nieprawidíowa díugoûç struktury zapytania
+255.25:BíÜd wyszukiwania
+255.26:Nieznany typ noûnika (dysk niezgodny z DOS)
+255.27:Nie znaleziono sektora
+255.28:Brak papieru w drukarce
+255.29:BíÜd zapisu
+255.30:BíÜd odczytu
+255.31:Og¢lna awaria
+255.32:Naruszenie zasad wsp¢ídzielenia
+255.33:Naruszenie blokady
+255.34:Nieprawidíowa zmiana dysku
+255.35:Niedostëpne FCB
+255.36:Przepeínienie bufora udostëpniania
+255.37:Niezgodnoûç strony kodowej
+255.38:Nie moßna uko§czyç operacji na pliku (EOF / brak danych wejûciowych)
+255.39:Za maío miejsca na dysku
+255.80:Plik juß istnieje

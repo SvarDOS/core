@@ -1,0 +1,298 @@
+#
+# SvarCOM translation file
+#
+# Language.....: French
+# Authors......: Berki Yenign + fixes and adaptations by Mateusz Viste
+# Last update..: 17 Feb 2023
+#
+
+# GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
+0.1:Syntaxe invalide
+0.2:Commutateur invalide
+0.3:Format de paramŠtres invalide
+0.4:Trop de paramŠtres
+0.5:Mauvaise commande ou nom de fichier
+0.6:ParamŠtre invalide
+0.7:ParamŠtre requis manquant
+0.8:Destination invalide
+0.9:Cette commande n'est pas disponible
+
+# the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
+# that user can press to answer interactive "Yes/No" questions
+0.10:ON
+
+# SVARCOM HELP SCREEN
+1.0:D‚marre l'interpr‚teur de commandes SvarCOM.
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] commande]
+1.2:/D       Sauter le traitement d'AUTOEXEC.BAT (n'a de sens que avec /P)
+1.3:/E:nnn   D‚finit la taille de l'environnement sur nnn octets
+1.4:/P       Rend le nouvel interpr‚teur permanent et ex‚cute AUTOEXEC.BAT
+1.5:/C       Ex‚cute la commande sp‚cifi‚e et retourne
+1.6:/K       Ex‚cute la commande sp‚cifi‚e et continue … fonctionner
+1.7:/Y       Ex‚cute le programme batch pas … pas (seulement avec /P, /K ou /C)
+
+# VARIOUS SVARCOM MESSAGES
+2.0:LA VERSION DE SVARCOM A CHANG. SYSTÔME ARRÒT. REDMARREZ VOTRE ORDINATEUR.
+2.1:ERREUR FATALE : rmod_install() a ‚chou‚
+2.2:SvarCOM: d‚bordem. de pile d‚tect‚, historique effac‚e (ce n'est pas un bug)
+
+# CLS
+10.0:Efface l'‚cran.
+
+# CHCP
+11.0:Affiche ou d‚finit le num‚ro de page de code active.
+11.1:CHCP [nnn]
+11.2:nnn  Sp‚cifie un num‚ro de page de code
+11.3:Tapez CHCP sans paramŠtres pour afficher la page de code active.
+11.4:Num‚ro de page de code invalide
+11.5:NLSFUNC n'est pas install‚
+11.6:chec du changement de la page de code
+11.7:Page de code active :
+
+# CD / CHDIR
+12.0:Affiche le nom ou modifie le r‚pertoire courant.
+12.1:CHDIR [lecteur:][chemin]
+12.2:CHDIR[..]
+12.3:CD [lecteur:][chemin]
+12.4:CD[..]
+12.5:.. Sp‚cifique que vous voulez aller au r‚pertoire parent.
+12.6:Tapez CD lecteur: pour afficher le dossier courant dans le lecteur sp‚cifi‚.
+12.7:Tapez CD sans paramŠtre pour afficher le lecteur et dossier courants.
+
+# CALL
+13.0:Appelle un programme batch depuis un autre programme batch.
+13.1:CALL [lecteur:][chemin]nomfichier [paramŠtres-batch]
+
+# BREAK
+14.0:D‚finit ou efface la v‚rification de CTRL+C ‚tendu.
+14.1:Tapez BREAK sans paramŠtres pour afficher le r‚glage actuel de BREAK.
+14.2:BREAK est d‚sactiv‚
+14.3:BREAK est activ‚
+
+# PAUSE
+15.0:Suspend l'ex‚cution d'un script batch.
+15.1:Appuyez sur une touche pour continuer...
+
+# SHIFT
+16.0:Modifie la position des arguments dans un fichier batch :
+16.1:Argument %1 devient %0, argument %2 devient %1, etc.
+
+# GOTO
+17.0:Dirige le traitement batch vers une ligne ‚tiquet‚e dans le script batch.
+17.1:GOTO LABEL
+17.2:LABEL sp‚cifie une chaŒne texte utilis‚e dans le script batch comme ‚tiquette.
+17.3:Une ‚tiquette est sur une ligne propre et doit ˆtre pr‚c‚d‚e par deux-points.
+17.10:tiquette introuvable
+
+# FOR
+18.0:Ex‚cute une commande sp‚cifi‚e pour chaque fichier dans un jeu de fichiers.
+18.1:FOR %variable IN (set) DO commande [paramŠtres]
+18.2:%variable    un nom de paramŠtre rempla‡able.
+18.3:(set)        une ou plusieurs expressions s‚par‚s par des espaces.
+18.4:commande     la commande … ex‚cuter pour chaque fichier correspondant.
+18.5:paramŠtres   paramŠtres ou options pour la commande sp‚cifi‚e.
+18.6:Pour utiliser FOR dans un programme batch, utilisez %%variable au lieu de\r\n%variable.
+18.7:FOR ne peut pas ˆtre imbriqu‚
+
+# VERIFY
+19.0:Indique … DOS s'il faut v‚rifier que les fichiers ont ‚t‚ ‚crits correctement.
+19.1:Tapez VERIFY sans paramŠtres pour v‚rifier son r‚glage actuel.
+19.2:VERIFY est d‚sactiv‚
+19.3:VERIFY est activ‚
+19.4:Vous devez sp‚cifier ON ou OFF
+
+# VER
+20.0:Affiche la version de DOS.
+20.1:Version du noyau DOS %u.%02u
+20.2:Version du shell SvarCOM
+20.3:SvarCOM est un interpr‚teur pour les noyaux DOS compatibles avec MS-DOS 5+.
+20.4:Ce logiciel est distribu‚ sous les termes de la licence MIT.
+20.5:R‚vision %c
+20.6:DOS est en %s
+20.7:m‚moire basse
+20.8:HMA (zone m‚moire haute)
+20.9:ROM
+20.10:vraie version %u.%02u
+20.11:Version du noyau DR-DOS %02X%02X
+
+# TYPE
+21.0:Affiche le contenu d'un fichier texte.
+21.1:TYPE [lecteur:][chemin]nomfichier
+
+# TIME
+22.0:Affiche ou d‚finit l'heure du systŠme.
+22.1:TIME [heure]
+22.2:Tapez TIME sans paramŠtre pour afficher l'heure actuelle et une invite pour\r\nune nouvelle heure. Appuyez sur ENTRE pour conserver.
+22.3:L'heure actuelle est
+22.4:Heure invalide
+22.5:Entrez une nouvelle heure :
+
+# SET
+23.0:Affiche, d‚finit ou enlŠve des variables d'environnement DOS.
+23.1:SET [variable=[chaŒne]]
+23.2:variable  Sp‚cifie le nom de la variable d'environnement
+23.3:chaŒne    Sp‚cifie une s‚rie de caractŠres … attribuer … la variable
+23.4:Tapez SET sans paramŠtre pour afficher la variable actuelle.
+23.5:Pas assez d'espace disponible dans le bloc d'environnement
+
+# RD / RMDIR
+24.0:EnlŠve (efface) un r‚pertoire.
+24.1:RMDIR [lecteur:]chemin
+24.2:RD [lecteur:]chemin
+
+# REN / RENAME
+25.0:Renomme un ou plusieurs fichiers, ou un r‚pertoire.
+25.1:RENAME [lecteur:][chemin]nomfichier1 nomfichier2
+25.2:REN [lecteur:][chemin]nomfichier1 nomfichier2
+25.3:Notez que vous ne pouvez pas sp‚cifier un nouveau lecteur ou chemin pour votre\r\nfichier de destination. Utilisez MOVE pour d‚placer des fichiers d'un\r\nr‚pertoire … un autre.
+
+# REM
+26.0:Enregistre des commentaires (remarques) dans un fichier batch.
+26.1:REM [commentaire]
+
+# PATH
+27.0:Affiche ou d‚finit un chemin de recherche pour les fichiers ex‚cutables.
+27.1:PATH [[lecteur:]chemin[;...]]
+27.2:Tapez PATH ; pour effacer tous les r‚glages de chemin de recherche et indiquer\r\n… DOS de ne rechercher que dans le r‚pertoire courant.
+27.3:Tapez PATH sans paramŠtre pour afficher le chemin actuel.
+27.4:Pas de chemin
+
+# MD / MKDIR
+28.0:Cr‚e un r‚pertoire.
+28.1:MKDIR [lecteur:]chemin
+28.2:MD [lecteur:]chemin
+
+# LN
+29.0:Ajoute, efface ou affiche des liens ex‚cutables.
+29.1:LN ADD nomlien dossiercible
+29.2:LN DEL nomlien
+29.3:LN LIST [pattern]
+29.4:Aucun ex‚cutable correspondant n'a ‚t‚ trouv‚ sur le chemin indiqu‚.
+29.5:%DOSDIR% n'est pas d‚fini
+
+# EXIT
+30.0:Quitte le programme COMMAND.COM (interpr‚teur de commandes).
+
+# ECHO
+31.0:Affiche des messages ou active ou d‚sactive les ‚chos des commandes.
+31.1:ECHO [message]
+31.2:Tapez ECHO sans paramŠtres pour afficher le r‚glage actuel d'echo.
+31.3:ECHO est activ‚
+31.4:ECHO est d‚sactiv‚
+
+# DATE
+32.0:Affiche ou d‚finit la date du systŠme.
+32.1:DATE [date]
+32.2:Tapez DATE sans paramŠtre pour afficher la date actuelle et une invite pour\r\nune nouvelle. Appuyez sur ENTRE pour conserver la date actuelle.
+32.3:Date invalide
+32.4:La date actuelle est
+32.5:Entrez une nouvelle date :
+
+# PROMPT
+33.0:Modifie l'invite de commandes de DOS.
+33.1:PROMPT [nouvelle sp‚cification d'invite de commandes]
+
+# VOL
+34.0:Affiche l'‚tiquette du volume de disque et le num‚ro de s‚rie, s'il existent.
+34.1:VOL [lecteur:]
+34.2:Volume dans le lecteur %c n'a pas d'‚tiquette
+34.3:Volume dans le lecteur %c est %s
+34.4:Le num‚ro de s‚rie du volume est %04X-%04X
+
+# IF
+35.0:Effectue des traitements conditionnels dans les programmes batch.
+35.1:IF [NOT] ERRORLEVEL num commande
+35.2:IF [NOT] chaŒne1==chaŒne2 commande
+35.3:IF [NOT] EXIST nomfichier commande
+35.4:NOT              la commande est ex‚cut‚e si la condition n'est PAS remplie
+35.5:ERRORLEVEL num   condition : le dernier programme a retourn‚ un code >= num
+35.6:string1==string2 condition : les deux chaŒnes doivent ˆtre identiques
+35.7:EXIST filename   condition : le nom de fichier existe (jokers accept‚s)
+35.8:command          commande … ex‚cuter si la condition est remplie
+
+# DEL
+36.0:Efface un ou plusieurs fichiers.
+36.1:DEL [lecteur:][chemin]nomfichier [/P]
+36.2:ERASE [lecteur:][chemin]nomfichier [/P]
+36.3:[lecteur:][chemin]nomfichier  Sp‚cifie le(s) fichier(s) … effacer.
+36.4:/P  Demande confirmation avant d'effacer chaque fichier.
+36.5:Tous les fichiers contenus dans le r‚pertoire seront effac‚s !
+36.6:Òtes-vous s–r ?
+36.7:Effacer ?
+
+# DIR
+37.0:Affiche une liste de fichiers et de sous-r‚pertoires dans un r‚pertoire.
+37.1:DIR [lecteur:][chemin][nomfichier] [/P] [/W] [/A[:]attributs]\r\n    [/O[[:]ordredetri]] [/S] [/B] [/L]
+37.2:/P Effectue une pause aprŠs chaque ‚cran d'information
+37.3:/W Utilise le format de liste large
+37.4:/A Affiche les fichiers avec les attributs sp‚cifi‚s :
+37.5:    D R‚pertoires            R Fichiers lecture seule H Fichiers cach‚s
+37.6:    A Prˆt pour archivage    S Fichiers systŠme      - pr‚fixe signifiant "non"
+37.7:/O Liste les fichiers dans l'ordre indiqu‚ :
+37.8:    N par nom                S par taille             E par extension
+37.9:    D par date               G grouper les r‚p       - pr‚fixe inverser ordre"
+37.10:/S Afficher les fichiers dans le dossier sp‚cifi‚ et tous les sous-dossiers
+37.11:/B Utilise le fomat d‚pouill‚ (pas d'informations d'en-tˆte ou de r‚sum‚)
+37.12:/L Utilise des caractŠres minuscules
+37.20:R‚pertoire de %s
+37.21:<RP>
+37.22:fichier(s)
+37.23:octets
+37.24:octets libres
+
+# COPY
+38.0:Copie un ou davantage de fichiers … un autre endroit.
+38.1:COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]
+38.2:source       Sp‚cifie le ou les fichiers … copier
+38.3:/A           Indique un fichier texte ASCII
+38.4:/B           Indique un fichier binaire
+38.5:destination  Sp‚cifie le dossier et/ou nom de fichier pour le nouveau fichier
+38.6:/V           V‚rifie que les nouveaux fichiers sont ‚crits correctement
+38.7:Pour concatener des fichiers, sp‚cifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant soit des jokers, soit le format\r\nfichier1+fichier2+fichier3).
+38.8:NOTE: /A et /B sont des no-ops (ignor‚s), fournis pour la compatibilit‚.\r\nCOPY considŠre toujours les fichiers comme ‚tant des binaires.
+38.9:%u fichier(s) copi‚(s)
+
+# TRUENAME
+39.0:Retourne un chemin ou un nom de fichier pleinement qualifi‚.
+39.1:TRUENAME [[lecteur:][chemin][nomfichier]]
+
+# DOS ERRORS
+255.1:Num‚ro de fonction invalide
+255.2:Fichier introuvable
+255.3:Chemin introuvable
+255.4:Trop de fichiers ouverts (plus d'indicateur disponible)
+255.5:AccŠs refus‚
+255.6:Indicateur invalide
+255.7:Bloc de contr“le de m‚moire d‚truit
+255.8:M‚moire insuffisante
+255.9:Adresse de bloc de m‚moire invalide
+255.10:Environnement invalide
+255.11:Format invalide
+255.12:Code d'accŠs invalide
+255.13:Donn‚es invalides
+255.15:Lecteur invalide
+255.16:Tentative d'effacement du r‚pertoire courant
+255.17:Pas le mˆme appareil
+255.18:Plus de fichier
+255.19:Le disque est prot‚g‚ en ‚criture
+255.20:Unit‚ inconnue
+255.21:Le lecteur n'est pas prˆt
+255.22:Commande inconnue
+255.23:Erreur de donn‚es (CRC)
+255.24:Mauvaise taille de structure de requˆte
+255.25:Erreur de recherche
+255.26:Type de media inconnu (disque non-DOS)
+255.27:Secteur introuvable
+255.28:Imprimante … court de papier
+255.29:D‚faut d'‚criture
+255.30:D‚faut de lecture
+255.31:chec g‚n‚ral
+255.32:Violation de partage
+255.33:Violation de verrou
+255.34:Changement de disque invalide
+255.35:FCB indisponible
+255.36:D‚passement de tampon de partage
+255.37:D‚faut de correspondance des pages de code
+255.38:Impossible de terminer les op‚rations de fichier (EOF / entr‚e termin‚e)
+255.39:Espace disque insuffisant
+255.80:Ce fichier existe d‚j…

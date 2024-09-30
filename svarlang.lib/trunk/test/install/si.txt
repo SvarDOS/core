@@ -1,0 +1,45 @@
+#
+# This is a localization file for the SvarDOS INSTALL program
+#
+# Language..: Slovene
+# Translator: Matej Horvat
+#
+
+### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
+0.0:NAMESTITEV SVARDOS
+0.1:Namesti SvarDOS
+0.2:Izhod v DOS
+0.3:Samodejno ustvari particijo
+0.4:Zaßeni program za particioniranje FDISK
+0.5:Pritisnite tipko...
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:Gor/dol = izbira | Enter = potrdi izbiro | Esc = prejÁnji zaslon
+0.11:Gor/dol = izbira | Enter = potrdi izbiro | Esc = izhod v DOS
+
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
+1.0:DobrodoÁli v SvarDOS!
+1.1:Izberite svoj jezik s spodnjega seznama:
+1.5:SvarDOS podpira razporede tipkovnic veü drßav. Izberite, katerega ßelite uporabljati.
+
+### WELCOME SCREEN ###
+2.0:Ta program bo namestil SvarDOS - brezplaüen in odprtokoden operacijski sistem, zdrußljiv z MS-DOS, ki uporablja jedro projekta FreeDOS. SvarDOS vkljuüuje veliko aplikacij tretjih oseb.\n\nOPOZORILO: ¨e ima raüunalnik ße nameÁüen operacijski sistem, tega morda ne bo veü mogoüe zagnati, ko boste namestili SvarDOS.
+
+### DISK SETUP ###
+3.0:NAPAKA: Pogon ni bil najden. Morda je treba najprej ustvariti particijo na trdem disku. Prosimo, ustvarite vsaj eno particijo, da lahko namestite SvarDOS. Velika mora biti vsaj %d MB.\n\nUstvarite jo lahko sami s programom FDISK, lahko pa jo program za namestitev ustvari samodejno. Namestitev lahko tudi prekinete in uporabite svoj program za particioniranje.
+3.1:Raüunalnik se bo zdaj ponovno zagnal.
+3.3:NAPAKA: Pogon %c: ni formatiran.
+3.4:NAPAKA: Pogon %c: je premajhen. SvarDOS zahteva vsaj %d MB prostora.
+3.5:NAPAKA: Pogon %c: ni prazen. SvarDOS mora biti nameÁüen na prazen pogon.\n\nLahko ga formatirate in s tem izpraznite, vendar bo to IZBRISALO VSE PODATKE na njem.
+3.6:Namestitev operacijskega sistema SvarDOS na pogon %c: se bo zaüela.
+
+### PACKAGES INSTALLATION ###
+# example: "Installing package 4/50: FDISK"
+4.0:NameÁüanje paketa %d/%d: %s
+
+### END SCREEN ###
+5.0:Raüunalnik se bo zdaj ponovno zagnal.
+5.1:Prosimo, odstranite namestitveni medij.
+5.2:SvarDOS je nameÁüen. Restart your computer now.
+
+### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
+6.0:DobrodoÁli v SvarDOS! ¨e potrebujete pomoü, vtipkajte HELP.

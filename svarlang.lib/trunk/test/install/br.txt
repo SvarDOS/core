@@ -1,0 +1,47 @@
+#
+# This is a localization file for the SvarDOS INSTALL program
+#
+# Language..: Portuguese
+# Translator: Luzem†rio Dantas
+#
+
+### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
+0.0:INSTALAÄ«O DO SVARDOS
+0.1:Instalar SvarDOS
+0.2:Sair para o DOS
+0.3:Criar uma partiá∆o automaticamente
+0.4:Rodar a ferramenta de particionamento FDISK
+0.5:Pressione qualquer tecla...
+0.7:Formatar drive %c:
+# Every string below must be at most 78 characters long! (used in status bar)
+0.10:Up/Down = Selecionar   | Enter = Escolher opá∆o | ESC = Tela anterior
+0.11:Up/Down = Selecionar   | Enter = Escolher opá∆o | ESC = Sair para o DOS
+
+### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
+1.0:Bem vindo ao SvarDOS
+1.1:Por favor selecione seu idioma preferido na lista abaixo:
+1.5:O SvarDOS suporta diferentes layouts de teclado. Escolha o layout de teclado desejado:
+
+### WELCOME SCREEN ###
+2.0:Vocà est† pronto para instalar o SvarDOS: um sistema operacional livre, gratuito, compat°vel com o MS-DOS, e baseado no FreeDOS. O SvarDOS vem com uma variedade de aplicaá‰es de terceiros.\n\nALERTA: Se seu PC tiver outro sistema operacional instalado, pode ser que n∆o seja mais poss°vel iniciar por ele quando o SvarDOS for instalado.
+
+### DISK SETUP ###
+3.0:ERRO: O drive n∆o foi encontrado. Talvez seu disco r°gido precise ser particionado primeiro. Por favor, crie pelo menos uma partiá∆o prim†ria no seu disco r°gido, assim o SvarDOS poder† ser instalado nele. Note que o SvarDOS requer pelo menos %d MiB de epaáo em disco dispon°vel.\n\nVocà pode usar a ferramenta de particionamento FDISK para criar a partiá∆o necess†ria manualmente, ou pode deixar o instalador criar a partiá∆o automaticamente. Vocà tambÇm pode abortar a instalaá∆o para usar o gerenciador de partiá‰es de sua escolha.
+3.1:Seu computador ir† reiniciar agora.
+3.3:ERRO: O drive %c: aparenta n∆o estar formatado.
+3.4:ERRO: O drive %c: n∆o tem espaáoo suficiente! O SvarDOS requer um disco de pelo menos %d MiB.
+3.5:ERRO: O drive %c: n∆o est† vazio. O SvarDOS deve ser instalado em um disco vazio.\n\nVocà pode formatar o disco agora, para torn†-lo vazio. Note contudo que ISSO IRµ APAGAR TODOS OS DADOS ATUAIS no seu disco.
+3.6:A instalaá∆o do SvarDOS em %c: est† pronta para comeáar.
+
+### PACKAGES INSTALLATION ###
+# example: "Installing package 4/50: FDISK"
+4.0:Instalando pacote %d/%d: %s
+4.1:*** INSIRA O DISCO QUE CONTêM O ARQUIVO NECESSµRIO E PRESSIONE QUALQUER TECLA ***
+
+### END SCREEN ###
+5.0:Seu computador ir† reiniciar agora.
+5.1:Por favor remova o disco de instalaá∆o do drive.
+5.2:A instalaá∆o do SvarDOS terminou. Por favor reinicie seu computador agora.
+
+### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
+6.0:Bem vindo ao SvarDOS! Digite 'HELP' se precisar de ajuda.
