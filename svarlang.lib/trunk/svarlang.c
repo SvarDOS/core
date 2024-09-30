@@ -184,6 +184,8 @@ int svarlang_load(const char *fname, const char *lang) {
     unsigned short compressedsize = buff16[1] / 2;
     unsigned short i;
     char *dst = svarlang_mem;
+    unsigned char rawwords = 0; /* number of uncompressible words */
+
     for (i = 0; i < compressedsize; i++) {
       /* read a word token */
       if (FREAD(fd, buff16, 2) != 2) {
@@ -193,15 +195,31 @@ int svarlang_load(const char *fname, const char *lang) {
 
       /* token format is LLLL OOOO OOOO OOOO, where:
        * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
-       * LLLL is the number of bytes (-1) that have to be copied from the offset
-       * if the token is > 256 then it represents a literal (single) byte
+       * LLLL is the number of bytes (-1) that have to be copied from the offset.
+       *
+       * However, if LLLL is zero then the token's format is different:
+       * 0000 RRRR BBBB BBBB
+       *
+       * The above form occurs when uncompressible data is encountered:
+       * BBBB BBBB is the literal value of a byte to be copied
+       * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
        */
 
+      /* raw word? */
+      if (rawwords != 0) {
+        unsigned short *dst16 = (void *)dst;
+        *dst16 = buff16[0];
+        dst += 2;
+        rawwords--;
+
       /* literal byte? */
-      if ((buff16[0] & 0xFF00) == 0) {
-        *dst = buff16[0];
+      } else if ((buff16[0] & 0xF000) == 0) {
+        *dst = buff16[0] & 0xff;
         dst++;
-      } else { /* backreference */
+        rawwords = buff16[0] >> 8; /* number of RAW words that are about to follow */
+
+      /* else it's a backreference */
+      } else {
         char *src = dst - (buff16[0] & 0x0FFF) - 1;
         buff16[0] >>= 12;
         for (;;) {

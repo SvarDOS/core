@@ -11,14 +11,23 @@
  *
  * === COMPRESSION ===========================================================
  * The compression scheme is very simple. It is applied only to strings (ie.
- * not the dictionnary) and it is basically a stream of 16-bit values (WORDs),
+ * not the dictionnary) and it is basically a stream of 16-bit words (tokens).
+ *
+ * Token format is LLLL OOOO OOOO OOOO, where:
+ * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
+ * LLLL is the number of bytes (-1) that have to be copied from the offset.
+ *
+ * However, if LLLL is zero then the token's format is different:
+ * 0000 RRRR BBBB BBBB
+ *
+ * The above form occurs when uncompressible data is encountered:
+ * BBBB BBBB is the literal value of a byte to be copied
+ * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
+ *
  * where each WORD value contains the following bits "LLLL OOOO OOOO OOOO":
  *
  * OOOO OOOO OOOO = a backreference offset ("look that many bytes back")
  * LLLL = the number of bytes to copy from the backreference
- *
- * Special case: a WORD that is smaller than 256 represents a single literal
- * byte.
  *
  * To recognize a compressed lang block one has to look at the id of the block
  * (16-bit language id). If its highest bit is set (0x8000) then the lang block
@@ -350,11 +359,47 @@ static int svl_write_header(unsigned short num_strings, FILE *fd) {
 }
 
 
+
+/* write qlen literal bytes into dst, returns amount of "compressed" bytes */
+static unsigned short mvcomp_litqueue_dump(unsigned short **dst, const unsigned char *q, unsigned short qlen) {
+  unsigned short complen = 0;
+
+  AGAIN:
+
+  /* are we done? (also take care of guys calling me in for jokes) */
+  if (qlen == 0) return(complen);
+
+  qlen--; /* now it's between 0 and 30 */
+  /* write the length and first char */
+  **dst = ((qlen / 2) << 8) | q[0];
+  *dst += 1;
+  q++;
+  complen += 2;
+
+  /* anything left? */
+  if (qlen == 0) return(complen);
+
+  /* write the pending words */
+  if (qlen > 1) {
+    memcpy(*dst, q, (qlen/2)*2);
+    *dst += qlen / 2;
+    q += (qlen / 2) * 2;
+    complen += (qlen / 2) * 2;
+    qlen -= (qlen / 2) * 2;
+  }
+
+  /* one byte might still be left if it did not fit inside a word */
+  goto AGAIN;
+}
+
+
 /* mvcomp applies the MV-COMPRESSION algorithm to data and returns the compressed size */
 static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) {
   unsigned short complen = 0;
   unsigned short *dst = (void *)dstbuf;
   unsigned short bytesprocessed = 0;
+  unsigned char litqueue[32];
+  unsigned char litqueuelen = 0;
 
   /* read src byte by byte, len times, each time look for a match of 15,14,13..2 chars in the back buffer */
   while (len > 0) {
@@ -376,22 +421,39 @@ static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) 
       }
     }
 
-    /* if here: no match found, write a literal byte */
-    *dst = *src;
-    dst++;
+    /* if here: no match found, write a literal byte to queue */
+    litqueue[litqueuelen++] = *src;
     src++;
     bytesprocessed++;
     len--;
-    complen += 2;
+
+    /* dump literal queue to dst if max length reached */
+    if (litqueuelen == 31) {
+      complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
+      litqueuelen = 0;
+    }
     continue;
 
     FOUND: /* found a match of matchlen bytes at -offset */
+
+    /* dump awaiting literal queue to dst first */
+    if (litqueuelen != 0) {
+      complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
+      litqueuelen = 0;
+    }
+
     *dst = ((matchlen - 1) << 12) | (offset - 1);
     dst++;
     src += matchlen;
     bytesprocessed += matchlen;
     len -= matchlen;
     complen += 2;
+  }
+
+  /* dump awaiting literal queue to dst first */
+  if (litqueuelen != 0) {
+    complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
+    litqueuelen = 0;
   }
 
   return(complen);
