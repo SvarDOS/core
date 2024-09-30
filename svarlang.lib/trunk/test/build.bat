@@ -15,6 +15,10 @@ cd fdisk
 del ..\fdisk.lng
 copy out.lng ..\fdisk.lng
 del out.lng
+
+del ..\fdisk_de.lng
+..\..\tlumacz de
+copy out.lng ..\fdisk_de.lng
 cd ..
 
 cd tree
