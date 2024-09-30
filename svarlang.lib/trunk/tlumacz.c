@@ -404,11 +404,21 @@ static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) 
   /* read src byte by byte, len times, each time look for a match of 15,14,13..2 chars in the back buffer */
   while (len > 0) {
     unsigned short matchlen;
+    unsigned short minmatch;
     unsigned short offset;
     matchlen = 16;
     if (len < matchlen) matchlen = len;
 
-    for (; matchlen > 1; matchlen--) {
+    /* look for a minimum match of 2 bytes, unless I have some pending literal bytes
+     * awaiting, in which case I am going through a new data pattern and it is more
+     * efficient to wait for a 3-bytes match before breaking the literal string */
+    if (litqueuelen != 0) {
+      minmatch = 3;
+    } else {
+      minmatch = 2;
+    }
+
+    for (; matchlen >= minmatch; matchlen--) {
       /* start at -matchlen and try to match something moving backward */
       unsigned short maxoffset = 4096;
       if (maxoffset > bytesprocessed) maxoffset = bytesprocessed;
