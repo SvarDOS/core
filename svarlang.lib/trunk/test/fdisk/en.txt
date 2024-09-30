@@ -1,0 +1,408 @@
+#
+# FDISK IN ENGLISH
+#
+
+
+##############################################################################
+# HELP SCREEN                                                                #
+##############################################################################
+
+0.0:Syntax: FDISK [<drive#>] [commands]...
+0.1:  no argument       Runs in interactive mode
+0.2:  /INFO             Displays partition information of <drive#>
+0.3:  /REBOOT           Reboots the Computer
+0.4:\t
+0.10:Commands to create and delete partitions:
+0.11:    <size> is a number for megabytes or MAX for maximum size
+0.12:           or <number>,100 for <number> to be in percent
+0.13:    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given
+0.14:\t
+0.20:  /PRI:<size> [/SPEC:<type#>]              Creates a primary partition
+0.21:  /EXT:<size>                              Creates an extended DOS partition
+0.22:  /LOG:<size> [/SPEC:<type#>]              Creates a logical drive
+0.23:  /PRIO,/EXTO,/LOGO                        same as above, but avoids FAT32
+0.24:  /AUTO                                    Automatically partitions the disk
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition
+0.27:           | /NUM:<part#>}                 ...logical drives start at /NUM=5
+0.29:  /DELETEALL                               Deletes all partitions from <drive#>
+0.30:\t
+0.31:Setting active partitions:
+0.32:  /ACTIVATE:<partition#>                   Sets <partition#> active
+0.33:  /DEACTIVATE                              Deactivates all partitions
+0.34:\t
+0.40:MBR (Master Boot Record) management:
+0.41:  /CLEARMBR                Deletes all partitions and boot code
+0.42:  /LOADMBR                 Loads part. table and code from "boot.mbr" into MBR
+0.43:  /SAVEMBR                 Saves partition table and code into file "boot.mbr"
+0.44:\t
+0.50:MBR code modifications leaving partitions intact:
+0.51:  /IPL                     Installs the standard boot code into MBR <drive#>
+0.52:                           ...same as /MBR and /CMBR for compatibility
+0.53:  /SMARTIPL                Installs DriveSmart IPL into MBR <drive#>
+0.54:  /LOADIPL                 Writes 440 code bytes from "boot.mbr" into MBR
+0.55:\t
+0.60:Advanced partition table modification:
+0.61:  /MODIFY:<part#>,<type#>                    Changes partition type to <type#>
+0.62:                                             ...logical drives start at "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>               Moves primary partitions
+0.64:  /SWAP:<1stpart#>,<2ndpart#>                Swaps primary partitions
+0.65:\t
+0.70:For handling flags on a hard disk:
+0.71:  /CLEARFLAG[{:<flag#>} | /ALL}]             Resets <flag#> or all on <drive#>
+0.72:  /SETFLAG:<flag#>[,<value>]                 Sets <flag#> to 1 or <value>
+0.73:  /TESTFLAG:<flag#>[,<value>]                Tests <flag#> for 1 or <value>
+0.74:\t
+0.80:For obtaining information about the hard disk(s):
+0.81:  /STATUS       Displays the current partition layout
+0.82:  /DUMP         Dumps partition information from all hard disks(for debugging)
+0.83:\t
+0.90:Interactive user interface switches:
+0.91:  /UI           Always starts UI if given as last argument
+0.92:  /MONO         Disables text attributes (bright, blinking text)
+0.93:  /FPRMT        Prompts for FAT32/FAT16 in interactive mode
+0.94:  /XO           Enables extended options
+0.95:\t
+0.100:Compatibility options:
+0.101:  /X            Disables ext. INT 13 and LBA for the following commands
+0.102:\t
+0.200:This program is Copyright %s by Brian E. Reifsnyder and
+0.201:The FreeDOS Project under the terms of the GNU General Public License,
+0.202:version 2.
+0.203:\t
+0.204:This program comes as-is and without warranty of any kind. The author of
+0.205:this software assumes no responsibility pertaining to the use or mis-use of
+0.206:this software. By using this software, the operator is understood to be
+0.207:agreeing to the terms of the above.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:\e[5;5HFDISK is capable of using large disk support to allow you to
+1.1:    create partitions that are greater than 2,048 MB by using FAT32
+1.2:    partitions. If you enable large disk support, any partitions or
+1.3:    logical drives greater than 512 MB will be created using FAT32.
+1.4:    IMPORTANT: If you enable large disk support, some operating systems
+1.5:    will be unable to access the partitions and logical drives that are
+1.6:    over 512 MB in size.
+1.7:\e[5;18HDo you want to use large disk (FAT32) support (Y/N)....?
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:You \e[1mMUST\e[22m restart your system for your changes to take effect.
+2.1:Any drives you have created or changed must be formatted \e[1mAFTER\e[22m you restart.
+2.2:System will now restart
+2.3:Press any key when ready . . .
+
+
+##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:FDISK Options
+3.1:Create DOS partition or Logical DOS Drive
+3.2:Set Active partition
+3.3:Delete partition or Logical DOS Drive
+3.4:Display partition information
+3.5:Display / Modify partition information
+3.6:Change current fixed disk drive
+3.7:MBR maintenance
+3.8:Abort changes and exit
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Create DOS Partition or Logical DOS Drive
+4.1:Create Primary DOS Partition
+4.2:Create Extended DOS Partition
+4.3:Create Logical DOS Drive(s) in the Extended DOS Partition
+
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Delete DOS Partition or Logical DOS Drive
+5.1:Delete Primary DOS Partition
+5.2:Delete Extended DOS Partition
+5.3:Delete Logical DOS Drive(s) in the Extended DOS Partition
+5.4:Delete Non-DOS Partition
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:MBR Maintenance
+6.1:Create BootEasy MBR (disabled)
+6.2:Load MBR (partitions and code) from saved file
+6.3:Save the MBR (partitions and code) to a file
+6.4:Remove boot code from the MBR
+
+
+##############################################################################
+# FDISKIO.C                                                                  #
+##############################################################################
+
+7.0:\nThe hard drive has already been partitioned.\n
+7.1:\nThe "boot.mbr" file has not been found.\n
+7.3:Error encountered on line %d of the "fdisk.ini" file.\n
+7.4:\nError reading sector.\n
+7.5:\nSector flagging functions have been disabled.\n
+7.6:Creating Drive Smart MBR for disk %d\n
+
+
+##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nSyntax Error\n\nProgram Terminated\n
+8.1:\nError clearing flag.\n
+8.2:\nFlag %d has been cleared.\n
+8.3:\nInvalid partition size specified.\n
+8.4:\nExtended partition already exists.\n
+8.5:\nError creating extended partition.\n
+8.7:\nNo usable extended partition found.\n
+8.8:\nError creating logical drive.\n
+8.10:\nError creating primary partition.\n
+8.11:\nprimary partition # (%ld) must be 1..4.\n
+8.12:\nNo partition to delete found.\n
+8.13:\n%d primary partitions found, you must specify number to delete.\n
+8.14:\nError deleting primary partition.\n
+8.15:\nError deleting extended partition.\n
+8.16:\nLogical drive number %d is out of range.\n
+8.17:\nPartition number is out of range.\n
+8.18:\nInvalid delete argument.\n
+8.19:\nError deleting logical drive.\n
+8.20:\nNew partition type is out of range.\n
+8.21:\nError modifying partition type.\n
+8.22:\nSource partition number is out of range.\n
+8.23:\nDestination partition number is out of range.\n
+8.24:\nError moving partition slot.\n
+8.25:\nInvalid flag number.\n
+8.26:\nFlag value is out of range.\n
+8.27:\nError setting flag.\n
+8.28:\nFlag %d has been set to %d.\n
+8.29:Fixed Disk Drive Status
+8.30:\nError swapping partitions.\n
+8.31:\nFlag %d is set to %d.\n
+8.32:\nFlag %d is not set to %d.\n
+8.34:\n<%s> should be a digit; terminated\n
+8.35:\nmore than one drive specified; terminated\n
+8.36:\n<%s> should start with '-' or '/'; terminated\n
+8.37:\n<%s> ':' expected; terminated\n
+8.38:\n<%s> ',' expected; terminated\n
+8.39:\n<%s> expected end of string; terminated\n
+8.40:\nInvalid drive designation.\n
+8.41:\nAll flags have been cleared.\n
+
+
+##############################################################################
+# USERINT0.C, USERINT1.C                                                     #
+##############################################################################
+
+9.0:Current fixed disk drive:
+9.1:Enter choice:
+9.2:Choose one of the following:
+9.3:sectors, geometry
+9.4:No partitions defined.
+9.5:\nLargest continuous free space for primary partition = %lu MBytes\n
+9.6:\nContents of Extended DOS Partition:\n
+9.7:\nLargest continuous free space in extended partition = %lu MBytes\n
+9.8:    -------- unusable ---------
+9.9:(1 Mbyte = 1048576 bytes)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nPartition   Status   Mbytes   System           Usage    Start CHS       End CHS\n
+9.11:Drv Volume Label  Mbytes  System          Usage    Start CHS       End CHS\n
+9.12:Disk   Drv   Mbytes    Free  Usage
+
+9.13:No space to create a DOS partition.
+9.14:Extended DOS Partition already exists.
+9.15:Cannot create Logical DOS Drive without\n    an Extended DOS Partition on the current drive.
+9.16:No Primary DOS Partition to delete.
+9.17:No Extended DOS Partition to delete.
+9.18:No Logical DOS Drive(s) to delete.
+9.19:No Non-DOS Partition to delete.
+9.20:is unusable!
+9.21:No partitions to delete.
+9.22:\e[1mWARNING!\e[22m No partitions are set active - disk 1 is not startable unless\n    a partition is set active
+9.23:  \e[1m%lu\e[22m Mbytes
+
+
+##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+# Delete logical partition
+10.0:Data in the deleted Non-DOS Partition will be lost.\n    What Non-DOS Partition do you want to delete?
+10.1:Not a partition!
+10.2:Refusing to delete DOS partition!
+10.3:Non-DOS Partition deleted.
+10.4:Error deleting Non-DOS Partition!
+
+# Display extended partition
+10.5:No logical drives defined.
+10.6:Total Extended Partition size is %lu Mbytes (1 Mbyte = 1048576 bytes)
+
+# Display primary partitions
+10.7:No partitions defined.
+10.8:Total disk space is %lu Mbytes (1 Mbyte = 1048576 bytes)
+
+# Table headers
+10.10:Partition  Status  Type     Volume Label   Mbytes  System          Usage
+10.11:Partition   Status   Mbytes  Description      Usage  Start Cyl  End Cyl
+10.12:Drv Volume Label  Mbytes System   Usage
+
+# Delete extended partition
+10.20:\e[1;5mWARNING!\e[22;25m Data in the deleted Extended DOS Partition and its\n    Logical Partitions will be lost. Continue (Y/N)...?
+10.21:Extended DOS Partition deleted
+
+# Delete logical drives
+10.30:\e[1;5mWARNING!\e[22;25m Data in a deleted Logical DOS Drive will be lost.\n    What drive do you want to delete...............................?
+10.31:Logical drive deleted
+10.32:Error deleting logical drive!
+
+# Delete primary partition
+10.40:\e[1;5mWARNING!\e[22;25m Data in the deleted Primary DOS Partition will be lost.\n    What primary partition do you want to delete...?
+10.41:Primary DOS Partition deleted
+10.42:Error deleting primary DOS Partition!
+10.43:Refusing to delete extended partition!
+10.44:Not a DOS partition!
+
+# Set active partition
+10.50:No partitions to make active.
+10.51:Enter the number of the partition you want to make active...........:
+10.52:%d is not a choice. Please enter a valid choice.
+10.53:The only startable partition on Drive %d is already set active.
+10.54:Partition %d was activated.
+
+# Create partition
+10.60:Do you wish to use the maximum available size for a Primary DOS Partition\n    and make the partition active (Y/N).....................?
+10.61:Do you wish to use the maximum available size for a Primary DOS Partition\n    (Y/N)...................................................?
+10.62:This drive is a FAT32 by default, switch to FAT16 (Y/N)?
+10.63:Maximum space available for partition is \e[1m%lu\e[22m Mbytes
+10.64:Enter partition size in Mbytes or percent (%%) of disk space to\n    create a Primary DOS Partition.....:
+10.65:Enter partition size in Mbytes or percent (%%) of disk space to\n    create an Extended DOS Partition.....:
+10.66:Primary DOS Partition created
+10.67:Extended DOS Partition created
+
+# Create logical partition
+10.70:Logical DOS Drive created, drive letters changed or added
+10.71:Maximum number of Logical DOS Drives installed
+10.72:Enter logical drive size in Mbytes or percent (%%) of\n    extended partition size...:
+10.73:All available space in the Extended DOS Partition\n    is assigned to logical drives.
+
+# Display partition info
+10.80:The Extended DOS Partition contains Logical DOS Drives.\n    Do you want to display the logical drive information (Y/N)......?
+10.81:Optional:  Type the number of the partition to modify.
+10.82:Enter the number of the partition you want to modify (1-4)...?
+10.83:Display Logical DOS Drive Information
+10.84:Enter the character of the logical drive you want to modify...?
+
+# List partition types
+10.90:List Partition Types
+10.91:Press any key to continue . . .
+
+# Display / modify partition
+10.100:Display/Modify Logical Drive Information
+10.101:Partition            Mbytes  Type             Usage  Start Cyl  End Cyl
+10.102:Change partition type
+10.104:Hide / Unhide partition
+10.105:Enter new partition type (1-255)...:
+10.106:Remove active status
+
+
+10.190:Enter Fixed Disk Drive Number (1-%d)...:
+10.200:Are you sure (Y/N)...?
+
+# Error strings
+10.250:Illegal drive letter
+
+
+11.0:\nUnable to find the \"boot.mbr\" file...MBR has not been loaded.\n
+11.1:MBR has been written using \"boot.mbr\"
+11.2:MBR has been saved to \"boot.mbr\"
+11.3:Boot code has been removed from MBR.
+
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Press \e[1mESC\e[22m to return to FDISK options
+20.6:Press \e[1mESC\e[22m to exit FDISK
+20.7:Press \e[1mESC\e[22m to continue
+20.8:Requested partition size exceeds the maximum available space
+20.9:Input entered by user:  %d
+20.10:Input:  %d
+20.11:Invalid entry, please enter
+20.12:is not a choice, please enter
+20.13:Invalid entry.
+
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+30.1:You have at least one disk larger than 2,097,152 MB. FDISK can\n    NOT handle partitions exceeding this barrier!\n\n
+30.2:    You may proceed but are in risk of data loss, especially if there\n    are already partitions created with other tools exceeding the barrier.\n\n
+30.3:    It should be ok if Free FDISK is the only partitioning tool you are\n    using, but we recommend using another disk utility to handle this type\n    of disk.
+30.4:Are you sure you want to continue (Y/N)...?
+
+30.10:FDISK is currently in cylinder alignment mode, but the\n    extended partition does not start on a cylinder boundary!\n\n
+30.11:    While unlikely, this MAY result in compatibility problems.\n\n
+30.12:If your system depends on proper cylinder alignment you should\n    consider re-creating the extended partition.
+30.13:Create logical drive in non-aligned extended partition...?
+
+30.20:    A non-compatible extended partition layout was detected on\n
+30.21:    this disk. The following actions are disabled:\n\n
+30.22:      - creating logical drives\n
+30.23:      - deleting logical drives\n\n
+30.24:    You may re-create the extended partition to enable editing or\n
+30.25:    use another disk utility to partition this disk.\n
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:YN
+250.1:yn
+250.2:Invalid entry, please enter Y-N
+250.3:Press any key to continue
+250.4:ERROR
+250.5:WARNING!
+250.6:ACTIVE
+250.250:Fixed Disk Setup Program
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+
+255.0:\n    Error reading partition tables.
+255.1:\n    No fixed disks present.
+255.2:\nNo drive number has been entered.
+255.3:\nPartition number is out of range (1-4).
+255.4:\nCan not activate partition.
+255.5:\nError auto-partitioning hard drive.
+255.6:\nError clearing MBR sector.
+255.7:\nError removing IPL.
+255.9:\nError deactivating partition.
+255.10:\nError clearing partition table.
+255.11:\nError writing IPL.
+255.12:\nError installing IPL from file.
+255.13:\nError installing MBR from file.
+255.14:\nError writing MBR.
+255.15:\nError writing partition tables.
+255.16:\nError saving MBR.
+255.17:\nError writing Smart IPL.
+255.18:\nInvalid command or syntax error. Invoke FDISK /? for help.
+255.19:\nUnsupported operating system.\n

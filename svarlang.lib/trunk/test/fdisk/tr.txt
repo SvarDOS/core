@@ -1,0 +1,409 @@
+#
+# FDISK IN TURKISH
+#
+
+
+##############################################################################
+# HELP SCREEN (YARDIM EKRANI)                                                #
+##############################################################################
+
+0.0:S”zdizim: FDISK [<src#>] [komutlar]...
+0.1:  argmansz        EtkileŸimli kipte ‡alŸr
+0.2:  /INFO             <src#>'nn b”lnt bilgisini g”rntler
+0.3:  /REBOOT           Bilgisayar yeniden baŸlatr
+0.4:\t
+0.10:B”lnt oluŸturma ve silme komutlar:
+0.11:    <boyut> MB trnden bir say, en yksek de§er i‡in MAX veya <say>'nn
+0.12:      yzde trnden olmas i‡in <say>,100
+0.13:    <tr#> bir saysal b”lnt trdr veya /SPEC verilmezse FAT-12/16/32'dir
+0.14:\t
+0.20:  /PRI:<boyut> [/SPEC:<tr#>]              Birincil bir b”lnt oluŸtur
+0.21:  /EXT:<boyut>                             GeniŸletilmiŸ DOS b”lnts oluŸtur
+0.22:  /LOG:<boyut> [/SPEC:<tr#>]              Mantksal bir src oluŸtur
+0.23:  /PRIO,/EXTO,/LOGO                        Yukardaki gibi; ancak FAT32 de§il
+0.24:  /AUTO                                    Diski kendili§inden b”lntle
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<b”l#>  Bir b”lnty sil
+0.27:           | /NUM:<b”lnt#>}                mantksal srcler /NUM=5'den
+0.29:  /DELETEALL                               <src#>'den tm b”lntleri sil
+0.30:\t
+0.31:Etkin b”lntleri ayarlamak:
+0.32:  /ACTIVATE:<b”lnt#>                     <b”lnt#>'y etkin kl
+0.33:  /DEACTIVATE                              Tm b”lntleri devre dŸ kl
+0.34:\t
+0.40:MBR (Ana ™nykleme Kayd) y”netimi:
+0.41:  /CLEARMBR                Tm b”lntleri ve ”nykleme kodunu sil
+0.42:  /LOADMBR                 MBR'ye b”lnt tablosunu/"boot.mbr" kodunu ykle
+0.43:  /SAVEMBR                 B”lnt tablosunu/kodunu "boot.mbr"ye kaydet
+0.44:\t
+0.50:B”lntlere ellemeyen MBR kodu de§iŸiklikleri:
+0.51:  /IPL                     Standart ”nykleme kodunu MBR <src#>'sne ykle
+0.52:                             uyumluluk i‡in /MBR ve /CMBR ile ayn
+0.53:  /SMARTIPL                DriveSmart IPL'yi MBR <src#>'sne kur
+0.54:  /LOADIPL                 440 bayt kodunu \"boot.mbr\"den MBR'ye kur
+0.55:\t
+0.60:GeliŸmiŸ b”lnt tablosu de§iŸiklikleri:
+0.61:  /MODIFY:<b”lnt#>,<tr#>                B”lnt <tr#>'n de§iŸtir
+0.62:                                             mantksal srcler "5"te baŸlar
+0.63:  /MOVE:<kaynakb”l#>,<hedefb”l#>         Birincil b”lntler taŸ
+0.64:  /SWAP:<1.b”lnt#>,<2.b”l#>             Birincil b”lntleri takas et
+0.65:\t
+0.70:Bir sabit diskteki bayraklar iŸlemek:
+0.71:  /CLEARFLAG[{:<bayrak#>} | /ALL}]         <src#>'deki <bayrak#>' sfrla
+0.72:  /SETFLAG:<bayrak#>[,<de§er>]             <bayrak#>' 1 veya <de§er> kl
+0.73:  /TESTFLAG:<bayrak#>[,<de§er>]            <bayrak#>' 1 veya <de§er>'le sna
+0.74:\t
+0.80:Sabit diskler zerine bilgi almak:
+0.81:  /STATUS       Ge‡erli b”lnt yerleŸimini g”rntle
+0.82:  /DUMP         Sabit disklerden b”lnt bilgisini d”k (hata ayklama i‡in)
+0.83:\t
+0.90:EtkileŸimli kullanc arayz ayarlar:
+0.91:  /UI           Arayz sanki son argmanla verilmiŸ gibi her zaman baŸlat
+0.92:  /MONO         Arayz iki renkli kipte ‡alŸmaya zorla
+0.93:  /FPRMT        EtkileŸimli kipte FAT32/FAT16 i‡in sor
+0.94:  /XO           GeniŸletilmiŸ se‡enekleri etkinleŸtir
+0.95:\t
+0.100:Uyumluluk se‡enekleri:
+0.101:  /X            unlarda geniŸletilmiŸ INT 13 ve LBA'y devre dŸ kl
+0.102:\t
+0.200:Telif hakk %s, Brian E. Reifsnyder ve FreeDOS toplulu§u.
+0.201:GNU Genel Kamu Lisans 2. srm kapsamnda lisanslanmŸtr.
+0.202:\t
+0.203:\t
+0.204:Bu program oldu§u gibi sunulur ve herhangi bir garanti i‡ermez. Bu
+0.205:programn yazar, programn (hatal) kullanmndan do§abilecek
+0.206:sorunlardan dolay herhangi bir sorumluluk kabul etmez. Bu yazlm
+0.207:kullanarak kullanc, yukardaki koŸullar kabul etmiŸ saylr.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN (FAT32 DESTEK EKRANI)                                 #
+##############################################################################
+
+1.0:\e[5;5HFDISK, byk disk deste§ini etkinleŸtirip FAT32 b”lntlerini
+1.1:    kullanarak 2.048 MB'den byk b”lntler oluŸturma yetene§ine sahiptir.
+1.2:    Byk disk deste§ini etkinleŸtirirseniz 512 MB'den byk tm b”lntler
+1.3:    veya mantksal srcler FAT32 kullanlarak oluŸturulur.
+1.4:    ™NEML˜: Byk disk deste§ini etkinleŸtirirseniz baz iŸletim sistemleri
+1.5:    512 MB'den byk b”lntlere ve mantksal srclere eriŸemeyebilir.
+1.6:\t
+1.7:\e[5;18HByk disk (FAT32) deste§ini kullanmak istiyor musunuz (E/H)?
+
+
+##############################################################################
+# EXIT SCREEN (€IKI EKRANI)                                                 #
+##############################################################################
+
+2.0:De§iŸikliklerin etkili olmas i‡in sisteminizi yeniden \e[1mBALATMALISINIZ\e[22m.
+
+2.1:OluŸturdu§unuz/de§iŸtirdi§iniz srcler, sistemi yeniden baŸlattktan\n    \e[1mSONRA\e[22m bi‡imlendirilmelidir.
+
+2.2:Sistem Ÿimdi yeniden baŸlatlacak
+2.3:Hazr olunca herhangi bir d§meye basn...
+
+
+
+##############################################################################
+# MAIN MENU (ANA MENš)                                                       #
+##############################################################################
+
+3.0:FDISK se‡enekleri
+3.1:DOS B”lnts veya Mantksal DOS Srcs oluŸtur
+3.2:Etkin b”lnty ayarla
+3.3:B”lnty veya Mantksal DOS Srcs'n sil
+3.4:B”lnt bilgisini g”ster
+3.5:B”lnt bilgisini g”rntle/de§iŸtir
+3.6:Ge‡erli sabit diski de§iŸtir
+3.7:MBR bakm
+3.8:De§iŸikliklerden vazge‡ ve ‡k
+
+
+##############################################################################
+# CREATE PARTITION MENU (B™LšNTš OLUTUR MENšSš)                             #
+##############################################################################
+
+4.0:DOS B”lnts veya Mantksal DOS Srcs oluŸtur
+4.1:Birincil DOS B”lnts oluŸtur
+4.2:GeniŸletilmiŸ DOS B”lnts oluŸtur
+4.3:GeniŸletilmiŸ DOS B”lnts'nde Mantksal DOS Srcs oluŸtur
+
+
+##############################################################################
+# DELETE PARTITION MENU (B™LšNTš S˜L MENšSš)                                 #
+##############################################################################
+
+5.0:DOS B”lnts'n veya Mantksal DOS Srcs'n sil
+5.1:Birincil DOS B”lnts'n sil
+5.2:GeniŸletilmiŸ DOS B”lnts'n sil
+5.3:GeniŸletilmiŸ DOS B”lnts'ndeki Mantksal DOS Srcs'n sil
+5.4:DOS olmayan b”lnty sil
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION) - (MBR BAKIMI MENšSš)               #
+##############################################################################
+
+6.0:MBR bakm
+6.1:BootEasy MBR oluŸtur (devre dŸ)
+6.2:Kaytl dosyadan MBR ykle (b”lntler ve kod)
+6.3:MBR'yi dosyaya kaydet (b”lntler ve kod)
+6.4:MBR'den ”nykleme kodunu kaldr
+
+
+##############################################################################
+# FDISKIO.C                                                                  #
+##############################################################################
+
+7.0:\nSabit src halihazrda b”lntlenmiŸ.\n
+7.1:\n"boot.mbr" dosyas bulunamad.\n
+7.3:"fdisk.ini" dosyasnn %d. satrnda hataya denk gelindi.\n
+7.4:\nDilim okunurken hata.\n
+7.5:\nDilim bayraklama iŸlevleri devre dŸ.\n
+7.6:%d diski i‡in Drive Smart MBR oluŸturuluyor\n
+
+
+##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nS”zdizim Hatas\n\nProgram Sonlandrld\n
+8.1:\nBayra§ temizlerken hata.\n
+8.2:\n%d bayra§ temizlendi.\n
+8.3:\nGe‡ersiz b”lnt boyutu belirtildi.\n
+8.4:\nGeniŸletilmiŸ b”lnt halihazrda var.\n
+8.5:\nGeniŸletilmiŸ b”lnt oluŸturulurken hata.\n
+8.7:\nKullanlabilir geniŸletilmiŸ b”lnt bulunamad.\n
+8.8:\nMantksal src oluŸturulurken hata.\n
+8.10:\nBirincil b”lnt oluŸturulurken hata.\n
+8.11:\nBirincil b”lnt # (%ld) 1..4 arasnda olmal.\n
+8.12:\nSilinecek b”lnt bulunamad.\n
+8.13:\n%d birincil b”lnt bulundu, silinecek numaray belirtmelisiniz.\n
+8.14:\nBirincil b”lnt silinirken hata.\n
+8.15:\nGeniŸletilmiŸ b”lnt silinirken hata.\n
+8.16:\nMantksal src numaras %d erim dŸnda.\n
+8.17:\nB”lnt numaras erim dŸnda.\n
+8.18:\nGe‡ersiz silme argman.\n
+8.19:\nMantksal src silinirken hata.\n
+8.20:\nYeni b”lnt tr erim dŸnda.\n
+8.21:\nB”lnt tr de§iŸtirilirken hata.\n
+8.22:\nKaynak b”lnt numaras erim dŸnda.\n
+8.23:\nHedef b”lnt numaras erim dŸnda.\n
+8.24:\nB”lnt yuvas taŸnrken hata.\n
+8.25:\nGe‡ersiz bayrak numaras.\n
+8.26:\nBayrak de§eri erim dŸnda.\n
+8.27:\nBayrak ayarlanrken hata.\n
+8.28:\n%d bayra§ %d olarak ayarland.\n
+8.29:Sabit Disk Srcs Durumu
+8.30:\nB”lntler takas edilirken hata.\n
+8.31:\n%d bayra§ %d olarak ayarland.\n
+8.32:\n%d bayra§ %d olarak ayarlanmad.\n
+8.34:\n<%s> bir basamak olmal; sonlandrld\n
+8.35:\nBirden ‡ok src belirtildi; sonlandrld\n
+8.36:\n<%s>, '-' veya '/' ile baŸlamal; sonlandrld\n
+8.37:\n<%s> ':' bekleniyordu; sonlandrld\n
+8.38:\n<%s> ',' bekleniyordu; sonlandrld\n
+8.39:\ndizi sonunda <%s> bekleniyordu; sonlandrld\n
+8.40:\nGe‡ersiz src tanm.\n
+8.41:\nTm bayraklar temizlendi.\n
+
+
+##############################################################################
+# USERINT0.C, USERINT1.C                                                     #
+##############################################################################
+
+9.0:Ge‡erli sabit disk srcs:
+9.1:Se‡im gir:
+9.2:AŸa§dakilerden birini se‡:
+9.3:dilimler, geometri
+9.4:Tanml b”lnt yok.
+9.5:\nBirincil b”lnt i‡in en byk srekli boŸ alan = %lu MB\n
+9.6:\nGeniŸletilmiŸ DOS B”lnts i‡eri§i:\n
+9.7:\nGeniŸletilmiŸ b”lntdeki en byk srekli boŸ alan = %lu MB\n
+9.8:    ------ kullanlamaz ------
+9.9:(1 MB = 1048576 bayt)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nB”lnt     Durum     Mbayt   Sistem        Kullanm     CHS BaŸ      CHS Sonu\n
+9.11:Src B”lm  Etiket  Mbayt  Sistem       Kullanm     CHS BaŸ      CHS Sonu\n
+9.12:Disk   Src   Mbayt     BoŸ   Kullanm
+
+9.13:Bir DOS b”lnts oluŸturmak i‡in yeterli alan yok.
+9.14:GeniŸletilmiŸ DOS B”lm halihazrda var.
+9.15:Ge‡erli srcde bir GeniŸletilmiŸ DOS B”lm\n    olmadan Mantksal DOS B”lm oluŸturulamaz.
+9.16:Silinecek Birincil DOS B”lm yok.
+9.17:Silinecek GeniŸletilmiŸ DOS B”lm yok.
+9.18:Silinecek Mantksal DOS Srcleri yok.
+9.19:Silinecek DOS olmayan b”lnt yok.
+9.20:kullanlamyor!
+9.21:Silinecek b”lnt yok.
+9.22:\e[1mUYARI!\e[22m Hi‡bir b”lnt etkin yaplmamŸ - bir b”lnt etkin yaplana de§in\n    disk 1 baŸlatlamaz
+9.23:  \e[1m%lu\e[22m Mbayt
+
+
+##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+# Delete logical partition
+10.0:Silinecek DOS olmayan b”lntdeki veri kaybolacak.\n    Hangi DOS olmayan b”lnty silmek istiyorsunuz?
+10.1:Bir b”lnt de§il!
+10.2:DOS b”lntsnn silinmesi reddediliyor!
+10.3:DOS olmayan b”lnt silindi.
+10.4:DOS olmayan b”lnt silinirken hata!
+
+# Display extended partition
+10.5:TanmlanmŸ mantksal src yok.
+10.6:Toplam GeniŸletilmiŸ B”lnt boyutu %lu MB (1 MB = 1048576 bayt)
+
+# Display primary partitions
+10.7:TanmlanmŸ b”lnt yok.
+10.8:Toplam disk alan %lu MB (1 MB = 1048576 bayt)
+
+# Table headers
+10.10:B”lnt    Durum   Tr      B”lm  Etiket   Mbayt  Sistem       Kullanm
+10.11:B”lnt     Durum    Mbayt   A‡klama      Kullanm   Sil BaŸ Sil Sonu
+10.12:Src B”lm  Etiket  Mbayt Sistem Kullanm
+
+# Delete extended partition
+10.20:\e[1;5mUYARI!\e[22;25m GeniŸletilmiŸ DOS B”lnts'ndeki ve onun Mantksal\n    B”lntleri'ndeki veri kaybolacak. Srdrlsn m (E/H)?
+10.21:GeniŸletilmiŸ DOS B”lnts silindi
+
+# Delete logical drives
+10.30:\e[1;5mUYARI!\e[22;25m Mantksal DOS Srcs'ndeki veri kaybolacak.\n    Hangi srcy silmek istiyorsunuz?
+10.31:Mantksal src silindi
+10.32:Mantksal src silinirken hata!
+
+# Delete primary partition
+10.40:\e[1;5mUYARI!\e[22;25m Silinecek Birincil DOS B”lnts'ndeki veri kaybolacak.\n    Hangi birincil b”lnty silmek istiyorsunuz?
+10.41:Birincil DOS B”lnts silindi
+10.42:Birincil DOS B”lnts silinirken hata!
+10.43:GeniŸletilmiŸ b”lnty silme reddediliyor!
+10.44:Bir DOS b”lnts de§il!
+
+# Set active partition
+10.50:Etkin yaplacak b”lnt yok.
+10.51:Etkin yapmak istedi§iniz b”lntnn numarasn girin:
+10.52:%d bir se‡enek de§il. Ltfen ge‡erli bir se‡enek girin.
+10.53:Src %d srcsndeki tek baŸlatlabilir b”lnt halihazrda etkin\n    yaplmŸ.
+10.54:B”lnt %d etkinleŸtirildi.
+
+# Create partition
+10.60:Bir Birincil DOS B™lnts i‡in kullanlabilir en ‡ok alan kullanmak\n    ve b”lnty etkin yapmak istiyor musunuz (E/H)?
+10.61:Bir Birincil DOS B™lnts i‡in kullanlabilir en ‡ok alan kullanmak\n    istiyor musunuz (E/H)?
+10.62:Bu src varsaylan olarak FAT32, FAT16'ya ge‡ilsin mi (E/H)?
+10.63:B”lnt i‡in kullanlabilir en ‡ok alan \e[1m%lu\e[22m MB
+10.64:Bir Birincil DOS B”lnts oluŸturmak i‡in b”lnt boyutunu MB olarak\n    veya disk alan yzdesi (%%) olarak girin:
+10.65:Bir GeniŸletilmiŸ DOS B”lnts oluŸturmak i‡in b”lnt boyutunu MB olarak\n    veya disk alan yzdesi (%%) olarak girin:
+10.66:Birincil DOS B”lnts oluŸturuldu
+10.67:GeniŸletilmiŸ DOS B”lnts oluŸturuldu
+
+# Create logical partition
+10.70:Mantksal DOS Srcs oluŸturuldu, src harfleri de§iŸtirildi\n    veya eklendi
+10.71:Olabilecek en ‡ok sayda Mantksal DOS Srcs kuruldu
+10.72:Mantksal src boyutunu MB olarak veya geniŸletilmiŸ\n    b”lnt boyutu yzdesi (%%) olarak girin:
+10.73:GeniŸletilmiŸ DOS B”lnts'ndeki tm kullanlabilir alan\n    mantksal srclere atanmŸtr.
+
+# Display partition info
+10.80:GeniŸletilmiŸ DOS B”lnts Mantksal DOS Srcleri i‡eriyor.\n    Mantksal src bilgisini g”rntlemek istiyor musunuz (E/H)?
+10.81:˜ste§e ba§l: De§iŸtirilecek src numarasn girin.
+10.82:De§iŸtirmek istedi§iniz b”lntnn numarasn girin (1-4).
+10.83:Mantksal DOS Srcs bilgisini g”rntle
+10.84:De§iŸtirmek istedi§iniz mantksal srcnn karakterini girin.
+
+# List partition types
+10.90:B”lnt trlerini listele
+10.91:Srdrmek i‡in herhangi bir d§meye basn...
+
+# Display / modify partition
+10.100:Mantksal src bilgisini g”rntle/de§iŸtir
+10.101:B”lnt              Mbayt   Tr           Kullanm   Sil BaŸ Sil Sonu
+10.102:B”lnt trn de§iŸtir
+10.104:B”lnty gizle/g”ster
+10.105:Yeni b”lnt tr gir (1-255):
+10.106:Etkin durumunu kaldr
+
+10.190:Sabit Disk Srcs numarasn girin (1-%d):
+10.200:Emin misiniz (E/H)?
+
+# Error strings
+10.250:Ge‡ersiz src harfi
+
+11.0:\n\"boot.mbr\" dosyas bulunamyor. MBR yklenmedi.\n
+11.1:MBR, \"boot.mbr\" kullanlarak yazld.
+11.2:MBR, \"boot.mbr\" dosyasna kaydedildi.
+11.3:MBR'den ”nykleme kodu kaldrld.
+
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:FDISK se‡eneklerine geri d”nmek i‡in \e[1mESC\e[22m'ye basn
+20.6:FDISK'ten ‡kmak i‡in \e[1mESC\e[22m'ye basn
+20.7:Srdrmek i‡in \e[1mESC\e[22m'ye basn
+20.8:˜stenen b”lnt boyutu kullanlabilir alan boyutunu aŸyor
+20.9:Kullanc girdisi: %d
+20.10:Girdi: %d
+20.11:Ge‡ersiz girdi, ltfen Ÿunu girin:
+20.12:bir se‡enek de§il, ltfen Ÿunu girin:
+20.13:Ge‡ersiz girdi.
+
+
+##############################################################################
+# WARNING SCREENS (UYARI EKRANLARI)                                          #
+##############################################################################
+30.1:En az bir diskiniz 2.097.152 MB'den byk.\n    FDISK bu boyutu aŸan diskleri iŸleyemez!\n\n
+30.2:    ˜Ÿlemi srdrebilirsiniz; ancak veri kayb riski vardr, ”zellikle\n    bu snr aŸan baŸka ara‡larla oluŸturulmuŸ b”lntler varsa.\n\n
+30.3:    FDISK kulland§nz tek b”lntlendirme aracysa bir sknt olmamaldr;\n    ancak bu tr diskleri iŸlemek i‡in baŸka bir disk izlencesi\n    kullanmanz ”neririz.
+30.4:Srdrmek istedi§inizden emin misiniz (E/H)?
+
+30.10:FDISK Ÿu anda silindir hizalama kipinde; ancak geniŸletilmiŸ\n    b”lnt bir silindir kenarnda baŸlamyor!\n\n
+30.11:    Pek olas olmasa da, bu uyumluluk sorunlarna neden OLAB˜L˜R.\n\n
+30.12:Sisteminiz dzgn silindir hizalamasna gerek duyuyorsa\n    geniŸletilmiŸ b”lnty yeniden oluŸturmay dŸnn.
+30.13:HizalanmamŸ geniŸletilmiŸ b”lntde mantksal src oluŸturulsun mu?
+
+30.20:    Bu diskte uyumsuz geniŸletilmiŸ b”lnt yerleŸimi algland.\n
+30.21:    AŸa§daki eylemler devre dŸ brakld:\n\n
+30.22:      - Mantksal srcler oluŸturmak\n
+30.23:      - Mantksal srcleri silmek\n\n
+30.24:    Dzenlemeyi etkinleŸtirmek i‡in geniŸletilmiŸ b”lnty yeniden\n
+30.25:    oluŸturabilir/diski b”lntlemede baŸka bir izlence kullanabilirsiniz.\n
+
+
+##############################################################################
+# GLOBAL STRINGS (GLOBAL D˜Z˜LER)                                            #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:EH
+250.1:eh
+250.2:Ge‡ersiz girdi, ltfen E veya H girin
+250.3:Srdrmek i‡in herhangi bir d§meye basn
+250.4:HATA
+250.5:UYARI!
+250.6:ETK˜N
+250.250:Sabit Disk Kurulum Program
+
+
+##############################################################################
+# ERROR MESSAGES (HATA ˜LET˜LER˜)                                            #
+##############################################################################
+
+255.0:\n    B”lnt tablolar okunurken hata.
+255.1:\n    Sabit disk yok.
+255.2:\nBir src numaras girilmedi.
+255.3:\nB”lnt numaras erim dŸnda (1-4).
+255.4:\nB”lnt etkinleŸtirilemiyor.
+255.5:\nSabit disk kendili§inden b”lntlenemiyor.
+255.6:\nMBR dilimi temizlenirken hata.
+255.7:\nIPL kaldrlrken hata.
+255.9:\nB”lnt devre dŸ braklrken hata.
+255.10:\nB”lnt tablosu temizlenirken hata.
+255.11:\nIPL yazlrken hata.
+255.12:\nDosyadan IPL kurulurken hata.
+255.13:\nDosyadan MBR kurulurken hata.
+255.14:\nMBR yazlrken hata.
+255.15:\nB”lnt tablolar yazlrken hata.
+255.16:\nMBR kaydedilirken hata.
+255.17:\nSmart IPL yazlrken hata.
+255.18:\nGe‡ersiz komut veya s”zdizim hatas. Yardm i‡in FDISK /? ‡a§rn.
+255.19:\nDesteklenmeyen iŸletim sistemi.\n

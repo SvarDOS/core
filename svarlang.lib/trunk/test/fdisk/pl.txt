@@ -1,0 +1,405 @@
+#
+# FDISK IN POLISH
+#
+
+# ### POMOC ##################################################################
+
+0.0:Skíadnia: FDISK [<dysk#> [polecenia]...
+0.1:  bez argument¢w    Uruchamia sië w trybie interaktywnym
+0.2:  /INFO             Wyûwietla informacje dot. partycji na <dysk#>
+0.3:  /REBOOT           Uruchamia ponownie komputer
+0.4:\t
+0.10:Polecenie tworzÜce lub usuwajÜce partycje:
+0.11:    <rozm> rozmiar w megabajtach lub MAX dla maksymalnego rozmiaru
+0.12:           albo <liczba>,100 jeûli <liczba> jest w procentach
+0.13:    <typ#> identyfikator typu partycji lub FAT-12/16/32 jeûli nie podano /SPEC
+0.14:\t
+0.20:  /PRI:<rozm> [/SPEC:<typ#>]               Tworzy partycjë podstawowÜ
+0.21:  /EXT:<rozm>                              Tworzy partycjë rozszerzonÜ
+0.22:  /LOG:<rozm> [/SPEC:<typ#>]               Tworzy dysk logiczny
+0.23:  /PRIO,/EXTO,/LOGO                        Jak wyßej, ale unika FAT32
+0.24:  /AUTO                                    Automatycznie partycjonuje dysk
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Usuwa partycjë
+0.27:           | /NUM:<part#>}            ...dyski logiczne zaczynajÜ sië od /NUM=5
+0.29:  /DELETEALL                               Usuwa wszystkie partycje z <dysk#>
+0.30:\t
+0.31:Ustawia aktywnÜ partycjë
+0.32:  /ACTIVATE:<partycja#>                    Ustawia <partycjë#> jako aktywnÜ
+0.33:  /DEACTIVATE                              Deaktywuje wszystkie partycje
+0.34:\t
+0.40:ZarzÜdzanie MBR (Master Boot Record):
+0.41:  /CLEARMBR                Usuwa wszystkie partycje oraz kod rozruchowy
+0.42:  /LOADMBR                 úaduje tablicë partycji oraz kod z "boot.mbr" do MBR
+0.43:  /SAVEMBR                 Zapisuje tablicë partycji i kod do pliku "boot.mbr"
+0.44:\t
+0.50:Zmiana kodu MBR z zachowaniem tablicy partycji:
+0.51:  /IPL                     Instaluje standardowy kod rozruchowy do MBR <dysku#>
+0.52:                           ...tak samo, jak /MBR i /CMBR (dla kompatybilnoûci)
+0.53:  /SMARTIPL                Instaluje IPL DriveSmart do MBR <dysku#>
+0.54:  /LOADIPL                 Zapisuje 440 bajty kodu z "boot.mbr" do MBR
+0.55:\t
+0.60:Zaawansowane modyfikacje tablicy partycji:
+0.61:  /MODIFY:<part#>,<typ#>                     Zmienia typ partycji na <typ#>
+0.62:                                         ...dyski logiczne zaczynajÜ sië od "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>               Przenosi partycjë podstawowÜ
+0.64:  /SWAP:<1stpart#>,<2ndpart#>                Zamienia partycje podst. miejscami
+0.65:\t
+0.70:ZarzÜdzanie flagami dysku twardego:
+0.71:  /CLEARFLAG[{:<flaga#>} | /ALL}]      Usuwa <flagë#> lub wszystkie na <dysku#>
+0.72:  /SETFLAG:<flaga#>[,<wartoûç>]        Ustawia <flagë#> na 1 lub <wartoûç>
+0.73:  /TESTFLAG:<flaga#>[,<wartoûç>]       Sprawdza <flagë#> dla 1 lub <wartoûç>
+0.74:\t
+0.80:Wyûwietlanie informacji o dysku (dyskach):
+0.81:  /STATUS       Wyûwietla obecny ukíad partycji
+0.82:  /DUMP         Informacje o partycjach wszystkich dysk¢w (debugging)
+0.83:\t
+0.90:Parametry dla trybu interaktywnego:
+0.91:  /UI           Zawsze uruchamia UI jeûli podane jako ostatni argument
+0.92:  /MONO         Wymusza tryb monochromatyczny interfejsu ußytkownika
+0.93:  /FPRMT        Pyta o FAT32/FAT16 w trybie interaktywnym
+0.94:  /XO           WíÜcza rozszerzone opcje
+0.95:\t
+0.100:Opcje dla kompatybilnoûci:
+0.101:  /X            WyíÜcza rozsz. INT 13 i LBA dla nastëpujÜcych polece§
+0.102:\t
+0.200:Ten program jest chroniony prawami autorskimi %s Briana E. Reifsnydera i
+0.201:spoíecznoûci FreeDOS na warunkach Powszechnej Licencji Publicznej GNU,
+0.202:wersja 2.
+0.203:\t
+0.204:Program jest dostarczony w takim stanie, w jakim sië znajduje, bez jakiej-
+0.205:kolwiek gwarancji. Autor tego oprogramowania nie ponosi ßadnej odpowiedzia-
+0.206:lnoûci za ußycie lub niewíaûciwe ußycie tego oprogramowania. Korzystanie z
+0.207:tego oprogramowania oznacza zgodë operatora na powyßsze warunki.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:\e[5;5HFDISK potrafi wykorzystaç wsparcie dla dußych dysk¢w, umoßliwiajÜc
+1.1:    tworzenie partycji wiëkszych niß 2048 MB przy pomocy systemu plik¢w FAT32
+1.2:    Jeûli wíÜczysz wsparcie dla dußych dysk¢w, wszelkie partycje lub wolumeny
+1.3:    logiczne wiëksze niß 512 MB zostanÜ utworzone jako FAT32.
+1.4:    WA°NE: WíÜczenie wsparcia dla dußych dysk¢w moße spowodowaç, ße niekt¢re
+1.5:    systemy operacyjne nie bëdÜ w stanie odczytaç partycji lub logicznych
+1.6:    wolumen¢w o rozmiarze powyßej 512 MB.
+1.7:\e[5;18HCzy chcesz wíÜczyç wsparcie dla dußych dysk¢w (FAT32)? (T/N)
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:\e[1mMUSISZ\e[22m zrestartowaç tw¢j system aby zmiany odniosíy efekt.
+2.1:Wszelkie stworzone lub zmienione napëdy muszÜ byç sformatowane \e[1mPO\e[22m restarcie.
+2.2:System zostanie teraz zrestartowany
+2.3:Naciûnij dowolny klawisz, gdy bëdziesz gotowy . . .
+
+
+##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:Opcje FDISK
+3.1:Utw¢rz partycjë lub logiczny napëd DOS
+3.2:Ustaw aktywnÜ partycjë
+3.3:Usu§ partycjë lub logiczny napëd DOS
+3.4:Wyûwietl informacje o partycjach
+3.5:Wyûwietl / Zmie§ informacje o partycjach
+3.6:Zmie§ bießÜcy dysk
+3.7:ZarzÜdzanie MBR
+3.8:Przerwij zmiany i wyjd¶
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Utw¢rz partycjë lub logiczny napëd DOS
+4.1:Utw¢rz partycjë podstawowÜ
+4.2:Utw¢rz partycjë rozszerzonÜ
+4.3:Utw¢rz jeden logiczny napëd lub wiëcej wewnÜtrz partycji rozszerzonej
+
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Usuwa partycjë DOS lub logiczny dysk DOS
+5.1:Usuwa podstawowÜ partycjë DOS
+5.2:Usuwa rozszerzonÜ partycjë DOS
+5.3:usuwa logiczny dysk DOS znajdujÜcy sië w rozszerzonej partycji
+5.4:Usuwa nie-DOSowÜ partycjë
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:ZarzÜdzanie MBRem
+6.1:Twowrzy MBR typu BootEasy (wyíÜczony)
+6.2:Przywraca MBR (partycje i kod) z zapisanego pliku
+6.3:Zapisuje MBR (partycje i kod) do pliku
+6.4:Usuwa kod startowy z MBR
+
+
+##############################################################################
+# FDISKIO.C                                                                  #
+##############################################################################
+
+7.0:\nDysk twardy zostaí juß wczeûniej spartycjonowany.\n
+7.1:\nNie znaleziono pliku "boot.mbr".\n
+7.3:Napotkano bíÜd w linii %d pliku "fdisk.ini".\n
+7.4:\nBíÜd odczytu sektora.\n
+7.5:\nFunkcja flagowania sektora zostaía wyíÜczona.\n
+7.6:Tworzenie MBR typu Drive Smart dla dysku %d\n
+
+
+##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nBíÜd skíadni\n\nProgram Zatrzymany\n
+8.1:\nBíÜd podczas usuwania flagi.\n
+8.2:\nFlaga %d zostaía usuniëta.\n
+8.3:\nPodano nieprawidíowy rozmiar partycji.\n
+8.4:\nPartycja rozszerzona juß istnieje.\n
+8.5:\nBíÜd podczas tworzenia partycji rozszerzonej.\n
+8.7:\nNie znaleziono stosownej partycji rozszerzonej.\n
+8.8:\nBíÜd podczas tworzenia dysku logicznego.\n
+8.10:\nBíÜd podczas tworzenia partycji podstawowej.\n
+8.11:\nnumer # partycji podstawowej (%ld) musi zawieraç sië w 1..4.\n
+8.12:\nNie znaleziono partycji do usuniëcia.\n
+8.13:\nZnaleziono %d partycji podstawowych, naleßy podaç numer do usuniëcia.\n
+8.14:\nBíÜd podczas usuwania partycji podstawowej.\n
+8.15:\nBíÜd podczas usuwania partycji rozszerzonej.\n
+8.16:\nNumer dysku logicznego %d jest poza zakresem.\n
+8.17:\nNumer partycji jest poza zakresem.\n
+8.18:\nNieprawidíowy argument do usuwania.\n
+8.19:\nBíÜd podczas usuwania dysku logicznego.\n
+8.20:\nTyp nowej partycji jest poza zakresem.\n
+8.21:\nBíÜd podczas zmiany typu partycji.\n
+8.22:\nNumer partycji ¶r¢díowej jest poza zakresem.\n
+8.23:\nNumer partycji docelowej jest poza zakresem.\n
+8.24:\nBíÜd podczas zmiany slotu dla partycji.\n
+8.25:\nNieprawidíowy numer flagi.\n
+8.26:\nWartoûç flagi jest poza zakresem.\n
+8.27:\nBíÜd podczas ustawiania flagi.\n
+8.28:\nFlaga %d zostaía ustawiona na %d.\n
+8.29:Status dysku staíego
+8.30:\nBíÜd podczas zamiany partycji miejscami.\n
+8.31:\nFlaga %d jest ustawiona na %d.\n
+8.32:\nFlaga %d nie jest ustawiona na %d.\n
+8.34:\n<%s> powinno byc cyfrÜ; program zatrzymany\n
+8.35:\npodano wiëcej niß jeden napëd; program zatrzymany\n
+8.36:\n<%s> powinno zaczynaç sië na '-' lub '/'; program zatrzymany\n
+8.37:\n<%s> oczekiwano ':' ; program zatrzymany\n
+8.38:\n<%s> oczekiwano ',' ; program zatrzymany\n
+8.39:\n<%s> oczekiwano koniec ciÜgu; program zatrzymany\n
+8.40:\nNieprawidíowy napëd.\n
+8.41:\nWszystkie flagi zostaíy usuniëte.\n
+
+
+##############################################################################
+# USERINT0.C, USERINT1.C                                                     #
+##############################################################################
+
+9.0:BießÜcy dysk staíy:
+9.1:Wprowad¶ wyb¢r:
+9.2:Wybierz jeden z ponißszych:
+9.3:sektory, geometria
+9.4:Brak zdefiniowanych partycji.
+9.5:\nNajwiëkszy ciÜgíy obszar dostëpny dla partycji podstawowej = %lu MBajt¢w\n
+9.6:\nZawartoûç rozszerzonej partycji DOS:\n
+9.7:\nNajwiëkszy ciÜgíy obszar w rozszerzonej partycji = %lu MBajt¢w\n
+9.8:    -------- nieußyteczne ---------
+9.9:(1 Mbajt = 1048576 bajt¢w)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nPartycja    Status   Mbajt¢w  System           Zajët.   Start CHS       Koniec CHS\n
+9.11:Nap Etykieta      Mbajt¢w System          Zajët.   Start CHS       Koniec CHS\n
+9.12:Dysk   Nap   Mbajt¢w   Wolne Zajët.
+
+9.13:Brak miejsca na utworzenie partycji DOS.
+9.14:Rozszerzona partycja juß istnieje.
+9.15:Nie moßna utworzyç logicznego dysku DOS bez\n    partycji rozszerzonej na bießÜcym dysku.
+9.16:Brak partycji podstawowej do usuniëcia.
+9.17:Brak partycji rozszerzonej do usuniëcia.
+9.18:Brak logicznego dysku do usuniëcia.
+9.19:Brak partycji nieDOSowej do usuniëcia.
+9.20:jest nieußyteczny!
+9.21:Brak partycji do usuniëcia.
+9.22:\e[1mUWAGA!\e[22m °adna partycja nie jest aktywna - dysk 1 jest niebootowalny \n    bez ßadnej aktywnej partycji
+9.23:  \e[1m%lu\e[22m Mbajt¢w
+
+
+##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+# Delete logical partition
+10.0:Dane w usuwanej nie-DOSowej partycji zostanÜ utracone.\n    Kt¢rÜ nie-DOSowÜ partycjë chcesz usunÜç?
+10.1:To nie partycja!
+10.2:To nie jest nie-DOSowa partycja!
+10.3:Nie-DOSowa partycja usuniëta.
+10.4:BíÜd podczas usuwania nie-DOSowej partycji!
+
+# Display extended partition
+10.5:Brak utworzonych dysk¢w logicznych.
+10.6:Caíkowity rozmiar partycji rozszerzonej to %lu Mbajt¢w (1 Mbajt = 1048576 bajt¢w)
+
+# Display primary partitions
+10.7:Brak utworzonych partycji.
+10.8:Caíkowity rozmiar dysku to %lu Mbajt¢w (1 Mbajt = 1048576 bajt¢w)
+
+# Table headers
+10.10:Partycja   Status  Typ      Etykieta       Mbajt¢w System          Ußycie
+10.11:Partycja    Status   Mbajt¢w Opis             Ußycie 1szy Cyl.  Ost. Cyl
+10.12:Dsk Etykieta      Mbajt. System   Ußycie
+
+# Delete extended partition
+10.20:\e[1;5mUWAGA!\e[22;25m Dane w usuwanej partycji rozszerzonej i wszystkie jej\n    partycje logiczne zostanÜ utracone. Kontynuowaç (T/N)...?
+10.21:Partycja rozszerzona zostaía usuniëta
+
+# Delete logical drives
+10.30:\e[1;5mUWAGA!\e[22;25m Dane w usuwanym dysku logicznym zostanÜ utracone.\n    Kt¢ry dysk logiczny chcesz usunÜç..............................?
+10.31:Dysk logiczny usuniëty
+10.32:BíÜd podczas usuwania dysku logicznego!
+
+# Delete primary partition
+10.40:\e[1;5mUWAGA!\e[22;25m Dane w usuwanej partycji podstawowej zostanÜ utracone.\n    Kt¢rÜ partycjë podstawowÜ chcesz usunÜç........?
+10.41:Partycja podstawowa usuniëta
+10.42:BíÜd podczas usuwania partycji podstawowej!
+10.43:To jest partycja rozszerzona!
+10.44:To nie jest partycja typu DOS!
+
+# Set active partition
+10.50:Nie ma partycji do aktywacji.
+10.51:Wprowad¶ numer partycji kt¢rÜ chcesz aktywowaç......................:
+10.52:%d nie jest moßliwÜ opcjÜ. Dokonaj wyboru spoûr¢d dostëpnych opcji.
+10.53:Jedyna startowalna partycja Dysku %d juß jest aktywna.
+10.54:Partycja %d zostaía aktywowana.
+
+# Create partition
+10.60:Czy chcesz ußyç maksymalnego roziaru dla podstawowej partycji DOS i\n    aktywowaç të partycjë (T/N).............................?
+10.61:Czy chcesz ußyç maksymalnego rozmiaru dla partycji DOS\n    (T/N)...................................................?
+10.62:Ten napëd jest domyûlnie FAT32, zmieniç na FAT16 (T/N)?
+10.63:Maksymalna iloûç dostëpnego miejsca dla partycji to \e[1m%lu\e[22m Mbajt¢w
+10.64:Podaj rozmiar partycji w Mbajtach lub procentach (%%) rozmiaru dysku\n    aby utworzyç podstawowÜ partycjë...:
+10.65:Podaj rozmiar partycji w Mbajtach lub procentach (%%) romiaru dysku\n    by utworzyç rozszerzonÜ partycjë DOS.:
+10.66:Partycja podstawowa zostaía utworzona
+10.67:Partycja rozszerzona zostaía utworzona
+
+# Create logical partition
+10.70:Dysk logiczny utworzony, litery napëd¢w zostaíy zmienione lub dodane
+10.71:Maksymalna iloûç zainstalowanych logicznych dysk¢w DOS
+10.72:Podaj rozmiar logicznego dysku w Mbajtach lub procentach\n    rozmiaru rozsz. partycji..:
+10.73:Caíe dostëpne miejsce w rozszerzonej partycji\n    jest nadane dyskom logicznym.
+
+# Display partition info
+10.80:Rozszerzona partycja DOS zawiera dyski logiczne.\n    Czy chcesz wyûwietliç informacje o dyskach logicznych (T/N).....?
+10.81:Opcjonalnie:  Podaj numer partycji do zmiany.
+10.82:Podaj numer partycji kt¢rÜ chcesz zmieniç (1-4)...?
+10.83:Wyûwietl informacje o dyskach logicznych
+10.84:Wprowad¶ literë dysku logicznego do zmiany...?
+
+# List partition types
+10.90:Lista typ¢w partycji
+10.91:Naciûnij dowolny klawisz by kontynuowaç . . .
+
+# Display / modify partition
+10.100:Wyûwietl/Zmie§ informacje o logicznych dyskach
+10.101:Partycja             Mbajt¢w Typ              Ußycie Cyl pocz.  Cyl ko§c.
+10.102:Zmie§ typ partycji
+10.104:Ukryj / odkryj partycjë
+10.105:Wprowad¶ nowy typ partycji (1-255).:
+10.106:Usu§ aktywny status
+
+
+10.190:Podaj numer dysku staíego (1-%d).......:
+10.200:Czy jesteû pewny(T/N)?
+
+# Error strings
+10.250:Nieprawidíowa litera dysku
+
+
+11.0:\nNie mogë znale¶ç pliku \"boot.mbr\"...MBR nie zostaí nadpisany.\n
+11.1:MBR zostaí nadpisany na podstawie \"boot.mbr\"
+11.2:MBR zostaí zapisany do \"boot.mbr\"
+11.3:Kod startowy zostaí usuniëty z MBR.
+
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Naciûnij \e[1mESC\e[22m by wr¢ciç do opcji FDISK
+20.6:Naciûnij \e[1mESC\e[22m by wyjûç z FDISK
+20.7:Naciûnij \e[1mESC\e[22m by kontynuowaç
+20.8:Podany rozmiar partycji przekracza iloûç dostëpnego miejsca
+20.9:Wyb¢r ußytkownika:  %d
+20.10:Wprowadzono:  %d
+20.11:Nieprawidíowy wpis, wprowad¶
+20.12:nie jest moßliwÜ opcjÜ, wprowad¶
+20.13:Nieprawidíowy wpis.
+
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+30.1:Masz co najmniej jeden dysk wiëkszy niß 2,097,152 MB. FDISK NIE\n    WSPIERA tak dußych partycji!\n\n
+30.2:    Moßesz kontynuowaç, ale z ryzykiem utraty danych, szczeg¢lnie jeûli\n    juß istniejÜ partycje ponad ten limit.\n\n
+30.3:    Powinno byç dobrze jeûli FDISK jest jedynym narzëdziem do partycji\n    kt¢rego ußywasz, lecz zalecamy ußycie innego narzëdzie dla tego typu\n    dysk¢w.
+30.4:Czy na pewno chcesz kontynuowaç (T/N).....?
+
+30.10:FDISK is currently in cylinder alignment mode, but the\n    extended partition does not start on a cylinder boundary!\n\n
+30.11:    While unlikely, this MAY result in compatibility problems.\n\n
+30.12:If your system depends on proper cylinder alignment you should\n    consider re-creating the extended partition.
+30.13:Create logical drive in non-aligned extended partition...?
+
+30.20:    Wykryto niekompatybilny ukíad partycji rozszerzonej na tym\n
+30.21:    dysku. Ponißsze operacje sÜ niemoßliwe:\n\n
+30.22:      - tworzenie dysk¢w logicznych\n
+30.23:      - usuwanie dysk¢w logicznych\n\n
+30.24:    Moßesz stworzyç partycjë rozszerzonÜ na nowo aby umoßliwiç edycjë\n
+30.25:    lub ußyj innego narzëdzie do spartycjonowania tego dysku.\n
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:TN
+250.1:tn
+250.2:Nieprawidíowa odpowied¶, wprowad¶ T lub N
+250.3:Wciûnij dowolny klawisz aby kontynuowaç
+250.4:BúèD
+250.5:UWAGA!
+250.6:AKTYWNA
+250.250:Program Konfiguracyjny Dysk¢w Staíych
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+
+255.0:\n    BíÜd odczytu tablicy partycji.
+255.1:\n    Nie znaleziono ßadnego dysku staíego.
+255.2:\nNie wprowadzono ßadnego numeru napëdu.
+255.3:\nNumer partycji jest poza zakresem (1-4).
+255.4:\nNie moßna aktywowaç partycji.
+255.5:\nBíÜd podczas autopartycjonowania dysku twardego.
+255.6:\nBíÜd podczas zerowania sektora MBR.
+255.7:\nBíÜd podczas usuwania IPL.
+255.9:\nBíÜd podczas wyíÜczania partycji.
+255.10:\nBíÜd podczas zerowania tablicy partycji.
+255.11:\nBíÜd podczas zapisu IPL.
+255.12:\nBíÜd podczas instalacji IPL z pliku.
+255.13:\nBíÜd podczas instalacji MBR z pliku.
+255.14:\nBíÜd zapisu MBR.
+255.15:\nBíÜd zapisu tablicy partycji.
+255.16:\nBíÜd podczas kopiowania MBR.
+255.17:\nBíÜd zapisu Smart IPL.
+255.18:\nNieprawidíowe polecenie lub bíÜd skíadni. Uruchom FDISK /? po pomoc.
+255.19:\nNieobsíugiwany system operacyjny.\n
