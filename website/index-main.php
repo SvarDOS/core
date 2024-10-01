@@ -67,4 +67,4 @@
 
     <p>If you only wish to take a quick peek, then we provide a read-only mirror of the SvarDOS subversion tree on github where you can easily <a href="https://github.com/SvarDOS/core">browse the development tree</a>.</p>
 
-    <p>SvarDOS uses a fork of the EDR kernel, whose development is kept on the <a href="https://github.com/SvarDOS/edrdos">EDR github repository</a>.</p>
+    <p>SvarDOS uses a fork of the Enhanced DR-DOS kernel, whose development is kept on the <a href="https://github.com/SvarDOS/edrdos">EDR github repository</a>.</p>
