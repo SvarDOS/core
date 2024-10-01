@@ -61,4 +61,10 @@
 
     <p>The links above point to the latest builds of installation images. Archival builds can be found in the <a href="?p=files">files section</a>.</p>
 
-    <p class="wondering">Wondering how SvarDOS is built? Take a look at the <a href="http://svn.svardos.org/">project's SVN</a>, where all the build-related files and scripts are stored. To pull the sources using the standard subversion client use this:<br>svn co svn://svn.svardos.org/svardos svardos</p>
+    <h2>Development &#x1F527;</h2>
+
+    <p>Wondering how SvarDOS is built? All the build-related files, scripts and sources of SvarDOS-specific tools are stored on the project's SVN server. To pull the sources using the standard subversion client use:<br><code>svn co svn://svn.svardos.org/svardos svardos</code></p>
+
+    <p>If you only wish to take a quick peek, then we provide a read-only mirror of the SvarDOS subversion tree on github where you can easily <a href="https://github.com/SvarDOS/core">browse the development tree</a>.</p>
+
+    <p>SvarDOS uses a fork of the EDR kernel, whose development is kept on the <a href="https://github.com/SvarDOS/edrdos">EDR github repository</a>.</p>
