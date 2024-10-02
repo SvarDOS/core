@@ -1,6 +1,7 @@
 xxxxxxxx
 - improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
 - added /nodef to TLUMACZ (skips deflang generation)
+- MVCOMP-packed data is loaded to RAM before unpacking (60x faster on an 8086)
 
 20240929
 - LNG strings may be optionally MVCOMP-compressed (disabled with /nocomp)

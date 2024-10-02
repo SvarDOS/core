@@ -185,13 +185,19 @@ int svarlang_load(const char *fname, const char *lang) {
     unsigned short i;
     char *dst = svarlang_mem;
     unsigned char rawwords = 0; /* number of uncompressible words */
+    unsigned short *mvcompptr;
 
+    /* start by loading the entire block at the end of the svarlang mem */
+    mvcompptr = (void *)(svarlang_mem + svarlang_memsz - buff16[1]);
+    if (FREAD(fd, mvcompptr, buff16[1]) != buff16[1]) {
+      exitcode = -5;
+      goto FCLOSE_AND_EXIT;
+    }
+
+    /* uncompress now */
     for (i = 0; i < compressedsize; i++) {
-      /* read a word token */
-      if (FREAD(fd, buff16, 2) != 2) {
-        exitcode = -5;
-        goto FCLOSE_AND_EXIT;
-      }
+      /* get next mvcomp token */
+      buff16[0] = mvcompptr[i];
 
       /* token format is LLLL OOOO OOOO OOOO, where:
        * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
@@ -236,7 +242,7 @@ int svarlang_load(const char *fname, const char *lang) {
 
   /* lang block not compressed - load as is */
   if (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1]) {
-    exitcode = -6;
+    exitcode = -7;
   }
 
   FCLOSE_AND_EXIT:
