@@ -181,8 +181,7 @@ int svarlang_load(const char *fname, const char *lang) {
 
   /* is the lang block compressed? then uncompress it */
   if (buff16[0] & 0x8000) {
-    unsigned short compressedsize = buff16[1] / 2;
-    unsigned short i;
+    unsigned short compressedwords = buff16[1] / 2;
     char *dst = svarlang_mem;
     unsigned char rawwords = 0; /* number of uncompressible words */
     unsigned short *mvcompptr;
@@ -195,9 +194,12 @@ int svarlang_load(const char *fname, const char *lang) {
     }
 
     /* uncompress now */
-    for (i = 0; i < compressedsize; i++) {
+    while (compressedwords != 0) {
+      unsigned short token;
       /* get next mvcomp token */
-      buff16[0] = mvcompptr[i];
+      token = *mvcompptr;
+      mvcompptr++;
+      compressedwords--;
 
       /* token format is LLLL OOOO OOOO OOOO, where:
        * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
@@ -214,26 +216,26 @@ int svarlang_load(const char *fname, const char *lang) {
       /* raw word? */
       if (rawwords != 0) {
         unsigned short *dst16 = (void *)dst;
-        *dst16 = buff16[0];
+        *dst16 = token;
         dst += 2;
         rawwords--;
 
       /* literal byte? */
-      } else if ((buff16[0] & 0xF000) == 0) {
-        *dst = buff16[0] & 0xff;
+      } else if ((token & 0xF000) == 0) {
+        *dst = token; /* no need for an explicit "& 0xff", dst is a char ptr so token is naturally truncated to lowest 8 bits */
         dst++;
-        rawwords = buff16[0] >> 8; /* number of RAW words that are about to follow */
+        rawwords = token >> 8; /* number of RAW words that are about to follow */
 
       /* else it's a backreference */
       } else {
-        char *src = dst - (buff16[0] & 0x0FFF) - 1;
-        buff16[0] >>= 12;
+        char *src = dst - (token & 0x0FFF) - 1;
+        token >>= 12;
         for (;;) {
           *dst = *src;
           dst++;
           src++;
-          if (buff16[0] == 0) break;
-          buff16[0]--;
+          if (token == 0) break;
+          token--;
         }
       }
     }
