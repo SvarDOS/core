@@ -11,9 +11,11 @@ rename out.lng outc.lng
 wcl -0 -wx -ox -we -ms test.c deflang.c ..\svarlngs.lib
 
 cd fdisk
-..\..\tlumacz /nodef en de es fr it pl tr
+..\..\tlumacz en de es fr it /nocomp pl tr
 del ..\fdisk.lng
 copy out.lng ..\fdisk.lng
+del ..\deflfdsk.c
+copy deflang.c ..\deflfdsk.c
 del out.lng
 
 del ..\fdisk_de.lng
@@ -21,6 +23,8 @@ del ..\fdisk_de.lng
 copy out.lng ..\fdisk_de.lng
 del out.lng
 cd ..
+
+wcl -0 -wx -ox -we -ms tim.c deflfdsk.c ..\svarlngs.lib
 
 cd tree
 ..\..\tlumacz /nodef en de es fi lv pt ru tr
