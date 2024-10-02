@@ -631,7 +631,7 @@ int main(int argc, char **argv) {
     puts("/asm      deflang ASM output");
     puts("/nasm     deflang NASM output");
     puts("/nodef    does NOT generate a deflang source file (only an LNG file)");
-    puts("/nocomp   disables compression of strings in the LNG file");
+    puts("/nocomp   disables the MVCOMP compression of strings in the LNG file");
     puts("/excref   excludes ref lang from the LNG file (inserted to deflang only)");
     return(1);
   }
