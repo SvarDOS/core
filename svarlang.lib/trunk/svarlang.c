@@ -44,6 +44,10 @@ typedef unsigned short FHANDLE;
 #include "svarlang.h"
 
 
+/* uncomment to use the x86 assembly version of mvucomp */
+#define MVUCOMP_ASM 1
+
+
 /* supplied through DEFLANG.C */
 extern char svarlang_mem[];
 extern unsigned short svarlang_dict[];
@@ -136,6 +140,139 @@ modify [ax cx dx]
 #endif
 
 
+
+#ifdef MVUCOMP_ASM
+
+void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned short src, unsigned short complen) {
+  _asm {
+    push ds
+    push es
+
+    /* ds:si = compressed stream */
+    /* es:di = output location */
+    /* bx = len of compressed stream */
+    mov bx, complen
+    shr bx, 1 /* convert byte length to number of words */
+    cld /* make sure stosw and friends move forward */
+    mov di, dst
+    mov si, src
+    /* set ds = es = bufseg */
+    mov es, bufseg
+    push es
+    pop ds
+
+    xor dl, dl /* literal continuation counter */
+
+    AGAIN:
+
+    /* do I have any input? */
+    test bx, bx
+    jz KONIEC
+    dec bx
+
+    /* load token */
+    lodsw  /* mov ax, [ds:si] + inc si + inc si */
+
+    /* literal continuation? */
+    test dl, dl
+    jz TRY_BACKREF
+    stosw
+    dec dl
+    jmp AGAIN
+
+    /* back ref? */
+    TRY_BACKREF:
+    test ax, 0xf000
+    jz LITERAL_START /* else it's a literal start */
+    /* AH = LLLL OOOO   AL = OOOO OOOO */
+    /* copy (ah>>4)+1 bytes from (ax & 0x0FFF)+1 */
+    /* save regs */
+    push si
+    /* prep DS:SI = source ; ES:DI = destination ; CX = len */
+    mov ch, ah
+    mov cl, 4
+    shr ch, cl
+    mov cl, ch
+    xor ch, ch
+    inc cx
+    and ax, 0x0fff  /* clear the backref length bits */
+    inc ax
+    mov si, di
+    sub si, ax
+    /* do the copy */
+    rep movsb /* copy cx bytes from ds:si to es:di */
+    /* restore regs */
+    pop si
+    jmp AGAIN
+
+    LITERAL_START: /* write al to dst and set literal counter */
+    /* 0000 UUUU  BBBB BBBB */
+    stosb /* mov [es:di], al + inc di */
+    mov dl, ah /* ah high nibble is guaranteed to be zero */
+    jmp AGAIN
+
+    KONIEC:
+    pop es
+    pop ds
+  }
+}
+
+#else
+
+void mvucomp(char *dst, const unsigned short *src, unsigned short complen) {
+  unsigned char rawwords = 0; /* number of uncompressible words */
+  complen /= 2; /* I'm interested in number of words, not bytes */
+
+  while (complen != 0) {
+    unsigned short token;
+    /* get next mvcomp token */
+    token = *src;
+    src++;
+    complen--;
+
+    /* token format is LLLL OOOO OOOO OOOO, where:
+     * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
+     * LLLL is the number of bytes (-1) that have to be copied from the offset.
+     *
+     * However, if LLLL is zero then the token's format is different:
+     * 0000 RRRR BBBB BBBB
+     *
+     * The above form occurs when uncompressible data is encountered:
+     * BBBB BBBB is the literal value of a byte to be copied
+     * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
+     */
+
+    /* raw word? */
+    if (rawwords != 0) {
+      unsigned short *dst16 = (void *)dst;
+      *dst16 = token;
+      dst += 2;
+      rawwords--;
+
+    /* literal byte? */
+    } else if ((token & 0xF000) == 0) {
+      *dst = token; /* no need for an explicit "& 0xff", dst is a char ptr so token is naturally truncated to lowest 8 bits */
+      dst++;
+      rawwords = token >> 8; /* number of RAW words that are about to follow */
+
+    /* else it's a backreference */
+    } else {
+      char *src = dst - (token & 0x0FFF) - 1;
+      token >>= 12;
+      for (;;) {
+        *dst = *src;
+        dst++;
+        src++;
+        if (token == 0) break;
+        token--;
+      }
+    }
+  }
+}
+
+#endif
+
+
 int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
   unsigned short buff16[2];
@@ -181,9 +318,6 @@ int svarlang_load(const char *fname, const char *lang) {
 
   /* is the lang block compressed? then uncompress it */
   if (buff16[0] & 0x8000) {
-    unsigned short compressedwords = buff16[1] / 2;
-    char *dst = svarlang_mem;
-    unsigned char rawwords = 0; /* number of uncompressible words */
     unsigned short *mvcompptr;
 
     /* start by loading the entire block at the end of the svarlang mem */
@@ -194,51 +328,12 @@ int svarlang_load(const char *fname, const char *lang) {
     }
 
     /* uncompress now */
-    while (compressedwords != 0) {
-      unsigned short token;
-      /* get next mvcomp token */
-      token = *mvcompptr;
-      mvcompptr++;
-      compressedwords--;
+#ifndef MVUCOMP_ASM
+    mvucomp(svarlang_mem, mvcompptr, buff16[1]);
+#else
+    mvucomp_asm(FP_SEG(svarlang_mem), FP_OFF(svarlang_mem), FP_OFF(svarlang_mem) + svarlang_memsz - buff16[1], buff16[1]);
+#endif
 
-      /* token format is LLLL OOOO OOOO OOOO, where:
-       * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
-       * LLLL is the number of bytes (-1) that have to be copied from the offset.
-       *
-       * However, if LLLL is zero then the token's format is different:
-       * 0000 RRRR BBBB BBBB
-       *
-       * The above form occurs when uncompressible data is encountered:
-       * BBBB BBBB is the literal value of a byte to be copied
-       * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
-       */
-
-      /* raw word? */
-      if (rawwords != 0) {
-        unsigned short *dst16 = (void *)dst;
-        *dst16 = token;
-        dst += 2;
-        rawwords--;
-
-      /* literal byte? */
-      } else if ((token & 0xF000) == 0) {
-        *dst = token; /* no need for an explicit "& 0xff", dst is a char ptr so token is naturally truncated to lowest 8 bits */
-        dst++;
-        rawwords = token >> 8; /* number of RAW words that are about to follow */
-
-      /* else it's a backreference */
-      } else {
-        char *src = dst - (token & 0x0FFF) - 1;
-        token >>= 12;
-        for (;;) {
-          *dst = *src;
-          dst++;
-          src++;
-          if (token == 0) break;
-          token--;
-        }
-      }
-    }
     goto FCLOSE_AND_EXIT;
   }
 
