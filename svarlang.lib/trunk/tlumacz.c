@@ -372,7 +372,7 @@ static unsigned short mvcomp_litqueue_dump(unsigned short **dst, const unsigned 
 
   qlen--; /* now it's between 0 and 30 */
   /* write the length and first char */
-  **dst = ((qlen / 2) << 8) | q[0];
+  **dst = (unsigned short)((qlen / 2) << 8) | q[0];
   *dst += 1;
   q++;
   complen += 2;
@@ -394,49 +394,84 @@ static unsigned short mvcomp_litqueue_dump(unsigned short **dst, const unsigned 
 }
 
 
-/* mvcomp applies the MV-COMPRESSION algorithm to data and returns the compressed size */
-static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) {
+/* compare up to n bytes of locations s1 and s2, returns the amount of same bytes (0..n) */
+static unsigned short comparemem(const unsigned char *s1, const unsigned char *s2, unsigned short n) {
+  unsigned short i;
+  for (i = 0; (i < n) && (s1[i] == s2[i]); i++);
+  return(i);
+}
+
+
+/* mvcomp applies the MV-COMPRESSION algorithm to data and returns the compressed size
+ * updates len with the number of input bytes left unprocessed */
+static unsigned short mvcomp(void *dstbuf, size_t dstbufsz, const unsigned char *src, size_t *len) {
   unsigned short complen = 0;
-  unsigned short *dst = (void *)dstbuf;
+  unsigned short *dst = dstbuf;
   unsigned short bytesprocessed = 0;
   unsigned char litqueue[32];
   unsigned char litqueuelen = 0;
 
   /* read src byte by byte, len times, each time look for a match of 15,14,13..2 chars in the back buffer */
-  while (len > 0) {
+  while (*len > 0) {
     unsigned short matchlen;
     unsigned short minmatch;
     unsigned short offset;
     matchlen = 16;
-    if (len < matchlen) matchlen = len;
+    if (*len < matchlen) matchlen = (unsigned short)(*len);
+
+    /* abort if no space in output buffer, but do NOT break a literal queue */
+    if ((complen >= dstbufsz - 32) && (litqueuelen == 0)) return(complen);
 
     /* look for a minimum match of 2 bytes, unless I have some pending literal bytes
      * awaiting, in which case I am going through a new data pattern and it is more
-     * efficient to wait for a 3-bytes match before breaking the literal string */
-    if (litqueuelen != 0) {
-      minmatch = 3;
+     * efficient to wait for a longer match before breaking the literal string */
+    if (litqueuelen & 1) {
+      minmatch = 3; /* breaking an uneven queue is less expensive */
+    } else if (litqueuelen > 0) {
+      goto NOMATCH; /* breaking an even-sized literal queue is never a good idea */
     } else {
       minmatch = 2;
     }
 
-    for (; matchlen >= minmatch; matchlen--) {
-      /* start at -1 and try to match something moving backward */
+    if (matchlen >= minmatch) {
+      /* start at -1 and try to match something moving backward. note that
+       * matching a string longer than the offset is perfectly valid, this
+       * allows for encoding self-duplicating strings (see MVCOMP.TXT) */
       unsigned short maxoffset = 4096;
+      unsigned short longestmatch = 0;
+      unsigned short longestmatchoffset = 0;
       if (maxoffset > bytesprocessed) maxoffset = bytesprocessed;
 
       for (offset = 1; offset <= maxoffset; offset++) {
-        if (memcmp(src, src - offset, matchlen) == 0) {
+        unsigned short matchingbytes;
+        /* quick skip if first two bytes to not match (never interested in 1-byte matches) */
+        if (*((const unsigned short *)src) != *(const unsigned short *)(src - offset)) continue;
+        /* compute the exact number of bytes that match */
+        matchingbytes = comparemem(src, src - offset, matchlen);
+        if (matchingbytes == matchlen) {
           //printf("Found match of %u bytes at offset -%u: '%c%c%c...'\n", matchlen, offset, src[0], src[1], src[2]);
           goto FOUND;
         }
+        if (matchingbytes > longestmatch) {
+          longestmatch = matchingbytes;
+          longestmatchoffset = offset ;
+        }
+      }
+      /* is the longest match interesting? */
+      if (longestmatch >= minmatch) {
+        matchlen = longestmatch;
+        offset = longestmatchoffset;
+        goto FOUND;
       }
     }
+
+    NOMATCH:
 
     /* if here: no match found, write a literal byte to queue */
     litqueue[litqueuelen++] = *src;
     src++;
     bytesprocessed++;
-    len--;
+    *len -= 1;
 
     /* dump literal queue to dst if max length reached */
     if (litqueuelen == 31) {
@@ -453,11 +488,11 @@ static unsigned short mvcomp(char *dstbuf, const char *src, unsigned short len) 
       litqueuelen = 0;
     }
 
-    *dst = ((matchlen - 1) << 12) | (offset - 1);
+    *dst = (unsigned short)((matchlen - 1) << 12) | (offset - 1);
     dst++;
     src += matchlen;
     bytesprocessed += matchlen;
-    len -= matchlen;
+    *len -= matchlen;
     complen += 2;
   }
 
@@ -482,7 +517,8 @@ static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag) {
   if (compflag) {
     static char compstrings[65000];
     unsigned short comp_bytes;
-    comp_bytes = mvcomp(compstrings, l->strings, strings_bytes);
+    size_t stringslen = strings_bytes;
+    comp_bytes = mvcomp(compstrings, sizeof(compstrings), l->strings, &stringslen);
     if (comp_bytes < strings_bytes) {
       printf("lang %c%c mvcomp-ressed (%u bytes -> %u bytes)\n", l->id[0], l->id[1], strings_bytes, comp_bytes);
       langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
@@ -512,8 +548,12 @@ static int svl_write_c_source(const struct svl_lang *l, const char *fn, unsigned
     return(0);
   }
 
-  allocsz = biggest_langsz + (biggest_langsz / 20);
-  printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (5%% safety margin)\n", biggest_langsz, allocsz);
+  /* the maximum mvcomp overhead is 3.23% (ie. an increase of 1 byte for every
+   * 31 bytes of source, because 31 source bytes are encoded as a 32 bytes
+   * sequence). The necessary buffer for in-place decompression is therefore
+   * FILESIZE + (FILESIZE / 31) + 1 */
+  allocsz = biggest_langsz + (biggest_langsz / 31) + 1;
+  printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (3.23%% margin for inplace mvcomp decompression)\n", biggest_langsz, allocsz);
   fprintf(fd, "/* THIS FILE HAS BEEN GENERATED BY TLUMACZ (PART OF THE SVARLANG LIBRARY) */\r\n");
   fprintf(fd, "const unsigned short svarlang_memsz = %uu;\r\n", allocsz);
   fprintf(fd, "const unsigned short svarlang_string_count = %uu;\r\n\r\n", l->num_strings);
