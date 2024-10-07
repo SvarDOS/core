@@ -15,6 +15,10 @@ CFLAGS = -q -0 -wx -we -os -s
 
 ALLFILES = auto_exe.c auto_nls.c svarlang.c version.c
 
+svarlang.obj: svarlang.c
+	wcc $(CFLAGS) -ms -Fo=svarlang.obj svarlang.c
+	wdis svarlang.obj > svarlang.out
+
 svarlngs.lib: $(ALLFILES)
 	wcc $(CFLAGS) -ms -Fo=auto_exe.obj auto_exe.c
 	wcc $(CFLAGS) -ms -Fo=auto_nls.obj auto_nls.c

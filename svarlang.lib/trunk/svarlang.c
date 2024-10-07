@@ -143,79 +143,79 @@ modify [ax cx dx]
 
 #ifdef MVUCOMP_ASM
 
-void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned short src, unsigned short complen) {
-  _asm {
-    push ds
-    push es
+static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned short src, unsigned short complen);
 
-    /* ds:si = compressed stream */
-    /* es:di = output location */
-    /* bx = len of compressed stream */
-    mov bx, complen
-    shr bx, 1 /* convert byte length to number of words */
-    cld /* make sure stosw and friends move forward */
-    mov di, dst
-    mov si, src
-    /* set ds = es = bufseg */
-    mov es, bufseg
-    push es
-    pop ds
-
-    xor dl, dl /* literal continuation counter */
-
-    AGAIN:
-
-    /* do I have any input? */
-    test bx, bx
-    jz KONIEC
-    dec bx
-
-    /* load token */
-    lodsw  /* mov ax, [ds:si] + inc si + inc si */
-
-    /* literal continuation? */
-    test dl, dl
-    jz TRY_BACKREF
-    stosw
-    dec dl
-    jmp AGAIN
-
-    /* back ref? */
-    TRY_BACKREF:
-    test ax, 0xf000
-    jz LITERAL_START /* else it's a literal start */
-    /* AH = LLLL OOOO   AL = OOOO OOOO */
-    /* copy (ah>>4)+1 bytes from (ax & 0x0FFF)+1 */
-    /* save regs */
-    push si
-    /* prep DS:SI = source ; ES:DI = destination ; CX = len */
-    mov ch, ah
-    mov cl, 4
-    shr ch, cl
-    mov cl, ch
-    xor ch, ch
-    inc cx
-    and ax, 0x0fff  /* clear the backref length bits */
-    inc ax
-    mov si, di
-    sub si, ax
-    /* do the copy */
-    rep movsb /* copy cx bytes from ds:si to es:di */
-    /* restore regs */
-    pop si
-    jmp AGAIN
-
-    LITERAL_START: /* write al to dst and set literal counter */
-    /* 0000 UUUU  BBBB BBBB */
-    stosb /* mov [es:di], al + inc di */
-    mov dl, ah /* ah high nibble is guaranteed to be zero */
-    jmp AGAIN
-
-    KONIEC:
-    pop es
-    pop ds
-  }
-}
+#pragma aux mvucomp_asm = \
+"    push ds"\
+\
+     /* ds:si = compressed stream */     \
+     /* es:di = output location */       \
+     /* bx = len of compressed stream */ \
+"    shr bx, 1" /* convert byte length to number of words */ \
+"    cld" /* make sure stosw and friends move forward */ \
+     /* set ds = es = bufseg */          \
+"    push es"\
+"    pop ds"\
+\
+"    xor dl, dl" /* literal continuation counter */ \
+\
+"    AGAIN:"\
+\
+     /* do I have any input? */ \
+"    test bx, bx"\
+"    jz KONIEC"\
+"    dec bx"\
+\
+     /* load token */ \
+"    lodsw"  /* mov ax, [ds:si] + inc si + inc si */ \
+\
+"    /* literal continuation? */"\
+"    test dl, dl"\
+"    jz TRY_BACKREF"\
+"    stosw"\
+"    dec dl"\
+"    jmp AGAIN"\
+\
+/* back ref? */ \
+"    TRY_BACKREF:"\
+"    test ax, 0xf000"\
+"    jz LITERAL_START" /* else it's a literal start */ \
+     /* AH = LLLL OOOO   AL = OOOO OOOO */ \
+     /* copy (ah>>4)+1 bytes from (ax & 0x0FFF)+1 */ \
+     /* save regs */ \
+"    push si"\
+     /* prep DS:SI = source ; ES:DI = destination ; CX = len */ \
+"    mov ch, ah"\
+"    mov cl, 4"\
+"    shr ch, cl"\
+"    mov cl, ch"\
+"    xor ch, ch"\
+"    inc cx"\
+"    and ax, 0x0fff"  /* clear the backref length bits */ \
+"    inc ax"\
+"    mov si, di"\
+"    sub si, ax"\
+"    /* do the copy */"\
+"    /* rep movsb *//* copy cx bytes from ds:si to es:di + inc si + inc di */"\
+"ag:"\
+"lodsb"\
+"stosb"\
+"loop ag"\
+\
+"    /* restore regs */"\
+"    pop si"\
+"    jmp AGAIN"\
+\
+"    LITERAL_START:" /* write al to dst and set literal counter */ \
+     /* 0000 UUUU  BBBB BBBB */ \
+"    stosb" /* mov [es:di], al + inc di */ \
+"    mov dl, ah" /* ah high nibble is guaranteed to be zero */ \
+"    jmp AGAIN"\
+""\
+"    KONIEC:"\
+"    pop ds"\
+modify [ax bx cx dx di si] \
+parm [es] [di] [si] [bx]
 
 #else
 
