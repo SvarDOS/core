@@ -196,11 +196,7 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
 "    mov si, di"\
 "    sub si, ax"\
 "    /* do the copy */"\
-"    /* rep movsb *//* copy cx bytes from ds:si to es:di + inc si + inc di */"\
-"ag:"\
-"lodsb"\
-"stosb"\
-"loop ag"\
+"    rep movsb" /* copy cx bytes from ds:si to es:di + inc si + inc di */ \
 \
 "    /* restore regs */"\
 "    pop si"\
