@@ -17,6 +17,22 @@ all: tree.com
 tree.com: tree.c deflang.c stack.c
 	$(CC) $(CFLAGS) tree.c deflang.c stack.c svarlang/svarlngs.lib
 
+release: tree.com .symbolic
+	mkdir appinfo
+	mkdir bin
+	mkdir doc
+	copy tree.lsm appinfo
+	copy tree.com bin
+	copy tree.lng bin
+	copy tree.txt doc
+	rm -f tree.svp
+	zip -r9kDX -m tree.svp appinfo bin doc
+	rmdir appinfo
+	rmdir bin
+	rmdir doc
+	rm -f tree-src.zip
+	zip -r9kDX tree-src.zip makefile *.c *.h *.lsm *.txt nls svarlang
+
 deflang.c: nls/*.txt
 	rm -f deflang.c
 	rm -f tree.lng
