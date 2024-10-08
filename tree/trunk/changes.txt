@@ -1,13 +1,17 @@
-History/Changes - Alternate Tree - pdTree v1.03
-Written by Kenneth J. Davis
-Public Domain Tree
+SvarDOS TREE History / Changes
 
-Future Plans:  When time permits.  KJD
-               I would like to get it to compile using other
-               compilers, such as DJGPP, Dunfield's Micro C, 
-               and Borland's TC++ v1.01
-               Update cats library (use cats v4 aka kitten
-               for DOS and cats v3.97 for Windows)
+Oct 10, 2024   SvarDOS TREE 20241010   Mateusz Viste
+               - ported to Open Watcom, builds with a makefile
+               - replaced all C++ things by proper ANSI C
+               - stripped the Windows API simulation
+               - removed LFN support
+               - replaced CATS by SvarLANG
+               - removed all printf calls
+               - memory optimizations
+               - lots of code simplifications and refactorizations
+               - documented all switches in /?
+               - added PL language
+               - added DE language (contributed by Bernd Boeckmann)
 
 Sept 12, 2005  pdTree V1.04 Release   KJD
                Add /DS option to display alternate streams in files
@@ -75,11 +79,11 @@ Jan 18, 2001   pdTree V1.01 Alpha Release   KJD
                on really deep (> 30) directory structures in DOS
                version.  Now uses non-recursive function to display
                directory tree, placing necessary information onto
-               the heap via a 'stack' object.  Depth is still 
+               the heap via a 'stack' object.  Depth is still
                limited to available memory, but maintained goal
                of minimal hard coded limits (if there is enough memory
                should be able to handle any number of files or
-               subdirectories in a given directory and able to 
+               subdirectories in a given directory and able to
                handle any depth directory tree up to MAX PATH length).
 
 
@@ -128,9 +132,9 @@ Sept 7, 2000   Tree V4.00 Gold Revision E Release   KJD
 
 Sept 2, 2000   Tree V4.00 Gold Revision D Release   KJD
                Modified tree source to use latest cats (v3.71), it
-               includes most of the changes I made to v3.6 for 
+               includes most of the changes I made to v3.6 for
                prior releases of tree v4.  Changed history.txt to
-               changes.txt.  Added history.txt to reflect FreeDOS 
+               changes.txt.  Added history.txt to reflect FreeDOS
                versions of tree including ones prior to v4 tree.
                Added batch files to aid in compiling.
 
@@ -143,7 +147,7 @@ Aug 26, 2000   Tree V4.00 Gold Revision C Updated   KJD
 Aug 25, 2000   Tree V4.00 Gold Revision C Release   KJD
                Added check in DOS get volume information for FreeDOS
                returning 0x02=File Not Found, instead of 0x12=No More
-               Files when disk has no label.  
+               Files when disk has no label.
 
 Aug 24, 2000   Tree v4.00 Gold Revision B Release   KJD
                Changed argument processing to allow the switch character
@@ -158,7 +162,7 @@ Aug 24, 2000   Tree v4.00 Gold Revision B Release   KJD
 Aug 22, 2000   Tree v4.00 Gold Revision A Release   KJD
                Added fix so LFN failure detection works properly under
                FreeDOS (beta 5 mini boot disk).  Now tree also works
-               under FreeDOS (without using /S switch - force shortnames 
+               under FreeDOS (without using /S switch - force shortnames
                only).  Also added initial spanish translation.
 
 
