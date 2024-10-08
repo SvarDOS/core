@@ -44,7 +44,7 @@ typedef unsigned short FHANDLE;
 #include "svarlang.h"
 
 
-/* uncomment to use the x86 assembly version of mvucomp */
+/* uncomment to use the x86 assembly version of mvucomp (26 bytes smaller) */
 #define MVUCOMP_ASM 1
 
 
@@ -157,7 +157,7 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
 "    push es"\
 "    pop ds"\
 \
-"    xor dl, dl" /* literal continuation counter */ \
+"    xor dx, dx" /* literal continuation counter */ \
 \
 "    AGAIN:"\
 \
@@ -170,10 +170,10 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
 "    lodsw"  /* mov ax, [ds:si] + inc si + inc si */ \
 \
 "    /* literal continuation? */"\
-"    test dl, dl"\
+"    test dx, dx"\
 "    jz TRY_BACKREF"\
 "    stosw"\
-"    dec dl"\
+"    dec dx" /* a byte shorter than dec dl */ \
 "    jmp AGAIN"\
 \
 /* back ref? */ \
@@ -185,8 +185,8 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
      /* save regs */ \
 "    push si"\
      /* prep DS:SI = source ; ES:DI = destination ; CX = len */ \
-"    mov ch, ah"\
-"    mov cl, 4"\
+"    mov ch, ah" /* this is all about setting CX to the high nibble of AX */ \
+"    mov cl, 4"  /* using a code as compact as possible.                  */ \
 "    shr ch, cl"\
 "    mov cl, ch"\
 "    xor ch, ch"\
