@@ -44,10 +44,6 @@ typedef unsigned short FHANDLE;
 #include "svarlang.h"
 
 
-/* uncomment to use the x86 assembly version of mvucomp (26 bytes smaller) */
-#define MVUCOMP_ASM 1
-
-
 /* supplied through DEFLANG.C */
 extern char svarlang_mem[];
 extern unsigned short svarlang_dict[];

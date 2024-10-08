@@ -13,11 +13,12 @@ CFLAGS = -q -0 -wx -we -os -s
 # it does not use FILE already, but it allows for 100% ANSI C compliancy.
 #CFLAGS += -DWITHSTDIO
 
+# uncomment this if you'd like to enable an assembly version of the mvcomp
+# depacker instead of the native C routine. This saves 27 bytes of footprint.
+CFLAGS += -DMVUCOMP_ASM
+
 ALLFILES = auto_exe.c auto_nls.c svarlang.c version.c
 
-svarlang.obj: svarlang.c
-	wcc $(CFLAGS) -ms -Fo=svarlang.obj svarlang.c
-	wdis svarlang.obj > svarlang.out
 
 svarlngs.lib: $(ALLFILES)
 	wcc $(CFLAGS) -ms -Fo=auto_exe.obj auto_exe.c
