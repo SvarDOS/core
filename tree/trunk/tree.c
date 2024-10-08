@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#define VERSION "1.04"
+#define VERSION "20241010"
 
 /****************************************************************************
 
@@ -12,8 +12,8 @@
   Date:       August, 2000
   Updated:    September, 2000; October, 2000; November, 2000; January, 2001;
               May, 2004; Sept, 2005
-  Contact:    jeremyd@computer.org
 
+  October 2024: lots of works by Mateusz Viste, became SvarDOS tree
 
 Copyright (c): Public Domain [United States Definition]
 
