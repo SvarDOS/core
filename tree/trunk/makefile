@@ -37,7 +37,6 @@ deflang.c: nls/*.txt
 	rm -f deflang.c
 	rm -f tree.lng
 	cd nls
-	rm -f ??.txt
 	utf8tocp 437 en-utf8.txt en.txt
 	utf8tocp 850 de-utf8.txt de.txt
 	utf8tocp 850 es-utf8.txt es.txt
@@ -51,6 +50,7 @@ deflang.c: nls/*.txt
 	$(CP) deflang.c ..
 	rm -f out.lng
 	rm -f deflang.c
+	rm -f ??.txt
 	cd ..
 
 clean: .symbolic
