@@ -1,24 +1,13 @@
-# Messages used by pdTree v1 and FreeDOS tree 3.6
-# Each line is limited to 159 characters unless MAXLINE is changed,
-# but if possible should be limited to 79 per line, with a \n
-# added to indicate go to next line, max 2 lines.
-# The messages are split into sets,
-# where each set corresponds to a given function in pdTree.
-# Set 1, is for main and common strings.
-# Many of the strings are used directly by printf,
-# so when a %? appears, be sure any changes also include the %?
-# where ? is a variable identifier and format.
-# Note: only \\, \n, \r, \t are supported (and a single slash must use \\).
-#
+# Messages used by SvarDOS TREE
+# German language
+# author: Bernd Boeckmann (2024)
 
-# main [Set 1]
-1.2:Verzeichnisauflistung\n
-# Must include %s for label
-1.3:Verzeichnisauflistung für Datenträger %s\n
-# Must include %s for serial #
-1.4:Seriennummer des Datenträgers ist %s\n
-1.5:Keine Unterverzeichnisse vorhanden\n\n
-1.6: --- Press any key to continue ---\n
+# main
+1.2:Verzeichnisauflistung
+1.3:Verzeichnisauflistung für Datenträger %
+1.4:Seriennummer des Datenträgers ist %
+1.5:Keine Unterverzeichnisse vorhanden
+1.6: --- Press any key to continue ---
 
 # show Usage
 2.1:Grafische Darstellung von Verzeichnisstrukturen
@@ -34,35 +23,20 @@
 2.12:  /DH  Zeige versteckte und Systemdateien (standardmäßig keine Anzeige)
 2.13:  /DR  Zeige Statistiken
 
-# showInvalidUsage [Set 3]
-# Must include the %s for option given.
-3.1:Ungültiger Schalter - %s\n
+# showInvalidUsage
+3.1:Ungültiger Schalter - %
 3.2:TREE /? für Nutzungshinweise.
-3.3:Zu viele Parameter - %s\n
+3.3:Zu viele Parameter - %
 
 # showVersionInfo
 4.0:Basiert auf pdTREE von Kenneth J. Davis (2000-2004)
 4.1:Weiterentwickelt und angepasst an SvarDOS von Mateusz Viste (2024)
 4.2:Lizenzfrei (public domain) gemäß US-amerikanischer Definition
 
-# showInvalidDrive [Set 5]
-5.1:Ungültige Laufwerksspezifikation\n
-# showInvalidPath [Set 6]
-# Must include %s for the invalid path given.
-6.1:Ungültiger Pfad - %s\n
-# misc error conditions [Set 7]
-# showBufferOverrun
-# %u required to show what the buffer's current size is.
-7.1:Fehler: Angegebener Dateipfad zu groß für Zwischenspeicher (%u Bytes)\n
-# showOutOfMemory
-# %s required to display what directory we were processing when ran out of memory.
-7.2:Zu wenig Arbeitsspeicher: %s\n
-#
-# deprecated [Set 8]
-# 8.1 - 8.10 reserved for option selection characters in earlier releases.
-# parseArguments [Set 8] contains the Character[s] used for
-#   argument processing.  Only the 1st character on a line is used.
-# Primary character used to determine option follows, default is '-'
-8.1:/
-# Secondary character used to determine option follows, default is '/'
-8.2:-
+# showInvalidDrive
+5.1:Ungültige Laufwerksspezifikation
+6.1:Ungültiger Pfad - %
+
+# misc error conditions
+7.1:Fehler: Angegebener Dateipfad zu groß für Zwischenspeicher (% Bytes)
+7.2:Zu wenig Arbeitsspeicher: %

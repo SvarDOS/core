@@ -141,6 +141,47 @@ static unsigned char is_stdout_redirected(void);
 modify [ax bx dx] \
 value [al]
 
+/* output string s to console (no newline) */
+static void outstr_pragma(const char far *s);
+#pragma aux outstr_pragma = \
+/* save DS and set it to ES so both point at the string */ \
+"push ds" \
+"push es" \
+"pop ds" \
+\
+/* compute strlen of s (es:di) and put it in cx */ \
+"xor al, al" /* look for a 0 char */ \
+"mov di, dx" \
+"xor cx, cx" \
+"not cx"     /* load cx with 0xffff (maximum loop iterations) */ \
+"cld"        /* clear direction flag so repnz is guaranteed to move forward */\
+"repne scasb" \
+"not cx" \
+"dec cx"     /* cx contains strlen(s) now */ \
+\
+/* ah=0x40 -- "write to file or device" */ \
+"mov ah, 0x40" \
+"xor bx, bx"       /* file handle 0 is stdout */ \
+/* mov cx, slen */ /* bytes count */ \
+"int 0x21" \
+"pop ds" \
+modify [ax bx cx di] \
+parm [es dx]
+
+
+static void outstr(const char *s) {
+  outstr_pragma(s);
+}
+
+
+/* outputs a single character to console */
+static void outch(char s);
+#pragma aux outch = \
+"mov ah, 0x02" \
+"int 0x21" \
+modify [ah] \
+parm [dl]
+
 
 static _Packed struct {
   unsigned short infolevel;
@@ -229,7 +270,7 @@ static void getConsoleSize(void) {
   } else { /* e.g. the console */
     if ((*bios_cols == 0) || (*bios_size == 0)) { /* MDA does not report size */
       cols = 80;
-      rows = 23;
+      rows = 24;
     } else {
       cols = *bios_cols;
       rows = *bios_size / cols / 2;
@@ -239,68 +280,37 @@ static void getConsoleSize(void) {
 }
 
 
-/* when pause == NOPAUSE then identical to printf,
+/* when pause == NOPAUSE then identical to puts,
    otherwise counts lines printed and pauses as needed.
    Should be used for all messages printed that do not
-   immediately exit afterwards (else printf may be used).
+   immediately exit afterwards (else puts may be used).
    May display N too many lines before pause if line is
    printed that exceeds cols [N=linelen%cols] and lacks
    any newlines (but this should not occur in tree).
 */
-#include <stdarg.h>  /* va_list, va_start, va_end */
-static int pprintf(const char *msg, ...) {
-  static int lineCnt = -1;
-  static int lineCol = 0;
-  va_list argptr;
-  int cnt;
-  char buffer[MAXLINE];
-
-  if (lineCnt == -1) lineCnt = rows;
-
-  va_start(argptr, msg);
-  cnt = vsprintf(buffer, msg, argptr);
-  va_end(argptr);
-
-  if (pause == PAUSE)
-  {
-    char *l = buffer;
-    char *t;
-    /* cycle through counting newlines and lines > cols */
-    for (t = strchr(l, '\n'); t != NULL; t = strchr(l, '\n'))
-    {
-      char c;
-      t++;             /* point to character after newline */
-      c = *t;          /* store current value */
-      *t = '\0';       /* mark as end of string */
-
-      /* print all but last line of a string that wraps across rows */
-      /* adjusting for partial lines printed without the newlines   */
-      while (strlen(l)+lineCol > cols)
-      {
-        char c = l[cols-lineCol];
-        l[cols-lineCol] = '\0';
-        printf("%s", l);
-        l[cols-lineCol] = c;
-        l += cols-lineCol;
-
-        lineCnt--;  lineCol = 0;
-        if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", svarlang_strid(0x0106));  waitkey(); }
-      }
-
-      printf("%s", l); /* print out this line */
-      *t = c;          /* restore value */
-      l = t;           /* mark beginning of next line */
-
-      lineCnt--;  lineCol = 0;
-      if (!lineCnt) { lineCnt= rows;  fflush(NULL);  fprintf(stderr, "%s", svarlang_strid(0x0106));  waitkey(); }
-    }
-    printf("%s", l);   /* print rest of string that lacks newline */
-    lineCol = strlen(l);
+static void pputs(const char *s) {
+  static unsigned short count;
+  puts(s);
+  if ((pause == PAUSE) && (count++ == rows)) {
+    outstr(svarlang_strid(0x0106));
+    waitkey();
+    puts("");
+    count = 0;
   }
-  else  /* NOPAUSE */
-    printf("%s", buffer);
+}
 
-  return cnt;
+
+
+/* prints two strings, one embedded in another */
+static void print_strinstr(const char *s1, const char *s2) {
+  /* output s1 char after char, if '%' is spotted then output s2 */
+  for (; *s1 != 0; s1++) {
+    if (*s1 == '%') {
+      outstr(s2);
+    } else {
+      outch(*s1);
+    }
+  }
 }
 
 
@@ -318,7 +328,8 @@ static void showUsage(void) {
 
 /* Displays error message then exits indicating error */
 static void showInvalidUsage(char * badOption) {
-  printf(svarlang_strid(0x0301), badOption); /* invalid switch - ... */
+  print_strinstr(svarlang_strid(0x0301), badOption); /* invalid switch - ... */
+  puts("");
   puts(svarlang_strid(0x0302)); /* use TREE /? for usage info */
   exit(1);
 }
@@ -339,7 +350,7 @@ static void showVersionInfo(void) {
 
 /* Displays error messge for invalid drives and exits */
 static void showInvalidDrive(void) {
-  printf(svarlang_strid(0x0501)); /* invalid drive spec */
+  puts(svarlang_strid(0x0501)); /* invalid drive spec */
   exit(1);
 }
 
@@ -353,13 +364,15 @@ static char *fixPathForDisplay(char *path);
 
 /* Displays error message for invalid path; Does NOT exit */
 static void showInvalidPath(const char *badpath) {
-  pprintf("%s\n", badpath);
-  pprintf(svarlang_strid(0x0601), badpath); /* invalid path - ... */
+  pputs(badpath);
+  print_strinstr(svarlang_strid(0x0601), badpath); /* invalid path - ... */
+  pputs("");
 }
 
 /* Displays error message for out of memory; Does NOT exit */
 static void showOutOfMemory(const char *path) {
-  pprintf(svarlang_strid(0x0702), path); /* out of memory on subdir ... */
+  print_strinstr(svarlang_strid(0x0702), path); /* out of memory on subdir ... */
+  pputs("");
 }
 
 
@@ -637,38 +650,38 @@ static char *removePadding(char *padding) {
  * moreSubdirsFollow is -1 for initial path else >= 0.
  */
 static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFollow, DIRDATA *ddata) {
-  if (padding != NULL)
-    pprintf("%s", padding);
+  if (padding != NULL) {
+    outstr(padding);
+  }
 
   /* print lead padding except for initial directory */
-  if (moreSubdirsFollow >= 0)
-  {
-    if (charSet == EXTENDEDCHARS)
-    {
+  if (moreSubdirsFollow >= 0) {
+    if (charSet == EXTENDEDCHARS) {
       if (moreSubdirsFollow)
-        pprintf("%s", TBAR_HORZBAR_STR);
+        outstr(TBAR_HORZBAR_STR);
       else
-        pprintf("%s", CBAR_HORZBAR_STR);
+        outstr(CBAR_HORZBAR_STR);
     } else {
       if (moreSubdirsFollow)
-        pprintf("+---");
+        outstr("+---");
       else
-        pprintf("\\---");
+        outstr("\\---");
     }
   }
 
   /* optional display data */
-  if (dspAttr)  /* attributes */
-    pprintf("[%c%c%c%c%c] ",
-      (ddata->attrib & _A_SUBDIR)?'D':' ',  /* keep this one? its always true */
-      (ddata->attrib & _A_ARCH)?'A':' ',
-      (ddata->attrib & _A_SYSTEM)?'S':' ',
-      (ddata->attrib & _A_HIDDEN)?'H':' ',
-      (ddata->attrib & _A_RDONLY)?'R':' '
-    );
+  if (dspAttr) { /* attributes */
+    char attrstr[] = "[     ] ";
+    if (ddata->attrib & _A_SUBDIR) attrstr[1] = 'D'; /* keep this one? its always true */
+    if (ddata->attrib & _A_ARCH) attrstr[2] = 'A';
+    if (ddata->attrib & _A_SYSTEM) attrstr[3] = 'S';
+    if (ddata->attrib & _A_HIDDEN) attrstr[4] = 'H';
+    if (ddata->attrib & _A_RDONLY) attrstr[5] = 'R';
+    outstr(attrstr);
+  }
 
   /* display directory name */
-  pprintf("%s\n", currentpath);
+  pputs(currentpath);
 }
 
 
@@ -677,19 +690,24 @@ static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFol
  * Expects to be called after displayFiles (optionally called)
  */
 static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
+  char buff[64];
   addPadding(padding, hasMoreSubdirs);
 
   if (dspSumDirs) {
     if (showFiles == SHOWFILESON) {
       /* print File summary with lead padding, add filesize to it */
-      pprintf("%s%lu files\n", padding, ddata->fileCnt);
+      outstr(padding);
+      sprintf(buff, "%lu files", ddata->fileCnt);
+      pputs(buff);
     }
 
     /* print Directory summary with lead padding */
-    pprintf("%s%lu subdirectories\n", padding, ddata->subdirCnt);
+    outstr(padding);
+    sprintf(buff, "%lu subdirectories", ddata->subdirCnt);
+    pputs(buff);
 
     /* show [nearly] blank line after summary */
-    pprintf("%s\n", padding);
+    pputs(padding);
   }
 
   removePadding(padding);
@@ -722,34 +740,37 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
          ( ((entry.attrib & (_A_HIDDEN | _A_SYSTEM)) == 0)  || dspAll) )
     {
       /* print lead padding */
-      pprintf("%s", padding);
+      outstr(padding);
 
       /* optional display data */
-      if (dspAttr)  /* file attributes */
-        pprintf("[%c%c%c%c] ",
-          (entry.attrib & _A_ARCH)?'A':' ',
-          (entry.attrib & _A_SYSTEM)?'S':' ',
-          (entry.attrib & _A_HIDDEN)?'H':' ',
-          (entry.attrib & _A_RDONLY)?'R':' '
-        );
+      if (dspAttr) { /* file attributes */
+        char attrstr[] = "[    ] ";
+        if (entry.attrib & _A_ARCH) attrstr[1] = 'A';
+        if (entry.attrib & _A_SYSTEM) attrstr[2] = 'S';
+        if (entry.attrib & _A_HIDDEN) attrstr[3] = 'H';
+        if (entry.attrib & _A_RDONLY) attrstr[4] = 'R';
+        outstr(attrstr);
+      }
 
       if (dspSize) { /* file size */
-        if (entry.size < 1048576ul)  /* if less than a MB, display in bytes */
-          pprintf("%10lu ", entry.size);
-        else                               /* otherwise display in KB */
-          pprintf("%8luKB ", entry.size / 1024ul);
+        char buff[16];
+        if (entry.size < 1048576ul) { /* if less than a MB, display in bytes */
+          sprintf(buff, "%10lu ", entry.size);
+        } else {                      /* otherwise display in KB */
+          sprintf(buff, "%8luKB ", entry.size / 1024ul);
+        }
+        outstr(buff);
       }
 
       /* print filename */
-      pprintf("%s\n", entry.name);
+      pputs(entry.name);
 
       filesShown++;
     }
   } while(_dos_findnext(&entry) == 0);
 
-  if (filesShown)
-  {
-    pprintf("%s\n", padding);
+  if (filesShown) {
+    pputs(padding);
   }
 
   removePadding(padding);
@@ -904,9 +925,10 @@ static long traverseTree(char *initialpath) {
         flgErr = findNextSubdir(sdi->findnexthnd, subdir, dsubdir);
       }
 
-      if (flgErr) // don't add invalid paths to stack
-      {
-        printf("INTERNAL ERROR: subdir count changed, expecting %li more!\n", sdi->subdircnt+1L);
+      if (flgErr) { // don't add invalid paths to stack
+        char buff[64];
+        sprintf(buff, "INTERNAL ERROR: subdir count changed, expecting %li more!", sdi->subdircnt+1L);
+        puts(buff);
 
         sdi->subdircnt = 0; /* force subdir counter to 0, none left */
         stackPushItem(&s, sdi);
@@ -960,19 +982,24 @@ int main(int argc, char **argv) {
   /* Get Volume & Serial Number */
   GetVolumeAndSerial(volume, serial, path);
   if (volume[0] == 0) {
-    pprintf(svarlang_strid(0x0102)); /* Dir PATH listing */
+    pputs(svarlang_strid(0x0102)); /* Dir PATH listing */
   } else {
-    pprintf(svarlang_strid(0x0103), volume); /* Dir PATH listing for volume ... */
+    print_strinstr(svarlang_strid(0x0103), volume); /* Dir PATH listing for volume ... */
+    pputs("");
   }
   if (serial[0] != '\0') {  /* Don't print anything if no serial# found */
-    pprintf(svarlang_strid(0x0104), serial); /* vol serial num is ... */
+    print_strinstr(svarlang_strid(0x0104), serial); /* vol serial num is ... */
+    pputs("");
   }
 
   /* now traverse & print tree, returns nonzero if has subdirectories */
   if (traverseTree(path) == 0) {
-    pprintf(svarlang_strid(0x0105)); /* no subdirs exist */
+    pputs(svarlang_strid(0x0105)); /* no subdirs exist */
   } else if (dspSumDirs) { /* show count of directories processed */
-    pprintf("\n    %lu total directories\n", totalSubDirCnt+1);
+    char buff[64];
+    pputs("");
+    sprintf(buff, "    %lu total directories", totalSubDirCnt+1);
+    pputs(buff);
   }
 
   return(0);

@@ -1,29 +1,15 @@
-# Mensagens usadas por pdTree v1 e FreeDOS tree 3.6
-# Cada linha é limitada a 159 caracteres, a menos que MAXLINE seja alterado.
-# Mas, se possível, deve ser limitada a 79 por linha, com um \n
-# adicionado para indicar ir para a próxima linha, no máximo 2 linhas.
-# As mensagens säo divididas em conjuntos,
-# onde cada conjunto corresponde a uma determinada funçäo em pdTree.
-# O conjunto 1 é para strings principais e comuns.
-# Muitas das strings säo usadas diretamente por printf,
-# entäo, quando um %? for exibido, certifique-se de que todas as alteraçöes
-# também incluam o %?. Onde ? é um identificador e formato de variável.
-# Nota: apenas \\, \n, \r e \t säo suportados (e uma única barra deve-se usar \\).
-#
+# Messages used by SvarDOS TREE
 # Traduçäo do inglês para o português feita por:
 # Francesco Sacco (francesco_sacco@hotmail.com)
-#
 
-# Principal [Conjunto 1]
-1.2:Lista de PATH do diretório.\n
-# Deve incluir %s para o rótulo.
-1.3:Lista de PATH do diretório para o Volume %s\n
-# Deve incluir %s para o número de série
-1.4:O número de série do volume é %s\n
-1.5:Näo existem subdiretórios\n\n
-1.6: --- Pressione qualquer tecla para continuar ---\n
+# main
+1.2:Lista de PATH do diretório.
+1.3:Lista de PATH do diretório para o Volume %
+1.4:O número de série do volume é %
+1.5:Näo existem subdiretórios
+1.6: --- Pressione qualquer tecla para continuar ---
 
-# showUsage [Conjunto 2]
+# showUsage
 2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.
 2.2:\t
 2.3:TREE [unidade:][caminho] [/F] [/A]
@@ -31,32 +17,19 @@
 2.5:  /F  Exibe os nomes dos arquivos em cada diretório.
 2.6:  /A  Use ASCII em vez de caracteres estendidos.
 
-# showInvalidUsage [Conjunto 3]
-# Deve incluir o %s para a opçäo fornecida.
-3.1:Opçäo inválida - %s\n
+# showInvalidUsage
+3.1:Opçäo inválida - %
 3.2:Use TREE /? para obter informaçöes de uso.
-3.3:Muitos parâmetros - %s\n
+3.3:Muitos parâmetros - %
 
-# showVersionInfo [Conjunto 4]
+# showVersionInfo
 
-# showInvalidDrive [Conjunto 5]
-5.1:Especificaçäo de unidade inválida\n
-# showInvalidPath [Conjunto 6]
-# Precisa incluir %s para o caminho inválido fornecido.
-6.1:Caminho inválido - %s\n
-# várias condiçöes de erro [Conjunto 7]
-# showBufferOverrun
-# %u necessário para mostrar qual é o tamanho atual do buffer.
-7.1:Erro: o caminho do arquivo especificado excede o buffer máximo = %u bytes\n
-# showOutOfMemory
-# %s é necessário para exibir qual diretório estávamos processando quando ficou sem memória.
-7.2:Sem memória no subdiretório: %s\n
-#
-# descontinuado [Conjunto 8]
-# 8.1 - 8.10 reservado para caracteres de seleçäo de opçäo em versöes anteriores.
-# parseArguments [Conjunto 8] contém o(s) caracter(es) usados ??para
-# processamento do argumento. Apenas o primeiro caractere em uma linha é usado.
-# O caractere primário usado para determinar a opçäo segue, o padräo é '-'.
-8.1:/
-# O caractere secundário usado para determinar a opçäo a seguir, o padräo é '/'.
-8.2:-
+# showInvalidDrive
+5.1:Especificaçäo de unidade inválida
+
+# showInvalidPath
+6.1:Caminho inválido - %
+
+# misc errors
+7.1:Erro: o caminho do arquivo especificado excede o buffer máximo = % bytes
+7.2:Sem memória no subdiretório: %
