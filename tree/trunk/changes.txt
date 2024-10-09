@@ -6,7 +6,9 @@ Oct 10, 2024   SvarDOS TREE 20241010   Mateusz Viste
                - stripped the Windows API simulation
                - removed LFN support
                - replaced CATS by SvarLANG
-               - removed all printf calls
+               - cleaned up all translation files
+               - replaced all printf calls by ligther equivalents
+               - redefined console ouput operations as direct DOS calls
                - memory optimizations
                - lots of code simplifications and refactorizations
                - documented all switches in /?

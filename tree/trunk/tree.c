@@ -39,7 +39,6 @@ DEALINGS IN THE SOFTWARE.
 /* Include files */
 #include <dos.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "stack.h"
@@ -61,6 +60,8 @@ DEALINGS IN THE SOFTWARE.
 #define NOPAUSE        0  /* Default, don't pause after screenfull       */
 #define PAUSE          1  /* Wait for keypress after each page           */
 
+
+#define PATH_MAX 256
 
 /* Global variables */
 short showFiles = SHOWFILESOFF;
@@ -141,38 +142,6 @@ static unsigned char is_stdout_redirected(void);
 modify [ax bx dx] \
 value [al]
 
-/* output string s to console (no newline) */
-static void outstr_pragma(const char far *s);
-#pragma aux outstr_pragma = \
-/* save DS and set it to ES so both point at the string */ \
-"push ds" \
-"push es" \
-"pop ds" \
-\
-/* compute strlen of s (es:di) and put it in cx */ \
-"xor al, al" /* look for a 0 char */ \
-"mov di, dx" \
-"xor cx, cx" \
-"not cx"     /* load cx with 0xffff (maximum loop iterations) */ \
-"cld"        /* clear direction flag so repnz is guaranteed to move forward */\
-"repne scasb" \
-"not cx" \
-"dec cx"     /* cx contains strlen(s) now */ \
-\
-/* ah=0x40 -- "write to file or device" */ \
-"mov ah, 0x40" \
-"xor bx, bx"       /* file handle 0 is stdout */ \
-/* mov cx, slen */ /* bytes count */ \
-"int 0x21" \
-"pop ds" \
-modify [ax bx cx di] \
-parm [es dx]
-
-
-static void outstr(const char *s) {
-  outstr_pragma(s);
-}
-
 
 /* outputs a single character to console */
 static void outch(char s);
@@ -181,6 +150,17 @@ static void outch(char s);
 "int 0x21" \
 modify [ah] \
 parm [dl]
+
+
+static void outstr(const char *s) {
+  for (; *s != 0; s++) outch(*s);
+}
+
+
+static void puts(const char *s) {
+  outstr(s);
+  outstr("\r\n");
+}
 
 
 static _Packed struct {
@@ -444,11 +424,18 @@ static void parseArguments(int argc, char **argv) {
  * and volume found using path.
  */
 static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
+  char buff[8];
   getdrvserial((path[0] & 0xDF) - '@');
   memcpy(volume, glob_drv_info.label, 12);
   volume[11] = 0;
 
-  sprintf(serial, "%04X:%04X", glob_drv_info.serial1, glob_drv_info.serial2);
+  /* build the "1234:56789" serial number string */
+  strcpy(serial, "0000");
+  utoa(glob_drv_info.serial1, buff, 16);
+  strcpy(serial + 4 - strlen(buff), buff);
+  strcat(serial, ":0000");
+  utoa(glob_drv_info.serial2, buff, 16);
+  strcpy(serial + 9 - strlen(buff), buff);
 }
 
 
@@ -690,21 +677,23 @@ static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFol
  * Expects to be called after displayFiles (optionally called)
  */
 static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
-  char buff[64];
+  char buff[16];
   addPadding(padding, hasMoreSubdirs);
 
   if (dspSumDirs) {
     if (showFiles == SHOWFILESON) {
       /* print File summary with lead padding, add filesize to it */
       outstr(padding);
-      sprintf(buff, "%lu files", ddata->fileCnt);
-      pputs(buff);
+      ultoa(ddata->fileCnt, buff, 10);
+      outstr(buff);
+      pputs(" files");
     }
 
     /* print Directory summary with lead padding */
     outstr(padding);
-    sprintf(buff, "%lu subdirectories", ddata->subdirCnt);
-    pputs(buff);
+    ultoa(ddata->subdirCnt, buff, 10);
+    outstr(buff);
+    pputs(" subdirectories");
 
     /* show [nearly] blank line after summary */
     pputs(padding);
@@ -753,13 +742,18 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
       }
 
       if (dspSize) { /* file size */
-        char buff[16];
+        char buff[32] = "          ";
         if (entry.size < 1048576ul) { /* if less than a MB, display in bytes */
-          sprintf(buff, "%10lu ", entry.size);
+          //sprintf(buff, "%10lu ", entry.size);
+          ultoa(entry.size, buff + 10, 10);
+          outstr(buff + strlen(buff + 10));
+          outstr(" ");
         } else {                      /* otherwise display in KB */
-          sprintf(buff, "%8luKB ", entry.size / 1024ul);
+          //sprintf(buff, "%8luKB ", entry.size / 1024ul);
+          ultoa(entry.size / 1024, buff + 8, 10);
+          outstr(buff + strlen(buff + 8));
+          outstr("KB ");
         }
-        outstr(buff);
       }
 
       /* print filename */
@@ -926,9 +920,8 @@ static long traverseTree(char *initialpath) {
       }
 
       if (flgErr) { // don't add invalid paths to stack
-        char buff[64];
-        sprintf(buff, "INTERNAL ERROR: subdir count changed, expecting %li more!", sdi->subdircnt+1L);
-        puts(buff);
+        //printf("INTERNAL ERROR: subdir count changed, expecting %li more!", sdi->subdircnt+1L);
+        puts("INTERNAL ERROR: subdir count changed!");
 
         sdi->subdircnt = 0; /* force subdir counter to 0, none left */
         stackPushItem(&s, sdi);
@@ -996,10 +989,12 @@ int main(int argc, char **argv) {
   if (traverseTree(path) == 0) {
     pputs(svarlang_strid(0x0105)); /* no subdirs exist */
   } else if (dspSumDirs) { /* show count of directories processed */
-    char buff[64];
+    char buff[16];
     pputs("");
-    sprintf(buff, "    %lu total directories", totalSubDirCnt+1);
-    pputs(buff);
+    outstr("    ");
+    ultoa(totalSubDirCnt+1, buff, 10);
+    outstr(buff);
+    pputs(" total directories");
   }
 
   return(0);
