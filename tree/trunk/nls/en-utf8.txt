@@ -24,7 +24,6 @@
 # showInvalidUsage
 3.1:Invalid switch - %
 3.2:Use TREE /? for usage information.
-3.3:Too many parameters - %
 
 # showVersionInfo
 4.0:Origin: pdTREE by Kenneth J. Davis (2000-2004)
@@ -38,5 +37,4 @@
 6.1:Invalid path - %
 
 # misc errors
-7.1:Error: File path specified exceeds maximum buffer = % bytes
 7.2:Out of memory on subdirectory: %

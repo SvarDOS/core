@@ -19,7 +19,6 @@
 # showInvalidUsage
 3.1:Nepareiza atslēga - %
 3.2:Lietojiet TREE /? lai iegūtu lietošanas informāciju.
-3.3:Pārāk daudz parametru - %
 
 # showVersionInfo [Set 4]
 
@@ -30,5 +29,4 @@
 6.1:Kļūdains ceļš - %
 
 # misc errors
-7.1:Kļūda: Faila ceļš pārsniedz maksimālo buferi = % baitus
 7.2:Pietrūkst atmiņas apakškatalogā: %

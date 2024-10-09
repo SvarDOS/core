@@ -21,7 +21,6 @@
 # showInvalidUsage
 3.1:Virheellinen valitsin - %
 3.2:Kirjoita TREE /? saadaksesi lisätietoja.
-3.3:Liikaa parametreja - %
 
 # showVersionInfo
 
@@ -32,5 +31,4 @@
 6.1:Virheellinen polku - %
 
 # misc errors
-7.1:Virhe: Tiedostopolku ei mahdu puskuriin = % tavua
 7.2:Muisti loppui alihakemistossa: %

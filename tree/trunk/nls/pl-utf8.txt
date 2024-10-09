@@ -26,7 +26,6 @@
 # showInvalidUsage
 3.1:Nieprawidłowy przełącznik - %
 3.2:Użyj TREE /? by uzyskać informacje o sposobie użycia.
-3.3:Za wiele parametrów - %
 
 # showVersionInfo
 4.0:Źródło: pdTREE by Kenneth J. Davis (2000-2004)
@@ -35,6 +34,9 @@
 
 # showInvalidDrive
 5.1:Nieprawidłowy napęd
+
+# showInvalidPath
 6.1:Nieprawidłowa ścieżka - %
-7.1:Błąd: Podana ścieżka pliku przekracza maksymalny bufor = % bajtów
+
+# misc errors
 7.2:Brak pamięci przy podkatalogu: %

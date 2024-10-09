@@ -19,7 +19,6 @@
 # showInvalidUsage
 3.1:Geçersiz anahtar - %
 3.2:Kullanım bilgisi için TREE /? yazın.
-3.3:Çok fazla parametre - %
 
 # showVersionInfo
 
@@ -28,5 +27,4 @@
 6.1:Geçersiz yol - %
 
 # misc errors
-7.1:Hata: Belirtilen dosya yolu olabilecek en büyük arabelleği aşıyor (% bayt)
 7.2:Şu altdizinde bellek yetersiz: %

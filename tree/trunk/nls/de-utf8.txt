@@ -26,7 +26,6 @@
 # showInvalidUsage
 3.1:Ungültiger Schalter - %
 3.2:TREE /? für Nutzungshinweise.
-3.3:Zu viele Parameter - %
 
 # showVersionInfo
 4.0:Basiert auf pdTREE von Kenneth J. Davis (2000-2004)
@@ -38,5 +37,4 @@
 6.1:Ungültiger Pfad - %
 
 # misc error conditions
-7.1:Fehler: Angegebener Dateipfad zu groß für Zwischenspeicher (% Bytes)
 7.2:Zu wenig Arbeitsspeicher: %

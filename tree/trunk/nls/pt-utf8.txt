@@ -20,7 +20,6 @@
 # showInvalidUsage
 3.1:Opçäo inválida - %
 3.2:Use TREE /? para obter informaçöes de uso.
-3.3:Muitos parâmetros - %
 
 # showVersionInfo
 
@@ -31,5 +30,4 @@
 6.1:Caminho inválido - %
 
 # misc errors
-7.1:Erro: o caminho do arquivo especificado excede o buffer máximo = % bytes
 7.2:Sem memória no subdiretório: %
