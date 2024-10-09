@@ -42,10 +42,11 @@ deflang.c: nls/*.txt
 	utf8tocp 850 es-utf8.txt es.txt
 	utf8tocp 850 fi-utf8.txt fi.txt
 	utf8tocp 775 lv-utf8.txt lv.txt
+	utf8tocp maz pl-utf8.txt pl.txt
 	utf8tocp 850 pt-utf8.txt pt.txt
 	utf8tocp 866 ru-utf8.txt ru.txt
 	utf8tocp 857 tr-utf8.txt tr.txt
-	..$(SEP)svarlang$(SEP)tlumacz /excref en de es fi lv pt ru tr > tlumacz.log
+	..$(SEP)svarlang$(SEP)tlumacz /excref en de es fi lv pl pt ru tr > tlumacz.log
 	$(CP) out.lng ..$(SEP)tree.lng
 	$(CP) deflang.c ..
 	rm -f out.lng
