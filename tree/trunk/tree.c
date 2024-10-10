@@ -81,10 +81,6 @@ static char path[PATH_MAX];   /* Path to begin search from, default=current   */
 #define MAXPADLEN (PATH_MAX*2) /* Must be large enough to hold the maximum padding */
 /* (PATH_MAX/2)*4 == (max path len / min 2chars dirs "?\") * 4chars per padding    */
 
-/* The maximum size any line of text output can be, including room for '\0'*/
-#define MAXLINE 160        /* Increased to fit two lines for translations  */
-
-
 
 /* Procedures */
 
@@ -138,7 +134,7 @@ static void outstr(const char *s) {
 }
 
 
-static void puts(const char *s) {
+static void outstrnl(const char *s) {
   outstr(s);
   outstr("\r\n");
 }
@@ -248,11 +244,11 @@ static void getConsoleSize(void) {
  */
 static void pputs(const char *s) {
   static unsigned short count;
-  puts(s);
+  outstrnl(s);
   if ((pause) && (++count + 1 >= rows)) {
     outstr(svarlang_strid(0x0106));
     waitkey();
-    puts("");
+    outstrnl("");
     count = 0;
   }
 }
@@ -277,7 +273,7 @@ static void showUsage(void) {
   for (i = 0x0200; i < 0x021F; i++) {
     const char *s = svarlang_strid(i);
     if (s[0] == 0) continue;
-    puts(s);
+    outstrnl(s);
   }
   exit(1);
 }
@@ -286,8 +282,8 @@ static void showUsage(void) {
 /* Displays error message then exits indicating error */
 static void showInvalidUsage(char * badOption) {
   print_strinstr(svarlang_strid(0x0301), badOption); /* invalid switch - ... */
-  puts("");
-  puts(svarlang_strid(0x0302)); /* use TREE /? for usage info */
+  outstrnl("");
+  outstrnl(svarlang_strid(0x0302)); /* use TREE /? for usage info */
   exit(1);
 }
 
@@ -295,11 +291,10 @@ static void showInvalidUsage(char * badOption) {
 /* Displays author, copyright, etc info, then exits indicating no error. */
 static void showVersionInfo(void) {
   unsigned short i;
-  puts("SvarDOS TREE " VERSION);
-  puts("");
+  outstrnl("SvarDOS TREE " VERSION "\r\n");
   for (i = 0x0400; i < 0x0409; i++) {
     if (svarlang_strid(i)[0] == 0) continue;
-    puts(svarlang_strid(i));
+    outstrnl(svarlang_strid(i));
   }
   exit(1);
 }
@@ -307,7 +302,7 @@ static void showVersionInfo(void) {
 
 /* Displays error messge for invalid drives and exits */
 static void showInvalidDrive(void) {
-  puts(svarlang_strid(0x0501)); /* invalid drive spec */
+  outstrnl(svarlang_strid(0x0501)); /* invalid drive spec */
   exit(1);
 }
 
@@ -897,7 +892,7 @@ static long traverseTree(char *initialpath) {
 
       if (flgErr) { // don't add invalid paths to stack
         //printf("INTERNAL ERROR: subdir count changed, expecting %li more!", sdi->subdircnt+1L);
-        puts("INTERNAL ERROR: subdir count changed!");
+        outstrnl("INTERNAL ERROR: subdir count changed!");
 
         sdi->subdircnt = 0; /* force subdir counter to 0, none left */
         stackPushItem(&s, sdi);
