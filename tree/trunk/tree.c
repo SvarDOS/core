@@ -53,14 +53,14 @@ DEALINGS IN THE SOFTWARE.
 #define PATH_MAX 256
 
 /* Global flags */
-static short showFiles = 0; /* Display names of files in directories       */
-static short asciiOnly = 0; /* Use ASCII [7bit] characters                 */
-static short pause = 0;     /* Wait for keypress after each page           */
+static unsigned char showFiles = 0;  /* Display names of files in directories       */
+static unsigned char asciiOnly = 0;  /* Use ASCII [7bit] characters                 */
+static unsigned char pause = 0;      /* Wait for keypress after each page           */
 
-static short dspAll = 0;  /* if nonzero includes HIDDEN & SYSTEM files in output */
-static short dspSize = 0; /* if nonzero displays filesizes                       */
-static short dspAttr = 0; /* if nonzero displays file attributes [DACESHRBP]     */
-static short dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
+static unsigned char dspAll = 0;     /* if nonzero includes HIDDEN & SYSTEM files in output */
+static unsigned char dspSize = 0;    /* if nonzero displays filesizes                       */
+static unsigned char dspAttr = 0;    /* if nonzero displays file attributes [DACESHRBP]     */
+static unsigned char dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
 
 
 /* maintains total count, for > 4billion dirs, use a __int64 */
@@ -68,7 +68,7 @@ static unsigned long totalSubDirCnt = 0;
 
 
 /* text window size, used to determine when to pause */
-static short cols = 80, rows = 25;  /* determined on startup (when possible) */
+static unsigned char cols = 80, rows = 25;  /* determined on startup (when possible) */
 
 
 
