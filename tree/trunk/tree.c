@@ -78,11 +78,8 @@ short dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
 unsigned long totalSubDirCnt = 0;
 
 
-/* text window size, used to determine when to pause,
-   Note: rows is total rows available - 2
-   1 is for pause message and then one to prevent auto scroll up
-*/
-short cols=80, rows=23;   /* determined these on startup (when possible)  */
+/* text window size, used to determine when to pause */
+short cols=80, rows=25;   /* determined these on startup (when possible)  */
 
 
 
@@ -250,11 +247,10 @@ static void getConsoleSize(void) {
   } else { /* e.g. the console */
     if ((*bios_cols == 0) || (*bios_size == 0)) { /* MDA does not report size */
       cols = 80;
-      rows = 24;
+      rows = 25;
     } else {
       cols = *bios_cols;
       rows = *bios_size / cols / 2;
-      if (rows > 2) rows -= 2; /* necessary to keep screen from scrolling */
     }
   }
 }
@@ -271,14 +267,13 @@ static void getConsoleSize(void) {
 static void pputs(const char *s) {
   static unsigned short count;
   puts(s);
-  if ((pause == PAUSE) && (count++ == rows)) {
+  if ((pause == PAUSE) && (++count + 1 >= rows)) {
     outstr(svarlang_strid(0x0106));
     waitkey();
     puts("");
     count = 0;
   }
 }
-
 
 
 /* prints two strings, one embedded in another */
