@@ -174,40 +174,18 @@ static void getdrvserial(unsigned char drv) {
 }
 
 
-static int truename(char *path, const char *origpath) {
-  unsigned short origpath_seg = FP_SEG(origpath);
-  unsigned short origpath_off = FP_OFF(origpath);
-  unsigned short dstpath_seg = FP_SEG(path);
-  unsigned short dstpath_off = FP_OFF(path);
-  unsigned char cflag = 0;
-
-  /* resolve path with truename */
-  _asm {
-    push ax
-    push si
-    push di
-    push es
-    push ds
-
-    mov ah, 0x60          /* AH = 0x60 -> TRUENAME */
-    mov di, dstpath_off   /* ES:DI -> dst buffer */
-    mov es, dstpath_seg
-    mov si, origpath_off  /* DS:SI -> src path */
-    mov ds, origpath_seg
-    int 0x21
-    jnc DONE
-    mov cflag, 1
-    DONE:
-
-    pop ds
-    pop es
-    pop di
-    pop si
-    pop ax
-  }
-
-  return(cflag);
-}
+static unsigned char truename(char far *path, const char far *origpath);
+#pragma aux truename = \
+"push ds" \
+"mov ds, dx" \
+"mov ah, 0x60" \
+"int 0x21"    /* DOS 5+ - TRUENAME */ \
+"lahf"        /* mov flags to ah */ \
+"and ah, 1"   /* isolate CF so AH != 0 on error */ \
+"pop ds" \
+parm [es di] [dx si] \
+modify [si di] \
+value [ah]
 
 
 /* sets rows & cols to size of actual console window
