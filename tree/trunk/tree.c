@@ -76,8 +76,6 @@ static unsigned char cols = 80, rows = 25;  /* determined on startup (when possi
 #define SERIALLEN 16      /* Defines max size of volume & serial number   */
 #define VOLLEN 16
 
-static char path[PATH_MAX];   /* Path to begin search from, default=current   */
-
 #define MAXPADLEN (PATH_MAX*2) /* Must be large enough to hold the maximum padding */
 /* (PATH_MAX/2)*4 == (max path len / min 2chars dirs "?\") * 4chars per padding    */
 
@@ -290,7 +288,7 @@ static void showOutOfMemory(const char *path) {
 
 
 /* Parses the command line and sets global variables. */
-static void parseArguments(int argc, char **argv) {
+static void parseArguments(char *path, int argc, char **argv) {
   int i;
 
   /* if no drive specified on command line, use current */
@@ -904,6 +902,7 @@ static long traverseTree(char *initialpath) {
 
 
 int main(int argc, char **argv) {
+  static char path[PATH_MAX]; /* path to begin search from, default=current */
   char serial[SERIALLEN]; /* volume serial #  0000:0000 */
   char volume[VOLLEN];    /* volume name (label), possibly none */
 
@@ -911,7 +910,7 @@ int main(int argc, char **argv) {
   svarlang_autoload_exepath(argv[0], getenv("LANG"));
 
   /* Parse any command line arguments, obtain path */
-  parseArguments(argc, argv);
+  parseArguments(path, argc, argv);
 
   /* Initialize screen size, may reset pause to NOPAUSE if redirected */
   getConsoleSize();
