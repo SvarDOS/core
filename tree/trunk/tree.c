@@ -13,7 +13,8 @@
   Updated:    September, 2000; October, 2000; November, 2000; January, 2001;
               May, 2004; Sept, 2005
 
-  October 2024: lots of works by Mateusz Viste, became SvarDOS tree
+  October 2024: lots of changes by Mateusz Viste, became SvarDOS TREE.
+                See CHANGES.TXT for details.
 
 Copyright (c): Public Domain [United States Definition]
 
@@ -36,9 +37,8 @@ DEALINGS IN THE SOFTWARE.
 ****************************************************************************/
 
 
-/* Include files */
 #include <dos.h>
-#include <stdio.h> /* PATH_MAX */
+#include <stdio.h>   /* only included for the PATH_MAX definition */
 #include <stdlib.h>
 #include <string.h>
 
@@ -127,11 +127,13 @@ modify [ah] \
 parm [dl]
 
 
+/* display nul-terminated string on screen, no new line */
 static void outstr(const char *s) {
   for (; *s != 0; s++) outch(*s);
 }
 
 
+/* display nul-terminated string on screen and append a new line (CR LF) */
 static void outstrnl(const char *s) {
   outstr(s);
   outstr("\r\n");
@@ -445,8 +447,7 @@ static long hasSubdirectories(char *path, DIRDATA *ddata) {
   /* prevent resource leaks, close the handle. */
   _dos_findclose(&findData);
 
-  if (ddata != NULL)  // don't bother if user doesn't want them
-  {
+  if (ddata != NULL) { // don't bother if user doesn't want them
     /* The root directory of a volume (including non root paths
        corresponding to mount points) may not have a current (.) and
        parent (..) entry.  So we can't get attributes for initial
@@ -480,10 +481,11 @@ static struct SUBDIRINFO *newSubdirInfo(struct SUBDIRINFO *parent, char *subdir,
   struct SUBDIRINFO *temp;
 
   /* Get length of parent directory */
-  if (parent == NULL)
+  if (parent == NULL) {
     parentLen = 0;
-  else
+  } else {
     parentLen = strlen(parent->currentpath);
+  }
 
   /* Get length of subdir, add 1 if does not end in slash */
   subdirLen = strlen(subdir);
@@ -504,18 +506,19 @@ static struct SUBDIRINFO *newSubdirInfo(struct SUBDIRINFO *parent, char *subdir,
     return NULL;
   }
   temp->parent = parent;
-  if (parent == NULL)
+  if (parent == NULL) {
     strcpy(temp->currentpath, "");
-  else
+  } else {
     strcpy(temp->currentpath, parent->currentpath);
+  }
   strcat(temp->currentpath, subdir);
+
   /* if subdir[subdirLen-1] == '\0' then we must append a slash */
-  if (*(subdir+subdirLen-1) == '\0')
-    strcat(temp->currentpath, "\\");
+  if (*(subdir+subdirLen-1) == '\0') strcat(temp->currentpath, "\\");
+
   temp->subdir = temp->currentpath+parentLen;
   strcpy(temp->dsubdir, dsubdir);
-  if ((temp->subdircnt = hasSubdirectories(temp->currentpath, &(temp->ddata))) == -1L)
-  {
+  if ((temp->subdircnt = hasSubdirectories(temp->currentpath, &(temp->ddata))) == -1L) {
     free (temp->currentpath);
     free (temp->dsubdir);
     free(temp);
@@ -667,8 +670,7 @@ static int displayFiles(const char *path, char *padding, int hasMoreSubdirs, DIR
   addPadding(padding, hasMoreSubdirs);
 
   /* cycle through directory printing out files. */
-  do
-  {
+  do {
     /* print padding followed by filename */
     if ( ((entry.attrib & _A_SUBDIR) == 0) &&
          ( ((entry.attrib & (_A_HIDDEN | _A_SYSTEM)) == 0)  || dspAll) )
@@ -867,9 +869,7 @@ static long traverseTree(char *initialpath) {
 
         sdi->subdircnt = 0; /* force subdir counter to 0, none left */
         stackPushItem(&s, sdi);
-      }
-      else
-      {
+      } else {
         sdi->subdircnt = sdi->subdircnt - 1L; /* decrement subdirs left count */
         stackPushItem(&s, sdi);
 
@@ -877,9 +877,7 @@ static long traverseTree(char *initialpath) {
         if ((sdi = newSubdirInfo(sdi, subdir, dsubdir)) != NULL)
           stackPushItem(&s, sdi);
       }
-    }
-    else /* this directory finished processing, so free resources */
-    {
+    } else { /* this directory finished processing, so free resources */
       /* Remove the padding for this directory, all but initial path. */
       if (sdi->parent != NULL)
         removePadding(padding);

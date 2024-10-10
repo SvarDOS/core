@@ -7,6 +7,7 @@ Oct 10, 2024   SvarDOS TREE 20241010   Mateusz Viste
                - removed LFN support
                - replaced CATS by SvarLANG
                - cleaned up all translation files
+               - reformatted the documentation
                - replaced all printf calls by ligther equivalents
                - redefined console ouput operations as direct DOS calls
                - memory optimizations
