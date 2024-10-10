@@ -50,36 +50,25 @@ DEALINGS IN THE SOFTWARE.
 #define TBAR_HORZBAR_STR "\xC3\xC4\xC4\xC4"    /* +--- */
 #define CBAR_HORZBAR_STR "\xC0\xC4\xC4\xC4"    /* \--- */
 
-/* Global flags */
-#define SHOWFILESON    1  /* Display names of files in directories       */
-#define SHOWFILESOFF   0  /* Don't display names of files in directories */
-
-#define ASCIICHARS     1  /* Use ASCII [7bit] characters                 */
-#define EXTENDEDCHARS  0  /* Use extended ASCII [8bit] characters        */
-
-#define NOPAUSE        0  /* Default, don't pause after screenfull       */
-#define PAUSE          1  /* Wait for keypress after each page           */
-
-
 #define PATH_MAX 256
 
-/* Global variables */
-short showFiles = SHOWFILESOFF;
-short charSet = EXTENDEDCHARS;
-short pause = NOPAUSE;
+/* Global flags */
+static short showFiles = 0; /* Display names of files in directories       */
+static short asciiOnly = 0; /* Use ASCII [7bit] characters                 */
+static short pause = 0;     /* Wait for keypress after each page           */
 
-short dspAll = 0;  /* if nonzero includes HIDDEN & SYSTEM files in output */
-short dspSize = 0; /* if nonzero displays filesizes                       */
-short dspAttr = 0; /* if nonzero displays file attributes [DACESHRBP]     */
-short dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
+static short dspAll = 0;  /* if nonzero includes HIDDEN & SYSTEM files in output */
+static short dspSize = 0; /* if nonzero displays filesizes                       */
+static short dspAttr = 0; /* if nonzero displays file attributes [DACESHRBP]     */
+static short dspSumDirs = 0; /* show count of subdirectories  (per dir and total)*/
 
 
 /* maintains total count, for > 4billion dirs, use a __int64 */
-unsigned long totalSubDirCnt = 0;
+static unsigned long totalSubDirCnt = 0;
 
 
 /* text window size, used to determine when to pause */
-short cols=80, rows=25;   /* determined these on startup (when possible)  */
+static short cols = 80, rows = 25;  /* determined on startup (when possible) */
 
 
 
@@ -95,11 +84,6 @@ static char path[PATH_MAX];   /* Path to begin search from, default=current   */
 /* The maximum size any line of text output can be, including room for '\0'*/
 #define MAXLINE 160        /* Increased to fit two lines for translations  */
 
-
-/* The hard coded strings used by the following show functions.            */
-
-/* common to many functions [Set 1] */
-char newLine[MAXLINE] = "\n";
 
 
 /* Procedures */
@@ -231,7 +215,7 @@ static int truename(char *path, const char *origpath) {
 
 
 /* sets rows & cols to size of actual console window
- * force NOPAUSE if appears output redirected to a file or
+ * force NO PAUSE if appears output redirected to a file or
  * piped to another program
  * Uses hard coded defaults and leaves pause flag unchanged
  * if unable to obtain information.
@@ -243,7 +227,7 @@ static void getConsoleSize(void) {
   if (is_stdout_redirected() != 0) {
     /* e.g. redirected to a file, tree > filelist.txt */
     /* Output to a file or program, so no screen to fill (no max cols or rows) */
-      pause = NOPAUSE;   /* so ignore request to pause */
+      pause = 0;   /* so ignore request to pause */
   } else { /* e.g. the console */
     if ((*bios_cols == 0) || (*bios_size == 0)) { /* MDA does not report size */
       cols = 80;
@@ -256,18 +240,16 @@ static void getConsoleSize(void) {
 }
 
 
-/* when pause == NOPAUSE then identical to puts,
-   otherwise counts lines printed and pauses as needed.
-   Should be used for all messages printed that do not
-   immediately exit afterwards (else puts may be used).
-   May display N too many lines before pause if line is
-   printed that exceeds cols [N=linelen%cols] and lacks
-   any newlines (but this should not occur in tree).
-*/
+/* when pause == 0 then identical to puts, otherwise counts lines printed and
+ * pauses as needed. Should be used for all messages printed that do not
+ * immediately exit afterwards (else puts may be used). May display N too many
+ * lines before pause if line is printed that exceeds cols [N=linelen%cols] and
+ * lacks any newlines (but this should not occur in tree).
+ */
 static void pputs(const char *s) {
   static unsigned short count;
   puts(s);
-  if ((pause == PAUSE) && (++count + 1 >= rows)) {
+  if ((pause) && (++count + 1 >= rows)) {
     outstr(svarlang_strid(0x0106));
     waitkey();
     puts("");
@@ -393,16 +375,16 @@ static void parseArguments(int argc, char **argv) {
 
     switch(argv[i][1] & 0xDF) { /* upcase */
       case 'F': /* show files */
-        showFiles = SHOWFILESON; /* set file display flag appropriately */
+        showFiles = 1; /* set file display flag appropriately */
         break;
       case 'A': /* use ASCII only (7-bit) */
-        charSet = ASCIICHARS;    /* set charset flag appropriately      */
+        asciiOnly = 1;    /* set charset flag appropriately      */
         break;
       case 'V': /* Version information */
         showVersionInfo();       /* show version info and exit          */
         break;
       case 'P': /* wait for keypress after each page (pause) */
-        pause = PAUSE;
+        pause = 1;
         break;
       case '?' & 0xDF:
         showUsage();             /* show usage info and exit            */
@@ -591,10 +573,10 @@ static struct SUBDIRINFO *newSubdirInfo(struct SUBDIRINFO *parent, char *subdir,
 static char * addPadding(char *padding, int moreSubdirsFollow) {
   if (moreSubdirsFollow) {
     /* 1st char is | or a vertical bar */
-    if (charSet == EXTENDEDCHARS) {
-      strcat(padding, VERTBAR_STR);
-    } else {
+    if (asciiOnly) {
       strcat(padding, "|   ");
+    } else {
+      strcat(padding, VERTBAR_STR);
     }
   } else {
     strcat(padding, "    ");
@@ -638,16 +620,18 @@ static void showCurrentPath(char *currentpath, char *padding, int moreSubdirsFol
 
   /* print lead padding except for initial directory */
   if (moreSubdirsFollow >= 0) {
-    if (charSet == EXTENDEDCHARS) {
-      if (moreSubdirsFollow)
+    if (!asciiOnly) {
+      if (moreSubdirsFollow) {
         outstr(TBAR_HORZBAR_STR);
-      else
+      } else {
         outstr(CBAR_HORZBAR_STR);
+      }
     } else {
-      if (moreSubdirsFollow)
+      if (moreSubdirsFollow) {
         outstr("+---");
-      else
+      } else {
         outstr("\\---");
+      }
     }
   }
 
@@ -676,7 +660,7 @@ static void displaySummary(char *padding, int hasMoreSubdirs, DIRDATA *ddata) {
   addPadding(padding, hasMoreSubdirs);
 
   if (dspSumDirs) {
-    if (showFiles == SHOWFILESON) {
+    if (showFiles) {
       /* print File summary with lead padding, add filesize to it */
       outstr(padding);
       ultoa(ddata->fileCnt, buff, 10);
@@ -883,29 +867,26 @@ static long traverseTree(char *initialpath) {
   /* Store count of subdirs in initial path so can display message if none. */
   subdirsInInitialpath = sdi->subdircnt;
 
-  do
-  {
+  do {
     sdi = (struct SUBDIRINFO *)stackPopItem(&s);
 
     if (sdi->findnexthnd == NULL) { // findfirst not called yet
       // 1st time this subdirectory processed, so display its name & possibly files
-      if (sdi->parent == NULL) // if initial path
-      {
+      if (sdi->parent == NULL) { // if initial path
         // display initial path
         showCurrentPath(/*sdi->dsubdir*/initialpath, NULL, -1, &(sdi->ddata));
-      }
-      else // normal processing (display path, add necessary padding)
-      {
+      } else { // normal processing (display path, add necessary padding)
         showCurrentPath(sdi->dsubdir, padding, (sdi->parent->subdircnt > 0L)?1 : 0, &(sdi->ddata));
         addPadding(padding, (sdi->parent->subdircnt > 0L)?1 : 0);
       }
 
-      if (showFiles == SHOWFILESON)  displayFiles(sdi->currentpath, padding, (sdi->subdircnt > 0L)?1 : 0, &(sdi->ddata));
+      if (showFiles) {
+        displayFiles(sdi->currentpath, padding, (sdi->subdircnt > 0L)?1 : 0, &(sdi->ddata));
+      }
       displaySummary(padding, (sdi->subdircnt > 0L)?1 : 0, &(sdi->ddata));
     }
 
-    if (sdi->subdircnt > 0) /* if (there are more subdirectories to process) */
-    {
+    if (sdi->subdircnt > 0) { /* if (there are more subdirectories to process) */
       int flgErr;
       if (sdi->findnexthnd == NULL) {
         sdi->findnexthnd = findFirstSubdir(sdi->currentpath, subdir, dsubdir);
