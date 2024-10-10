@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 /* Include files */
 #include <dos.h>
+#include <stdio.h> /* PATH_MAX */
 #include <stdlib.h>
 #include <string.h>
 
@@ -50,7 +51,6 @@ DEALINGS IN THE SOFTWARE.
 #define TBAR_HORZBAR_STR "\xC3\xC4\xC4\xC4"    /* +--- */
 #define CBAR_HORZBAR_STR "\xC0\xC4\xC4\xC4"    /* \--- */
 
-#define PATH_MAX 256
 
 /* Global flags */
 static unsigned char showFiles = 0;  /* Display names of files in directories       */
