@@ -280,7 +280,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
 
   fd = fopen(fname, "rb");
   if (fd == NULL) {
-    printf("ERROR: FAILED TO OPEN '%s'\r\n", fname);
+    printf("ERROR: FAILED TO OPEN '%s'\n", fname);
     return(0);
   }
 
@@ -297,20 +297,20 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
 
     /* handle malformed lines */
     if (ptr == NULL) {
-      printf("WARNING: %s[#%u] is malformed (linelen = %u):\r\n", fname, linecount, linelen);
+      printf("WARNING: %s[#%u] is malformed (linelen = %u):\n", fname, linecount, linelen);
       puts(linebuf);
       continue;
     }
 
     /* ignore empty strings (but emit a warning) */
     if (ptr[0] == 0) {
-      printf("WARNING: %s[#%u] ignoring empty string %u.%u\r\n", fname, linecount, id >> 8, id & 0xff);
+      printf("WARNING: %s[#%u] ignoring empty string %u.%u\n", fname, linecount, id >> 8, id & 0xff);
       continue;
     }
 
     /* warn about dirty lines */
     if (linebuf[0] == '?') {
-      printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\r\n", fname, linecount, id >> 8, id & 0xff);
+      printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\n", fname, linecount, id >> 8, id & 0xff);
     }
 
     /* add the string contained in current line, if conditions are met */
@@ -325,13 +325,13 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
           maxid = id;
           maxid_line = linecount;
         } else {
-          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);
+          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);
         }
       } else {
-        printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
+        printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\n", fname, linecount, id >> 8, id & 0xff);
       }
     } else {
-      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);
+      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\n", fname, linecount, id >> 8, id & 0xff);
     }
   }
 
@@ -342,7 +342,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
     for (i = 0; i < refl->num_strings; i++) {
       id = refl->dict[i].id;
       if (!svl_find(l, id)) {
-        printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
+        printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\n", fname, id >> 8, id & 0xff);
         if (!svl_add_str(l, id, refl->strings + refl->dict[i].offset)) {
           fprintf(stderr, "ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
           return(0);
