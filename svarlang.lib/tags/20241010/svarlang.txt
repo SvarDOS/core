@@ -1,0 +1,127 @@
+
+
+              SVARLANG.LIB - THE SVARDOS TRANSLATION C LIBRARY
+
+                   Copyright (C) 2021-2024 Mateusz Viste
+
+
+
+SvarLANG is a library and toolset for enabling SvarDOS applications to easily
+support multiple languages. It is part of the SvarDOS project.
+
+Homepage: http://svardos.org/svarlang/
+
+
+### PREPARING TRANSLATION FILES ###############################################
+
+The translation files must be CATS-style text files in the usual format:
+
+1.1:Hello, World!
+1.2:Help screen
+2.0:Type /? for more options
+
+The files must be named as EN.TXT, DE.TXT, FR.TXT, etc. Then, they must be
+converted into SvarLANG's binary format using the TLUMACZ tool:
+
+tlumacz en fr pl (...)
+
+The first language provided in the command line is the reference language and
+is used both as the default (embedded in the application) language, as well as
+to substitute messages missing in other languages.
+
+TLUMACZ computes two files:
+
+ * OUT.LNG   - the binary file that contains all translations
+ * DEFLANG.C - the default translations that will be embedded into the program
+
+Then, DEFLANG.C must be compiled and linked to your program along with
+SVARLNGx.LIB. From there you will be able to use SvarLANG calls, like this
+very basic example:
+
+  svarlang_load("myprogram.lng", "pl");  /* load PL lang from myprogram.lng */
+  puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
+
+A more practical, real-world example would probably be this one:
+
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));
+  puts(svarlang_str(2, 0));
+
+Read svarlang.h for more information about available functions.
+
+
+### ESCAPED CHARACTERS ########################################################
+
+Translation strings may contain some escaped characters. At this time only the
+following escaped characters are supported: \e \r \n \t and \\
+
+
+### DIRTY STRINGS #############################################################
+
+In the CATS-style source translation, lines may be prefixed with a '?' sign:
+
+?1.1:Hello, World!
+
+Such string is used by tlumacz like any other, but it is also reported on the
+command-line with a warning about the line being "dirty" (that is, requiring
+to be reviewed by a translator).
+
+
+### ENVIRONMENT ###############################################################
+
+The program translation file should be named "PROGNAME.LNG", where PROGNAME
+is the program's name. This file should be placed in a well-known location,
+typically the program's own directory.
+
+The %LANG% environment variable usually defines what language should be loaded,
+albeit the program can just as well provide its own controls for language
+selection and pass this information to svarlang_load() accordingly.
+
+
+### WHY IS IT BETTER THAN CATS? ###############################################
+
+The CATS library is heavier and slower, as it embeds a text-file parser.
+Translations also take more disk space since each language is stored in a
+separate file, leading to cluster waste. Finally, CATS requires default strings
+to be part of the application's source code, while SvarLANG keeps all strings
+in TXT files and embedds the default one inside the application in an automated
+way at compile time.
+
+There is also a licensing issue: CATS/Kitten libraries are published under the
+terms of a viral, corrosive license. SvarLANG, on the other hand, is published
+under a truly free, liberal MIT license.
+
+
+### FILE FORMAT ###############################################################
+
+File =
+    magic         : Char[4] := "SvL\x1a" (ie. "SvL" followed with a 0x1a char)
+                  ; 0x1a is an end-of-file marker that prevents TYPE garbage
+    num_strings   : U16
+    languages     : array[num_languages] of Language
+
+Language =
+    lang_id       : Char[2]
+    len_strings   : U16 := SizeOf(strings)
+    dictionary    : StringDict
+    strings       : array[File.num_strings] of StringZ (possibly compressed)
+
+StringDict =
+    elements : array[File.num_strings] of DictEntry
+             ; sorted by DictEntry.Id
+
+DictEntry =
+    id     : U16
+    offset : U16
+           ; relative to Language.strings[0]
+
+StringZ = array[?] of Char ; zero-terminated string
+
+
+NOTE 1: All numeric values are stored in x86 (little endian) order.
+
+NOTE 2: A language with compressed strings is flagged with bit 0x8000 set in
+        lang_id. The strings are then compressed with the MVCOMP algorithm,
+        see https://mvcomp.sourceforge.io for more details about MVCOMP.
+
+
+####################################################################### EOF ###
