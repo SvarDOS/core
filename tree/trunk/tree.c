@@ -277,7 +277,6 @@ static char *fixPathForDisplay(char *path);
 
 /* Displays error message for invalid path; Does NOT exit */
 static void showInvalidPath(const char *badpath) {
-  pputs(badpath);
   print_strinstr(svarlang_strid(0x0601), badpath); /* invalid path - ... */
   pputs("");
 }
@@ -300,7 +299,10 @@ static void parseArguments(char *path, int argc, char **argv) {
 
     /* Check if user is giving an option or drive/path */
     if ((argv[i][0] != '/') && (argv[i][0] != '-') ) {
-      if (truename(path, argv[i]) != 0) showInvalidPath(argv[i]);
+      if (truename(path, argv[i]) != 0) {
+        showInvalidPath(argv[i]);
+        exit(1);
+      }
       continue;
     }
 
