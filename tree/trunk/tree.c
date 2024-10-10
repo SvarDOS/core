@@ -140,38 +140,21 @@ static void outstrnl(const char *s) {
 }
 
 
-static _Packed struct {
-  unsigned short infolevel;
-  unsigned short serial2;
-  unsigned short serial1;
-  char label[11];
-  short fstype[8];
-} glob_drv_info;
-
-
 /* drv is 1-based (A=1, B=2, ...) */
-static void getdrvserial(unsigned char drv) {
-  unsigned short drvinfo_seg = FP_SEG(&glob_drv_info);
-
-  _asm {
-    push ax
-    push bx
-    push dx
-
-    mov ax, 0x6900
-    xor bh, bh
-    mov bl, drv
-    mov dx, offset glob_drv_info
-    push ds
-    mov ds, drvinfo_seg
-    int 0x21
-    pop ds
-
-    pop dx
-    pop bx
-    pop ax
-  }
-}
+static unsigned char getdrvserial(unsigned char drv, void far *drv_info_ptr);
+#pragma aux getdrvserial = \
+"mov ax, 0x6900"   /* DOS 4+ - get disk serial number */ \
+"push ds" \
+"xor bh, bh"       /* "info level" (OS/2 only, must be 0 for DOS) */ \
+"push es" \
+"pop ds"           /* ptr is expected in DS:DX */ \
+"int 0x21" \
+"lahf" \
+"and ah, 1" \
+"pop ds" \
+parm [bl] [es dx] \
+modify [ax bh] \
+value [ah]
 
 
 static unsigned char truename(char far *path, const char far *origpath);
@@ -373,18 +356,30 @@ static void parseArguments(int argc, char **argv) {
  * Fills in the serial and volume variables with the serial #
  * and volume found using path.
  */
-static void GetVolumeAndSerial(char *volume, char *serial, char *path) {
+static void GetVolumeAndSerial(char *volume, char *serial, const char *path) {
   char buff[8];
-  getdrvserial((path[0] & 0xDF) - '@');
-  memcpy(volume, glob_drv_info.label, 12);
+  _Packed struct {
+    unsigned short infolevel;
+    unsigned short serial2;
+    unsigned short serial1;
+    char label[11];
+    char fstype[8];
+  } drv_info;
+
+  if (getdrvserial((path[0] & 0xDF) - '@', &drv_info) != 0) {
+    *volume = 0;
+    *serial = 0;
+    return;
+  }
+  memcpy(volume, drv_info.label, 11);
   volume[11] = 0;
 
-  /* build the "1234:56789" serial number string */
+  /* build the "1234:5678" serial number string */
   strcpy(serial, "0000");
-  utoa(glob_drv_info.serial1, buff, 16);
+  utoa(drv_info.serial1, buff, 16);
   strcpy(serial + 4 - strlen(buff), buff);
   strcat(serial, ":0000");
-  utoa(glob_drv_info.serial2, buff, 16);
+  utoa(drv_info.serial2, buff, 16);
   strcpy(serial + 9 - strlen(buff), buff);
 }
 
