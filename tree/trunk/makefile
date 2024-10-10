@@ -18,6 +18,7 @@ tree.com: tree.c deflang.c stack.c
 	$(CC) $(CFLAGS) tree.c deflang.c stack.c svarlang/svarlngs.lib
 
 release: tree.com .symbolic
+	upx -9 --8086 tree.com
 	mkdir appinfo
 	mkdir bin
 	mkdir doc
