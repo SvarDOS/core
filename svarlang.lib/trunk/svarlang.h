@@ -26,7 +26,7 @@
 #define SVARLANG_H
 
 /* library version */
-#define SVARLANGVER "20240929"
+#define SVARLANGVER "20241010"
 
 /* returns a pointer to a string with the SvarLANG's library version,
  * independently of the SVARLANGVER string above. */
