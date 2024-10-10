@@ -1,0 +1,34 @@
+# Messages used by SvarDOS TREE
+# Language: Finnish (CP850)
+# Translated by Sampo Hippeläinen
+# Last update: 21 Dec 2020
+
+# main
+1.2:Levyn polkujen luettelo
+1.3:Levyn % polkujen luettelo
+1.4:Taltion sarjanumero on %
+1.5:Ei alihakemistoja
+1.6: --- Paina näppäintä jatkaaksesi ---
+
+# showUsage
+2.1:Esittää aseman tai polun hakemistorakenteen graafisesti.
+2.2:\t
+2.3:TREE [asema:][polku] [/F] [/A]
+2.4:\t
+2.5:  /F  Näyttää jokaisen hakemiston tiedostojen nimet.
+2.6:  /A  Käyttää ASCII:ta laajennettujen merkkien asemesta.
+
+# showInvalidUsage
+3.1:Virheellinen valitsin - %
+3.2:Kirjoita TREE /? saadaksesi lisätietoja.
+
+# showVersionInfo
+
+# showInvalidDrive
+5.1:Virheellinen asemamäärittely
+
+# showInvalidPath
+6.1:Virheellinen polku - %
+
+# misc errors
+7.2:Muisti loppui alihakemistossa: %

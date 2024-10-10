@@ -1,0 +1,40 @@
+# Messages used by SvarDOS TREE
+
+# main
+1.2:Directory PATH listing
+1.3:Directory PATH listing for Volume %
+1.4:Volume serial number is %
+1.5:No subdirectories exist
+1.6: --- Press any key to continue ---
+
+# showUsage
+2.1:Graphically displays the directory structure of a drive or path.
+2.2:\t
+2.3:TREE [drive:][path] [/F] [/A]
+2.4:\t
+2.5:  /F  Display the names of the files in each directory.
+2.6:  /A  Use ASCII instead of extended characters.
+2.7:  /P  Pause after each page
+2.8:  /V  Show version information
+2.10:  /DF  Display file sizes
+2.11:  /DA  Display file attributes
+2.12:  /DH  Display hidden and system files (normally not shown)
+2.13:  /DR  Display results at end
+
+# showInvalidUsage
+3.1:Invalid switch - %
+3.2:Use TREE /? for usage information.
+
+# showVersionInfo
+4.0:Origin: pdTREE by Kenneth J. Davis (2000-2004)
+4.1:Forked and adapted to SvarDOS by Mateusz Viste (2024)
+4.2:Copyright (c): Public Domain [United States Definition]
+
+# showInvalidDrive
+5.1:Invalid drive specification
+
+# showInvalidPath
+6.1:Invalid path - %
+
+# misc errors
+7.2:Out of memory on subdirectory: %
