@@ -1,21 +1,9 @@
 
-SvarDOS TREE
+[ SvarDOS TREE ]
 
-Run tree with /? for help in using tree.
+Usage: TREE [switches] [path]
 
-Usage: TREE [/A] [/F] [path]
-/A  - use ASCII (7bit) characters for graphics (lines)
-/F  - show files
-path indicates which directory to start display from, default is current.
-
-Note: The following nonstandard options are not documented
-      with the /? switch.
-/V  - show version information,
-/S  - force ShortFileNames (SFNs, disable LFN support)
-/P  - pause after each page
-/DF - display filesizes
-/DA - display attributes (Hidden,System,Readonly,Archive)
-/DH - display hidden and system files (normally not shown)
+Run tree with /? for more help about using tree.
 
 
 === ORIGINS ===
