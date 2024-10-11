@@ -630,24 +630,21 @@ struct dos_udsc {
 
 
 /* get the DOS drive data table list */
-static struct dos_udsc far *get_dos_udsc(void)  {
-  unsigned short udsc_seg = 0, udsc_off = 0;
-  _asm {
-    push ds
-    push di
-
-    mov ax, 0x0803
-    int 0x2f
-    /* drive data table list is in DS:DI now */
-    mov udsc_seg, ds
-    mov udsc_off, di
-
-    pop di
-    pop ds
-  }
-  if (udsc_off == 0xffff) return(NULL);
-  return(MK_FP(udsc_seg, udsc_off));
-}
+static struct dos_udsc far *get_dos_udsc(void);
+#pragma aux get_dos_udsc = \
+"push ds" \
+"mov ax, 0x0803" \
+"int 0x2f" /* drive data table list is in DS:DI, error if DI is 0xffff */ \
+"push ds" \
+"pop es" \
+"pop ds" \
+"cmp di, 0xffff" \
+"jne DONE" \
+"xor di, di" \
+"mov es, di" \
+"DONE:" \
+modify [ax] \
+value [es di]
 
 
 /* returns 0 if fsid is a valid (recognized) filesystem for SvarDOS install  */
@@ -698,7 +695,7 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
       drives[listlen].start_lba = ((unsigned long *)entry)[2];
       drives[listlen].tot_sect = ((unsigned long *)entry)[3];
 
-      /* now iterate over DOS drives and try to match ont to this MBR entry */
+      /* now iterate over DOS drives and try to match one to this MBR entry */
       udsc_node = udsc_root;
       while (udsc_node != NULL) {
         if (udsc_node->hd != drv) goto NEXT;
@@ -1264,6 +1261,16 @@ static void finalreboot(void) {
 }
 
 
+static void reinit_ega(void);
+#pragma aux reinit_ega = \
+"mov ah, 0x0f" /* get current video mode */ \
+"int 0x10"     /* al contains the current video mode now */ \
+"or al, 128"   /* set AL's high bit so BIOS does not flush VRAM (EGA+) */ \
+"xor ah, ah"   /* re-set video mode (to whatever is set in AL) */ \
+"int 0x10" \
+modify [ax bx]
+
+
 static void loadcp(const struct slocales *locales) {
   char buff[64];
   if (locales->codepage == 437) return;
@@ -1279,15 +1286,7 @@ static void loadcp(const struct slocales *locales) {
   /* below I re-init the video controller - apparently this is required if
    * I want the new glyph symbols to be actually applied, at least some
    * (broken?) BIOSes, like VBox, apply glyphs only at next video mode change */
-  _asm {
-    push bx
-    mov ah, 0x0F  /* get current video mode */
-    int 0x10      /* al contains the current video mode now */
-    or al, 128    /* set high bit of AL to instruct BIOS not to flush VRAM's content (EGA+) */
-    xor ah, ah    /* re-set video mode (to whatever is set in AL) */
-    int 0x10
-    pop bx
-  }
+  reinit_ega();
 }
 
 
