@@ -1,0 +1,31 @@
+# Messages used by SvarDOS TREE
+# La traducción de inglés al español ha sido efectuada por:
+# Aitor Santamaría (aitor.sm@terra.es)
+
+# main
+1.2:Listado de las RUTAS de directorios
+1.3:Listado de las RUTAS de directorio para el disco etiquetado %
+1.4:El número de serie del volumen es %
+1.5:No existen subdirectorios
+1.6: --- Press any key to continue ---
+
+# showUsage
+2.1:Visualiza gráficamente la estructura de directorios de un disco o ruta.
+2.2:\t
+2.3:TREE [unidad:][ruta] [/F] [/A]
+2.4:\t
+2.5:  /F  Visualiza los nombres de los archivos en cada directorio.
+2.6:  /A  Utiliza el ASCII en vez de caracteres extendidos.
+
+# showInvalidUsage
+3.1:La opción es no válida - %
+3.2:Utilice TREE /? para ver la información sobre su uso.
+
+# showInvalidDrive
+5.1:El disco especificado no es válido.
+
+# showInvalidPath
+6.1:La ruta no es válida. - %
+
+# misc errors
+7.2:Memoria agotada en el subdirectorio: %
