@@ -8,6 +8,7 @@
 
  - COPY returns "insufficient disk space" on write error (was: "insuff. mem")
  - batch execution in step-by-step mode accepts the RETURN key as "Yes"
+ - upgraded SvarLANG to ver 20241010 (LNG file is compressed now)
 
 
 === ver 2024.6 (28.08.2024) ==================================================
