@@ -225,15 +225,13 @@ int 0x21
 ; if all went well, jump back to start
 jnc skipsig
 
-; save error code into cl
-mov cl, al
-
 ; display program name (in DS:DX), but first replace its nul terminator by a $
 ;mov si, dx           ; done already before the exec attempt
 PARSENEXTBYTE:
 lodsb ; load byte at DS:SI into AL and inc SI (direction flag is clear already)
 test al, al  ; is zero yet?
 jnz PARSENEXTBYTE
+dec si               ; lodsb incremented si so it was pointing one byte too far
 mov [si], byte '$'   ; replace the nul terminator by a $ and display it
 mov ah, 0x09
 int 0x21
@@ -461,7 +459,7 @@ ret
 ;          59H (get extended error information)
 ;
 ; =============================================================================
-HANDLER_24H:    ; +465h
+HANDLER_24H:    ; +464h
 
 ; save registers so I can restore them later. AX does not require saving.
 ; Microsoft documentation says:
