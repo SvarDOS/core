@@ -45,6 +45,8 @@
 3.4:(W)iederholen
 3.5:(I)gnorieren
 3.6:(U)ebergehen
+3.7:LADEFEHLER
+3.8:TASTE DRÜCKEN..
 # THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
 3.9:AWIU
 

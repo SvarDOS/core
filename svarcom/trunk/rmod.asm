@@ -243,18 +243,22 @@ mov [si], byte 0     ; revert the nul terminator back to its place
 mov bx, cs
 mov ds, bx
 
-; update error string so it contains the error number
-mov al, '0'
-add al, cl    ; the exec error code
-mov [ERRLOAD + 6], al
-
 ; display error message
 mov ah, 0x09
+mov dx, CRITERRDASH
+int 0x21
 mov dx, ERRLOAD
 int 0x21
-
+mov dx, CRITERRDASH
+int 0x21
+mov dx, PRESSANYKEY
+int 0x21
 ; wait for keypress
 mov ah, 0x07    ; use INT 21h,AH=7 instead of AH=8 for CTRL+C immunity
+int 0x21
+mov ah, 0x09
+; final newline
+mov dx, CRLF
 int 0x21
 
 ; back to program start
@@ -265,8 +269,6 @@ jmp skipsig
 ; called as respawn (as opposed to being invoked as a normal application)
 ; this allows multiple copies of SvarCOM to stack upon each other.
 CMDTAIL db 0x01, 0x0A, 0x0D
-
-ERRLOAD db ": ERR x, LOAD FAILED", 0x0A, 0x0D, '$'
 
 ; variables used to revert stdin/stdout to their initial state
 OLD_STDOUT dw 0xffff
@@ -459,7 +461,7 @@ ret
 ;          59H (get extended error information)
 ;
 ; =============================================================================
-HANDLER_24H:    ; +46Dh
+HANDLER_24H:    ; +465h
 
 ; save registers so I can restore them later. AX does not require saving.
 ; Microsoft documentation says:
@@ -669,8 +671,13 @@ CRITERR_ABORT db    "(A)bort$        "
 CRITERR_RETRY db    "(R)etry$        "
 CRITERR_IGNOR db    "(I)gnore$       "
 CRITERR_FAIL  db    "(F)ail$         "
+ERRLOAD db          "FAILED TO LOAD$ "
+PRESSANYKEY db      "PRESS ANY KEY..$"
 CRITERR_KEYS  db    "ARIF"        ; upcase keys for Abort, Retry, Ignore, Fail
+
+; messages below are NOT translatable
 CRITERRSYST db      " #XXX$"
-CRITERRDISK db "@: - $"
+CRITERRDISK db "@:"     ; no $ because it continues below!
+CRITERRDASH db " - $"   ; must follow CRITERRDISK
 CRITERR_COMMA db ", $"
 CRLF db 0x0A, 0x0D, "$"

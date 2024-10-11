@@ -712,7 +712,7 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
   _fmemcpy(&lastlang, lang, 2);
 
   /* update RMOD's critical handler with new strings */
-  for (i = 0; i < 7; i++) {
+  for (i = 0; i < 9; i++) {
     int len;
     len = strlen(svarlang_str(3, i));
     if (len > 15) len = 15;
@@ -720,7 +720,7 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
     _fmemcpy(rmodcritmsg + (i * 16) + len, "$", 1);
   }
   /* The ARIF string is special: always 4 bytes long and no $ terminator */
-  _fmemcpy(rmodcritmsg + (7 * 16), svarlang_str(3,9), 4);
+  _fmemcpy(rmodcritmsg + (9 * 16), svarlang_str(3,9), 4);
 }
 
 

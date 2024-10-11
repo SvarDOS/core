@@ -44,6 +44,8 @@
 3.4:(R)etry
 3.5:(I)gnore
 3.6:(F)ail
+3.7:FAILED TO LOAD
+3.8:PRESS ANY KEY..
 # THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
 3.9:ARIF
 

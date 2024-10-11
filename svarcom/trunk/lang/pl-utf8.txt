@@ -44,6 +44,8 @@
 3.4:p(O)nów
 3.5:(I)gnoruj
 3.6:(Z)rezygnuj
+3.7:BŁĄD ŁADOWANIA
+3.8:NACIŚNIJ COŚ...
 # THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
 3.9:POIZ
 

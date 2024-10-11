@@ -84,8 +84,8 @@ struct rmod_props {
 #define RMOD_OFFSET_CTRLCFLAG  (0x100 + 0x274)
 #define RMOD_OFFSET_BRKHANDLER (0x100 + 0x275)
 #define RMOD_OFFSET_ROUTINE    (0x100 + 0x27F)
-#define RMOD_OFFSET_CRITHANDLER (0x100 + 0x46D)
-#define RMOD_OFFSET_CRITMSG    (0x100 + 0x573)
+#define RMOD_OFFSET_CRITHANDLER (0x100 + 0x465)
+#define RMOD_OFFSET_CRITMSG    (0x100 + 0x56B)
 
 struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodcore, unsigned short rmodcore_len, unsigned char *cfgflags);
 struct rmod_props far *rmod_find(unsigned short rmodcore_len);
