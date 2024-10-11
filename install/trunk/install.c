@@ -471,34 +471,14 @@ static int welcomescreen(void) {
 
 /* returns total disk space of drive drv (in MiB, max 2048, A=1 B=2 etc), or -1 if drive invalid */
 static int disksize(unsigned char drv) {
-  unsigned short sec_per_cluster = 0;
-  unsigned short tot_clusters = 0;
-  unsigned short bytes_per_sec = 0;
+  struct diskfree_t df;
   long res;
-  _asm {
-    push ax
-    push bx
-    push cx
-    push dx
 
-    mov ah, 0x36
-    mov dl, drv
-    int 0x21
-    /* AX=sec_per_cluster DX=tot_clusters BX=free_clusters CX=bytes_per_sec */
-    mov sec_per_cluster, ax
-    mov bytes_per_sec, cx
-    mov tot_clusters, dx
+  if (_dos_getdiskfree(drv, &df) != 0) return(-1);
 
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-  }
-
-  if (sec_per_cluster == 0xffff) return(-1);
-  res = sec_per_cluster;
-  res *= tot_clusters;
-  res *= bytes_per_sec;
+  res = df.sectors_per_cluster;
+  res *= df.total_clusters;
+  res *= df.bytes_per_sector;
   res >>= 20;
   return((int)res);
 }
