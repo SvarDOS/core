@@ -1,5 +1,8 @@
 SvarDOS TREE History / Changes
 
+Oct 11, 2024   SvarDOS TREE 20241011   Mateusz Viste
+               - volume label is read from the volid file instead of the EBPB
+
 Oct 10, 2024   SvarDOS TREE 20241010   Mateusz Viste
                - ported to Open Watcom, builds with a makefile
                - replaced all C++ things by proper ANSI C

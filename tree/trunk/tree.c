@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#define VERSION "20241010"
+#define VERSION "20241011"
 
 /****************************************************************************
 
@@ -359,7 +359,8 @@ static void parseArguments(char *path, int argc, char **argv) {
  * and volume found using path.
  */
 static void GetVolumeAndSerial(char *volume, char *serial, const char *path) {
-  char buff[8];
+  char buff[8] = "@:\\*.*";
+  struct find_t findData;
   _Packed struct {
     unsigned short infolevel;
     unsigned short serial2;
@@ -368,21 +369,35 @@ static void GetVolumeAndSerial(char *volume, char *serial, const char *path) {
     char fstype[8];
   } drv_info;
 
-  if (getdrvserial((path[0] & 0xDF) - '@', &drv_info) != 0) {
+  /* do not rely on the EBPB for the volume label - look for a volume file at
+   * the root of the drive, as all applications do */
+  buff[0] = path[0];
+  if (_dos_findfirst(buff, _A_VOLID, &findData) != 0) {
     *volume = 0;
-    *serial = 0;
-    return;
+  } else {
+    char *s;
+    /* copy the filename to volume name, skip the dot */
+    for (s = findData.name;; s++) {
+      if (*s == '.') continue;
+      *volume = *s;
+      volume++;
+      if (*s == 0) break;
+    }
   }
-  memcpy(volume, drv_info.label, 11);
-  volume[11] = 0;
+  _dos_findclose(&findData);
 
-  /* build the "1234:5678" serial number string */
-  strcpy(serial, "0000");
-  utoa(drv_info.serial1, buff, 16);
-  strcpy(serial + 4 - strlen(buff), buff);
-  strcat(serial, ":0000");
-  utoa(drv_info.serial2, buff, 16);
-  strcpy(serial + 9 - strlen(buff), buff);
+  /* now let's ask DOS for the serial */
+  if (getdrvserial((path[0] & 0xDF) - '@', &drv_info) != 0) {
+    *serial = 0;
+  } else {
+    /* build the "1234:5678" serial number string */
+    strcpy(serial, "0000");
+    utoa(drv_info.serial1, buff, 16);
+    strcpy(serial + 4 - strlen(buff), buff);
+    strcat(serial, ":0000");
+    utoa(drv_info.serial2, buff, 16);
+    strcpy(serial + 9 - strlen(buff), buff);
+  }
 }
 
 
