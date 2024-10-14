@@ -57,18 +57,31 @@ struct copy_setup {
   char verifyflag;
   char lastitemwasplus;
   unsigned short databufsz;
+  unsigned short databufseg_custom; /* seg of buffer if dynamically allocated (0 otherwise) */
   char databuf[1];
 };
+
+
+static void dos_freememseg(unsigned short seg);
+#pragma aux dos_freememseg = \
+"mov ah, 0x49" \
+"int 0x21" \
+modify [ax] \
+parm [es]
 
 
 /* copies src to dst, overwriting or appending to the destination.
  * - copy is performed in ASCII mode if asciiflag set (stop at first EOF in src
  *   and append an EOF in dst).
  * - returns zero on success, DOS error code on error */
-static unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src, char srcascii, unsigned char appendflag, void *buff, unsigned short buffsz) {
+static unsigned short cmd_copy_internal(const char *dst, char dstascii, const char *src, char srcascii, unsigned char appendflag, void far *buff, unsigned short buffsz) {
   unsigned short errcode = 0;
   unsigned short srch = 0xffff, dsth = 0xffff;
+  unsigned short buffseg = FP_SEG(buff);
+  unsigned short buffoff =  FP_OFF(buff);
+
   _asm {
+    push ds
 
     /* open src */
     OPENSRC:
@@ -110,11 +123,13 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
 
     /* perform actual copy */
     COPY:
+    mov ds, buffseg
+    COPY_LOOP:
     /* read a block from src */
     mov ah, 0x3f   /* DOS 2+ -- read from file */
     mov bx, [srch]
     mov cx, [buffsz]
-    mov dx, [buff] /* DX points to buffer */
+    mov dx, [buffoff] /* DX points to buffer */
     int 0x21       /* CF set on error, bytes read in AX (0=EOF) */
     jc FAIL        /* abort on error */
     /* EOF? (ax == 0) */
@@ -124,13 +139,13 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     mov cx, ax     /* block length */
     mov ah, 0x40   /* DOS 2+ -- write to file (CX bytes from DS:DX) */
     mov bx, [dsth] /* file handle */
-    /* mov dx, [buff] */ /* DX points to buffer already */
+    /* mov dx, buffoff */ /* DX points to buffer already */
     int 0x21       /* CF clear and AX=CX on success */
     jc FAIL
     cmp ax, cx     /* should be equal, otherwise failed */
     mov ax, 0x39   /* preset to DOS error "Insufficient disk space" */
-    jne FAIL
-    jmp COPY
+    je COPY_LOOP
+    jmp short FAIL
 
     ENDOFFILE:
     /* if dst ascii mode -> add an EOF (ASCII mode not supported for the time being) */
@@ -173,6 +188,8 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     int 0x21
 
     DONE:
+
+    pop ds
   }
   return(errcode);
 }
@@ -286,6 +303,52 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
     return(CMD_FAIL);
   }
 
+  /* alloc as much memory as possible */
+  {
+    unsigned short alloc_size = 0;
+    unsigned short alloc_seg = 0;
+    _asm {
+      push ax
+      push bx
+      push dx
+
+      mov ah, 0x48  /* DOS 2+ allocate memory */
+      mov bx, 4095  /* number of segments to allocate (4095 segs = 65520 bytes) */
+      mov dx, bx    /* my own variable to hold result */
+      int 0x21      /* on success AX=segment, on error AX=max number of segments */
+      jnc DONE
+      TRY_AGAIN:
+      /* ask again, this time using the max segments value obtained earlier */
+      mov bx, ax
+      mov dx, bx
+      mov ah, 0x48
+      int 0x21
+      jnc DONE
+      xor dx, dx
+      DONE:
+      /* dx = size ; ax = segment (error if dx = 0) */
+      test dx, dx
+      jz FINITO
+      mov alloc_seg, ax
+      mov alloc_size, dx
+      FINITO:
+
+      pop dx
+      pop bx
+      pop ax
+    }
+
+    if (alloc_size != 0) {
+      /* if dos malloc returned less than the buffer I already have then free it */
+      if (alloc_size * 16 < setup->databufsz) {
+        dos_freememseg(alloc_seg);
+      } else {
+        setup->databufseg_custom = alloc_seg;
+        setup->databufsz = alloc_size * 16;
+      }
+    }
+  }
+
   /* perform the operation based on setup directives:
    * iterate over every source and copy it to dest */
 
@@ -361,9 +424,11 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       }
       outputnl(setup->dst);
 
-      t = cmd_copy_internal(setup->dst, 0, setup->cursrc, 0, appendflag, setup->databuf, setup->databufsz);
+      t = cmd_copy_internal(setup->dst, 0, setup->cursrc, 0, appendflag, (setup->databufseg_custom != 0)?MK_FP(setup->databufseg_custom, 0):setup->databuf, setup->databufsz);
       if (t != 0) {
         nls_outputnl_doserr(t);
+        /* free memory block if it is not the static BUFF */
+        if (setup->databufseg_custom != 0) dos_freememseg(setup->databufseg_custom);
         return(CMD_FAIL);
       }
 
@@ -374,6 +439,9 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
   sprintf(setup->databuf, svarlang_str(38,9)/*"%u file(s) copied"*/, copiedcount_out);
   outputnl(setup->databuf);
+
+  /* free memory block if it is not the static BUFF */
+  if (setup->databufseg_custom != 0) dos_freememseg(setup->databufseg_custom);
 
   return(CMD_OK);
 }
