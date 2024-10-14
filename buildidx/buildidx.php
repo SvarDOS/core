@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  14 oct 2024: tolerate single-file documentation of CORE pkgs in DOC/PKGNAME.TXT
   20 may 2024: directory for alternative kernels changed to "KERNEL"
   10 mar 2024: support for "url" in LSM files
   01 feb 2024: computes the "latest" collection of symlinks
@@ -43,7 +44,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20240520";
+$PVER = "20241014";
 
 
 // computes the BSD sum of a file and returns it
@@ -402,12 +403,13 @@ foreach ($pkgfiles as $fname) {
       if (str_head_is($f, 'bin/')) continue;
       if (str_head_is($f, 'cpi/')) continue;
       if (str_head_is($f, "doc/{$pkgdir}/")) continue;
+      if ($f === "doc/{$pkgnam}.txt") continue;
       if ($f === 'doc/') continue;
       if (str_head_is($f, "nls/{$pkgdir}.")) continue;
       if ($f === 'nls/') continue;
     }
-    // SVARCOM is allowed to have a root-based COMMAND.COM file
-    if ($pkgnam === 'svarcom') {
+    // SVARCOM and FREECOM are allowed to have a root-based COMMAND.COM file
+    if (($pkgnam === 'svarcom') || ($pkgnam === 'freecom')) {
       if ($f === 'command.com') continue;
     }
     // the help package is allowed to put files in... help
