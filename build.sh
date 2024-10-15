@@ -79,17 +79,18 @@ COREPKGS=`ls -1LS 'packages-core' | grep -o '^[a-zA-Z0-9]*'`
 function prep_flop {
   WORKDIR="$5/$6"
   LIST=$7
+  DISKPREFIX="svdos-$6-disk"
   mkdir "$WORKDIR"
-  mformat -C -t $1 -h $2 -s $3 -v $CURDATE -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
+  mformat -C -t $1 -h $2 -s $3 -v $CURDATE -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/$DISKPREFIX-1.img"
 
   # copy basic files (installer, startup files...)
-  mcopy -sQm -i "$WORKDIR/disk1.img" "$FLOPROOT/"* ::/
+  mcopy -sQm -i "$WORKDIR/$DISKPREFIX-1.img" "$FLOPROOT/"* ::/
 
   # generate the INSTALL.LST file
   for pkg in $7 ; do
     echo "$pkg" >> "$WORKDIR/install.lst"
   done
-  mcopy -i "$WORKDIR/disk1.img" "$WORKDIR/install.lst" ::/
+  mcopy -i "$WORKDIR/$DISKPREFIX-1.img" "$WORKDIR/install.lst" ::/
   rm "$WORKDIR/install.lst"
 
   # now populate the floppies with *.svp packages
@@ -101,7 +102,7 @@ function prep_flop {
     for p in $LIST ; do
       # if copy fails, then probably the floppy is full - try other packages
       # but remember all that fails so they will be retried on a new floppy
-      if ! mcopy -mi "$WORKDIR/disk$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
+      if ! mcopy -mi "$WORKDIR/$DISKPREFIX-$curdisk.img" "$CDROOT/$p.svp" ::/ ; then
         PENDING="$PENDING $p"
       fi
     done
@@ -110,7 +111,7 @@ function prep_flop {
     # if there are any pending items, then create a new floppy and try pushing pending packages to it
     if [ ! -z "$PENDING" ] ; then
       curdisk=$((curdisk+1))
-      mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$WORKDIR/disk$curdisk.img"
+      mformat -C -t $1 -h $2 -s $3 -v SVARDOS -i "$WORKDIR/$DISKPREFIX-$curdisk.img"
     fi
 
   done
@@ -124,9 +125,9 @@ function prep_flop {
 
   unix2dos "$WORKDIR/readme.txt"
 
-  # make a copy of the image, if requested
+  # make a copy of the (first) image, if requested
   if [ "x$8" != "x" ] ; then
-    cp "$WORKDIR/disk1.img" $8
+    cp "$WORKDIR/$DISKPREFIX-1.img" $8
   fi
 
   # zip the images (and remove them at the same time)
