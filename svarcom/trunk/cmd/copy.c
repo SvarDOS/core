@@ -70,6 +70,20 @@ modify [ax] \
 parm [es]
 
 
+/* returns 0 on success */
+static unsigned short dos_delfile(const char *f);
+#pragma aux dos_delfile = \
+"mov ah, 0x41" \
+"xor cx, cx" \
+"int 0x21" \
+"jc DONE" \
+"xor ax, ax" \
+"DONE:" \
+modify [cx] \
+parm [dx] \
+value [ax]
+
+
 /* copies src to dst, overwriting or appending to the destination.
  * - copy is performed in ASCII mode if asciiflag set (stop at first EOF in src
  *   and append an EOF in dst).
@@ -81,6 +95,10 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
   unsigned short buffoff =  FP_OFF(buff);
 
   _asm {
+    push ax
+    push bx
+    push cx
+    push dx
     push ds
 
     /* open src */
@@ -143,7 +161,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     int 0x21       /* CF clear and AX=CX on success */
     jc FAIL
     cmp ax, cx     /* should be equal, otherwise failed */
-    mov ax, 0x39   /* preset to DOS error "Insufficient disk space" */
+    mov ax, 0x27   /* preset to DOS error "Insufficient disk space" */
     je COPY_LOOP
     jmp short FAIL
 
@@ -168,15 +186,14 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     int 0x21
 
     CLOSEDST:
-    mov ax, bx     /* save src handle, because I'll need it in a moment */
     mov bx, [dsth]
     cmp bx, 0xffff
     je DONE
-    /* set timestamp, unless src was in error or operation was appending */
-    cmp ax, 0xffff /* skip date/time setting if source was not open */
-    je SKIPDATESAVE
+    /* set timestamp, unless an error occured or operation was appending */
+    xor ax, ax
+    cmp [errcode], ax
+    jne SKIPDATESAVE
     /* skip timesetting also if appending */
-    xor al, al
     cmp [appendflag], al
     jne SKIPDATESAVE
     /* do the job */
@@ -187,9 +204,23 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     mov ah, 0x3e   /* DOS 2+ -- close a file handle */
     int 0x21
 
+    /* remove dst file on error (remember DS still points to databuff) */
+    cmp word ptr [errcode], 0
+    jz DONE
+    mov ah, 0x41
+    mov dx, dst
+    xor cx, cx
+    pop ds
+    int 0x21
+    push ds
+
     DONE:
 
     pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
   }
   return(errcode);
 }
