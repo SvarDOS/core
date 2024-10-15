@@ -161,6 +161,7 @@ done
 # add some extra packages to CDROOT but not in the list of packages to install
 cp "$REPOROOT/pcntpk.svp" "$CDROOT/"
 cp "$REPOROOT/videcdd-2.14.svp" "$CDROOT/videcdd.svp"
+cp "$REPOROOT/provox-6.6.svp" "$CDROOT/provox.svp"
 
 #
 
@@ -192,10 +193,7 @@ unzip -CLj "$REPOROOTCORE/sys.svp" bin/sys.com -d "$FLOPROOT/"
 
 # generate a simple autoexec.bat file
 echo '@ECHO OFF' > "$FLOPROOT/autoexec.bat"
-echo '' >> "$FLOPROOT/autoexec.bat"
-echo 'REM Load DISPLAY driver if present' >> "$FLOPROOT/autoexec.bat"
-echo 'IF EXIST DISPLAY.EXE DISPLAY CON=(EGA,,1)' >> "$FLOPROOT/autoexec.bat"
-echo '' >> "$FLOPROOT/autoexec.bat"
+echo 'DISPLAY CON=(EGA,,1)' >> "$FLOPROOT/autoexec.bat"
 echo 'FDAPM ADV:REG' >> "$FLOPROOT/autoexec.bat"
 echo '' >> "$FLOPROOT/autoexec.bat"
 echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
@@ -204,6 +202,11 @@ echo 'ECHO   WELCOME TO SVARDOS' >> "$FLOPROOT/autoexec.bat"
 echo 'ECHO  ********************' >> "$FLOPROOT/autoexec.bat"
 echo "ECHO  build: $CURDATE" >> "$FLOPROOT/autoexec.bat"
 echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
+echo '' >> "$FLOPROOT/autoexec.bat"
+echo 'REM Load PROVOX screen reader if present' >> "$FLOPROOT/autoexec.bat"
+echo 'IF EXIST PROVOX.EXE CLS' >> "$FLOPROOT/autoexec.bat"
+echo 'IF EXIST PROVOX.EXE PROVOX.EXE' >> "$FLOPROOT/autoexec.bat"
+echo 'IF EXIST PV.EXE PV.EXE BNS' >> "$FLOPROOT/autoexec.bat"
 echo '' >> "$FLOPROOT/autoexec.bat"
 echo "INSTALL" >> "$FLOPROOT/autoexec.bat"
 unix2dos "$FLOPROOT/autoexec.bat"
@@ -243,6 +246,14 @@ prep_flop 80 2 18 1440 "$PUBDIR" "1.44M" "$COREPKGS pcntpk"
 prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
 prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
 prep_flop 40 2  9  360 "$PUBDIR" "360K" "$COREPKGS"
+
+# BNS-enabled (screen reader) 2.88M build
+unzip -CLj "$CDROOT/provox.svp" drivers/provox/provox.exe -d "$FLOPROOT/"
+unzip -CLj "$CDROOT/provox.svp" drivers/provox/pv.exe -d "$FLOPROOT/"
+prep_flop 80 2 36 2880 "$PUBDIR" "2.88M-BNS" "$COREPKGS pcntpk videcdd provox" "$CDROOT/bootbns.img"
+rm "$FLOPROOT/provox.exe"
+rm "$FLOPROOT/pv.exe"
+
 
 
 echo
@@ -319,15 +330,19 @@ zip -rm9jk "$PUBDIR/svardos-$CURDATE-dosemu.zip" "$DOSEMUDIR"
 rmdir "$DOSEMUDIR"
 
 echo
-echo "### Generating ISO CD image"
+echo "### Generating ISO CD images"
 echo
 
+# normal
 CDISO="$PUBDIR/svardos-$CURDATE-cd.iso"
 CDZIP="$PUBDIR/svardos-$CURDATE-cd.zip"
-
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/boot.img"
+zip -mj9 "$CDZIP" "$CDISO"
 
-# compress the ISO
+# BNS-enabled
+CDISO="$PUBDIR/svardos-$CURDATE-cd-bns.iso"
+CDZIP="$PUBDIR/svardos-$CURDATE-cd-bns.zip"
+$GENISOIMAGE -input-charset cp437 -b bootbns.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/bootbns.img"
 zip -mj9 "$CDZIP" "$CDISO"
 
 

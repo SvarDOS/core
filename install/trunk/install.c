@@ -1031,6 +1031,11 @@ static void bootfilesgen(void) {
 
     /* write all to file */
     fputs(autoexec_bat1, fd);
+    /* insert provox initialization if to be installed */
+    if (fileexists("PROVOX.SVP")) {
+      fprintf(fd, "%c:\\DRIVERS\\PROVOX\\PROVOX.EXE\r\n", bootdrv);
+      fprintf(fd, "%c:\\DRIVERS\\PROVOX\\PV.EXE BNS\r\n", bootdrv);
+    }
     genlocalesconf(fd, &locales);
     fputs(autoexec_bat2, fd);
 
@@ -1186,6 +1191,14 @@ static int copypackages(char drvletter, const struct slocales *locales) {
   snprintf(buff, sizeof(buff), "%c:\\TEMP\\INSTALL.LNG", drvletter);
   fcopy(buff, buff + 8, buff, sizeof(buff));
 
+  /* copy the PROVOX driver, if present */
+  if (fileexists("provox.exe")) {
+    snprintf(buff, sizeof(buff), "%c:\\TEMP\\PROVOX.EXE", drvletter);
+    fcopy(buff, buff + 8, buff, sizeof(buff));
+    snprintf(buff, sizeof(buff), "%c:\\TEMP\\PV.EXE", drvletter);
+    fcopy(buff, buff + 8, buff, sizeof(buff));
+  }
+
   /* copy packages */
   for (i = 0;; i++) {
     RETRY_ENTIRE_LIST:
@@ -1242,6 +1255,8 @@ static int copypackages(char drvletter, const struct slocales *locales) {
   if (fd == NULL) return(-1);
   fprintf(fd, "@ECHO OFF\r\n"
               "CD TEMP\r\n"
+              "IF EXIST PROVOX.EXE PROVOX.EXE\r\n"
+              "IF EXIST PV.EXE PV BNS\r\n"
               "install\r\n"   /* installer will run in 2nd stage (generating autoexec.bat, pkg.cfg and stuff) */
               "postinst.bat\r\n");
   fclose(fd);
