@@ -110,7 +110,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     xor dx, dx     /* offset zero */
     int 0x21       /* CF set on error */
     jc FAIL
-    jmp COPY
+    jmp short COPY
 
     /* create dst */
     CREATEDST:
@@ -150,7 +150,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     ENDOFFILE:
     /* if dst ascii mode -> add an EOF (ASCII mode not supported for the time being) */
 
-    jmp CLOSESRC
+    jmp short CLOSESRC
 
     FAIL:
     mov [errcode], ax
