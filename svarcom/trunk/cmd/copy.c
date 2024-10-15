@@ -397,7 +397,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
       /* if there was no destination, then YOU are the destination now!
        * this handles situations like COPY a.txt+b.txt+c.txt */
-      if (setup->dst[0] == NULL) {
+      if (setup->dst[0] == 0) {
         strcpy(setup->dst, setup->cursrc);
         setup->dstlen = strlen(setup->dst);
         copiedcount_in++;
