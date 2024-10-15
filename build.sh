@@ -55,11 +55,6 @@ if [ "x$GENISOIMAGE" == "x" ] ; then
   exit 1
 fi
 
-SED='sed'
-if [ `uname` == "Darwin" ] ; then
-  SED='gsed'
-fi
-
 # abort if anything fails
 set -e
 
@@ -86,9 +81,18 @@ function prep_flop {
   LIST=$7
   mkdir "$WORKDIR"
   mformat -C -t $1 -h $2 -s $3 -v $CURDATE -B "$CUSTFILES/floppy.mbr" -i "$WORKDIR/disk1.img"
+
+  # copy basic files (installer, startup files...)
   mcopy -sQm -i "$WORKDIR/disk1.img" "$FLOPROOT/"* ::/
 
-  # now populate the floppies
+  # generate the INSTALL.LST file
+  for pkg in $7 ; do
+    echo "$pkg" >> "$WORKDIR/install.lst"
+  done
+  mcopy -i "$WORKDIR/disk1.img" "$WORKDIR/install.lst" ::/
+  rm "$WORKDIR/install.lst"
+
+  # now populate the floppies with *.svp packages
   curdisk=1
 
   while [ ! -z "$LIST" ] ; do
@@ -151,7 +155,6 @@ mkdir "$FLOPROOT"
 # add CORE packages to CDROOT + create the list of packages on floppy
 for pkg in $COREPKGS ; do
   cp "$REPOROOTCORE/$pkg.svp" "$CDROOT/"
-  echo "$pkg" >> "$FLOPROOT/install.lst"
 done
 
 # add some extra packages to CDROOT but not in the list of packages to install
@@ -234,10 +237,7 @@ echo
 export MTOOLS_NO_VFAT=1
 
 # prepare images for floppies in different sizes (args are C H S SIZE)
-echo "videcdd" >> "$FLOPROOT/install.lst"
 prep_flop 80 2 36 2880 "$PUBDIR" "2.88M" "$COREPKGS pcntpk videcdd" "$CDROOT/boot.img"
-# no videcdd for non-2.88M images
-$SED -i '/^videcdd$/d' "$FLOPROOT/install.lst"
 prep_flop 80 2 18 1440 "$PUBDIR" "1.44M" "$COREPKGS pcntpk"
 prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
 prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
