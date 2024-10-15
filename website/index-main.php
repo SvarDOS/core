@@ -55,7 +55,7 @@
         echo "<li><a href=\"download/{$latestbuild}/svardos-{$latestbuild}-cd-bns.zip\">CD-ROM ISO image</a></li>\n";
       ?>
       </ul>
-      <p>A "talking" version for blind persons. Requires a Braille 'n Speak synthesizer connected to the COM1 port. If running as a VM, the BNS can be <a href="https://emubns.sourceforge.net/">emulated</a>.</p>
+      <p>A "talking" version for blind persons. Uses the PROVOX screen reader and requires a Braille 'n Speak synthesizer connected to the COM1 port. If running as a VM, the BNS can be <a href="https://emubns.sourceforge.net/">emulated</a>.</p>
     </div>
 
     <?php
