@@ -13,7 +13,7 @@ install.com: keylay.h install.c deflang.c
 	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=install.map install.c deflang.c mdr\mdrs2024.lib svarlang.lib\svarlngs.lib
 	upx --8086 -9 install.com
 
-deflang.c:
+deflang.c: nls/*.txt
 	cd nls
 	utf8tocp 437 en_utf8.txt en.txt
 	utf8tocp 850 br_utf8.txt br.txt
