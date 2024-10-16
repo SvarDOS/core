@@ -77,6 +77,34 @@ struct slocales {
 };
 
 
+/* a special routine to display a message trough the video BIOS. this is much
+ * slower than direct writes to video memory, but it is the only way to make
+ * provox read such info message */
+static void infomsg(unsigned char row, unsigned char col, const char *msg, unsigned char attr, unsigned short maxlen);
+#pragma aux infomsg = \
+"mov cx, 1" \
+"xor bh, bh" \
+"NEXT:" \
+/* put cursor at position [dl,dh] */ \
+"mov ah, 0x02" \
+"int 0x10" \
+/* am I allowed to print more? */ \
+"test di, di" \
+"jz DONE" \
+/* write char (unless nul terminator) */ \
+"mov ah, 0x09" \
+"lodsb" \
+"test al, al" \
+"jz DONE" \
+"int 0x10" \
+"inc dl" \
+"dec di" \
+"jmp short NEXT" \
+"DONE:" \
+modify [ax bx cx dx si di] \
+parm [dh] [dl] [si] [bl] [di]
+
+
 /* install a dummy int24h handler that always fails. this is to avoid the
  * annoying "abort, retry, fail... DOS messages. */
 static void install_int24(void) {
@@ -150,7 +178,7 @@ static unsigned char putstringwrap(unsigned char y, unsigned char x, unsigned ch
         break;
       }
     }
-    mdr_cout_str(y++, x, s, attr, len);
+    infomsg(y++, x, s, attr, len);
     s += len;
     if (*s == 0) break;
     s += 1; /* skip the whitespace char */
@@ -242,7 +270,7 @@ static int menuselect(unsigned char ypos, unsigned char height, const char **lis
     for (y = ypos; y < (ypos + height); y++) {
       mdr_cout_char(y, xpos-1, 0xB3, COLOR_SELECT); /* left side */
       if (y - ypos == i) {
-        mdr_cout_char(y, xpos+width+2, '=', COLOR_SELECT); /* cursor */
+        mdr_cout_char(y, xpos+width+2, ' ', 0); /* cursor */
       } else {
         mdr_cout_char(y, xpos+width+2, 0xB3, COLOR_SELECT); /* right side */
       }
@@ -362,7 +390,7 @@ static int selectlang(struct slocales *locales) {
   newscreen(1);
   msg = svarlang_strid(0x0100); /* "Welcome to SvarDOS" */
   x = 40 - (strlen(msg) >> 1);
-  mdr_cout_str(4, x, msg, COLOR_BODY, 80);
+  infomsg(4, x, msg, COLOR_BODY, 80);
   mdr_cout_char_rep(5, x, '=', COLOR_BODY, strlen(msg));
 
   /* center out the string "Please select your language..." */
@@ -370,7 +398,7 @@ static int selectlang(struct slocales *locales) {
   if (strlen(msg) > 74) {
     putstringwrap(8, 1, COLOR_BODY, msg);
   } else {
-    mdr_cout_str(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY, 80);
+    infomsg(8, 40 - (strlen(msg) / 2), msg, COLOR_BODY, 80);
   }
 
   choice = menuselect(11, 9, langlist, -1);
@@ -825,7 +853,7 @@ static int preparedrive(int hd_drv) {
     const char *list[3];
     newscreen(0);
     snprintf(buff, sizeof(buff), svarlang_str(3, 3), cselecteddrive); /* "ERROR: Drive %c: seems to be unformated. Do you wish to format it?") */
-    mdr_cout_str(7, 1, buff, COLOR_BODY, 80);
+    infomsg(7, 1, buff, COLOR_BODY, 80);
 
     snprintf(buff, sizeof(buff), svarlang_strid(0x0007), cselecteddrive); /* "Format drive %c:" */
     list[0] = buff;
@@ -881,7 +909,7 @@ static int preparedrive(int hd_drv) {
     list[1] = svarlang_strid(0x0002); /* Quit to DOS */
     list[2] = NULL;
     snprintf(buff, sizeof(buff), svarlang_strid(0x0306), cselecteddrive); /* "The installation of SvarDOS to %c: is about to begin." */
-    mdr_cout_str(7, 40 - (strlen(buff) / 2), buff, COLOR_BODY, 80);
+    infomsg(7, 40 - (strlen(buff) / 2), buff, COLOR_BODY, 80);
     choice = menuselect(10, 2, list, -1);
     if (choice < 0) return(MENUPREV);
     if (choice == 1) return(MENUQUIT);
@@ -1156,14 +1184,14 @@ static int copypackages(char drvletter, const struct slocales *locales) {
   /* load pkg list */
   fd = fopen("install.lst", "rb");
   if (fd == NULL) {
-    mdr_cout_str(10, 30, "ERROR: INSTALL.LST NOT FOUND", COLOR_BODY, 80);
+    infomsg(10, 30, "ERROR: INSTALL.LST NOT FOUND", COLOR_BODY, 80);
     mdr_dos_getkey();
     return(-1);
   }
   pkglistflen = fread(pkglist, 1, sizeof(pkglist) - 2, fd);
   fclose(fd);
   if (pkglistflen == sizeof(pkglist) - 2) {
-    mdr_cout_str(10, 30, "ERROR: INSTALL.LST TOO LARGE", COLOR_BODY, 80);
+    infomsg(10, 30, "ERROR: INSTALL.LST TOO LARGE", COLOR_BODY, 80);
     mdr_dos_getkey();
     return(-1);
   }
@@ -1226,12 +1254,12 @@ static int copypackages(char drvletter, const struct slocales *locales) {
     /* copy the package */
     snprintf(buff, sizeof(buff), svarlang_strid(0x0400), i+1, pkglistlen, pkgptr); /* "Copying package %d/%d: %s" */
     strcat(buff, "       ");
-    mdr_cout_str(10, 1, buff, COLOR_BODY, 40);
+    infomsg(10, 1, buff, COLOR_BODY, 80);
 
     /* proceed with package copy */
     sprintf(buff, "%c:\\TEMP\\%s.svp", drvletter, pkgptr);
     if (fcopy(buff, buff + 8, buff, sizeof(buff)) != 0) {
-      mdr_cout_str(10, 30, "READ ERROR", COLOR_BODY, 80);
+      infomsg(10, 30, "READ ERROR", COLOR_BODY, 80);
       mdr_dos_getkey();
       return(-1);
     }
