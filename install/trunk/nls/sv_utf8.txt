@@ -39,7 +39,7 @@
 ### WELCOME SCREEN ###
 ### VÄLKOMSTSKÄRM ###
 #2.0:You are about to install SvarDOS: a free, MS-DOS compatible operating system based on FreeDOS. SvarDOS comes with a variety of third-party applications.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once SvarDOS is installed.
-2.0:Du ska just till att installera SvarDOS: ett fritt, MS-DOS-kompatibelt operativsystem baserat på FreeDOS. SvarDOS kommer med en samling olika tredjepartsapplikationer.\n\nVARNING: Om din PC har ett annat operativsystem intstallerat, kanske detta andra system inte kan boota när väl SvarDOS har installerats.
+2.0:Du ska just till att installera SvarDOS: ett fritt, MS-DOS-kompatibelt operativsystem. SvarDOS kommer med en samling olika tredjepartsapplikationer.\n\nVARNING: Om din PC har ett annat operativsystem intstallerat, kanske detta andra system inte kan boota när väl SvarDOS har installerats.
 
 ### DISK SETUP ###
 ### DISKSETUP ###
