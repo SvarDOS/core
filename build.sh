@@ -161,7 +161,7 @@ done
 # add some extra packages to CDROOT but not in the list of packages to install
 cp "$REPOROOT/pcntpk.svp" "$CDROOT/"
 cp "$REPOROOT/videcdd-2.14.svp" "$CDROOT/videcdd.svp"
-cp "$REPOROOT/provox-6.6.svp" "$CDROOT/provox.svp"
+cp "$REPOROOT/provox-6.71.svp" "$CDROOT/provox.svp"
 
 #
 
@@ -204,10 +204,12 @@ echo "ECHO  build: $CURDATE" >> "$FLOPROOT/autoexec.bat"
 echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
 echo '' >> "$FLOPROOT/autoexec.bat"
 echo 'REM Load PROVOX screen reader if present' >> "$FLOPROOT/autoexec.bat"
-echo 'IF EXIST PROVOX.EXE CLS' >> "$FLOPROOT/autoexec.bat"
-echo 'IF EXIST PROVOX.EXE PROVOX.EXE' >> "$FLOPROOT/autoexec.bat"
-echo 'IF EXIST PV.EXE PV.EXE BNS' >> "$FLOPROOT/autoexec.bat"
+echo 'IF NOT EXIST PROVOX.EXE GOTO INSTALL' >> "$FLOPROOT/autoexec.bat"
+echo 'CLS' >> "$FLOPROOT/autoexec.bat"
+echo 'PROVOX.EXE' >> "$FLOPROOT/autoexec.bat"
+echo 'PV.EXE INIT BNS' >> "$FLOPROOT/autoexec.bat"
 echo '' >> "$FLOPROOT/autoexec.bat"
+echo ":INSTALL" >> "$FLOPROOT/autoexec.bat"
 echo "INSTALL" >> "$FLOPROOT/autoexec.bat"
 unix2dos "$FLOPROOT/autoexec.bat"
 
