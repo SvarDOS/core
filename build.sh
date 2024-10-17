@@ -161,7 +161,7 @@ done
 # add some extra packages to CDROOT but not in the list of packages to install
 cp "$REPOROOT/pcntpk.svp" "$CDROOT/"
 cp "$REPOROOT/videcdd-2.14.svp" "$CDROOT/videcdd.svp"
-cp "$REPOROOT/provox-6.71.svp" "$CDROOT/provox.svp"
+cp "$REPOROOT/provox-7.05.svp" "$CDROOT/provox.svp"
 
 #
 
@@ -205,10 +205,10 @@ ECHO  build: $CURDATE
 ECHO.
 
 REM Load PROVOX screen reader if present
-IF NOT EXIST PROVOX.EXE GOTO INSTALL
+IF NOT EXIST PROVOX7.EXE GOTO INSTALL
 CLS
-PROVOX.EXE
-PV.EXE INIT BNS
+PROVOX7.EXE
+PV7.EXE INIT BNS > NUL
 
 :INSTALL
 INSTALL
@@ -261,11 +261,11 @@ prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
 prep_flop 40 2  9  360 "$PUBDIR" "360K" "$COREPKGS"
 
 # BNS-enabled (screen reader) 2.88M build
-unzip -CLj "$CDROOT/provox.svp" drivers/provox/provox.exe -d "$FLOPROOT/"
-unzip -CLj "$CDROOT/provox.svp" drivers/provox/pv.exe -d "$FLOPROOT/"
+unzip -CLj "$CDROOT/provox.svp" drivers/provox/provox7.exe -d "$FLOPROOT/"
+unzip -CLj "$CDROOT/provox.svp" drivers/provox/pv7.exe -d "$FLOPROOT/"
 prep_flop 80 2 36 2880 "$PUBDIR" "2.88M-BNS" "$COREPKGS pcntpk videcdd provox" "$CDROOT/bootbns.img"
-rm "$FLOPROOT/provox.exe"
-rm "$FLOPROOT/pv.exe"
+rm "$FLOPROOT/provox7.exe"
+rm "$FLOPROOT/pv7.exe"
 
 
 

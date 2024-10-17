@@ -1022,6 +1022,14 @@ static void bootfilesgen(void) {
   fprintf(fd, "\r\n"
               "; NLS configuration\r\n");
   fprintf(fd, "COUNTRY=%03u,%u,%c:\\SVARDOS\\COUNTRY.SYS\r\n", locales.countryid, locales.codepage, bootdrv);
+
+  /* insert provox initialization if to be installed */
+  if (fileexists("PROVOX.SVP")) {
+    fprintf(fd, "\r\n"
+                "; PROVOX SCREEN READER DRIVER\r\n"
+                "DEVICE=%c:\\DRIVERS\\PROVOX\\PROVOX7.EXE\r\n", bootdrv);
+  }
+
   fprintf(fd, "\r\n"
               "; CD-ROM driver initialization\r\n"
               ";DEVICE=%c:\\DRIVERS\\VIDECDD\\VIDE-CDD.SYS /D:SVCD0001\r\n", bootdrv);
@@ -1061,8 +1069,7 @@ static void bootfilesgen(void) {
     fputs(autoexec_bat1, fd);
     /* insert provox initialization if to be installed */
     if (fileexists("PROVOX.SVP")) {
-      fprintf(fd, "%c:\\DRIVERS\\PROVOX\\PROVOX.EXE\r\n", bootdrv);
-      fprintf(fd, "%c:\\DRIVERS\\PROVOX\\PV.EXE BNS\r\n", bootdrv);
+      fprintf(fd, "%c:\\DRIVERS\\PROVOX\\PV7.EXE BNS\r\n", bootdrv);
     }
     genlocalesconf(fd, &locales);
     fputs(autoexec_bat2, fd);
