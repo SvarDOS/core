@@ -24,7 +24,7 @@
 1.5:SvarDOS supporta le tastiere usate in paesi differenti. Scegli la tastiera che stai usando.
 
 ### WELCOME SCREEN ###
-2.0:Stai per installare SvarDOS: un sistema operativo libero, compatibile con MSDOS. SvarDOS include una varietà di applicazioni di terze parti.\n\nATTENZIONE: Se il tuo PC ha già un altro sistema operativo installato, l'altro sistema operativo potrebbe non essere in grado di ripartire dopo aver installato SvarDOS.
+2.0:Stai per installare SvarDOS, un sistema operativo libero, compatibile con MSDOS.\n\nATTENZIONE: Se il tuo PC ha già un altro sistema operativo installato, l'altro sistema operativo potrebbe non essere in grado di ripartire dopo aver installato SvarDOS.
 
 ### DISK SETUP ###
 3.0:ERRORE: L'unità non è stata trovata. Forse perché l'hard disk deve essere prima partizionato. Occorre creare almeno una partizione sull'hard disk per poterci installare SvarDOS. Notare che SvarDOS richiede almeno %d MiB di spazio libero su disco.\n\nPuoi usare lo strumento di partizionamento FDISK per creare la partizione manualmente, o lasciare che il programma di installazione partizioni il disco automaticamente. Puoi anche annullare l'installazione per usare lo strumento di partizionamento che preferisci.

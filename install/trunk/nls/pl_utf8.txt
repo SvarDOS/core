@@ -23,7 +23,7 @@
 1.5:SvarDOS wspiera różne układy klawiatury. Wybierz układ, który ci odpowiada.
 
 ### WELCOME SCREEN ###
-2.0:Za chwilę rozpocznie się instalacja systemu SvarDOS: bezpłatnego systemu operacyjnego kompatybilnego z MSDOS. SvarDOS zawiera mnóstwo aplikacji dodatkowych.\n\nUWAGA: Jeśli twój komputer posiada już inny system operacyjny, system ten może nie zdołać uruchomić się po instalacji SvarDOS.
+2.0:Za chwilę rozpocznie się instalacja systemu SvarDOS, bezpłatnego systemu operacyjnego kompatybilnego z MSDOS.\n\nUWAGA: Jeśli twój komputer posiada już inny system operacyjny, system ten może nie zdołać uruchomić się po instalacji SvarDOS.
 
 ### DISK SETUP ###
 3.0:BŁĄD: Nie znaleziono żadnego napędu. Być może twój dysk powinien zostać najpierw spartycjonowany. Utwórz co najmniej jedną partycję na twoim dysku, aby SvarDOS mógł zostać na nią zainstalowany. SvarDOS wymaga co najmniej %d MiB miejsca.\n\nMożesz skorzystać z narzędzia FDISK aby stworzyć wymaganą partycję ręcznie, lub pozwolić instalatorowi stworzyć ją automatycznie. Możesz także wstrzymać instalację aby użyć jakiegokolwiek innego narzędzia do partycjonowania.
