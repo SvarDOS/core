@@ -45,4 +45,4 @@
 5.2:SvarDOS został zainstalowany. Zrestartuj teraz komputer.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
-6.0:Witaj w systemie SvarDOS! Wpisz 'HELP' jeśli potrzebujesz pomocy.
+6.0:Witaj w systemie SvarDOS! Wpisz HELP jeśli potrzebujesz pomocy.

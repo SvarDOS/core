@@ -42,4 +42,4 @@
 5.2:SvarDOS kurulumu sona ermiştir. Bilgisayarınızı şimdi tekrar başlatın.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
-6.0:SvarDOS'a hoş geldiniz! Yardıma ihtiyacınız varsa 'HELP' yazınız.
+6.0:SvarDOS'a hoş geldiniz! Yardıma ihtiyacınız varsa HELP yazınız.

@@ -44,4 +44,4 @@
 5.2:L'installazione di SvarDOS è terminata. Restart your computer now.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
-6.0:Benvenuto in SvarDOS! Scrivi 'HELP' se hai bisogno di aiuto.
+6.0:Benvenuto in SvarDOS! Scrivi HELP se hai bisogno di aiuto.

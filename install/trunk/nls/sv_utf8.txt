@@ -75,5 +75,5 @@
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 ### LOGINVÄLKOMSTTEXT NÄR SYSTEMET ÄR INSTALLERAT ###
-#6.0:Welcome to SvarDOS! Type 'HELP' if you need help.
-6.0:Välkommen till SvarDOS! Skriv 'HELP' om du behöver hjälp.
+#6.0:Welcome to SvarDOS! Type HELP if you need help.
+6.0:Välkommen till SvarDOS! Skriv HELP om du behöver hjälp.
