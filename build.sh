@@ -207,8 +207,17 @@ ECHO.
 REM Load PROVOX screen reader if present
 IF NOT EXIST PROVOX7.EXE GOTO INSTALL
 CLS
+ECHO This svardos build comes with the provox screen reader preinstalled
+ECHO.
+ECHO It outputs speech to a Braille n Speak device that has to be connected to
+ECHO the first serial port of your computer
+ECHO.
+ECHO The installation of the SvarDOS system is about to begin
+ECHO Press any key to continue
+ECHO.
 PROVOX7.EXE
 PV7.EXE INIT BNS > NUL
+PAUSE
 
 :INSTALL
 INSTALL

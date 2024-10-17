@@ -1166,8 +1166,17 @@ static void bootfilesgen(void) {
               "DEL install.lng\r\n"
               "SET COMSPEC=\\COMMAND.COM\r\n"
               "DEL \\CMD.COM\r\n");
-  /* print out the "installation over" message (load codepage first, now that MODE is installed) */
+  /* load codepage, now that MODE is installed */
   genlocalesconf(fd, &locales);
+
+  /* if provox has been installed, then load it now */
+  fprintf(fd, "IF NOT EXIST \\DRIVERS\\PROVOX\\PROVOX7.EXE GOTO SKIPPROVOX\r\n"
+              "CLS\r\n"
+              "\\DRIVERS\\PROVOX\\PROVOX7.EXE\r\n"
+              "\\DRIVERS\\PROVOX\\PV7.EXE INIT BNS > NUL\r\n"
+              ":SKIPPROVOX\r\n");
+
+  /* print out the "installation over" message */
   fprintf(fd, "ECHO.\r\n"
               "ECHO ");
   fprintf(fd, svarlang_strid(0x0502)); /* "SvarDOS installation is over. Please restart your computer now" */
