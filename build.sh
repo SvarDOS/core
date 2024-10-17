@@ -191,27 +191,38 @@ unzip -CLj "$REPOROOTCORE/pkg.svp" bin/pkg.exe -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/sved.svp" bin/sved.com -d "$FLOPROOT/"
 unzip -CLj "$REPOROOTCORE/sys.svp" bin/sys.com -d "$FLOPROOT/"
 
-# generate a simple autoexec.bat file
-echo '@ECHO OFF' > "$FLOPROOT/autoexec.bat"
-echo 'DISPLAY CON=(EGA,,1)' >> "$FLOPROOT/autoexec.bat"
-echo 'FDAPM ADV:REG' >> "$FLOPROOT/autoexec.bat"
-echo '' >> "$FLOPROOT/autoexec.bat"
-echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
-echo 'ECHO  ********************' >> "$FLOPROOT/autoexec.bat"
-echo 'ECHO   WELCOME TO SVARDOS' >> "$FLOPROOT/autoexec.bat"
-echo 'ECHO  ********************' >> "$FLOPROOT/autoexec.bat"
-echo "ECHO  build: $CURDATE" >> "$FLOPROOT/autoexec.bat"
-echo 'ECHO.' >> "$FLOPROOT/autoexec.bat"
-echo '' >> "$FLOPROOT/autoexec.bat"
-echo 'REM Load PROVOX screen reader if present' >> "$FLOPROOT/autoexec.bat"
-echo 'IF NOT EXIST PROVOX.EXE GOTO INSTALL' >> "$FLOPROOT/autoexec.bat"
-echo 'CLS' >> "$FLOPROOT/autoexec.bat"
-echo 'PROVOX.EXE' >> "$FLOPROOT/autoexec.bat"
-echo 'PV.EXE INIT BNS' >> "$FLOPROOT/autoexec.bat"
-echo '' >> "$FLOPROOT/autoexec.bat"
-echo ":INSTALL" >> "$FLOPROOT/autoexec.bat"
-echo "INSTALL" >> "$FLOPROOT/autoexec.bat"
+# generate a simple AUTOEXEC.BAT
+cat <<EOF > "$FLOPROOT/autoexec.bat"
+@ECHO OFF
+DISPLAY CON=(EGA,,1)
+FDAPM ADV:REG
+
+ECHO.
+ECHO  ********************
+ECHO   WELCOME TO SVARDOS
+ECHO  ********************
+ECHO  build: $CURDATE
+ECHO.
+
+REM Load PROVOX screen reader if present
+IF NOT EXIST PROVOX.EXE GOTO INSTALL
+CLS
+PROVOX.EXE
+PV.EXE INIT BNS
+
+:INSTALL
+INSTALL
+EOF
 unix2dos "$FLOPROOT/autoexec.bat"
+
+# generate a simple CONFIG.SYS
+cat <<EOF > "$FLOPROOT/config.sys"
+LASTDRIVE=Z
+FILES=8
+BUFFERS=10
+SHELL=COMMAND.COM /e:512 /p
+EOF
+unix2dos "$FLOPROOT/config.sys"
 
 
 echo
