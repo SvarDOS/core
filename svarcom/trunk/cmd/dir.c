@@ -463,8 +463,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   struct dirrequest req;
 
   /* make sure there's no risk of buffer overflow */
-  if (sizeof(buf) > p->BUFFERSZ) {
-    outputnl("INTERNAL MEM ERROR IN " __FILE__);
+  if (sizeof(*buf) > p->BUFFERSZ) {
+    sprintf(p->BUFFER, "INTERNAL DIR ERROR: p->BUFFERSZ=%u / required=%u", p->BUFFERSZ, sizeof(*buf));
+    outputnl(p->BUFFER);
     return(CMD_FAIL);
   }
 
