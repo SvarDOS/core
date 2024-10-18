@@ -143,6 +143,43 @@ static void dir_pagination(unsigned short *availrows) {
 }
 
 
+/* add a new dirname to path, C:\XXX\*.EXE + YYY -> C:\XXX\YYY\*.EXE */
+static void path_add(char *path, const char *dirname) {
+  short i, ostatni = -1, slen;
+  printf("path_add(%s,%s) -> ", path, dirname);
+  /* find the last backslash */
+  for (i = 0; path[i] != 0; i++) {
+    if (path[i] == '\\') ostatni = i;
+  }
+  /* abort on error */
+  if (ostatni == -1) return;
+  /* do the trick */
+  slen = strlen(dirname);
+  memmove(path + ostatni + slen + 1, path + ostatni, slen + 1);
+  memcpy(path + ostatni + 1, dirname, slen);
+  printf("'%s'\n", path);
+}
+
+
+/* take back last dir from path, C:\XXX\YYY\*.EXE -> C:\XXX\*.EXE */
+static void path_back(char *path) {
+  short i, ostatni = -1, przedostatni = -1;
+  /* find the two last backslashes */
+  for (i = 0; path[i] != 0; i++) {
+    if (path[i] == '\\') {
+      przedostatni = ostatni;
+      ostatni = i;
+    }
+  }
+  /* abort on error */
+  if (przedostatni == -1) return;
+  /* do the trick */
+  for (i = przedostatni; path[i] != 0; i++) {
+    path[i] = path[ostatni++];
+  }
+}
+
+
 /* parse an attr list like "Ar-hS" and fill bitfield into attrfilter_may and attrfilter_must.
  * /AHS   -> adds S and H to mandatory attribs ("must")
  * /A-S   -> removes S from allowed attribs ("may")
@@ -417,9 +454,7 @@ static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
           break;
         case 's':
         case 'S':
-          /* TODO */
-          outputnl("/S NOT IMPLEMENTED YET");
-          return(-1);
+          req->flags |= DIR_FLAG_RECUR;
           break;
         case 'w':
         case 'W':
@@ -442,6 +477,8 @@ static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
 }
 
 
+#define MAX_SORTABLE_FILES 8192
+
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
   struct TINYDTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
@@ -455,19 +492,15 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     struct nls_patterns nls;
     char buff64[64];
     char path[128];
-    unsigned short orderidx[65535 / sizeof(struct TINYDTA)];
-  } *buf = (void *)(p->BUFFER);
+    struct DTA dtastack[64]; /* used for /S, max number of subdirs in DOS5 is 42 (A/B/C/...) */
+    unsigned char dirpending; /* set if a dir has been added to dtastack */
+    unsigned char dtastacklen;
+    unsigned short orderidx[MAX_SORTABLE_FILES / sizeof(struct TINYDTA)];
+  } *buf;
   unsigned long summary_fcount = 0;
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
   struct dirrequest req;
-
-  /* make sure there's no risk of buffer overflow */
-  if (sizeof(*buf) > p->BUFFERSZ) {
-    sprintf(p->BUFFER, "INTERNAL DIR ERROR: p->BUFFERSZ=%u / required=%u", p->BUFFERSZ, sizeof(*buf));
-    outputnl(p->BUFFER);
-    return(CMD_FAIL);
-  }
 
   if (cmd_ishlp(p)) {
     nls_outputnl(37,0); /* "Displays a list of files and subdirectories in a directory" */
@@ -488,7 +521,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     nls_outputnl(37,10); /* "/S Displays files in specified directory and all subdirectories" */
     nls_outputnl(37,11); /* "/B Uses bare format (no heading information or summary)" */
     nls_outputnl(37,12); /* "/L Uses lowercases" */
-    return(CMD_OK);
+    goto OK;
+  }
+
+  /* allocate buf */
+  buf = calloc(sizeof(*buf), 1);
+  if (buf == NULL) {
+    nls_output_err(255, 8); /* insufficient memory */
+    goto FAIL;
   }
 
   /* zero out glob_sortcmp_dat and init the collation table */
@@ -584,19 +624,18 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       nls_output(255, 10);/* bad environment */
       output(" - ");
       outputnl("DIRCMD");
-      return(CMD_FAIL);
+      goto FAIL;
     }
   }
   }
 
   /* parse user's command line */
-  if (dir_parse_cmdline(&req, p->argv) != 0) return(CMD_FAIL);
-
-  /* if no filespec provided, then it's about the current directory */
-  if (req.filespecptr == NULL) req.filespecptr = ".";
+  if (dir_parse_cmdline(&req, p->argv) != 0) goto FAIL;
 
   /*** PARSING COMMAND LINE DONE *********************************************/
 
+  /* if no filespec provided, then it's about the current directory */
+  if (req.filespecptr == NULL) req.filespecptr = ".";
 
   availrows = screen_getheight() - 2;
 
@@ -613,7 +652,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
   if (i != 0) {
     nls_outputnl_doserr(i);
-    return(CMD_FAIL);
+    goto FAIL;
   }
 
   if (req.format != DIR_OUTPUT_BARE) {
@@ -638,11 +677,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* if ends with a \ then append ????????.??? */
   if (buf->path[i - 1] == '\\') strcat(buf->path, "????????.???");
 
-  /* ask DOS for list of files, but only with allowed attribs */
-  i = findfirst(dta, buf->path, req.attrfilter_may);
+  NEXT_ITER: /* re-entry point for /S recursing */
+
+  /* ask DOS for list of files, but only with allowed attribs (+directories, because
+   * I need them for /S) */
+  i = findfirst(dta, buf->path, req.attrfilter_may | DIR_FLAG_RECUR);
   if (i != 0) {
     nls_outputnl_doserr(i);
-    return(CMD_FAIL);
+    goto FAIL;
   }
 
   /* if sorting is involved, then let's buffer all results (and sort them) */
@@ -657,7 +699,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     if (dtabuf == NULL) {
       nls_outputnl_doserr(8); /* out of memory */
-      return(CMD_FAIL);
+      goto FAIL;
     }
 
     /* remember the address so I can free it afterwards */
@@ -665,9 +707,16 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* compute the amount of DTAs I can buffer */
     max_dta_bufcount = memsz[i] / sizeof(struct TINYDTA);
+    if (max_dta_bufcount > MAX_SORTABLE_FILES) max_dta_bufcount = MAX_SORTABLE_FILES;
     /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
 
     do {
+      /* if /S then remember first directory encountered (but not . nor ..) */
+      if ((req.flags & DIR_FLAG_RECUR) && (buf->dirpending == 0) && (dta->attr & DOS_ATTR_DIR) && (dta->fname[0] != '.')) {
+        buf->dirpending = 1;
+        memcpy(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
+      }
+
       /* filter out files with uninteresting attributes */
       if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
 
@@ -694,7 +743,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
      * because while findfirst() succeeds, all entries can be rejected) */
     if (dtabufcount == 0) {
       nls_outputnl_doserr(2); /* "File not found" */
-      return(CMD_FAIL);
+      goto FAIL;
     }
 
     /* sort the list - the tricky part is that my array is a far address while
@@ -712,6 +761,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   wcolcount = 0; /* may be used for columns counting with wide mode */
 
   for (;;) {
+
+    /* if /S then remember first directory encountered */
+      if ((req.flags & DIR_FLAG_RECUR) && (buf->dirpending == 0) && (dta->attr & DOS_ATTR_DIR) && (dta->fname[0] != '.')) {
+      buf->dirpending = 1;
+      puts("GOT DIR (/S)");
+      memcpy(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
+    }
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
     if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
@@ -836,8 +892,35 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
+  /* /S processing */
+  if (buf->dirpending) {
+    buf->dirpending = 0;
+    /* add dir to path and redo scan */
+    printf("DIR PENDING: %s\n", buf->dtastack[buf->dtastacklen].fname);
+    path_add(buf->path, buf->dtastack[buf->dtastacklen].fname);
+    buf->dtastacklen++;
+    goto NEXT_ITER;
+  }
+  while (buf->dtastacklen > 0) {
+    /* rewind path one directory back, pop the next dta and do a FindNext */
+    path_back(buf->path);
+    buf->dtastacklen--;
+    TRYNEXTENTRY:
+    if (findnext(&(buf->dtastack[buf->dtastacklen])) != 0) continue;
+    if ((buf->dtastack[buf->dtastacklen].attr & DOS_ATTR_DIR) == 0) goto TRYNEXTENTRY;
+    /* something found -> add dir to path and redo scan */
+    path_add(buf->path, buf->dtastack[buf->dtastacklen].fname);
+    goto NEXT_ITER;
+  }
+
   /* free the buffer memory (if used) */
   if (glob_sortcmp_dat.dtabuf_root != NULL) _ffree(glob_sortcmp_dat.dtabuf_root);
 
+  FAIL:
+  free(buf);
+  return(CMD_FAIL);
+
+  OK:
+  free(buf);
   return(CMD_OK);
 }
