@@ -858,3 +858,30 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
 
   return(0);
 }
+
+
+/* like memcpy() but guarantees to copy from left to right */
+void memcpy_ltr(void *d, const void *s, unsigned short len) {
+  unsigned char const *ss = s;
+  unsigned char *dd = d;
+
+  while (len--) {
+    *dd = *ss;
+    ss++;
+    dd++;
+  }
+}
+
+/* like memcpy() but guarantees to copy from right to left */
+void memcpy_rtl(void *d, const void *s, unsigned short len) {
+  unsigned char const *ss = s;
+  unsigned char *dd = d;
+
+  dd += len - 1;
+  ss += len - 1;
+  while (len--) {
+    *dd = *ss;
+    ss--;
+    dd--;
+  }
+}
