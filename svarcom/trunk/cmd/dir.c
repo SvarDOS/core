@@ -690,12 +690,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* if sorting is involved, then let's buffer all results (and sort them) */
   if (req.flags & DIR_FLAG_SORT) {
     /* allocate a memory buffer - try several sizes until one succeeds */
-    const unsigned short memsz[] = {65500, 32000, 16000, 8000, 4000, 2000, 1000, 0};
-    unsigned short max_dta_bufcount = 0;
-    for (i = 0; memsz[i] != 0; i++) {
-      dtabuf = _fmalloc(memsz[i]);
+    unsigned short max_dta_bufcount;
+
+    /* compute the amount of DTAs I can buffer */
+    for (max_dta_bufcount = MAX_SORTABLE_FILES; max_dta_bufcount != 0; max_dta_bufcount /= 2) {
+      dtabuf = _fmalloc(max_dta_bufcount * sizeof(struct TINYDTA));
       if (dtabuf != NULL) break;
     }
+    /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
 
     if (dtabuf == NULL) {
       nls_outputnl_doserr(8); /* out of memory */
@@ -704,11 +706,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* remember the address so I can free it afterwards */
     glob_sortcmp_dat.dtabuf_root = dtabuf;
-
-    /* compute the amount of DTAs I can buffer */
-    max_dta_bufcount = memsz[i] / sizeof(struct TINYDTA);
-    if (max_dta_bufcount > MAX_SORTABLE_FILES) max_dta_bufcount = MAX_SORTABLE_FILES;
-    /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
 
     do {
       /* if /S then remember first directory encountered (but not . nor ..) */
