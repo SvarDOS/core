@@ -494,7 +494,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     char buff64[64];
     char path[128];
     struct DTA dtastack[64]; /* used for /S, max number of subdirs in DOS5 is 42 (A/B/C/...) */
-    unsigned char dirpending; /* set if a dir has been added to dtastack */
     unsigned char dtastacklen;
     unsigned short orderidx[MAX_SORTABLE_FILES / sizeof(struct TINYDTA)];
   } *buf;
@@ -680,10 +679,10 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   NEXT_ITER: /* re-entry point for /S recursing */
 
-  /* ask DOS for list of files, but only with allowed attribs (+directories, because
-   * I need them for /S) */
-  i = findfirst(dta, buf->path, req.attrfilter_may | DIR_FLAG_RECUR);
+  /* ask DOS for list of files, but only with allowed attribs */
+  i = findfirst(dta, buf->path, req.attrfilter_may);
   if (i != 0) {
+    if (req.flags & DIR_FLAG_RECUR) goto CHECK_RECURS;
     nls_outputnl_doserr(i);
     goto FAIL;
   }
@@ -709,12 +708,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     glob_sortcmp_dat.dtabuf_root = dtabuf;
 
     do {
-      /* if /S then remember first directory encountered (but not . nor ..) */
-      if ((req.flags & DIR_FLAG_RECUR) && (buf->dirpending == 0) && (dta->attr & DOS_ATTR_DIR) && (dta->fname[0] != '.')) {
-        buf->dirpending = 1;
-        memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
-      }
-
       /* filter out files with uninteresting attributes */
       if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
 
@@ -759,13 +752,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   wcolcount = 0; /* may be used for columns counting with wide mode */
 
   for (;;) {
-
-    /* if /S then remember first directory encountered */
-      if ((req.flags & DIR_FLAG_RECUR) && (buf->dirpending == 0) && (dta->attr & DOS_ATTR_DIR) && (dta->fname[0] != '.')) {
-      buf->dirpending = 1;
-      puts("GOT DIR (/S)");
-      memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
-    }
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
     if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
@@ -891,14 +877,35 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   /* /S processing */
-  if (buf->dirpending) {
-    buf->dirpending = 0;
-    /* add dir to path and redo scan */
-    printf("DIR PENDING: %s\n", buf->dtastack[buf->dtastacklen].fname);
-    path_add(buf->path, buf->dtastack[buf->dtastacklen].fname);
-    buf->dtastacklen++;
-    goto NEXT_ITER;
+  CHECK_RECURS:
+  /* if /S then look for a subdir */
+  if (req.flags & DIR_FLAG_RECUR) {
+    /* do the findfirst on *.* instead of reusing the user filter */
+    char *s;
+    char backup[4];
+    printf("orig path='%s' new=", buf->path);
+    for (s = buf->path; *s != 0; s++);
+    for (; s[-1] != '\\'; s--);
+    memcpy_ltr(backup, s, 4);
+    memcpy_ltr(s, "*.*", 4);
+    printf("'%s'\n", buf->path);
+    if (findfirst(dta, buf->path, DOS_ATTR_DIR) == 0) {
+      memcpy_ltr(s, backup, 4);
+      for (;;) {
+        if ((dta->fname[0] != '.') && (dta->attr & DOS_ATTR_DIR)) break;
+        if (findnext(dta) != 0) goto NOSUBDIR;
+      }
+      printf("GOT DIR (/S): '%s'\n", dta->fname);
+      /* add dir to path and redo scan */
+      memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
+      buf->dtastacklen++;
+      path_add(buf->path, dta->fname);
+      goto NEXT_ITER;
+    }
+    memcpy_ltr(s, backup, 4);
   }
+  NOSUBDIR:
+
   while (buf->dtastacklen > 0) {
     /* rewind path one directory back, pop the next dta and do a FindNext */
     path_back(buf->path);
