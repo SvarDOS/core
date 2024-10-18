@@ -43,6 +43,20 @@
  * /S Displays files in specified directory and all subdirectories.
  * /B Uses bare format (no heading information or summary)
  * /L Uses lowercases
+ *
+ * about /S - recursive DIR on specified (or current) path and subdirectories:
+ * prerequisite: some sort of mechanism that works as a stack pile of DTAs
+ *
+ * /S logic:
+ * 1. do a FindFirst on current directory
+ * 2. do FindNext calls in a loop, if a DIR entry is encountered, remember its
+ *    name and put a copy of the current DTA on stack, then continue the
+ *    listing without further interruption
+ * 3. if a new DIR was discovered, do a FindFirst on it and jmp to 2.
+ *    if no DIR found, then go to 4.
+ * 4. look on the stack for a DTA.
+ *    if any found, pop it and jmp to 2.
+ *    otherwise job is done, exit.
  */
 
 /* NOTE: /A attributes are matched in an exclusive way, ie. only files with

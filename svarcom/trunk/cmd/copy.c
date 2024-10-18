@@ -43,21 +43,6 @@
  *
  * special case: "COPY A+B+C+D" means "append B, C and D files to the A file"
  * if A does not exist, then "append C and D to B", etc.
- *
- * /S - recursive DIR on specified (or current) path and all subdirectories
- *
- * prerequisite needed: some sort of mechanism that works as a stack pile of DTAs
- *
- * /S logic:
- * 1. do a FindFirst on current directory
- * 2. do FindNext calls in a loop, if a DIR entry is encountered, remember its
- *    name and put a copy of the current DTA on stack, then continue the
- *    listing without further interruption
- * 3. if a new DIR was discovered, do a FindFirst on it and jmp to 2.
- *    if no DIR found, then go to 4.
- * 4. look on the stack for a DTA.
- *    if any found, pop it and jmp to 2.
- *    otherwise job is done, exit.
  */
 
 struct copy_setup {
