@@ -250,11 +250,11 @@ parm [dx] \
 value [ax]
 
 
-enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFER, unsigned short BUFFERSZ, const struct redir_data *redir, unsigned char delstdin) {
+enum cmd_result cmd_process(struct rmod_props far *rmod, unsigned short env_seg, const char *cmdline, void *BUFFERPTR, unsigned short BUFFERSZ, const struct redir_data *redir, unsigned char delstdin) {
   const struct CMD_ID *cmdptr;
   unsigned short argoffset;
   enum cmd_result cmdres;
-  struct cmd_funcparam *p = (void *)BUFFER;
+  struct cmd_funcparam *p = (void *)BUFFERPTR;
   p->BUFFERSZ = BUFFERSZ - sizeof(*p);
 
   /* special case: is this a drive change? (like "E:") */
