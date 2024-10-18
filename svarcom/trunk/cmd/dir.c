@@ -145,7 +145,7 @@ static void dir_pagination(unsigned short *availrows) {
 
 /* add a new dirname to path, C:\XXX\*.EXE + YYY -> C:\XXX\YYY\*.EXE */
 static void path_add(char *path, const char *dirname) {
-  short i, ostatni = -1, slen;
+  short i, ostatni = -1;
   printf("path_add(%s,%s) -> ", path, dirname);
   /* find the last backslash */
   for (i = 0; path[i] != 0; i++) {
@@ -154,9 +154,10 @@ static void path_add(char *path, const char *dirname) {
   /* abort on error */
   if (ostatni == -1) return;
   /* do the trick */
-  slen = strlen(dirname);
-  memmove(path + ostatni + slen + 1, path + ostatni, slen + 1);
-  memcpy(path + ostatni + 1, dirname, slen);
+  /* move ending to the right */
+  memcpy_rtl(path + ostatni + strlen(dirname) + 1, path + ostatni, strlen(path + ostatni) + 1);
+  /* fill in the space with dirname */
+  memcpy_ltr(path + ostatni + 1, dirname, strlen(dirname));
   printf("'%s'\n", path);
 }
 
@@ -164,6 +165,7 @@ static void path_add(char *path, const char *dirname) {
 /* take back last dir from path, C:\XXX\YYY\*.EXE -> C:\XXX\*.EXE */
 static void path_back(char *path) {
   short i, ostatni = -1, przedostatni = -1;
+  printf("path_back(%s) -> ", path);
   /* find the two last backslashes */
   for (i = 0; path[i] != 0; i++) {
     if (path[i] == '\\') {
@@ -174,9 +176,8 @@ static void path_back(char *path) {
   /* abort on error */
   if (przedostatni == -1) return;
   /* do the trick */
-  for (i = przedostatni; path[i] != 0; i++) {
-    path[i] = path[ostatni++];
-  }
+  memcpy_ltr(path + przedostatni, path + ostatni, 1 + i - ostatni);
+  printf("'%s'\n", path);
 }
 
 
@@ -711,7 +712,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       /* if /S then remember first directory encountered (but not . nor ..) */
       if ((req.flags & DIR_FLAG_RECUR) && (buf->dirpending == 0) && (dta->attr & DOS_ATTR_DIR) && (dta->fname[0] != '.')) {
         buf->dirpending = 1;
-        memcpy(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
+        memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
       }
 
       /* filter out files with uninteresting attributes */
@@ -763,7 +764,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       if ((req.flags & DIR_FLAG_RECUR) && (buf->dirpending == 0) && (dta->attr & DOS_ATTR_DIR) && (dta->fname[0] != '.')) {
       buf->dirpending = 1;
       puts("GOT DIR (/S)");
-      memcpy(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
+      memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
     }
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
