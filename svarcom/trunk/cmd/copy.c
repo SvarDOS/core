@@ -267,7 +267,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   /* parse cmdline and fill the setup struct accordingly */
 
   memset(setup, 0, sizeof(*setup));
-  setup->databufsz = p->BUFFERSZ - sizeof(*setup);
+  setup->databufsz = (p->BUFFERSZ - sizeof(*setup)) & 0xfe00; /* use a multiple of 512 for better DOS performances */
 
   for (i = 0; i < p->argc; i++) {
 
@@ -359,12 +359,14 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       push dx
 
       mov ah, 0x48  /* DOS 2+ allocate memory */
-      mov bx, 4095  /* number of segments to allocate (4095 segs = 65520 bytes) */
+      mov bx, 4064  /* number of segments to allocate (4064 segs = 127 * 512 bytes) */
       mov dx, bx    /* my own variable to hold result */
       int 0x21      /* on success AX=segment, on error AX=max number of segments */
       jnc DONE
       TRY_AGAIN:
-      /* ask again, this time using the max segments value obtained earlier */
+      /* ask again, this time using the max segments value obtained earlier
+       * (but truncated to a multiple of 512 for better copy performances) */
+      and ax, 0xffe0 /* it's segments, not bytes (32 segs = 512 bytes) */
       mov bx, ax
       mov dx, bx
       mov ah, 0x48
