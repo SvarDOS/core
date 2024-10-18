@@ -67,7 +67,7 @@ helpers.obj: helpers.c
 	wcc $(CFLAGS) $<
 
 rmodcore.h: file2c.com rmod.bin
-	file2c /s /l4096 rmod.bin rmodcore.h BUFFER
+	file2c /s /l8192 rmod.bin rmodcore.h BUFFER
 
 file2c.com: file2c.c
 	wcl $(LDFLAGS) file2c.c

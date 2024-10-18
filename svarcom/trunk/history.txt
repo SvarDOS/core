@@ -4,7 +4,7 @@
 
 
 
-=== ver XXXX.X (XX.XX.XXXX) ==================================================
+=== ver 2024.7 (XX.XX.XXXX) ==================================================
 
  - COPY returns "insufficient disk space" on write error (was: "insuff. mem")
  - COPY uses a bigger buffer to limit floppy swaps with the B: ghost drive
@@ -12,7 +12,7 @@
  - COPY removes the partially copied file when error occurs during copy
  - batch execution in step-by-step mode accepts the RETURN key as "Yes"
  - upgraded SvarLANG to ver 20241010 (LNG file is compressed now)
- - improved message when failing to respawn (translatable)
+ - improved message when failing to respawn (also, msg is translatable now)
 
 
 === ver 2024.6 (28.08.2024) ==================================================
