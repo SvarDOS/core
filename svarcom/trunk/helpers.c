@@ -213,8 +213,12 @@ unsigned short findfirst(struct DTA *dta, const char *pattern, unsigned short at
 unsigned short findnext(struct DTA *dta) {
   unsigned short res = 0;
   _asm {
-    mov ah, 0x4f    /* FindNext */
+    /* set DTA location */
+    mov ah, 0x1a
     mov dx, dta
+    int 0x21
+    /* FindNext */
+    mov ah, 0x4f
     int 0x21        /* CF set on error + err code in AX, DTA filled with FileInfoRec on success */
     jnc DONE
     mov [res], ax
