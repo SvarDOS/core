@@ -501,6 +501,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned long summary_totsz = 0;
   unsigned char drv = 0;
   struct dirrequest req;
+  unsigned short summary_alignpos;
+  unsigned short uint32maxlen = 14; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
+  if (screenw < 80) uint32maxlen = 10;
 
   if (cmd_ishlp(p)) {
     nls_outputnl(37,0); /* "Displays a list of files and subdirectories in a directory" */
@@ -851,14 +854,10 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* print out summary (unless bare output mode) */
   if (req.format != DIR_OUTPUT_BARE) {
-    unsigned short alignpos;
-    unsigned short uint32maxlen = 14; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
-    if (screenw < 80) uint32maxlen = 10;
-
     /* x file(s) (maximum of files in a FAT-32 directory is 65'535) */
     memset(buf->buff64, ' ', 8);
     i = nls_format_number(buf->buff64 + 8, summary_fcount, &(buf->nls));
-    alignpos = sprintf(buf->buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
+    summary_alignpos = sprintf(buf->buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
     output(buf->buff64 + i);
     /* xxxx bytes */
     memset(buf->buff64, ' ', 14);
@@ -866,17 +865,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     output(buf->buff64 + i + 1);
     output(" ");
     nls_outputnl(37,23); /* "bytes" */
-    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
-
-    /* xxxx bytes free */
-    i = cmd_dir_df(&summary_totsz, drv);
-    if (i != 0) nls_outputnl_doserr(i);
-    alignpos += 8 + uint32maxlen;
-    memset(buf->buff64, ' ', alignpos); /* align the freebytes value to same column as totbytes */
-    i = nls_format_number(buf->buff64 + alignpos, summary_totsz, &(buf->nls));
-    output(buf->buff64 + i + 1);
-    output(" ");
-    nls_outputnl(37,24); /* "bytes free" */
     if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
@@ -887,19 +875,19 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* do the findfirst on *.* instead of reusing the user filter */
     char *s;
     char backup[4];
-    printf("orig path='%s' new=", buf->path);
+    //printf("orig path='%s' new=", buf->path);
     for (s = buf->path; *s != 0; s++);
     for (; s[-1] != '\\'; s--);
     memcpy_ltr(backup, s, 4);
     memcpy_ltr(s, "*.*", 4);
-    printf("'%s'\n", buf->path);
+    //printf("'%s'\n", buf->path);
     if (findfirst(dta, buf->path, DOS_ATTR_DIR) == 0) {
       memcpy_ltr(s, backup, 4);
       for (;;) {
         if ((dta->fname[0] != '.') && (dta->attr & DOS_ATTR_DIR)) break;
         if (findnext(dta) != 0) goto NOSUBDIR;
       }
-      printf("GOT DIR (/S): '%s'\n", dta->fname);
+      //printf("GOT DIR (/S): '%s'\n", dta->fname);
       /* add dir to path and redo scan */
       memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
       buf->dtastacklen++;
@@ -917,9 +905,23 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     TRYNEXTENTRY:
     if (findnext(&(buf->dtastack[buf->dtastacklen])) != 0) continue;
     if ((buf->dtastack[buf->dtastacklen].attr & DOS_ATTR_DIR) == 0) goto TRYNEXTENTRY;
+    if (buf->dtastack[buf->dtastacklen].fname[0] == '.') goto TRYNEXTENTRY;
     /* something found -> add dir to path and redo scan */
     path_add(buf->path, buf->dtastack[buf->dtastacklen].fname);
     goto NEXT_ITER;
+  }
+
+  /* print out disk space available (unless bare output mode) */
+  if (req.format != DIR_OUTPUT_BARE) {
+    /* xxxx bytes free */
+    i = cmd_dir_df(&summary_totsz, drv);
+    if (i != 0) nls_outputnl_doserr(i);
+    memset(buf->buff64, ' ', summary_alignpos + 8 + uint32maxlen); /* align the freebytes value to same column as totbytes */
+    i = nls_format_number(buf->buff64 + summary_alignpos + 8 + uint32maxlen, summary_totsz, &(buf->nls));
+    output(buf->buff64 + i + 1);
+    output(" ");
+    nls_outputnl(37,24); /* "bytes free" */
+    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
   /* free the buffer memory (if used) */
