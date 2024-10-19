@@ -146,7 +146,7 @@ static void dir_pagination(unsigned short *availrows) {
 /* add a new dirname to path, C:\XXX\*.EXE + YYY -> C:\XXX\YYY\*.EXE */
 static void path_add(char *path, const char *dirname) {
   short i, ostatni = -1;
-  printf("path_add(%s,%s) -> ", path, dirname);
+  //printf("path_add(%s,%s) -> ", path, dirname);
   /* find the last backslash */
   for (i = 0; path[i] != 0; i++) {
     if (path[i] == '\\') ostatni = i;
@@ -158,14 +158,14 @@ static void path_add(char *path, const char *dirname) {
   memcpy_rtl(path + ostatni + strlen(dirname) + 1, path + ostatni, strlen(path + ostatni) + 1);
   /* fill in the space with dirname */
   memcpy_ltr(path + ostatni + 1, dirname, strlen(dirname));
-  printf("'%s'\n", path);
+  //printf("'%s'\n", path);
 }
 
 
 /* take back last dir from path, C:\XXX\YYY\*.EXE -> C:\XXX\*.EXE */
 static void path_back(char *path) {
   short i, ostatni = -1, przedostatni = -1;
-  printf("path_back(%s) -> ", path);
+  //printf("path_back(%s) -> ", path);
   /* find the two last backslashes */
   for (i = 0; path[i] != 0; i++) {
     if (path[i] == '\\') {
@@ -177,7 +177,7 @@ static void path_back(char *path) {
   if (przedostatni == -1) return;
   /* do the trick */
   memcpy_ltr(path + przedostatni, path + ostatni, 1 + i - ostatni);
-  printf("'%s'\n", path);
+  //printf("'%s'\n", path);
 }
 
 
@@ -655,6 +655,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     goto FAIL;
   }
 
+  /* volume label and serial */
   if (req.format != DIR_OUTPUT_BARE) {
     drv = buf->path[0];
     if (drv >= 'a') {
@@ -663,6 +664,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       drv -= 'A';
     }
     cmd_vol_internal(drv, buf->buff64);
+  }
+
+  NEXT_ITER: /* re-entry point for /S recursing */
+
+  if (req.format != DIR_OUTPUT_BARE) {
     sprintf(buf->buff64, svarlang_str(37,20)/*"Directory of %s"*/, buf->path);
     /* trim at first '?', if any */
     for (i = 0; buf->buff64[i] != 0; i++) if (buf->buff64[i] == '?') buf->buff64[i] = 0;
@@ -676,8 +682,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* if ends with a \ then append ????????.??? */
   if (buf->path[i - 1] == '\\') strcat(buf->path, "????????.???");
-
-  NEXT_ITER: /* re-entry point for /S recursing */
 
   /* ask DOS for list of files, but only with allowed attribs */
   i = findfirst(dta, buf->path, req.attrfilter_may);
