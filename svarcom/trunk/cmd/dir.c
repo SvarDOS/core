@@ -659,7 +659,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* if no filespec provided, then it's about the current directory */
   if (req.filespecptr == NULL) req.filespecptr = ".";
 
-  availrows = screen_getheight() - 2;
+  availrows = screen_getheight() - 1;
 
   /* special case: "DIR drive:" (truename() fails on "C:" under MS-DOS 6.0) */
   if ((req.filespecptr[0] != 0) && (req.filespecptr[1] == ':') && (req.filespecptr[2] == 0)) {
@@ -686,6 +686,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       drv -= 'A';
     }
     cmd_vol_internal(drv, buf->buff64);
+    availrows -= 2;
   }
 
   NEXT_ITER: /* re-entry point for /S recursing */
@@ -699,7 +700,10 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     for (i = 0; buf->buff64[i] != 0; i++) if (buf->buff64[i] == '?') buf->buff64[i] = 0;
     outputnl(buf->buff64);
     outputnl("");
-    availrows -= 3;
+    if (req.flags & DIR_FLAG_PAUSE) {
+      dir_pagination(&availrows);
+      dir_pagination(&availrows);
+    }
   }
 
   /* if dir: append a backslash (also get its len) */
