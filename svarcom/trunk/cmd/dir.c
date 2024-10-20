@@ -694,18 +694,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   summary_fcount = 0;
   summary_totsz = 0;
 
-  if (req.format != DIR_OUTPUT_BARE) {
-    sprintf(buf->buff64, svarlang_str(37,20)/*"Directory of %s"*/, buf->path);
-    /* trim at first '?', if any */
-    for (i = 0; buf->buff64[i] != 0; i++) if (buf->buff64[i] == '?') buf->buff64[i] = 0;
-    outputnl(buf->buff64);
-    outputnl("");
-    if (req.flags & DIR_FLAG_PAUSE) {
-      dir_pagination(&availrows);
-      dir_pagination(&availrows);
-    }
-  }
-
   /* if dir: append a backslash (also get its len) */
   i = path_appendbkslash_if_dir(buf->path);
 
@@ -714,6 +702,22 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* ask DOS for list of files, but only with allowed attribs */
   i = findfirst(dta, buf->path, req.attrfilter_may);
+
+  /* print "directory of" unless /B or /S mode with no match */
+  if ((req.format != DIR_OUTPUT_BARE) && (((req.flags & DIR_FLAG_RECUR) == 0) || (i == 0))) {
+    unsigned char t;
+    sprintf(buf->buff64, svarlang_str(37,20)/*"Directory of %s"*/, buf->path);
+    /* trim at first '?', if any */
+    for (t = 0; buf->buff64[t] != 0; t++) if (buf->buff64[t] == '?') buf->buff64[t] = 0;
+    outputnl(buf->buff64);
+    outputnl("");
+    if (req.flags & DIR_FLAG_PAUSE) {
+      dir_pagination(&availrows);
+      dir_pagination(&availrows);
+    }
+  }
+
+  /* if no file match then abort */
   if (i != 0) {
     if (req.flags & DIR_FLAG_RECUR) goto CHECK_RECURS;
     nls_outputnl_doserr(i);
@@ -881,6 +885,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* print out summary (unless bare output mode) */
   if (req.format != DIR_OUTPUT_BARE) {
     dir_print_summary_files(buf->buff64, uint32maxlen, summary_totsz, summary_fcount, &availrows, req.flags, &(buf->nls));
+    /* extra linefeed if /S mode */
+    if (req.flags & DIR_FLAG_RECUR) {
+      outputnl("");
+      dir_pagination(&availrows);
+    }
   }
 
   /* update global counters in case /s is used */
