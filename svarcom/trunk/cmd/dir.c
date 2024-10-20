@@ -478,6 +478,23 @@ static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
 }
 
 
+static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, unsigned long summary_totsz, unsigned long summary_fcount, unsigned short *availrows, unsigned char flags, const struct nls_patterns *nls) {
+  unsigned short i;
+  /* x file(s) (maximum of files in a FAT-32 directory is 65'535) */
+  memset(buff64, ' ', 8);
+  i = nls_format_number(buff64 + 8, summary_fcount, nls);
+  sprintf(buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
+  output(buff64 + i);
+  /* xxxx bytes */
+  memset(buff64, ' ', 14);
+  i = nls_format_number(buff64 + uint32maxlen, summary_totsz, nls);
+  output(buff64 + i + 1);
+  output(" ");
+  nls_outputnl(37,23); /* "bytes" */
+  if (flags & DIR_FLAG_PAUSE) dir_pagination(availrows);
+}
+
+
 #define MAX_SORTABLE_FILES 8192
 
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
@@ -497,11 +514,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     unsigned char dtastacklen;
     unsigned short orderidx[MAX_SORTABLE_FILES / sizeof(struct TINYDTA)];
   } *buf;
-  unsigned long summary_fcount = 0;
-  unsigned long summary_totsz = 0;
+  unsigned long summary_recurs_fcount = 0; /* used for /s global summary */
+  unsigned long summary_recurs_totsz = 0;  /* used for /s global summary */
+  unsigned long summary_fcount;
+  unsigned long summary_totsz;
   unsigned char drv = 0;
   struct dirrequest req;
-  unsigned short summary_alignpos;
+  unsigned short summary_alignpos = strlen(svarlang_str(37,22)) + 2;
   unsigned short uint32maxlen = 14; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
   if (screenw < 80) uint32maxlen = 10;
 
@@ -670,6 +689,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   NEXT_ITER: /* re-entry point for /S recursing */
+
+  summary_fcount = 0;
+  summary_totsz = 0;
 
   if (req.format != DIR_OUTPUT_BARE) {
     sprintf(buf->buff64, svarlang_str(37,20)/*"Directory of %s"*/, buf->path);
@@ -854,19 +876,12 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* print out summary (unless bare output mode) */
   if (req.format != DIR_OUTPUT_BARE) {
-    /* x file(s) (maximum of files in a FAT-32 directory is 65'535) */
-    memset(buf->buff64, ' ', 8);
-    i = nls_format_number(buf->buff64 + 8, summary_fcount, &(buf->nls));
-    summary_alignpos = sprintf(buf->buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
-    output(buf->buff64 + i);
-    /* xxxx bytes */
-    memset(buf->buff64, ' ', 14);
-    i = nls_format_number(buf->buff64 + uint32maxlen, summary_totsz, &(buf->nls));
-    output(buf->buff64 + i + 1);
-    output(" ");
-    nls_outputnl(37,23); /* "bytes" */
-    if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+    dir_print_summary_files(buf->buff64, uint32maxlen, summary_totsz, summary_fcount, &availrows, req.flags, &(buf->nls));
   }
+
+  /* update global counters in case /s is used */
+  summary_recurs_fcount += summary_fcount;
+  summary_recurs_totsz += summary_totsz;
 
   /* /S processing */
   CHECK_RECURS:
@@ -913,6 +928,12 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* print out disk space available (unless bare output mode) */
   if (req.format != DIR_OUTPUT_BARE) {
+    /* if /s mode then print also global stats */
+    if (req.flags & DIR_FLAG_RECUR) {
+      nls_outputnl(37,25); /* Total files listed: */
+      if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+      dir_print_summary_files(buf->buff64, uint32maxlen, summary_recurs_totsz, summary_recurs_fcount, &availrows, req.flags, &(buf->nls));
+    }
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) nls_outputnl_doserr(i);

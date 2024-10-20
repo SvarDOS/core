@@ -252,6 +252,7 @@
 37.22:plik(i)
 37.23:bajty
 37.24:bajty wolne
+37.25:Całość wylistowanych plików:
 
 # COPY
 38.0:Kopiuje jeden lub więcej plików do innej lokalizacji.

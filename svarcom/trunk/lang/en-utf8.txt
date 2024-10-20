@@ -252,6 +252,7 @@
 37.22:file(s)
 37.23:bytes
 37.24:bytes free
+37.25:Total files listed:
 
 # COPY
 38.0:Copies one or more files to another location.
