@@ -794,6 +794,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       /* filter out files with uninteresting attributes */
       if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
 
+      /* /B hides . and .. entries */
+      if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) continue;
+
       /* normalize "size" of directories to zero because kernel returns garbage
        * sizes for directories which might confuse the sorting routine later */
       if (dta->attr & DOS_ATTR_DIR) dta->size = 0;
@@ -816,6 +819,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* no match? kein gluck! (this can happen when filtering attribs with /A:xxx
      * because while findfirst() succeeds, all entries can be rejected) */
     if (dtabufcount == 0) {
+      if (req.flags & DIR_FLAG_RECUR) goto CHECK_RECURS;
       nls_outputnl_doserr(2); /* "File not found" */
       goto GAMEOVER;
     }
@@ -838,6 +842,9 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
     if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
+
+    /* /B hides . and .. entries */
+    if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) continue;
 
     /* turn string lcase (/L) */
     if (req.flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
