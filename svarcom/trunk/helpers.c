@@ -27,7 +27,6 @@
  */
 
 #include <i86.h>    /* MK_FP() */
-#include <stdio.h>  /* sprintf() */
 
 #include "svarlang.lib\svarlang.h"
 
@@ -166,7 +165,8 @@ void nls_outputnl_doserr(unsigned short e) {
   if (e < 0xff) ptr = svarlang_strid(0xff00 | e);
   /* if not found, use a fallback */
   if ((ptr == NULL) || (ptr[0] == 0)) {
-    sprintf(errstr, "DOS ERR %u", e);
+    sv_strcpy(errstr, "DOS ERR ");
+    ustoa(errstr + sv_strlen(errstr), e, 0, '0');
     ptr = errstr;
   }
 
@@ -449,6 +449,42 @@ void file_fcb2fname(char *dst, const char *src) {
 }
 
 
+/* convert an unsigned short to ASCIZ, output set to fixlen chars if fixlen
+ * is non zero (prefixed with prefixchar if value too small, else truncated)
+ * returns length of produced string */
+unsigned short ustoa(char *dst, unsigned short n, unsigned char fixlen, char prefixchar) {
+  unsigned short r;
+  unsigned char i;
+  unsigned char nonzerocharat = 5;
+
+  for (i = 4; i != 0xff; i--) {
+    r = n % 10;
+    n /= 10;
+    dst[i] = '0' + r;
+    if (r != 0) nonzerocharat = i;
+  }
+
+  /* change prefix to prefixchar (eg. "00120" -> "  120") */
+  for (i = 0; i < 4; i++) {
+    if (dst[i] != '0') break;
+    dst[i] = prefixchar;
+  }
+
+  /* apply fixlen, if set */
+  if ((fixlen > 0) && (fixlen < 6)) {
+    nonzerocharat = 5 - fixlen;
+  }
+
+  if (nonzerocharat != 0) {
+    memcpy_ltr(dst, dst + nonzerocharat, 5 - nonzerocharat);
+  }
+
+  dst[5 - nonzerocharat] = 0;
+
+  return(5 - nonzerocharat);
+}
+
+
 /* converts an ASCIIZ string into an unsigned short. returns 0 on success.
  * on error, result will contain all valid digits that were read until
  * error occurred (0 on overflow or if parsing failed immediately) */
@@ -617,6 +653,8 @@ unsigned short nls_getpatterns(struct nls_patterns *p) {
  * returns length of result */
 unsigned short nls_format_date(char *s, unsigned short yr, unsigned char mo, unsigned char dy, const struct nls_patterns *p) {
   unsigned short items[3];
+  unsigned short slen;
+
   /* preset date/month/year in proper order depending on date format */
   switch (p->dateformat) {
     case 0:  /* USA style: m d y */
@@ -637,7 +675,14 @@ unsigned short nls_format_date(char *s, unsigned short yr, unsigned char mo, uns
       break;
   }
   /* compute the string */
-  return(sprintf(s, "%02u%s%02u%s%02u", items[0], p->datesep, items[1], p->datesep, items[2]));
+
+  slen = ustoa(s, items[0], 2, '0');
+  slen += sv_strcpy(s + slen, p->datesep);
+  slen += ustoa(s + slen, items[1], 2, '0');
+  slen += sv_strcpy(s + slen, p->datesep);
+  slen += ustoa(s + slen, items[2], 2, '0');
+
+  return(slen);
 }
 
 
@@ -657,18 +702,22 @@ unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, unsi
       if (ho == 0) ho = 12;
       ampm = 'a';
     }
-    res = sprintf(s, "%2u", ho);
+    res = ustoa(s, ho, 2, ' '); /* %2u */
   } else {
-    res = sprintf(s, "%02u", ho);
+    res = ustoa(s, ho, 2, '0'); /* %02u */
   }
 
   /* append separator and minutes */
-  res += sprintf(s + res, "%s%02u", p->timesep, mn);
+  res += sv_strcpy(s + res, p->timesep);
+  res += ustoa(s + res, mn, 2, '0'); /* %02u */
 
   /* if seconds provided, append them, too */
-  if (sc != 0xff) res += sprintf(s + res, "%s%02u", p->timesep, sc);
+  if (sc != 0xff) {
+    res += sv_strcpy(s + res, p->timesep);
+    res += ustoa(s + res, sc, 2, '0'); /* %02u */
+  }
 
-  /* finally append AM/PM char */
+  /* finally append the AM/PM char */
   if (ampm != 0) s[res++] = ampm;
   s[res] = 0;
 
@@ -892,7 +941,7 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
 
   /* prep filename: %DOSDIR%\LINKS\PKG.LNK */
   if (fname[pathlen - 1] == '\\') pathlen--;
-  pathlen += sprintf(fname + pathlen, "\\LINKS");
+  pathlen += sv_strcpy(fname + pathlen, "\\LINKS");
   /* create \LINKS if not exists */
   if (file_getattr(fname) < 0) {
     _asm {
@@ -919,7 +968,9 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
     nls_outputnl(255,3); /* path not found */
     return(-1);
   }
-  sprintf(fname + pathlen, "\\%s.LNK", linkname);
+  sv_strcat(fname + pathlen, "\\");
+  sv_strcat(fname + pathlen, linkname);
+  sv_strcat(fname + pathlen, ".LNK");
 
   return(0);
 }

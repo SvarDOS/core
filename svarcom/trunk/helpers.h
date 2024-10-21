@@ -173,6 +173,11 @@ void file_fcb2fname(char *dst, const char *src);
  * error occurred (0 on overflow or if parsing failed immediately) */
 int atous(unsigned short *r, const char *s);
 
+/* convert an unsigned short to ASCIZ, output set to fixlen chars if fixlen
+ * is non zero (prefixed with prefixchar if value too small, else truncated)
+ * returns length of produced string */
+unsigned short ustoa(char *dst, unsigned short n, unsigned char fixlen, char prefixchar);
+
 /* appends a backslash if path is a directory
  * returns the (possibly updated) length of path */
 unsigned short path_appendbkslash_if_dir(char *path);
