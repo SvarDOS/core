@@ -10,6 +10,7 @@
  - COPY uses a bigger buffer to limit floppy swaps with the B: ghost drive
  - COPY's buffer is always a multiple of 512 (better performances)
  - COPY removes the partially copied file when error occurs during copy
+ - DIR /S implemented (recursive search)
  - batch execution in step-by-step mode accepts the RETURN key as "Yes"
  - upgraded SvarLANG to ver 20241010 (LNG file is compressed now)
  - improved message when failing to respawn (also, msg is translatable now)

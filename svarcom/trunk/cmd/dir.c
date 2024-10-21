@@ -150,6 +150,9 @@ static void dir_print_dirof(const char *p, unsigned short *availrows, unsigned c
   char buff[2] = {0, 0};
   const char *dirof = svarlang_str(37,20); /* Directory of % */
 
+  outputnl("");
+  if (pagination) dir_pagination(availrows);
+
   /* print string until % */
   while ((*dirof != 0) && (*dirof != '%')) {
     *buff = *dirof;
@@ -588,14 +591,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     nls_outputnl(37,10); /* "/S Displays files in specified directory and all subdirectories" */
     nls_outputnl(37,11); /* "/B Uses bare format (no heading information or summary)" */
     nls_outputnl(37,12); /* "/L Uses lowercases" */
-    goto OK;
+    goto GAMEOVER;
   }
 
   /* allocate buf */
   buf = calloc(sizeof(*buf), 1);
   if (buf == NULL) {
     nls_output_err(255, 8); /* insufficient memory */
-    goto FAIL;
+    goto GAMEOVER;
   }
 
   /* zero out glob_sortcmp_dat and init the collation table */
@@ -691,13 +694,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       nls_output(255, 10);/* bad environment */
       output(" - ");
       outputnl("DIRCMD");
-      goto FAIL;
+      goto GAMEOVER;
     }
   }
   }
 
   /* parse user's command line */
-  if (dir_parse_cmdline(&req, p->argv) != 0) goto FAIL;
+  if (dir_parse_cmdline(&req, p->argv) != 0) goto GAMEOVER;
 
   /*** PARSING COMMAND LINE DONE *********************************************/
 
@@ -719,7 +722,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
   if (i != 0) {
     nls_outputnl_doserr(i);
-    goto FAIL;
+    goto GAMEOVER;
   }
 
   /* volume label and serial */
@@ -757,7 +760,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   if (i != 0) {
     if (req.flags & DIR_FLAG_RECUR) goto CHECK_RECURS;
     nls_outputnl_doserr(i);
-    goto FAIL;
+    goto GAMEOVER;
   }
 
   /* if sorting is involved, then let's buffer all results (and sort them) */
@@ -774,7 +777,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     if (dtabuf == NULL) {
       nls_outputnl_doserr(8); /* out of memory */
-      goto FAIL;
+      goto GAMEOVER;
     }
 
     /* remember the address so I can free it afterwards */
@@ -807,7 +810,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
      * because while findfirst() succeeds, all entries can be rejected) */
     if (dtabufcount == 0) {
       nls_outputnl_doserr(2); /* "File not found" */
-      goto FAIL;
+      goto GAMEOVER;
     }
 
     /* sort the list - the tricky part is that my array is a far address while
@@ -921,11 +924,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* print out summary (unless bare output mode) */
   if (req.format != DIR_OUTPUT_BARE) {
     dir_print_summary_files(buf->buff64, uint32maxlen, summary_totsz, summary_fcount, &availrows, req.flags, &(buf->nls));
-    /* extra linefeed if /S mode */
-    if (req.flags & DIR_FLAG_RECUR) {
-      outputnl("");
-      dir_pagination(&availrows);
-    }
   }
 
   /* update global counters in case /s is used */
@@ -979,9 +977,18 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   if (req.format != DIR_OUTPUT_BARE) {
     /* if /s mode then print also global stats */
     if (req.flags & DIR_FLAG_RECUR) {
-      nls_outputnl(37,25); /* Total files listed: */
-      if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
-      dir_print_summary_files(buf->buff64, uint32maxlen, summary_recurs_totsz, summary_recurs_fcount, &availrows, req.flags, &(buf->nls));
+      if (summary_recurs_fcount == 0) {
+        file_truename(req.filespecptr, buf->path);
+        dir_print_dirof(buf->path, &availrows, req.flags & DIR_FLAG_PAUSE);
+        nls_outputnl_doserr(2); /* "File not found" */
+        goto GAMEOVER;
+      } else {
+        outputnl("");
+        if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+        nls_outputnl(37,25); /* Total files listed: */
+        if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
+        dir_print_summary_files(buf->buff64, uint32maxlen, summary_recurs_totsz, summary_recurs_fcount, &availrows, req.flags, &(buf->nls));
+      }
     }
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
@@ -994,14 +1001,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     if (req.flags & DIR_FLAG_PAUSE) dir_pagination(&availrows);
   }
 
+  GAMEOVER:
+
   /* free the buffer memory (if used) */
   if (glob_sortcmp_dat.dtabuf_root != NULL) _ffree(glob_sortcmp_dat.dtabuf_root);
 
-  FAIL:
-  free(buf);
-  return(CMD_FAIL);
-
-  OK:
   free(buf);
   return(CMD_OK);
 }
