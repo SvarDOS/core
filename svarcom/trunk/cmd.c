@@ -38,7 +38,6 @@
 #include <malloc.h> /* _fmalloc() */
 #include <stdio.h>
 #include <stdlib.h> /* qsort() */
-#include <string.h>
 
 #include "svarlang.lib/svarlang.h"
 

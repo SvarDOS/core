@@ -974,3 +974,13 @@ void sv_bzero(void far *dst, unsigned short len) {
     d++;
   }
 }
+
+
+/* like memset() */
+void sv_memset(void *dst, unsigned char c, unsigned short len) {
+  unsigned char *d = dst;
+  while (len--) {
+    *d = c;
+    d++;
+  }
+}

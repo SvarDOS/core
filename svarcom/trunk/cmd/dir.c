@@ -536,12 +536,12 @@ static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
 static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, unsigned long summary_totsz, unsigned long summary_fcount, unsigned short *availrows, unsigned char flags, const struct nls_patterns *nls) {
   unsigned short i;
   /* x file(s) (maximum of files in a FAT-32 directory is 65'535) */
-  memset(buff64, ' ', 8);
+  sv_memset(buff64, ' ', 8);
   i = nls_format_number(buff64 + 8, summary_fcount, nls);
   sprintf(buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
   output(buff64 + i);
   /* xxxx bytes */
-  memset(buff64, ' ', 14);
+  sv_memset(buff64, ' ', 14);
   i = nls_format_number(buff64 + uint32maxlen, summary_totsz, nls);
   output(buff64 + i + 1);
   output(" ");
@@ -846,8 +846,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* /B hides . and .. entries */
     if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) continue;
 
-    /* turn string lcase (/L) */
-    if (req.flags & DIR_FLAG_LCASE) _strlwr(dta->fname); /* OpenWatcom extension, probably does not care about NLS so results may be odd with non-A-Z characters... */
+    /* turn string lcase (/L) - naive method, only low-ascii */
+    if (req.flags & DIR_FLAG_LCASE) {
+      char *s = dta->fname;
+      while (*s != 0) {
+        if ((*s >= 'A') && (*s <= 'Z')) *s |= 0x20;
+        s++;
+      }
+    }
 
     summary_fcount++;
     if ((dta->attr & DOS_ATTR_DIR) == 0) summary_totsz += dta->size;
@@ -870,7 +876,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
          * on the presence of a thousands delimiter (max 2'000'000'000) */
         {
           unsigned short szlen = 10 + (sv_strlen(buf->nls.thousep) * 3);
-          memset(buf->buff64, ' ', 16);
+          sv_memset(buf->buff64, ' ', 16);
           if (dta->attr & DOS_ATTR_DIR) {
             sv_strcpy(buf->buff64 + szlen, svarlang_str(37,21));
           } else {
@@ -1009,7 +1015,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* xxxx bytes free */
     i = cmd_dir_df(&summary_totsz, drv);
     if (i != 0) nls_outputnl_doserr(i);
-    memset(buf->buff64, ' ', summary_alignpos + 8 + uint32maxlen); /* align the freebytes value to same column as totbytes */
+    sv_memset(buf->buff64, ' ', summary_alignpos + 8 + uint32maxlen); /* align the freebytes value to same column as totbytes */
     i = nls_format_number(buf->buff64 + summary_alignpos + 8 + uint32maxlen, summary_totsz, &(buf->nls));
     output(buf->buff64 + i + 1);
     output(" ");

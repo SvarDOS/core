@@ -235,4 +235,7 @@ void memcpy_rtl(void *d, const void *s, unsigned short len);
 /* like bzero(), but accepts far pointers */
 void sv_bzero(void far *dst, unsigned short len);
 
+/* like memset() */
+void sv_memset(void *dst, unsigned char c, unsigned short len);
+
 #endif
