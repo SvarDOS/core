@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,7 +43,7 @@ static enum cmd_result cmd_call(struct cmd_funcparam *p) {
   if (p->argc == 0) return(CMD_OK);
 
   /* change the command by moving batch filename and arguments to the start of the string */
-  memmove((void *)(p->cmdline), p->cmdline + p->argoffset, strlen(p->cmdline + p->argoffset) + 1);
+  memcpy_ltr((void *)(p->cmdline), p->cmdline + p->argoffset, sv_strlen(p->cmdline + p->argoffset) + 1);
 
   return(CMD_CHANGED_BY_CALL); /* notify callee that command needs to be reevaluated */
 }

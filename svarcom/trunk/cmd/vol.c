@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -56,7 +56,7 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
     sprintf(buff, svarlang_str(34,2)/*"Volume in drive %c has no label"*/, drv + 'A');
   } else {
     /* if label > 8 chars then drop the dot (DRIVE_LA.BEL -> DRIVE_LABEL) */
-    if (strlen(dta->fname) > 8) memmove(dta->fname + 8, dta->fname + 9, 4);
+    if (sv_strlen(dta->fname) > 8) memcpy_ltr(dta->fname + 8, dta->fname + 9, 4);
     sprintf(buff, svarlang_str(34,3)/*"Volume in drive %c is %s"*/, drv + 'A', dta->fname);
   }
   outputnl(buff);

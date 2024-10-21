@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -131,7 +131,7 @@ static enum cmd_result cmd_goto(struct cmd_funcparam *p) {
   for (;;) {
 
     /* move any existing data to the start of the buffer */
-    if (bufflen > 0) memmove(p->BUFFER, buff, bufflen);
+    if (bufflen > 0) memcpy_ltr(p->BUFFER, buff, bufflen);
 
     buff = p->BUFFER; /* assumption: must be big enough to hold 2 sectors (2 * 512) */
 

@@ -42,7 +42,7 @@ static enum cmd_result cmd_loadhigh(struct cmd_funcparam *p) {
 
   /* set the command to be executed */
   if (p->cmdline[p->argoffset] != 0) {
-    memmove((void *)p->cmdline, p->cmdline + p->argoffset, strlen(p->cmdline + p->argoffset) + 1);
+    memcpy_ltr((void *)p->cmdline, p->cmdline + p->argoffset, sv_strlen(p->cmdline + p->argoffset) + 1);
   }
 
   return(CMD_CHANGED_BY_LH);

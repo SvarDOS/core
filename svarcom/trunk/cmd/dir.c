@@ -210,9 +210,9 @@ static void path_add(char *path, const char *dirname) {
   if (ostatni == -1) return;
   /* do the trick */
   /* move ending to the right */
-  memcpy_rtl(path + ostatni + strlen(dirname) + 1, path + ostatni, strlen(path + ostatni) + 1);
+  memcpy_rtl(path + ostatni + sv_strlen(dirname) + 1, path + ostatni, sv_strlen(path + ostatni) + 1);
   /* fill in the space with dirname */
-  memcpy_ltr(path + ostatni + 1, dirname, strlen(dirname));
+  memcpy_ltr(path + ostatni + 1, dirname, sv_strlen(dirname));
   //printf("'%s'\n", path);
 }
 
@@ -575,7 +575,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   unsigned long summary_totsz;
   unsigned char drv = 0;
   struct dirrequest req;
-  unsigned short summary_alignpos = strlen(svarlang_str(37,22)) + 2;
+  unsigned short summary_alignpos = sv_strlen(svarlang_str(37,22)) + 2;
   unsigned short uint32maxlen = 14; /* 13 is the max len of a 32 bit number with thousand separators (4'000'000'000) */
   if (screenw < 80) uint32maxlen = 10;
 
@@ -857,11 +857,11 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         /* print fname-space-extension (unless it's "." or "..", then print as-is) */
         if (dta->fname[0] == '.') {
           output(dta->fname);
-          i = strlen(dta->fname);
+          i = sv_strlen(dta->fname);
           while (i++ < 12) output(" ");
         } else {
           file_fname2fcb(buf->buff64, dta->fname);
-          memmove(buf->buff64 + 9, buf->buff64 + 8, 4);
+          memcpy_rtl(buf->buff64 + 9, buf->buff64 + 8, 4);
           buf->buff64[8] = ' ';
           output(buf->buff64);
         }
@@ -869,14 +869,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         /* either <DIR> or right aligned 13 or 10 chars byte size, depending
          * on the presence of a thousands delimiter (max 2'000'000'000) */
         {
-          unsigned short szlen = 10 + (strlen(buf->nls.thousep) * 3);
+          unsigned short szlen = 10 + (sv_strlen(buf->nls.thousep) * 3);
           memset(buf->buff64, ' ', 16);
           if (dta->attr & DOS_ATTR_DIR) {
             strcpy(buf->buff64 + szlen, svarlang_str(37,21));
           } else {
             nls_format_number(buf->buff64 + 12, dta->size, &(buf->nls));
           }
-          output(buf->buff64 + strlen(buf->buff64) - szlen);
+          output(buf->buff64 + sv_strlen(buf->buff64) - szlen);
         }
         /* one spaces and NLS DATE */
         buf->buff64[0] = ' ';
@@ -893,7 +893,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         break;
 
       case DIR_OUTPUT_WIDE: /* display in columns of 12 chars per item */
-        i = strlen(dta->fname);
+        i = sv_strlen(dta->fname);
         if (dta->attr & DOS_ATTR_DIR) {
           i += 2;
           output("[");

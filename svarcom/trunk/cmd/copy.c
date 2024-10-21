@@ -398,7 +398,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       nls_outputnl_doserr(t);
       continue;
     }
-    cursrclen = strlen(setup->cursrc); /* remember cursrc length */
+    cursrclen = sv_strlen(setup->cursrc); /* remember cursrc length */
 
     /* if length zero, skip (not sure why this would be possible, though) */
     if (cursrclen == 0) continue;
@@ -432,7 +432,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
        * this handles situations like COPY a.txt+b.txt+c.txt */
       if (setup->dst[0] == 0) {
         strcpy(setup->dst, setup->cursrc);
-        setup->dstlen = strlen(setup->dst);
+        setup->dstlen = sv_strlen(setup->dst);
         copiedcount_in++;
         copiedcount_out++;
         continue;
