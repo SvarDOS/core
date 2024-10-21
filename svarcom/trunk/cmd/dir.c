@@ -872,7 +872,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
           unsigned short szlen = 10 + (sv_strlen(buf->nls.thousep) * 3);
           memset(buf->buff64, ' ', 16);
           if (dta->attr & DOS_ATTR_DIR) {
-            strcpy(buf->buff64 + szlen, svarlang_str(37,21));
+            sv_strcpy(buf->buff64 + szlen, svarlang_str(37,21));
           } else {
             nls_format_number(buf->buff64 + 12, dta->size, &(buf->nls));
           }

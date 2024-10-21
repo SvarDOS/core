@@ -426,12 +426,12 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       if (dta->attr & DOS_ATTR_DIR) continue; /* skip directories */
 
       /* compute full path/name of the file */
-      strcpy(setup->cursrc + pathendoffset, dta->fname);
+      sv_strcpy(setup->cursrc + pathendoffset, dta->fname);
 
       /* if there was no destination, then YOU are the destination now!
        * this handles situations like COPY a.txt+b.txt+c.txt */
       if (setup->dst[0] == 0) {
-        strcpy(setup->dst, setup->cursrc);
+        sv_strcpy(setup->dst, setup->cursrc);
         setup->dstlen = sv_strlen(setup->dst);
         copiedcount_in++;
         copiedcount_out++;
@@ -439,7 +439,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       }
 
       /* is dst ending with a backslash? then append fname to it */
-      if (setup->dst[setup->dstlen - 1] == '\\') strcpy(setup->dst + setup->dstlen, dta->fname);
+      if (setup->dst[setup->dstlen - 1] == '\\') sv_strcpy(setup->dst + setup->dstlen, dta->fname);
 
       /* now cursrc contains the full source and dst contains the full dest... COPY TIME! */
 

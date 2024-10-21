@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -77,7 +77,7 @@ static enum cmd_result cmd_path(struct cmd_funcparam *p) {
   /* otherwise set PATH to whatever is passed on command-line */
   {
     unsigned short i;
-    strcpy(buff, "PATH=");
+    sv_strcpy(buff, "PATH=");
     for (i = 0;; i++) {
       buff[i + 5] = p->argv[0][i];
       if (buff[i + 5] == 0) break;

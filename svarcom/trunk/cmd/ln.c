@@ -176,7 +176,7 @@ static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned sho
     output(buff16);
     output(" @ ");
     /* prep full link filename */
-    strcpy(buff + pathlen, dta->fname);
+    sv_strcpy(buff + pathlen, dta->fname);
     /* read up to 128 bytes from link file to buff and display it */
     i = 0;
     _asm {

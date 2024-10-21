@@ -107,7 +107,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
     /* prep the full path/name of the file in buff */
     /* NOTE: buff contained the search pattern but it is no longer needed so I
      * can reuse it now */
-    strcpy(buff + pathlimit, fname);
+    sv_strcpy(buff + pathlimit, fname);
 
     /* ask if confirmation required: PLIK.TXT  Delete (Y/N)? */
     if (confirmflag) {
