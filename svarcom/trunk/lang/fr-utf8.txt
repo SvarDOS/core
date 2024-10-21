@@ -234,7 +234,7 @@
 37.10:/S Afficher les fichiers dans le dossier spécifié et tous les sous-dossiers
 37.11:/B Utilise le fomat dépouillé (pas d'informations d'en-tête ou de résumé)
 37.12:/L Utilise des caractères minuscules
-37.20:Répertoire de %s
+37.20:Répertoire de %
 37.21:<RÉP>
 37.22:fichier(s)
 37.23:octets

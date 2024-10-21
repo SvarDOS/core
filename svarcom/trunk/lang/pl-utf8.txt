@@ -247,7 +247,7 @@
 37.10:/S Wyświetla pliki w podanym katalogu i wszystkich podkatalogach
 37.11:/B Używa uproszczonego formatu (bez nagłówka i podsumowania)
 37.12:/L Używa małych liter
-37.20:Katalog %s
+37.20:Katalog %
 37.21:<KAT>
 37.22:plik(i)
 37.23:bajty

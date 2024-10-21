@@ -233,7 +233,7 @@
 37.10:/S Mostra arquivos no diretório especificado e todos os subdiretórios
 37.11:/B Usa formato simples (sem cabeçalho ou sumário)
 37.12:/L Usa minúsculas
-37.20:Diretório de %s
+37.20:Diretório de %
 37.21:<DIR>
 37.22:arquivo(s)
 37.23:bytes

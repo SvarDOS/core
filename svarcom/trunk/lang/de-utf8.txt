@@ -247,7 +247,7 @@
 37.10:/S Zeigt Dateien im angegebenen Verzeichnis und allen Unterverzeichnissen
 37.11:/B Verwendet knappes Format (kein Vorspann und keine Zusammenfassung)
 37.12:/L Verwendet Kleinschreibung
-37.20:Verzeichnis von %s
+37.20:Verzeichnis von %
 37.21:<DIR>
 37.22:Datei(en)
 37.23:Byte

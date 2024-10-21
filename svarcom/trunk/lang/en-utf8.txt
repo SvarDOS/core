@@ -247,7 +247,7 @@
 37.10:/S Displays files in specified directory and all subdirectories
 37.11:/B Uses bare format (no heading information or summary)
 37.12:/L Uses lowercases
-37.20:Directory of %s
+37.20:Directory of %
 37.21:<DIR>
 37.22:file(s)
 37.23:bytes

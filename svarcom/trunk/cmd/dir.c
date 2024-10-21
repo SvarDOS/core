@@ -143,6 +143,51 @@ static void dir_pagination(unsigned short *availrows) {
 }
 
 
+/* print the "Directory of C:\ABC\.... string using a buffer with possible
+ * file pattern garbage trailing */
+static void dir_print_dirof(const char *p, unsigned short *availrows, unsigned char pagination) {
+  unsigned char t, lastbkslash;
+  char buff[2] = {0, 0};
+  const char *dirof = svarlang_str(37,20); /* Directory of % */
+
+  /* print string until % */
+  while ((*dirof != 0) && (*dirof != '%')) {
+    *buff = *dirof;
+    output(buff);
+    dirof++;
+  }
+
+  if (*dirof != '%') return;
+  dirof++;
+
+  /* find the last backslash of path */
+  lastbkslash = 0;
+  for (t = 0; p[t] != 0; t++) {
+    if (p[t] == '\\') lastbkslash = t;
+  }
+  if (lastbkslash == 0) return;
+
+  /* print path until last bkslash */
+  do {
+    *buff = *p;
+    output(buff);
+    p++;
+  } while (lastbkslash-- != 0);
+
+  /* print the rest of the dirof string */
+  while (*dirof != 0) {
+    *buff = *dirof;
+    output(buff);
+    dirof++;
+  }
+
+  outputnl("");
+  if (pagination) dir_pagination(availrows);
+  outputnl("");
+  if (pagination) dir_pagination(availrows);
+}
+
+
 /* add a new dirname to path, C:\XXX\*.EXE + YYY -> C:\XXX\YYY\*.EXE */
 static void path_add(char *path, const char *dirname) {
   short i, ostatni = -1;
@@ -705,16 +750,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* print "directory of" unless /B or /S mode with no match */
   if ((req.format != DIR_OUTPUT_BARE) && (((req.flags & DIR_FLAG_RECUR) == 0) || (i == 0))) {
-    unsigned char t;
-    sprintf(buf->buff64, svarlang_str(37,20)/*"Directory of %s"*/, buf->path);
-    /* trim at first '?', if any */
-    for (t = 0; buf->buff64[t] != 0; t++) if (buf->buff64[t] == '?') buf->buff64[t] = 0;
-    outputnl(buf->buff64);
-    outputnl("");
-    if (req.flags & DIR_FLAG_PAUSE) {
-      dir_pagination(&availrows);
-      dir_pagination(&availrows);
-    }
+    dir_print_dirof(buf->path, &availrows, req.flags & DIR_FLAG_PAUSE);
   }
 
   /* if no file match then abort */

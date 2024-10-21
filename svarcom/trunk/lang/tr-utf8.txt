@@ -233,7 +233,7 @@
 37.10:/S Belirtilen dizin ve tüm alt dizinlerdeki dosyaları listeler
 37.11:/B Sade biçimi kullanır (başlık bilgisi veya özet görüntülenmez)
 37.12:/L Küçük harfleri kullanır
-37.20:%s unsurunun dizini
+37.20:% unsurunun dizini
 37.21:<DİZİN>
 37.22:dosya
 37.23:bayt
