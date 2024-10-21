@@ -13,7 +13,7 @@ functionaly equivalent to COMMAND.COM from MS-DOS 5.x/6.x. No LFN support.
 SvarCOM's resident footprint is under 2 KiB.
 
 Translation strings are stored in the file SVARCOM.LNG, which should be
-placed in a directory pointed at by %NLSPATH% for SvarCOM to be able to output
+placed in a directory pointed at by %DOSDIR% for SvarCOM to be able to output
 messages in non-english languages. SvarCOM's language is controlled by the
 %LANG% environment variable.
 

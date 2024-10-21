@@ -4,7 +4,7 @@
 
 
 
-=== ver 2024.7 (XX.XX.XXXX) ==================================================
+=== ver 2024.7 (21.10.2024) ==================================================
 
  - COPY: returns "insufficient disk space" on write error (was: "insuff. mem")
  - COPY: uses a bigger buffer to limit floppy swaps with the B: ghost drive
