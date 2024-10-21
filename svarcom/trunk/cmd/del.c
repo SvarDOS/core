@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -78,7 +78,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
 
   /* is delspec pointing at a directory? if so, add a \*.* */
   i = path_appendbkslash_if_dir(buff);
-  if (buff[i - 1] == '\\') strcat(buff, "????????.???");
+  if (buff[i - 1] == '\\') sv_strcat(buff, "????????.???");
 
   /* parse delspec in buff and remember where last backslash or slash is */
   for (i = 0; buff[i] != 0; i++) if (buff[i] == '\\') pathlimit = i + 1;

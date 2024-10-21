@@ -408,7 +408,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
     /* if src ends with a '\' then append *.* */
     if (setup->cursrc[cursrclen - 1] == '\\') {
-      strcat(setup->cursrc, "*.*");
+      sv_strcat(setup->cursrc, "*.*");
     }
 
     /* remember where the path in cursrc ends */

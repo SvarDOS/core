@@ -753,7 +753,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   i = path_appendbkslash_if_dir(buf->path);
 
   /* if ends with a \ then append ????????.??? */
-  if (buf->path[i - 1] == '\\') strcat(buf->path, "????????.???");
+  if (buf->path[i - 1] == '\\') sv_strcat(buf->path, "????????.???");
 
   /* ask DOS for list of files, but only with allowed attribs */
   i = findfirst(dta, buf->path, req.attrfilter_may);

@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -47,7 +47,7 @@ static enum cmd_result cmd_shift(struct cmd_funcparam *p) {
   nextarg++; /* move ptr past the zero terminator */
 
   /* move down batargv so 2nd argument is at the head now */
-  _fmemmove(batargv, nextarg, sizeof(p->rmod->bat->argv) - (nextarg - batargv));
+  memcpy_ltr_far(batargv, nextarg, sizeof(p->rmod->bat->argv) - (nextarg - batargv));
 
   return(CMD_OK);
 }
