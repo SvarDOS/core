@@ -25,6 +25,10 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
+#ifndef NULL
+#define NULL (0)
+#endif
+
 /* sets y, m, d to current (DOS) date */
 void dos_get_date(unsigned short *y, unsigned char *m, unsigned char *d);
 
@@ -36,6 +40,9 @@ void dos_get_time(unsigned char *h, unsigned char *m, unsigned char *s);
 int imatchlim(const char *s1, const char *s2, unsigned short maxlen);
 
 #define imatch(a,b) imatchlim(a,b,0xffff)
+
+/* like strlen() */
+unsigned short sv_strlen(const char *s);
 
 /* returns zero if s1 starts with s2 */
 int strstartswith(const char *s1, const char *s2);
@@ -174,6 +181,18 @@ unsigned short path_appendbkslash_if_dir(char *path);
  * returns 0 on success, doserr otherwise */
 unsigned short curpathfordrv(char *buff, unsigned char d);
 
+/* like strcpy() but returns the string's length */
+unsigned short sv_strcpy(char *dst, const char *s);
+
+/* like sv_strcpy() but operates on far pointers */
+unsigned short sv_strcpy_far(char far *dst, const char far *s);
+
+/* like strcat() */
+void sv_strcat(char *dst, const char *s);
+
+/* like strcat() but operates on far pointers */
+void sv_strcat_far(char far *dst, const char far *s);
+
 /* fills a nls_patterns struct with current NLS patterns, returns 0 on success, DOS errcode otherwise */
 unsigned short nls_getpatterns(struct nls_patterns *p);
 
@@ -207,7 +226,13 @@ int link_computefname(char *fname, const char *linkname, unsigned short env_seg)
 /* like memcpy() but guarantees to copy from left to right */
 void memcpy_ltr(void *d, const void *s, unsigned short len);
 
+/* like memcpy_ltr() but operates on far pointers */
+void memcpy_ltr_far(void far *d, const void far *s, unsigned short len);
+
 /* like memcpy() but guarantees to copy from right to left */
 void memcpy_rtl(void *d, const void *s, unsigned short len);
+
+/* like bzero(), but accepts far pointers */
+void sv_bzero(void far *dst, unsigned short len);
 
 #endif

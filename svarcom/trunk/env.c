@@ -27,9 +27,10 @@
  */
 
 #include <i86.h>
-#include <string.h>
 
 #include "env.h"
+#include "helpers.h"
+
 
 /* looks for varname in environment block and returns a far ptr to it if
  * found, NULL otherwise. varname MUST be in upper-case and MUST be terminated
@@ -114,11 +115,11 @@ int env_dropvar(unsigned short env_seg, const char *varname) {
   if (varptr == NULL) return(-1);
 
   for (len = 0; varptr[len] != 0; len++); /* compute length of variable (without trailing null) */
-  blocksz = env_allocsz(env_seg);           /* total environment size */
+  blocksz = env_allocsz(env_seg);         /* total environment size */
   traillen = blocksz - (FP_OFF(varptr) + len + 1); /* how much bytes are present after the variable */
-  _fmemset(varptr, 0, len);               /* zero out the variable */
+  sv_bzero(varptr, len);                   /* zero out the variable */
   if (traillen != 0) {
-    _fmemmove(varptr, varptr + len + 1, traillen); /* move rest of memory */
+    memcpy_ltr_far(varptr, varptr + len + 1, traillen); /* move rest of memory */
   }
   return(0);
 }
@@ -174,7 +175,7 @@ int env_setvar(unsigned short env_seg, const char *v) {
   if (veqpos == vlen - 1) return(ENV_SUCCESS);
 
   /* write the new variable (with its NULL terminator) to environment tail */
-  _fmemcpy(env + envlen, v, vlen + 1);
+  memcpy_ltr_far(env + envlen, v, vlen + 1);
 
   /* add the environment's NULL terminator */
   env[envlen + vlen + 1] = 0;

@@ -22,8 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <string.h> /* memset() */
-
 #include "env.h"
 #include "helpers.h"
 #include "rmodinit.h"
@@ -95,7 +93,7 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
   oldstdout = 0xffff;
 
   /* clear out the redir_data struct */
-  memset(d, 0, sizeof(*d));
+  sv_bzero(d, sizeof(*d));
 
   *awaitingcmd = 0;
 
@@ -130,23 +128,23 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
   if (pipescount != 0) {
     static char tmpfile[130];
     for (i = 0; i < pipescount; i++) {
-      if (i != 0) _fstrcat(awaitingcmd, "|");
-      _fstrcat(awaitingcmd, d->pipes[i]);
+      if (i != 0) sv_strcat_far(awaitingcmd, "|");
+      sv_strcat_far(awaitingcmd, d->pipes[i]);
     }
     /* append stdout redirection so I don't forget about it for the last command of the pipe queue */
     if (d->stdoutfile != NULL) {
       if (d->stdout_openflag == 0x11) {
-        _fstrcat(awaitingcmd, ">>");
+        sv_strcat_far(awaitingcmd, ">>");
       } else {
-        _fstrcat(awaitingcmd, ">");
+        sv_strcat_far(awaitingcmd, ">");
       }
       d->stdoutfile = NULL;
     }
     /* redirect stdin of next command from a temp file (that is used as my output) */
-    _fstrcat(awaitingcmd, "<");
+    sv_strcat_far(awaitingcmd, "<");
     i = gentmpfile(tmpfile, envseg);
     if (i != 0) return(i);
-    _fstrcat(awaitingcmd, tmpfile);
+    sv_strcat_far(awaitingcmd, tmpfile);
     /* same file is used as my stdout */
     d->stdoutfile = tmpfile;
     d->stdout_openflag = 0x12;

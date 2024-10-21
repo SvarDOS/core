@@ -28,7 +28,6 @@
 
 #include <i86.h>    /* MK_FP() */
 #include <stdio.h>  /* sprintf() */
-#include <string.h> /* memcpy() */
 
 #include "svarlang.lib\svarlang.h"
 
@@ -65,6 +64,17 @@ void dos_get_time(unsigned char *h, unsigned char *m, unsigned char *s) {
     mov bx, s
     mov [bx], dh
   }
+}
+
+
+/* like strlen() */
+unsigned short sv_strlen(const char *s) {
+  unsigned short len = 0;
+  while (*s != 0) {
+    s++;
+    len++;
+  }
+  return(len);
 }
 
 
@@ -542,6 +552,50 @@ unsigned short curpathfordrv(char *buff, unsigned char d) {
 }
 
 
+/* like strcpy() but returns the string's length */
+unsigned short sv_strcpy(char *dst, const char *s) {
+  unsigned short len = 0;
+  for (;;) {
+    *dst = *s;
+    if (*s == 0) return(len);
+    dst++;
+    s++;
+    len++;
+  }
+}
+
+
+/* like sv_strcpy() but operates on far pointers */
+unsigned short sv_strcpy_far(char far *dst, const char far *s) {
+  unsigned short len = 0;
+  for (;;) {
+    *dst = *s;
+    if (*s == 0) return(len);
+    dst++;
+    s++;
+    len++;
+  }
+}
+
+
+/* like strcat() */
+void sv_strcat(char *dst, const char *s) {
+  /* advance dst to end of string */
+  while (*dst != 0) dst++;
+  /* append string */
+  sv_strcpy(dst, s);
+}
+
+
+/* like strcat() but operates on far pointers */
+void sv_strcat_far(char far *dst, const char far *s) {
+  /* advance dst to end of string */
+  while (*dst != 0) dst++;
+  /* append string */
+  sv_strcpy_far(dst, s);
+}
+
+
 /* fills a nls_patterns struct with current NLS patterns, returns 0 on success, DOS errcode otherwise */
 unsigned short nls_getpatterns(struct nls_patterns *p) {
   unsigned short r = 0;
@@ -673,8 +727,15 @@ void nls_strtoup(char *buff) {
     pop ax
   }
 
-  /* rely on OpenWatcom's strupr() if DOS has no NLS support */
-  if (errcode != 0) strupr(buff);
+  /* do a naive upcase if DOS has no NLS support */
+  if (errcode != 0) {
+    while (*buff) {
+      if (*buff < 128) { /* apply only to 7bit (low ascii) values */
+        *buff &= 0xDF;
+      }
+      buff++;
+    }
+  }
 }
 
 
@@ -691,40 +752,40 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
   /* look up the LANG env variable, upcase it and copy to lang */
   lang = env_lookup_val(rmodenvseg, "LANG");
   if ((lang == NULL) || (lang[0] == 0)) return;
-  _fmemcpy(buff, lang, 2);
+  memcpy_ltr_far(buff, lang, 2);
   buff[2] = 0;
 
   /* check if there is need to reload at all */
-  if (memcmp(&lastlang, buff, 2) == 0) return;
+  if (lastlang == *((unsigned short *)buff)) return;
 
   buff[4] = 0;
   dosdir = env_lookup_val(rmodenvseg, "DOSDIR");
   if (dosdir == NULL) return;
 
-  _fstrcpy(buff + 4, dosdir);
-  dosdirlen = strlen(buff + 4);
+  sv_strcpy_far(buff + 4, dosdir);
+  dosdirlen = sv_strlen(buff + 4);
   if (buff[4 + dosdirlen - 1] == '\\') dosdirlen--;
-  memcpy(buff + 4 + dosdirlen, "\\SVARCOM.LNG", 13);
+  memcpy_ltr(buff + 4 + dosdirlen, "\\SVARCOM.LNG", 13);
 
   /* try loading %DOSDIR%\SVARCOM.LNG */
   if (svarlang_load(buff + 4, buff) != 0) {
     /* failed! try %DOSDIR%\BIN\SVARCOM.LNG */
-    memcpy(buff + 4 + dosdirlen, "\\BIN\\SVARCOM.LNG", 17);
+    memcpy_ltr(buff + 4 + dosdirlen, "\\BIN\\SVARCOM.LNG", 17);
     if (svarlang_load(buff + 4, buff) != 0) return;
   }
 
-  _fmemcpy(&lastlang, lang, 2);
+  memcpy_ltr_far(&lastlang, lang, 2);
 
   /* update RMOD's critical handler with new strings */
   for (i = 0; i < 9; i++) {
     int len;
-    len = strlen(svarlang_str(3, i));
+    len = sv_strlen(svarlang_str(3, i));
     if (len > 15) len = 15;
-    _fmemcpy(rmodcritmsg + (i * 16), svarlang_str(3, i), len);
-    _fmemcpy(rmodcritmsg + (i * 16) + len, "$", 1);
+    memcpy_ltr_far(rmodcritmsg + (i * 16), svarlang_str(3, i), len);
+    memcpy_ltr_far(rmodcritmsg + (i * 16) + len, "$", 1);
   }
   /* The ARIF string is special: always 4 bytes long and no $ terminator */
-  _fmemcpy(rmodcritmsg + (9 * 16), svarlang_str(3,9), 4);
+  memcpy_ltr_far(rmodcritmsg + (9 * 16), svarlang_str(3,9), 4);
 }
 
 
@@ -780,22 +841,22 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
   /* if no path prefix was found in fname (no colon or backslash) AND we have
    * a path arg, then assemble path+filename */
   if ((!explicitpath) && (path != NULL) && (path[0] != 0)) {
-    i = strlen(path);
+    i = sv_strlen(path);
     if (path[i - 1] != '\\') i++; /* add a byte for inserting a bkslash after path */
     /* move the filename at the place where path will end */
-    memmove(res + i, res + lastbslash + 1, len - lastbslash);
+    memcpy_rtl(res + i, res + lastbslash + 1, len - lastbslash);
     /* copy path in front of the filename and make sure there is a bkslash sep */
-    memmove(res, path, i);
+    memcpy_ltr(res, path, i);
     res[i - 1] = '\\';
   }
 
   /* if no extension was initially provided, try matching COM, EXE, BAT */
   if (*extptr == NULL) {
     int attr;
-    len = strlen(res);
+    len = sv_strlen(res);
     res[len++] = '.';
     for (i = 0; exec_ext[i] != NULL; i++) {
-      strcpy(res + len, exec_ext[i]);
+      sv_strcpy(res + len, exec_ext[i]);
       /* printf("? '%s'\r\n", res); */
       *extptr = exec_ext[i];
       attr = file_getattr(res);
@@ -876,6 +937,20 @@ void memcpy_ltr(void *d, const void *s, unsigned short len) {
   }
 }
 
+
+/* like memcpy_ltr() but operates on far pointers */
+void memcpy_ltr_far(void far *d, const void far *s, unsigned short len) {
+  unsigned char const far *ss = s;
+  unsigned char far *dd = d;
+
+  while (len--) {
+    *dd = *ss;
+    ss++;
+    dd++;
+  }
+}
+
+
 /* like memcpy() but guarantees to copy from right to left */
 void memcpy_rtl(void *d, const void *s, unsigned short len) {
   unsigned char const *ss = s;
@@ -887,5 +962,15 @@ void memcpy_rtl(void *d, const void *s, unsigned short len) {
     *dd = *ss;
     ss--;
     dd--;
+  }
+}
+
+
+/* like bzero(), but accepts far pointers */
+void sv_bzero(void far *dst, unsigned short len) {
+  char far *d = dst;
+  while (len--) {
+    *d = 0;
+    d++;
   }
 }

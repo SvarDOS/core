@@ -101,8 +101,8 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
   }
 
   /* clear out struct and copy command line to it */
-  bzero(f, sizeof(*f));
-  strcpy(f->cmd, p->cmdline);
+  sv_bzero(f, sizeof(*f));
+  sv_strcpy(f->cmd, p->cmdline);
 
   /* locate the %varname (single char) */
   i = p->argoffset;

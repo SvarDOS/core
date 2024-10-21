@@ -609,7 +609,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   }
 
   /* zero out glob_sortcmp_dat and init the collation table */
-  bzero(&glob_sortcmp_dat, sizeof(glob_sortcmp_dat));
+  sv_bzero(&glob_sortcmp_dat, sizeof(glob_sortcmp_dat));
   for (i = 0; i < 256; i++) {
     glob_sortcmp_dat.sortownia[i] = i;
     /* sorting should be case-insensitive */
@@ -687,7 +687,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /*** PARSING COMMAND LINE STARTS *******************************************/
 
   /* init req with some defaults */
-  bzero(&req, sizeof(req));
+  sv_bzero(&req, sizeof(req));
   req.attrfilter_may = DIR_ATTR_DEFAULT;
   req.format = DIR_OUTPUT_NORM;
 

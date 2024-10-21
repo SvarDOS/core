@@ -251,7 +251,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
   /* parse cmdline and fill the setup struct accordingly */
 
-  memset(setup, 0, sizeof(*setup));
+  sv_bzero(setup, sizeof(*setup));
   setup->databufsz = (p->BUFFERSZ - sizeof(*setup)) & 0xfe00; /* use a multiple of 512 for better DOS performances */
 
   for (i = 0; i < p->argc; i++) {

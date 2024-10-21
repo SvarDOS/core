@@ -22,8 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <dos.h>
-#include <stdio.h>
+#include <dos.h> /* MK_FP(), FP_SEG(), FP_OFF()... */
 #include <string.h>
 
 #include "svarlang.lib/svarlang.h"
@@ -230,7 +229,7 @@ static void parse_argv(struct config *cfg) {
    * mentionned at [80h] or to first CR or nul, whichever comes first.
    */
 
-  bzero(cfg, sizeof(*cfg));
+  sv_bzero(cfg, sizeof(*cfg));
 
   /* Make sure that the advertised cmdline length is no more than 126 bytes
    * because the PSP ends at [0xff] and there ought to be at least 1 byte of
@@ -378,7 +377,7 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         struct nls_patterns nls;
         unsigned char h, m, sec;
         if (nls_getpatterns(&nls) != 0) {
-          s += sprintf(s, "ERR");
+          s += sv_strcpy(s, "ERR");
         } else {
           dos_get_time(&h, &m, &sec);
           s += nls_format_time(s, h, m, sec, &nls);
@@ -392,7 +391,7 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         unsigned short y;
         unsigned char m, d;
         if (nls_getpatterns(&nls) != 0) {
-          s += sprintf(s, "ERR");
+          s += sv_strcpy(s, "ERR");
         } else {
           dos_get_date(&y, &m, &d);
           s += nls_format_date(s, y, m, d, &nls);
@@ -413,7 +412,7 @@ static void build_and_display_prompt(char *buff, unsigned short envseg) {
         break;
       case 'V':  /* $V = version number */
       case 'v':
-        s += sprintf(s, PVER);
+        s += sv_strcpy(s, PVER);
         break;
       case 'N':  /* $N = current drive */
       case 'n':
@@ -627,11 +626,11 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     }
 
     /* fill the newly allocated batctx structure */
-    _fstrcpy(newbat->fname, cmdfile); /* truename of the BAT file */
+    sv_strcpy_far(newbat->fname, cmdfile); /* truename of the BAT file */
     newbat->flags = flags & FLAG_STEPBYSTEP;
     /* explode args of the bat file and store them in rmod buff */
     cmd_explode(buff, cmdline, NULL);
-    _fmemcpy(newbat->argv, buff, sizeof(newbat->argv));
+    memcpy_ltr_far(newbat->argv, buff, sizeof(newbat->argv));
 
     /* push the new bat to the top of rmod's linked list */
     newbat->parent = rmod->bat;
@@ -641,13 +640,13 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   }
 
   /* copy full filename to execute, along with redirected files (if any) */
-  _fstrcpy(rmod_execprog, cmdfile);
+  sv_strcpy_far(rmod_execprog, cmdfile);
 
   /* copy stdin file if a redirection is needed */
   if (redir->stdinfile) {
     char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDINFILE);
     char far *delstdin = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDIN_DEL);
-    _fstrcpy(farptr, redir->stdinfile);
+    sv_strcpy_far(farptr, redir->stdinfile);
     if (flags & DELETE_STDIN_FILE) {
       *delstdin = redir->stdinfile[0];
     } else {
@@ -659,7 +658,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
   if (redir->stdoutfile) {
     char far *farptr = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTFILE);
     unsigned short far *farptr16 = MK_FP(rmod->rmodseg, RMOD_OFFSET_STDOUTAPP);
-    _fstrcpy(farptr, redir->stdoutfile);
+    sv_strcpy_far(farptr, redir->stdoutfile);
     /* openflag */
     *farptr16 = redir->stdout_openflag;
   }
@@ -684,7 +683,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     char far *farptr;
     /* prep the unopened FCBs */
     farptr = MK_FP(rmod->rmodseg, 0x5C);
-    _fmemset(farptr, 0, 36); /* first FCB is 16 bytes long, second is 20 bytes long */
+    sv_bzero(farptr, 36); /* first FCB is 16 bytes long, second is 20 bytes long */
     cmdtail_to_fcb(farptr, farptr + 16, cmdtail);
     /* set (far) pointers in the ExecParam block */
     ExecParam->fcb1 = (unsigned long)MK_FP(rmod->rmodseg, 0x5C);
@@ -988,7 +987,7 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   } else { /* dta in progress */
 
     /* copy forloop DTA to my local copy */
-    _fmemcpy(dta, &(forloop->dta), sizeof(*dta));
+    memcpy_ltr_far(dta, &(forloop->dta), sizeof(*dta));
 
     /* findnext() call */
     if (findnext(dta) != 0) {
@@ -998,7 +997,7 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   }
 
   /* copy updated DTA to rmod */
-  _fmemcpy(&(forloop->dta), dta, sizeof(*dta));
+  memcpy_ltr_far(&(forloop->dta), dta, sizeof(*dta));
 
   /* prefill pathprefix with the prefix (path) of the files */
   {
@@ -1020,8 +1019,8 @@ static int forloop_process(char *res, struct forctx far *forloop) {
   i = 0;
   for (;;) {
     if ((forloop->cmd[forloop->exec + t] == '%') && (forloop->cmd[forloop->exec + t + 1] == forloop->varname)) {
-      strcpy(res + i, pathprefix);
-      strcat(res + i, fnameptr);
+      sv_strcpy(res + i, pathprefix);
+      sv_strcat(res + i, fnameptr);
       for (; res[i] != 0; i++);
       t += 2;
     } else {
@@ -1174,7 +1173,7 @@ int main(void) {
 
     /* load awaiting command, if any (used to run piped commands) */
     if (rmod->awaitingcmd[0] != 0) {
-      _fstrcpy(cmdline, rmod->awaitingcmd);
+      sv_strcpy_far(cmdline, rmod->awaitingcmd);
       rmod->awaitingcmd[0] = 0;
       flags |= DELETE_STDIN_FILE;
       goto EXEC_CMDLINE;
@@ -1245,7 +1244,7 @@ int main(void) {
       rmod_inputbuf[rmod_inputbuf[1] + 3] = 0xCA; /* trailing signature */
       rmod_inputbuf[rmod_inputbuf[1] + 4] = 0xFE; /* trailing signature */
       /* copy it to local cmdline */
-      if (rmod_inputbuf[1] != 0) _fmemcpy(cmdline, rmod_inputbuf + 2, rmod_inputbuf[1]);
+      if (rmod_inputbuf[1] != 0) memcpy_ltr_far(cmdline, rmod_inputbuf + 2, rmod_inputbuf[1]);
       cmdline[rmod_inputbuf[1]] = 0; /* zero-terminate local buff (original is '\r'-terminated) */
     }
 

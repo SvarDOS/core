@@ -23,7 +23,6 @@
  */
 
 #include <i86.h>
-#include <string.h>
 
 #include "env.h"
 #include "helpers.h"
@@ -166,19 +165,19 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 
   /* copy rmod to its destination (right past the PSP I prepared) */
   myptr = MK_FP(rmodseg, 0x100);
-  _fmemcpy(myptr, rmodcore, rmodcore_len);
+  memcpy_ltr_far(myptr, rmodcore, rmodcore_len);
 
   /* mark rmod memory (MCB) as "self owned" */
   mcb = MK_FP(rmodseg - 1, 0);
   owner = (void far *)(mcb + 1);
   *owner = rmodseg;
-  _fmemcpy(mcb + 8, "SVARCOM", 8);
+  memcpy_ltr_far(mcb + 8, "SVARCOM", 8);
 
   /* mark env memory (MCB) as "owned by rmod" */
   mcb = MK_FP(envseg - 1, 0);
   owner = (void far *)(mcb + 1);
   *owner = rmodseg;
-  _fmemcpy(mcb + 8, "SVARENV", 8);
+  memcpy_ltr_far(mcb + 8, "SVARENV", 8);
 
   /* if env block is newly allocated, then:
    *  if an original env is present then copy it
@@ -189,7 +188,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     owner[1] = 0;
 
     /* do we have an original environment? if yes copy it (envsize is a number of paragraphs) */
-    if (origenvseg != 0) _fmemcpy(owner, MK_FP(origenvseg, 0), envsize * 16);
+    if (origenvseg != 0) memcpy_ltr_far(owner, MK_FP(origenvseg, 0), envsize * 16);
   }
 
   _asm {
@@ -246,7 +245,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
 
   /* prepare result (rmod props) */
   res = MK_FP(rmodseg, 0x100 + rmodcore_len);
-  _fmemset(res, 0, sizeof(*res));  /* zero out */
+  sv_bzero(res, sizeof(*res));     /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
 
   /* save my original int22h handler and parent in rmod's memory */
@@ -365,14 +364,14 @@ void far *rmod_fcalloc(unsigned short bytes, unsigned short rmod_seg, char *iden
   if (ident) {
     char far *mcbdesc = MK_FP(newseg - 1, 8);
     int i;
-    _fmemset(mcbdesc, 0, 8);
+    sv_bzero(mcbdesc, 8);
     for (i = 0; (i < 8) && (ident[i] != 0); i++) { /* field's length is limited to 8 bytes max */
       mcbdesc[i] = ident[i];
     }
   }
 
   /* zero out the memory before handing it out */
-  _fmemset(MK_FP(newseg, 0), 0, bytes);
+  sv_bzero(MK_FP(newseg, 0), bytes);
 
   return(MK_FP(newseg, 0));
 }
