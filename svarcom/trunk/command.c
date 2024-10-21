@@ -23,7 +23,6 @@
  */
 
 #include <dos.h> /* MK_FP(), FP_SEG(), FP_OFF()... */
-#include <string.h>
 
 #include "svarlang.lib/svarlang.h"
 
