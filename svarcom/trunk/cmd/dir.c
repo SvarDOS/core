@@ -801,7 +801,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
        * sizes for directories which might confuse the sorting routine later */
       if (dta->attr & DOS_ATTR_DIR) dta->size = 0;
 
-      _fmemcpy(&(dtabuf[dtabufcount]), ((char *)dta) + 22, sizeof(struct TINYDTA));
+      memcpy_ltr_far(&(dtabuf[dtabufcount]), ((char *)dta) + 22, sizeof(struct TINYDTA));
 
       /* save attribs in sec field, otherwise zero it (this field is not
        * displayed and dropping the attr field saves 2 bytes per entry) */
@@ -832,7 +832,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* preload first entry (last from orderidx, since entries are sorted in reverse) */
     dtabufcount--;
-    _fmemcpy(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
+    memcpy_ltr_far(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
     dta->attr = dtabuf[buf->orderidx[dtabufcount]].time_sec2; /* restore attr from the abused time_sec2 field */
   }
 
@@ -924,7 +924,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* take next entry, either from buf or disk */
     if (dtabufcount > 0) {
       dtabufcount--;
-      _fmemcpy(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
+      memcpy_ltr_far(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
       dta->attr = dtabuf[buf->orderidx[dtabufcount]].time_sec2; /* restore attr from the abused time_sec2 field */
     } else {
       if (findnext(dta) != 0) break;

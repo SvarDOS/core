@@ -145,7 +145,7 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
     nls_outputnl_doserr(8);
     return(CMD_FAIL);
   }
-  _fmemcpy(p->rmod->forloop, f, sizeof(*f));
+  memcpy_ltr_far(p->rmod->forloop, f, sizeof(*f));
 
   return(CMD_OK);
 
