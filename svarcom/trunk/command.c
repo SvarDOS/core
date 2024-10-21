@@ -22,10 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <i86.h>
 #include <dos.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "svarlang.lib/svarlang.h"
@@ -119,6 +117,14 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
   outputnl(msg);
   return(1);
 }
+
+
+/* exit do DOS with exist code */
+static void EXIT(char code);
+#pragma aux EXIT = \
+"mov ah, 0x4c" \
+"int 0x21" \
+parm [al]
 
 
 /* DR-DOS specific boot processing: check for F5/F8 boot key presses and reset
@@ -224,7 +230,7 @@ static void parse_argv(struct config *cfg) {
    * mentionned at [80h] or to first CR or nul, whichever comes first.
    */
 
-  memset(cfg, 0, sizeof(*cfg));
+  bzero(cfg, sizeof(*cfg));
 
   /* Make sure that the advertised cmdline length is no more than 126 bytes
    * because the PSP ends at [0xff] and there ought to be at least 1 byte of
@@ -303,7 +309,7 @@ static void parse_argv(struct config *cfg) {
         nls_outputnl(1,5); /* "/C      Executes the specified command and returns" */
         nls_outputnl(1,6); /* "/K      Executes the specified command and continues running" */
         nls_outputnl(1,7); /* "/Y      Executes the batch program step by step" */
-        exit(1);
+        EXIT(1);
         break;
 
       default:
@@ -684,7 +690,7 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     ExecParam->fcb1 = (unsigned long)MK_FP(rmod->rmodseg, 0x5C);
     ExecParam->fcb2 = (unsigned long)MK_FP(rmod->rmodseg, 0x6C);
   }
-  exit(0); /* let rmod do the job now */
+  EXIT(0); /* let rmod do the job now */
 }
 
 

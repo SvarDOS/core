@@ -4,6 +4,10 @@
 
 
 
+=== ver 2024.8 (xx.xx.2024) ==================================================
+ - removed some libc dependencies
+
+
 === ver 2024.7 (21.10.2024) ==================================================
 
  - COPY: returns "insufficient disk space" on write error (was: "insuff. mem")
