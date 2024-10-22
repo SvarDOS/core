@@ -195,9 +195,9 @@
 # VOL
 34.0:Affiche l'étiquette du volume de disque et le numéro de série, s'il existent.
 34.1:VOL [lecteur:]
-34.2:Volume dans le lecteur %c n'a pas d'étiquette
-34.3:Volume dans le lecteur %c est %s
-34.4:Le numéro de série du volume est %04X-%04X
+34.2:Volume dans le lecteur @ n'a pas d'étiquette
+34.3:Volume dans le lecteur @ est %
+34.4:Le numéro de série du volume est %%%%-%%%%
 
 # IF
 35.0:Effectue des traitements conditionnels dans les programmes batch.

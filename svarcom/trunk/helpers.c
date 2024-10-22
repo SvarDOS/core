@@ -485,6 +485,17 @@ unsigned short ustoa(char *dst, unsigned short n, unsigned char fixlen, char pre
 }
 
 
+/* converts an unsigned short to a four-byte ASCIZ hex string ("0ABC") */
+void ustoh(char *dst, unsigned short n) {
+  const char *h = "0123456789ABCDEF";
+  dst[2] = h[(n >> 4) & 15];
+  dst[3] = h[n & 15];
+  n >>= 8;
+  dst[0] = h[n >> 4];
+  dst[1] = h[n & 15];
+}
+
+
 /* converts an ASCIIZ string into an unsigned short. returns 0 on success.
  * on error, result will contain all valid digits that were read until
  * error occurred (0 on overflow or if parsing failed immediately) */
@@ -1034,4 +1045,36 @@ void sv_memset(void *dst, unsigned char c, unsigned short len) {
     *d = c;
     d++;
   }
+}
+
+
+/* replaces characters a by b in s */
+void sv_strtr(char *s, char a, char b) {
+  while (*s) {
+    if (*s == a) *s = b;
+    s++;
+  }
+}
+
+
+/* inserts string s2 into s1 in place of the first % character */
+void sv_insert_str_in_str(char *s1, const char *s2) {
+  unsigned short s2len;
+
+  /* fast forward s1 to either % or 0 */
+  while ((*s1 != 0) && (*s1 != '%')) s1++;
+
+  /* if not % then quit */
+  if (*s1 != '%') return;
+
+  /* make room for s2, unless s2 is exactly 1 byte long */
+  s2len = sv_strlen(s2);
+  if (s2len == 0) {
+    memcpy_ltr(s1, s1 + 1, sv_strlen(s1 + 1) + 1);
+  } else if (s2len > 1) {
+    memcpy_rtl(s1 + s2len, s1 + 1, sv_strlen(s1 + 1) + 1);
+  }
+
+  /* write s2 to the cleared space */
+  if (s2len != 0) memcpy_ltr(s1, s2, s2len);
 }

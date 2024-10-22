@@ -194,9 +194,9 @@
 # VOL
 34.0:Mostra o rótulo do volume do disco e o número de série, se existir.
 34.1:VOL [drive:]
-34.2:O volume no drive %c não tem nome
-34.3:O volume no drive %c é %s
-34.4:O número de série do volume é %04X-%04X
+34.2:O volume no drive @ não tem nome
+34.3:O volume no drive @ é %
+34.4:O número de série do volume é %%%%-%%%%
 
 # IF
 35.0:Executa processamento condicional em programas de lote.

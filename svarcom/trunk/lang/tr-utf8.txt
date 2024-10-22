@@ -194,9 +194,9 @@
 # VOL
 34.0:Mevcutsa, disk birimi etiketini ve seri numarasını görüntüler.
 34.1:VOL [sürücü:]
-34.2:%c sürücüsündeki birimin etiketi yok
-34.3:%c sürücüsündeki birim şudur %s
-34.4:Birim Seri Numarası şudur: %04X-%04X
+34.2:@ sürücüsündeki birimin etiketi yok
+34.3:@ sürücüsündeki birim şudur %
+34.4:Birim Seri Numarası şudur: %%%%-%%%%
 
 # IF
 35.0:Toplu iş programlarında koşullu işleme yapar.

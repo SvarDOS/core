@@ -34,7 +34,9 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
   outputnl("");  /* start with an empty line to mimic MS-DOS */
 
   /* look for volume label in root dir via a FindFirst call */
-  sprintf(buff, "%c:\\????????.???", drv + 'A');
+  sv_strcpy(buff, "A:\\????????.???");
+  buff[0] += drv;
+
   _asm {
     push ax
     push cx
@@ -53,11 +55,14 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
   }
 
   if (err != 0) {
-    sprintf(buff, svarlang_str(34,2)/*"Volume in drive %c has no label"*/, drv + 'A');
+    sv_strcpy(buff, svarlang_str(34,2)); /* "Volume in drive @ has no label" */
+    sv_strtr(buff, '@', 'A' + drv);
   } else {
     /* if label > 8 chars then drop the dot (DRIVE_LA.BEL -> DRIVE_LABEL) */
     if (sv_strlen(dta->fname) > 8) memcpy_ltr(dta->fname + 8, dta->fname + 9, 4);
-    sprintf(buff, svarlang_str(34,3)/*"Volume in drive %c is %s"*/, drv + 'A', dta->fname);
+    sv_strcpy(buff, svarlang_str(34,3)); /* "Volume in drive @ is %" */
+    sv_strtr(buff, '@', 'A' + drv);
+    sv_insert_str_in_str(buff, dta->fname);
   }
   outputnl(buff);
 
@@ -87,8 +92,13 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
    06h  11 BYTEs   volume label or "NO NAME    " if none present
    11h   8 BYTEs   filesystem type */
   if ((err == 0) && (buff16[1] | buff16[2])) {
-    sprintf(buff + 4, svarlang_str(34,4)/*"Volume Serial Number is %04X-%04X"*/, buff16[2], buff16[1]);
-    outputnl(buff + 4);
+    char *s;
+    sv_strcpy(buff + 6, svarlang_str(34,4)); /* "Volume Serial Number is %%%%-%%%%" */
+    /* find first % and place there %%%%-%%%% */
+    for (s = buff + 6; *s != '%'; s++);
+    ustoh(s, buff16[2]);
+    ustoh(s+5, buff16[1]);
+    outputnl(buff + 6);
   }
 }
 

@@ -168,6 +168,9 @@ void file_fname2fcb(char *dst, const char *src);
 /* converts a FCB filename (FILENAMEEXT) into normal format (FILENAME.EXT) */
 void file_fcb2fname(char *dst, const char *src);
 
+/* converts an unsigned short to a four-byte ASCIZ hex string ("0ABC") */
+void ustoh(char *dst, unsigned short n);
+
 /* converts an ASCIIZ string into an unsigned short. returns 0 on success.
  * on error, result will contain all valid digits that were read until
  * error occurred (0 on overflow or if parsing failed immediately) */
@@ -242,5 +245,11 @@ void sv_bzero(void far *dst, unsigned short len);
 
 /* like memset() */
 void sv_memset(void *dst, unsigned char c, unsigned short len);
+
+/* replaces characters a by b in s */
+void sv_strtr(char *s, char a, char b);
+
+/* inserts string s2 into s1 in place of the first % character */
+void sv_insert_str_in_str(char *s1, const char *s2);
 
 #endif
