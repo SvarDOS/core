@@ -449,12 +449,12 @@ void file_fcb2fname(char *dst, const char *src) {
 }
 
 
-/* convert an unsigned short to ASCIZ, output set to fixlen chars if fixlen
- * is non zero (prefixed with prefixchar if value too small, else truncated)
+/* convert an unsigned short to ASCIZ, output expanded to minlen chars
+ * (prefixed with prefixchar if value too small, else truncated)
  * returns length of produced string */
-unsigned short ustoa(char *dst, unsigned short n, unsigned char fixlen, char prefixchar) {
+unsigned short ustoa(char *dst, unsigned short n, unsigned char minlen, char prefixchar) {
   unsigned short r;
-  unsigned char i;
+  unsigned char i, len;
   unsigned char nonzerocharat = 5;
 
   for (i = 4; i != 0xff; i--) {
@@ -470,18 +470,21 @@ unsigned short ustoa(char *dst, unsigned short n, unsigned char fixlen, char pre
     dst[i] = prefixchar;
   }
 
-  /* apply fixlen, if set */
-  if ((fixlen > 0) && (fixlen < 6)) {
-    nonzerocharat = 5 - fixlen;
+  len = 5 - nonzerocharat;
+
+  /* apply minlen, if set */
+  if ((minlen > len) && (minlen < 6)) {
+    len = minlen;
+    nonzerocharat = 5 - minlen;
   }
 
   if (nonzerocharat != 0) {
-    memcpy_ltr(dst, dst + nonzerocharat, 5 - nonzerocharat);
+    memcpy_ltr(dst, dst + nonzerocharat, len);
   }
 
-  dst[5 - nonzerocharat] = 0;
+  dst[len] = 0;
 
-  return(5 - nonzerocharat);
+  return(len);
 }
 
 
