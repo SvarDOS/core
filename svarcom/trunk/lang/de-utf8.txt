@@ -263,7 +263,7 @@
 38.6:/V      Überprüft, dass neue Dateien korrekt geschrieben werden
 38.7:Um Dateien aneinanderzuhängen, geben Sie eine einzelne Datei als Ziel an, aber\r\nmehrere Dateien als Quelle (per Platzhalter oder Format Datei1+Datei2+Datei3).
 38.8:HINWEIS: /A und /B sind ohne Wirkung. Sie werden nur aus Gründen der\r\nKompatibilität angeboten. COPY nimmt immer binär an.
-38.9:%u Datei(en) kopiert
+38.9:% Datei(en) kopiert
 
 # TRUENAME
 39.0:Gibt einen vollständig qualifizierten Pfad oder Dateinamen zurück.

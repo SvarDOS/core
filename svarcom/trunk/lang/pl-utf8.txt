@@ -264,7 +264,7 @@
 38.6:/V         Sprawdza, czy nowe pliki zostały poprawnie zapisane
 38.7:Aby połączać pliki, należy podać pojedynczy plik jako cel, ale wiele plików\r\nźródłowych (używając symboli wieloznacznych lub formatu plik1+plik2+plik3).
 38.8:UWAGA: /A i /B są ignorowane, podane tylko ze względu na kompatybilność.\r\nCOPY zakłada zawsze binaria.
-38.9:skopiowano %u plik(i)
+38.9:skopiowano % plik(ów)
 
 # TRUENAME
 39.0:Zwraca w pełni kwalifikowaną ścieżkę lub nazwę pliku.

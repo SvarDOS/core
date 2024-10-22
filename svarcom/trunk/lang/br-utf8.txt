@@ -249,7 +249,7 @@
 38.6:/V           Verifica se os novos arquivos são gravados corretamente
 38.7:Para concatenar arquivos, especifique um único arquivo para o destino, mas\r\nmúltiplos arquivos de origem (usando curingas ou o formato\r\narquivo1+arquivo2+arquivo3).
 38.8:NOTE: /A e /B não são opções válidas (são ignoradas), providos somente\r\npor motivos de compatibilidade. COPY sempre assume que os arquivos são binários.
-38.9:%u arquivos(s) copiado(s)
+38.9:% arquivos(s) copiado(s)
 
 # TRUENAME
 39.0:Returna um caminho ou nome de arquivo totalmente qualificado.

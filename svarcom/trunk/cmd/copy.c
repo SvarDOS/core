@@ -470,8 +470,10 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
   }
 
-  sprintf(setup->databuf, svarlang_str(38,9)/*"%u file(s) copied"*/, copiedcount_out);
-  outputnl(setup->databuf);
+  ustoa(setup->databuf, copiedcount_out, 0, '0');
+  sv_strcpy(setup->databuf + 8, svarlang_str(38,9)); /* "% file(s) copied" */
+  sv_insert_str_in_str(setup->databuf + 8, setup->databuf);
+  outputnl(setup->databuf + 8);
 
   /* free memory block if it is not the static BUFF */
   if (setup->databufseg_custom != 0) dos_freememseg(setup->databufseg_custom);

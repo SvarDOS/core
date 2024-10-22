@@ -249,7 +249,7 @@
 38.6:/V           Yeni dosyaların doğru olarak yazıldığını kontrol eder
 38.7:Dosya eklemek için hedef olarak tek bir dosya belirtin, fakat kaynak için\r\nçoklu (joker veya dosya1+doya2+dosya3 biçimini kullanın).
 38.8:NOT: /A ve /B no-op'tur (yok sayılır), sadece uyumluluk amaçlı bulunurlar.\r\nCOPY daima ikili var sayar.
-38.9:%u dosya kopyalandı
+38.9:% dosya kopyalandı
 
 # TRUENAME
 39.0:Tam nitelikli bir yol veya dosya adı döndürür.

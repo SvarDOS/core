@@ -250,7 +250,7 @@
 38.6:/V           Vérifie que les nouveaux fichiers sont écrits correctement
 38.7:Pour concatener des fichiers, spécifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant soit des jokers, soit le format\r\nfichier1+fichier2+fichier3).
 38.8:NOTE: /A et /B sont des no-ops (ignorés), fournis pour la compatibilité.\r\nCOPY considère toujours les fichiers comme étant des binaires.
-38.9:%u fichier(s) copié(s)
+38.9:% fichier(s) copié(s)
 
 # TRUENAME
 39.0:Retourne un chemin ou un nom de fichier pleinement qualifié.

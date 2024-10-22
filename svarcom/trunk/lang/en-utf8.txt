@@ -264,7 +264,7 @@
 38.6:/V           Verifies that new files are written correctly
 38.7:To append files, specify a single file for destination, but multiple files\r\nfor source (using wildcards or file1+file2+file3 format).
 38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.\r\nCOPY assumes binary always.
-38.9:%u file(s) copied
+38.9:% file(s) copied
 
 # TRUENAME
 39.0:Returns a fully qualified path or filename.
