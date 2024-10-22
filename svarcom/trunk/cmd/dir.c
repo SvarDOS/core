@@ -535,11 +535,16 @@ static int dir_parse_cmdline(struct dirrequest *req, const char **argv) {
 
 static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, unsigned long summary_totsz, unsigned long summary_fcount, unsigned short *availrows, unsigned char flags, const struct nls_patterns *nls) {
   unsigned short i;
+
   /* x file(s) (maximum of files in a FAT-32 directory is 65'535) */
   sv_memset(buff64, ' ', 8);
+  buff64[8] = 0;
   i = nls_format_number(buff64 + 8, summary_fcount, nls);
-  sprintf(buff64 + 8 + i, " %s ", svarlang_str(37,22)/*"file(s)"*/);
   output(buff64 + i);
+  output(" ");
+  output(svarlang_str(37,22)); /* "file(s)" */
+  output(" ");
+
   /* xxxx bytes */
   sv_memset(buff64, ' ', 14);
   i = nls_format_number(buff64 + uint32maxlen, summary_totsz, nls);
