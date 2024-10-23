@@ -35,7 +35,6 @@
  */
 
 #include <i86.h>
-#include <malloc.h> /* _fmalloc() */
 #include <stdlib.h> /* qsort() */
 
 #include "svarlang.lib/svarlang.h"

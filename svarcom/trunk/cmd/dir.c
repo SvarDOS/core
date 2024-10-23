@@ -91,6 +91,29 @@ _Packed struct TINYDTA {
 };
 
 
+static void far *cmd_dir_farmalloc(unsigned short segcount);
+#pragma aux cmd_dir_farmalloc = \
+"mov ah, 0x48" \
+"int 0x21" \
+"jnc DONE" \
+"xor ax, ax" \
+"DONE:" \
+"xor bx, bx" \
+"mov es, ax" \
+parm [bx] \
+modify [ax] \
+value [es bx] \
+
+
+static void cmd_dir_farfree(void far *ptr);
+#pragma aux cmd_dir_farfree = \
+"mov ah, 0x49" \
+"int 0x21" \
+parm [es ax] \
+modify [ax]
+
+
+
 /* fills freebytes with free bytes for drv (A=0, B=1, etc)
  * returns DOS ERR code on failure */
 static unsigned short cmd_dir_df(unsigned long *freebytes, unsigned char drv) {
@@ -782,7 +805,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* compute the amount of DTAs I can buffer */
     for (max_dta_bufcount = MAX_SORTABLE_FILES; max_dta_bufcount != 0; max_dta_bufcount /= 2) {
-      dtabuf = _fmalloc(max_dta_bufcount * sizeof(struct TINYDTA));
+      dtabuf = cmd_dir_farmalloc(max_dta_bufcount * sizeof(struct TINYDTA) / 16);
       if (dtabuf != NULL) break;
     }
     /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
@@ -1031,7 +1054,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   GAMEOVER:
 
   /* free the buffer memory (if used) */
-  if (glob_sortcmp_dat.dtabuf_root != NULL) _ffree(glob_sortcmp_dat.dtabuf_root);
+  if (glob_sortcmp_dat.dtabuf_root != NULL) cmd_dir_farfree(glob_sortcmp_dat.dtabuf_root);
 
   free(buf);
   return(CMD_OK);
