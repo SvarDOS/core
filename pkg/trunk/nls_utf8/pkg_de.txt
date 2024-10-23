@@ -10,6 +10,16 @@
 
 1.0:PKG ist der SvarDOS-Paketmanager.
 1.19:Syntax:
+1.20:pkg install paket[.svp]     installiert Paket
+1.21:pkg update paket[.svp]      aktualisiert Paket
+1.22:pkg rm paket                entfernt Paket
+1.23:pkg files paket             zeigt alle Dateien des Paketes an
+1.24:pkg list [filter]           zeigt installierte Pakete an
+1.25:pkg check [paket]           überprüft Integrität ausführbarer Dateien
+1.26:pkg check+ [paket]          wie oben, aber für ALLE Dateien aus Paket
+1.27:pkg unzip datei.zip         entpackt ein ZIP-Archiv
+1.28:pkg crc32 datei             berechnet CRC32 Prüfsumme
+1.29:pkg ziplist datei.zip       listet alle Dateien aus ZIP Datei auf
 1.40:PKG ist unter der MIT-Lizenz veröffentlicht.
 1.41:Er wird mittels %DOSDIR%\\PKG.CFG konfiguriert.
 
@@ -46,8 +56,12 @@
 7.0:FEHLER: Benutzerdefiniertes Verzeichnis "%s" ist doppelt aufgeführt!
 7.1:FEHLER: Konnte Konfigurationsdatei "%s" nicht öffnen!
 7.4:Warnung: Token mit leerem Wert in Zeile #%d
+7.5:Warnung: Falsches Startlaufwerk in Zeile #%d
 7.8:Warnung: Unbekanntes Token "%s" in Zeile #%d
 7.11:Warnung: Ungültige "DIR"-Anweisung in Zeile #%d gefunden
+7.15:FEHLER: invalid custom dir:
+7.17:FEHLER: PKG.CFG nicht gefunden in %s
+7.18:        Bitte verschieben Sie die Datei nach %DOSDIR%\\PKG.CFG
 
 #### Unziping package ####
 
@@ -61,7 +75,13 @@
 #### unzip ####
 
 10.0:OK
-?10.1:FEHLER: Öffnen der Datei fehlgeschlagen
+10.1:FEHLER: Datei nicht gefunden
 10.2:FEHLER: Ungültiges ZIP-Archiv
 10.3:FEHLER: Datei existiert bereits
 10.4:FEHLER: unzip-Fehler (%d)
+
+#### Health check ####
+
+11.0:FALSCHE PRÜFSUMME
+11.1:FEHLT
+11.2:%u Fehler.
