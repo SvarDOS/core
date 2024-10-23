@@ -116,17 +116,17 @@
 
 # VER
 20.0:Displays the DOS kernel and SvarCOM shell versions.
-20.1:DOS kernel version %u.%02u
+20.1:DOS kernel version %
 20.2:SvarCOM shell ver
 20.3:SvarCOM is a shell interpreter for DOS kernels compatible with MS-DOS 5+.
 20.4:This software is distributed under the terms of the MIT license.
-20.5:Revision %c
-20.6:DOS is in %s
+20.5:Revision @
+20.6:DOS is in %
 20.7:low memory
 20.8:HMA
 20.9:ROM
-20.10:true version %u.%02u
-20.11:DR-DOS kernel version %02X%02X
+20.10:true version %
+20.11:DR-DOS kernel version %
 
 # TYPE
 21.0:Displays the contents of a text file.

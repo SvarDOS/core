@@ -117,16 +117,16 @@
 
 # VER
 20.0:Zeigt die Versionen von DOS-Kernel und SvarCOM-Shell an.
-20.1:DOS-Kernel-Version %u.%02u
+20.1:DOS-Kernel-Version %
 20.2:SvarCOM-Shell-Version
 20.3:SvarCOM ist ein Shell-Interpreter für DOS-Kernel kompatibel mit MS-DOS 5+.
 20.4:Diese Software wird unter den Bedingungen der MIT-Lizenz verbreitet.
-20.5:Revision %c
-20.6:DOS ist im %s
+20.5:Revision @
+20.6:DOS ist im %
 20.7:unteren Speicherbereich
 20.8:oberen Speicherbereich (High Memory Area)
 20.9:ROM
-20.10:wahre Version %u.%02u
+20.10:wahre Version %
 
 # TYPE
 21.0:Zeigt den Inhalt einer Textdatei an.

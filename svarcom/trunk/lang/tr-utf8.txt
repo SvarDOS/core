@@ -103,16 +103,16 @@
 
 # VER
 20.0:DOS sürümünü görüntüler.
-20.1:DOS çekirdek sürümü %u.%02u
+20.1:DOS çekirdek sürümü %
 20.2:SvarCOM kabuk sürümü
 20.3:SvarCOM, MS-DOS 5+ ile uyumlu DOS çekirdekleri için kabuk yorumlayıcısıdır.
 20.4:Bu yazılım MIT lisansı kapsamında yayınlanmıştır.
-20.5:Gözden geçirme %c
-20.6:DOS şuradadır: %s
+20.5:Gözden geçirme @
+20.6:DOS şuradadır: %
 20.7:düşük bellek alanı
 20.8:HMA (Yüksek Bellek Alanı)
 20.9:ROM
-20.10:gerçek sürümü %u.%02u
+20.10:gerçek sürümü %
 
 # TYPE
 21.0:Metin dosyalarının içeriğini görüntüler.

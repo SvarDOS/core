@@ -27,6 +27,15 @@
  */
 
 
+/* takes two numbers and builds a string of the format "%u.%02u" */
+static void cmd_ver_buildver(char *buf, unsigned char x, unsigned char y) {
+  buf += ustoa(buf, x, 0, '0');
+  *buf = '.';
+  buf++;
+  ustoa(buf, y, 2, '0');
+}
+
+
 static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   char *buff = p->BUFFER;
   unsigned char maj = 0, min = 0, retcode = 0, truemaj = 0, truemin = 0, rev = 0, verflags = 0;
@@ -62,7 +71,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
     buff[i] = 0;
     printf("[rmod:RMOD_OFFSET_BOOTCOMSPEC] = '%s'\r\n", buff);
     if (*rmod_comspecptr == 0) {
-      sprintf(buff, "NULL");
+      sv_strcpy(buff, "NULL");
     } else {
       for (fptr = MK_FP(*rmod_envseg, *rmod_comspecptr), i = 0; *fptr != 0; fptr++) buff[i++] = *fptr;
       buff[i] = 0;
@@ -157,33 +166,46 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   }
 
   if (drdosver != 0) {
-    sprintf(buff, svarlang_str(20,11), drdosver & 0xff, drdosver >> 8);
+    char hexbuf[8];
+    sv_strcpy(buff, svarlang_str(20,11)); /* DR-DOS kernel version % */
+    ustoh(hexbuf, drdosver);
+    sv_insert_str_in_str(buff, hexbuf);
     outputnl(buff);
   }
 
-  sprintf(buff, svarlang_str(20,1), maj, min); /* "DOS kernel version %u.%u" */
+  {
+  char verbuf[8];
+  cmd_ver_buildver(verbuf, maj, min);
+  sv_strcpy(buff, svarlang_str(20,1)); /* "DOS kernel version %" */
+  sv_insert_str_in_str(buff, verbuf);
   output(buff);
+  }
 
   /* can we trust in the data returned? */
   /* DR DOS 5&6 return 0x01, MS-DOS 2-4 return 0xff */
   /* 'truemaj' is checked to mitigate the conflict from the CBIS redirector */
   if ((retcode > 1) && (retcode < 255) && (truemaj > 4) && (truemaj < 100)) {
     if ((maj != truemaj) || (min != truemin)) {
+      char verbuf[8];
+      cmd_ver_buildver(verbuf, truemaj, truemin);
       output(" (");
-      sprintf(buff, svarlang_str(20,10), truemaj, truemin); /* "true ver xx.xx" */
+      sv_strcpy(buff, svarlang_str(20,10)); /* "true ver %" */
+      sv_insert_str_in_str(buff, verbuf);
       output(buff);
       output(")");
     }
     outputnl("");
 
-    sprintf(buff, svarlang_str(20,5), 'A' + rev); /* "Revision %c" */
+    sv_strcpy(buff, svarlang_str(20,5)); /* "Revision %c" */
+    sv_strtr(buff, '@', 'A' + rev);
     outputnl(buff);
 
     {
       const char *loc = svarlang_str(20,7);        /* "low memory" */
       if (verflags & 16) loc = svarlang_str(20,8); /* "HMA" */
       if (verflags & 8) loc = svarlang_str(20,9);  /* "ROM" */
-      sprintf(buff, svarlang_str(20,6), loc);      /* "DOS is in %s" */
+      sv_strcpy(buff, svarlang_str(20,6));         /* "DOS is in %" */
+      sv_insert_str_in_str(buff, loc);
       outputnl(buff);
     }
   }
