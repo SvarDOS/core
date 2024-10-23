@@ -22,7 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <dos.h> /* MK_FP(), FP_SEG(), FP_OFF()... */
+#include <i86.h> /* MK_FP(), FP_SEG(), FP_OFF()... */
 
 #include "svarlang.lib/svarlang.h"
 
