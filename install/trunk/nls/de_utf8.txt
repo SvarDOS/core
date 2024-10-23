@@ -32,6 +32,7 @@
 3.4:FEHLER: Laufwerk %c: ist nicht groß genug! SvarDOS benötigt mindestens %d MiB.
 3.5:FEHLER: Laufwerk %c: ist nicht leer. SvarDOS muss auf einem leeren Datenträger installiert werden.\n\nSie können den Datenträger jetzt formatieren, um ihn zu leeren. Beachten Sie jedoch, dass dies ALLE AKTUELLEN DATEN auf Ihrer Festplatte löscht.
 3.6:Die Installation von SvarDOS auf Laufwerk %c: beginnt nun.
+3.7:Wählen Sie das SvarDOS Installationslaufwerk. Sie können auch zu DOS\nzurückkehren und FDISK benutzen, um die Festplatte zu partitionieren. SvarDOS\nkann nur auf einer primären Partition (nicht auf einer logischen) installiert\nwerden.
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
