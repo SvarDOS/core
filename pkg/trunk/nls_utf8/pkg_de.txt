@@ -59,7 +59,7 @@
 7.5:Warnung: Falsches Startlaufwerk in Zeile #%d
 7.8:Warnung: Unbekanntes Token "%s" in Zeile #%d
 7.11:Warnung: Ungültige "DIR"-Anweisung in Zeile #%d gefunden
-7.15:FEHLER: invalid custom dir:
+7.15:FEHLER: Ungültiges Verzeichnis:
 7.17:FEHLER: PKG.CFG nicht gefunden in %s
 7.18:        Bitte verschieben Sie die Datei nach %DOSDIR%\\PKG.CFG
 
