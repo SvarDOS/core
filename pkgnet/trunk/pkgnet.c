@@ -30,12 +30,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <time.h>
 
 #include "net.h"
 #include "unchunk.h"
 
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "../../pkg/trunk/lsm.h"
 
@@ -233,7 +234,7 @@ static unsigned short checkupdata(char *buff) {
 
     /* load the metadata from %DOSDIR\APPINFO\*.lsm */
     sprintf(buff, "%s\\appinfo\\%s.lsm", dosdir, ep->d_name);
-    readlsm(buff, ver, sizeof(ver));
+    readlsm(buff, "version", ver, sizeof(ver));
 
     return(sprintf(buff, "%s\t%s\n", ep->d_name, ver));
   }
