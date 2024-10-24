@@ -4,9 +4,11 @@
 
 !ifdef __UNIX__
 SEP=/
+CP = cp
 MV = mv
 !else
 SEP=\
+CP = copy
 MV = move /Y
 !endif
 
@@ -20,17 +22,17 @@ all: pkgnet.exe
 release: pkgnet.exe .symbolic
 	mkdir bin
 	mkdir appinfo
-	copy pkgnet.exe bin
-	copy pkgnet.lng bin
-	copy pkgnet.lsm appinfo
-	if exist pkgnet.svp del pkgnet.svp
+	$(CP) pkgnet.exe bin
+	$(CP) pkgnet.lng bin
+	$(CP) pkgnet.lsm appinfo
+	rm -f pkgnet.svp
 	zip -9krDX -m pkgnet.svp bin appinfo
 	rmdir bin
 	rmdir appinfo
-	if exist pkgnet.zip del pkgnet.zip
+	rm -f pkgnet.zip
 	zip -9krDX pkgnet.zip Makefile *.c *.h nls_utf8 pkgnet.lsm watt32 svarlang.lib
 
-deflang.c:
+deflang.obj:
 	cd nls_utf8
 	rm -f ??.txt
 	utf8tocp 850 br_utf8.txt br.txt
@@ -44,8 +46,9 @@ deflang.c:
 	$(MV) deflang.c ..$(SEP)deflang.c
 	$(MV) out.lng ..$(SEP)pkgnet.lng
 	cd ..
+	wcc $(CFLAGS) -fo=deflang.obj deflang.c
 
-pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj deflang.c
+pkgnet.exe: pkgnet.obj net.obj unchunk.obj lsm.obj helpers.obj trim.obj deflang.obj
 	*wcl -lr -k4096 $(LIB) pkgnet.obj deflang.c net.obj unchunk.obj lsm.obj helpers.obj trim.obj -fe=pkgnet.exe
 	upx --8086 --best pkgnet.exe
 
@@ -78,3 +81,6 @@ clean: .symbolic
 	rm -f deflang.*
 	rm -f pkgnet.exe
 	rm -f pkgnet.lng
+	rm -f pkgnet.svp
+	rm -f pkgnet.zip
+
