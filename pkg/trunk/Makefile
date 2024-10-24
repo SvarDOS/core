@@ -89,5 +89,10 @@ unzip.obj: unzip.c
 	wcc $(CFLAGS) unzip.c
 
 clean: .symbolic
-	del *.obj
-	del pkg.exe
+	rm -f *.obj
+	rm -f pkg.exe
+	rm -f pkg.lng
+	rm -f pkg.map
+	rm -f deflang.c
+
+

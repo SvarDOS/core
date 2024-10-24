@@ -9,6 +9,7 @@
 #include <ctype.h>    /* tolower() */
 #include <direct.h>   /* provides the mkdir() prototype */
 #include <string.h>   /* */
+#include <strings.h>  /* strcasecmp() */
 #include <stdio.h>    /* sprintf() */
 #include <stdlib.h>   /* atoi() */
 #include <sys/stat.h> /* mkdir() */

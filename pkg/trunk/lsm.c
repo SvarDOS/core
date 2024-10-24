@@ -4,7 +4,7 @@
  */
 
 #include <stdio.h>   /* fopen, fclose... */
-#include <string.h>  /* strcasecmp() */
+#include <strings.h> /* strcasecmp() */
 
 #include "helpers.h"
 
