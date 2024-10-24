@@ -32,13 +32,13 @@ pkg.exe: main.obj healthck.obj crc32.obj fileexst.obj helpers.obj inf.obj libunz
 deflang.obj: nls_utf8\pkg_??.txt
 	cd nls_utf8
 	copy pkg_en.txt en.txt
-	utf8tocp 850 pkg_br.txt > br.txt
-	utf8tocp 850 pkg_de.txt > de.txt
-	utf8tocp 850 pkg_fr.txt > fr.txt
-	utf8tocp 850 pkg_dk.txt > dk.txt
-	utf8tocp 852 pkg_si.txt > si.txt
-	utf8tocp 857 pkg_tr.txt > tr.txt
-	utf8tocp maz pkg_pl.txt > pl.txt
+	utf8tocp 850 pkg_br.txt br.txt
+	utf8tocp 850 pkg_de.txt de.txt
+	utf8tocp 850 pkg_fr.txt fr.txt
+	utf8tocp 850 pkg_dk.txt dk.txt
+	utf8tocp 852 pkg_si.txt si.txt
+	utf8tocp 857 pkg_tr.txt tr.txt
+	utf8tocp maz pkg_pl.txt pl.txt
 	..\svarlang.lib\tlumacz en br de fr dk si tr pl > tlumacz.log
 	move /y out.lng ..\pkg.lng
 	move /y deflang.c ..
