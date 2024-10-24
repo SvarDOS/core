@@ -27,10 +27,10 @@ release: pkg.exe .symbolic
 	mkdir appinfo
 	mkdir bin
 	mkdir doc
-	copy pkg.lng bin
-	copy pkg.exe bin
-	copy pkg.lsm appinfo
-	copy pkg.txt doc
+	$(CP) pkg.lng bin
+	$(CP) pkg.exe bin
+	$(CP) pkg.lsm appinfo
+	$(CP) pkg.txt doc
 	zip -9moDkrX pkg.svp appinfo bin doc
 	zip -9oDkrX pkg.zip nls_utf8 svarlang.lib zlib *.c *.h pkg.txt pkg.lsm makefile
 	rmdir appinfo
@@ -105,6 +105,8 @@ unzip.obj: unzip.c
 clean: .symbolic
 	rm -f *.obj
 	rm -f pkg.exe
+	rm -f pkg.svp
+	rm -f pkg.zip
 	rm -f pkg.lng
 	rm -f pkg.map
 	rm -f deflang.c
