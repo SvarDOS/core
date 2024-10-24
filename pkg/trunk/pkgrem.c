@@ -6,12 +6,13 @@
 #include <ctype.h>    /* toupper() */
 #include <stdio.h>
 #include <string.h>    /* strlen() */
+#include <strings.h>
 #include <stdlib.h>    /* free() */
 #include <unistd.h>    /* rmdir(), unlink() */
 #include <direct.h>  /* watcom needs this for the rmdir() prototype */
 
 #include "helpers.h"   /* slash2backslash() */
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "pkgrem.h"
 

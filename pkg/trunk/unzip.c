@@ -12,7 +12,7 @@
 #include "fileexst.h"
 #include "helpers.h"
 #include "libunzip.h"
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "unzip.h"
 

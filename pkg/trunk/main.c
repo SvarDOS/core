@@ -27,7 +27,8 @@
 
 #include <stdio.h>    /* FILE */
 #include <stdlib.h>   /* malloc() and friends */
-#include <string.h>   /* strcasecmp() */
+#include <string.h>
+#include <strings.h>  /* strcasecmp() */
 
 #include "svarlang.lib/svarlang.h"
 #include "healthck.h"

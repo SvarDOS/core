@@ -7,13 +7,14 @@
 #include <ctype.h>    /* tolower() */
 #include <stdlib.h>   /* atoi(), qsort() - not using it after all, redefining it manually later */
 #include <string.h>   /* strlen() */
+#include <strings.h>
 #include <sys/types.h>
 #include <direct.h> /* opendir() and friends */
 
 #include "helpers.h"  /* fdnpkg_strcasestr(), slash2backslash()... */
 #include "libunzip.h"  /* zip_freelist()... */
 #include "lsm.h"
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "showinst.h"  /* include self for control */
 

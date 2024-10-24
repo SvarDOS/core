@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>    /* system() */
 #include <string.h>    /* strcpy() */
+#include <strings.h>
 #include <unistd.h>    /* read() */
 #include <sys/types.h> /* struct utimbuf */
 
@@ -14,7 +15,7 @@
 #include "fileexst.h"
 #include "libunzip.h"  /* zip_listfiles()... */
 #include "showinst.h"  /* pkg_loadflist() */
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "pkginst.h"   /* include self for control */
 

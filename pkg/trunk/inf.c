@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "crc32.h"
-#include "zlib\zlib.h"
+#include "zlib/zlib.h"
 
 #include "inf.h"
 

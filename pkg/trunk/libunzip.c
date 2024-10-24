@@ -15,7 +15,7 @@
 #include "crc32.h"
 #include "helpers.h"
 #include "inf.h"   /* INFLATE support */
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "libunzip.h"  /* include self for control */
 

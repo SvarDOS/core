@@ -4,11 +4,12 @@
  */
 
 #include <stdio.h>  /* printf(), fclose(), fopen()... */
-#include <string.h> /* strcasecmp() */
+#include <string.h>
+#include <strings.h> /* strcasecmp() */
 #include <stdlib.h> /* malloc(), free() */
 
 #include "helpers.h" /* slash2backslash(), removeDoubleBackslashes()... */
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "loadconf.h"
 

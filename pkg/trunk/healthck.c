@@ -6,11 +6,12 @@
 #include <direct.h> /* opendir() and friends */
 #include <stdio.h>
 #include <string.h>    /* strlen() */
+#include <strings.h>
 #include <stdlib.h>    /* free() */
 
 #include "crc32.h"
 #include "helpers.h"
-#include "svarlang.lib\svarlang.h"
+#include "svarlang.lib/svarlang.h"
 
 #include "healthck.h"
 
