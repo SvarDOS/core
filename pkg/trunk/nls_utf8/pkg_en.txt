@@ -10,16 +10,16 @@
 
 1.0:PKG is the SvarDOS package manager.
 1.19:Usage:
-1.20:pkg install package[.svp]   installs package
-1.21:pkg update package[.svp]    updates (or reinstalls) package
-1.22:pkg rm package              uninstalls package
-1.23:pkg files package           lists files belonging to package
-1.24:pkg list [filter]           lists installed packages
-1.25:pkg check [package]         checks integrity of installed executable files
-1.26:pkg check+ [package]        same as above but checks ALL installed files
-1.27:pkg unzip file.zip          unzips a ZIP archive
-1.28:pkg crc32 file              computes the CRC32 of a file
-1.29:pkg ziplist file.zip        lists the files inside a ZIP archive
+1.20:pkg install <package[.svp]>   installs package
+1.21:pkg update <package[.svp]>    updates (or reinstalls) package
+1.22:pkg rm <package>              uninstalls package
+1.23:pkg files <package>           lists files belonging to package
+1.24:pkg list [<filter>]           lists installed packages
+1.25:pkg check [<package>]         checks integrity of installed executable files
+1.26:pkg check+ [<package>]        same as above but checks ALL installed files
+1.27:pkg unzip <file.zip>          unzips a ZIP archive
+1.28:pkg crc32 <file>              computes the CRC32 of a file
+1.29:pkg ziplist <file.zip>        lists the files inside a ZIP archive
 1.40:PKG is published under the MIT license.
 1.41:It is configured through %DOSDIR%\\PKG.CFG
 
