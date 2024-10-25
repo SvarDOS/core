@@ -578,7 +578,9 @@ static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, u
 }
 
 
-#define MAX_SORTABLE_FILES 8192
+/* max amount of files to sort - limited by the memory block I will allocate
+ * to store the TINYDTA of each entry */
+#define MAX_SORTABLE_FILES (65500 / sizeof(struct TINYDTA))
 
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
