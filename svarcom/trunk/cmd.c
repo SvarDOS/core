@@ -35,7 +35,7 @@
  */
 
 #include <i86.h>
-#include <stdlib.h> /* qsort() */
+#include <stdlib.h> /* calloc(), free() */
 
 #include "svarlang.lib/svarlang.h"
 

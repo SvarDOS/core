@@ -372,9 +372,7 @@ static int dir_process_order_directive(const char *ordstring) {
 }
 
 
-static int sortcmp(const void *dtaid1, const void *dtaid2) {
-  struct TINYDTA far *dta1 = &(glob_sortcmp_dat.dtabuf_root[*((unsigned short *)dtaid1)]);
-  struct TINYDTA far *dta2 = &(glob_sortcmp_dat.dtabuf_root[*((unsigned short *)dtaid2)]);
+static int sortcmp(const struct TINYDTA far *dta1, const struct TINYDTA far *dta2) {
   char *ordconf = glob_sortcmp_dat.order;
 
   /* debug stuff
@@ -446,6 +444,26 @@ static int sortcmp(const void *dtaid1, const void *dtaid2) {
   }
 
   return(0);
+}
+
+
+/* sort function for DIR /O (selection sort) */
+static void cmd_dir_sort(struct TINYDTA far *dta, unsigned short dtacount) {
+  int i, t, smallest;
+  for (i = 0; i < (dtacount - 1); i++) {
+    // find "smallest" entry
+    smallest = i;
+    for (t = i + 1; t < dtacount; t++) {
+      if (sortcmp(dta + t, dta + smallest) < 0) smallest = t;
+    }
+    // if smallest different than current found then swap
+    if (smallest != i) {
+      struct TINYDTA entry;
+      memcpy_ltr_far(&entry, dta + i, sizeof(struct TINYDTA));
+      memcpy_ltr_far(dta + i, dta + smallest, sizeof(struct TINYDTA));
+      memcpy_ltr_far(dta + smallest, &entry, sizeof(struct TINYDTA));
+    }
+  }
 }
 
 
@@ -597,7 +615,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     char path[128];
     struct DTA dtastack[64]; /* used for /S, max number of subdirs in DOS5 is 42 (A/B/C/...) */
     unsigned char dtastacklen;
-    unsigned short orderidx[MAX_SORTABLE_FILES / sizeof(struct TINYDTA)];
   } *buf;
   unsigned long summary_recurs_fcount = 0; /* used for /s global summary */
   unsigned long summary_recurs_totsz = 0;  /* used for /s global summary */
@@ -854,16 +871,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       goto GAMEOVER;
     }
 
-    /* sort the list - the tricky part is that my array is a far address while
-     * qsort works only with near pointers, so I have to use an ugly (and
-     * global) auxiliary table */
-    for (i = 0; i < dtabufcount; i++) buf->orderidx[i] = i;
-    qsort(buf->orderidx, dtabufcount, 2, &sortcmp);
+    /* sort the list */
+    cmd_dir_sort(dtabuf, dtabufcount);
 
-    /* preload first entry (last from orderidx, since entries are sorted in reverse) */
+    /* preload first entry (last, since entries are sorted in reverse) */
     dtabufcount--;
-    memcpy_ltr_far(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
-    dta->attr = dtabuf[buf->orderidx[dtabufcount]].time_sec2; /* restore attr from the abused time_sec2 field */
+    memcpy_ltr_far(((unsigned char *)dta) + 22, dtabuf + dtabufcount, sizeof(struct TINYDTA));
+    dta->attr = dtabuf[dtabufcount].time_sec2; /* restore attr from the abused time_sec2 field */
   }
 
   wcolcount = 0; /* may be used for columns counting with wide mode */
@@ -960,8 +974,8 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* take next entry, either from buf or disk */
     if (dtabufcount > 0) {
       dtabufcount--;
-      memcpy_ltr_far(((unsigned char *)dta) + 22, &(dtabuf[buf->orderidx[dtabufcount]]), sizeof(struct TINYDTA));
-      dta->attr = dtabuf[buf->orderidx[dtabufcount]].time_sec2; /* restore attr from the abused time_sec2 field */
+      memcpy_ltr_far(((unsigned char *)dta) + 22, dtabuf + dtabufcount, sizeof(struct TINYDTA));
+      dta->attr = dtabuf[dtabufcount].time_sec2; /* restore attr from the abused time_sec2 field */
     } else {
       if (findnext(dta) != 0) break;
     }
