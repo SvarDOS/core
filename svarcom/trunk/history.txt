@@ -5,7 +5,7 @@
 
 
 === ver 2024.8 (xx.xx.2024) ==================================================
- - removed some libc dependencies
+ - removed all libc dependencies, SvarCOM is linked against WMINCRT now
 
 
 === ver 2024.7 (21.10.2024) ==================================================

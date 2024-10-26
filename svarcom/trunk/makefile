@@ -20,7 +20,7 @@ FEATURES =
 
 
 LDFLAGS = -0 -y -wx -mt -lr -we -d0 -ox -fm=command.map
-CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
+CFLAGS = -0 -wx -ms -we -d0 -ox -zl $(FEATURES)
 # -0   generate 8086 compatible code
 # -y   ignore %WCL% if present
 # -wx  maximum warnings level
@@ -29,14 +29,18 @@ CFLAGS = -0 -wx -ms -we -d0 -ox $(FEATURES)
 # -we  any warning is considered an error
 # -d0  no debug data
 # -ox  maximum optimization level
+# -zl  remove default library information
 #
 # NOTE: wcc does not understand -mt, that is why -ms must be passed instead
 
 all: command.com
 
-command.com: rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+command.com: startup.obj rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 	# build the final executable
-	*wcl $(LDFLAGS) command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj svarlang.lib\svarlngs.lib
+	*wlink SYSTEM DOS COM OPTION MAP FILE startup,command.obj,cmd.obj,deflang.obj,env.obj,redir.obj,rmodinit.obj,sayonara.obj,helpers.obj,svarlang.lib\svarlngs.lib NAME command.com
+
+startup.obj: startup.asm
+	wasm startup.asm -DSTACKSIZE=2048
 
 deflang.obj: lang\*.txt
 	# GENERATE CODEPAGE-SPECIFIC VERSIONS OUT OF UTF-8 FILES
