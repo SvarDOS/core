@@ -648,12 +648,13 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     goto GAMEOVER;
   }
 
-  /* allocate buf */
-  buf = calloc(sizeof(*buf), 1);
-  if (buf == NULL) {
+  /* reserve buf space within the upstream-supplied buffer */
+  if (sizeof(*buf) > p->BUFFERSZ) {
     nls_output_err(255, 8); /* insufficient memory */
     goto GAMEOVER;
   }
+  buf = (void *)(p->BUFFER);
+  sv_bzero(buf, sizeof(*buf));
 
   /* zero out glob_sortcmp_dat and init the collation table */
   sv_bzero(&glob_sortcmp_dat, sizeof(glob_sortcmp_dat));
@@ -1072,6 +1073,5 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   /* free the buffer memory (if used) */
   if (glob_sortcmp_dat.dtabuf_root != NULL) cmd_dir_farfree(glob_sortcmp_dat.dtabuf_root);
 
-  free(buf);
   return(CMD_OK);
 }

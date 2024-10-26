@@ -35,7 +35,6 @@
  */
 
 #include <i86.h>
-#include <stdlib.h> /* calloc(), free() */
 
 #include "svarlang.lib/svarlang.h"
 
