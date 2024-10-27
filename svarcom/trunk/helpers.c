@@ -739,6 +739,34 @@ unsigned short nls_format_time(char *s, unsigned char ho, unsigned char mn, unsi
 }
 
 
+/* divides an unsigned long by 10 using 16bit division */
+static unsigned short divulong10(unsigned long *n) {
+  unsigned short a, b;
+  unsigned short rem;
+  const long adj[10] = {-1, 6553, 13107, 19660, 26214, 32767, 39321, 45875, 52428, 58982};
+
+  b = *n;
+  *n >>= 16;
+  a = *n;
+
+  rem = ((a % 10) << 4) + (b % 10);
+  rem %= 10;
+
+  /* AB / 10 = (((A / 10) + ((A % 10) / 10)) << 16) + (B / 10) */
+
+  *n = (a / 10);
+  *n <<= 16;
+  *n += b / 10;
+
+  /* I have no clue about the math behind this, found out the cyclic relation
+   * using brute force */
+  *n += adj[a % 10];
+  if ((b % 10) >= (((a % 10) * 4) % 10)) *n += 1;
+
+  return(rem);
+}
+
+
 /* computes a formatted integer number based on NLS patterns found in p
  * returns length of result */
 unsigned short nls_format_number(char *s, unsigned long num, const struct nls_patterns *p) {
@@ -747,12 +775,13 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 
   /* write the value (reverse) with thousand separators (if any defined) */
   do {
+    unsigned short rem;
     if ((thcount == 3) && (p->thousep[0] != 0)) {
       s[sl++] = p->thousep[0];
       thcount = 0;
     }
-    s[sl++] = '0' + num % 10;
-    num /= 10;
+    rem = divulong10(&num);
+    s[sl++] = '0' + rem;
     thcount++;
   } while (num > 0);
 
