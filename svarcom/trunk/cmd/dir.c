@@ -114,6 +114,32 @@ modify [ax]
 
 
 
+static unsigned long mul16(unsigned short a, unsigned short b);
+#pragma aux mul16 = \
+"mul bx" \
+parm [ax] [bx] \
+value [dx ax]
+
+
+
+/* multiplies two 32 bits number together using 16bit math to avoid
+ * linkage against Watcom libc.
+ * AB * CD = (A*C << 32) + ((B*C + A*D) << 16) + B*D */
+static unsigned long mul32(unsigned long ab, unsigned long cd) {
+  unsigned short a = ab >> 16l;
+  unsigned short b = ab & 0xffff;
+  unsigned short c = cd >> 16l;
+  unsigned short d = cd & 0xffff;
+  unsigned long res;
+
+  res = mul16(b, c);
+  res += mul16(a, d);
+  res <<= 16;
+  res += mul16(b, d);
+  return(res);
+}
+
+
 /* fills freebytes with free bytes for drv (A=0, B=1, etc)
  * returns DOS ERR code on failure */
 static unsigned short cmd_dir_df(unsigned long *freebytes, unsigned char drv) {
@@ -149,9 +175,8 @@ static unsigned short cmd_dir_df(unsigned long *freebytes, unsigned char drv) {
   }
 
   /* multiple steps to avoid uint16 overflow */
-  *freebytes = sects_per_clust;
-  *freebytes *= avail_clusts;
-  *freebytes *= bytes_per_sect;
+  *freebytes = mul32(sects_per_clust, avail_clusts);
+  *freebytes = mul32(*freebytes, bytes_per_sect);
 
   return(res);
 }
