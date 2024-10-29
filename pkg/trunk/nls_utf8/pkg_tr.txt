@@ -3,11 +3,25 @@
 #
 # Language..: Turkish
 # Translator: anonymous
+# Last updated: 23 Aug 2024
 #
 
 #### Help ####
 
 1.0:Bu, SvarDOS için ağ tabanlı bir paket yöneticisidir.
+1.19:Usage:
+1.20:pkg install <paket[.svp]>   paketi kurar
+1.21:pkg update <paket[.svp]>    paketi günceller (veya tekrar kurar)
+1.22:pkg rm <paket>              paketi kaldırır
+1.23:pkg files <paket>           pakete ait dosyaları listeler
+1.24:pkg list [<filtre>]         kurulu paketleri listeler
+1.25:pkg check [<paket>]         kurulu ikili dosyaların bütünlüğünü denetler
+1.26:pkg check+ [<paket>]        yukarıdaki gibi ama TÜM kurulu dosyalar için
+1.27:pkg unzip <dosya.zip>       bir ZIP arşivini açar
+1.28:pkg crc32 <dosya>           bir dosyanın CRC32 değerini hesaplar
+1.29:pkg ziplist <dosya.zip>     ZIP arşivi içindeki dosyaları listeler
+1.40:PKG, MIT lisansı kapsamında yayınlanmıştır.
+1.41:%DOSDIR%\\PKG.CFG vasıtasıyla yapılandırılır.
 
 ### General stuff ####
 
@@ -25,6 +39,7 @@
 3.19:%s paketi kuruldu: %ld hata, %ld dosya çıkarıldı.
 3.20:HATA: paket şifreli bir dosya içermektedir:
 3.23:HATA: paket geçersiz bir dosya ismi içermektedir:
+3.24:HATA: paket ismi çok uzun
 
 #### Removing package ####
 
@@ -41,8 +56,12 @@
 7.0:HATA: '%s' deposu iki kez listelenmiş!
 7.1:HATA: '%s' yapılandırma dosyası açılamadı!
 7.4:İkaz: #%d satırında boş değerli bir belirteç
+7.5:İkaz: #%d satırında geçersiz başlatma sürücüsü
 7.8:İkaz: #%d satırında bilinmeyen '%s' belirteci
 7.11:İkaz: #%d satırında  geçersiz 'DIR' yönergesi bulundu
+7.15:HATA: geçersiz özel dizin:
+7.17:HATA: PKG.CFG, %s konumunda bulundu
+7.18:       Lütfen onu %DOSDIR%\\PKG.CFG konumuna taşıyın
 
 #### Unziping package ####
 
@@ -52,3 +71,17 @@
 
 9.0:Hata: dizinine erişilemedi:
 9.1:Hata: %s yerel paketi bulunamadı.
+
+#### Unzip ####
+
+10.0:OK
+10.1:HATA: dosya bulunamadı
+10.2:HATA: geçersiz ZIP arşivi
+10.3:HATA: dosya zaten mevcut
+10.4:HATA: zip açma başarısız (%d)
+
+#### Health check ####
+
+11.0:HATALI CRC
+11.1:EKSİK
+11.2:%u hata.

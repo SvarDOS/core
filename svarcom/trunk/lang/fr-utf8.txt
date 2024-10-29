@@ -3,7 +3,7 @@
 #
 # Language.....: French
 # Authors......: Berki Yenigün + fixes and adaptations by Mateusz Viste
-# Last update..: 17 Feb 2023
+# Last update..: 29 Oct 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -35,6 +35,19 @@
 2.0:LA VERSION DE SVARCOM A CHANGÉ. SYSTÈME ARRÊTÉ. REDÉMARREZ VOTRE ORDINATEUR.
 2.1:ERREUR FATALE : rmod_install() a échoué
 2.2:SvarCOM: débordem. de pile détecté, historique effacée (ce n'est pas un bug)
+
+# CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
+3.0:ERREUR CRITIQUE
+3.1:ÉCHEC DE LECTR.
+3.2:ÉCHEC D'ÉCRITR.
+3.3:(A)nnuler
+3.4:(R)éessayer
+3.5:(I)gnorer
+3.6:(E)chec
+3.7:ÉCHEC DU CHARG.
+3.8:APPUYEZ...
+# THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
+3.9:ARIE
 
 # CLS
 10.0:Efface l'écran.
@@ -239,6 +252,7 @@
 37.22:fichier(s)
 37.23:octets
 37.24:octets libres
+37.25:Fichiers listés au total :
 
 # COPY
 38.0:Copie un ou davantage de fichiers à un autre endroit.
@@ -255,6 +269,11 @@
 # TRUENAME
 39.0:Retourne un chemin ou un nom de fichier pleinement qualifié.
 39.1:TRUENAME [[lecteur:][chemin][nomfichier]]
+
+# LH / LOADHIGH
+40.0:Charge un programme dans la zone mémoire haute.
+40.1:[lecteur:][chemin]nomfichier [paramètres]
+40.2:paramètres : tout argument requis par le programme à charger.
 
 # DOS ERRORS
 255.1:Numéro de fonction invalide

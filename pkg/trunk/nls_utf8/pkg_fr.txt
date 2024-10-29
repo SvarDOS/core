@@ -3,32 +3,43 @@
 #
 # Language..: French
 # Translator: anonymous
+# Last updated: 23 Aug 2024
 #
 
 #### Help ####
 
 1.0:PKG est le gestionnaire de paquets de SvarDOS.
 1.19:Usage:
-1.40:PKG est publié sous license MIT.
+1.20:pkg install <package[.svp]>   installe le paquet
+1.21:pkg update <package[.svp]>    met à jour (ou réinstalle) le paquet
+1.22:pkg rm <package>              enlève le paquet
+1.23:pkg files <package>           liste les fichiers appartenant au paquet
+1.24:pkg list [<filter>]           liste les paquets installés
+1.25:pkg check [<package>]         vérifie l'intégrité des fichiers exécutables
+1.26:pkg check+ [<package>]        comme ci-dessus mais pour TOUS installés
+1.27:pkg unzip <file.zip>          ouvre une archive ZIP
+1.28:pkg crc32 <file>              calcule la valeur CRC32 d'un fichier
+1.29:pkg ziplist <file.zip>        liste les fichiers au sein de l'archive ZIP
+1.40:PKG est publié sous licence MIT.
 1.41:Cet outil est configurable via %DOSDIR%\\PKG.CFG
 
 ### General stuff ####
 
-2.2:%DOSDIR% non défini! Faites-le pointer vers le répertoire principal de SvarDOS.
+2.2:%DOSDIR% non défini ! Faites-le pointer vers le répertoire principal de SvarDOS.
 2.3:Exemple : SET DOSDIR=C:\\SVARDOS
-2.14:Mémoire insuffisante!
+2.14:Mémoire insuffisante !
 
 #### Installing package ####
 
-3.8:ERREUR: archive zip invalide! Le paquet n'a pas été installé.
-3.9:ERREUR: le paquet contient un fichier qui existe déjà localement:
-3.10:ERREUR: impossible de créer %s!
-3.12:ERREUR: Ce n'est pas un paquet SvarDOS valide
+3.8:ERREUR : archive zip invalide! Le paquet n'a pas été installé.
+3.9:ERREUR : le paquet contient un fichier qui existe déjà localement :
+3.10:ERREUR : impossible de créer %s!
+3.12:ERREUR : Ce n'est pas un paquet SvarDOS valide
 3.18:Le paquet %s est déjà installé! Utilisez plutôt l'action "update".
 3.19:Le paquet %s a été installé: %ld erreurs, %ld fichiers extraits.
-3.20:ERREUR: le paquet contient un fichier crypté:
-3.23:ERREUR: le paquet contient un nom de fichier invalide:
-3.24:ERREUR: nom du paquet trop long
+3.20:ERREUR : le paquet contient un fichier crypté:
+3.23:ERREUR : le paquet contient un nom de fichier invalide :
+3.24:ERREUR : nom du paquet trop long
 
 #### Removing package ####
 
@@ -42,26 +53,35 @@
 
 #### Loading configuration ####
 
-7.0:ERREUR: le répertoire personalisé "%s" est listé deux fois!
-7.1:ERREUR: échec de l'ouverture du fichier de configuration "%s"!
-7.4:Attention: jeton avec une valeur vide sur la ligne #%d
-7.8:Attention: jeton "%s" inconnu à la ligne #%d
-7.11:Attention: directive "DIR" invalide trouvée à la ligne #%d
-7.15:ERREUR: répertoire personnalisé invalide:
+7.0:ERREUR : le répertoire personalisé "%s" est listé deux fois !
+7.1:ERREUR : échec de l'ouverture du fichier de configuration "%s"!
+7.4:Attention : jeton avec une valeur vide sur la ligne #%d
+7.5:Attention : lecteur de d'amorçage invalide sur la ligne #%d
+7.8:Attention : jeton "%s" inconnu à la ligne #%d
+7.11:Attention : directive "DIR" invalide trouvée à la ligne #%d
+7.15:ERREUR : répertoire personnalisé invalide :
+7.17:ERREUR: PKG.CFG trouvé sur %s
+7.18:       Veuillez le déplacer vers %DOSDIR%\\PKG.CFG
 
 #### Unziping package ####
 
-8.2:ERREUR: le paquet utilise une méthode de compression non supportée:
+8.2:ERREUR : le paquet utilise une méthode de compression non prise en charge :
 
 #### Handling the local list of installed packages ####
 
-9.0:ERREUR: échec de l'accès au répertoire:
-9.1:ERREUR: le paquet local  %s n'a pas été trouvé
+9.0:ERREUR : échec de l'accès au répertoire :
+9.1:ERREUR : le paquet local  %s n'a pas été trouvé
 
 #### unzip ####
 
 10.0:OK
-10.1:ERREUR: Fichier non trouvé
-10.2:ERREUR: Archive ZIP invalide
-10.3:ERREUR: Fichier déjà existant
-10.4:ERREUR: Échec de unzip (%d)
+10.1:ERREUR : Fichier non trouvé
+10.2:ERREUR : Archive ZIP invalide
+10.3:ERREUR : Fichier déjà existant
+10.4:ERREUR : Échec d'unzip (%d)
+
+#### Health check ####
+
+11.0:CRC ERRONÉE
+11.1:MANQUANT
+11.2:%u erreur(s).

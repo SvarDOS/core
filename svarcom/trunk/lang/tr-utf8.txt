@@ -3,7 +3,7 @@
 #
 # Language...: Turkish
 # Authors....: Berki Yenigün
-# Last update: 12 Mar 2022
+# Last update: 29 Oct 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -35,6 +35,19 @@
 2.0:SVARCOM SÜRÜMÜ DEĞİŞTİ. SİSTEM DURDURULDU. BİLGİSAYARINIZI YENİDEN BAŞLATIN.
 2.1:ÖLÜMCÜL HATA: rmod_install() başarısız oldu
 2.2:SvarCOM: yığın taşması tespit edildi, komut tarihçesi silindi (hata değildir)
+
+# CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
+3.0:KRİTİK HATA
+3.1:OKUMA HATASI
+3.2:YAZMA HATASI
+3.3:(İ)ptal
+3.4:(T)ekrar dene
+3.5:(Y)ok say
+3.6:(B)aşarısız
+3.7:YÜKLENEMEDİ
+3.8:BİR TUŞA BASIN..
+# THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
+3.9:İTYB
 
 # CLS
 10.0:Ekranı siler.
@@ -112,7 +125,8 @@
 20.7:düşük bellek alanı
 20.8:HMA (Yüksek Bellek Alanı)
 20.9:ROM
-20.10:gerçek sürümü %
+20.10:gerçek sürüm %
+20.11:DR-DOS çekirdek sürümü %
 
 # TYPE
 21.0:Metin dosyalarının içeriğini görüntüler.
@@ -238,6 +252,7 @@
 37.22:dosya
 37.23:bayt
 37.24:bayt boş
+37.25:Toplam listelenen dosya:
 
 # COPY
 38.0:Bir veya daha fazla dosyayı başka bir konuma kopyalar.
@@ -254,6 +269,11 @@
 # TRUENAME
 39.0:Tam nitelikli bir yol veya dosya adı döndürür.
 39.1:TRUENAME [[sürücü:][yol][dosyaismi]]
+
+# LH / LOADHIGH
+40.0:Bir programı üst bellek alanına yükler.
+40.1:[sürücü:][yol]dosyaismi [parametreler]
+40.2:parametreler: yüklemek istediğiniz programın ihtiyaç duyduğu parametreler.
 
 # DOS ERRORS
 255.1:Geçersiz işlev sayısı
