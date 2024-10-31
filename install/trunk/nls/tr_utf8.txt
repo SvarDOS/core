@@ -7,11 +7,12 @@
 
 ### COMMON STUFF: TITLE BAR AND MULTIPLE CHOICE STRINGS ###
 0.0:SVARDOS KURULUMU
-0.1:SvarDOS'ı kur
+0.1:SvarDOS'u kur
 0.2:DOS'a çık
 0.3:Disk bölümünü otomatik olarak oluştur
 0.4:FDISK disk bölümü oluşturma aracını çalıştır
 0.5:Herhangi bir tuşa basın...
+0.7:%c: sürücüsünü biçimlendir
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Yukarı/Aşağı = Unsur seç | Enter = Seçimi doğrula | ESC = Önceki ekran
 0.11:Yukarı/Aşağı = Unsur seç | Enter = Seçimi doğrula | ESC = Dos'a çık
@@ -31,10 +32,12 @@
 3.4:HATA: %c: sürücüsü yeteri kadar büyük değildir! SvarDOS en az %d MiB boyutunda bir diske ihtiyaç duyar.
 3.5:HATA: %c: sürücüsü boş değildir. SvarDOS, boş bir diske kurulmalıdır.\n\nDiski boşaltmak için şimdi biçimlendirebilirsiniz. Bununla beraber, bunun diskinizdeki TÜM GÜNCEL VERİLERİ SİLECEĞİNİ unutmayınız.
 3.6:SvarDOS'ın %c: sürücüsüne kurulumu başlamak üzeredir.
+3.7:SvarDOS'un kurulacağı sürücüyü seçin. Ayrıca DOS'a dönüp diskinizi bölümlendirmek için FDISK kullanabilirsiniz. SvarDOS sadece birincil bir bölüme kurulabilir (yani mantıksal bir sürücüye değil).
 
 ### PACKAGES INSTALLATION ###
 # example: "Installing package 4/50: FDISK"
 4.0:Şu paket kuruluyor: %d/%d: %s
+4.1:*** SONRAKİ DİSKETİ TAKIP HERHANGİ BİR TUŞA BASIN ***
 
 ### END SCREEN ###
 5.0:Bilgisayarınız şimdi yeniden başlayacaktır.

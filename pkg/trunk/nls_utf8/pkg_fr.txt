@@ -37,7 +37,7 @@
 3.12:ERREUR : Ce n'est pas un paquet SvarDOS valide
 3.18:Le paquet %s est déjà installé! Utilisez plutôt l'action "update".
 3.19:Le paquet %s a été installé: %ld erreurs, %ld fichiers extraits.
-3.20:ERREUR : le paquet contient un fichier crypté:
+3.20:ERREUR : le paquet contient un fichier crypté :
 3.23:ERREUR : le paquet contient un nom de fichier invalide :
 3.24:ERREUR : nom du paquet trop long
 

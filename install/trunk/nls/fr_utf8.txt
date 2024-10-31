@@ -26,17 +26,18 @@
 2.0:Vous êtes sur le point d'installer SvarDOS, un système d'exploitation libre, compatible avec MS-DOS.\n\nATTENTION : s'il y a un autre système d'exploitation installé sur votre PC, cet autre système pourrait ne plus démarrer une fois que SvarDOS sera installé.
 
 ### DISK SETUP ###
-3.0:ERREUR: aucun lecteur n'a pu être trouvé. Peut-être que votre disque a d'abord besoin d'être partitionné. Veuillez créer au moins une partition sur votre disque dur pour que SvarDOS puisse y être installé. Notez que SvarDOS nécessite au moins %d Mio d'espace disque disponible.\n\nVous pouvez utiliser l'outil de partitionnement FDISK pour créer manuellement la partition nécessaire, ou bien vous pouvez laisser l'installeur partitionner votre disque automatiquement. Vous pouvez aussi annuler l'installation pour utiliser un autre outil.
+3.0:ERREUR : aucun lecteur n'a pu être trouvé. Peut-être que votre disque a d'abord besoin d'être partitionné. Veuillez créer au moins une partition sur votre disque dur pour que SvarDOS puisse y être installé. Notez que SvarDOS nécessite au moins %d Mio d'espace disque disponible.\n\nVous pouvez utiliser l'outil de partitionnement FDISK pour créer manuellement la partition nécessaire, ou bien vous pouvez laisser l'installeur partitionner votre disque automatiquement. Vous pouvez aussi annuler l'installation pour utiliser un autre outil.
 3.1:Votre ordinateur va maintenant redémarrer.
-3.3:ERREUR: le lecteur %c: ne semble pas être formaté.
-3.4:ERREUR: le lecteur %c: n'a pas assez d'espace ! SvarDOS nécessite un disque d'au moins %d Mio.
-3.5:ERREUR: le lecteur %c: n'est pas vide. SvarDOS doit être installé sur un disque vide.\n\nVous pouvez formater le disque maintenant afin de le vider. Veuillez noter cependant que cela EFFACERA TOUTES LES DONNÉES ACTUELLES de votre disque.
+3.3:ERREUR : le lecteur %c: ne semble pas être formaté.
+3.4:ERREUR : le lecteur %c: n'a pas assez d'espace ! SvarDOS nécessite un disque d'au moins %d Mio.
+3.5:ERREUR : le lecteur %c: n'est pas vide. SvarDOS doit être installé sur un disque vide.\n\nVous pouvez formater le disque maintenant afin de le vider. Veuillez noter cependant que cela EFFACERA TOUTES LES DONNÉES ACTUELLES de votre disque.
 3.6:L'installation de SvarDOS sur %c: est sur le point de commencer.
+3.7: Sélectionnez le disque sur lequel SvarDOS sera installé. Vous pouvez également retourner sous DOS et utiliser FDISK pour partitionner votre disque. SvarDOS ne peut être installé que sur une partition primaire (c'est-à-dire pas sur une partition logique).
 
 ### PACKAGES INSTALLATION ###
 # example: "Copying package 4/50: FDISK"
 4.0:Copie du paquet %d/%d: %s
-4.1:*** INSEREZ LA DISQUETTE SUIVANTE ET APPUYEZ SUR UNE TOUCHE ***
+4.1:*** INSÉREZ LA DISQUETTE SUIVANTE ET APPUYEZ SUR UNE TOUCHE ***
 
 ### END SCREEN ###
 5.0:Votre ordinateur va maintenant redémarrer.
