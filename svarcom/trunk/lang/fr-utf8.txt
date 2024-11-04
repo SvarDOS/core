@@ -135,7 +135,7 @@
 # TIME
 22.0:Affiche ou définit l'heure du système.
 22.1:TIME [heure]
-22.2:Tapez TIME sans paramètre pour afficher l'heure actuelle et une invite pour\r\nune nouvelle heure. Appuyez sur ENTRÉE pour conserver.\r\nTime can be passed either in 24h format or 12h format. Minutes and seconds are\r\noptional. Examples:
+22.2:Tapez TIME sans paramètre pour afficher l'heure actuelle et une invite pour\r\nune nouvelle heure. Appuyez sur ENTRÉE pour conserver.\r\nL'heure peut être transmise soit au format 24 h, soit au format 12 h.\r\Les minutes et les secondes sont optionnelles. Exemples :
 22.3:L'heure actuelle est
 22.4:Heure invalide
 22.5:Entrez une nouvelle heure :

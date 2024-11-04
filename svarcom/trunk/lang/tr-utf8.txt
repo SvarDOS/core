@@ -135,7 +135,7 @@
 # TIME
 22.0:Sistem zamanını görüntüler veya ayarlar.
 22.1:TIME [saat]
-22.2:Güncel saati görüntülemek ve yeni bir saat girmek için parametresiz TIME\r\nyazın. Saati muhafaza etmek için ENTER'a basın.\r\nTime can be passed either in 24h format or 12h format. Minutes and seconds are\r\noptional. Examples:
+22.2:Güncel saati görüntülemek ve yeni bir saat girmek için parametresiz TIME\r\nyazın. Saati muhafaza etmek için ENTER'a basın.\r\nSaat, ya 12 ya da 24 saat olarak aktarılabilir. Dakikalar ve saniyeler isteğe\r\bağlıdır. Örnekler:
 22.3:Güncel saat şudur:
 22.4:Geçersiz saat
 22.5:Yeni saati girin:
