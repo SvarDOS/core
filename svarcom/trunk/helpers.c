@@ -850,6 +850,11 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
   /* check if there is need to reload at all */
   if (lastlang == *((unsigned short *)buff)) return;
 
+  /* mark the new lang as current even though I do not know yet if I will
+   * succeed. in case I fail, I do not want to retry reloading the lang block
+   * after every command. https://github.com/SvarDOS/bugz/issues/12 */
+  memcpy_ltr_far(&lastlang, lang, 2);
+
   buff[4] = 0;
   dosdir = env_lookup_val(rmodenvseg, "DOSDIR");
   if (dosdir == NULL) return;
@@ -865,8 +870,6 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
     memcpy_ltr(buff + 4 + dosdirlen, "\\BIN\\SVARCOM.LNG", 17);
     if (svarlang_load(buff + 4, buff) != 0) return;
   }
-
-  memcpy_ltr_far(&lastlang, lang, 2);
 
   /* update RMOD's critical handler with new strings */
   for (i = 0; i < 9; i++) {
