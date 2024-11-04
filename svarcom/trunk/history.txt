@@ -7,6 +7,7 @@
 === ver 2024.8 (xx.xx.2024) ==================================================
  - removed all libc dependencies, SvarCOM is linked against WMINCRT now
  - TIME: displays an error if too many arguments are provided + improved help
+ - updated French and Turkish translations (Berki Yenigun)
 
 
 === ver 2024.7 (21.10.2024) ==================================================
