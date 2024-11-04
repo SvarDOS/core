@@ -141,11 +141,17 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
   unsigned char ho = 255, mi, se;
 
   if (cmd_ishlp(p)) {
+    const char *hlpformats[] = {"14:00:00", "19:30", "03:05p", "17", "9a", NULL};
     nls_outputnl(22,0); /* "Displays or sets the system time." */
     outputnl("");
     nls_outputnl(22,1); /* "TIME [time]" */
     outputnl("");
-    nls_outputnl(22,2); /* "Type TIME with no parameters to display the current time and (...)" */
+    nls_outputnl(22,2); /* "Type TIME with no parameters to display (...) Examples:" */
+    outputnl("");
+    for (i = 0; hlpformats[i] != NULL; i++) {
+      output("TIME ");
+      outputnl(hlpformats[i]);
+    }
     return(CMD_OK);
   }
 

@@ -135,7 +135,7 @@
 # TIME
 22.0:Wyświetla lub ustawia czas systemowy.
 22.1:TIME [czas]
-22.2:Wpisz TIME bez parametrów aby wyświetlić aktualną godzinę, wraz z zapytaniem\r\no podanie nowej. Wciśnij ENTER aby zachować bieżącą godzinę.
+22.2:Wpisz TIME bez argumentu aby wyświetlić aktualną godzinę oraz zapytanie o\r\nwprowadzenie nowej. Wciśnij ENTER aby zachować bieżącą godzinę.\r\nCzas może zostać podany w formacie 24- lub 12-godzinnym. Minuty i sekundy są\r\nopcjonalne. Np:
 22.3:Aktualna godzina to
 22.4:Nieprawidłowy czas
 22.5:Podaj nową godzinę:

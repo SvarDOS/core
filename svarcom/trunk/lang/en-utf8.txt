@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 17 Feb 2024
+# Last update: 04 Nov 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -135,7 +135,7 @@
 # TIME
 22.0:Displays or sets the system time.
 22.1:TIME [time]
-22.2:Type TIME with no parameters to display the current time and a prompt for a\r\nnew one. Press ENTER to keep the same time.
+22.2:Type TIME with no argument to display the current time and prompt for a new\r\none. Press ENTER to keep the same time.\r\nTime can be passed either in 24h format or 12h format. Minutes and seconds are\r\noptional. Examples:
 22.3:Current time is
 22.4:Invalid time
 22.5:Enter new time:

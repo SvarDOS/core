@@ -121,7 +121,7 @@
 # TIME
 22.0:Mostra ou define as horas no relógio do sistema.
 22.1:TIME [horas]
-22.2:Digite TIME sem parâmetros para mostrar a hora atual e um prompt para uma\r\nnova hora. Pressione ENTER para manter a hora atual.
+22.2:Digite TIME sem parâmetros para mostrar a hora atual e um prompt para uma\r\nnova hora. Pressione ENTER para manter a hora atual.\r\nTime can be passed either in 24h format or 12h format. Minutes and seconds are\r\noptional. Examples:
 22.3:A hora atual é
 22.4:Hora inválida
 22.5:Entre a nova hora:
