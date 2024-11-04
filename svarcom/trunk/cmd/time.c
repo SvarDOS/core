@@ -165,11 +165,14 @@ static enum cmd_result cmd_time(struct cmd_funcparam *p) {
     nls_output(22,3); /* "Current time is" */
     outputnl(buff);
     ho = 255;
-  } else { /* parse time if provided */
+  } else if (p->argc == 1) { /* parse time if provided */
     if (cmd_time_parse(p->argv[0], &ho, &mi, &se, nls) != 0) {
       nls_outputnl(22,4); /* "Invalid time" */
       ho = 255;
     }
+  } else {
+    nls_outputnl(0, 4); /* "too many arguments" */
+    return(CMD_FAIL);
   }
 
   /* ask for time if not provided or if input was malformed */
