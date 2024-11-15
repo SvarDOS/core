@@ -59,61 +59,16 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     envsize /= 16;
   }
 
-  _asm {
-    push bx
-    push cx
-    push dx
-
-    /* link in the UMB memory chain for enabling high-memory allocation (and save initial status on stack) */
-    mov ax, 0x5802  /* GET UMB LINK STATE */
-    int 0x21
-    xor ah, ah
-    push ax         /* save link state on stack */
-    mov ax, 0x5803  /* SET UMB LINK STATE */
-    mov bx, 1
-    int 0x21
-    /* get current allocation strategy and save it in DX */
-    mov ax, 0x5800
-    int 0x21
-    push ax
-    pop dx
-    /* set strategy to 'last fit, try high then low memory' */
-    mov ax, 0x5801
-    mov bx, 0x0082
-    int 0x21
-    /* ask for a memory block and save the given segment to rmodseg */
-    mov ah, 0x48
-    mov bx, sizeof_rmodandprops_paras
-    int 0x21
-    jc ALLOC_FAIL
-    mov rmodseg, ax
-    /* ask for a memory block for the environment and save it to envseg (only if custom size requested) */
-    mov bx, envsize
-    test bx, bx
-    jz ALLOC_FAIL
-    mov ah, 0x48
-    int 0x21
-    jc ALLOC_FAIL
-    mov envseg, ax
-
-    ALLOC_FAIL:
-    /* restore initial allocation strategy */
-    mov ax, 0x5801
-    mov bx, dx
-    int 0x21
-    /* restore initial UMB memory link state */
-    mov ax, 0x5803
-    pop bx       /* pop initial UMB link state from stack */
-    int 0x21
-
-    pop dx
-    pop cx
-    pop bx
-  }
-
-  if (rmodseg == 0xffff) {
+  /* ask for a memory block and save the given segment to rmodseg */
+  rmodseg = alloc_high_seg(sizeof_rmodandprops_paras);
+  if (rmodseg == 0) {
     outputnl("malloc error");
     return(NULL);
+  }
+
+  /* ask for a memory block for the environment and save it to envseg (only if custom size requested) */
+  if (envseg != 0) {
+    envseg = alloc_high_seg(envsize);
   }
 
   /* generate a new PSP where RMOD is about to land */
@@ -247,6 +202,39 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   res = MK_FP(rmodseg, 0x100 + rmodcore_len);
   sv_bzero(res, sizeof(*res));     /* zero out */
   res->rmodseg = rmodseg;          /* rmod segment */
+
+  /* if /MSG then allocate a lang block */
+  if (*cfgflags & FLAG_MSG) {
+    /* supplied through DEFLANG.C */
+    extern char svarlang_mem[];
+    extern unsigned short svarlang_dict[];
+    extern const unsigned short svarlang_memsz;
+    extern const unsigned short svarlang_string_count;
+
+    /* alloc (high) memory for svarlang strings and dict index */
+    res->lng_segmem = alloc_high_seg((svarlang_memsz + 15) / 16);
+    res->lng_segdict = alloc_high_seg((svarlang_string_count * 4 + 15) / 16);
+
+    /* back out if failed on any of the allocations */
+    if ((res->lng_segdict == 0) || (res->lng_segmem == 0)) {
+      if (res->lng_segdict != 0) freeseg(res->lng_segdict);
+      if (res->lng_segmem != 0) freeseg(res->lng_segmem);
+      res->lng_segdict = 0;
+      res->lng_segmem = 0;
+    } else { /* success */
+      /* mark lng mem seg as owned by RMOD */
+      mcb = MK_FP(res->lng_segmem - 1, 0);
+      owner = (void far *)(mcb + 1);
+      *owner = rmodseg;
+      memcpy_ltr_far(mcb + 8, "SVARLNGM", 8);
+
+      /* mark lng dict seg as owned by RMOD */
+      mcb = MK_FP(res->lng_segdict - 1, 0);
+      owner = (void far *)(mcb + 1);
+      *owner = rmodseg;
+      memcpy_ltr_far(mcb + 8, "SVARLNGD", 8);
+    }
+  }
 
   /* save my original int22h handler and parent in rmod's memory */
   res->origint22 = *((unsigned long *)0x0a); /* original int22h handler seg:off is at 0x0a of my PSP */

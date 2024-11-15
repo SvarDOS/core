@@ -220,7 +220,7 @@ unsigned short nls_format_number(char *s, unsigned long num, const struct nls_pa
 void nls_strtoup(char *buff);
 
 /* reload nls ressources from svarcom.lng into langblock */
-void nls_langreload(char *buff, unsigned short rmodseg);
+void nls_langreload(char *buff, struct rmod_props far *rmod);
 
 /* locates executable fname in path and fill res with result. returns 0 on success,
  * -1 on failed match and -2 on failed match + "don't even try with other paths"
@@ -251,5 +251,12 @@ void sv_strtr(char *s, char a, char b);
 
 /* inserts string s2 into s1 in place of the first % character */
 void sv_insert_str_in_str(char *s1, const char *s2);
+
+/* allocates a block of paras paragraphs, as high as possible
+ * returns segment of allocated block on success, 0 on failure */
+unsigned short alloc_high_seg(unsigned short paras);
+
+/* free previously allocated memory block at segment segm */
+void freeseg(unsigned short segm);
 
 #endif

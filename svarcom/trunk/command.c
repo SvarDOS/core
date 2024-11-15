@@ -43,7 +43,7 @@
  * with what I think it is.
  *          *** INCREMENT THIS AT EACH NEW SVARCOM RELEASE! ***
  *            (or at least whenever RMOD's struct is changed)            */
-#define BYTE_VERSION 7
+#define BYTE_VERSION 8
 
 
 struct config {
@@ -296,6 +296,11 @@ static void parse_argv(struct config *cfg) {
         cfg->flags |= FLAG_PERMANENT;
         break;
 
+      case 'm': /* keep a copy of the lang block resident (/MSG) */
+      case 'M':
+        cfg->flags |= FLAG_MSG;
+        break;
+
       case '?':
         nls_outputnl(1,0); /* "Starts the SvarCOM command interpreter" */
         outputnl("");
@@ -307,6 +312,7 @@ static void parse_argv(struct config *cfg) {
         nls_outputnl(1,5); /* "/C      Executes the specified command and returns" */
         nls_outputnl(1,6); /* "/K      Executes the specified command and continues running" */
         nls_outputnl(1,7); /* "/Y      Executes the batch program step by step" */
+        nls_outputnl(1,8); /* "/M      Keep the lang messages resident" */
         EXIT(1);
         break;
 
@@ -1150,7 +1156,7 @@ int main(void) {
     cmdline = cmdlinebuf;
 
     /* (re)load translation strings if needed */
-    nls_langreload(BUFFER, rmod->rmodseg);
+    nls_langreload(BUFFER, rmod);
 
     /* am I inside a FOR loop? */
     if (rmod->forloop) {

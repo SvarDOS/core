@@ -832,16 +832,22 @@ void nls_strtoup(char *buff) {
 
 
 /* reload nls ressources from svarcom.lng into svarlang_mem and rmod */
-void nls_langreload(char *buff, unsigned short rmodseg) {
+void nls_langreload(char *buff, struct rmod_props far *rmod) {
   const char far *dosdir;
   const char far *lang;
   static unsigned short lastlang;
   unsigned short dosdirlen;
-  unsigned short rmodenvseg = *(unsigned short far *)MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
-  unsigned char far *rmodcritmsg = MK_FP(rmodseg, RMOD_OFFSET_CRITMSG);
+  unsigned short rmodenvseg = *(unsigned short far *)MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
+  unsigned char far *rmodcritmsg = MK_FP(rmod->rmodseg, RMOD_OFFSET_CRITMSG);
   int i;
 
-  /* look up the LANG env variable, upcase it and copy to lang */
+  /* supplied through DEFLANG.C */
+  extern char svarlang_mem[];
+  extern unsigned short svarlang_dict[];
+  extern const unsigned short svarlang_memsz;
+  extern const unsigned short svarlang_string_count;
+
+  /* look up the LANG env variable and copy to lang */
   lang = env_lookup_val(rmodenvseg, "LANG");
   if ((lang == NULL) || (lang[0] == 0)) return;
   memcpy_ltr_far(buff, lang, 2);
@@ -854,6 +860,14 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
    * succeed. in case I fail, I do not want to retry reloading the lang block
    * after every command. https://github.com/SvarDOS/bugz/issues/12 */
   memcpy_ltr_far(&lastlang, lang, 2);
+
+  /* load lng from rmod if it's there (/M) */
+  if (rmod->lng_current == *((unsigned short *)buff)) {
+    rmod->lng_current = lastlang;
+    memcpy_ltr_far(svarlang_mem, MK_FP(rmod->lng_segmem, 0), svarlang_memsz);
+    memcpy_ltr_far(svarlang_dict, MK_FP(rmod->lng_segdict, 0), svarlang_string_count * 4);
+    return;
+  }
 
   buff[4] = 0;
   dosdir = env_lookup_val(rmodenvseg, "DOSDIR");
@@ -881,6 +895,13 @@ void nls_langreload(char *buff, unsigned short rmodseg) {
   }
   /* The ARIF string is special: always 4 bytes long and no $ terminator */
   memcpy_ltr_far(rmodcritmsg + (9 * 16), svarlang_str(3,9), 4);
+
+  /* if /M then back up the new lang into rmod memory */
+  if ((rmod->lng_segmem) && (rmod->lng_segdict)) {
+    rmod->lng_current = lastlang;
+    memcpy_ltr_far(MK_FP(rmod->lng_segmem, 0), svarlang_mem, svarlang_memsz);
+    memcpy_ltr_far(MK_FP(rmod->lng_segdict, 0), svarlang_dict, svarlang_string_count * 4);
+  }
 }
 
 
@@ -1112,4 +1133,74 @@ void sv_insert_str_in_str(char *s1, const char *s2) {
 
   /* write s2 to the cleared space */
   if (s2len != 0) memcpy_ltr(s1, s2, s2len);
+}
+
+
+/* allocates a block of paras paragraphs, as high as possible
+ * returns segment of allocated block on success, 0 on failure */
+unsigned short alloc_high_seg(unsigned short paras) {
+  unsigned short res = 0;
+
+  _asm {
+    push bx
+    push cx
+    push dx
+
+    /* link in the UMB memory chain for enabling high-memory allocation (and save initial status on stack) */
+    mov ax, 0x5802  /* GET UMB LINK STATE */
+    int 0x21
+    xor ah, ah
+    push ax         /* save link state on stack */
+    mov ax, 0x5803  /* SET UMB LINK STATE */
+    mov bx, 1
+    int 0x21
+
+    /* get current allocation strategy and save it in DX */
+    mov ax, 0x5800
+    int 0x21
+    push ax
+    pop dx
+
+    /* set strategy to 'last fit, try high then low memory' */
+    mov ax, 0x5801
+    mov bx, 0x0082
+    int 0x21
+
+    /* ask for a memory block */
+    mov ah, 0x48
+    mov bx, paras
+    int 0x21
+    jc ALLOC_FAIL
+    mov res, ax
+
+    ALLOC_FAIL:
+    /* restore initial allocation strategy */
+    mov ax, 0x5801
+    mov bx, dx
+    int 0x21
+    /* restore initial UMB memory link state */
+    mov ax, 0x5803
+    pop bx       /* pop initial UMB link state from stack */
+    int 0x21
+
+    pop dx
+    pop cx
+    pop bx
+  }
+
+  return(res);
+}
+
+
+/* free previously allocated memory block at segment segm */
+void freeseg(unsigned short segm) {
+  _asm {
+    push es
+
+    mov ah, 0x49
+    mov es, segm
+    int 0x21
+
+    pop es
+  }
 }

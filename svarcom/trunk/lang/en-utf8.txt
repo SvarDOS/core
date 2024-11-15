@@ -30,6 +30,7 @@
 1.5:/C      Executes the specified command and returns
 1.6:/K      Executes the specified command and continues running
 1.7:/Y      Executes the batch program step by step (only with /P, /K or /C)
+1.8:/M      Keeps NLS messages in memory
 
 # VARIOUS SVARCOM MESSAGES
 2.0:SVARCOM VERSION CHANGED. SYSTEM HALTED. PLEASE REBOOT YOUR COMPUTER.

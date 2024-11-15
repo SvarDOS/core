@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,7 @@
 #define FLAG_ECHO_BEFORE_BAT  8
 #define FLAG_SKIP_AUTOEXEC   16
 #define FLAG_STEPBYSTEP      32
+#define FLAG_MSG             64
 
 
 /* batch context structure used to track what batch file is being executed,
@@ -65,6 +66,9 @@ struct rmod_props {
   char awaitingcmd[130];      /* command to exec next time (if any) */
   struct batctx far *bat;     /* linked list of bat contexts, if BAT ongoing */
   struct forctx far *forloop; /* a single FOR loop structure, if FOR ongoing */
+  unsigned short lng_segmem;  /* segment where a lang block copy is kept (/M), 0=none */
+  unsigned short lng_segdict; /* segment where a lang block copy is kept (/M), 0=none */
+  unsigned short lng_current; /* current LNG loaded in lng_seg* (0 = none) */
 };
 
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
