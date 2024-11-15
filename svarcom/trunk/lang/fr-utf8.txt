@@ -30,6 +30,7 @@
 1.5:/C       Exécute la commande spécifiée et retourne
 1.6:/K       Exécute la commande spécifiée et continue à fonctionner
 1.7:/Y       Exécute le programme batch pas à pas (seulement avec /P, /K ou /C)
+1.8:/M       Garde les messages NLS dans la mémoire
 
 # VARIOUS SVARCOM MESSAGES
 2.0:LA VERSION DE SVARCOM A CHANGÉ. SYSTÈME ARRÊTÉ. REDÉMARREZ VOTRE ORDINATEUR.

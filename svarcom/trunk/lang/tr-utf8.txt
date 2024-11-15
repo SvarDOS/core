@@ -15,7 +15,7 @@
 0.6:Geçersiz parametre
 0.7:Gerekli parametre eksik
 0.8:Geçersiz hedef
-?0.9:Bu komut mevcut değil
+0.9:Bu komut mevcut değil
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
@@ -30,6 +30,7 @@
 1.5:/C      Belirtilen komutu çalıştırır ve döner
 1.6:/K      Belirtilen komutu çalıştırır ve çalışmaya devam eder
 1.7:/Y      Toplu iş programını adım adım çalıştırır (sadece /P, /K veya /C ile)
+1.8:/M      NLS (millî dil desteği) mesajlarını bellekte muhafaza eder
 
 # VARIOUS SVARCOM MESSAGES
 2.0:SVARCOM SÜRÜMÜ DEĞİŞTİ. SİSTEM DURDURULDU. BİLGİSAYARINIZI YENİDEN BAŞLATIN.
