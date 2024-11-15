@@ -3,7 +3,7 @@
 #
 # Language...: Polish
 # Authors....: Mateusz Viste
-# Last update: 17 Feb 2024
+# Last update: 15 Nov 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -30,6 +30,7 @@
 1.5:/C      Wykonuje podane polecenie i kończy się
 1.6:/K      Wykonuje podane polecenie i działa dalej
 1.7:/Y      Wykonuje program wsadowy krok po kroku (tylko z /P, /K lub /C)
+1.8:/M      Przechowuje komunikaty NLS w pamięci
 
 # VARIOUS SVARCOM MESSAGES
 2.0:WERSJA SVARCOM ULEGŁA ZMIANIE. SYSTEM ZATRZYMANY. ZRESTARTUJ KOMPUTER.
