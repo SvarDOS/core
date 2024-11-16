@@ -3,7 +3,7 @@
 #
 # Language...: Portuguese Brazil
 # Authors....: Luzemário Dantas
-# Last update: 17 Feb 2023
+# Last update: 16 Nov 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -26,15 +26,29 @@
 1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] commando]
 1.2:/D      Pula o processamento do AUTOEXEC.BAT (faz sentido só com /P)
 1.3:/E:nnn  define o tamanho do ambiente para nnn bytes
-1.4:/P      Torna o novo interpretador de comandos permanente e roda o AUTOEXEC.BAT
+1.4:/P      Torna o novo interpretador permanente e roda o AUTOEXEC.BAT
 1.5:/C      Executa o comando especificado e retorna
 1.6:/K      Executa o comando especificado e continua rodando
 1.7:/Y      Executa o programa em lote passo a passo (só com /P, /K or /C)
+1.8:/M      Mantém mensagens NLS na memória
 
 # VARIOUS SVARCOM MESSAGES
-2.0:A VERSÃO DO SVARCOM MUDOU. SISTEMA INTERROMPIDO. POR FAVOR REINICIE SEU COMPUTADOR.
+2.0:A VERSÃO DO SVARCOM MUDOU. SISTEMA INTERROMPIDO. POR FAVOR REINICIE SEU\r\nCOMPUTADOR.
 2.1:ERRO FATAL: rmod_install() falhou
 2.2:SvarCOM: estouro de pilha detectado, histórico de comandos esvaziado (isso\r\nnão é um bug)
+
+# CRITICAL HANDLER (INT 24H) - EACH MESSAGE MUST BE NO LONGER THAN 15 BYTES!
+3.0:ERRO CRÍTICO
+3.1:FALHA LEITURA
+3.2:FALHA GRAVAÇÃO
+3.3:(A)bortar
+3.4:(R)epetir
+3.5:(I)gnorar
+3.6:(F)alhar
+3.7:FALHA NA CARGA
+3.8:APERTE TECLA...
+# THESE ARE THE 4 KEYS FOR "Abort Retry Ignore Fail" (MUST BE IN UPPER CASE):
+3.9:ARIF
 
 # CLS
 10.0:Limpa a tela.
@@ -43,7 +57,7 @@
 11.0:Mostra ou define o número de página de código ativo.
 11.1:CHCP [nnn]
 11.2:nnn  Especifica um número de página de código
-11.3:Digite CHCP sem parâmetros para mostrar o número de página de código atual.
+11.3:Digite CHCP sem parâmetros para mostrar a página de código atual.
 11.4:Número de página de código inválido
 11.5:NLSFUNC não instalado
 11.6:Falha na mudança de página de código
@@ -113,6 +127,7 @@
 20.8:HMA
 20.9:ROM
 20.10:versão verdadeira %
+20.11:versão do kernel DR-DOS %
 
 # TYPE
 21.0:Mostra o conteúdo de um arquivo de texto.
@@ -238,10 +253,11 @@
 37.22:arquivo(s)
 37.23:bytes
 37.24:bytes livres
+37.25:Total de aquivos listados:
 
 # COPY
 38.0:Copia um ou mais arquivos para outro lugar.
-38.1:COPY [/A|/B] origem [/A|/B] [+origem [/A|/B] [+...]] [destino [/A|/B]] [/V]
+38.1:COPY [/A|/B] origem [/A|/B] [+origem [/A|/B] [+...]] [dest. [/A|/B]] [/V]
 38.2:origem       Especifica o arquivo ou arquivos para copiar
 38.3:/A           Indica um arquivo de texto ASCII
 38.4:/B           Indica um arquivo binário
@@ -254,6 +270,11 @@
 # TRUENAME
 39.0:Returna um caminho ou nome de arquivo totalmente qualificado.
 39.1:TRUENAME [[drive:][caminho][arquivo]]
+
+# LH / LOADHIGH
+40.0:Carrega um programa na área de memória alta.
+40.1:[drive:][caminho]arquivo [parâmetros]
+40.2:parâmetros: os argumentos necessários ao programa que você quer carregar.
 
 # DOS ERRORS
 255.1:Número de função inválida

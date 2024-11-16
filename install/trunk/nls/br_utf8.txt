@@ -20,10 +20,10 @@
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Bem vindo ao SvarDOS
 1.1:Por favor selecione seu idioma preferido na lista abaixo:
-1.5:O SvarDOS suporta diferentes layouts de teclado. Escolha o layout de teclado desejado:
+1.5:O SvarDOS suporta diferentes layouts de teclado. Escolha o que deseja:
 
 ### WELCOME SCREEN ###
-2.0:Você está pronto para instalar o SvarDOS: um sistema operacional livre, gratuito, compatível com o MS-DOS.\n\nALERTA: Se seu PC tiver outro sistema operacional instalado, pode ser que não seja mais possível iniciar por ele quando o SvarDOS for instalado.
+2.0:Você está pronto para instalar o SvarDOS: um sistema operacional livre, gratuito, compatível com o MS-DOS.\n\nALERTA: Se seu PC tiver outro sistema operacional instalado, pode ser que não seja mais possível iniciar por ele depois que o SvarDOS for instalado.
 
 ### DISK SETUP ###
 3.0:ERRO: O drive não foi encontrado. Talvez seu disco rígido precise ser particionado primeiro. Por favor, crie pelo menos uma partição primária no seu disco rígido, assim o SvarDOS poderá ser instalado nele. Note que o SvarDOS requer pelo menos %d MiB de epaço em disco disponível.\n\nVocê pode usar a ferramenta de particionamento FDISK para criar a partição necessária manualmente, ou pode deixar o instalador criar a partição automaticamente. Você também pode abortar a instalação para usar o gerenciador de partições de sua escolha.
@@ -34,14 +34,14 @@
 3.6:A instalação do SvarDOS em %c: está pronta para começar.
 
 ### PACKAGES INSTALLATION ###
-# example: "Installing package 4/50: FDISK"
-4.0:Instalando pacote %d/%d: %s
-4.1:*** INSIRA O DISCO QUE CONTÉM O ARQUIVO NECESSÁRIO E PRESSIONE QUALQUER TECLA ***
+# example: "Copying package 4/50: FDISK"
+4.0:Copiando pacote %d/%d: %s
+4.1:*** INSIRA O PRÓXIMO DISCO E PRESSIONE QUALQUER TECLA ***
 
 ### END SCREEN ###
 5.0:Seu computador irá reiniciar agora.
 5.1:Por favor remova o disco de instalação do drive.
-5.2:A instalação do SvarDOS terminou. Por favor reinicie seu computador agora.
+5.2:O SvarDOS foi instalado. Reinicie seu computador agora.
 
 ### LOG IN WELCOME TEXT ONCE SYSTEM IS INSTALLED ###
 6.0:Bem vindo ao SvarDOS! Digite HELP se precisar de ajuda.
