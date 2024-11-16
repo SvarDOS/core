@@ -862,7 +862,7 @@ void nls_langreload(char *buff, struct rmod_props far *rmod) {
   memcpy_ltr_far(&lastlang, lang, 2);
 
   /* load lng from rmod if it's there (/M) */
-  if (rmod->lng_current == *((unsigned short *)buff)) {
+  if ((rmod->lng_segmem) && (rmod->lng_segdict) && (rmod->lng_current == *((unsigned short *)buff))) {
     rmod->lng_current = lastlang;
     memcpy_ltr_far(svarlang_mem, MK_FP(rmod->lng_segmem, 0), svarlang_memsz);
     memcpy_ltr_far(svarlang_dict, MK_FP(rmod->lng_segdict, 0), svarlang_string_count * 4);
