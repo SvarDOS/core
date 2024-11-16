@@ -31,6 +31,7 @@
 1.5:/C      Führt den angegebenen Befehl aus und kehrt dann zurück
 1.6:/K      Führt den angegebenen Befehl aus und läuft dann weiter
 1.7:/Y      Führt das Stapelprogramm schrittweise aus (nur mit /P, /K oder /C)
+1.8:/M      Hält deutsche Übersetzung im Speicher
 
 # VARIOUS SVARCOM MESSAGES
 2.0:SVARCOM-VERSION VERÄNDERT. SYSTEM ANGEHALTEN. STARTEN SIE DEN COMPUTER NEU.
@@ -127,6 +128,7 @@
 20.8:oberen Speicherbereich (High Memory Area)
 20.9:ROM
 20.10:wahre Version %
+20.11:DR-DOS Kernel Version %
 
 # TYPE
 21.0:Zeigt den Inhalt einer Textdatei an.
@@ -252,6 +254,7 @@
 37.22:Datei(en)
 37.23:Byte
 37.24:Byte frei
+37.25:Anzahl angezeigter Datei(en):
 
 # COPY
 38.0:Kopiert eine oder mehrere Dateien an eine andere Stelle.
