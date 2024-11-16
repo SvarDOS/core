@@ -2,9 +2,9 @@
 # SvarCOM language file
 #
 # Language...........: German
-# Authors.  .........: Robert Riebisch
-# Last update........: 17 Feb 2024
-# In sync with EN rev: 1734
+# Authors.  .........: Robert Riebisch (2022-2023), Bernd Boeckmann (2024)
+# Last update........: 16 Nov 2024
+# In sync with EN rev: 2255
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
