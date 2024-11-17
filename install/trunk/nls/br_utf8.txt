@@ -32,6 +32,7 @@
 3.4:ERRO: O drive %c: não tem espaçoo suficiente! O SvarDOS requer um disco de pelo menos %d MiB.
 3.5:ERRO: O drive %c: não está vazio. O SvarDOS deve ser instalado em um disco vazio.\n\nVocê pode formatar o disco agora, para torná-lo vazio. Note contudo que ISSO IRÁ APAGAR TODOS OS DADOS ATUAIS no seu disco.
 3.6:A instalação do SvarDOS em %c: está pronta para começar.
+3.7:Selecione o drive onde o SvarDOS será instalado. Você também pode retornar ao DOS e usar FDISK para particionar seu disco. O SvarDOS pode ser instalado somente numa partição primária (por ex. não em um drive lógico).
 
 ### PACKAGES INSTALLATION ###
 # example: "Copying package 4/50: FDISK"
