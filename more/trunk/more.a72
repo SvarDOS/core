@@ -109,9 +109,8 @@ xor     di, di
 CMP_NEXT_VAR:
 
 ; if it points at a nul already then it's the end of the env block
-mov     al, [es:di]
-test    al, al
-jz      LANG_DONE
+cmp     byte [es:di], 0
+je      LANG_DONE
 
 mov     si, LANG
 mov     cx, 5
