@@ -49,12 +49,10 @@ ORG     100h
 ; * at the first non-space character. If it's a CR then no argument (CR is   *
 ; * the tail's terminator).                                                  *
 ; ****************************************************************************
-mov     ax, ds
-mov     es, ax
 mov     al, ' '
 mov     cx, 0ffh
 mov     di, 81h
-repe    scasb                          ; compare AL with [ES:DI++]
+repe    scasb                          ; compare AL with [ES:DI++]  (ES == DS)
 mov     al, [di-1]
 
 cmp     al, 0Dh
@@ -137,8 +135,8 @@ and      bx, [es:di]
 ; ****************************************************************************
 
 mov     di, LANGLIST
-mov     ax, ds
-mov     es, ax
+push    ds
+pop     es
 
 NEXTLANG:
 cmp     byte ptr [di], 0               ; look for the end of list terminator
