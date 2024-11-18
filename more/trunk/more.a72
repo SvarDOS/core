@@ -331,6 +331,7 @@ SEPAR2 DB " ---$"
 LANGLIST:
 DB "EN",  "MORE$"                      ; EN must be 1st to be used as default
 ; non-EN strings follow
+DB "BR",  "MAIS$"
 DB "DE",  "WEITER$"
 DB "DK",  "MERE$"
 DB "ES",  "M", 0B5h, "S$"              ; "MAS" with an A-acute (CP 850)
