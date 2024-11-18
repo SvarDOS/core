@@ -286,7 +286,7 @@ jae     PRESSANYKEY
 
 CHARLOOP:
 loop    NEXTCHAR                       ; dec cx and jmp to NEXTCHAR if cx > 0
-jmp     RELOADBUF
+jmp     short RELOADBUF
 
 
 ; display "--- More ---"
@@ -313,7 +313,7 @@ mov     dx, offset CRLF
 mov     ah, 9h
 int     21h
 xor     bx, bx                         ; bh = cur row, bl = cur col
-jmp     CHARLOOP
+jmp     short CHARLOOP
 
 
 ; ****************************************************************************
