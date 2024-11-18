@@ -115,9 +115,8 @@ je      LANG_DONE
 mov     si, LANG
 mov     cx, 5
 repe    cmpsb
-
-; if CX == 0 then found a LANG= match
-jcxz    FOUND_LANG
+; have I found "LANG=" ?
+je      FOUND_LANG
 
 ; otherwise jump to next var (look for nearest nul terminator)
 xor     al, al
