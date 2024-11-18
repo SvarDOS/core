@@ -127,8 +127,9 @@ jmp     short CMP_NEXT_VAR
 ; FOUND THE LANG VARIABLE (at ES:DI)
 FOUND_LANG:
 
-mov     bx, [es:di]                    ; load the LANG ID to BX and make
-and     bx, 0DFDFh                     ; sure it is always upper case
+; load the LANG ID to BX and make sure it is upper case
+mov      bx, 0DFDFh
+and      bx, [es:di]
 
 
 ; ****************************************************************************
