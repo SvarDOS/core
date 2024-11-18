@@ -105,7 +105,7 @@ mov     es, [2Ch]
 
 ; compare DS:[SI] with ES:[DI], up to 5 bytes ("LANG=")
 cld
-mov     di, 0
+xor     di, di
 CMP_NEXT_VAR:
 
 ; if it points at a nul already then it's the end of the env block
