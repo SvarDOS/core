@@ -289,11 +289,11 @@ jmp     short RELOADBUF
 ; display "--- More ---"
 PRESSANYKEY:
 mov     ah, 9h                         ; disp $-termin. string pointed by DX
-mov     dx, offset SEPAR1
+mov     dx, offset SEPAR + 1
 int     21h
 mov     dx, bp
 int     21h
-mov     dx, offset SEPAR2
+mov     dx, offset SEPAR
 int     21h
 
 ; wait for a keypress
@@ -322,8 +322,7 @@ MAXCOL  db      80                     ; total available columns
 
 CRLF DB 13, 10, '$'
 LANG DB "LANG="
-SEPAR1 DB "--- $"
-SEPAR2 DB " ---$"
+SEPAR DB " --- $"
 
 LANGLIST:
 DB "EN",  "MORE$"                      ; EN must be 1st to be used as default
