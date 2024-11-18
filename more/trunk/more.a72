@@ -67,7 +67,8 @@ int     20h
 HELP db "SvarDOS MORE 2024.0", 13, 10
      db 10
      db "MORE < README.TXT", 13, 10
-     db "TYPE README.TXT | MORE", 13, 10, '$'
+     db "TYPE README.TXT | MORE"
+CRLF db 13, 10, '$'                    ; this CR/LF terminator is reused later
 
 NO_ARGS:
 
@@ -320,7 +321,6 @@ jmp     short CHARLOOP
 MAXROW  db      24                     ; maximum *addressable* row (not total)
 MAXCOL  db      80                     ; total available columns
 
-CRLF DB 13, 10, '$'
 LANG DB "LANG="
 SEPAR DB " --- $"
 
