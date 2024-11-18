@@ -1,12 +1,12 @@
 
-                                 SvarDOS MORE
+                                 SVARDOS MORE
 
 SvarDOS MORE is a filter that displays output one screen at a time. It is part
 of the SvarDOS project <http://svardos.org>, and as such it shares SvarDOS'
 principles of minimalism, compactness and bare-bones functionality. It is:
 
  - multilingual (use the LANG variable, eg. "SET LANG=PL" switches to Polish)
- - TINY! (fits within a single disk sector)
+ - tiny (fits within a single disk sector)
 
 Usage:
 
@@ -17,9 +17,15 @@ SvarDOS MORE is hand crafted in x86 assembly and built using the excellent
 A72 assembler by Mr R. Swan <https://github.com/swanlizard/a72>.
 
 
-### Distributed under the terms of the MIT LICENSE ###########################
+### HISTORY ###
 
-Copyright (C) 2023 Mateusz Viste
+2024.0  BR language, size optimizations, fixed a minor LANG parsing issue
+2023.0  first public release
+
+
+### LICENSE (MIT) ###
+
+Copyright (C) 2023-2024 Mateusz Viste
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
