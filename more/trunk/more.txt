@@ -13,14 +13,14 @@ Usage:
   MORE < FILE.TXT
   TYPE FILE.TXT | MORE
 
-SvarDOS MORE is hand crafted in x86 assembly and built using the excellent
+SvarDOS MORE is hand crafted in x86 assembly and build with the excellent
 A72 assembler by Mr R. Swan <https://github.com/swanlizard/a72>.
 
 
 ### HISTORY ###
 
 2024.0  BR & PT languages, size optimizations, minor LANG parsing issue fix
-2023.0  first public release
+2023.0  First public release
 
 
 ### LICENSE (MIT) ###
