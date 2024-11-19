@@ -205,7 +205,7 @@ mov     dx, offset BUFFER
 int     21h
 
 ; abort on error
-jc EXIT
+jc      EXIT
 
 ; restore bx
 xchg    bx, di
@@ -230,7 +230,7 @@ lodsb
 
 ; EOF char? (check this first so a short jump to exit is still possible)
 cmp     al, 1Ah
-jz      EXIT
+je      EXIT
 
 ; [7h] BELL?
 cmp     al, 7h
