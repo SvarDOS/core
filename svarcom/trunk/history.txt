@@ -5,9 +5,10 @@
 
 
 === ver 2024.8 (xx.xx.2024) ==================================================
+
  - removed all libc dependencies, SvarCOM is linked against WMINCRT now
  - TIME: displays an error if too many arguments are provided + improved help
- - updated translations: FR + TR (Berki Yenigun), DE (Bernd Boeckmann)
+ - nls update: BR: Luzemario Dantes, DE: Bernd Boeckmann, FR+TR: Berki Yenigun
  - no SVARCOM.LNG reloading after every command when loading fails
  - added /M, keeps lang messages in memory at all times (like /MSG in MS-DOS)
 
@@ -15,7 +16,7 @@
 === ver 2024.7 (21.10.2024) ==================================================
 
  - COPY: returns "insufficient disk space" on write error (was: "insuff. mem")
- - COPY: uses a bigger buffer to limit floppy swaps with the B: ghost drive
+ - COPY: uses a bigger buffer to limit floppy swaps with a B: ghost drive
  - COPY: buffer is always a multiple of 512 (better performances)
  - COPY: removes the partially copied file when error occurs during copy
  - DIR: /S implemented (recursive search)
