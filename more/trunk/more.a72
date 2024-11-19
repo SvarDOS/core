@@ -339,6 +339,7 @@ DB "LV",  "T", 0A0h, "L", 0A0h, "K$"   ; "TALAK" with A-makron (CP 775)
 DB "NL",  "MEER$"
 DB "NO",  "MER$"
 DB "PL",  "DALEJ$"
+DB "PT",  "MAIS$"
 DB "RU",  84h,80h,8Bh,85h,85h,'$'      ; "DALEE" (CP 866)
 DB "SL",  "VE", 0ACh, "$"              ; "VEC" with C-caron (CP 852)
 DB "SV",  "MERA$"

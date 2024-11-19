@@ -19,7 +19,7 @@ A72 assembler by Mr R. Swan <https://github.com/swanlizard/a72>.
 
 ### HISTORY ###
 
-2024.0  BR language, size optimizations, fixed a minor LANG parsing issue
+2024.0  BR & PT languages, size optimizations, minor LANG parsing issue fix
 2023.0  first public release
 
 
