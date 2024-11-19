@@ -208,17 +208,12 @@ pop     bx                             ; restore bx
 ; abort on error
 jc      EXIT
 
-; did I get any bytes? 0 bytes read means "EOF"
-test    ax, ax
-jnz     PREPLOOP
-
-EXIT:
-int     20h
-
 ; prepare the LODSB loop
-PREPLOOP:
 mov     cx, ax
 mov     si, dx
+
+; did I get any bytes? reading 0 bytes means "EOF"
+jcxz    EXIT
 
 NEXTCHAR:
 
@@ -284,6 +279,8 @@ CHARLOOP:
 loop    NEXTCHAR                       ; dec cx and jmp to NEXTCHAR if cx > 0
 jmp     short RELOADBUF
 
+EXIT:
+int     20h
 
 ; display "--- More ---"
 PRESSANYKEY:
