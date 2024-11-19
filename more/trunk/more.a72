@@ -140,7 +140,7 @@ push    ds
 pop     es
 
 NEXTLANG:
-cmp     byte ptr [di], 0               ; look for the end of list terminator
+cmp     byte ptr [di], ' '             ; look for the end of list terminator
 je      LANG_DONE
 cmp     [di], bx                       ; look for a LANG ID match
 je      LANGIDOK
@@ -322,7 +322,6 @@ MAXROW  db      24                     ; maximum *addressable* row (not total)
 MAXCOL  db      80                     ; total available columns
 
 LANG DB "LANG="
-SEPAR DB " --- $"
 
 DEFAULTLANG DB "MORE$"                 ; default (EN) string
 
@@ -344,7 +343,9 @@ DB "RU",  84h,80h,8Bh,85h,85h,'$'      ; "DALEE" (CP 866)
 DB "SL",  "VE", 0ACh, "$"              ; "VEC" with C-caron (CP 852)
 DB "SV",  "MERA$"
 DB "TR",  "DAHA FAZLA$"
-DB 0                                   ; LANGLIST terminator
+
+; The visual page separator, but it also acts as the LANGLIST terminator!
+SEPAR DB " --- $"
 
 ; uninitialized area (must be defined last)
 
