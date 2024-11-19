@@ -188,9 +188,9 @@ int     21h
 
 
 ; make sure cursor is on column 0
-mov ah, 2h                             ; write character in DL to stdout
-mov dl, 0Dh                            ; carriage return
-int 21h
+mov     ah, 2h                         ; write character in DL to stdout
+mov     dl, 0Dh                        ; carriage return
+int     21h
 
 ; reset BX - from now on bh = cur row and bl = cur col
 xor     bx, bx
