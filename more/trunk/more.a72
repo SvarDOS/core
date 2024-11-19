@@ -197,18 +197,16 @@ xor     bx, bx
 
 ; consume stdin bytes by loading them into buffer
 RELOADBUF:
-xchg    di, bx                         ; save BX to DI (contains cur row+col)
+push    bx                             ; save BX (contains cur row and col)
 mov     ah, 3Fh                        ; DOS 2+ - read from file or device
 mov     bx, [FHANDLE]                  ; duplicated stdin was saved in FHANDLE
 mov     cx, 1024
 mov     dx, offset BUFFER
 int     21h
+pop     bx                             ; restore bx
 
 ; abort on error
 jc      EXIT
-
-; restore bx
-xchg    bx, di
 
 ; did I get any bytes? 0 bytes read means "EOF"
 test    ax, ax
