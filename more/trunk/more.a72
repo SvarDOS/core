@@ -92,7 +92,7 @@ SKIP_ROWS_DETECTION:
 ; ****************************************************************************
 ; * preset lang to EN                                                        *
 ; ****************************************************************************
-mov     bp, LANGLIST+2
+mov     bp, DEFAULTLANG
 
 
 ; ****************************************************************************
@@ -324,9 +324,10 @@ MAXCOL  db      80                     ; total available columns
 LANG DB "LANG="
 SEPAR DB " --- $"
 
-LANGLIST:
-DB "EN",  "MORE$"                      ; EN must be 1st to be used as default
+DEFAULTLANG DB "MORE$"                 ; default (EN) string
+
 ; non-EN strings follow
+LANGLIST:
 DB "BR",  "MAIS$"
 DB "DE",  "WEITER$"
 DB "DK",  "MERE$"
