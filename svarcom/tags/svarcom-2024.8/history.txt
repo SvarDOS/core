@@ -1,0 +1,157 @@
+
+
+                    === SvarCOM's history / changelog ===
+
+
+
+=== ver 2024.8 (20.11.2024) ==================================================
+
+ - removed all libc dependencies, SvarCOM is linked against WMINCRT now
+ - TIME: displays an error if too many arguments are provided + improved help
+ - NLS updates: BR=Luzemario Dantes, DE=Bernd Boeckmann, FR+TR=Berki Yenigun
+ - no SVARCOM.LNG reloading after every command when loading fails
+ - added /M, keeps lang messages in memory at all times (like /MSG in MS-DOS)
+
+
+=== ver 2024.7 (21.10.2024) ==================================================
+
+ - COPY: returns "insufficient disk space" on write error (was: "insuff. mem")
+ - COPY: uses a bigger buffer to limit floppy swaps with a B: ghost drive
+ - COPY: buffer is always a multiple of 512 (better performances)
+ - COPY: removes the partially copied file when error occurs during copy
+ - DIR: /S implemented (recursive search)
+ - DIR: /B hides "." and ".." entries
+ - batch execution in step-by-step mode treats the RETURN key as "Yes"
+ - upgraded SvarLANG to ver 20241010 (LNG file is MVCOMP compressed now)
+ - improved message when failing to respawn (also, msg is translatable now)
+
+
+=== ver 2024.6 (28.08.2024) ==================================================
+
+ - DIR: size of files larger than 100M is displayed correctly
+
+
+=== ver 2024.5 (17.08.2024) ==================================================
+
+ - Fixed resetting the EDR kernel environment segment after fetching it
+
+
+=== ver 2024.4 (16.08.2024) ==================================================
+
+ - /P is implied when SvarCOM is the init shell (works in DR-DOS and MS-DOS 5)
+ - DR-DOS compatibility: F5/F8 boot key presses are detected and handled
+ - VER command: provides extended kernel information when available
+ - fixed COMSPEC respawning when SvarCOM is aborted through CTRL+C
+ - when COMMAND.COM respawn fails, the exact path that was tried is displayed
+ - CTRL+C can abort the ongoing batch files or FOR loop
+ - EDR-DOS kernel ("config") environment is used as the initial (master) env
+ - SvarCOM provides its own INT 24h handler (thank you ECM for all your help!)
+
+
+=== ver 2024.3 (25.07.2024) ==================================================
+
+ - PROMPT: supports $v, $d and $t tags
+ - fixed COMMAND/C processing of batch files and FOR loops (bugz #74)
+
+
+=== ver 2024.2 (20.02.2024) ==================================================
+
+ - DIR command: added /O support
+ - DIR command: %DIRCMD% support
+ - command-line parsing modified to work around a DN bug. Thanks to Robert
+   Riebisch for reporting the issue and to E. C. Masloch for locating the root
+   cause. ref: https://github.com/SvarDOS/bugz/issues/67
+ - implemented the internal LH / LOADHIGH command
+ - SET command: failure to update an env variable does not delete the variable
+ - COPY command: timestamps of copied files are preserved
+
+
+=== ver 2024.1 (17.01.2024) ==================================================
+
+ - EDR-DOS compatibility fixes: resident module's PSP is being patched with
+   cleared JFTs and its parent fields are rewired to SvarCOM. Many thanks to
+   E. C. Masloch (pushbx) for suggesting this.
+ - updated SvarLANG.lib to ver 20230730
+
+
+=== ver 2023.1 (17.02.2023) ==================================================
+
+ - improved BR translations (courtesy of Luzemario Dantes)
+
+
+=== ver 2023.0 (06.02.2023) ==================================================
+
+ - added a dummy INT 0x2E handler
+ - added BR translations (courtesy of Luzemario Dantes)
+
+
+=== ver 2022.4 (12.04.2022) ==================================================
+
+ - SET command: fixed upcasing of var names with high-ASCII chars [#44145]
+ - PATH command: path is always upcased [#44146]
+ - DIR command: output adapted to 40-columns screen modes [#44153]
+ - DIR command: make use of thousands separator for file sizes [#44151]
+ - tabs are accepted as command-line separators (part of [#44145])
+ - PSP FCB fields of launched apps are filled with cmdline arguments [#44268]
+
+
+=== ver 2022.3 (13.03.2022) ==================================================
+
+ - fixed stdin redirection handling (was broken since 2022.1) [#44027]
+ - only COM, EXE and BAT files are allowed for execution [#44068]
+ - FOR command: accepts control characters as pattern delimiters [#44058]
+ - FOR command: patterns without wildcards are processed as messages [#44058]
+ - implemented the TRUENAME command [#44051]
+ - DIR command: /a:xxx is supported like an equivalent to /axxx [#44077]
+ - VER command: displays DOS memory location (low, HMA, ROM...) [#44050]
+ - VER command: displays true DOS version and DOS rev (bttr) [#44050]
+ - REN command: allows renaming directory names [#44060]
+ - implemented CTTY and LOADHIGH/LH as no-ops (LH loads programs low)
+ - LN creates %DOSDIR%\LINKS directory when needed and warns on error [#44042]
+ - LN ADD outputs an error message when link already exists [#44043]
+ - added Polish translations
+ - added German translations, courtesy of Robert Riebisch (bttr)
+ - added French translations, kindly contributed by Berki Yenigun (thraex)
+ - added Turkish translations, submitted by Berki Yenigun (thraex)
+ - fixed and improved English help screens
+
+
+=== ver 2022.2 (04.03.2022) ==================================================
+
+ - added support for the internal FOR command
+ - step-by-step execution of batch files (/Y)
+ - fixed parsing of /C and /K arguments that was leading to spurious warnings
+ - fixed %var% matching within batch files to be case-insensitive [#44000]
+
+
+=== ver 2022.1 (28.02.2022) ==================================================
+
+ - added GOTO support (jumps to a labelled line within a batch file)
+ - added CALL support (calls batch files from within batch files)
+ - DOS errors are output to stdout, and also to stderr if stdout is redirected
+ - fixed batch processing with /C (was executing only first command)
+ - stack overflow detection degrades gracefully by invalidating command-line
+   history (useful if a stack-hungry TSR overflows the RMOD stack)
+ - multi-lang support relies on SvarLANG.lib instead of its own routines
+ - made all SvarCOM strings localizable
+ - added partial German translations (kindly provided by Robert Riebisch)
+
+
+=== ver 2022.0 (01.02.2022) ==================================================
+
+ - added "global executable links" support (new command: LN)
+ - prompt fixed when current drive becomes invalid (eg. empty diskette drive)
+ - piping support (like dir/b | sort)
+ - DIR: fixed /P pagination in wide mode
+ - DIR: implemented /A
+ - implemented IF command (IF EXIST, IF ERRORLEVEL, IF str==str)
+ - added a break handler (running application can be aborted with CTRL+C)
+ - DOS error messages are output to stderr
+
+
+=== ver 2021.0 (24.11.2021) ==================================================
+
+ - first public release, after roughly a month of work
+
+
+====================================================================== EOF ===
