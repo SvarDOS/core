@@ -10,7 +10,7 @@
 all: install.com
 
 install.com: keylay.h install.c deflang.c
-	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=install.map install.c deflang.c mdr\mdrs2024.lib svarlang.lib\svarlngs.lib
+	wcl -0 -y -cc -wx -mt -lr -we -d0 -ox -fm=install.map install.c deflang.c mdr\mdrs2025.lib svarlang.lib\svarlngs.lib
 	upx --8086 -9 install.com
 
 deflang.c: nls/*.txt
