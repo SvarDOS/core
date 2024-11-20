@@ -4,11 +4,11 @@
 
 
 
-=== ver 2024.8 (xx.xx.2024) ==================================================
+=== ver 2024.8 (20.11.2024) ==================================================
 
  - removed all libc dependencies, SvarCOM is linked against WMINCRT now
  - TIME: displays an error if too many arguments are provided + improved help
- - nls update: BR: Luzemario Dantes, DE: Bernd Boeckmann, FR+TR: Berki Yenigun
+ - NLS updates: BR=Luzemario Dantes, DE=Bernd Boeckmann, FR+TR=Berki Yenigun
  - no SVARCOM.LNG reloading after every command when loading fails
  - added /M, keeps lang messages in memory at all times (like /MSG in MS-DOS)
 
