@@ -35,6 +35,7 @@
 
 #include "mdr\cout.h"
 #include "mdr\dos.h"
+#include "mdr\video.h"
 #include "svarlang.lib\svarlang.h"
 
 /* keyboard layouts and locales */
@@ -65,7 +66,7 @@ static char BUILDSTRING[13];
 #define DBG(x) { video_putstringfix(24, 0, 0x4F00u, x, 80); }
 
 struct slocales {
-  char lang[4];
+  const char *lang;
   const char *keybcode;
   unsigned short codepage;
   unsigned char egafile;
@@ -361,9 +362,16 @@ static void kblay2slocal(struct slocales *locales) {
   /* skip keyb code and copy it to locales.keybcode */
   locales->keybcode = m;
   for (; *m != 0; m++);
-  /* */
-  locales->codepage = ((unsigned short)m[1] << 8) | m[2];
-  locales->egafile = m[3];
+
+  /* use the specific codepage only on EGA+ */
+  if (video_detectega()) {
+    locales->codepage = ((unsigned short)m[1] << 8) | m[2];
+    locales->egafile = m[3];
+  } else {
+    locales->codepage = 437;
+    locales->egafile = 0;
+  }
+
   locales->keybfile = m[4];
   locales->keybid = ((unsigned short)m[5] << 8) | m[6];
   locales->countryid = ((unsigned short)m[7] << 8) | m[8];
@@ -408,56 +416,57 @@ static int selectlang(struct slocales *locales) {
   memset(locales, 0, sizeof(struct slocales));
   switch (choice) {
     case 1:
-      strcpy(locales->lang, "BR");
+      locales->lang = "BR";
       locales->keyboff = OFFLOC_BR;
       locales->keyblen = OFFLEN_BR;
       break;
     case 2:
-      strcpy(locales->lang, "FR");
+      locales->lang = "FR";
       locales->keyboff = OFFLOC_FR;
       locales->keyblen = OFFLEN_FR;
       break;
     case 3:
-      strcpy(locales->lang, "DE");
+      locales->lang = "DE";
       locales->keyboff = OFFLOC_DE;
       locales->keyblen = OFFLEN_DE;
       break;
     case 4:
-      strcpy(locales->lang, "IT");
+      locales->lang = "IT";
       locales->keyboff = OFFLOC_IT;
       locales->keyblen = OFFLEN_IT;
       break;
     case 5:
-      strcpy(locales->lang, "PL");
+      locales->lang = "PL";
       locales->keyboff = OFFLOC_PL;
       locales->keyblen = OFFLEN_PL;
       break;
     case 6:
-      strcpy(locales->lang, "RU");
+      locales->lang = "RU";
       locales->keyboff = OFFLOC_RU;
       locales->keyblen = OFFLEN_RU;
       break;
     case 7:
-      strcpy(locales->lang, "SI");
+      locales->lang = "SI";
       locales->keyboff = OFFLOC_SI;
       locales->keyblen = OFFLEN_SI;
       break;
     case 8:
-      strcpy(locales->lang, "SV");
+      locales->lang = "SV";
       locales->keyboff = OFFLOC_SV;
       locales->keyblen = OFFLEN_SV;
       break;
     case 9:
-      strcpy(locales->lang, "TR");
+      locales->lang = "TR";
       locales->keyboff = OFFLOC_TR;
       locales->keyblen = OFFLEN_TR;
       break;
     default:
-      strcpy(locales->lang, "EN");
+      locales->lang = "EN";
       locales->keyboff = 0;
       locales->keyblen = OFFCOUNT;
       break;
   }
+
   /* populate the slocales struct accordingly to the keyboff member */
   kblay2slocal(locales);
   /* */
