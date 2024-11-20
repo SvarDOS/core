@@ -1,5 +1,8 @@
 SvarDOS TREE History / Changes
 
+Nov 20, 2024   SvarDOS TREE 20241120   Berki Yenigun
+               - added FR and updated TR translations
+
 Oct 11, 2024   SvarDOS TREE 20241011   Mateusz Viste
                - volume label is read from the volid file instead of the EBPB
 

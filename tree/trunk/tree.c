@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#define VERSION "20241011"
+#define VERSION "20241120"
 
 /****************************************************************************
 
@@ -13,8 +13,8 @@
   Updated:    September, 2000; October, 2000; November, 2000; January, 2001;
               May, 2004; Sept, 2005
 
-  October 2024: lots of changes by Mateusz Viste, became SvarDOS TREE.
-                See CHANGES.TXT for details.
+  2024:       Lots of changes by Mateusz Viste, became SvarDOS TREE.
+              See CHANGES.TXT for details.
 
 Copyright (c): Public Domain [United States Definition]
 
