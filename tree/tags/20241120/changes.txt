@@ -1,0 +1,232 @@
+SvarDOS TREE History / Changes
+
+Nov 20, 2024   SvarDOS TREE 20241120   Berki Yenigun
+               - added FR and updated TR translations
+
+Oct 11, 2024   SvarDOS TREE 20241011   Mateusz Viste
+               - volume label is read from the volid file instead of the EBPB
+
+Oct 10, 2024   SvarDOS TREE 20241010   Mateusz Viste
+               - ported to Open Watcom, builds with a makefile
+               - replaced all C++ things by proper ANSI C
+               - stripped the Windows API simulation
+               - removed LFN support
+               - replaced CATS by SvarLANG
+               - cleaned up all translation files
+               - reformatted the documentation
+               - replaced all printf calls by ligther equivalents
+               - redefined console ouput operations as direct DOS calls
+               - memory optimizations
+               - lots of code simplifications and refactorizations
+               - documented all switches in /?
+               - added PL language
+               - added DE language (contributed by Bernd Boeckmann)
+
+Sept 12, 2005  pdTree V1.04 Release   KJD
+               Add /DS option to display alternate streams in files
+               on Windows NT systems with NTFS.  Use with /F option.
+               See notes for V1.03 Beta about DOS version.
+
+Dec 03, 2004   --   KJD
+               Official source now in fdos project cvs on SourceForge.
+               Moved fixstub to TOOLS module (fixhdr).
+
+May 30, 2004   pdTree V1.03 Beta Release   KJD
+               Fix so runs on Windows 95 again and compiles for DOS.
+               On NT we use its advanced FindFirstFileEx (which may
+               limit search results to just directories, that is,
+               may omit extranous filename matches).
+               Warning: The /U option should not be used when
+               ran under pure DOS, as the DOS executable [stub]
+               does not yet properly map characters outside of
+               7bit ASCII range to Unicode equivalent.
+               Warning: The DOS version may exit early due to
+               out of memory errors or findnext failing too early.
+
+May 29, 2004   pdTree V1.03 Alpha Release   KJD
+               Update DOS version to properly query screen size
+               and detect if output is redirected or not,
+               so /P produces more correct results.  [Note:
+               if ran under Windows XP (R) console, the size
+               returned by Windows approximates standard display
+               modes and not actual console size.]
+               Add support for FreeDOS tree 3.x display options,
+               /DF (display filesize) and /DA (display attributes).
+               Add support for UTF-8 output (filenames may not
+               be converted correctly under DOS).
+               Changed FindFile functions to use short name for
+               actual query if exists as LFN returned with Unicode
+               values that can't be converted to current ANSI CP
+               may be invalid (include default character replacement
+               for unconvertable values, e.g. ? character).
+
+
+May 22, 2004   pdTree V1.02 Release   KJD
+               Add Latvian translation from Kristaps Kaupe
+               Adjust to continue on certain errors accessing
+               subdirectories (match v1.00 behaviour I believe).
+               Add initial /P option, pause after screenful (80x25).
+               Update Win32 version to also support /S option
+
+
+Feb 11, 2001   pdTree V1.01 Release   KJD
+               Source includes fixstub that can be used to fix DOS
+               executable automatically so can be used as stub
+               for win32 executable (limited testing).
+
+
+Jan 21, 2001   pdTree V1.01 Beta Release   KJD
+               Ensured compiles with Borland's v5 win32 C++ compiler
+               that is freely (if you tell them about yourself)
+               available.  Retested with various versions of DOS
+               and Windows.  Tree.exe is dual Win32 and DOS executable,
+               with both parts compressed with UPX.
+
+
+Jan 18, 2001   pdTree V1.01 Alpha Release   KJD
+               Implemented proper fix for potential stack overwrites
+               on really deep (> 30) directory structures in DOS
+               version.  Now uses non-recursive function to display
+               directory tree, placing necessary information onto
+               the heap via a 'stack' object.  Depth is still
+               limited to available memory, but maintained goal
+               of minimal hard coded limits (if there is enough memory
+               should be able to handle any number of files or
+               subdirectories in a given directory and able to
+               handle any depth directory tree up to MAX PATH length).
+
+
+November, 2000 Fixed relocation table of the dual Win32/DOS binary.
+
+
+Oct 26, 2000   pdTree V1.00 Initial Release   Kenneth J. Davis
+               Initial Release version of my public domain tree.
+               Initially called Tree (and labeled version 4) in hopes
+               it would become the official FreeDOS tree (at version 3),
+               but I have since given up on that and officially released
+               it as pdTree.  Includes the method specified by Borland
+               to insure the stack on the DOS version is 40KB instead
+               of the default 4KB value.  History.txt is now separate
+               as it is for the FreeDOS tree (and this is no longer
+               attempting to be part of that chain).  Updated tree.htm
+               to conform to HTML Help 4.1 help files (added <pre></pre>).
+               Using unmodified Jim Hall's cats v3.8 now.
+               DOS version packed using APACK v0.99b
+               http://apack.cjb.net/ - jibz@hotmail.com - Joergen Ibsen
+               Copyright (c) 1997-2000 by  - Jibz -  All Rights Reserved
+               Greetings. [Apack is free for noncommerical use - with greeting.]
+               Note: apack produces slightly smaller DOS exes than UPX, but
+               UPX will make a win32 only binary about 20k.
+
+
+October, 2000  Tree V4.00 Gold Revision G   KJD
+               Internal version.  Not released.
+
+Sept 11, 2000  Tree V4.00 Gold Revision F Release   KJD
+               Recompiled DOS version using small model.  Found a
+               minor bug in the large model compile. Will be fixed
+               in next release (as soon as I figure out the cause).
+               DOS version now packed using APACK v0.98b
+               http://apack.cjb.net/ - jibz@hotmail.com - Joergen Ibsen
+               Copyright (c) 1997-99 by  - Jibz -  All Rights Reserved
+               Greetings.
+               [ Apack is free for noncommerical use - requires greeting. ]
+
+
+Sept 7, 2000   Tree V4.00 Gold Revision E Release   KJD
+               Updated w32fdos.cpp to use far pointers, allowing it
+               to used in large and compact memory models.
+               Changed traverseTree to reuse buffers instead
+               of adding them to the stack with each recursive call.
+
+Sept 2, 2000   Tree V4.00 Gold Revision D Release   KJD
+               Modified tree source to use latest cats (v3.71), it
+               includes most of the changes I made to v3.6 for
+               prior releases of tree v4.  Changed history.txt to
+               changes.txt.  Added history.txt to reflect FreeDOS
+               versions of tree including ones prior to v4 tree.
+               Added batch files to aid in compiling.
+
+Aug 26, 2000   Tree V4.00 Gold Revision C Updated   KJD
+               Added Aitor Santamaria Merino's corrected spanish
+               translation (tree.es) and changed MAXLINE to support
+               lines twice as long. [version change deemed unneccesary
+               due to lack of availability of prior release]
+
+Aug 25, 2000   Tree V4.00 Gold Revision C Release   KJD
+               Added check in DOS get volume information for FreeDOS
+               returning 0x02=File Not Found, instead of 0x12=No More
+               Files when disk has no label.
+
+Aug 24, 2000   Tree v4.00 Gold Revision B Release   KJD
+               Changed argument processing to allow the switch character
+               and options to be read in from message catalog.  This is
+               to allow easy changing of switch character and language
+               specific option character(s).  Aitor Santamaria Merino
+               is helping me to fix my spanish translation.
+               Added tree.htm for Joe Cosentino's HTML Help (using
+               existing tree.htm from HTML4.ZIP as basis).
+
+
+Aug 22, 2000   Tree v4.00 Gold Revision A Release   KJD
+               Added fix so LFN failure detection works properly under
+               FreeDOS (beta 5 mini boot disk).  Now tree also works
+               under FreeDOS (without using /S switch - force shortnames
+               only).  Also added initial spanish translation.
+
+
+Aug 18, 2000   Tree v4.00 Gold Release   KJD
+               This version contains fully functional tree (win32 and DOS),
+               with support for Long FileNames, [DOS limited] network
+               shares using Universal Naming Convention (\\server\share),
+               near identical output to NT tree, and support for messages
+               catalog (language specific output).  Tested under
+               WinNT 2000SP1, WinNT 4SP6a, Win98SE, PC DOS 2000, and
+               Caldera OpenDOS 7.01  [ Includes minor fixes, such as
+               now using official DOS 4+ documented interface to get
+               disk serial #. ]
+
+Aug 15, 2000   Tree V4.00 Beta4 Release   KJD
+               Added Long FileName support.
+
+Aug 14, 2000   Tree V4.00 Beta3c (Beta3b updated)   KJD
+               Minor code clean up and fixes for failing on network
+               drives (in form \\server\share).
+
+Aug 14, 2000   Tree V4.00 Beta3b (Beta3 updated)   KJD
+               Added a fix to GetVolumeInformation(...) so under NT5
+               properly detects failure.  NT5 does not change the
+               carry flag on int 21h 0x6900, so the only test for
+               failure is if it made no changes.
+
+Aug 13, 2000   Tree V4.00 Beta3 Release   KJD
+               Rewrote w32fdos to directly call DOS's findfirst/findnext.
+               This is a much better DOS implementation.
+
+Aug 13, 2000   Tree V4.00 Beta2 (updated)   KJD
+               Added support for serial# using DOS 4+ internal
+               int 21 0x6900 call.
+
+Aug 11, 2000   Tree V4.00 Beta2 Release   KJD
+               Added DOS support using Borland's findfirst, findnext.
+               Supports volume label but not serial #.
+               Not a good implementation, but appears to work.
+
+Aug 10, 2000   Tree V4.00 Beta Release   KJD
+               Tested cases produce identical results to WinNT's tree.
+               Except return code, which instead of always 0, uses
+               PC DOS 2000's return codes.  Still Win32 only.
+
+Aug 9, 2000    Alpha version (Win32 only) of alternate tree.
+               Adding LFN support and message support, so opting
+               to rewrite instead of retro fitting FreeDOS tree v3.5
+               with LFN findfirst/findnext/findclose and message
+               catalog support.
+
+Feb 2000       KJD For a short time official maintainer of tree.
+               Wanted to add LFN support to tree (current then
+               was v3.2 - port to Borland's compilers from v3.1).
+               But alas, my time was consumed with my last
+               class for my MS in CS. [ And yes I'm still working
+               on that, but its near complete so I took a break
+               to work on this. ]

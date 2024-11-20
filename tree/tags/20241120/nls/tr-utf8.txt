@@ -1,0 +1,41 @@
+# Messages used by SvarDOS TREE
+# Turkish
+
+# main
+1.2:Dizin PATH listelemesi
+1.3:% disk bölümü için dizin PATH listelemesi
+1.4:Bölüm seri numarası %
+1.5:Alt dizin mevcut değil
+1.6: --- Sürdürmek için bir düğmeye basın ---
+
+# showUsage
+2.1:Bir disk bölümünün veya yolun dizin yapısını grafik biçiminde görüntüler.
+2.2:\t
+2.3:TREE [sürücü:][yol] [/F] [/A]
+2.4:\t
+2.5:  /F  Her bir dizindeki dosya adlarını görüntüler.
+2.6:  /A  Genişletilmiş karakterler yerine ASCII kullanır.
+2.7:  /P  Her sayfadan sonra durakla
+2.8:  /V  Sürüm bilgisini göster
+2.10:  /DF  Dosya boyutlarını görüntüle
+2.11:  /DA  Dosya özniteliklerini görüntüle
+2.12:  /DH  Gizli ve sistem dosyalarını görüntüle (normalde gösterilmez)
+2.13:  /DR  Sonuçları sonda görüntüle
+
+# showInvalidUsage
+3.1:Geçersiz anahtar - %
+3.2:Kullanım bilgisi için TREE /? yazın.
+
+# showVersionInfo
+4.0:Köken: Kenneth J. Davis tarafından yazılan pdTREE (2000-2004)
+4.1:Çatallama ve SvarDOS uyarlaması Mateusz Viste tarafından yapılmıştır (2024)
+4.2:Telif hakkı(c): Kamu Malı [Amerika Birleşik Devletleri Tanımı]
+
+# showInvalidDrive
+5.1:Geçersiz sürücü belirtimi
+
+# showInvalidPath
+6.1:Geçersiz yol - %
+
+# misc errors
+7.2:Şu altdizinde bellek yetersiz: %
