@@ -1,3 +1,9 @@
+version 2025 (xx xxx xxxx)
+- added the pktdrv packet driver Ethernet interface
+- added mdr_cout_scrollup()
+- mdr_cout_close() restores the cursor (if it has been hidden)
+- video_detect_ega() returns 0 when EGA is *NOT* found
+
 version 2024 (29 Jul 2024)
 - added the OPL driver (Adlib-style OPL2 FM synth) along with IMF playback
 - new mdr_dos_selfexe()
