@@ -1020,6 +1020,10 @@ static void bootfilesgen(void) {
               "; max. number of files that programs are allowed to open simultaneously\r\n"
               "FILES=25\r\n");
   fprintf(fd, "\r\n"
+              "; SHELL history: this allows to recall previous commands with up/down keys\r\n"
+              "; Value after comma is the amount of allocated bytes (min: 128, max: 4096)\r\n"
+              "HISTORY=ON,256\r\n");
+  fprintf(fd, "\r\n"
               "; XMS memory driver\r\n"
               "DEVICE=%c:\\SVARDOS\\HIMEMX.EXE\r\n", bootdrv);
   fprintf(fd, "\r\n"

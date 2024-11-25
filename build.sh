@@ -229,6 +229,7 @@ cat <<EOF > "$FLOPROOT/config.sys"
 LASTDRIVE=Z
 FILES=8
 BUFFERS=10
+HISTORY=ON,128
 SHELL=COMMAND.COM /e:512 /p
 EOF
 unix2dos "$FLOPROOT/config.sys"
