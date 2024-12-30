@@ -236,6 +236,23 @@ unix2dos "$FLOPROOT/config.sys"
 
 
 echo
+echo "### Computing the USB image"
+echo
+
+# prepare the USB bootable image
+USBIMG=$PUBDIR/svardos-usb.img
+cp files/boot-svardos.img $USBIMG
+mlabel -i "$USBIMG@@32256" ::$CURDATE
+mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
+for p in $COREPKGS ; do
+  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
+done
+
+# compress the USB image
+zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
+
+
+echo
 echo "### Creating floppy images"
 echo
 echo "You might notice a lot of DISK FULL warnings below. Do not worry, these"
@@ -253,26 +270,13 @@ prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
 prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
 prep_flop 40 2  9  360 "$PUBDIR" "360K" "$COREPKGS"
 
-# USB image must happen here because I need an INSTALL.LST file that contains
-# only CORE packages
-echo
-echo "### Computing the USB image"
-echo
-USBIMG=$PUBDIR/svardos-usb.img
-cp files/boot-svardos.img $USBIMG
-mlabel -i "$USBIMG@@32256" ::$CURDATE
-mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
-for p in $COREPKGS ; do
-  mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
-done
-zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
-
 # BNS-enabled (screen reader) 2.88M build
 unzip -CLj "$CDROOT/provox.svp" drivers/provox/provox7.exe -d "$FLOPROOT/"
 unzip -CLj "$CDROOT/provox.svp" drivers/provox/pv7.exe -d "$FLOPROOT/"
 prep_flop 80 2 36 2880 "$PUBDIR" "2.88M-BNS" "$COREPKGS pcntpk videcdd provox" "$CDROOT/bootbns.img"
 rm "$FLOPROOT/provox7.exe"
 rm "$FLOPROOT/pv7.exe"
+
 
 
 echo
