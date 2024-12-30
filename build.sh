@@ -246,7 +246,10 @@ mlabel -i "$USBIMG@@32256" ::$CURDATE
 mcopy -sQm -i "$USBIMG@@32256" "$FLOPROOT/"* ::/
 for p in $COREPKGS ; do
   mcopy -mi "$USBIMG@@32256" "$CDROOT/$p.svp" ::/
+  echo "$p" >> "$FLOPROOT/install.lst"
 done
+mcopy -mi "$USBIMG@@32256" "$FLOPROOT/install.lst" ::/
+rm "$FLOPROOT/install.lst"
 
 # compress the USB image
 zip -mj9 "$PUBDIR/svardos-$CURDATE-usb.zip" "$USBIMG"
