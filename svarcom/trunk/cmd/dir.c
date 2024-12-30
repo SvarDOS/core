@@ -914,7 +914,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
 
     /* /B hides . and .. entries */
-    if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) continue;
+    if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) goto NEXT_ENTRY;
 
     /* turn string lcase (/L) - naive method, only low-ascii */
     if (req.flags & DIR_FLAG_LCASE) {
