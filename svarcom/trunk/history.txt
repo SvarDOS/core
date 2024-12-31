@@ -9,6 +9,7 @@
  - The equal sign is treated as an arg delimiter (MS-DOS compatibility)
  - DIR: /S stack handling fixed (Bernd Boeckmann)
  - DIR: fixed handling of '.' and '..' entries in /B mode (Bernd Boeckmann)
+ - DIR: fixed a major memory leak when /S is combined with /O
 
 
 === ver 2024.8 (20.11.2024) ==================================================
