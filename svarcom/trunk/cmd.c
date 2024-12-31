@@ -174,7 +174,7 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
     buff[i] = cmdline[i];
   }
   buff[i] = 0;
-  if (cmdline[i] != 0) i++;
+  if (cmdline[i] == '=') i++;
 
   /* advance to nearest non-space to find where arguments start */
   while (cmdline[i] == ' ') i++;
@@ -202,8 +202,8 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
 unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist) {
   int si = 0, argc = 0, i = 0;
   for (;;) {
-    /* skip to next non-space character */
-    while (s[si] == ' ') si++;
+    /* skip to next non-space (and non-equal) character */
+    while ((s[si] == ' ') || (s[si] == '=')) si++;
     /* end of string? */
     if (s[si] == 0) break;
     /* set argv ptr */
