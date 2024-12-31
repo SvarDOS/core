@@ -1062,6 +1062,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     if (buf->dtastack[buf->dtastacklen].fname[0] == '.') goto TRYNEXTENTRY;
     /* something found -> add dir to path and redo scan */
     path_add(buf->path, buf->dtastack[buf->dtastacklen].fname);
+    buf->dtastacklen++;
     goto NEXT_ITER;
   }
 
