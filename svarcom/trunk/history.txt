@@ -4,6 +4,13 @@
 
 
 
+=== ver 2025.0 (xx.xx.2025) ==================================================
+
+ - The equal sign is treated as an arg delimiter (MS-DOS compatibility)
+ - DIR: /S stack handling fixed (Bernd Boeckmann)
+ - DIR: fixed handling of '.' and '..' entries in /B mode (Bernd Boeckmann)
+
+
 === ver 2024.8 (20.11.2024) ==================================================
 
  - removed all libc dependencies, SvarCOM is linked against WMINCRT now
