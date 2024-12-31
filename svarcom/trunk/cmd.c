@@ -161,7 +161,7 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
   unsigned short i;
   char buff[10];
 
-  /* copy command to buffer, until space, NULL, tab, return, dot, slash or backslash */
+  /* copy command to buffer, until space, NULL, tab, return, dot, slash, backslash or equal */
   for (i = 0; i < 9; i++) {
     if (cmdline[i] == ' ') break;
     if (cmdline[i] == 0) break;
@@ -170,9 +170,11 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
     if (cmdline[i] == '.') break;
     if (cmdline[i] == '/') break;
     if (cmdline[i] == '\\') break;
+    if (cmdline[i] == '=') break;
     buff[i] = cmdline[i];
   }
   buff[i] = 0;
+  if (cmdline[i] != 0) i++;
 
   /* advance to nearest non-space to find where arguments start */
   while (cmdline[i] == ' ') i++;
@@ -207,10 +209,11 @@ unsigned short cmd_explode(char *buff, const char far *s, char const **argvlist)
     /* set argv ptr */
     if (argvlist) argvlist[argc] = buff + i;
     argc++;
-    /* find next arg delimiter (spc, null, slash or plus) while copying arg to local buffer */
+    /* find next arg delimiter (spc, null, slash, plus or equal) while copying
+     * arg to local buffer */
     do {
       buff[i++] = s[si++];
-    } while (s[si] != ' ' && s[si] != 0 && s[si] != '/' && s[si] != '+');
+    } while (s[si] != ' ' && s[si] != 0 && s[si] != '/' && s[si] != '+' && s[si] != '=');
     buff[i++] = 0;
     /* is this end of string? */
     if (s[si] == 0) break;
