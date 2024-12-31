@@ -496,6 +496,7 @@ void ustoh(char *dst, unsigned short n) {
   n >>= 8;
   dst[0] = h[n >> 4];
   dst[1] = h[n & 15];
+  dst[4] = 0;
 }
 
 
