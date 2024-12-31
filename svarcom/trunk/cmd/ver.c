@@ -166,7 +166,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   }
 
   if (drdosver != 0) {
-    char hexbuf[8];
+    char hexbuf[8] = {0};
     sv_strcpy(buff, svarlang_str(20,11)); /* DR-DOS kernel version % */
     ustoh(hexbuf, drdosver);
     sv_insert_str_in_str(buff, hexbuf);
@@ -174,7 +174,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   }
 
   {
-  char verbuf[8];
+  char verbuf[8] = {0};
   cmd_ver_buildver(verbuf, maj, min);
   sv_strcpy(buff, svarlang_str(20,1)); /* "DOS kernel version %" */
   sv_insert_str_in_str(buff, verbuf);
@@ -186,7 +186,7 @@ static enum cmd_result cmd_ver(struct cmd_funcparam *p) {
   /* 'truemaj' is checked to mitigate the conflict from the CBIS redirector */
   if ((retcode > 1) && (retcode < 255) && (truemaj > 4) && (truemaj < 100)) {
     if ((maj != truemaj) || (min != truemin)) {
-      char verbuf[8];
+      char verbuf[8] = {0};
       cmd_ver_buildver(verbuf, truemaj, truemin);
       output(" (");
       sv_strcpy(buff, svarlang_str(20,10)); /* "true ver %" */
