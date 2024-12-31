@@ -346,7 +346,6 @@ static int filter_attribs(const struct DTA *dta, unsigned char attrfilter_must, 
 
 
 static struct {
-  struct TINYDTA far *dtabuf_root;
   char order[8]; /* GNESD values (ucase = lower first ; lcase = higher first) */
   unsigned char sortownia[256]; /* collation table (used for NLS-aware sorts) */
 } glob_sortcmp_dat;
@@ -628,6 +627,7 @@ static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, u
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
   struct TINYDTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
+  unsigned short max_dta_bufcount; /* max amount of DTAs to buffer with /O */
   unsigned short dtabufcount = 0;
   unsigned short i;
   unsigned short availrows;  /* counter of available rows on display (used for /P) */
@@ -817,6 +817,22 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     availrows -= 2;
   }
 
+  /* if sorting is enabled then allocate a memory buffer - try several sizes
+   * until one succeeds */
+  if (req.flags & DIR_FLAG_SORT) {
+    /* compute the amount of DTAs I can buffer */
+    for (max_dta_bufcount = MAX_SORTABLE_FILES; max_dta_bufcount != 0; max_dta_bufcount /= 2) {
+      dtabuf = cmd_dir_farmalloc(max_dta_bufcount * sizeof(struct TINYDTA) / 16);
+      if (dtabuf != NULL) break;
+    }
+    /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
+
+    if (dtabuf == NULL) {
+      nls_outputnl_doserr(8); /* out of memory */
+      goto GAMEOVER;
+    }
+  }
+
   NEXT_ITER: /* re-entry point for /S recursing */
 
   summary_fcount = 0;
@@ -845,23 +861,6 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
   /* if sorting is involved, then let's buffer all results (and sort them) */
   if (req.flags & DIR_FLAG_SORT) {
-    /* allocate a memory buffer - try several sizes until one succeeds */
-    unsigned short max_dta_bufcount;
-
-    /* compute the amount of DTAs I can buffer */
-    for (max_dta_bufcount = MAX_SORTABLE_FILES; max_dta_bufcount != 0; max_dta_bufcount /= 2) {
-      dtabuf = cmd_dir_farmalloc(max_dta_bufcount * sizeof(struct TINYDTA) / 16);
-      if (dtabuf != NULL) break;
-    }
-    /* printf("max_dta_bufcount = %u\n", max_dta_bufcount); */
-
-    if (dtabuf == NULL) {
-      nls_outputnl_doserr(8); /* out of memory */
-      goto GAMEOVER;
-    }
-
-    /* remember the address so I can free it afterwards */
-    glob_sortcmp_dat.dtabuf_root = dtabuf;
 
     do {
       /* filter out files with uninteresting attributes */
@@ -1097,7 +1096,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   GAMEOVER:
 
   /* free the buffer memory (if used) */
-  if (glob_sortcmp_dat.dtabuf_root != NULL) cmd_dir_farfree(glob_sortcmp_dat.dtabuf_root);
+  if (dtabuf != NULL) cmd_dir_farfree(dtabuf);
 
   return(CMD_OK);
 }
