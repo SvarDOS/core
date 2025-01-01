@@ -67,7 +67,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   }
 
   /* ask for a memory block for the environment and save it to envseg (only if custom size requested) */
-  if (envseg != 0) {
+  if (envsize != 0) {
     envseg = alloc_high_seg(envsize);
   }
 
