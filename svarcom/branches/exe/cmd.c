@@ -38,6 +38,7 @@
 
 #include "svarlang.lib/svarlang.h"
 
+#include "crt.h"
 #include "env.h"
 #include "helpers.h"
 #include "redir.h"
@@ -46,7 +47,6 @@
 #include "version.h"
 
 #include "cmd.h"
-
 
 /* struct used to pass all necessary information to the sub-commands */
 struct cmd_funcparam {

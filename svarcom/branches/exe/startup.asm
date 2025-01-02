@@ -34,18 +34,45 @@
 
 .8086
 
+
+IFDEF DEBUG
+  IFNDEF EXE
+    EXE EQU 1
+  ENDIF
+ENDIF
+
+NULLGUARD_VAL    equ 0101h
+NULLGUARD_COUNT  equ 16
+
 IFNDEF STACKSIZE
 STACKSIZE = 400h
 ENDIF
 
+IFDEF EXE
+      DGROUP group _NULL,_AFTERNULL,CONST,CONST2,STRINGS,_DATA,_BSS,_STACK
+ELSE
       DGROUP group _TEXT,_DATA,CONST,CONST2,_BSS,_STACK
+ENDIF
+
+ASSUME DS:DGROUP,ES:DGROUP
 
       extrn   "C",main : near
 
-      public _cstart_, _small_code_
+IFDEF EXE
+BEGTEXT segment word public 'CODE'
+      dw 10 dup(?)
+BEGTEXT ends
+ENDIF
 
 _TEXT segment word public 'CODE'
+
+      public _cstart_
+      public _small_code_
+      public crt_exit_
+
+IFNDEF EXE
       org   100h
+ENDIF
 
 _small_code_ label near
 
@@ -57,19 +84,25 @@ _cstart_ proc
       ; for this reasons it is beneficial to resize the memory block we occupy
       ; into a more reasonable value
 
+  IFDEF EXE
+      mov ax,seg DGROUP
+      mov ds,ax
+      mov es,ax
+      ; adjust SS, SP to our DGROUP
+      mov ss,ax
+      mov sp,offset DGROUP:_stack_end_
+      mov [_crt_temp_dta],offset DGROUP:dta
+      mov [_crt_temp_cmdline], offset DGROUP:cmdline
+  ELSE
     @verify_stack_size:
       cmp sp,offset DGROUP:_stack_end_
       ja @resize_mem
-      mov dx,offset @memerr
+      mov dx,offset DGROUP:memerr_msg
       jmp _panic_
-      @memerr db 'MEMERR$'
 
       ; step 2: resize our memory block to sp bytes (ie. sp/16 paragraphs)
     @resize_mem:
       mov sp,offset DGROUP:_stack_end_
-      IFDEF STACKSTAT
-        mov [_stack_low_],sp
-      ENDIF STACKSTAT
       mov ah,4ah
       mov bx,sp
       add bx,0fh
@@ -78,6 +111,20 @@ _cstart_ proc
       shr bx,1
       shr bx,1
       int 21h
+  ENDIF
+
+  IFDEF DEBUG
+      ; initialize NULLPTR guard area
+      mov ax,NULLGUARD_VAL
+      mov cx,NULLGUARD_COUNT
+      mov di,offset DGROUP:__nullarea
+      cld
+      rep stosw
+  ENDIF
+
+  IFDEF STACKSTAT
+      mov [_stack_low_],sp
+  ENDIF STACKSTAT
 
       ; clear _BSS to be ANSI C conformant
       mov di,offset DGROUP:_BSS
@@ -88,10 +135,46 @@ _cstart_ proc
       cld
       rep stosw
 
+      ; get our PSP
+      mov ah,51h
+      int 21h
+      mov [_crt_psp],bx
+
+  IFDEF EXE
+      ; set disk transfer address
+      mov ah,1ah
+      mov dx,[_crt_temp_dta]
+      int 21h
+
+      ; copy command line
+      mov ds,bx
+      mov si,80h
+      mov di,offset DGROUP:cmdline
+      mov cx,40h
+      cld
+      rep movsw
+      push es
+      pop ds
+  ENDIF
+
       call main
+
+      jmp crt_exit_
+_cstart_ endp
+
+crt_exit_ proc
+  IFDEF DEBUG
+      ; check for writing NULL ptr
+      mov bx,NULLGUARD_VAL
+      cmp [__nullarea],bx
+      je @done
+      mov dx,offset DGROUP:nullguard_msg
+      jmp _panic_
+  ENDIF
+@done:
       mov ah,4ch
       int 21h
-_cstart_ endp
+crt_exit_ endp
 
 _panic_ proc
       ; output error message in DX, then terminate with FF
@@ -128,25 +211,79 @@ __STK endp
 
       ENDIF
 
-_DATA segment word public 'DATA'
-_DATA ends
+FAR_DATA segment byte public 'FAR_DATA'
+FAR_DATA ends
+
+
+_NULL   segment para public 'BEGDATA'
+
+__nullarea label word
+        public  __nullarea              ; Watcom Debugger needs this!!!
+  IFDEF DEBUG
+      dw      NULLGUARD_VAL dup(NULLGUARD_COUNT)
+  ENDIF
+_NULL   ends
+
+_AFTERNULL segment word public 'BEGDATA'
+      dw      0                       ; nullchar for string at address 0
+_AFTERNULL ends
+
 
 CONST segment word public 'DATA'
+
+memerr_msg db 'MEMERR$'
+
+  IFDEF DEBUG
+      nullguard_msg db 'NULLPTR guard detected write!$'
+  ENDIF
 CONST ends
 
 CONST2 segment word public 'DATA'
 CONST2 ends
 
-_BSS  segment word public 'BSS'
-      IFDEF STACKSTAT
-        public _stack_low_
-        _stack_low_:  dw 1 dup(?)
-      ENDIF STACKSTAT
+STRINGS segment word public 'DATA'
+STRINGS ends
+
+_DATA segment word public 'DATA'
+
+      public _crt_temp_dta
+      public _crt_temp_cmdline
+
+  IFDEF EXE
+    _crt_temp_dta     dw offset DGROUP:dta
+    _crt_temp_cmdline dw offset DGROUP:cmdline
+  ELSE
+    _crt_temp_dta     dw 80h  ; point to PSP if .COM file
+    _crt_temp_cmdline dw 80h  ; point to PSP if .COM file
+  ENDIF
+
+_DATA ends
+
+_BSS segment word public 'BSS'
+
+      public _crt_psp
+
+_crt_psp dw ?                 ; segment of PSP
+
+  IFDEF STACKSTAT
+    public _stack_low_
+    _stack_low_:  dw 1 dup(?)
+  ENDIF STACKSTAT
+
+  IFDEF EXE
+    dta label byte
+    cmdline db 80h dup (?) ; used as DTA etc. when compiled as .EXE
+  ENDIF
 _BSS  ends
 
 ; stack definition, available memory is checked at runtime
 ; defined as segment so that linker may detect .COM size overflow
+IFDEF EXE
+_STACK segment para public 'STACK'
+ELSE
 _STACK segment para public 'TINY_STACK'
+ENDIF
+
 public _stack_end_
       db STACKSIZE dup(?)
 _stack_end_:

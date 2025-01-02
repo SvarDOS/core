@@ -93,7 +93,7 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
   unsigned short srch = 0xffff, dsth = 0xffff;
   unsigned short buffseg = FP_SEG(buff);
   unsigned short buffoff =  FP_OFF(buff);
-
+  (void)dstascii; (void)srcascii;
   _asm {
     push ax
     push bx
@@ -230,7 +230,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   struct copy_setup *setup = (void *)(p->BUFFER);
   unsigned short i;
   unsigned short copiedcount_in = 0, copiedcount_out = 0; /* number of input/output copied files */
-  struct DTA *dta = (void *)0x80; /* use DTA at default location in PSP */
+  struct DTA *dta = crt_temp_dta; /* use default DTA */
 
   if (cmd_ishlp(p)) {
     nls_outputnl(38,0); /* "Copies one or more files to another location." */

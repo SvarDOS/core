@@ -25,6 +25,8 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
+#include "crt.h"
+
 #ifndef NULL
 #define NULL (0)
 #endif
@@ -40,9 +42,6 @@ void dos_get_time(unsigned char *h, unsigned char *m, unsigned char *s);
 int imatchlim(const char *s1, const char *s2, unsigned short maxlen);
 
 #define imatch(a,b) imatchlim(a,b,0xffff)
-
-/* like strlen() */
-unsigned short sv_strlen(const char *s);
 
 /* returns zero if s1 starts with s2 */
 int strstartswith(const char *s1, const char *s2);
@@ -65,29 +64,6 @@ void nls_output_internal(unsigned short id, unsigned char nl, unsigned char hand
 
 /* output DOS error e to stderr, terminated with a CR/LF */
 void nls_outputnl_doserr(unsigned short e);
-
-/*
- * FileInfoRec (DTA) format:
- * offset size desc
- *    +0   21  reserved
- *  +15h    1  file attr (1=RO 2=Hidden 4=System 8=VOL 16=DIR 32=Archive
- *  +16h    2  time: bits 0-4=bi-seconds (0-30), bits 5-10=minutes (0-59), bits 11-15=hour (0-23)
- *  +18h    2  date: bits 0-4=day(0-31), bits 5-8=month (1-12), bits 9-15=years since 1980
- *  +1ah    4  DWORD file size, in bytes
- *  +1eh   13  13-bytes max ASCIIZ filename
- */
-_Packed struct DTA {
-  char reserved[21];
-  unsigned char attr;
-  unsigned short time_sec2:5;
-  unsigned short time_min:6;
-  unsigned short time_hour:5;
-  unsigned short date_dy:5;
-  unsigned short date_mo:4;
-  unsigned short date_yr:7;
-  unsigned long size;
-  char fname[13];
-};
 
 
 /* this is also known as the "Country Info Block" or "CountryInfoRec":
@@ -200,6 +176,12 @@ void sv_strcat(char *dst, const char *s);
 
 /* like strcat() but operates on far pointers */
 void sv_strcat_far(char far *dst, const char far *s);
+
+/* like strlen() */
+unsigned short sv_strlen(const char *s);
+
+/* like len() but operates on far pointers */
+unsigned short sv_strlen_far(const char far *s);
 
 /* fills a nls_patterns struct with current NLS patterns, returns 0 on success, DOS errcode otherwise */
 unsigned short nls_getpatterns(struct nls_patterns *p);

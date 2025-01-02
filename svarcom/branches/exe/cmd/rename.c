@@ -32,7 +32,7 @@ static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
   char *buff1 = p->BUFFER + 512;
   char *buff2 = p->BUFFER + 1024;
   unsigned short i, fnameoffset;
-  struct DTA *dta = (void *)0x80; /* use default DTA in PSP */
+  struct DTA *dta = crt_temp_dta; /* use default DTA */
 
   if (cmd_ishlp(p)) {
     nls_outputnl(25,0); /* "Renames one or more files or directories." */

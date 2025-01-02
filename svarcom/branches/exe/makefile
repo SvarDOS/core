@@ -18,9 +18,10 @@ FEATURES =
 # dump the NLS collate table to screen at each DIR
 #FEATURES += -DDIR_DUMPNLSCOLLATE
 
+LDFLAGS = -q -0 -y -wx -mt -lr -we -fm=command.map
+CFLAGS = -q -0 -wx -ms -we -zl $(FEATURES)
+AFLAGS = -q
 
-LDFLAGS = -0 -y -wx -mt -lr -we -d0 -ox -fm=command.map
-CFLAGS = -0 -wx -ms -we -d0 -ox -zl $(FEATURES)
 # -0   generate 8086 compatible code
 # -y   ignore %WCL% if present
 # -wx  maximum warnings level
@@ -33,14 +34,30 @@ CFLAGS = -0 -wx -ms -we -d0 -ox -zl $(FEATURES)
 #
 # NOTE: wcc does not understand -mt, that is why -ms must be passed instead
 
+!ifdef DEBUG
+EXE = 1
+AFLAGS += -d1 -dDEBUG=1
+CFLAGS += -d2
+LFLAGS += debug all
+!else
+CFLAGS += -d0
+!endif
+
+!ifdef EXE
+AFLAGS += -dEXE=1
+LSYS = dos
+!else
+LSYS = dos com
+!endif
+
 all: command.com
 
 command.com: startup.obj rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
 	# build the final executable
-	*wlink SYSTEM DOS COM OPTION MAP FILE startup,command.obj,cmd.obj,deflang.obj,env.obj,redir.obj,rmodinit.obj,sayonara.obj,helpers.obj,svarlang.lib\svarlngs.lib NAME command.com
+	*wlink system $(LSYS) $(LFLAGS) op map op quiet file startup.obj,command.obj,cmd.obj,deflang.obj,env.obj,redir.obj,rmodinit.obj,sayonara.obj,helpers.obj,svarlang.lib\svarlngs.lib NAME command.com
 
 startup.obj: startup.asm
-	wasm startup.asm -DSTACKSIZE=2048
+	wasm $(AFLAGS) startup.asm -DSTACKSIZE=2048
 
 deflang.obj: lang\*.txt
 	# GENERATE CODEPAGE-SPECIFIC VERSIONS OUT OF UTF-8 FILES

@@ -36,6 +36,7 @@
 
 #include "rmodcore.h" /* rmod binary inside a BUFFER array */
 
+
 /* this version byte is used to tag RMOD so I can easily make sure that
  * the RMOD struct I find in memory is one that I know. Should the version
  * mismatch, then it would likely mean that SvarCOM has been upgraded and
@@ -115,14 +116,6 @@ static int memguard_check(unsigned short rmodseg, char *cmdlinebuf) {
   outputnl(msg);
   return(1);
 }
-
-
-/* exit do DOS with exist code */
-static void EXIT(char code);
-#pragma aux EXIT = \
-"mov ah, 0x4c" \
-"int 0x21" \
-parm [al]
 
 
 /* DR-DOS specific boot processing: check for F5/F8 boot key presses and reset
@@ -213,8 +206,8 @@ static void drdos_init(struct config *cfg) {
 
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
-  unsigned char *cmdlinelen = (void *)0x80;
-  char *cmdline = (void *)0x81;
+  unsigned char *cmdlinelen = crt_temp_cmdline;
+  char *cmdline = crt_temp_cmdline+1;
 
   /* The arg tail at [81h] needs some care when being processed.
    *
@@ -246,7 +239,6 @@ static void parse_argv(struct config *cfg) {
 
   /* process the parameters given to COMMAND.COM */
   while (*cmdline != 0) {
-
     /* skip over any leading spaces */
     if (*cmdline == ' ') {
       cmdline++;
@@ -313,7 +305,7 @@ static void parse_argv(struct config *cfg) {
         nls_outputnl(1,6); /* "/K      Executes the specified command and continues running" */
         nls_outputnl(1,7); /* "/Y      Executes the batch program step by step" */
         nls_outputnl(1,8); /* "/M      Keep the lang messages resident" */
-        EXIT(1);
+        crt_exit(1);
         break;
 
       default:
@@ -694,12 +686,12 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     ExecParam->fcb1 = (unsigned long)MK_FP(rmod->rmodseg, 0x5C);
     ExecParam->fcb2 = (unsigned long)MK_FP(rmod->rmodseg, 0x6C);
   }
-  EXIT(0); /* let rmod do the job now */
+  crt_exit(0); /* let rmod do the job now */
 }
 
 
 static void set_comspec_to_self(unsigned short envseg) {
-  unsigned short *psp_envseg = (void *)(0x2c); /* pointer to my env segment field in the PSP */
+  unsigned short far *psp_envseg = PSP_PTR(0x2c); /* pointer to my env segment field in the PSP */
   char far *myenv = MK_FP(*psp_envseg, 0);
   unsigned short varcount;
   char buff[256] = "COMSPEC=";
@@ -938,7 +930,7 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
    more things to process) */
 static int forloop_process(char *res, struct forctx far *forloop) {
   unsigned short i, t;
-  struct DTA *dta = (void *)0x80; /* default DTA at 80h in PSP */
+  struct DTA *dta = crt_temp_dta; /* default DTA */
   char *fnameptr = dta->fname;
   char *pathprefix = BUFFER + 256;
 

@@ -625,7 +625,7 @@ static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, u
 #define MAX_SORTABLE_FILES (65500 / sizeof(struct TINYDTA))
 
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
-  struct DTA *dta = (void *)0x80; /* set DTA to its default location at 80h in PSP */
+  struct DTA *dta = crt_temp_dta; /* set DTA to its default location */
   struct TINYDTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
   unsigned short max_dta_bufcount; /* max amount of DTAs to buffer with /O */
   unsigned short dtabufcount = 0;

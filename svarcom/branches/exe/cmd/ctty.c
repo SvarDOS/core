@@ -27,6 +27,7 @@
  */
 
 static enum cmd_result cmd_ctty(struct cmd_funcparam *p) {
+  (void)p;
   nls_outputnl(0,9); /* "This command is not implemented" */
   return(CMD_FAIL);
 }

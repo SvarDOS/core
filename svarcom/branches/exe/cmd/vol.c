@@ -29,7 +29,7 @@
 static void cmd_vol_internal(unsigned char drv, char *buff) {
   unsigned short *buff16 = (void *)(buff);
   unsigned short err = 0;
-  struct DTA *dta = (void *)0x80; /* use the default DTA at location 80h in PSP */
+  struct DTA *dta = crt_temp_dta; /* use the default DTA */
 
   outputnl("");  /* start with an empty line to mimic MS-DOS */
 
@@ -41,6 +41,9 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
     push ax
     push cx
     push dx
+    mov dx,[crt_temp_dta] /* set DTA */
+    mov ah,0x1a
+    int 0x21
     mov [err], 0    /* preset errflag to zero */
     mov ah, 0x4e  /* FindFirst */
     mov dx, buff
