@@ -8,6 +8,7 @@
 
  - The equal sign is treated as an arg delimiter (MS-DOS compatibility)
  - fixed a bug causing initial env to be corrupted sometimes (Bernd Boeckmann)
+ - fixed some failing executable lookups in %PATH% (Bernd Boeckmann)
  - DIR: /S stack handling fixed (Bernd Boeckmann)
  - DIR: fixed handling of '.' and '..' entries in /B mode (Bernd Boeckmann)
  - DIR: fixed a major memory leak when /S is combined with /O
