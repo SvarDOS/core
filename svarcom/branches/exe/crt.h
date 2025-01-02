@@ -48,10 +48,10 @@ _Packed struct DTA {
   char fname[13];
 };
 
-#define PSP_PTR(ofs)MK_FP(crt_psp,(ofs))
+#define PSP_PTR(ofs)MK_FP(crt_psp_seg,(ofs))
 
 /* segment (frame) number of our PSP */
-extern unsigned short crt_psp;
+extern unsigned short crt_psp_seg;
 
 /* pointer to command line character array (COM: PSP:80h, EXE: _DATA:crt_cmdline)
    WHY TEMP? because it is shared with the crt_temp_dta buffer,

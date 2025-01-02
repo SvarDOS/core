@@ -7,6 +7,9 @@
 #  wmake           - compiles the program
 #  wmake clean     - cleans up all non-source files
 #
+# To build a debuggable MZ-executable (named command.com):
+#
+#  wmake DEBUG=1
 
 FEATURES =
 

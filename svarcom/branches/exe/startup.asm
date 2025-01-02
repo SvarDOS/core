@@ -42,7 +42,7 @@ IFDEF DEBUG
 ENDIF
 
 NULLGUARD_VAL    equ 0101h
-NULLGUARD_COUNT  equ 16
+NULLGUARD_COUNT  equ 80h      ; check first 256 bytes for writes
 
 IFNDEF STACKSIZE
 STACKSIZE = 400h
@@ -128,7 +128,7 @@ _cstart_ proc
 
       ; clear _BSS to be ANSI C conformant
       mov di,offset DGROUP:_BSS
-      mov cx,offset DGROUP:_STACK
+      mov cx,offset DGROUP:_STACK+1       ; +1 for rounding up against 2
       sub cx,di
       shr cx,1
       xor ax,ax
@@ -138,7 +138,7 @@ _cstart_ proc
       ; get our PSP
       mov ah,51h
       int 21h
-      mov [_crt_psp],bx
+      mov [_crt_psp_seg],bx
 
   IFDEF EXE
       ; set disk transfer address
@@ -165,9 +165,16 @@ _cstart_ endp
 crt_exit_ proc
   IFDEF DEBUG
       ; check for writing NULL ptr
-      mov bx,NULLGUARD_VAL
-      cmp [__nullarea],bx
-      je @done
+      mov bx,ax
+      mov ax,NULLGUARD_VAL
+      mov cx,NULLGUARD_COUNT
+      mov di,offset DGROUP:__nullarea
+      push ds
+      pop es
+      cld
+      repe scasw
+      mov ax,bx
+      jz @done          ; no magic words changed, assume no NULL ptr write
       mov dx,offset DGROUP:nullguard_msg
       jmp _panic_
   ENDIF
@@ -234,7 +241,7 @@ CONST segment word public 'DATA'
 memerr_msg db 'MEMERR$'
 
   IFDEF DEBUG
-      nullguard_msg db 'NULLPTR guard detected write!$'
+      nullguard_msg db 'NULLPTR guard detected write to null area!$'
   ENDIF
 CONST ends
 
@@ -261,9 +268,9 @@ _DATA ends
 
 _BSS segment word public 'BSS'
 
-      public _crt_psp
+      public _crt_psp_seg
 
-_crt_psp dw ?                 ; segment of PSP
+_crt_psp_seg dw ?             ; segment of PSP
 
   IFDEF STACKSTAT
     public _stack_low_
