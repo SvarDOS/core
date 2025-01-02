@@ -92,12 +92,15 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
    06h  11 BYTEs   volume label or "NO NAME    " if none present
    11h   8 BYTEs   filesystem type */
   if ((err == 0) && (buff16[1] | buff16[2])) {
-    char *s;
-    sv_strcpy(buff + 6, svarlang_str(34,4)); /* "Volume Serial Number is %%%%-%%%%" */
-    /* find first % and place there %%%%-%%%% */
-    for (s = buff + 6; *s != '%'; s++);
-    ustoh(s, buff16[2]);
-    ustoh(s+5, buff16[1]);
+    char serialnum[10];
+
+    /* fill serialnum with... the disk's serial num */
+    ustoh(serialnum, buff16[2]);
+    serialnum[4] = '-';
+    ustoh(serialnum+5, buff16[1]);
+
+    sv_strcpy(buff + 6, svarlang_str(34,4)); /* "Volume Serial Number is %" */
+    sv_insert_str_in_str(buff + 6, serialnum);
     outputnl(buff + 6);
   }
 }

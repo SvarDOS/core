@@ -212,7 +212,7 @@
 34.1:VOL [Laufwerk:]
 34.2:Datenträger in Laufwerk @ hat keine Bezeichnung
 34.3:Datenträger in Laufwerk @ ist %
-34.4:Datenträgerseriennummer: %%%%-%%%%
+34.4:Datenträgerseriennummer: %
 
 # IF
 35.0:Führt eine bedingte Verarbeitung in Batchprogrammen durch.
