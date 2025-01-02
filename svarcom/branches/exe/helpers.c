@@ -971,7 +971,7 @@ int lookup_cmd(char *res, const char *fname, const char *path, const char **extp
     i = sv_strlen(path);
     if (path[i - 1] != '\\') i++; /* add a byte for inserting a bkslash after path */
     /* move the filename at the place where path will end */
-    memcpy_rtl(res + i, res + lastbslash + 1, len - lastbslash);
+    sv_memmove(res + i, res + lastbslash + 1, len - lastbslash);
     /* copy path in front of the filename and make sure there is a bkslash sep */
     memcpy_ltr(res, path, i);
     res[i - 1] = '\\';
@@ -1092,6 +1092,13 @@ void memcpy_rtl(void *d, const void *s, unsigned short len) {
     ss--;
     dd--;
   }
+}
+
+
+void * sv_memmove(void *dst, const void *src, unsigned short len) {
+  if (dst < src) memcpy_ltr(dst, src, len);
+  else memcpy_rtl(dst, src, len);
+  return dst;
 }
 
 

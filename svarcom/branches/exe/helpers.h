@@ -222,6 +222,9 @@ void memcpy_ltr_far(void far *d, const void far *s, unsigned short len);
 /* like memcpy() but guarantees to copy from right to left */
 void memcpy_rtl(void *d, const void *s, unsigned short len);
 
+/* copies src into dst, memory regions may overlap */
+void * sv_memmove(void *dst, const void *src, unsigned short len);
+
 /* like bzero(), but accepts far pointers */
 void sv_bzero(void far *dst, unsigned short len);
 
