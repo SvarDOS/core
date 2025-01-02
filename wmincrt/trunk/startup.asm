@@ -8,6 +8,8 @@
 ;   - panics if running out of stack during execution
 ;
 ; WASM definitions:
+;   EXE                   assemble for use with small memory model .EXE
+;   DEBUG                 assemble for debugging (nullptr checks etc.)
 ;   STACKSIZE=<value>     define stack size other than 400h
 ;   NOSTACKCHECK          do not assemble __STK function
 ;   STACKSTAT             remember the minimum SP, maintained by __STK__
@@ -17,20 +19,28 @@
 ;   wasm startup.asm
 ;   wcc -0 -bt=dos -ms -os -zl your_c_file.c
 ;   wlink system dos com file startup,your_c_file
-; and for .EXE:
+;
+; To build an .EXE program:
 ;   wasm -DEXE startup.asm
 ;   wcc -0 -bt=dos -ms -os -zl your_c_file.c
-;   wlink system dos com file startup,your_c_file
+;   wlink system dos file startup,your_c_file
+;
+; To build a debug version of your program:
+;   wasm -d1 -DDEBUG startup.asm
+;   wcc -bt=dos -ms -d2 -zl your_c_file.c
+;   wlink system dos com debug all option map file startup,your_c_file
+;
+; To debug .EXE files:
+;   wasm -d1 -DDEBUG -DEXE startup.asm
+;   wcc -bt=dos -ms -d2 -zl your_c_file.c
+;   wlink system dos debug all option map file startup,your_c_file
+;
 ; To change the stack size, add -DSTACKSIZE=<value> to the wasm call
 ;
 ; To compile without stack checking:
 ;   a) compile this startup file with wasm -DNOSTACKCHECK startup.asm
 ;   b) call the C compiler with -s flag
-;
-; To build a debug version of your program:
-;   wasm -d1 startup.asm
-;   wcc -bt=dos -ms -d2 -zl your_c_file.c
-;   wlink system dos com debug all option map file startup,your_c_file
+
 ;
 ; TODO:
 ;   - display stack statistics on program termination if STACKSTAT is enabled
@@ -38,13 +48,6 @@
 ;   - many more (optional) things while keeping it small :-)
 
 .8086
-
-
-IFDEF DEBUG
-  IFNDEF EXE
-    EXE EQU 1
-  ENDIF
-ENDIF
 
 NULLGUARD_VAL    equ 0101h
 NULLGUARD_COUNT  equ 80h      ; check first 256 bytes for writes
@@ -65,7 +68,7 @@ ASSUME DS:DGROUP,ES:DGROUP
 
     IFDEF EXE
 BEGTEXT segment word public 'CODE'
-      dw 10 dup(?)
+      dw 0  ; not really needed?
 BEGTEXT ends
     ENDIF
 
@@ -119,12 +122,14 @@ _cstart_ proc
   ENDIF
 
   IFDEF DEBUG
+    IFDEF EXE
       ; initialize NULLPTR guard area
       mov ax,NULLGUARD_VAL
       mov cx,NULLGUARD_COUNT
       mov di,offset DGROUP:__nullarea
       cld
       rep stosw
+    ENDIF
   ENDIF
 
   IFDEF STACKSTAT
@@ -169,6 +174,7 @@ _cstart_ endp
 
 crt_exit_ proc
   IFDEF DEBUG
+    IFDEF EXE
       ; check for writing NULL ptr
       mov bx,ax
       mov ax,NULLGUARD_VAL
@@ -180,6 +186,11 @@ crt_exit_ proc
       repe scasw
       mov ax,bx
       jz @done          ; no magic words changed, assume no NULL ptr write
+    ELSE
+      cmp word ptr ds:[0], 20CDh  ; should be INT20, otherwise overwritten!
+      je @done
+    ENDIF
+
       mov dx,offset DGROUP:nullguard_msg
       jmp _panic_
   ENDIF
@@ -226,7 +237,6 @@ __STK endp
 
 FAR_DATA segment byte public 'FAR_DATA'
 FAR_DATA ends
-
 
 _NULL   segment para public 'BEGDATA'
 
