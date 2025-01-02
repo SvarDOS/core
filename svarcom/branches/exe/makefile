@@ -43,7 +43,7 @@ AFLAGS += -d1 -dDEBUG=1
 CFLAGS += -d2
 LFLAGS += debug all
 !else
-CFLAGS += -d0
+CFLAGS += -ox -d0
 !endif
 
 !ifdef EXE
