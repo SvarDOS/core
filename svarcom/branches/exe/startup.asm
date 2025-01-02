@@ -58,11 +58,11 @@ ASSUME DS:DGROUP,ES:DGROUP
 
       extrn   "C",main : near
 
-IFDEF EXE
+    IFDEF EXE
 BEGTEXT segment word public 'CODE'
       dw 10 dup(?)
 BEGTEXT ends
-ENDIF
+    ENDIF
 
 _TEXT segment word public 'CODE'
 
@@ -217,6 +217,8 @@ __STK endp
 
       ENDIF
 
+      IFDEF EXE
+
 FAR_DATA segment byte public 'FAR_DATA'
 FAR_DATA ends
 
@@ -234,6 +236,7 @@ _AFTERNULL segment word public 'BEGDATA'
       dw      0                       ; nullchar for string at address 0
 _AFTERNULL ends
 
+      ENDIF
 
 CONST segment word public 'DATA'
 
@@ -248,8 +251,12 @@ CONST ends
 CONST2 segment word public 'DATA'
 CONST2 ends
 
+      IFDEF EXE
+
 STRINGS segment word public 'DATA'
 STRINGS ends
+
+      ENDIF
 
 _DATA segment word public 'DATA'
 
