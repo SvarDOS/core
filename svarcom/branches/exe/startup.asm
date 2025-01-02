@@ -202,10 +202,9 @@ __STK proc
       cmp ax,offset DGROUP:_STACK - 2 ; -2 is to compensate for __STK ret addr
       jae @l1           ; enough stack => return, else panic
       int 3             ; trap into debugger
-      mov dx,offset @stkerr
+      mov dx,offset DGROUP:stkerr_msg
       add sp,200h       ; make sure we have enough stack to call DOS
       jmp _panic_
-      @stkerr db 'STKERR$'
 @l1:
       IFDEF STACKSTAT   ; update lowest stack pointer if statistics enabled
         cmp [_stack_low_],ax
@@ -239,6 +238,7 @@ _AFTERNULL ends
 CONST segment word public 'DATA'
 
 memerr_msg db 'MEMERR$'
+stkerr_msg db 'STKERR$'
 
   IFDEF DEBUG
       nullguard_msg db 'NULLPTR guard detected write to null area!$'
