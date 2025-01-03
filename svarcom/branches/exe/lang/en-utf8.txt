@@ -211,7 +211,7 @@
 34.1:VOL [drive:]
 34.2:Volume in drive @ has no label
 34.3:Volume in drive @ is %
-34.4:Volume Serial Number is %%%%-%%%%
+34.4:Volume Serial Number is %
 
 # IF
 35.0:Performs conditional processing in batch programs.

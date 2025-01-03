@@ -211,7 +211,7 @@
 34.1:VOL [sürücü:]
 34.2:@ sürücüsündeki birimin etiketi yok
 34.3:@ sürücüsündeki birim şudur %
-34.4:Birim Seri Numarası şudur: %%%%-%%%%
+34.4:Birim Seri Numarası şudur: %
 
 # IF
 35.0:Toplu iş programlarında koşullu işleme yapar.

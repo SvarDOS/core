@@ -211,7 +211,7 @@
 34.1:VOL [dysk:]
 34.2:Wolumin w napędzie @ nie ma etykiety
 34.3:Wolumin w napędzie @ to %
-34.4:Numer seryjny woluminu to %%%%-%%%%
+34.4:Numer seryjny woluminu to %
 
 # IF
 35.0:Wykonuje przetwarzanie warunkowe w programach wsadowych.
