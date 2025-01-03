@@ -24,6 +24,7 @@
 
 #include <i86.h>
 
+#include "crt.h"
 #include "env.h"
 #include "helpers.h"
 
@@ -40,7 +41,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   struct rmod_props far *res;
 
   /* read my current env segment from PSP and save it */
-  envseg = *((unsigned short *)0x2c);
+  envseg = *((unsigned short far *)PSP_PTR(0x2c));
   origenvseg = envseg;
 
   /* printf("original (PSP) env buffer at %04X\r\n", envseg); */
@@ -237,13 +238,13 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   }
 
   /* save my original int22h handler and parent in rmod's memory */
-  res->origint22 = *((unsigned long *)0x0a); /* original int22h handler seg:off is at 0x0a of my PSP */
-  res->origparent = *((unsigned short *)0x16); /* PSP segment of my parent is at 0x16 of my PSP */
+  res->origint22 = *((unsigned long far *)PSP_PTR(0x0a)); /* original int22h handler seg:off is at 0x0a of my PSP */
+  res->origparent = *((unsigned short far *)PSP_PTR(0x16)); /* PSP segment of my parent is at 0x16 of my PSP */
 
   /* set the int22 handler in my PSP to rmod so DOS jumps to rmod after I
    * terminate and save the original handler in rmod's memory */
   {
-    unsigned short *ptr = (void *)0x0a; /* int22 handler is at 0x0A of the PSP */
+    unsigned short far *ptr = PSP_PTR(0x0a); /* int22 handler is at 0x0A of the PSP */
     ptr[0] = RMOD_OFFSET_ROUTINE;
     ptr[1] = rmodseg;
   }
@@ -251,7 +252,7 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   /* set my own parent to RMOD (this is not necessary for MS-DOS nor FreeDOS but
    * might be on other DOS implementations) */
   {
-    unsigned short *ptr = (void *)0x16;
+    unsigned short far *ptr = PSP_PTR(0x16);
     *ptr = rmodseg;
   }
 
@@ -263,10 +264,10 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
  * otherwise return NULL
  * I look at PSP[Ch] to locate RMOD (ie. the "terminate address") */
 struct rmod_props far *rmod_find(unsigned short rmodcore_len) {
-  unsigned short *parent = (void *)0x0C;
+  unsigned short far *parent = PSP_PTR(0x0C);
   unsigned short far *ptr;
   const unsigned short sig[] = {0x1983, 0x1985, 0x2017, 0x2019};
-  unsigned char *cmdtail = (void *)0x80;
+  unsigned char far *cmdtail = PSP_PTR(0x80);
   unsigned char i;
   /* is it rmod? */
   ptr = MK_FP(*parent, 0x100);

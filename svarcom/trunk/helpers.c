@@ -36,7 +36,6 @@
 #include "helpers.h"
 
 
-
 void dos_get_date(unsigned short *y, unsigned char *m, unsigned char *d) {
   /* get cur date */
   _asm {
@@ -68,6 +67,17 @@ void dos_get_time(unsigned char *h, unsigned char *m, unsigned char *s) {
 
 /* like strlen() */
 unsigned short sv_strlen(const char *s) {
+  unsigned short len = 0;
+  while (*s != 0) {
+    s++;
+    len++;
+  }
+  return(len);
+}
+
+
+/* like strlen() but operates on far pointers */
+unsigned short sv_strlen_far(const char far *s) {
   unsigned short len = 0;
   while (*s != 0) {
     s++;

@@ -24,6 +24,7 @@
 
 #include <i86.h>
 
+#include "crt.h"
 #include "rmodinit.h"
 
 #include "sayonara.h"
@@ -33,8 +34,8 @@
  * my parent is unknown */
 void sayonara(struct rmod_props far *rmod) {
   unsigned short rmodseg = rmod->rmodseg;
-  unsigned long *myint22 = (void *)0x0A;
-  unsigned short *myparent = (void *)0x16;
+  unsigned long far *myint22 = PSP_PTR(0x0A);
+  unsigned short far *myparent = PSP_PTR(0x16);
   unsigned short far *rmodenv_ptr = MK_FP(rmodseg, RMOD_OFFSET_ENVSEG);
   unsigned short rmodenv = *rmodenv_ptr;
 
@@ -58,9 +59,7 @@ void sayonara(struct rmod_props far *rmod) {
     mov ah, 0x49   /* DOS 2+ -- Free Memory Block */
     mov es, rmodenv
     int 0x21
-
-    /* gameover */
-    mov ax, 0x4C00 /* DOS 2+ -- Terminate with exit code 0 */
-    int 0x21
   }
+
+  crt_exit(0);
 }
