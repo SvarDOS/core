@@ -140,7 +140,7 @@ static enum cmd_result cmd_lndel(char *buff, const char *linkname, unsigned shor
 
 static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned short env_seg) {
   unsigned short i, pathlen;
-  struct DTA *dta = (void *)0x80;
+  struct DTA *dta = crt_temp_dta;
   char *buff128 = buff + 256;
   char *buff16 = buff128 + 128;
 

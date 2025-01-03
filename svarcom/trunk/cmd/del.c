@@ -34,7 +34,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
   unsigned short pathlimit = 0;
   char *buff = p->BUFFER;
 
-  struct DTA *dta = (void *)0x80; /* use the default DTA at location 80h in PSP */
+  struct DTA *dta = crt_temp_dta; /* use the default DTA */
   char *fname = dta->fname;
 
   if (cmd_ishlp(p)) {
