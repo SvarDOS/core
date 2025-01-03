@@ -1043,8 +1043,6 @@ int main(void) {
   static unsigned char flags;
   static unsigned char far *rmod_farptr;
 
-  //*(unsigned short *)0 = 0x4711;
-
   rmod = rmod_find(BUFFER_len);
   if (rmod == NULL) {
 
