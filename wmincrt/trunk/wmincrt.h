@@ -25,16 +25,17 @@
 #ifndef WMINCRT_H
 #define WMINCRT_H
 
+#ifndef MK_FP
+#  define MK_FP(seg, ofs)(void __far *)(((unsigned long)(seg) << 16) + (ofs))
+#endif
 
-#define PSP_PTR(ofs)MK_FP(crt_psp_seg,(ofs))
+#define PSP_PTR(ofs) MK_FP(crt_psp_seg, ofs)
 
 /* segment (frame) number of our PSP */
 extern unsigned short crt_psp_seg;
 
-/* pointer to command line character array (COM: PSP:80h, EXE: _DATA:crt_cmdline)
-   WHY TEMP? because it is shared with the crt_temp_dta buffer,
-   MEANING crt_temp_cmdline IS OVERWRITTEN AS SOON an operation that requires a DTA
-   is performed. */
+/* pointer to command line character array (COM: PSP:80h, EXE: _DATA:crt_cmdline
+   As this comes from the PSP command tail it MIGHT NOT BE terminated by a 0 or CR! */
 extern char *crt_cmdline;
 
 void crt_exit(int exitcode);
