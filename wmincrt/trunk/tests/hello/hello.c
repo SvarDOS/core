@@ -8,8 +8,8 @@ size_t strlen( const char *text )
 }
 
 /* pragma aus generates more efficient machine code than _asm {} blocks */
-extern unsigned dos_f40h(unsigned handle, const char* data, size_t len);
-#pragma aux dos_f40h = \
+extern unsigned dos_write(unsigned handle, const char* data, size_t len);
+#pragma aux dos_write = \
    "mov ah,40h" \
    "int 21h" \
    parm [bx] [dx] [cx] \
@@ -18,7 +18,7 @@ extern unsigned dos_f40h(unsigned handle, const char* data, size_t len);
 
 void puts( const char *text )
 {
-   dos_f40h(1, text, strlen( text ));
+   dos_write(1, text, strlen( text ));
 }
 
 int main( void )

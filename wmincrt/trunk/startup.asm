@@ -99,8 +99,7 @@ _cstart_ proc
       ; adjust SS, SP to our DGROUP
       mov ss,ax
       mov sp,offset DGROUP:_stack_end_
-      mov [_crt_temp_dta],offset DGROUP:dta
-      mov [_crt_temp_cmdline], offset DGROUP:cmdline
+      mov [_crt_cmdline], offset DGROUP:cmdline
   ELSE
     @verify_stack_size:
       cmp sp,offset DGROUP:_stack_end_
@@ -151,11 +150,6 @@ _cstart_ proc
       mov [_crt_psp_seg],bx
 
   IFDEF EXE
-      ; set disk transfer address
-      mov ah,1ah
-      mov dx,[_crt_temp_dta]
-      int 21h
-
       ; copy command line
       mov ds,bx
       mov si,80h
@@ -241,14 +235,14 @@ FAR_DATA ends
 _NULL   segment para public 'BEGDATA'
 
 __nullarea label word
-        public  __nullarea              ; Watcom Debugger needs this!!!
+      public  __nullarea     ; Watcom Debugger needs this!!!
   IFDEF DEBUG
-      dw      NULLGUARD_VAL dup(NULLGUARD_COUNT)
+      dw NULLGUARD_VAL dup(NULLGUARD_COUNT)
   ENDIF
 _NULL   ends
 
 _AFTERNULL segment word public 'BEGDATA'
-      dw      0                       ; nullchar for string at address 0
+      dw 0                  ; nullchar for string at address 0
 _AFTERNULL ends
 
       ENDIF
@@ -256,8 +250,11 @@ _AFTERNULL ends
 CONST segment word public 'DATA'
 
 memerr_msg db 'MEMERR$'
-stkerr_msg db 'STKERR$'
 
+  IFNDEF NOSTACKCHECK
+      stkerr_msg db 'STKERR$'
+  ENDIF
+  
   IFDEF DEBUG
       nullguard_msg db 'NULLPTR guard detected write to null area!$'
   ENDIF
@@ -275,15 +272,12 @@ STRINGS ends
 
 _DATA segment word public 'DATA'
 
-      public _crt_temp_dta
-      public _crt_temp_cmdline
+      public _crt_cmdline
 
   IFDEF EXE
-    _crt_temp_dta     dw offset DGROUP:dta
-    _crt_temp_cmdline dw offset DGROUP:cmdline
+    _crt_cmdline dw offset DGROUP:cmdline
   ELSE
-    _crt_temp_dta     dw 80h  ; point to PSP if .COM file
-    _crt_temp_cmdline dw 80h  ; point to PSP if .COM file
+    _crt_cmdline dw 80h  ; point to PSP if .COM file
   ENDIF
 
 _DATA ends
@@ -300,8 +294,7 @@ _crt_psp_seg dw ?             ; segment of PSP
   ENDIF STACKSTAT
 
   IFDEF EXE
-    dta label byte
-    cmdline db 80h dup (?) ; used as DTA etc. when compiled as .EXE
+    cmdline db 80h dup (?)    ; used as cmdline buffer
   ENDIF
 _BSS  ends
 
