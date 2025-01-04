@@ -15,7 +15,7 @@ char hextochar( unsigned x )
    return x + '0' + ((x > 9) ? 7 : 0);
 }
 
-void hextostr( unsigned short x, const char *s )
+void hextostr( unsigned short x, char *s )
 {
    s[4] = 0;   
    s[3] = hextochar(x); x >>= 4;
