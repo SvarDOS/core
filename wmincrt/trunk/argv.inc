@@ -79,6 +79,9 @@ IFNDEF NOARGV
 @arg_done:
       mov [si],bl                   ; zero-terminate last argument
       mov word ptr [di],bx          ; zero-terminate argv ptr array
+      inc di                        ; adjust bottom of stack
+      inc di
+      mov [stk_bottom],di
 
       mov ax,[__argc]
       mov dx,[__argv]

@@ -49,6 +49,14 @@ extern char **crt_argv;
    command line tail which is part of the PSP! */
 extern char *crt_cmdline;
 
+/* Stack memory allocation routines, useful if some dynamic memory is
+   required locally. */
+/* crt_stk_alloc reserves memory from the stack (from the bottom) */
+void *crt_stk_mem_alloc(unsigned short size);
+/* crt_stk_dispose resets stack allocation pointer to bottom,
+   freeing all allocated stack memory above. */
+void *crt_stk_mem_rewind(void *bottom);
+
 /* Returns to operating system with exitcode. */
 void crt_exit(int exitcode);
 

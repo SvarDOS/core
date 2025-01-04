@@ -53,6 +53,8 @@ IFNDEF STACKSIZE
 STACKSIZE = 400h
 ENDIF
 
+STK_ALLOC_MARGIN equ 100h  ; stay in distance to SP when allocating
+
 
 INCLUDE "segments.inc"        ; establish segment order
 
@@ -67,8 +69,10 @@ ASSUME DS:DGROUP,ES:DGROUP
 
 _DATA segment
 
-      public _crt_cmdline
+      public stk_bottom
+stk_bottom dw offset DGROUP:_STACK
 
+      public _crt_cmdline
   IFDEF EXE
     _crt_cmdline dw offset DGROUP:cmdline
   ELSE ; EXE
@@ -93,8 +97,10 @@ _BSS  ends
 ; defined as segment so that linker may detect .COM size overflow
 _STACK segment
 
+      public _stack_start_
       public _stack_end_
 
+_stack_start_:
       db STACKSIZE dup(?)
 
 _stack_end_:
@@ -198,7 +204,7 @@ _cstart_ proc
 
       INCLUDE "argv.inc"                ; optional AX=argc, DX=argv handling
       call main
-
+      int 3
       ; fallthrough to crt_exit_
 _cstart_ endp
 
@@ -230,6 +236,8 @@ panic proc
       mov ax,4c7fh      ; terminate with error code 7f
       int 21h
 panic endp
+
+  INCLUDE "alloc.inc"
 
 _TEXT ends
 
@@ -268,16 +276,17 @@ _TEXT segment
 
       public __STK
 
-__STK proc
-      ; ensures that we have enough stack space left. the needed bytes are
-      ; given in AX. panics if stack low.
-
   CONST segment
       stkerr_msg db 'STKERR',13,10,'$'
   CONST ends
+
+__STK proc
+      ; ensures that we have enough stack space left. the needed bytes are
+      ; given in AX. panics if stack low.
       sub ax,sp         ; subtract needed bytes from SP
       neg ax            ; SP-AX = -(AX-SP)
-      cmp ax,offset DGROUP:_STACK - 2 ; -2 is to compensate for __STK ret addr
+      add ax,2          ; +2 is to compensate for __STK ret addr
+      cmp ax,[stk_bottom]
       jae @stk_stat     ; enough stack => return, else panic
   IFDEF DEBUG
       int 3             ; give debugger chance to trap
