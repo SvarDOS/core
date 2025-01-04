@@ -22,7 +22,6 @@ void hextostr( unsigned short x, char *s )
    s[2] = hextochar(x); x >>= 4;
    s[1] = hextochar(x); x >>= 4;
    s[0] = hextochar(x);
-   *(unsigned short *)0 = 0;
 }
 
 /* pragma aux generates more efficient machine code than _asm {} blocks */

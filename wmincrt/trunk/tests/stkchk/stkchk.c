@@ -1,4 +1,4 @@
-/* This should trigger a stack overflow */
+/* This should trigger a stack overflow error message */
 
 int main( void )
 {

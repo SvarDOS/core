@@ -29,21 +29,40 @@
 #  define MK_FP(seg, ofs)(void __far *)(((unsigned long)(seg) << 16) + (ofs))
 #endif
 
+/* FAR pointer into the PSP */
 #define PSP_PTR(ofs) MK_FP(crt_psp_seg, ofs)
 
 /* segment (frame) number of our PSP */
 extern unsigned short crt_psp_seg;
 
-/* remembers lowest SP if stack checking is not disabled */
-extern unsigned short crt_stack_low;
-
-/* pointer to command line character array (COM: PSP:80h, EXE: _DATA:crt_cmdline
-   As this comes from the PSP command tail it MIGHT NOT BE terminated by a 0 or CR! */
+/* Pointer to command line character array.
+   Lives at PSP:80h if .COM is built, otherwise at DGROUP:crt_cmdline.
+   As this comes from the PSP command tail it MIGHT NOT BE terminated
+   by a 0 or CR! */
 extern char *crt_cmdline;
 
+/* Returns to operating system with exitcode. */
 void crt_exit(int exitcode);
 
-/* checks to NULL area for changes, returns 1 if unchanged, 0 otherwise */
+
+/* The following is available if WMINCRT is assembled with DEBUG defined: */
+
+/* Checks NULL area for changes, returns 1 if unchanged, 0 otherwise.
+   NULL area is 2 bytes for .COM files and 256 bytes for .EXE files, so that
+   writes that should have gone to the PSP can be detected.
+
+   The 256 byte .EXE NULL area is filled with INT3 instructions to catch
+   jumps and calls via NULL pointer.
+
+   Check is performed by CRT on program termination. May also be called
+   by the user. */
 int crt_nullarea_check(void);
+
+
+/* the following is available if WMINCRT is assembled with STACKSTAT defined
+   and NOSTACKCHECK UNDEFINED! */
+
+/* remembers lowest SP */
+extern unsigned short crt_stack_low;
 
 #endif

@@ -39,7 +39,7 @@
 ;
 ; To compile without stack checking:
 ;   a) compile this startup file with wasm -DNOSTACKCHECK startup.asm
-;   b) call the C compiler with -s flag
+;   b) call the C compiler with -s flag or optimize via -ox
 
 ;
 ; TODO:
@@ -244,9 +244,14 @@ IFDEF EXE
 ELSE
   NULLGUARD_VAL  equ 20CDh    ; for .COM we check for INT20 in first two
                               ; bytes of PSP
-  NULLGUARD_COUNT  equ 1      ; check first 256 bytes for writes
+  NULLGUARD_COUNT  equ 1
 ENDIF
 
+IFDEF STACKSTAT
+  IFDEF NOSTACKCHECK
+    ERROR "stack statistics requires NOSTACKCHECK to be undefined!"
+  ENDIF
+ENDIF
 
 _TEXT segment
 
@@ -274,7 +279,9 @@ __STK proc
 @stk_stat:
   IFDEF STACKSTAT       ; update lowest stack pointer if statistics enabled
     _BSS segment
+
       public _crt_stack_low
+
       _crt_stack_low:  dw 1 dup(?)
     _BSS ends
 
