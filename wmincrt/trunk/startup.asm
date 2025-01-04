@@ -1,5 +1,5 @@
-; WMINICRT - minimal runtime for (Open) Watcom C to generate DOS .COM files
-;            and small memory model .EXE MZ executables
+; WMINCRT - minimal runtime for (Open) Watcom C to generate DOS .COM files
+;           and small memory model .EXE MZ executables
 ;
 ; The default behaviour of the runtime is:
 ;   - sets up a stack of 400H bytes
@@ -13,7 +13,7 @@
 ;   STACKSIZE=<value>     define stack size other than 400h
 ;   NOSTACKCHECK          do not assemble __STK function
 ;   STACKSTAT             remember the minimum SP, maintained by __STK__
-;                         and exported via _stack_low_.
+;                         and exported via _crt_stack_low.
 ;
 ; To build an executable without build- and linker scripts run for .COM:
 ;   wasm startup.asm
@@ -49,38 +49,70 @@
 
 .8086
 
-NULLGUARD_VAL    equ 0101h
-NULLGUARD_COUNT  equ 80h      ; check first 256 bytes for writes
-
 IFNDEF STACKSIZE
 STACKSIZE = 400h
 ENDIF
 
-IFDEF EXE
-      DGROUP group _NULL,_AFTERNULL,CONST,CONST2,STRINGS,_DATA,_BSS,_STACK
-ELSE
-      DGROUP group _TEXT,_DATA,CONST,CONST2,_BSS,_STACK
-ENDIF
+
+INCLUDE "segments.inc"        ; establish segment order
+
 
 ASSUME DS:DGROUP,ES:DGROUP
 
       extrn   "C",main : near
 
-    IFDEF EXE
-BEGTEXT segment word public 'CODE'
-      dw 0  ; not really needed?
-BEGTEXT ends
-    ENDIF
 
-_TEXT segment word public 'CODE'
+;-----------------------------------------------------------------------------
+; DGROUP: DATA, BSS , STACK etc.
+
+_DATA segment
+
+      public _crt_cmdline
+
+  IFDEF EXE
+    _crt_cmdline dw offset DGROUP:cmdline
+  ELSE ; EXE
+    _crt_cmdline dw 80h  ; point to PSP if .COM file
+  ENDIF ; EXE
+
+_DATA ends
+
+_BSS segment
+
+      public _crt_psp_seg
+
+_crt_psp_seg dw ?             ; segment of PSP
+
+  IFDEF EXE
+    cmdline db 80h dup (?)    ; used as cmdline buffer for .EXE, otherwise PSP
+  ENDIF ; EXE
+
+_BSS  ends
+
+; stack definition, available memory is checked at runtime
+; defined as segment so that linker may detect .COM size overflow
+_STACK segment
+
+      public _stack_end_
+
+      db STACKSIZE dup(?)
+
+_stack_end_:
+_STACK ends
+
+
+;-----------------------------------------------------------------------------
+; COMMON CODE FOR ALL CONFIGURATIONS
+
+_TEXT segment
 
       public _cstart_
       public _small_code_
       public crt_exit_
 
-IFNDEF EXE
+  IFNDEF EXE
       org   100h
-ENDIF
+  ENDIF
 
 _small_code_ label near
 
@@ -100,12 +132,15 @@ _cstart_ proc
       mov ss,ax
       mov sp,offset DGROUP:_stack_end_
       mov [_crt_cmdline], offset DGROUP:cmdline
-  ELSE
+  ELSE EXE
+    CONST segment
+      memerr_msg db 'MEMERR$'
+    CONST ends
     @verify_stack_size:
       cmp sp,offset DGROUP:_stack_end_
       ja @resize_mem
       mov dx,offset DGROUP:memerr_msg
-      jmp _panic_
+      jmp panic
 
       ; step 2: resize our memory block to sp bytes (ie. sp/16 paragraphs)
     @resize_mem:
@@ -118,7 +153,7 @@ _cstart_ proc
       shr bx,1
       shr bx,1
       int 21h
-  ENDIF
+  ENDIF EXE
 
   IFDEF DEBUG
     IFDEF EXE
@@ -128,11 +163,11 @@ _cstart_ proc
       mov di,offset DGROUP:__nullarea
       cld
       rep stosw
-    ENDIF
-  ENDIF
+    ENDIF EXE
+  ENDIF DEBUG
 
   IFDEF STACKSTAT
-      mov [_stack_low_],sp
+      mov [_crt_stack_low],sp
   ENDIF STACKSTAT
 
       ; clear _BSS to be ANSI C conformant
@@ -159,158 +194,163 @@ _cstart_ proc
       rep movsw
       push es
       pop ds
-  ENDIF
+  ENDIF EXE
 
       call main
 
       ; fallthrough to crt_exit_
 _cstart_ endp
 
+
 crt_exit_ proc
   IFDEF DEBUG
-    IFDEF EXE
-      ; check for writing NULL ptr
-      mov bx,ax
-      mov ax,NULLGUARD_VAL
-      mov cx,NULLGUARD_COUNT
-      mov di,offset DGROUP:__nullarea
-      push ds
-      pop es
-      cld
-      repe scasw
-      mov ax,bx
-      jz @done          ; no magic words changed, assume no NULL ptr write
-    ELSE
-      cmp word ptr ds:[0], 20CDh  ; should be INT20, otherwise overwritten!
-      je @done
-    ENDIF
 
+  CONST segment
+      public nullguard_msg
+      nullguard_msg db 'NULLPTR guard detected write to null area!',13,10,'$'
+  CONST ends
+
+      call crt_nullarea_check_
+      cmp byte ptr [crt_nullarea_writes],0
+      je @exit_done
       mov dx,offset DGROUP:nullguard_msg
-      jmp _panic_
-  ENDIF
-@done:
+      jmp panic
+@exit_done:
+  ENDIF DEBUG
       mov ah,4ch
       int 21h
 crt_exit_ endp
 
-_panic_ proc
+
+panic proc
       ; output error message in DX, then terminate with FF
       mov ah,9
       int 21h
-      mov ax,4cffh      ; terminate if not enough stack space
+      mov ax,4c7fh      ; terminate with error code 7f
       int 21h
-_panic_ endp
+panic endp
 
-      IFNDEF NOSTACKCHECK
+_TEXT ends
 
-public __STK
+
+;-----------------------------------------------------------------------------
+; DEBUGGING AND STACK CHECKING ROUTINES
+
+IFDEF EXE
+  NULLGUARD_VAL  equ 0CCCCh   ; INT3 opcode takes us to debugger if we
+                              ;  erronerously call into the null area
+  NULLGUARD_COUNT  equ 80h    ; check first 256 bytes to catch ill-targeted
+                              ;  writes that should go to PSP
+ELSE
+  NULLGUARD_VAL  equ 20CDh    ; for .COM we check for INT20 in first two
+                              ; bytes of PSP
+  NULLGUARD_COUNT  equ 1      ; check first 256 bytes for writes
+ENDIF
+
+
+_TEXT segment
+
+  IFNDEF NOSTACKCHECK
+
+      public __STK
+
 __STK proc
       ; ensures that we have enough stack space left. the needed bytes are
       ; given in AX. panics if stack low.
+
+  CONST segment
+      stkerr_msg db 'STKERR',13,10,'$'
+  CONST ends
       sub ax,sp         ; subtract needed bytes from SP
       neg ax            ; SP-AX = -(AX-SP)
       cmp ax,offset DGROUP:_STACK - 2 ; -2 is to compensate for __STK ret addr
-      jae @l1           ; enough stack => return, else panic
-      int 3             ; trap into debugger
+      jae @stk_stat     ; enough stack => return, else panic
+  IFDEF DEBUG
+      int 3             ; give debugger chance to trap
+  ENDIF DEBUG
       mov dx,offset DGROUP:stkerr_msg
       add sp,200h       ; make sure we have enough stack to call DOS
-      jmp _panic_
-@l1:
-      IFDEF STACKSTAT   ; update lowest stack pointer if statistics enabled
-        cmp [_stack_low_],ax
-        jbe @r
-        mov [_stack_low_],ax
-      ENDIF STACKSTAT
-@r:
+      jmp panic
+@stk_stat:
+  IFDEF STACKSTAT       ; update lowest stack pointer if statistics enabled
+    _BSS segment
+      public _crt_stack_low
+      _crt_stack_low:  dw 1 dup(?)
+    _BSS ends
+
+      cmp [_crt_stack_low],ax
+      jbe @stk_r
+      mov [_crt_stack_low],ax
+  ENDIF STACKSTAT
+@stk_r:
       ret
 __STK endp
 
-      ENDIF
+  ENDIF NOSTACKCHECK
 
-      IFDEF EXE
-
-FAR_DATA segment byte public 'FAR_DATA'
-FAR_DATA ends
-
-_NULL   segment para public 'BEGDATA'
-
-__nullarea label word
-      public  __nullarea     ; Watcom Debugger needs this!!!
   IFDEF DEBUG
-      dw NULLGUARD_VAL dup(NULLGUARD_COUNT)
-  ENDIF
-_NULL   ends
 
-_AFTERNULL segment word public 'BEGDATA'
-      dw 0                  ; nullchar for string at address 0
-_AFTERNULL ends
+      public crt_nullarea_check_
 
-      ENDIF
+  _DATA segment
+      crt_nullarea_writes db 0
+  _DATA ends
 
-CONST segment word public 'DATA'
+crt_nullarea_check_ proc
+  ; checks to nullarea for corruption, triggers INT3 on failed check
+  ; returns 0 on corrupted nullarea, otherwise 1
+  ; returns ZF cleared on corruption, otherwise set
 
-memerr_msg db 'MEMERR$'
+    IFDEF EXE
+      ; check for writing NULL ptr
+      push ax
+      push cx
+      push di
+      mov ax,NULLGUARD_VAL
+      mov cx,NULLGUARD_COUNT
+      mov di,offset DGROUP:__nullarea
+      push es
+      push ds
+      pop es
+      cld
+      repe scasw
+      pop es
+      pop di
+      pop cx
+      pop ax
+      je @chk_done          ; no magic words changed, assume no NULL ptr write
+    ELSE
+      cmp word ptr ds:[0],NULLGUARD_VAL
+      je @chk_done
+    ENDIF
+    mov crt_nullarea_writes,1
+    int 3
+@chk_done:
+    ret
+crt_nullarea_check_ endp
 
-  IFNDEF NOSTACKCHECK
-      stkerr_msg db 'STKERR$'
-  ENDIF
-  
-  IFDEF DEBUG
-      nullguard_msg db 'NULLPTR guard detected write to null area!$'
-  ENDIF
-CONST ends
-
-CONST2 segment word public 'DATA'
-CONST2 ends
-
-      IFDEF EXE
-
-STRINGS segment word public 'DATA'
-STRINGS ends
-
-      ENDIF
-
-_DATA segment word public 'DATA'
-
-      public _crt_cmdline
-
-  IFDEF EXE
-    _crt_cmdline dw offset DGROUP:cmdline
-  ELSE
-    _crt_cmdline dw 80h  ; point to PSP if .COM file
-  ENDIF
-
-_DATA ends
-
-_BSS segment word public 'BSS'
-
-      public _crt_psp_seg
-
-_crt_psp_seg dw ?             ; segment of PSP
-
-  IFDEF STACKSTAT
-    public _stack_low_
-    _stack_low_:  dw 1 dup(?)
-  ENDIF STACKSTAT
-
-  IFDEF EXE
-    cmdline db 80h dup (?)    ; used as cmdline buffer
-  ENDIF
-_BSS  ends
-
-; stack definition, available memory is checked at runtime
-; defined as segment so that linker may detect .COM size overflow
-IFDEF EXE
-_STACK segment para public 'STACK'
-ELSE
-_STACK segment para public 'TINY_STACK'
-ENDIF
-
-public _stack_end_
-      db STACKSIZE dup(?)
-_stack_end_:
-_STACK ends
+  ENDIF DEBUG
 
 _TEXT ends
+
+IFDEF DEBUG
+
+  IFDEF EXE
+
+  _NULL segment
+      public  __nullarea     ; Watcom Debugger needs this!!!
+  __nullarea label word
+
+      dw NULLGUARD_COUNT dup (NULLGUARD_VAL)
+
+  _NULL   ends
+
+  _AFTERNULL segment
+      dw 0                  ; nullchar for string at address 0
+  _AFTERNULL ends
+
+  ENDIF EXE
+
+ENDIF DEBUG
 
       end _cstart_

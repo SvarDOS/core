@@ -1,4 +1,4 @@
-/* This file is part of the SvarCOM project and is published under the terms
+/* This file is part of the SvarDOS project and is published under the terms
  * of the MIT license.
  *
  * Copyright (C) 2021-2024 Bernd Boeckmann, Mateusz Viste
@@ -34,10 +34,16 @@
 /* segment (frame) number of our PSP */
 extern unsigned short crt_psp_seg;
 
+/* remembers lowest SP if stack checking is not disabled */
+extern unsigned short crt_stack_low;
+
 /* pointer to command line character array (COM: PSP:80h, EXE: _DATA:crt_cmdline
    As this comes from the PSP command tail it MIGHT NOT BE terminated by a 0 or CR! */
 extern char *crt_cmdline;
 
 void crt_exit(int exitcode);
+
+/* checks to NULL area for changes, returns 1 if unchanged, 0 otherwise */
+int crt_nullarea_check(void);
 
 #endif

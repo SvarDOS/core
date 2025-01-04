@@ -5,11 +5,11 @@ typedef unsigned size_t;
 size_t strlen( const char *text )
 {
    size_t len = 0;
-   while (text[len]) len++;
+   while ( text[len] ) len++;
    return len;
 }
 
-char hextochar(int x)
+char hextochar( unsigned x )
 {
    x &= 0xf;
    return x + '0' + ((x > 9) ? 7 : 0);
@@ -22,10 +22,11 @@ void hextostr( unsigned short x, char *s )
    s[2] = hextochar(x); x >>= 4;
    s[1] = hextochar(x); x >>= 4;
    s[0] = hextochar(x);
+   *(unsigned short *)0 = 0;
 }
 
-/* pragma aus generates more efficient machine code than _asm {} blocks */
-extern unsigned dos_write(unsigned handle, const char* data, size_t len);
+/* pragma aux generates more efficient machine code than _asm {} blocks */
+extern unsigned dos_write( unsigned handle, const char* data, size_t len );
 #pragma aux dos_write = \
    "mov ah,40h" \
    "int 21h" \
@@ -35,7 +36,7 @@ extern unsigned dos_write(unsigned handle, const char* data, size_t len);
 
 void puts( const char *text )
 {
-   dos_write(1, text, strlen( text ));
+   dos_write( 1, text, strlen( text ) );
 }
 
 int main( void )
