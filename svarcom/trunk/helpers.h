@@ -180,9 +180,6 @@ void sv_strcat_far(char far *dst, const char far *s);
 /* like strlen() */
 unsigned short sv_strlen(const char *s);
 
-/* like len() but operates on far pointers */
-unsigned short sv_strlen_far(const char far *s);
-
 /* fills a nls_patterns struct with current NLS patterns, returns 0 on success, DOS errcode otherwise */
 unsigned short nls_getpatterns(struct nls_patterns *p);
 

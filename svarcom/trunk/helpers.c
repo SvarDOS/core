@@ -76,17 +76,6 @@ unsigned short sv_strlen(const char *s) {
 }
 
 
-/* like strlen() but operates on far pointers */
-unsigned short sv_strlen_far(const char far *s) {
-  unsigned short len = 0;
-  while (*s != 0) {
-    s++;
-    len++;
-  }
-  return(len);
-}
-
-
 /* case-insensitive comparison of strings, compares up to maxlen characters.
  * returns non-zero on equality. */
 int imatchlim(const char *s1, const char *s2, unsigned short maxlen) {
