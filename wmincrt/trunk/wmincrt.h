@@ -35,15 +35,22 @@
 /* segment (frame) number of our PSP */
 extern unsigned short crt_psp_seg;
 
+/* crt_argc and crt_argv contain the values handed over as argc and argv
+   to main(). These are valid for the whole runtime. crt_argv lives at the
+   bottom of the stack. May not be used if NOARGV is given on assembly. */
+extern int crt_argc;
+extern char **crt_argv;
+
 /* Pointer to command line character array.
-   Lives at PSP:80h if .COM is built, otherwise at DGROUP:crt_cmdline.
-   As this comes from the PSP command tail it MIGHT NOT BE terminated
-   by a 0 or CR! */
+   Contains the command line arguments separated by one or more zeroes.
+   crt_argv is a pointer array into it.
+
+   If NOARGV is given on assembly, this instead contains the unprocessed
+   command line tail which is part of the PSP! */
 extern char *crt_cmdline;
 
 /* Returns to operating system with exitcode. */
 void crt_exit(int exitcode);
-
 
 /* The following is available if WMINCRT is assembled with DEBUG defined: */
 

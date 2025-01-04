@@ -1,3 +1,4 @@
+#include "../../wmincrt.h"
 
 typedef unsigned size_t;
 
@@ -25,6 +26,9 @@ void puts( const char *text )
 int main( int argc, char *argv[] )
 {
 	int i;
+	puts( "I am " );
+	puts( crt_argv[0] );
+	puts( "\r\n" );
 	for ( i = 1 ; i < argc ; i++ ) {
 		puts( "ARG [" );
 		puts( argv[i] );

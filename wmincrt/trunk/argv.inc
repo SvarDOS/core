@@ -18,14 +18,22 @@ IFNDEF NOARGV
 
   _DATA segment
       public __argc
+      public _crt_argc
+
+    _crt_argc label word
     __argc dw 1          ; number or arguments, first is program name
+
     prg_name db 'NONAME',0
   _DATA ends
 
   _BSS segment
       public __argv
+      public _crt_argv
+
+    _crt_argv label word
     __argv dw ?          ; pointer to array of cmdline argument pointers
   _BSS ends
+
       xor bx,bx                     ; use bx as zero store
       ; We place to argv pointer array on the bottom of the stack.
       ; We loose a few bytes of stack space, but that should be ok.
