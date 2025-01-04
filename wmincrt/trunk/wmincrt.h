@@ -50,10 +50,11 @@ extern char **crt_argv;
 extern char *crt_cmdline;
 
 /* Stack memory allocation routines, useful if some dynamic memory is
-   required locally. */
+   required locally. It allocates stack from the bottom, so it grows
+   towards the call stack. */
 /* crt_stk_alloc reserves memory from the stack (from the bottom) */
 void *crt_stk_mem_alloc(unsigned short size);
-/* crt_stk_dispose resets stack allocation pointer to bottom,
+/* crt_stk_mem_rewind resets stack allocation pointer to bottom,
    freeing all allocated stack memory above. */
 void *crt_stk_mem_rewind(void *bottom);
 
