@@ -14,6 +14,7 @@
 ;   DEBUG                 assemble for debugging (nullptr checks etc.)
 ;   STACKSIZE=<value>     define stack size other than 400h
 ;   NOARGV                disables argc, argv setup
+;   NOSTACKALLOC          disables the stack allocator
 ;   NOSTACKCHECK          do not assemble __STK function
 ;   STACKSTAT             remember the minimum SP, maintained by __STK__
 ;                         and exported via _crt_stack_low.
@@ -72,6 +73,7 @@ ASSUME DS:DGROUP,ES:DGROUP
 
 _DATA segment
 
+  
       public stk_bottom
 stk_bottom dw offset DGROUP:_STACK
 
@@ -157,10 +159,8 @@ _cstart_ proc
       mov ah,4ah
       mov bx,sp
       add bx,0fh
-      shr bx,1
-      shr bx,1
-      shr bx,1
-      shr bx,1
+      mov cl,4
+      shr bx,cl
       int 21h
   ENDIF EXE
 
@@ -247,7 +247,9 @@ panic proc
       int 21h
 panic endp
 
-  INCLUDE "alloc.inc"
+  IFDEF NOSTACKALLOC
+    INCLUDE "alloc.inc"
+  ENDIF
 
 _TEXT ends
 
