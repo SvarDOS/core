@@ -1,9 +1,11 @@
 ; WMINCRT - minimal runtime for (Open) Watcom C to generate DOS .COM files
 ;           and small memory model .EXE MZ executables
 ;
-; The default behaviour of the runtime is:
+; The default feature set / behaviour of the runtime is:
 ;   - sets up a stack of 400H bytes
 ;   - releases additional memory beyond stack to DOS
+;   - processes command line arguments into argc, argv
+;   - stack based dynamic memory allocation
 ;   - panics on initialization, if not enough memory for stack size
 ;   - panics if running out of stack during execution
 ;
@@ -11,6 +13,7 @@
 ;   EXE                   assemble for use with small memory model .EXE
 ;   DEBUG                 assemble for debugging (nullptr checks etc.)
 ;   STACKSIZE=<value>     define stack size other than 400h
+;   NOARGV                disables argc, argv setup
 ;   NOSTACKCHECK          do not assemble __STK function
 ;   STACKSTAT             remember the minimum SP, maintained by __STK__
 ;                         and exported via _crt_stack_low.
@@ -202,9 +205,16 @@ _cstart_ proc
       pop ds
   ENDIF EXE
 
+  IFNDEF NOARGV
+
       INCLUDE "argv.inc"                ; optional AX=argc, DX=argv handling
+
+      mov ax,[__argc]
+      mov dx,[__argv]
+  ENDIF
+
       call main
-      int 3
+
       ; fallthrough to crt_exit_
 _cstart_ endp
 

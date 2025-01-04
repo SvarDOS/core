@@ -1,5 +1,3 @@
-IFNDEF NOARGV
-
       ; We process the command line given to us by the PSP into the
       ; __argc and __argv variables.
 
@@ -82,7 +80,3 @@ IFNDEF NOARGV
       inc di                        ; adjust bottom of stack
       inc di
       mov [stk_bottom],di
-
-      mov ax,[__argc]
-      mov dx,[__argv]
-ENDIF
