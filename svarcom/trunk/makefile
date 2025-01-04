@@ -59,8 +59,8 @@ command.com: startup.obj rmodcore.h command.obj cmd.obj deflang.obj env.obj redi
 	# build the final executable
 	*wlink system $(LSYS) $(LFLAGS) op map op quiet file startup.obj,command.obj,cmd.obj,deflang.obj,env.obj,redir.obj,rmodinit.obj,sayonara.obj,helpers.obj,svarlang.lib\svarlngs.lib NAME command.com
 
-startup.obj: startup.asm
-	wasm $(AFLAGS) startup.asm -DSTACKSIZE=2048
+startup.obj: wmincrt\startup.asm
+	wasm $(AFLAGS) wmincrt\startup.asm -DSTACKSIZE=2048
 
 deflang.obj: lang\*.txt
 	# GENERATE CODEPAGE-SPECIFIC VERSIONS OUT OF UTF-8 FILES

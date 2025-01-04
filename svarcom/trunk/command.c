@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,7 @@
 #include "rmodinit.h"
 #include "sayonara.h"
 #include "version.h"
+#include "wmincrt/wmincrt.h"
 
 #include "rmodcore.h" /* rmod binary inside a BUFFER array */
 
@@ -206,8 +207,8 @@ static void drdos_init(struct config *cfg) {
 
 /* parses command line the hard way (directly from PSP) */
 static void parse_argv(struct config *cfg) {
-  unsigned char *cmdlinelen = crt_temp_cmdline;
-  char *cmdline = crt_temp_cmdline+1;
+  unsigned char *cmdlinelen = crt_cmdline;
+  char *cmdline = crt_cmdline+1;
 
   /* The arg tail at [81h] needs some care when being processed.
    *
@@ -930,8 +931,8 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
    more things to process) */
 static int forloop_process(char *res, struct forctx far *forloop) {
   unsigned short i, t;
-  struct DTA *dta = crt_temp_dta; /* default DTA */
-  char *fnameptr = dta->fname;
+  struct DTA dta;
+  char *fnameptr = dta.fname;
   char *pathprefix = BUFFER + 256;
 
   *pathprefix = 0;
@@ -977,24 +978,24 @@ static int forloop_process(char *res, struct forctx far *forloop) {
     }
 
     /* FOR in MSDOS 6 includes hidden and system files, but not directories nor volumes */
-    if (findfirst(dta, BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_ARC) != 0) {
+    if (findfirst(&dta, BUFFER, DOS_ATTR_RO | DOS_ATTR_HID | DOS_ATTR_SYS | DOS_ATTR_ARC) != 0) {
       goto TRYAGAIN;
     }
     forloop->dta_inited = 1;
   } else { /* dta in progress */
 
     /* copy forloop DTA to my local copy */
-    memcpy_ltr_far(dta, &(forloop->dta), sizeof(*dta));
+    memcpy_ltr_far(&dta, &(forloop->dta), sizeof(dta));
 
     /* findnext() call */
-    if (findnext(dta) != 0) {
+    if (findnext(&dta) != 0) {
       forloop->dta_inited = 0;
       goto TRYAGAIN;
     }
   }
 
   /* copy updated DTA to rmod */
-  memcpy_ltr_far(&(forloop->dta), dta, sizeof(*dta));
+  memcpy_ltr_far(&(forloop->dta), &dta, sizeof(dta));
 
   /* prefill pathprefix with the prefix (path) of the files */
   {

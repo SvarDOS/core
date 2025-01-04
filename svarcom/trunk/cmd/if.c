@@ -87,7 +87,7 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
    * TODO: checking for a file on an empty diskette drive should NOT lead bother
    *       the user with the stupid 'retry, abort, fail' query! */
   if (imatchlim(s, "EXIST ", 6)) {
-    struct DTA *dta = crt_temp_dta; /* default dta location */
+    struct DTA dta;
     JMP_NEXT_ARG(s);
     /* copy filename to buffer */
     for (i = 0; (s[i] != ' ') && (s[i] != 0); i++) p->BUFFER[i] = s[i];
@@ -96,7 +96,7 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
     JMP_NEXT_ARG(s);
     if (*s == 0) goto SYNTAX_ERR; /* check now to avoid moving the diskette drive if syntax bad anyway */
     /* does file exist? */
-    if (findfirst(dta, p->BUFFER, 0) == 0) negflag ^= 1;
+    if (findfirst(&dta, p->BUFFER, 0) == 0) negflag ^= 1;
     goto EXEC_S_CMD_IF_NEGFLAG_SET;
   }
 

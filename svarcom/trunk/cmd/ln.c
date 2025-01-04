@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -140,9 +140,9 @@ static enum cmd_result cmd_lndel(char *buff, const char *linkname, unsigned shor
 
 static enum cmd_result cmd_lnlist(char *buff, const char *linkname, unsigned short env_seg) {
   unsigned short i, pathlen;
-  struct DTA *dta = crt_temp_dta;
   char *buff128 = buff + 256;
   char *buff16 = buff128 + 128;
+  struct DTA *dta = (void *)(buff16 + 16);
 
   if (linkname != NULL) {
     /* make sure link pattern is valid (must not contain '.' or '\\' or '/') */

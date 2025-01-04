@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -625,7 +625,7 @@ static void dir_print_summary_files(char *buff64, unsigned short uint32maxlen, u
 #define MAX_SORTABLE_FILES (65500 / sizeof(struct TINYDTA))
 
 static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
-  struct DTA *dta = crt_temp_dta; /* set DTA to its default location */
+  struct DTA dta;
   struct TINYDTA far *dtabuf = NULL; /* used to buffer results when sorting is enabled */
   unsigned short max_dta_bufcount; /* max amount of DTAs to buffer with /O */
   unsigned short dtabufcount = 0;
@@ -845,7 +845,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   if (buf->path[i - 1] == '\\') sv_strcat(buf->path, "????????.???");
 
   /* ask DOS for list of files, but only with allowed attribs */
-  i = findfirst(dta, buf->path, req.attrfilter_may);
+  i = findfirst(&dta, buf->path, req.attrfilter_may);
 
   /* print "directory of" unless /B or /S mode with no match */
   if ((req.format != DIR_OUTPUT_BARE) && (((req.flags & DIR_FLAG_RECUR) == 0) || (i == 0))) {
@@ -864,20 +864,20 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     do {
       /* filter out files with uninteresting attributes */
-      if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
+      if (filter_attribs(&dta, req.attrfilter_must, req.attrfilter_may) == 0) continue;
 
       /* /B hides . and .. entries */
-      if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) continue;
+      if ((req.format == DIR_OUTPUT_BARE) && (dta.fname[0] == '.')) continue;
 
       /* normalize "size" of directories to zero because kernel returns garbage
        * sizes for directories which might confuse the sorting routine later */
-      if (dta->attr & DOS_ATTR_DIR) dta->size = 0;
+      if (dta.attr & DOS_ATTR_DIR) dta.size = 0;
 
-      memcpy_ltr_far(&(dtabuf[dtabufcount]), ((char *)dta) + 22, sizeof(struct TINYDTA));
+      memcpy_ltr_far(&(dtabuf[dtabufcount]), ((char *)&dta) + 22, sizeof(struct TINYDTA));
 
       /* save attribs in sec field, otherwise zero it (this field is not
        * displayed and dropping the attr field saves 2 bytes per entry) */
-      dtabuf[dtabufcount++].time_sec2 = (dta->attr & 31);
+      dtabuf[dtabufcount++].time_sec2 = (dta.attr & 31);
 
       /* do I have any space left? */
       if (dtabufcount == max_dta_bufcount) {
@@ -886,7 +886,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         break;
       }
 
-    } while (findnext(dta) == 0);
+    } while (findnext(&dta) == 0);
 
     /* no match? kein gluck! (this can happen when filtering attribs with /A:xxx
      * because while findfirst() succeeds, all entries can be rejected) */
@@ -901,8 +901,8 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
 
     /* preload first entry (last, since entries are sorted in reverse) */
     dtabufcount--;
-    memcpy_ltr_far(((unsigned char *)dta) + 22, dtabuf + dtabufcount, sizeof(struct TINYDTA));
-    dta->attr = dtabuf[dtabufcount].time_sec2; /* restore attr from the abused time_sec2 field */
+    memcpy_ltr_far(((unsigned char *)&dta) + 22, dtabuf + dtabufcount, sizeof(struct TINYDTA));
+    dta.attr = dtabuf[dtabufcount].time_sec2; /* restore attr from the abused time_sec2 field */
   }
 
   wcolcount = 0; /* may be used for columns counting with wide mode */
@@ -910,14 +910,14 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   for (;;) {
 
     /* filter out attributes (skip if entry comes from buffer, then it was already veted) */
-    if (filter_attribs(dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
+    if (filter_attribs(&dta, req.attrfilter_must, req.attrfilter_may) == 0) goto NEXT_ENTRY;
 
     /* /B hides . and .. entries */
-    if ((req.format == DIR_OUTPUT_BARE) && (dta->fname[0] == '.')) goto NEXT_ENTRY;
+    if ((req.format == DIR_OUTPUT_BARE) && (dta.fname[0] == '.')) goto NEXT_ENTRY;
 
     /* turn string lcase (/L) - naive method, only low-ascii */
     if (req.flags & DIR_FLAG_LCASE) {
-      char *s = dta->fname;
+      char *s = dta.fname;
       while (*s != 0) {
         if ((*s >= 'A') && (*s <= 'Z')) *s |= 0x20;
         s++;
@@ -925,17 +925,17 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     }
 
     summary_fcount++;
-    if ((dta->attr & DOS_ATTR_DIR) == 0) summary_totsz += dta->size;
+    if ((dta.attr & DOS_ATTR_DIR) == 0) summary_totsz += dta.size;
 
     switch (req.format) {
       case DIR_OUTPUT_NORM:
         /* print fname-space-extension (unless it's "." or "..", then print as-is) */
-        if (dta->fname[0] == '.') {
-          output(dta->fname);
-          i = sv_strlen(dta->fname);
+        if (dta.fname[0] == '.') {
+          output(dta.fname);
+          i = sv_strlen(dta.fname);
           while (i++ < 12) output(" ");
         } else {
-          file_fname2fcb(buf->buff64, dta->fname);
+          file_fname2fcb(buf->buff64, dta.fname);
           memcpy_rtl(buf->buff64 + 9, buf->buff64 + 8, 4);
           buf->buff64[8] = ' ';
           output(buf->buff64);
@@ -946,36 +946,36 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
         {
           unsigned short szlen = 10 + (sv_strlen(buf->nls.thousep) * 3);
           sv_memset(buf->buff64, ' ', 16);
-          if (dta->attr & DOS_ATTR_DIR) {
+          if (dta.attr & DOS_ATTR_DIR) {
             sv_strcpy(buf->buff64 + szlen, svarlang_str(37,21));
           } else {
-            nls_format_number(buf->buff64 + 12, dta->size, &(buf->nls));
+            nls_format_number(buf->buff64 + 12, dta.size, &(buf->nls));
           }
           output(buf->buff64 + sv_strlen(buf->buff64) - szlen);
         }
         /* one spaces and NLS DATE */
         buf->buff64[0] = ' ';
         if (screenw >= 80) {
-          nls_format_date(buf->buff64 + 1, dta->date_yr + 1980, dta->date_mo, dta->date_dy, &(buf->nls));
+          nls_format_date(buf->buff64 + 1, dta.date_yr + 1980, dta.date_mo, dta.date_dy, &(buf->nls));
         } else {
-          nls_format_date(buf->buff64 + 1, (dta->date_yr + 80) % 100, dta->date_mo, dta->date_dy, &(buf->nls));
+          nls_format_date(buf->buff64 + 1, (dta.date_yr + 80) % 100, dta.date_mo, dta.date_dy, &(buf->nls));
         }
         output(buf->buff64);
 
         /* one space and NLS TIME */
-        nls_format_time(buf->buff64 + 1, dta->time_hour, dta->time_min, 0xff, &(buf->nls));
+        nls_format_time(buf->buff64 + 1, dta.time_hour, dta.time_min, 0xff, &(buf->nls));
         outputnl(buf->buff64);
         break;
 
       case DIR_OUTPUT_WIDE: /* display in columns of 12 chars per item */
-        i = sv_strlen(dta->fname);
-        if (dta->attr & DOS_ATTR_DIR) {
+        i = sv_strlen(dta.fname);
+        if (dta.attr & DOS_ATTR_DIR) {
           i += 2;
           output("[");
-          output(dta->fname);
+          output(dta.fname);
           output("]");
         } else {
-          output(dta->fname);
+          output(dta.fname);
         }
         while (i++ < WCOLWIDTH) output(" ");
         if (++wcolcount == wcols) {
@@ -989,7 +989,7 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
       case DIR_OUTPUT_BARE:
         /* if /B used in combination with /S then files are displayed with full path */
         if (req.flags & DIR_FLAG_RECUR) dir_print_dirprefix(buf->path);
-        outputnl(dta->fname);
+        outputnl(dta.fname);
         break;
     }
 
@@ -999,10 +999,10 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     /* take next entry, either from buf or disk */
     if (dtabufcount > 0) {
       dtabufcount--;
-      memcpy_ltr_far(((unsigned char *)dta) + 22, dtabuf + dtabufcount, sizeof(struct TINYDTA));
-      dta->attr = dtabuf[dtabufcount].time_sec2; /* restore attr from the abused time_sec2 field */
+      memcpy_ltr_far(((unsigned char *)&dta) + 22, dtabuf + dtabufcount, sizeof(struct TINYDTA));
+      dta.attr = dtabuf[dtabufcount].time_sec2; /* restore attr from the abused time_sec2 field */
     } else {
-      if (findnext(dta) != 0) break;
+      if (findnext(&dta) != 0) break;
     }
 
   }
@@ -1034,17 +1034,17 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
     memcpy_ltr(backup, s, 4);
     memcpy_ltr(s, "*.*", 4);
     //printf("'%s'\n", buf->path);
-    if (findfirst(dta, buf->path, DOS_ATTR_DIR) == 0) {
+    if (findfirst(&dta, buf->path, DOS_ATTR_DIR) == 0) {
       memcpy_ltr(s, backup, 4);
       for (;;) {
-        if ((dta->fname[0] != '.') && (dta->attr & DOS_ATTR_DIR)) break;
-        if (findnext(dta) != 0) goto NOSUBDIR;
+        if ((dta.fname[0] != '.') && (dta.attr & DOS_ATTR_DIR)) break;
+        if (findnext(&dta) != 0) goto NOSUBDIR;
       }
       //printf("GOT DIR (/S): '%s'\n", dta->fname);
       /* add dir to path and redo scan */
-      memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), dta, sizeof(struct DTA));
+      memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), &dta, sizeof(struct DTA));
       buf->dtastacklen++;
-      path_add(buf->path, dta->fname);
+      path_add(buf->path, dta.fname);
       goto NEXT_ITER;
     }
     memcpy_ltr(s, backup, 4);

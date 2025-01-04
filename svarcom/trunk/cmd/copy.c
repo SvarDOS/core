@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -230,7 +230,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   struct copy_setup *setup = (void *)(p->BUFFER);
   unsigned short i;
   unsigned short copiedcount_in = 0, copiedcount_out = 0; /* number of input/output copied files */
-  struct DTA *dta = crt_temp_dta; /* use default DTA */
+  struct DTA dta;
 
   if (cmd_ishlp(p)) {
     nls_outputnl(38,0); /* "Copies one or more files to another location." */
@@ -417,16 +417,16 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
     }
 
     /* */
-    if (findfirst(dta, setup->cursrc, 0) != 0) {
+    if (findfirst(&dta, setup->cursrc, 0) != 0) {
       continue;
     }
 
     do {
       char appendflag;
-      if (dta->attr & DOS_ATTR_DIR) continue; /* skip directories */
+      if (dta.attr & DOS_ATTR_DIR) continue; /* skip directories */
 
       /* compute full path/name of the file */
-      sv_strcpy(setup->cursrc + pathendoffset, dta->fname);
+      sv_strcpy(setup->cursrc + pathendoffset, dta.fname);
 
       /* if there was no destination, then YOU are the destination now!
        * this handles situations like COPY a.txt+b.txt+c.txt */
@@ -439,7 +439,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       }
 
       /* is dst ending with a backslash? then append fname to it */
-      if (setup->dst[setup->dstlen - 1] == '\\') sv_strcpy(setup->dst + setup->dstlen, dta->fname);
+      if (setup->dst[setup->dstlen - 1] == '\\') sv_strcpy(setup->dst + setup->dstlen, dta.fname);
 
       /* now cursrc contains the full source and dst contains the full dest... COPY TIME! */
 
@@ -466,7 +466,7 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       }
 
       copiedcount_in++;
-    } while (findnext(dta) == 0);
+    } while (findnext(&dta) == 0);
 
   }
 

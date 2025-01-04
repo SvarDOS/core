@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -38,13 +38,13 @@
 
 #include "svarlang.lib/svarlang.h"
 
-#include "crt.h"
 #include "env.h"
 #include "helpers.h"
 #include "redir.h"
 #include "rmodinit.h"
 #include "sayonara.h"
 #include "version.h"
+#include "wmincrt/wmincrt.h"
 
 #include "cmd.h"
 

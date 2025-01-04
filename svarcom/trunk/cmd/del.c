@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,8 +34,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
   unsigned short pathlimit = 0;
   char *buff = p->BUFFER;
 
-  struct DTA *dta = crt_temp_dta; /* use the default DTA */
-  char *fname = dta->fname;
+  struct DTA dta;
 
   if (cmd_ishlp(p)) {
     nls_outputnl(36,0); /* "Deletes one or more files." */
@@ -94,20 +93,20 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
 
     /* exec FindFirst or FindNext */
     if (i == 0) {
-      err = findfirst(dta, buff, DOS_ATTR_RO | DOS_ATTR_SYS | DOS_ATTR_HID);
+      err = findfirst(&dta, buff, DOS_ATTR_RO | DOS_ATTR_SYS | DOS_ATTR_HID);
       if (err != 0) { /* report the error only if query had no wildcards */
         for (i = 0; buff[i] != 0; i++) if (buff[i] == '?') break;
         if (buff[i] == 0) nls_outputnl_doserr(err);
         break;
       }
     } else {
-      if (findnext(dta) != 0) break; /* do not report errors on findnext() */
+      if (findnext(&dta) != 0) break; /* do not report errors on findnext() */
     }
 
     /* prep the full path/name of the file in buff */
     /* NOTE: buff contained the search pattern but it is no longer needed so I
      * can reuse it now */
-    sv_strcpy(buff + pathlimit, fname);
+    sv_strcpy(buff + pathlimit, dta.fname);
 
     /* ask if confirmation required: PLIK.TXT  Delete (Y/N)? */
     if (confirmflag) {
@@ -131,7 +130,7 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
     }
 
     if (err != 0) {
-      output(fname);
+      output(dta.fname);
       output(": ");
       nls_outputnl_doserr(err);
       break;

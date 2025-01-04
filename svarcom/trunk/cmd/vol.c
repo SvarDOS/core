@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,8 @@
 static void cmd_vol_internal(unsigned char drv, char *buff) {
   unsigned short *buff16 = (void *)(buff);
   unsigned short err = 0;
-  struct DTA *dta = crt_temp_dta; /* use the default DTA */
+  struct DTA dta;
+  struct DTA *dtaptr = &dta;
 
   outputnl("");  /* start with an empty line to mimic MS-DOS */
 
@@ -41,14 +42,14 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
     push ax
     push cx
     push dx
-    mov dx,[crt_temp_dta] /* set DTA */
+    mov dx,[dtaptr] /* set DTA */
     mov ah,0x1a
     int 0x21
     mov [err], 0    /* preset errflag to zero */
-    mov ah, 0x4e  /* FindFirst */
+    mov ah, 0x4e    /* FindFirst */
     mov dx, buff
-    mov cx, 0x08  /* match volume labels only */
-    int 0x21      /* dta filled or CF set on error */
+    mov cx, 0x08    /* match volume labels only */
+    int 0x21        /* dta filled or CF set on error */
     jnc DONE
     mov [err], ax
     DONE:
@@ -62,10 +63,10 @@ static void cmd_vol_internal(unsigned char drv, char *buff) {
     sv_strtr(buff, '@', 'A' + drv);
   } else {
     /* if label > 8 chars then drop the dot (DRIVE_LA.BEL -> DRIVE_LABEL) */
-    if (sv_strlen(dta->fname) > 8) memcpy_ltr(dta->fname + 8, dta->fname + 9, 4);
+    if (sv_strlen(dta.fname) > 8) memcpy_ltr(dta.fname + 8, dta.fname + 9, 4);
     sv_strcpy(buff, svarlang_str(34,3)); /* "Volume in drive @ is %" */
     sv_strtr(buff, '@', 'A' + drv);
-    sv_insert_str_in_str(buff, dta->fname);
+    sv_insert_str_in_str(buff, dta.fname);
   }
   outputnl(buff);
 

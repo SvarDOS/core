@@ -27,12 +27,19 @@
  */
 
 static enum cmd_result cmd_rename(struct cmd_funcparam *p) {
-  char *src = p->BUFFER;
-  char *dst = p->BUFFER + 256;
-  char *buff1 = p->BUFFER + 512;
-  char *buff2 = p->BUFFER + 1024;
+  struct {
+    char src[256];
+    char dst[256];
+    char buff1[256];
+    char buff2[512];
+    struct DTA dta;
+  } *stuff = (void *)p->BUFFER;
+  char *src = stuff->src;
+  char *dst = stuff->dst;
+  char *buff1 = stuff->buff1;
+  char *buff2 = stuff->buff2;
+  struct DTA *dta = &(stuff->dta);
   unsigned short i, fnameoffset;
-  struct DTA *dta = crt_temp_dta; /* use default DTA */
 
   if (cmd_ishlp(p)) {
     nls_outputnl(25,0); /* "Renames one or more files or directories." */

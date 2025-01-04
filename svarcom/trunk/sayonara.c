@@ -24,8 +24,8 @@
 
 #include <i86.h>
 
-#include "crt.h"
 #include "rmodinit.h"
+#include "wmincrt/wmincrt.h"
 
 #include "sayonara.h"
 
