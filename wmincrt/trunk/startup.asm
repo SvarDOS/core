@@ -247,7 +247,7 @@ panic proc
       int 21h
 panic endp
 
-  IFDEF NOSTACKALLOC
+  IFNDEF NOSTACKALLOC
     INCLUDE "alloc.inc"
   ENDIF
 
