@@ -196,6 +196,7 @@ _cstart_ proc
       pop ds
   ENDIF EXE
 
+      INCLUDE "argv.inc"                ; optional AX=argc, DX=argv handling
       call main
 
       ; fallthrough to crt_exit_

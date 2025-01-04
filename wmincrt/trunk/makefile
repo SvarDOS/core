@@ -4,6 +4,9 @@ all: .symbolic
 	echo Run wmake clean to clean the tree
 
 clean: .symbolic
+	rm -f tests/argv/*.exe
+	rm -f tests/argv/*.obj
+	rm -f tests/argv/*.map
 	rm -f tests/hello/*.com
 	rm -f tests/hello/*.exe
 	rm -f tests/hello/*.obj
