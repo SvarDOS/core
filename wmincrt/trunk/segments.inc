@@ -9,7 +9,6 @@ ENDIF EXE
 
 IFDEF EXE
   BEGTEXT segment word public 'CODE'
-      dw 0  ; not really needed?
   BEGTEXT ends
 ENDIF EXE
 

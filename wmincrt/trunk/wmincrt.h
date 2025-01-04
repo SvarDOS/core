@@ -52,7 +52,7 @@ void crt_exit(int exitcode);
    writes that should have gone to the PSP can be detected.
 
    The 256 byte .EXE NULL area is filled with INT3 instructions to catch
-   jumps and calls via NULL pointer.
+   jumps and calls to that region.
 
    Check is performed by CRT on program termination. May also be called
    by the user. */

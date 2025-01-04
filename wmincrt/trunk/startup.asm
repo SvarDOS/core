@@ -253,6 +253,14 @@ IFDEF STACKSTAT
   ENDIF
 ENDIF
 
+IFDEF DEBUG
+  IFDEF EXE
+    BEGTEXT segment word public 'CODE'
+      int 3                   ; catch jumps / calls via NULL ptr
+    BEGTEXT ends
+  ENDIF
+ENDIF ENDIF
+
 _TEXT segment
 
   IFNDEF NOSTACKCHECK
