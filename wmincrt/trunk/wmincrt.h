@@ -54,13 +54,13 @@ extern char *crt_cmdline;
    towards the call stack. */
 /* crt_stk_alloc reserves memory from the stack (from the bottom).
    Returns a valid pointer, or 0 on failure. */
-void *crt_stk_mem_alloc(unsigned short size);
+void __watcall *crt_stk_mem_alloc(unsigned short size);
 /* crt_stk_mem_rewind resets stack allocation pointer to bottom,
    freeing all allocated stack memory above. */
-void *crt_stk_mem_rewind(void *bottom);
+void __watcall *crt_stk_mem_rewind(void *bottom);
 
 /* Returns to operating system with exitcode. */
-void crt_exit(int exitcode);
+void __watcall crt_exit(int exitcode);
 
 /* The following is available if WMINCRT is assembled with DEBUG defined: */
 
@@ -73,7 +73,7 @@ void crt_exit(int exitcode);
 
    Check is performed by CRT on program termination. May also be called
    by the user. */
-int crt_nullarea_check(void);
+int __watcall crt_nullarea_check(void);
 
 
 /* the following is available if WMINCRT is assembled with STACKSTAT defined

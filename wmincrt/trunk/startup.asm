@@ -73,8 +73,6 @@ ASSUME DS:DGROUP,ES:DGROUP
 
 _DATA segment
 
-  
-      public stk_bottom
 stk_bottom dw offset DGROUP:_STACK
 
       public _crt_cmdline
