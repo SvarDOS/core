@@ -35,24 +35,7 @@
 
       xor bx,bx                     ; use bx as zero store for rest of .INC
 
-    IFDEF PRGNAME
-      ; first we get the program name from the MCB preceeding our PSP
-      push ds
-      push ds
-      pop es                        ; get out data segment into es
-      mov ax,[_crt_psp_seg]
-      dec ax
-      mov ds,ax                     ; get MCB segment into ds
-      mov si,8                      ; name is at offset 8 of MCB
-      mov di,offset DGROUP:prg_name ; copy to prg_name
-      movsw                         ; eight bytes
-      movsw                         ; unused MCB name bytes are zero
-      movsw
-      movsw
-      pop ds                        ; restore out data segment
-    ENDIF PRGNAME
-
-      ; We place to argv pointer array on the bottom of the stack.
+      ; We place the argv pointer array on the bottom of the stack.
       ; We loose a few bytes of stack space, but that should be ok.
       mov di,offset DGROUP:_STACK
       ; ARGV[0] is typically the name of the executable, currently set to NULL
@@ -92,10 +75,50 @@
       jbe @arg_skip_ws              ; if yes, skip over it
       inc si
       loop @arg_loop
-
 @arg_done:
       mov [si],bl                   ; zero-terminate last argument
       mov word ptr [di],bx          ; zero-terminate argv ptr array
       inc di                        ; adjust bottom of stack
       inc di
       mov [stk_bottom],di
+
+    IFDEF PRGNAME
+      ; get absolute PATH to executable and put it into ARGV[0]
+      ; the string itself snacks from the bottom stack
+      push ds
+      push ds
+      pop es
+      mov ax,[_crt_psp_seg]
+      mov ds,ax                     ; PSP seg into ds
+      mov ax,[bx+2ch]
+      mov ds,ax                     ; ENV seg into ds
+      xor ax,ax
+      xor si,si
+@env_prgname:
+      ; programs executable absolute path follows environment terminated
+      ; by two zeroes
+      mov ax,[si]
+      inc si
+      test ax,ax
+      jnz @env_prgname
+      lodsb                         ; skip second zero
+      lodsw                         ; skip string count
+      ; si now points to executable file name
+      mov ah,60h                    ; call TRUENAME on file name
+      int 21h                       ; to canonicalize and copy to bottom
+      pop ds                        ; restore our ds
+      jc @env_prgname_done          ; leave ARGV[0]="" on error
+      mov si,di                     ; let si point to canonicalized name
+@env_prgname_to_end:
+      lodsb                         ; and determine end of name
+      test al,al                    ; by testing for zero
+      jnz @env_prgname_to_end    
+      inc si                        ; skip terminating zero
+      ; update bottom of stack and argv[0]
+      mov ax,[stk_bottom]           ; get start of program path
+      mov di,[__argv]               ; get argv array
+      mov [di],ax                   ; put program path address into argv[0]
+      mov [stk_bottom],si           ; update bottom of stack
+      int 3
+@env_prgname_done:
+    ENDIF PRGNAME

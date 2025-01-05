@@ -37,7 +37,11 @@ extern unsigned short crt_psp_seg;
 
 /* crt_argc and crt_argv contain the values handed over as argc and argv
    to main(). These are valid for the whole runtime. crt_argv lives at the
-   bottom of the stack. May not be used if NOARGV is given on assembly. */
+   bottom of the stack. May not be used if NOARGV is given on assembly.
+
+   If WMINCRT is assembled with PRGNAME defined, argv[0] is initialized with
+   the canonicalized file name of the executable. Otherwise it contains an
+   empty string. */
 extern int crt_argc;
 extern char **crt_argv;
 

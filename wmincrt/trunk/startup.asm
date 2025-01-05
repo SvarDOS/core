@@ -16,7 +16,7 @@
 ;   NOARGV                disables argc, argv setup
 ;   NOSTACKALLOC          disables the stack allocator
 ;   NOSTACKCHECK          do not assemble __STK function
-;   PRGNAME               fill argv[0] with program name from MCB
+;   PRGNAME               fill argv[0] canonicalized program file name
 ;   STACKSTAT             remember the minimum SP, maintained by __STK__
 ;                         and exported via _crt_stack_low.
 ;
