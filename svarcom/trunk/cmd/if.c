@@ -35,6 +35,8 @@
 
 
 #define JMP_NEXT_ARG(s) while ((*s != ' ') && (*s != 0)) s++; while (*s == ' ') s++;
+#define IS_WHITE(c)(((c) == ' ') || ((c) == '='))
+#define SKIP_WHITE(s) while (IS_WHITE(*s)) s++;
 
 
 static enum cmd_result cmd_if(struct cmd_funcparam *p) {
@@ -66,9 +68,13 @@ static enum cmd_result cmd_if(struct cmd_funcparam *p) {
   }
 
   /* IF ERRORLEVEL x cmd */
-  if (imatchlim(s, "ERRORLEVEL ", 11)) {
+  if (imatchlim(s, "ERRORLEVEL", 10)) {
     unsigned char far *rmod_exitcode = MK_FP(p->rmod->rmodseg, RMOD_OFFSET_LEXITCODE);
-    JMP_NEXT_ARG(s);
+    s += 10;
+
+    if (!IS_WHITE(*s)) goto SYNTAX_ERR;
+    SKIP_WHITE(s);
+
     if (*s == 0) goto SYNTAX_ERR;
     /* convert errorlevel to an uint */
     if ((*s < '0') || (*s > '9')) {
