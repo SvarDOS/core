@@ -191,9 +191,6 @@ unsigned short curpathfordrv(char *buff, unsigned char d);
 /* like strcpy() but returns the string's length */
 unsigned short sv_strcpy(char *dst, const char *s);
 
-/* like sv_strcpy() but operates on far pointers */
-unsigned short sv_strcpy_far(char far *dst, const char far *s);
-
 /* like strcat() */
 void sv_strcat(char *dst, const char *s);
 
@@ -243,7 +240,7 @@ void memcpy_ltr_far(void far *d, const void far *s, unsigned short len);
 void memcpy_rtl(void *d, const void *s, unsigned short len);
 
 /* copies src into dst, memory regions may overlap */
-void * sv_memmove(void *dst, const void *src, unsigned short len);
+void sv_memmove(void *dst, const void *src, unsigned short len);
 
 /* like bzero(), but accepts far pointers */
 void sv_bzero(void far *dst, unsigned short len);

@@ -1084,10 +1084,12 @@ void memcpy_rtl(void *d, const void *s, unsigned short len) {
 }
 
 
-void * sv_memmove(void *dst, const void *src, unsigned short len) {
-  if (dst < src) memcpy_ltr(dst, src, len);
-  else memcpy_rtl(dst, src, len);
-  return dst;
+void sv_memmove(void *dst, const void *src, unsigned short len) {
+  if (dst < src) {
+    memcpy_ltr(dst, src, len);
+  } else {
+    memcpy_rtl(dst, src, len);
+  }
 }
 
 
