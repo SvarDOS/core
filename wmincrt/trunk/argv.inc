@@ -8,11 +8,8 @@
       ; for a terminating zero, therefore we error out if it is equal or more
       ; than 7fh bytes long.
 
-      ; Whitespace between arguments is filled with zero, which implicitly
-      ; zero-terminates all arguments but the last.
-
-      ; We consider every character below and including 20h (space)
-      ; as whitespace. 0Ch (CR) terminates the command line.
+      ; Whitespaces isolate command line arguments. We filter them out.
+      ; All characters <= 20h are considered to be whitespace.
 
   _DATA segment
       public __argc
@@ -21,7 +18,11 @@
     _crt_argc label word
     __argc dw 1          ; number or arguments, first is program name
 
-    prg_name db 'NONAME',0
+    IFDEF PRGNAME
+      prg_name db '        ',0
+    ELSE
+      prg_name db '',0
+    ENDIF
   _DATA ends
 
   _BSS segment
@@ -32,7 +33,25 @@
     __argv dw ?          ; pointer to array of cmdline argument pointers
   _BSS ends
 
-      xor bx,bx                     ; use bx as zero store
+      xor bx,bx                     ; use bx as zero store for rest of .INC
+
+    IFDEF PRGNAME
+      ; first we get the program name from the MCB preceeding our PSP
+      push ds
+      push ds
+      pop es                        ; get out data segment into es
+      mov ax,[_crt_psp_seg]
+      dec ax
+      mov ds,ax                     ; get MCB segment into ds
+      mov si,8                      ; name is at offset 8 of MCB
+      mov di,offset DGROUP:prg_name ; copy to prg_name
+      movsw                         ; eight bytes
+      movsw                         ; unused MCB name bytes are zero
+      movsw
+      movsw
+      pop ds                        ; restore out data segment
+    ENDIF PRGNAME
+
       ; We place to argv pointer array on the bottom of the stack.
       ; We loose a few bytes of stack space, but that should be ok.
       mov di,offset DGROUP:_STACK
