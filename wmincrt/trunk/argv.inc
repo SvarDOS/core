@@ -119,6 +119,5 @@
       mov di,[__argv]               ; get argv array
       mov [di],ax                   ; put program path address into argv[0]
       mov [stk_bottom],si           ; update bottom of stack
-      int 3
 @env_prgname_done:
     ENDIF PRGNAME
