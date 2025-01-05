@@ -39,10 +39,11 @@ AFLAGS = -q
 
 !ifdef DEBUG
 EXE = 1
-AFLAGS += -d1 -dDEBUG=1
+AFLAGS += -d1 -DDEBUG
 CFLAGS += -d2
 LFLAGS += debug all
 !else
+AFLAGS += -DNOSTACKCHECK
 CFLAGS += -ox -d0
 !endif
 
