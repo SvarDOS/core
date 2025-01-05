@@ -7,11 +7,14 @@
 === ver 2025.0 (xx.xx.2025) ==================================================
 
  - The equal sign is treated as an arg delimiter (MS-DOS compatibility)
- - fixed a bug causing initial env to be corrupted sometimes (Bernd Boeckmann)
- - fixed some failing executable lookups in %PATH% (Bernd Boeckmann)
- - DIR: /S stack handling fixed (Bernd Boeckmann)
- - DIR: fixed handling of '.' and '..' entries in /B mode (Bernd Boeckmann)
  - DIR: fixed a major memory leak when /S is combined with /O
+
+ patches by Bernd Boeckmann:
+ - fixed a bug causing initial env to be corrupted sometimes
+ - fixed some failing executable lookups in %PATH%
+ - DIR: /S stack handling fixed
+ - DIR: fixed handling of '.' and '..' entries in /B mode
+ - IF: supports the undocumented "IF ERRORLEVEL==2" syntax
 
 
 === ver 2024.8 (20.11.2024) ==================================================
