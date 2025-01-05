@@ -191,6 +191,9 @@ unsigned short curpathfordrv(char *buff, unsigned char d);
 /* like strcpy() but returns the string's length */
 unsigned short sv_strcpy(char *dst, const char *s);
 
+/* like sv_strcpy() but operates on far pointers */
+unsigned short sv_strcpy_far(char far *dst, const char far *s);
+
 /* like strcat() */
 void sv_strcat(char *dst, const char *s);
 
