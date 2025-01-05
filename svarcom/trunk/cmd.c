@@ -51,7 +51,7 @@
 /* struct used to pass all necessary information to the sub-commands */
 struct cmd_funcparam {
   int argc;                 /* number of arguments */
-  const char *argv[128];    /* pointers to each argument */
+  const char *argv[128];    /* pointers to each argument (NULL terminated)*/
   char argvbuf[256];        /* buffer that hold data pointed out by argv[] */
   unsigned short env_seg;   /* segment of environment block */
   struct rmod_props far *rmod; /* rmod settings */
@@ -174,10 +174,9 @@ static const struct CMD_ID *cmd_match(const char *cmdline, unsigned short *argof
     buff[i] = cmdline[i];
   }
   buff[i] = 0;
-  if (cmdline[i] == '=') i++;
 
-  /* advance to nearest non-space to find where arguments start */
-  while (cmdline[i] == ' ') i++;
+  /* advance to nearest non-space (and non-equal) to find where arguments start */
+  while (cmdline[i] == ' ' || cmdline[i] == '=') i++;
   *argoffset = i;
 
   /* try matching an internal command */
