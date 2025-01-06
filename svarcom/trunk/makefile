@@ -114,7 +114,7 @@ release: command.com .SYMBOLIC
 	IF EXIST svarcom.zip DEL svarcom.zip
 	IF EXIST svarcom.svp DEL svarcom.svp
 	# source package
-	zip -9rkDX svarcom.zip makefile *.c *.h *.txt *.asm cmd lang svarlang.lib
+	zip -9rkDX svarcom.zip makefile *.c *.h *.txt *.asm cmd lang svarlang.lib wmincrt
 	# SvarDOS binary package
 	mkdir appinfo
 	mkdir bin
