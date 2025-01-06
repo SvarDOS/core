@@ -4,7 +4,7 @@
 
 
 
-=== ver 2025.0 (xx.xx.2025) ==================================================
+=== ver 2025.0 (06.01.2025) ==================================================
 
  - The equal sign is treated as an arg delimiter (MS-DOS compatibility)
  - DIR: fixed a major memory leak when /S is combined with /O
@@ -14,7 +14,7 @@
  - fixed some failing executable lookups in %PATH%
  - DIR: /S stack handling fixed
  - DIR: fixed handling of '.' and '..' entries in /B mode
- - IF: supports the undocumented "IF ERRORLEVEL==2" syntax
+ - IF: supports the undocumented "IF ERRORLEVEL==2" syntax (MS-DOS compat)
 
 
 === ver 2024.8 (20.11.2024) ==================================================
