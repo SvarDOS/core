@@ -72,9 +72,10 @@ be harmful since SvarCOM wouldn't be able to relocate to the highest address
 as it would be allocated by SHELLHIGH already.
 
 SvarCOM supports multiple languages. To enable SvarCOM using them it is
-necessary to define an NLSPATH environment variable that would point to a
-directory and copy the SVARCOM.LNG file there. Once done, SvarCOM will try
-loading whatever language is being set up in the LANG environment variable.
+necessary to define a DOSDIR environment variable that would point to a
+directory and copy the SVARCOM.LNG file into it or under its BIN directory.
+Once done, SvarCOM will try loading whatever language is being set up in the
+LANG environment variable.
 
 
 === LICENSE ==================================================================
