@@ -22,7 +22,7 @@
 0.10:EH
 
 # SVARCOM HELP SCREEN
-1.0:SvarCOM komut yorumlayıcısını başlatır.
+1.0:SvarCOM komut yorumlayıcısını başlatır, ver
 1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] komut]
 1.2:/D      AUTOEXEC.BAT işlenmesini atla (sadece /P ile bir anlamı vardır)
 1.3:/E:nnn  Ortamın boyutunu nnn bayt olarak ayarlar

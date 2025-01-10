@@ -22,7 +22,7 @@
 0.10:TN
 
 # SVARCOM HELP SCREEN
-1.0:Uruchamia interpreter poleceń SvarCOM.
+1.0:Interpreter poleceń SvarCOM, wersja
 1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] polecenie]
 1.2:/D      Ignoruje AUTOEXEC.BAT (ma sens tylko przy /P)
 1.3:/E:nnn  Ustawia rozmiar środowiska na nnn bajtów

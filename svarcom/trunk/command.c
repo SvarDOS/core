@@ -295,7 +295,9 @@ static void parse_argv(struct config *cfg) {
         break;
 
       case '?':
-        nls_outputnl(1,0); /* "Starts the SvarCOM command interpreter" */
+        nls_output(1,0); /* "SvarCOM command interpreter, version" */
+        output(" ");
+        outputnl(PVER);
         outputnl("");
         nls_outputnl(1,1); /* "COMMAND /E:nnn [/[C|K] [/P] [/D] command]" */
         outputnl("");

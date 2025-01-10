@@ -22,7 +22,7 @@
 0.10:YN
 
 # SVARCOM HELP SCREEN
-1.0:Starts the SvarCOM command interpreter.
+1.0:SvarCOM command interpreter, version
 1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] command]
 1.2:/D      Skip AUTOEXEC.BAT processing (makes sense only with /P)
 1.3:/E:nnn  Sets the environment size to nnn bytes
