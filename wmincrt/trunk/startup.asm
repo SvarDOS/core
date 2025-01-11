@@ -54,15 +54,7 @@
 
 .8086
 
-IFNDEF STACKSIZE
-STACKSIZE = 400h
-ENDIF
-
-STK_ALLOC_MARGIN equ 100h  ; stay in distance to SP when allocating
-
-
-INCLUDE "segments.inc"        ; establish segment order
-
+include "common.inc"
 
 ASSUME DS:DGROUP,ES:DGROUP
 
@@ -72,9 +64,10 @@ ASSUME DS:DGROUP,ES:DGROUP
 ;-----------------------------------------------------------------------------
 ; DGROUP: DATA, BSS , STACK etc.
 
-_DATA segment
+startdata
 
-stk_bottom dw offset DGROUP:_STACK
+  public _crt_stk_bottom
+_crt_stk_bottom dw offset DGROUP:_STACK
 
       public _crt_cmdline
   IFDEF EXE
@@ -83,19 +76,24 @@ stk_bottom dw offset DGROUP:_STACK
     _crt_cmdline dw 80h  ; point to PSP if .COM file
   ENDIF ; EXE
 
-_DATA ends
+IFDEF DEBUG
+  IFDEF EXE
+      dw ___begtext       ; make sure BEG_TEXT segment is not eliminated
+  ENDIF EXE
+ENDIF DEBUG
 
-_BSS segment
+enddata
+
+startbss
 
       public _crt_psp_seg
-
 _crt_psp_seg dw ?             ; segment of PSP
 
   IFDEF EXE
     cmdline db 80h dup (?)    ; used as cmdline buffer for .EXE, otherwise PSP
   ENDIF ; EXE
 
-_BSS  ends
+endbss
 
 ; stack definition, available memory is checked at runtime
 ; defined as segment so that linker may detect .COM size overflow
@@ -114,7 +112,7 @@ _STACK ends
 ;-----------------------------------------------------------------------------
 ; COMMON CODE FOR ALL CONFIGURATIONS
 
-_TEXT segment
+startcode
 
       public _cstart_
       public _small_code_
@@ -126,7 +124,7 @@ _TEXT segment
 
 _small_code_ label near
 
-_cstart_ proc
+pubproc _cstart_
       ; DOS puts the COM program in the largest memory block it can find
       ; and sets SP to the end of this block. On top of that, it reserves
       ; the entire memory (not only the process' block) to the program, which
@@ -150,7 +148,7 @@ _cstart_ proc
       cmp sp,offset DGROUP:_stack_end_
       ja @resize_mem
       mov dx,offset DGROUP:memerr_msg
-      jmp panic
+      jmp crt_panic_
 
       ; step 2: resize our memory block to sp bytes (ie. sp/16 paragraphs)
     @resize_mem:
@@ -206,19 +204,141 @@ _cstart_ proc
 
   IFNDEF NOARGV
 
-      INCLUDE "argv.inc"                ; optional AX=argc, DX=argv handling
+      ; We process the command line given to us by the PSP into the
+      ; __argc and __argv variables.
+
+      ; First byte of _crt_cmdline contains the length of the command line.
+      ; The cmdline provided to us by the PSP may or may not be terminated
+      ; by a carriage return (0ch).
+      ; It may be 7fh bytes at max. If it is 7fh bytes, there is no space
+      ; for a terminating zero, therefore we error out if it is equal or more
+      ; than 7fh bytes long.
+
+      ; Whitespaces isolate command line arguments. We filter them out.
+      ; All characters <= 20h are considered to be whitespace.
+
+  _DATA segment
+      public __argc
+      public _crt_argc
+
+    _crt_argc label word
+    __argc dw 1          ; number or arguments, first is program name
+
+    IFDEF PRGNAME
+      prg_name db '        ',0
+    ELSE
+      prg_name db '',0
+    ENDIF
+  _DATA ends
+
+  _BSS segment
+      public __argv
+      public _crt_argv
+
+    _crt_argv label word
+    __argv dw ?          ; pointer to array of cmdline argument pointers
+  _BSS ends
+
+      xor bx,bx                     ; use bx as zero store for rest of .INC
+
+      ; We place the argv pointer array on the bottom of the stack.
+      ; We loose a few bytes of stack space, but that should be ok.
+      mov di,offset DGROUP:_STACK
+      ; ARGV[0] is typically the name of the executable, currently set to NULL
+      ; TODO: implement properly
+      mov [__argv],di
+      mov [di],offset DGROUP:prg_name
+      inc di
+      inc di
+      ; load cmdline length and verify we can deal with it
+      mov si,[_crt_cmdline]
+      lodsb                         ; load cmdline length should be 7fh at max                
+      mov cl,al
+      xor dh,dh
+      cmp cl,07fh                   ; make sure there is space for trailing zero
+      jae @arg_done                 ; or else return empty argv
+@arg_skip_ws:
+      ; Skip over whitespace characters while replacing them by zeroes.
+      ; This impliciyly zero-terminates the preceeding argument.
+      mov al,[si]                   ; get next chararcter
+      cmp al,' '                    ; is it a whitespace?
+      ja @arg_start                 ; if not, argument starts
+      cmp al,13                     ; CR terminates the command line
+      je @arg_done
+      mov [si],bl                   ; replace whitespace with zero
+      dec cx                        ; one character less
+      jcxz @arg_done                ; no more characters?
+      inc si                        ; next character
+      jmp @arg_skip_ws              ; contine whitespace skipping
+@arg_start:
+      inc [__argc]
+      mov [di],si                   ; store next ARGV pointer
+      inc di
+      inc di
+@arg_loop:
+      mov al,[si]                   ; get next character
+      cmp al,' '                    ; is it a whitespace?
+      jbe @arg_skip_ws              ; if yes, skip over it
+      inc si
+      loop @arg_loop
+@arg_done:
+      mov [si],bl                   ; zero-terminate last argument
+      mov word ptr [di],bx          ; zero-terminate argv ptr array
+      inc di                        ; adjust bottom of stack
+      inc di
+      mov [_crt_stk_bottom],di
+
+    IFNDEF NOPRGNAME
+      ; get absolute PATH to executable and put it into ARGV[0]
+      ; the string itself snacks from the bottom stack
+      push ds
+      push ds
+      pop es
+      mov ax,[_crt_psp_seg]
+      mov ds,ax                     ; PSP seg into ds
+      mov ax,[bx+2ch]
+      mov ds,ax                     ; ENV seg into ds
+      xor ax,ax
+      xor si,si
+@env_prgname:
+      ; programs executable absolute path follows environment terminated
+      ; by two zeroes
+      mov ax,[si]
+      inc si
+      test ax,ax
+      jnz @env_prgname
+      lodsb                         ; skip second zero
+      lodsw                         ; skip string count
+      ; si now points to executable file name
+      mov ah,60h                    ; call TRUENAME on file name
+      int 21h                       ; to canonicalize and copy to bottom
+      pop ds                        ; restore our ds
+      jc @env_prgname_done          ; leave ARGV[0]="" on error
+      mov si,di                     ; let si point to canonicalized name
+@env_prgname_to_end:
+      lodsb                         ; and determine end of name
+      test al,al                    ; by testing for zero
+      jnz @env_prgname_to_end    
+      inc si                        ; skip terminating zero
+      ; update bottom of stack and argv[0]
+      mov ax,[_crt_stk_bottom]      ; get start of program path
+      mov di,[__argv]               ; get argv array
+      mov [di],ax                   ; put program path address into argv[0]
+      mov [_crt_stk_bottom],si      ; update bottom of stack
+@env_prgname_done:
+    ENDIF NOPRGNAME
 
       mov ax,[__argc]
       mov dx,[__argv]
-  ENDIF
+  ENDIF NOARGV
 
       call main
 
       ; fallthrough to crt_exit_
-_cstart_ endp
+endproc _cstart_
 
 
-crt_exit_ proc
+pubproc crt_exit_
   IFDEF DEBUG
 
   CONST segment
@@ -230,27 +350,23 @@ crt_exit_ proc
       cmp byte ptr [crt_nullarea_writes],0
       je @exit_done
       mov dx,offset DGROUP:nullguard_msg
-      jmp panic
+      jmp crt_panic_
 @exit_done:
   ENDIF DEBUG
       mov ah,4ch
       int 21h
-crt_exit_ endp
+endproc crt_exit_
 
-
-panic proc
+      public crt_panic_
+pubproc crt_panic_
       ; output error message in DX, then terminate with FF
       mov ah,9
       int 21h
       mov ax,4c7fh      ; terminate with error code 7f
       int 21h
-panic endp
+endproc crt_panic_
 
-  IFNDEF NOSTACKALLOC
-    INCLUDE "alloc.inc"
-  ENDIF
-
-_TEXT ends
+endcode
 
 
 ;-----------------------------------------------------------------------------
@@ -276,53 +392,14 @@ ENDIF
 IFDEF DEBUG
   IFDEF EXE
     BEGTEXT segment word public 'CODE'
+    public ___begtext
+    ___begtext label byte
       int 3                   ; catch jumps / calls via NULL ptr
     BEGTEXT ends
   ENDIF
 ENDIF ENDIF
 
 _TEXT segment
-
-  IFNDEF NOSTACKCHECK
-
-      public __STK
-
-  CONST segment
-      stkerr_msg db 'STKERR',13,10,'$'
-  CONST ends
-
-__STK proc
-      ; ensures that we have enough stack space left. the needed bytes are
-      ; given in AX. panics if stack low.
-      sub ax,sp         ; subtract needed bytes from SP
-      neg ax            ; SP-AX = -(AX-SP)
-      add ax,2          ; +2 is to compensate for __STK ret addr
-      cmp ax,[stk_bottom]
-      jae @stk_stat     ; enough stack => return, else panic
-  IFDEF DEBUG
-      int 3             ; give debugger chance to trap
-  ENDIF DEBUG
-      mov dx,offset DGROUP:stkerr_msg
-      add sp,200h       ; make sure we have enough stack to call DOS
-      jmp panic
-@stk_stat:
-  IFDEF STACKSTAT       ; update lowest stack pointer if statistics enabled
-    _BSS segment
-
-      public _crt_stack_low
-
-      _crt_stack_low:  dw 1 dup(?)
-    _BSS ends
-
-      cmp [_crt_stack_low],ax
-      jbe @stk_r
-      mov [_crt_stack_low],ax
-  ENDIF STACKSTAT
-@stk_r:
-      ret
-__STK endp
-
-  ENDIF NOSTACKCHECK
 
   IFDEF DEBUG
 

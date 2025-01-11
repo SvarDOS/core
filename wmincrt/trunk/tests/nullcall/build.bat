@@ -1,3 +1,3 @@
-wasm -q -d1 -DDEBUG -DEXE ..\..\startup.asm
-wcc -q -d2 -zl nullcall.c
-wlink system dos option quiet debug all option map name nullcall file startup,nullcall
+set PRGNAME=nullcall
+wcc -q -d2 %PRGNAME%.c
+wlink system dos debug all option quiet,eliminate,map libfile ..\..\lib\dbgexe\wmincrt.lib file %PRGNAME%

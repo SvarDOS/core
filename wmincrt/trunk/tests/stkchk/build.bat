@@ -1,3 +1,3 @@
-wasm -q ..\..\startup.asm
-wcc -q -os -zl stkchk.c
-wlink system dos com option quiet option map name stkchk file startup,stkchk
+set PRGNAME=stkchk
+wcc -q -os %PRGNAME%.c
+wlink system dos com option quiet,eliminate,map libfile ..\..\lib\com\wmincrtc.lib file %PRGNAME%

@@ -1,3 +1,3 @@
-wasm -q -DNOARGV -DNOSTACKALLOC -DNOSTACKCHECK ..\..\startup.asm
-wcc -q -os -s -zl hello.c
-wlink system dos com option quiet option map name hello file startup,hello
+set PRGNAME=hello
+wcc -q -ox %PRGNAME%.c
+wlink system dos com option quiet,eliminate,map libfile ..\..\lib\com\wmincrtc.lib file %PRGNAME%

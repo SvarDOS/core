@@ -1,12 +1,18 @@
 ;-----------------------------------------------------------------------------
 ; ALLOCATION STACK ROUTINES
 
-  public crt_stk_mem_alloc_
-  public crt_stk_mem_rewind_
+include "common.inc"
 
-crt_stk_mem_alloc_ proc
+
+startcode
+
+startdata
+      extrn _crt_stk_bottom:word
+enddata
+
+pubproc crt_stk_mem_alloc_
       push dx
-      add ax,[stk_bottom]
+      add ax,[_crt_stk_bottom]
       jc @alloc_err                 ; we do not want to overflow!
       mov dx,ax
       add ax,STK_ALLOC_MARGIN
@@ -14,16 +20,20 @@ crt_stk_mem_alloc_ proc
       cmp ax,sp
       jae @alloc_err
       mov ax,dx
-      mov [stk_bottom],ax
+      mov [_crt_stk_bottom],ax
       pop dx
       ret
 @alloc_err:
       pop dx
       xor ax,ax
       ret
-crt_stk_mem_alloc_ endp
+endproc crt_stk_mem_alloc_
 
-crt_stk_mem_rewind_ proc
-      mov [stk_bottom],ax
+pubproc crt_stk_mem_rewind_
+      mov [_crt_stk_bottom],ax
       ret
-crt_stk_mem_rewind_ endp
+endproc crt_stk_mem_rewind_
+
+endcode
+
+end

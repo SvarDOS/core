@@ -1,3 +1,3 @@
-wasm -q -DNOARGV -DNOSTACKALLOC -DNOSTACKCHECK -DEXE ..\..\startup.asm
-wcc -q -ox -s -zl minimal.c
-wlink system dos option quiet option map name minimal file startup,minimal
+set PRGNAME=minimal
+wcc -q -ox %PRGNAME%.c
+wlink system dos option quiet,eliminate,map libfile ..\..\lib\exe\wmincrt.lib file %PRGNAME%
