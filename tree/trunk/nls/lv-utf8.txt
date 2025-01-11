@@ -9,12 +9,12 @@
 1.5:Apakškatalogi neeksistē
 
 # showUsage
-2.1:Grafiski parāda diska vai ceļa katalogu struktūru.
+2.1:Parāda diska vai ceļa katalogu struktūru.
 2.2:\t
 2.3:TREE [disks:][ceļš] [/F] [/A]
 2.4:\t
-2.5:  /F  Izvadīt failu nosaukumus katrā katalogā.
-2.6:  /A  Izmantot ASCII paplašināto simbolu vietā.
+2.5:/F   Izvadīt failu nosaukumus katrā katalogā.
+2.6:/A   Izmantot ASCII paplašināto simbolu vietā.
 
 # showInvalidUsage
 3.1:Nepareiza atslēga - %

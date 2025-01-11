@@ -1,5 +1,8 @@
 SvarDOS TREE History / Changes
 
+Jan 11, 2025   SvarDOS TREE 20250111   Mateusz Viste
+               - version is displayed on help screen + minor rewordings
+
 Nov 20, 2024   SvarDOS TREE 20241120   Berki Yenigun
                - added FR and updated TR translations
 

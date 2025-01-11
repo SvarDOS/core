@@ -10,12 +10,12 @@
 1.6: --- Pressione qualquer tecla para continuar ---
 
 # showUsage
-2.1:Exibe graficamente a estrutura de diretório de uma unidade ou caminho.
+2.1:Exibe a estrutura de diretório de uma unidade ou caminho.
 2.2:\t
 2.3:TREE [unidade:][caminho] [/F] [/A]
 2.4:\t
-2.5:  /F  Exibe os nomes dos arquivos em cada diretório.
-2.6:  /A  Use ASCII em vez de caracteres estendidos.
+2.5:/F   Exibe os nomes dos arquivos em cada diretório.
+2.6:/A   Use ASCII em vez de caracteres estendidos.
 
 # showInvalidUsage
 3.1:Opçäo inválida - %

@@ -8,18 +8,18 @@
 1.6: --- Press any key to continue ---
 
 # showUsage
-2.1:Graphically displays the directory structure of a drive or path.
-2.2:\t
-2.3:TREE [drive:][path] [/F] [/A]
-2.4:\t
-2.5:  /F  Display the names of the files in each directory.
-2.6:  /A  Use ASCII instead of extended characters.
-2.7:  /P  Pause after each page
-2.8:  /V  Show version information
-2.10:  /DF  Display file sizes
-2.11:  /DA  Display file attributes
-2.12:  /DH  Display hidden and system files (normally not shown)
-2.13:  /DR  Display results at end
+2.01:Displays the directory structure of a drive or path.
+2.02:\t
+2.03:TREE [drive:][path] [/F] [/A]
+2.04:\t
+2.05:/F   Display the names of the files in each directory.
+2.06:/A   Use ASCII instead of extended characters.
+2.07:/P   Pause after each page
+2.08:/V   Show version information
+2.10:/DF  Display file sizes
+2.11:/DA  Display file attributes
+2.12:/DH  Display hidden and system files (not shown by default)
+2.13:/DR  Display results at end
 
 # showInvalidUsage
 3.1:Invalid switch - %
@@ -27,7 +27,7 @@
 
 # showVersionInfo
 4.0:Origin: pdTREE by Kenneth J. Davis (2000-2004)
-4.1:Forked and adapted to SvarDOS by Mateusz Viste (2024)
+4.1:Further development and adaptation to SvarDOS by Mateusz Viste (2024-2025)
 4.2:Copyright (c): Public Domain [United States Definition]
 
 # showInvalidDrive

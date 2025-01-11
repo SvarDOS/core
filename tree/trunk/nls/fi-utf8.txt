@@ -15,8 +15,8 @@
 2.2:\t
 2.3:TREE [asema:][polku] [/F] [/A]
 2.4:\t
-2.5:  /F  Näyttää jokaisen hakemiston tiedostojen nimet.
-2.6:  /A  Käyttää ASCII:ta laajennettujen merkkien asemesta.
+2.5:/F   Näyttää jokaisen hakemiston tiedostojen nimet.
+2.6:/A   Käyttää ASCII:ta laajennettujen merkkien asemesta.
 
 # showInvalidUsage
 3.1:Virheellinen valitsin - %

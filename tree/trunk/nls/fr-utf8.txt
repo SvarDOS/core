@@ -9,18 +9,18 @@
 1.6: --- Appuyez sur une touche pour continuer ---
 
 # showUsage
-2.1:Affiche le graphique de la structure de dossiers d'un lecteur ou d'un chemin.
-2.2:\t
-2.3:TREE [lecteur:][chemin] [/F] [/A]
-2.4:\t
-2.5:  /F  Afficher les noms des fichiers dans chaque répertoire.
-2.6:  /A  Utiliser l'ASCII au lieu des caractères étendus.
-2.7:  /P  Pause after each page
-2.8:  /V  Afficher les informations de version
-2.10:  /DF  Afficher les tailles des fichiers
-2.11:  /DA  Afficher les attributs des fichiers
-2.12:  /DH  Afficher les fichiers cachés et système (normalement non affichés)
-2.13:  /DR  Afficher les résultats à la fin
+2.1:Affiche la structure de dossiers d'un lecteur ou d'un chemin.
+2.02:\t
+2.03:TREE [lecteur:][chemin] [/F] [/A]
+2.04:\t
+2.05:/F   Affiche les noms des fichiers dans chaque répertoire.
+2.06:/A   Utilise l'ASCII au lieu des caractères étendus.
+2.07:/P   Pause après chaque page
+2.08:/V   Affiche les informations de version
+2.10:/DF  Affiche les tailles des fichiers
+2.11:/DA  Affiche les attributs des fichiers
+2.12:/DH  Affiche les fichiers cachés et système (non affichés par défaut)
+2.13:/DR  Affiche les résultats à la fin
 
 # showInvalidUsage
 3.1:Commutateur invalide - %
@@ -28,7 +28,7 @@
 
 # showVersionInfo
 4.0:Origine : pdTREE par Kenneth J. Davis (2000-2004)
-4.1:Forké et adapté à SvarDOS par Mateusz Viste (2024)
+4.1:Reprise du développement et adaptation à SvarDOS: Mateusz Viste (2024-2025)
 4.2:Copyright (c) : domaine public [Définition des États-Unis]
 
 # showInvalidDrive

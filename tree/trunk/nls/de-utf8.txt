@@ -7,21 +7,21 @@
 1.3:Verzeichnisauflistung für Datenträger %
 1.4:Seriennummer des Datenträgers ist %
 1.5:Keine Unterverzeichnisse vorhanden
-1.6: --- Press any key to continue ---
+1.6: --- Drücken Sie eine beliebige Taste, um fortzufahren ---
 
 # show Usage
-2.1:Grafische Darstellung von Verzeichnisstrukturen
+2.1:Darstellung der Verzeichnisstrukturen anzeigen
 2.2:\t
 2.3:TREE [Laufwerk:][Pfad] [/F] [/A]
 2.4:\t
-2.5:  /F   Zeige Dateinamen in Verzeichnissen
-2.6:  /A   Nutze ASCII anstatt erweiterter Zeichen
-2.7:  /P   Pause nach jeder Bildschirmseite
-2.8:  /V   Zeige Versionsinformationen
-2.10:  /DF  Zeige Dateigrößen
-2.11:  /DA  Zeige Dateiattribute
-2.12:  /DH  Zeige versteckte und Systemdateien (standardmäßig keine Anzeige)
-2.13:  /DR  Zeige Statistiken
+2.5:/F   Zeige Dateinamen in Verzeichnissen
+2.6:/A   Nutze ASCII anstatt erweiterter Zeichen
+2.7:/P   Pause nach jeder Bildschirmseite
+2.8:/V   Zeige Versionsinformationen
+2.10:/DF  Zeige Dateigrößen
+2.11:/DA  Zeige Dateiattribute
+2.12:/DH  Zeige versteckte und Systemdateien (standardmäßig keine Anzeige)
+2.13:/DR  Zeige Statistiken
 
 # showInvalidUsage
 3.1:Ungültiger Schalter - %
@@ -29,7 +29,7 @@
 
 # showVersionInfo
 4.0:Basiert auf pdTREE von Kenneth J. Davis (2000-2004)
-4.1:Weiterentwickelt und angepasst an SvarDOS von Mateusz Viste (2024)
+4.1:Weiterentwickelt und angepasst an SvarDOS von Mateusz Viste (2024-2025)
 4.2:Lizenzfrei (public domain) gemäß US-amerikanischer Definition
 
 # showInvalidDrive

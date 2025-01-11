@@ -1,6 +1,6 @@
 # Messages used by SvarDOS TREE
 # Polish
-# author: Mateusz Viste (2024)
+# author: Mateusz Viste (2024-2025)
 
 # main
 1.2:Lista podkatalogów dla ścieżki
@@ -10,18 +10,18 @@
 1.6: --- Naciśnij dowolny klawisz aby kontynuować ---
 
 # showUsage
-2.1:Wyświetla graficzną reprezentację struktury katalogów dysku lub ścieżki.
-2.2:\t
-2.3:TREE [napęd:][ścieżka] [/F] [/A]
-2.4:\t
-2.5:  /F  Wyświetla nazwy plików w każdym katalogu
-2.6:  /A  Korzysta z ASCII zamiast rozszerzonych znaków
-2.7:  /P  Pauza po każdej stronie
-2.8:  /V  Wyświetla informacje o wersji
-2.10:  /DF  Wyświetla rozmiary plików
-2.11:  /DA  Wyświetla atrybuty plików
-2.12:  /DH  Wyświetla pliki ukryte i systemowe (domyślnie ukryte)
-2.13:  /DR  Wyświetla wyniki na końcu
+2.01:Wyświetla reprezentację struktury katalogów dysku lub ścieżki.
+2.02:\t
+2.03:TREE [napęd:][ścieżka] [/F] [/A]
+2.04:\t
+2.05:/F   Wyświetla nazwy plików w każdym katalogu
+2.06:/A   Korzysta z ASCII zamiast rozszerzonych znaków
+2.07:/P   Pauza po każdej stronie
+2.08:/V   Wyświetla informacje o wersji
+2.10:/DF  Wyświetla rozmiary plików
+2.11:/DA  Wyświetla atrybuty plików
+2.12:/DH  Wyświetla pliki ukryte i systemowe (domyślnie ukryte)
+2.13:/DR  Wyświetla wyniki na końcu
 
 # showInvalidUsage
 3.1:Nieprawidłowy przełącznik - %
@@ -29,7 +29,7 @@
 
 # showVersionInfo
 4.0:Źródło: pdTREE by Kenneth J. Davis (2000-2004)
-4.1:Adaptację dla systemu SvarDOS wykonał Mateusz Viste (2024)
+4.1:Dalszy rozwój i adaptacja do systemu SvarDOS: Mateusz Viste (2024-2025)
 4.2:Copyright (c): Domena Publiczna [Definicja Stanów Zjednoczonych]
 
 # showInvalidDrive

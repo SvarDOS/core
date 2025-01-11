@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#define VERSION "20241120"
+#define VERSION "20250111"
 
 /****************************************************************************
 
@@ -13,7 +13,7 @@
   Updated:    September, 2000; October, 2000; November, 2000; January, 2001;
               May, 2004; Sept, 2005
 
-  2024:       Lots of changes by Mateusz Viste, became SvarDOS TREE.
+  2024-2025:  Lots of changes by Mateusz Viste, became SvarDOS TREE.
               See CHANGES.TXT for details.
 
 Copyright (c): Public Domain [United States Definition]
@@ -228,9 +228,15 @@ static void print_strinstr(const char *s1, const char *s2) {
 }
 
 
+static void showShortVer(void) {
+  outstrnl("SvarDOS TREE " VERSION "\r\n");
+}
+
+
 /* Displays to user valid options then exits program indicating no error */
 static void showUsage(void) {
   unsigned short i;
+  showShortVer();
   for (i = 0x0200; i < 0x021F; i++) {
     const char *s = svarlang_strid(i);
     if (s[0] == 0) continue;
@@ -252,7 +258,7 @@ static void showInvalidUsage(char * badOption) {
 /* Displays author, copyright, etc info, then exits indicating no error. */
 static void showVersionInfo(void) {
   unsigned short i;
-  outstrnl("SvarDOS TREE " VERSION "\r\n");
+  showShortVer();
   for (i = 0x0400; i < 0x0409; i++) {
     if (svarlang_strid(i)[0] == 0) continue;
     outstrnl(svarlang_strid(i));
