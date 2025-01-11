@@ -1,0 +1,32 @@
+# Messages used by SvarDOS TREE
+# Latvian translation
+# by Kristaps Kaupe <neons@hackers.lv>
+
+# main
+1.2:Katalogu CEĻA saraksts
+1.3:Katalogu CEĻA saraksts sējumam %
+1.4:Sējuma sērijas numurs ir %
+1.5:Apakškatalogi neeksistē
+
+# showUsage
+2.1:Parāda diska vai ceļa katalogu struktūru.
+2.2:\t
+2.3:TREE [disks:][ceļš] [/F] [/A]
+2.4:\t
+2.5:/F   Izvadīt failu nosaukumus katrā katalogā.
+2.6:/A   Izmantot ASCII paplašināto simbolu vietā.
+
+# showInvalidUsage
+3.1:Nepareiza atslēga - %
+3.2:Lietojiet TREE /? lai iegūtu lietošanas informāciju.
+
+# showVersionInfo [Set 4]
+
+# showInvalidDrive [Set 5]
+5.1:Kļūdaini norādīta diskiekārta
+
+# showInvalidPath [Set 6]
+6.1:Kļūdains ceļš - %
+
+# misc errors
+7.2:Pietrūkst atmiņas apakškatalogā: %

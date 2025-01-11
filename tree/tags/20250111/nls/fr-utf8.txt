@@ -1,0 +1,41 @@
+# Messages used by SvarDOS TREE
+# French
+
+# main
+1.2:Listage du chemin (PATH) du répertoire
+1.3:Listage du chemin (PATH) pour le volume %
+1.4:Le numéro de série du volume est %
+1.5:Aucun sous-répertoire n'existe
+1.6: --- Appuyez sur une touche pour continuer ---
+
+# showUsage
+2.1:Affiche la structure de dossiers d'un lecteur ou d'un chemin.
+2.02:\t
+2.03:TREE [lecteur:][chemin] [/F] [/A]
+2.04:\t
+2.05:/F   Affiche les noms des fichiers dans chaque répertoire.
+2.06:/A   Utilise l'ASCII au lieu des caractères étendus.
+2.07:/P   Pause après chaque page
+2.08:/V   Affiche les informations de version
+2.10:/DF  Affiche les tailles des fichiers
+2.11:/DA  Affiche les attributs des fichiers
+2.12:/DH  Affiche les fichiers cachés et système (non affichés par défaut)
+2.13:/DR  Affiche les résultats à la fin
+
+# showInvalidUsage
+3.1:Commutateur invalide - %
+3.2:Utilisez TREE /? pour les informations d'utilisation.
+
+# showVersionInfo
+4.0:Origine : pdTREE par Kenneth J. Davis (2000-2004)
+4.1:Reprise du développement et adaptation à SvarDOS: Mateusz Viste (2024-2025)
+4.2:Copyright (c) : domaine public [Définition des États-Unis]
+
+# showInvalidDrive
+5.1:Spécification de lecteur invalide
+
+# showInvalidPath
+6.1:Chemin invalide - %
+
+# misc errors
+7.2:Mémoire insuffisante dans le sous-répertoire : %
