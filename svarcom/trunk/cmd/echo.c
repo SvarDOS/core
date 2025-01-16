@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,8 +34,10 @@ static enum cmd_result cmd_echo(struct cmd_funcparam *p) {
     nls_outputnl(31,0); /* "Displays messages, or turns command-echoing on or off" */
     outputnl("");
     outputnl("ECHO [ON | OFF]");
-    nls_outputnl(31,1); /* "ECHO [message]" */
+    nls_outputnl(31,1);  /* "ECHO [message]" */
+    nls_outputnl(31,11); /* "ECHO." */
     outputnl("");
+    nls_outputnl(31,12); /* "ECHO. outputs an empty line" */
     nls_outputnl(31,2); /* "Type ECHO without parameters to display the current setting." */
     return(CMD_OK);
   }

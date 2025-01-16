@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,9 +32,12 @@
 static enum cmd_result cmd_prompt(struct cmd_funcparam *p) {
 
   if (cmd_ishlp(p)) {
-    nls_outputnl(33,0); /* "Changes the DOS command prompt." */
-    outputnl("");
-    nls_outputnl(33,1); /* "PROMPT [new command prompt specification]" */
+    const char *s;
+    unsigned short i;
+    for (i = 0; i < 50; i++) {
+      s = svarlang_str(33, i);
+      if (*s != 0) outputnl(s);
+    }
     return(CMD_OK);
   }
 

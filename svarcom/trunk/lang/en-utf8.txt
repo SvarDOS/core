@@ -190,6 +190,8 @@
 # ECHO
 31.0:Displays messages, or turns command-echoing on or off.
 31.1:ECHO [message]
+31.11:ECHO.
+31.12:ECHO. outputs an empty line.
 31.2:Type ECHO without parameters to display the current echo setting.
 31.3:ECHO is on
 31.4:ECHO is off
@@ -203,8 +205,22 @@
 32.5:Enter new date:
 
 # PROMPT
-33.0:Changes the DOS command prompt.
-33.1:PROMPT [new command prompt specification]
+33.0:Changes the DOS command prompt.\n
+33.1:PROMPT [new command prompt specification]\n
+33.10:Prompt specification can include following special codes:
+33.11:$$   $ (dollar sign)
+33.12:$_   New line
+33.13:$B   | (pipe)
+33.14:$D   Current date
+33.15:$E   Escape character (ASCII code 27, see NANSI.SYS)
+33.16:$G   > (greater-than sign)
+33.17:$H   Backspace (erases previous character)
+33.18:$L   < (less-than sign)
+33.19:$N   Current drive
+33.20:$P   Current drive and path
+33.21:$Q   = (equal sign)
+33.22:$T   Current time
+33.23:$V   The SvarDOS command shell version number
 
 # VOL
 34.0:Displays the disk volume label and serial number, if they exist.
