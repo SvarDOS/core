@@ -4,8 +4,8 @@
 # Language...........: German
 # Authors.  .........: Robert Riebisch (2022-2023), Bernd Boeckmann (2024)
 # Last update........: 16 Nov 2024
-# In sync with EN rev: 2255
-#
+# In sync with EN rev: 2255;
+# 31.11 and 31.12 and 33.10 - 33.23 added by W. Spiegl
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
 0.1:Ungültige Syntax
@@ -191,10 +191,11 @@
 # ECHO
 31.0:Zeigt Meldungen an oder schaltet die Befehlsanzeige ein (ON) oder aus (OFF).
 31.1:ECHO [Meldung]
+31.11:ECHO.
+31.12:ECHO. Gibt eine leere Zeile aus.
 31.2:ECHO ohne Parameter zeigt die aktuelle Einstellung der Befehlsanzeige an.
 31.3:ECHO ist eingeschaltet (ON)
 31.4:ECHO ist ausgeschaltet (OFF)
-
 # DATE
 32.0:Zeigt das Systemdatum an oder legt es fest.
 32.1:DATE [Datum]
@@ -206,6 +207,20 @@
 # PROMPT
 33.0:Ändert die DOS-Eingabeaufforderung.
 33.1:PROMPT [neue Eingabeaufforderungspezifikation]
+33.10:Prompt unterstützt folgende Zeichen:
+33.11:$$   $ (Dollarzeichen)
+33.12:$_   Neue Zeile
+33.13:$B   | (Pipe)
+33.14:$D   Aktuelles Datum
+33.15:$E   Escape Code (ASCII Code 27), vgl. NANSI.SYS
+33.16:$G   > (größer-als-Zeichen)
+33.17:$H   Backspace (löscht das vorangehende Zeichen)
+33.18:$L   < (kleiner-als-Zeichen)
+33.19:$N   Aktuelles Laufwerk
+33.20:$P   Aktuelles Laufwerk und Pfad
+33.21:$Q   = (Gleichheitszeichen)
+33.22:$T   Aktuelle Zeit
+33.23:$V   Die SvarDOS Command Shell Versionsnummer
 
 # VOL
 34.0:Zeigt die Datenträgerbezeichnung und -seriennummer an, falls vorhanden.

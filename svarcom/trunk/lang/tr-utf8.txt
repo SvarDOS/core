@@ -3,7 +3,7 @@
 #
 # Language...: Turkish
 # Authors....: Berki Yenigün
-# Last update: 15 Nov 2024
+# Last update: 19 Jan 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -190,6 +190,8 @@
 # ECHO
 31.0:Mesaj görüntüler, komut yankılamasını etkinleştirir veya devre dışı bırakır.
 31.1:ECHO [mesaj]
+31.11:ECHO.
+31.12:ECHO. boş bir satır çıktılar.
 31.2:Güncel yankı ayarını görüntülemek için parametresiz ECHO yazın.
 31.3:ECHO etkin
 31.4:ECHO devre dışı
@@ -205,6 +207,20 @@
 # PROMPT
 33.0:DOS komut istemini değiştirir.
 33.1:PROMPT [yeni komut istemi özellikleri]
+33.10:İstem belirtimi şu özel kodları içerebilir :
+33.11:$$   $ (dolar işareti)
+33.12:$_   Yeni satır
+33.13:$B   | (boru, pipe)
+33.14:$D   Güncel tarih
+33.15:$E   Kaçış karakteri (27 numaralı ASCII kodu, bkz. NANSI.SYS)
+33.16:$G   > (büyüktür işareti)
+33.17:$H   Geri gitme (önceki karakteri siler)
+33.18:$L   < (küçüktür işareti)
+33.19:$N   Güncel sürücü
+33.20:$P   Güncel sürücü ve yol
+33.21:$Q   = (eşitlik işareti)
+33.22:$T   Güncel zaman
+33.23:$V   SvarDOS komut kabuğu sürüm sayısı
 
 # VOL
 34.0:Mevcutsa, disk birimi etiketini ve seri numarasını görüntüler.

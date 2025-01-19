@@ -3,7 +3,7 @@
 #
 # Language.....: French
 # Authors......: Berki Yenigün + fixes and adaptations by Mateusz Viste
-# Last update..: 15 Nov 2024
+# Last update..: 19 Jan 2024
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -190,6 +190,8 @@
 # ECHO
 31.0:Affiche des messages ou active ou désactive les échos des commandes.
 31.1:ECHO [message]
+31.11:ECHO.
+31.12:ECHO. affiche une ligne vide.
 31.2:Tapez ECHO sans paramètres pour afficher le réglage actuel d'echo.
 31.3:ECHO est activé
 31.4:ECHO est désactivé
@@ -205,6 +207,20 @@
 # PROMPT
 33.0:Modifie l'invite de commandes de DOS.
 33.1:PROMPT [nouvelle spécification d'invite de commandes]
+33.10:La spécification de l'invite peut inclure les codes spéciaux :
+33.11:$$   $ (signe du dollar)
+33.12:$_   Nouvelle ligne
+33.13:$B   | (barre verticale, pipe)
+33.14:$D   Date actuelle
+33.15:$E   Caractère d'échappement (code ASCII 27, cf. NANSI.SYS)
+33.16:$G   > (signe supérieur à)
+33.17:$H   Retour arrière (efface le caractère précédent)
+33.18:$L   < (signe inférieur à)
+33.19:$N   Lecteur actuel
+33.20:$P   Lecteur et chemin actuels
+33.21:$Q   = (signe d'égalité)
+33.22:$T   Temps actuel
+33.23:$V   Le numéro de version du shell de commande de SvarDOS
 
 # VOL
 34.0:Affiche l'étiquette du volume de disque et le numéro de série, s'il existent.
