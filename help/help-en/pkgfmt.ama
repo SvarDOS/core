@@ -10,7 +10,7 @@ by the SvarDOS package manager.
 
 Packages names must follow some basic rules. They shall be max. 8 letters long
 (but should not be too short either, since a 1 or 2-letters package name might
-be confusing), and must not be composed of characters other than a-b, 0-9 and
+be confusing), and must not be composed of characters other than a-z, 0-9 and
 '_'. This for backward compatibility with short file names (8+3) and ISO 9660
 file systems (used on CDROMs). The package filename is always followed by the
 .svp ("SvarDOS Package") extension.

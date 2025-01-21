@@ -9,9 +9,9 @@ corretamente pelo gerenciador de pacotes do SvarDOS.
 Os nomes dos pacotes devem seguir algumas regras básicas. Devem ser de no
 máximo 8 caracteres alfanuméricos (mas também não devem ser muito curtos, pois
 um pacote com 1 ou 2 letras no nome pode ser confuso), e deve ser composto
-pelos caracteres a-b, 0-9 e '_'. Isso é devido a compatibilidade com o padrão
+pelos caracteres a-z, 0-9 e '_'. Isso é devido a compatibilidade com o padrão
 de nomes de arquivo curtos (8+3) e sistemas de arquivo ISO 9660 (usados em
-CDROMs). O nome de arquivo do pacote sempre é seguido da extensão .SVP 
+CDROMs). O nome de arquivo do pacote sempre é seguido da extensão .SVP
 ("SvarDOS Package").
 
 
@@ -98,7 +98,7 @@ qualquer coisa. Essa versão original (upstream) pode ser opcionalmente seguida
 por um sinal de mais "+" e a revisão do SvarDOS. Se a versão upstream já tiver
 um sinal de mais, a versão da revisão do SvarDOS é delimitada com um til "~".
 
-A revisão do SvarDOS começa com 0 e incrementa em 1 por cada vez que a revisão 
+A revisão do SvarDOS começa com 0 e incrementa em 1 por cada vez que a revisão
 upstream é reempacotada. A revisão SvarDOS reinicia sempre que a versão
 upstream mudar. A revisão SvarDOS com 0 é sempre oculta.
 
@@ -115,9 +115,9 @@ O string de versão inteiro de um pacote nunca deve exceder 16 caracteres.
 
 %hFontes de software
 
-Quando um software empacotado tiver arquivos de código fonte disponíveis, é 
+Quando um software empacotado tiver arquivos de código fonte disponíveis, é
 recomendado também arquivá-los. Nesse efeito, ponha os fontes num arquivo ZIP
-que tenha o mesmo nome do pacote, mas com uma extensão *.ZIP (em oposição à 
+que tenha o mesmo nome do pacote, mas com uma extensão *.ZIP (em oposição à
 extensão *.SVP própria do pacote). O resultado é que o software empacotado
 será distribuído com dois arquivos. Exemplo para o FDISK:
 

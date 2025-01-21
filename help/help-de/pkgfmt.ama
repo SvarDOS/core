@@ -11,7 +11,7 @@ sie vom SvarDOS-Paketmanager richtig behandelt werden können.
 Die Namen der Pakete müssen einigen Grundregeln entsprechen. Sie sollen max. 8
 Buchstaben lang sein (sollten aber auch nicht zu kurz sein, da ein Paketname
 mit 1 oder 2 Buchstaben verwirrend sein könnte) und dürfen nicht aus anderen
-Zeichen als a-b, 0-9 und '_' bestehen. Dies geschieht aus Gründen der
+Zeichen als a-z, 0-9 und '_' bestehen. Dies geschieht aus Gründen der
 Abwärtskompatibilität mit kurzen Dateinamen (8+3) und ISO 9660-Dateisystemen
 (auf CD-ROMs verwendet). Auf den Dateinamen des Pakets folgt immer die
 Erweiterung .svp ("SvarDOS Package").
