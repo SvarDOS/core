@@ -776,33 +776,34 @@ static int selectdrive(void) {
 
   /* if no drive found - disk not partitioned? */
   if (drvlistlen == 0) {
-    const char *list[4];
+    const char *list[5];
     newscreen(0);
     list[0] = svarlang_str(0, 3); /* Create a partition automatically */
-    list[1] = svarlang_str(0, 4); /* Run the FDISK tool */
-    list[2] = svarlang_str(0, 2); /* Quit to DOS */
-    list[3] = NULL;
+    list[1] = svarlang_str(0, 12); /* Create a partition automatically (no FAT32) */
+    list[2] = svarlang_str(0, 4); /* Run the FDISK tool */
+    list[3] = svarlang_str(0, 2); /* Quit to DOS */
+    list[4] = NULL;
     snprintf(buff, sizeof(buff), svarlang_strid(0x0300), SVARDOS_DISK_REQ); /* "ERROR: No drive could be found. Note, that SvarDOS requires at least %d MiB of available disk space */
     switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
       case 0:
-        sprintf(buff, "FDISK /PRI:MAX %u", driveid);
+        sprintf(buff, "FDISK /IPL /PRI:MAX %u", driveid);
         exec(buff);
         break;
       case 1:
+        sprintf(buff, "FDISK /IPL /PRIO:MAX %u", driveid);
+        exec(buff);
+        break;        
+      case 2:
         mdr_cout_cls(0x07);
         mdr_cout_locate(0, 0);
         sprintf(buff, "FDISK %u", driveid);
         exec(buff);
         break;
-      case 2:
+      case 3:
         return(MENUQUIT);
       default:
         return(-1);
     }
-    /* write a temporary MBR which only skips the drive (in case BIOS would
-     * try to boot off the not-yet-ready C: disk) */
-    sprintf(buff, "FDISK /LOADIPL %u", driveid);
-    exec(buff); /* writes BOOT.MBR into actual MBR */
     newscreen(2);
     putstringnls(10, 10, COLOR_BODY, 3, 1); /* "Your computer will reboot now." */
     putstringnls(12, 10, COLOR_BODY, 0, 5); /* "Press any key..." */
@@ -927,7 +928,7 @@ static int preparedrive(int hd_drv) {
      * is ACTIVE and create a TEMP directory to copy SVP files over */
     snprintf(buff, sizeof(buff), "SYS %c: > NUL", cselecteddrive);
     exec(buff);
-    sprintf(buff, "FDISK /MBR %u", driveid + 1);
+    sprintf(buff, "FDISK /IPL %u", driveid + 1);
     exec(buff);
 
     if (READ_OR_WRITE_MBR(MBR_READ, buff, driveid | 0x80) == 0) {
