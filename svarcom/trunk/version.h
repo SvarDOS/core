@@ -4,7 +4,7 @@
 
 #ifndef PVER
 
-#define PVER "2025.0"
+#define PVER "2025.1"
 #define COPYRDATE "2021-2025"
 
 #endif
