@@ -9,6 +9,8 @@
  - COMMAND /? shows the program's version
  - fixed the message displayed by COPY when no file could be copied
  - improved help screens of ECHO and PROMPT (suggested by Fritz Mueller)
+ - updated FR and TR translations (by Berki Yenigun)
+ - updated DE translations (by Wilhelm Spiegl)
 
 
 === ver 2025.0 (06.01.2025) ==================================================
