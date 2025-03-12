@@ -470,7 +470,8 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
 
   }
 
-  ustoa(setup->databuf, copiedcount_out, 0, '0');
+  ustoa(setup->databuf, copiedcount_out, 1, '0');
+
   sv_strcpy(setup->databuf + 8, svarlang_str(38,9)); /* "% file(s) copied" */
   sv_insert_str_in_str(setup->databuf + 8, setup->databuf);
   outputnl(setup->databuf + 8);
