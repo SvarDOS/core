@@ -35,7 +35,7 @@ static enum cmd_result cmd_echo(struct cmd_funcparam *p) {
     outputnl("");
     outputnl("ECHO [ON | OFF]");
     nls_outputnl(31,1);  /* "ECHO [message]" */
-    nls_outputnl(31,11); /* "ECHO." */
+    outputnl("ECHO.");
     outputnl("");
     nls_outputnl(31,12); /* "ECHO. outputs an empty line" */
     nls_outputnl(31,2); /* "Type ECHO without parameters to display the current setting." */

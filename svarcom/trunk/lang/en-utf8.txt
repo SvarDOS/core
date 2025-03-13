@@ -190,11 +190,10 @@
 # ECHO
 31.0:Displays messages, or turns command-echoing on or off.
 31.1:ECHO [message]
-31.11:ECHO.
-31.12:ECHO. outputs an empty line.
 31.2:Type ECHO without parameters to display the current echo setting.
 31.3:ECHO is on
 31.4:ECHO is off
+31.12:ECHO. outputs an empty line.
 
 # DATE
 32.0:Displays or sets the system date.

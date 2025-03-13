@@ -191,11 +191,11 @@
 # ECHO
 31.0:Zeigt Meldungen an oder schaltet die Befehlsanzeige ein (ON) oder aus (OFF).
 31.1:ECHO [Meldung]
-31.11:ECHO.
-31.12:ECHO. Gibt eine leere Zeile aus.
 31.2:ECHO ohne Parameter zeigt die aktuelle Einstellung der Befehlsanzeige an.
 31.3:ECHO ist eingeschaltet (ON)
 31.4:ECHO ist ausgeschaltet (OFF)
+31.12:ECHO. Gibt eine leere Zeile aus.
+
 # DATE
 32.0:Zeigt das Systemdatum an oder legt es fest.
 32.1:DATE [Datum]

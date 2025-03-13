@@ -193,6 +193,7 @@
 31.2:Wpisz ECHO bez parametrów, aby wyświetlić bieżące ustawienie echa.
 31.3:ECHO jest włączone
 31.4:ECHO jest wyłączone
+31.12:ECHO. wyświetla pustą linię.
 
 # DATE
 32.0:Wyświetla lub ustawia datę systemową.

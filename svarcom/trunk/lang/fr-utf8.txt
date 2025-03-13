@@ -190,11 +190,10 @@
 # ECHO
 31.0:Affiche des messages ou active ou désactive les échos des commandes.
 31.1:ECHO [message]
-31.11:ECHO.
-31.12:ECHO. affiche une ligne vide.
 31.2:Tapez ECHO sans paramètres pour afficher le réglage actuel d'echo.
 31.3:ECHO est activé
 31.4:ECHO est désactivé
+31.12:ECHO. affiche une ligne vide.
 
 # DATE
 32.0:Affiche ou définit la date du système.
