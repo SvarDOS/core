@@ -4,7 +4,7 @@
 
 
 
-=== ver 2025.1 (xx.xx.2025) ==================================================
+=== ver 2025.1 (13.03.2025) ==================================================
 
  - COMMAND /? shows the program's version
  - fixed the message displayed by COPY when no file could be copied
