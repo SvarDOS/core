@@ -206,6 +206,20 @@
 # PROMPT
 33.0:Zmienia znak zachęty poleceń systemu DOS.
 33.1:PROMPT [specyfikacja nowego znaku zachęty poleceń]
+33.10:Specyfikacja znaku zachęty może zawierać następujące znaczniki:
+33.11:$$   $ (znak dolara)
+33.12:$_   Nowa linia
+33.13:$B   | (kreska pionowa)
+33.14:$D   Bieżąca data
+33.15:$E   Znak ucieczki (ASCII kod 27, patrz NANSI.SYS)
+33.16:$G   > (znak większości)
+33.17:$H   Backspace (usuwa poprzedni znak)
+33.18:$L   < (znak mniejszości)
+33.19:$N   Bieżący napęd
+33.20:$P   Bieżący napęd i ścieżka
+33.21:$Q   = (znak równości)
+33.22:$T   Bieżąca godzina
+33.23:$V   Numer wersji powłoki SvarDOS
 
 # VOL
 34.0:Wyświetla etykietę woluminu dysku i numer seryjny, jeśli istnieją.

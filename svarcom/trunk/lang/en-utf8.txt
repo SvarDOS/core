@@ -204,8 +204,8 @@
 32.5:Enter new date:
 
 # PROMPT
-33.0:Changes the DOS command prompt.\n
-33.1:PROMPT [new command prompt specification]\n
+33.0:Changes the DOS command prompt.
+33.1:PROMPT [new command prompt specification]
 33.10:Prompt specification can include following special codes:
 33.11:$$   $ (dollar sign)
 33.12:$_   New line
