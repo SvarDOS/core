@@ -3,7 +3,7 @@
 # SvarDOS build script
 # http://svardos.org
 #
-# Copyright (C) 2016-2024 Mateusz Viste
+# Copyright (C) 2016-2025 Mateusz Viste
 #
 # This script builds floppy and CD images. It should be executed each time that
 # a CORE package has been modified or the build script changed. This is usually
@@ -229,7 +229,7 @@ cat <<EOF > "$FLOPROOT/config.sys"
 LASTDRIVE=Z
 FILES=8
 BUFFERS=10
-HISTORY=ON,128
+HISTORY=ON,128,OFF
 SHELL=COMMAND.COM /e:512 /p
 EOF
 unix2dos "$FLOPROOT/config.sys"
