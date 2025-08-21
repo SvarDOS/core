@@ -1015,21 +1015,25 @@ static void bootfilesgen(void) {
   if (fd == NULL) return;
   fprintf(fd, "; SvarDOS kernel configuration\r\n"
               "\r\n"
-              "; highest allowed drive letter\r\n"
-              "LASTDRIVE=Z\r\n"
+              "; highest allowed drive letter (stored in HMA if available)\r\n"
+              "LASTDRIVEHIGH=Z\r\n"
               "\r\n"
               "; max. number of files that programs are allowed to open simultaneously\r\n"
-              "FILES=25\r\n");
+              "FILESHIGH=25\r\n");
   fprintf(fd, "\r\n"
               "; SHELL history: this allows to recall previous commands with up/down keys\r\n"
-              "; Value after comma is the amount of allocated bytes (min: 128, max: 4096)\r\n"
-              "HISTORY=ON,256\r\n");
+              "; First setting is to enable the history feature, then follows the amount of\r\n"
+              "; allocated bytes (min: 128, max: 4096). Last setting controls the default\r\n"
+              "; INSERT/REPLACE editing mode after boot.\r\n"
+              "HISTORY=ON,128,OFF\r\n");
   fprintf(fd, "\r\n"
               "; XMS memory driver\r\n"
               "DEVICE=%c:\\SVARDOS\\HIMEMX.EXE\r\n", bootdrv);
   fprintf(fd, "\r\n"
-              "; try moving DOS to upper memory, then to high memory\r\n"
-              "DOS=UMB,HIGH\r\n");
+              "; try moving DOS code to HMA first, if fails then try UMB\r\n"
+              "DOS=HIGH,UMB\r\n"
+              "; move DOS data to UMB, if available\r\n"
+              "DOSDATA=UMB\r\n");
   fprintf(fd, "\r\n"
               "; command interpreter (shell) location and environment size\r\n"
               "SHELL=%c:\\COMMAND.COM /E:512 /P\r\n", bootdrv);
