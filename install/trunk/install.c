@@ -792,7 +792,7 @@ static int selectdrive(void) {
       case 1:
         sprintf(buff, "FDISK /IPL /PRIO:MAX %u", driveid);
         exec(buff);
-        break;        
+        break;
       case 2:
         mdr_cout_cls(0x07);
         mdr_cout_locate(0, 0);
@@ -1121,6 +1121,9 @@ static void bootfilesgen(void) {
       "\r\n"
       "# Drivers\r\n"
       "DIR DRIVERS @:\\DRIVERS\r\n"
+      "\r\n"
+      "# Alternative shells (COMMAND.COM replacements)\r\n"
+      "DIR SHELLS @:\\\r\n"
       "\r\n"
       "# Development tools\r\n"
       "DIR DEVEL @:\\DEVEL\r\n";
