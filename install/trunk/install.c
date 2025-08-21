@@ -784,7 +784,7 @@ static int selectdrive(void) {
     list[3] = svarlang_str(0, 2); /* Quit to DOS */
     list[4] = NULL;
     snprintf(buff, sizeof(buff), svarlang_strid(0x0300), SVARDOS_DISK_REQ); /* "ERROR: No drive could be found. Note, that SvarDOS requires at least %d MiB of available disk space */
-    switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 3, list, -1)) {
+    switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 4, list, -1)) {
       case 0:
         sprintf(buff, "FDISK /IPL /PRI:MAX %u", driveid);
         exec(buff);
