@@ -27,7 +27,7 @@
 2.0:You are about to install SvarDOS, a free, MS-DOS compatible operating system.\n\nWARNING: If your PC has another operating system installed, this other system might be unable to boot once SvarDOS is installed.
 
 ### DISK SETUP ###
-3.0:ERROR: No drive could be found. Perhaps your hard disk needs to be partitioned first. Please create at least one primary partition on your hard disk, so SvarDOS can be installed on it. Note, that SvarDOS requires at least %d MiB of available disk space.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice.
+3.0:ERROR: No drive could be found. Perhaps your hard disk needs to be partitioned first. Please create at least one primary partition on your hard disk, so SvarDOS can be installed on it.\n\nYou can use the FDISK partitioning tool for creating the required partition manually, or you can let the installer partitioning your disk automatically. You can also abort the installation to use any other partition manager of your choice.
 3.1:Your computer will reboot now.
 3.3:ERROR: Drive %c: seems to be unformated.
 3.4:ERROR: Drive %c: is not big enough! SvarDOS requires a disk of at least %d MiB.

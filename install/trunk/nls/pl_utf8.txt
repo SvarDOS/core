@@ -27,7 +27,7 @@
 2.0:Za chwilę rozpocznie się instalacja systemu SvarDOS, bezpłatnego systemu operacyjnego kompatybilnego z MSDOS.\n\nUWAGA: Jeśli twój komputer posiada już inny system operacyjny, system ten może nie zdołać uruchomić się po instalacji SvarDOS.
 
 ### DISK SETUP ###
-3.0:BŁĄD: Nie znaleziono żadnego napędu. Być może twój dysk powinien zostać najpierw spartycjonowany. Utwórz co najmniej jedną partycję na twoim dysku, aby SvarDOS mógł zostać na nią zainstalowany. SvarDOS wymaga co najmniej %d MiB miejsca.\n\nMożesz skorzystać z narzędzia FDISK aby stworzyć wymaganą partycję ręcznie, lub pozwolić instalatorowi stworzyć ją automatycznie. Możesz także wstrzymać instalację aby użyć jakiegokolwiek innego narzędzia do partycjonowania.
+3.0:BŁĄD: Nie znaleziono żadnego napędu. Być może twój dysk powinien zostać najpierw spartycjonowany. Utwórz co najmniej jedną partycję na twoim dysku, aby SvarDOS mógł zostać na nią zainstalowany.\n\nMożesz skorzystać z narzędzia FDISK aby stworzyć wymaganą partycję ręcznie, lub pozwolić instalatorowi stworzyć ją automatycznie. Możesz także wstrzymać instalację aby użyć jakiegokolwiek innego narzędzia do partycjonowania.
 3.1:Twój komputer zostanie teraz uruchomiony ponownie.
 3.3:BŁĄD: Dysk %c: zdaje się nie być sformatowany.
 3.4:BŁĄD: Dysk %c: jest za mały! SvarDOS wymaga co najmniej %d MiB miejsca.

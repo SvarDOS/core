@@ -764,7 +764,7 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
  * PP = position of the partition in MBR (0..3)
  * LL... = drive's DOS id (A=0, B=1, C=2, ...) */
 static int selectdrive(void) {
-  char buff[1024];
+  char buff[512];
   struct drivelist drives[16];
   char drvlist[16][32]; /* up to 16 drives (4 partitions on 4 disks) */
   int i, drvlistlen;
@@ -783,8 +783,9 @@ static int selectdrive(void) {
     list[2] = svarlang_str(0, 4); /* Run the FDISK tool */
     list[3] = svarlang_str(0, 2); /* Quit to DOS */
     list[4] = NULL;
-    snprintf(buff, sizeof(buff), svarlang_strid(0x0300), SVARDOS_DISK_REQ); /* "ERROR: No drive could be found. Note, that SvarDOS requires at least %d MiB of available disk space */
-    switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, buff), 4, list, -1)) {
+
+    /* "ERROR: No drive could be found. Note, that SvarDOS requires at least % MiB of available disk space */
+    switch (menuselect(6 + putstringwrap(4, 1, COLOR_BODY, svarlang_strid(0x0300)), 4, list, -1)) {
       case 0:
         sprintf(buff, "FDISK /IPL /PRI:MAX %u", driveid);
         exec(buff);

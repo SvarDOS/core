@@ -26,7 +26,7 @@
 2.0:Ta program bo namestil SvarDOS - brezplačen in odprtokoden operacijski sistem, združljiv z MS-DOS.\n\nOPOZORILO: Če ima računalnik že nameščen operacijski sistem, tega morda ne bo več mogoče zagnati, ko boste namestili SvarDOS.
 
 ### DISK SETUP ###
-3.0:NAPAKA: Pogon ni bil najden. Morda je treba najprej ustvariti particijo na trdem disku. Prosimo, ustvarite vsaj eno particijo, da lahko namestite SvarDOS. Velika mora biti vsaj %d MB.\n\nUstvarite jo lahko sami s programom FDISK, lahko pa jo program za namestitev ustvari samodejno. Namestitev lahko tudi prekinete in uporabite svoj program za particioniranje.
+3.0:NAPAKA: Pogon ni bil najden. Morda je treba najprej ustvariti particijo na trdem disku. Prosimo, ustvarite vsaj eno particijo, da lahko namestite SvarDOS.\n\nUstvarite jo lahko sami s programom FDISK, lahko pa jo program za namestitev ustvari samodejno. Namestitev lahko tudi prekinete in uporabite svoj program za particioniranje.
 3.1:Računalnik se bo zdaj ponovno zagnal.
 3.3:NAPAKA: Pogon %c: ni formatiran.
 3.4:NAPAKA: Pogon %c: je premajhen. SvarDOS zahteva vsaj %d MB prostora.
