@@ -764,7 +764,7 @@ static int get_drives_list(char *buff, struct drivelist *drives) {
  * PP = position of the partition in MBR (0..3)
  * LL... = drive's DOS id (A=0, B=1, C=2, ...) */
 static int selectdrive(void) {
-  char buff[512];
+  char buff[1024];
   struct drivelist drives[16];
   char drvlist[16][32]; /* up to 16 drives (4 partitions on 4 disks) */
   int i, drvlistlen;
