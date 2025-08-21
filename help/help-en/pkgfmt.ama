@@ -74,6 +74,7 @@ DEVEL    | Development tools (mostly compilers)
 DRIVERS  | Drivers
 GAMES    | Games
 PROGS    | User programs, tools...
+SHELLS   | Alternative shells (COMMAND.COM replacements)
 
 Note: "DOC", "NLS", "BIN" and "HELP" directories are strictly reserved to
       CORE packages.

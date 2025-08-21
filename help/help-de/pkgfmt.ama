@@ -69,6 +69,7 @@ DEVEL     | Entwicklungswerkzeuge (hauptsächlich Compiler)
 DRIVERS   | Treiber
 GAMES     | Spiele
 PROGS     | Anwendungen, Hilfsprogramme...
+SHELLS    | Alternative shells (COMMAND.COM replacements)
 
 Hinweis: Die Verzeichnisse "DOC", "NLS", "BIN" und "HELP" sind ausschließlich
          den Kernpaketen vorbehalten.
