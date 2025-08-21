@@ -16,6 +16,7 @@
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Вверх/вниз = выбор входа | Enter = Подтвердить выбор | ESC = Предыдущий экран
 0.11:Вверх/вниз = выбор входа | Enter = Подтвердить выбор | ESC = Выход в DOS
+0.12:Создание раздела автоматически (без FAT32)
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Добро пожаловать в SvarDOS

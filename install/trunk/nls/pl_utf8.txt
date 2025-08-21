@@ -16,6 +16,7 @@
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Góra/Dół = Wybór pozycji | Enter = Zatwierdź wybór | ESC = Poprzedni ekran
 0.11:Góra/Dół = Wybór pozycji | Enter = Zatwierdź wybór | ESC = Wyjdź do DOS
+0.12:Stwórz partycję automatycznie (bez FAT32)
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Witaj w systemie SvarDOS

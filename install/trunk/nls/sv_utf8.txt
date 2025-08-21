@@ -26,6 +26,7 @@
 0.10:Upp/Ner = Välj rad | Enter = Bekräfta val | ESC = Föregående skärm
 #0.11:Up/Down = Select entry | Enter = Confirm choice | ESC = Quit to DOS
 0.11:Up/Down = Välj rad | Enter = Bekräfta val | ESC = Avsluta till DOS
+0.12:Skapa en partition automatiskt (utan FAT32)
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 ### SPRÅKVAL & TANGENTBORDSLAYOUTSKÄRMAR ###

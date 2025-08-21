@@ -11,12 +11,13 @@
 0.0:INSTALLAZIONE DI SVARDOS
 0.1:Installa SvarDOS
 0.2:Esci al DOS
-0.3:Crea automaticamente una partizione
+0.3:Crea una partizione automaticamente
 0.4:Esegui lo strumento di partizionamento FDISK
 0.5:Premi un tasto...
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Su/Giù = Seleziona | Invio = Conferma la scelta | ESC = Precedente
 0.11:Su/Giù = Seleziona | Invio = Conferma la scelta | ESC = Esci al DOS
+0.12:Crea una partizione automaticamente (senza FAT32)
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Benvenuto in SvarDOS

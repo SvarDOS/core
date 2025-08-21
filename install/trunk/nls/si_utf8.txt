@@ -15,6 +15,7 @@
 # Every string below must be at most 78 characters long! (used in status bar)
 0.10:Gor/dol = izbira | Enter = potrdi izbiro | Esc = prejšnji zaslon
 0.11:Gor/dol = izbira | Enter = potrdi izbiro | Esc = izhod v DOS
+0.12:Samodejno ustvari particijo (brez FAT32)
 
 ### LANGUAGE SELECTION & KEYBOARD LAYOUT SCREENS ###
 1.0:Dobrodošli v SvarDOS!
