@@ -10,7 +10,7 @@ files (autoexec.bat and config.sys).
 
 The SvarDOS INSTALL program is published under the terms of the MIT license.
 
-Copyright (C) 2016-2024 Mateusz Viste
+Copyright (C) 2016-2025 Mateusz Viste
 All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
