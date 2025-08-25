@@ -6,26 +6,25 @@ The SvarDOS (EDR) kernel is configured through the CONFIG.SYS file. Here is
 the list of possible settings.
 
 COUNTRY=nnn,nnn,country
-SHELL=filename
-LASTDRIVE=d:
+SHELL[HIGH]=filename
+LASTDRIVE[HIGH]=d:
 HILASTDRIVE=d:
 BREAK=ON/OFF
-BUFFERS=nn
+BUFFERS[HIGH]=nn
 HIBUFFERS=nn
 FCBS=nn
 HIFCBS=nn
-FILES=nn
+FILES[HIGH]=nn
 HIFILES=nn
 STACKS=nn
 HISTACKS=nn
 FASTOPEN=nnn
 DRIVPARM=/d:nn ...
-HISTORY=ON|OFF,NNN
-HIINSTALLLAST=cmdstring
+HISTORY=ON|OFF,NNN,ON|OFF
 HIINSTALL=cmdstring
-INSTALLHIGH=cmdstring
+INSTALL[HIGH]=cmdstring
 INSTALLLAST=cmdstring
-INSTALL=cmdstring
+HIINSTALLLAST=cmdstring
 HIDOS=ON/OFF
 DOSDATA=UMB
 DDSCS=HIGH,UMB
@@ -34,8 +33,7 @@ DOS=HIGH
 SET envar=string
 SWITCHES=...
 HIDEVICE=filename
-DEVICEHIGH=filename
-DEVICE=filename
+DEVICE[HIGH]=filename
 REM Comment
 ; Comment
 :label
@@ -43,7 +41,7 @@ CHAIN=filename
 GOTO=label
 GOSUB=label
 RETURN (from GOSUB)
-Clear Screen
+CLS
 CPOS=row,col            Set Cursor Position
 COLOUR=[fg][,[bg][,bc]] Set Fore-/Background/Border Colour
 TIMEOUT=n               set ? 	TIMEOUT
