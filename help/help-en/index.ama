@@ -5,7 +5,7 @@
  * %lnewbie.ama:New to SvarDOS? Read this first!
 
  * %lcommands.ama:List of shell commands
- * %lkerncfg.ama:Kernel configuration
+ * %lkerncfg.ama:Kernel configuration (CONFIG.SYS)
  * %lnls.ama:Internationalization and NLS overview
  * %lpkg.ama:Packages management (install/remove/update software)
  * %lnetwork.ama:Networking
