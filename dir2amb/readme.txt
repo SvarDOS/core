@@ -15,4 +15,4 @@ The script performs several tasks:
 
 It relies on the following tools:
 
-ambpack, bash, dos2unix, fold, mvcomp, sed, tr
+ambpack, bash, dos2unix, expand, fold, mvcomp, sed
