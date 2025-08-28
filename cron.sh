@@ -44,8 +44,8 @@ php "$SVNREPODIR/buildidx/buildidx.php" "$SVNREPODIR/packages/" > "$SVNREPODIR/p
 ###############################################################################
 
 read -r STABLE < "$SVNREPODIR/website/default_build.txt"
-unzip -o "$SVNREPODIR/website/download/$STABLE/svardos-$STABLE-floppy-2.88M.zip" disk1.img -d /tmp/
-mv /tmp/disk1.img "$SVNREPODIR/packages/latest/boot.img"
+unzip -o "$SVNREPODIR/website/download/$STABLE/svardos-$STABLE-floppy-2.88M.zip" svdos-2.88M-disk-1.img -d /tmp/
+mv /tmp/svdos-2.88M-disk-1.img "$SVNREPODIR/packages/latest/boot.img"
 mkisofs -input-charset cp437 -b boot.img -hide boot.img -hide boot.catalog -iso-level 1 -f -V SVARDOS_REPO -o "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR"/packages/latest/*
 rm -f "$SVNREPODIR/packages/latest/boot.img"
 mv "$SVNREPODIR/website/repo/sv-repo.tmp" "$SVNREPODIR/website/repo/sv-repo.iso"
