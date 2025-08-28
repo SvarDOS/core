@@ -57,7 +57,7 @@ echo "* %l$FNAME:$f" >> ../index.ama
 
 # trim trailing spaces, replace TABs with spaces, word-wrap at 78 characters
 # and escape all '%'
-cat "$f" | expand | fold -w 78 -s | sed 's/[[:space:]]\+$//' | sed 's/%/%%/g' | dos2unix > "$FNAME".ama
+cat "$f" | expand | fold -w 78 -s | sed 's/[[:space:]]\+$//' | sed 's/%/%%/g' | dos2unix -f > "$FNAME".ama
 
 # compress
 mvcomp "$FNAME".ama "$FNAME".amc
