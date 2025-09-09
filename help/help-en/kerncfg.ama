@@ -22,6 +22,11 @@ value the user must define.
 
 Here is a list of possible settings:
 
+[COMMON]                This keyword does not perform any action. It was 
+                        designed for compatibility with MS-DOS 6.x.
+                        This is the only keyword that should be written with 
+                        brackets.
+
 COUNTRY=[country number],[code page],[country.sys file location]
                         Country specific conventions to display times, dates,
                         currency, character sort order, forbidden characters,
@@ -76,6 +81,11 @@ FASTOPEN=nnn
             Tracks the location of files on hard disk in memory for fast
             access. Valid values are in the range of 128 through 32768.
             Each file tracked requires 2 bytes of memory.
+            
+GETKEY      Pulls out an errorlevel depending on the keyboard key being hit. 
+            Ideal for use in conjunction with ONERROR. 
+            See GETKEY Addendum for key listings and corresponding errorlevel 
+            codes.            
 
 DRIVPARM=/d:nn ...
             Defines the physical characteristics of a specified disk drive.
