@@ -212,3 +212,6 @@ NUMLOCK=ON/OFF          Defines the status of the NumLock numeric pad key.
 VERSION=n.nn[,n.nn]     Sets the DOS version (Int 21h/AH=30h) and optionally 
                         the true DOS version (Int 21h/AX=3306h) to be reported 
                         to programs.
+
+Authors: Ignacio Gully and Mateusz Viste
+Last updated on: 9th September 2025 by Ignacio Gully
