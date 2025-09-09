@@ -14,8 +14,8 @@ uses precious Conventional memory.
 
 A LABEL, is a location in the CONFIG.SYS which is marked by the user, with a 
 two dots character followed by a unique string, like for example, ":ENDING" 
-(without double quotes). It is a reference used for GOTO and GOSUB jumps when 
-executing keywords.
+(without double quotes). It is a reference used for GOTO, GOSUB and SWITCH 
+jumps when executing keywords.
 
 The use of "n", "nn" and "nnn" (without double quotes) indicates a numeric 
 value the user must define.
@@ -101,9 +101,9 @@ HISTORY=ON|OFF,nnn,ON|OFF,ON|OFF,ON|OFF
             cursor.
             [Search] Sets ON or OFF, the display of the most-recently-entered 
             command that matches the current one by pressing <Ctrl> + <R>.
-	          [Match]  Sets ON or OFF, recalling the most-recently-entered 
-	          command that matches each character you type, by pressing 
-	          <Ctrl> + <_>.
+           [Match]  Sets ON or OFF, recalling the most-recently-entered 
+           command that matches each character you type, by pressing 
+           <Ctrl> + <_>.
 
 [HI]INSTALL or INSTALL[HIGH]=program options
             Loads a program automatically from CONFIG.SYS when you start DOS. 
