@@ -2,57 +2,205 @@
                  %h*** Kernel configuration (CONFIG.SYS) ***
 
 
-The SvarDOS (EDR) kernel is configured through the CONFIG.SYS file. Here is
-the list of possible settings.
+The SvarDOS (EDR) kernel is configured through the CONFIG.SYS file using 
+specialized keywords. 
 
-COUNTRY=nnn,nnn,country
-SHELL[HIGH]=filename
-LASTDRIVE[HIGH]=d:
-HILASTDRIVE=d:
-BREAK=ON/OFF
-BUFFERS[HIGH]=nn
-HIBUFFERS=nn
-FCBS=nn
-HIFCBS=nn
-FILES[HIGH]=nn
-HIFILES=nn
-STACKS=nn
-HISTACKS=nn
+Conventions:
+Keywords may include [HIGH] or [HI] (write them without brackets!), which both 
+indicate they will prioritize allocating High Memory (HMA) as storage, which 
+saves valuable Conventional memory whenever possible. Example: FILES, HIFILES, 
+and FILESHIGH. Of these three, the first one is the only one that exclusively 
+uses precious Conventional memory.
+
+A LABEL, is a location in the CONFIG.SYS which is marked by the user, with a two 
+dots character followed by a unique string, like for example, ":ENDING" (without 
+double quotes). It is a reference used for GOTO and GOSUB jumps when executing 
+keywords.
+
+The use of "n", "nn" and "nnn" (without double quotes) indicates a numeric value 
+the user must define.
+
+Here is a list of possible settings:
+
+COUNTRY=[country number],[code page],[country.sys file location] 
+                        Country specific conventions to display times, dates, 
+                        currency, character sort order, forbidden characters, 
+                        mathematical separators, etc.. 
+                        Consult the COUNTRY Addendum for further details 
+                        and country codes.
+
+SHELL[HIGH]=\COMMAND.COM /E:512 /P    
+            Points to the location of the SHELL (command interpreter) to be 
+            used. An increased environment (/E value) prevents aborted programs, 
+            but consumes more memory. The /P switch makes the shell permanent, 
+            so that you cannot EXIT it. More SHELL switches may be available 
+            and can be queried at the command-line by entering COMMAND /?
+
+[HI]LASTDRIVE or LASTDRIVE[HIGH]=X:   
+            Sets the last logical drive-letter to letter x. This is done to 
+            reserve at least two drive letters (Y: and Z:) for some vintage 
+            external drives which specifically fail if there are none available.
+
+BREAK=ON/OFF            Enables stopping execution by pressing <Ctrl> + <C> on 
+                        your keyboard.
+                        
+BUFFERS[HIGH]=nn        Built-in system-wide cache. For all types of drives. It 
+                        also sets the secondary read-ahead cache size.
+
+[HI]FCBS=nn             If a program tries to open more than certain amount of 
+                        files by using file control blocks (FCB), EDR-DOS might 
+                        close the files that were opened earlier. Most newer 
+                        programs do not require FCBs. However, some older 
+                        programs might require you to set them. This is a legacy 
+                        feature, now replaced by the FILES handle method as seen 
+                        in the next CONFIG.SYS entry below. It only remains here 
+                        for backwards compatibility purposes. Value set by 
+                        default to safely run old programs should be 10,4.
+
+FILES[HIGH] or [HI]FILES=nn
+                        Specifies the number of files that EDR-DOS can access at 
+                        one time.
+
+[HI]STACKS=nn           Prevents stack overflow errors from happening upon 
+                        receiving a hardware interrupt. Multitasking and 
+                        networking environments are often sensitive to this 
+                        value being low. Stacks consume memory. If you find 
+                        instability on your system try by exchanging the below 
+                        value with "0,0", "9,128", "9,256" or "48,256". Always 
+                        perform a cold reboot after you make a change.  
+
 FASTOPEN=nnn
+            Tracks the location of files on hard disk in memory for fast access.
+            Valid values are in the range of 128 through 32768.
+            Each file tracked requires 2 bytes of memory.
+ 
 DRIVPARM=/d:nn ...
-HISTORY=ON|OFF,NNN,ON|OFF
-HIINSTALL=cmdstring
-INSTALL[HIGH]=cmdstring
-INSTALLLAST=cmdstring
-HIINSTALLLAST=cmdstring
-HIDOS=ON/OFF
-DOSDATA=UMB
-DDSCS=HIGH,UMB
-XBDA=LOW,UMB
-DOS=HIGH
-SET envar=string
-SWITCHES=...
-HIDEVICE=filename
-DEVICE[HIGH]=filename
-REM Comment
-; Comment
-:label
-CHAIN=filename
-GOTO=label
-GOSUB=label
-RETURN (from GOSUB)
-CLS
-CPOS=row,col            Set Cursor Position
-COLOUR=[fg][,[bg][,bc]] Set Fore-/Background/Border Colour
-TIMEOUT=n               set ? 	TIMEOUT
-SWITCH=n
-ONERROR='n'             optional command
-?                       optional command
-ECHO=string
-EXIT
-ERROR='n'
-GETKEY
-YESCHAR=
-DEBLOCK=xxxx
-NUMLOCK=ON/OFF
-VERSION=x.xx
+            Defines the physical characteristics of a specified disk drive. Use 
+            it to associate a particular type of physical disk drive with a 
+            logical drive. To add a 3.5-inch diskette drive to a computer that 
+            does not expect to use 3.5-inch diskette drives, for example, the 
+            DRIVPARM keyword is required to redefine the drive parameters for 
+            subsequent use by DOS.
+            
+            You can also use DRIVPARM to modify a logical drive already 
+            recognized by DOS but to add and define a new logical drive, you 
+            must use the DRIVER.SYS device driver instead.
+            
+            This is a highly specialized keyword most users should not need. 
+            For further details consult the DRIVEPARM Addendum.
+
+HISTORY=ON|OFF,nnn,ON|OFF,ON|OFF,ON|OFF
+            [Active],[Buffer],[Insert],[Search],[Match]
+            [Active] Enables or disables HISTORY features (ON or OFF).
+            [Buffer] Sets the storage buffer size (between 128 and 4096 bytes).
+            [Insert] Sets ON or OFF, character insertion in front of the cursor.
+            [Search] Sets ON or OFF, the display of the most-recently-entered 
+            command that matches the current one by pressing <Ctrl> + <R>.
+	          [Match]  Sets ON or OFF, recalling the most-recently-entered command 
+	          that matches each character you type, by pressing <Ctrl> + <_>.
+
+[HI]INSTALL or INSTALL[HIGH]=program options
+            Loads a program automatically from CONFIG.SYS when you start DOS. 
+            You can specify options to pass to the specified program
+
+[HI]INSTALLLAST=cmdstring
+            Works like [HI]INSTALL, but loads program after the DOS data segment 
+            relocation. It is effectively, the last INSTALL of them all to be 
+            ran.
+
+DOSDATA=UMB             DOSDATA=LOW|UMB    
+                        Moves main DOS data segment to upper memory.
+                        
+DDSCS=HIGH,UMB          DDSCS=UMB|HIGH|HIGH,UMB
+                        Moves drive descriptor tables (DDSCS) to upper or high 
+                        memory.
+
+XBDA=LOW,UMB            XBDA=LOW|UMB|LOW,UMB
+                        Relocates extended BIOS data area (XBDA) to low base or 
+                        upper memory if the memory manager has not already done 
+                        this.
+
+DOS=HIGH,UMB            Specifies that EDR-DOS should maintain a link to the 
+                        upper memory area, load part of itself into the high 
+                        memory area (HMA) and take advantage of upper memory 
+                        blocks (UMB) if they are available.
+
+SET [name[=string]]     Adds environment variables to the command processor's 
+                        master environment. Very useful to communicate to the 
+                        AUTOEXEC.BAT which multi-configuration option was 
+                        selected in the CONFIG.SYS, between other things.
+
+SWITCHES=               Specifies special options in DOS.
+                        /F Skips the two seconds delay after starting DOS
+                        /K Forces an enhanced keyboard to behave like a 
+                        conventional keyboard.
+                        /N Prevents the user from using the F5 or F8 key to 
+                        bypass startup files.
+
+DEVICE[HIGH]=filename   Loads a device driver.
+
+REM or ; or ::          A line in the CONFIG.SYS begining with either of these 
+                        three characters sets, will not be executed and can be 
+                        used to add comments or to disable some keyword. 
+
+CHAIN=filename          Diverts execution of CONFIG.SYS keywords to another 
+                        file only if it exists at the specified location.          
+
+GOTO LABEL              Jumps execution to a CONFIG.SYS LABEL.
+
+GOSUB LABEL             Jumps execution to a CONFIG.SYS LABEL subroutine that 
+                        ends in a RETURN keyword. It is very useful to save 
+                        space by avoiding repeating over and over again the  
+                        same group of keywords or to prevent a difficult to 
+                        follow CONFIG.SYS structure flow.
+
+RETURN                  Jumps back to continue executing the CONFIG.SYS 
+                        immediately after the GOSUB or SWITCH keyword 
+                        which called this subroutine.
+                        
+CLS                     Clears the screen contents and moves the cursor to the 
+                        begining of the first line.
+
+CPOS=row,col            Sets cursor position to specified row and column number 
+                        of the current text mode screen.
+
+COLOUR=[fg][,[bg][,bc]] Sets Foreground/Background/Border Colour.
+
+TIMEOUT=n               Sets the waiting interval (in seconds) to automatically 
+                        jump CONFIG.SYS execution to the first LABEL the SWITCH 
+                        keyword has enumerated.
+
+SWITCH MENU1, MENU2     Enumerates the different user selectable 
+                        multi-configuration options as LABELS.
+
+ONERROR                 On matching errorlevel condition executes the remaining 
+                        part of the line. Conditions may be > or < or = or => or 
+                        <=. One example to better illustrate its usage:
+                        ONERROR =< 1 GOTO FAILURE
+
+?                       Optional command execution that requires user keyboard
+                        confirmation. To activate it, prepend it to the required
+                        keyword. Example:
+                        ?DEVICE=DRMOUSE.COM 
+
+ECHO string             Displays its arguments. Note that "ECHO" (without 
+                        double quotes and without any argument) will display an 
+                        empty line. Further neat tricks can be accomplished with 
+                        an active ANSI console driver and its escape codes.
+
+EXIT                    Defines the end of CONFIG.SYS execution.
+
+ERROR=n                 Sets errorlevel (return code).
+
+YESCHAR=                Allows to give a different character for the Yes-Char 
+                        (necessary to better cope with the questioning in 
+                        foreign countries, especially prior to any keyboard 
+                        driver loaded).
+
+NUMLOCK=ON/OFF          Defines the status of the NumLock numeric pad key.
+                        On old PCs the (PC) keyboard LEDs might not reflect the 
+                        actual status, but still may work anyway.
+
+VERSION=n.nn[,n.nn]     Sets the DOS version (Int 21h/AH=30h) and optionally the 
+                        true DOS version (Int 21h/AX=3306h) to be reported to 
+                        programs.
