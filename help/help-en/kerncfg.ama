@@ -101,9 +101,9 @@ HISTORY=ON|OFF,nnn,ON|OFF,ON|OFF,ON|OFF
             cursor.
             [Search] Sets ON or OFF, the display of the most-recently-entered 
             command that matches the current one by pressing <Ctrl> + <R>.
-           [Match]  Sets ON or OFF, recalling the most-recently-entered 
-           command that matches each character you type, by pressing 
-           <Ctrl> + <_>.
+            [Match]  Sets ON or OFF, recalling the most-recently-entered 
+            command that matches each character you type, by pressing 
+            <Ctrl> + <_>.
 
 [HI]INSTALL or INSTALL[HIGH]=program options
             Loads a program automatically from CONFIG.SYS when you start DOS. 
@@ -126,10 +126,16 @@ XBDA=LOW,UMB            XBDA=LOW|UMB|LOW,UMB
                         or upper memory if the memory manager has not already 
                         done this.
 
+DEBLOCK=[nnnn|ON|OFF]   Value 0000 disables multitracking, which is the same 
+                        as OFF switch. Value FFFF enables multitracking, which 
+                        is the same as the ON switch. This was added for 
+                        MS-DOS 4.0x+ compatibility.
+
 DOS=HIGH,UMB            Specifies that EDR-DOS should maintain a link to the 
                         upper memory area, load part of itself into the high 
                         memory area (HMA) and take advantage of upper memory 
                         blocks (UMB) if they are available.
+                        This keyword replaces the old HIDOS=ON/OFF.
 
 SET [name[=string]]     Adds environment variables to the command processor's 
                         master environment. Very useful to communicate to the 
