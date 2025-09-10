@@ -1,0 +1,37 @@
+                      
+                      %h Country Addendum
+
+Country               Code   Code Pages
+Australia             061     437 850
+Belgium               032     437 850
+Canada (French)       002     863 850
+Denmark               045     865 850
+Finland               358     437 850
+France                033     437 850
+Germany               049     437 850
+Hungary               036     852 850
+Italy                 039     437 850
+Latin America         003     437 850
+Netherlands           031     437 850
+Norway                047     865 850
+Portugal              351     860 850
+Russia                007     866 850
+Spain                 034     437 850
+Sweden                046     437 850
+Switzerland (French)  041     437 850
+Switzerland (German)  041     437 850
+Turkey                090     857 850
+United Kingdom        044     437 850
+United States         001     437 850
+
+Example:
+
+The following entry in your CONFIG.SYS file would convert the currency symbol 
+and date and time formats to the United States versions using code page 437:
+
+COUNTRY= 001, 437, C:\SVARDOS\COUNTRY.SYS 
+
+%b_____________________________________________________________________________
+%b                                                        Author: Ignacio Gully
+%b                                          Last updated on 10th September 2025
+ 

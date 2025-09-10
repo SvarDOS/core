@@ -31,8 +31,8 @@ COUNTRY=[country number],[code page],[country.sys file location]
                         Country specific conventions to display times, dates,
                         currency, character sort order, forbidden characters,
                         mathematical separators, etc..
-                        Consult the COUNTRY Addendum for further details
-                        and country codes.
+                        For further details and country codes consult the 
+                        %lcountry.ama:Country Addendum
 
 SHELL[HIGH]=\COMMAND.COM /E:512 /P
             Points to the location of the SHELL (command interpreter) to be
