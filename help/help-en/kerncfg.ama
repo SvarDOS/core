@@ -87,20 +87,24 @@ GETKEY      Pulls out an errorlevel depending on the keyboard key being hit.
             See GETKEY Addendum for key listings and corresponding errorlevel 
             codes.            
 
-DRIVPARM=/d:nn ...
-            Defines the physical characteristics of a specified disk drive.
-            Use it to associate a particular type of physical disk drive with
-            a logical drive. To add a 3.5-inch diskette drive to a computer
-            that does not expect to use 3.5-inch diskette drives, for example,
-            the DRIVPARM keyword is required to redefine the drive parameters
-            for subsequent use by DOS.
-
-            You can also use DRIVPARM to modify a logical drive already
-            recognized by DOS but to add and define a new logical drive, you
-            must use the DRIVER.SYS device driver instead.
-
-            This is a highly specialized keyword most users should not need.
-            For further details consult the DRIVEPARM Addendum.
+DRIVPARM=   Modifies the features of a disk drive already recognized by DOS.
+            /D:n   Single digit that corresponds to the selected logical drive
+            /C     Specifies that the drive detects when a disk is changed. 
+            /F:n   0   160/180 KB or 320/360 KB
+                   1   1.2 MB
+                   2   720 KB (the default)
+                   5   Hard disk
+                   6   Tape
+                   7   1.44 MB
+                   8   Read/write optical disk
+                   9   2.88 MB
+            /H:nn  Specifies the max. number of drive heads (from 1 up to 99)
+            /I     Specifies a 3.5-inch diskette drive when your computer does 
+            not support one.
+            /N     Specifies that the drive is permanent media.
+            /S:nn  Specifies the number of sector supported by the drive 
+            (from 1 up to 99)
+            /T:nn  Specifies the number of tracks supported by the drive.
 
 HISTORY=ON|OFF,nnn,ON|OFF,ON|OFF,ON|OFF
             [Active],[Buffer],[Insert],[Search],[Match]
