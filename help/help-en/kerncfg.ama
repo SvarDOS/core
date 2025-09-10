@@ -154,8 +154,6 @@ SET [name[=string]]     Adds environment variables to the command processor's
 
 SWITCHES=               Specifies special options in DOS.
                         /F Skips the two seconds delay after starting DOS
-                        /K Forces an enhanced keyboard to behave like a
-                        conventional keyboard.
                         /N Prevents the user from using the F5 or F8 key to
                         bypass startup files.
 
