@@ -194,9 +194,9 @@ SWITCH MENU1, MENU2     Enumerates the different user selectable
                         multi-configuration options as LABELS.
 
 ONERROR                 On matching errorlevel condition executes the
-                        remaining part of the line. Conditions may be > or
-                        < or = or => or <=. One example to better illustrate
-                        its usage:
+                        remaining part of the line. Conditions may be >, or
+                        <, or =, or =>, or <=. or ><. One example to better
+                        illustrate its usage:
                         ONERROR =< 1 GOTO FAILURE
 
 ?                       Optional command execution that requires user keyboard
