@@ -84,7 +84,7 @@ FASTOPEN=nnn
             
 GETKEY      Pulls out an errorlevel depending on the keyboard key being hit. 
             Ideal for use in conjunction with ONERROR. 
-            See GETKEY Addendum for key listings and corresponding errorlevel 
+            See Getkey Addendum for key listings and corresponding errorlevel 
             codes.            
 
 DRIVPARM=   Modifies the features of a disk drive already recognized by DOS.
@@ -189,7 +189,24 @@ CPOS=row,col            Sets cursor position to specified row and column
                         number of the current text mode screen.
 
 COLOUR=[fg][,[bg][,bc]] Sets Foreground/Background/Border Colour.
-
+                        Number       Colour
+                         0           Black
+                         1           Blue
+                         2           Green
+                         3           Cyan
+                         4           Red
+                         5           Magenta
+                         6           Brown
+                         7           Gray / Grey
+                         8           DarkGray / DarkGrey
+                         9           LightBlue
+                        10           LightGreen
+                        11           LightCyan
+                        12           LightRed
+                        13           LightMagenta
+                        14           Yellow
+                        15           White
+    
 TIMEOUT=n               Sets the waiting interval (in seconds) to
                         automatically jump CONFIG.SYS execution to the first
                         LABEL the SWITCH keyword has enumerated.
@@ -232,4 +249,4 @@ VERSION=n.nn[,n.nn]     Sets the DOS version (Int 21h/AH=30h) and optionally
                         to programs.
 %b_____________________________________________________________________________
 %b                                                        Author: Ignacio Gully
-%b                                           Last updated on 9th September 2025
+%b                                          Last updated on 11th September 2025
