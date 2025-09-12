@@ -82,10 +82,14 @@ FASTOPEN=nnn
             access. Valid values are in the range of 128 through 32768.
             Each file tracked requires 2 bytes of memory.
             
-GETKEY      Pulls out an errorlevel depending on the keyboard key being hit. 
-            Ideal for use in conjunction with ONERROR. 
-            See Getkey Addendum for key listings and corresponding errorlevel 
-            codes.            
+GETKEY     Waits for a keystroke and then sets the error level to the value 
+           of the corresponding ASCII code of the key (0..255). For example, 
+           to set the errorlevel to 1, one does not have to press <1> (has 
+           scan/ASCII code 0231h and thus 31h = 49), but rather make an 
+           <Alt>-NumPad entry, here for example <Alt>=<Alt>+<NumPad1>. 
+           This option makes it possible to react differently to any 
+           key (for which the keyboard driver generates a character) 
+           (i.e. the levels with <Shift> and <AltGr> are generally supported).  
 
 DRIVPARM=   Modifies the features of a disk drive already recognized by DOS.
             /D:n   Single digit that corresponds to the selected logical drive
