@@ -13,20 +13,51 @@ FreeDOS packages available at the given moment.
 
 I still wasn't satisfied with how FreeDOS clings to its notion of "releases"
 and that it cannot include some software because of licensing issues, so in
-2016 I decided to create my own distribution, that I called Svarog386 (there
-was also a Svarog86 project that I had created a couple months earlier,
-dedicated to 8086 machines). Svarog386 naturally relied on the FreeDOS kernel
+2016 I decided to create my own distribution, that I called Svarog386, as a
+parallel to the Svarog86 project that I had created a couple months earlier,
+dedicated to 8086 machines. Svarog386 naturally relied on the FreeDOS kernel
 and used the FDNPKG package manager.
 
-Then, in 2021, I found it increasingly annoying to look after two separate
+By 2021 I found it increasingly annoying to look after two separate
 distributions. Over time, FDNPKG also became a huge piece of protected mode
-code, and although it was magnificent code, I was no longer happy with it: too
-many features, too much data processing, too much memory required... In a
-word: too much fluff. I longed for something simpler, that would do perhaps
-less, but with more transparency towards the user - and something that would
-work in real mode with not much RAM, so it could run even on ancient 8086
-machines.
+code. I was no longer happy with it: too many features, too much data
+processing, too much memory required... In a word: too much fluff. I longed
+for something simpler, that would do perhaps less, but with more transparency
+towards the user - and something that would work in real mode with not much
+RAM, so it could run even on ancient 8086 machines.
 
 The result of these thoughts was SvarDOS: a distribution that replaced both
 Svarog86 and Svarog386, and that came with its own package manager - a much
 simpler (and in my opinion much more elegant) tool than FDNPKG.
+
+
+%hWhat does "SvarDOS" mean?
+
+The name "SvarDOS" traces its roots to "Svarog", a figure from Slavic
+mythology believed to be the ancient god of heat, fire, and blacksmithing.
+
+Svarog is mentioned in the Hypatian Codex, a 15th-century compilation of much
+older texts, from the Ipatiev Monastery in Russia. One passage reads:
+
+ "(Then) began his reign Feosta (Hephaestus), whom the Egyptians called Svarog
+  ... during his rule, from the heavens fell the smith's prongs and weapons
+  were forged for the first time; before that, (people) fought with clubs and
+  stones."
+
+The above excerpt is a Slavic translation of an original Greek manuscript of
+Malalin from the 6th century, about Hephaestus and Helios. The Rus translator
+supposedly replaced the Greek gods with their fitting Slavic counterparts.
+
+Despite this mythological reference, SvarDOS is not affiliated with any
+religion or ideology. The name "Svar" is chosen for its broader associations
+with heat, fire, forging, and craftsmanship - qualities deeply connected to
+the art of blacksmithing and symbolic of creation and transformation.
+
+In that spirit, SvarDOS represents a framework that unites diverse elements of
+the DOS ecosystem. It’s a system built for tinkerers, builders, and passionate
+hobbyists - those who thrive on shaping, refining, and breathing new life into
+classic computing.
+
+
+%b-----------------------------------------------------------------------------
+%b                                Author: Mateusz Viste | Last edit: 2025-09-12
