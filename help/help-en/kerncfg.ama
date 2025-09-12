@@ -186,7 +186,7 @@ RETURN [errorlevel from 0 to 65535]
                         Jumps back to continue executing the CONFIG.SYS
                         immediately after the GOSUB or SWITCH keyword
                         which called this subroutine. It is possible to 
-                        specify an optional errorlevel, which is considered as 
+                        specify an optional errorlevel, which is considered as
                         the return value of the subroutine block.
                         If no value is specified, the errorlevel is set to 0.
 
@@ -223,9 +223,9 @@ SWITCH MENU1, MENU2     Enumerates the different user selectable
                         multi-configuration options as LABELS.
 
 ONERROR                 On matching errorlevel condition executes the
-                        remaining part of the line. Conditions may be >, or
-                        <, or =, or =>, or <=. or ><. One example to better
-                        illustrate its usage:
+                        remaining part of the line. Conditions may be
+                        =|>|<|<>|>=|<=|=>|=<|==
+                        One example to better illustrate its usage:
                         ONERROR =< 1 GOTO FAILURE
 
 ?                       Optional command execution that requires user keyboard
@@ -241,7 +241,7 @@ ECHO string             Displays its arguments. Note that "ECHO" (without
 
 EXIT                    Defines the end of CONFIG.SYS execution.
 
-ERROR=n                 Sets errorlevel (return code).
+ERROR=n                 Sets errorlevel (return code) from 0 to 65535.
 
 YESCHAR=                Allows to give a different character for the Yes-Char
                         (necessary to better cope with the questioning in
