@@ -22,16 +22,16 @@ value the user must define.
 
 Here is a list of possible settings:
 
-[COMMON]                This keyword does not perform any action. It was 
+[COMMON]                This keyword does not perform any action. It was
                         designed for compatibility with MS-DOS 6.x.
-                        This is the only keyword that should be written with 
+                        This is the only keyword that should be written with
                         brackets.
 
 COUNTRY=[country number],[code page],[country.sys file location]
                         Country specific conventions to display times, dates,
                         currency, character sort order, forbidden characters,
                         mathematical separators, etc..
-                        For further details and country codes consult the 
+                        For further details and country codes consult the
                         %lcountry.ama:Country Addendum
 
 SHELL[HIGH]=\COMMAND.COM /E:512 /P
@@ -81,19 +81,19 @@ FASTOPEN=nnn
             Tracks the location of files on hard disk in memory for fast
             access. Valid values are in the range of 128 through 32768.
             Each file tracked requires 2 bytes of memory.
-            
-GETKEY     Waits for a keystroke and then sets the error level to the value 
-           of the corresponding ASCII code of the key (0..255). For example, 
-           to set the errorlevel to 1, one does not have to press <1> (has 
-           scan/ASCII code 0231h and thus 31h = 49), but rather make an 
-           <Alt>-NumPad entry, here for example <Alt>=<Alt>+<NumPad1>. 
-           This option makes it possible to react differently to any 
-           key (for which the keyboard driver generates a character) 
-           (i.e. the levels with <Shift> and <AltGr> are generally supported).  
+
+GETKEY     Waits for a keystroke and then sets the error level to the value
+           of the corresponding ASCII code of the key (0..255). For example,
+           to set the errorlevel to 1, one does not have to press <1> (has
+           scan/ASCII code 0231h and thus 31h = 49), but rather make an
+           <Alt>-NumPad entry, here for example <Alt>=<Alt>+<NumPad1>.
+           This option makes it possible to react differently to any
+           key (for which the keyboard driver generates a character)
+           (i.e. the levels with <Shift> and <AltGr> are generally supported).
 
 DRIVPARM=   Modifies the features of a disk drive already recognized by DOS.
             /D:n   Single digit that corresponds to the selected logical drive
-            /C     Specifies that the drive detects when a disk is changed. 
+            /C     Specifies that the drive detects when a disk is changed.
             /F:n   0   160/180 KB or 320/360 KB
                    1   1.2 MB
                    2   720 KB (the default)
@@ -103,10 +103,10 @@ DRIVPARM=   Modifies the features of a disk drive already recognized by DOS.
                    8   Read/write optical disk
                    9   2.88 MB
             /H:nn  Specifies the max. number of drive heads (from 1 up to 99)
-            /I     Specifies a 3.5-inch diskette drive when your computer does 
+            /I     Specifies a 3.5-inch diskette drive when your computer does
             not support one.
             /N     Specifies that the drive is permanent media.
-            /S:nn  Specifies the number of sector supported by the drive 
+            /S:nn  Specifies the number of sector supported by the drive
             (from 1 up to 99)
             /T:nn  Specifies the number of tracks supported by the drive.
 
@@ -210,7 +210,7 @@ COLOUR=[fg][,[bg][,bc]] Sets Foreground/Background/Border Colour.
                         13           LightMagenta
                         14           Yellow
                         15           White
-    
+
 TIMEOUT=n               Sets the waiting interval (in seconds) to
                         automatically jump CONFIG.SYS execution to the first
                         LABEL the SWITCH keyword has enumerated.
@@ -251,6 +251,5 @@ NUMLOCK=ON/OFF          Defines the status of the NumLock numeric pad key.
 VERSION=n.nn[,n.nn]     Sets the DOS version (Int 21h/AH=30h) and optionally
                         the true DOS version (Int 21h/AX=3306h) to be reported
                         to programs.
-%b_____________________________________________________________________________
-%b                                                        Author: Ignacio Gully
-%b                                          Last updated on 11th September 2025
+%b______________________________________________________________________________
+%b                               Author: Ignacio Gully | Last edit: 2025-09-12

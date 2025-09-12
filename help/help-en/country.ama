@@ -1,4 +1,4 @@
-                      
+
                       %h Country Addendum
 
 Country               Code   Code Pages
@@ -26,12 +26,10 @@ United States         001     437 850
 
 Example:
 
-The following entry in your CONFIG.SYS file would convert the currency symbol 
+The following entry in your CONFIG.SYS file would convert the currency symbol
 and date and time formats to the United States versions using code page 437:
 
-COUNTRY= 001, 437, C:\SVARDOS\COUNTRY.SYS 
+COUNTRY= 001, 437, C:\SVARDOS\COUNTRY.SYS
 
-%b_____________________________________________________________________________
-%b                                                        Author: Ignacio Gully
-%b                                          Last updated on 10th September 2025
- 
+%b______________________________________________________________________________
+%b                               Author: Ignacio Gully | Last edit: 2025-09-10
