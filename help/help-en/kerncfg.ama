@@ -182,9 +182,13 @@ GOSUB LABEL             Jumps execution to a CONFIG.SYS LABEL subroutine that
                         same group of keywords or to prevent a difficult to
                         follow CONFIG.SYS structure flow.
 
-RETURN                  Jumps back to continue executing the CONFIG.SYS
+RETURN [errorlevel from 0 to 65535]                 
+                        Jumps back to continue executing the CONFIG.SYS
                         immediately after the GOSUB or SWITCH keyword
-                        which called this subroutine.
+                        which called this subroutine. It is possible to 
+                        specify an optional errorlevel, which is considered as 
+                        the return value of the subroutine block.
+                        If no value is specified, the errorlevel is set to 0.
 
 CLS                     Clears the screen contents and moves the cursor to the
                         begining of the first line.
