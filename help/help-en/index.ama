@@ -11,8 +11,19 @@
  * %lnetwork.ama:Networking
  * %lmouse.ama:Mouse support
 
- * %lfreedos.ama:SvarDOS vs FreeDOS: what is the story?
- * %lcontact.ama:How do I get in touch with the SvarDOS community?
-
+ * %lfreedos.ama:SvarDOS vs FreeDOS
  * %lhistory.ama:SvarDOS origins
- * %llicense.ama:SvarDOS license
+ * %llicense.ama:SvarDOS licensing
+
+______________________________________________________________________________
+If this help document doesn't address your needs, or if you'd simply like to
+connect with the SvarDOS community, there are a couple of ways to reach out.
+
+ - For general discussions, visit the community forum:
+   <http://svardos.org/?p=forum>
+
+ - Submit bug reports or feature requests on the SvarDOS bug tracker:
+   <https://github.com/SvarDOS/bugz/issues>
+
+ - Explore more about the project on the SvarDOS homepage:
+   <http://svardos.org>
