@@ -182,7 +182,7 @@ GOSUB LABEL             Jumps execution to a CONFIG.SYS LABEL subroutine that
                         same group of keywords or to prevent a difficult to
                         follow CONFIG.SYS structure flow.
 
-RETURN [errorlevel from 0 to 65535]                 
+RETURN [errorlevel from 0 to 65535]
                         Jumps back to continue executing the CONFIG.SYS
                         immediately after the GOSUB or SWITCH keyword
                         which called this subroutine. It is possible to 
@@ -222,9 +222,9 @@ TIMEOUT=n               Sets the waiting interval (in seconds) to
 SWITCH MENU1, MENU2     Enumerates the different user selectable
                         multi-configuration options as LABELS.
 
-ONERROR                 On matching errorlevel condition executes the
-                        remaining part of the line. Conditions may be
-                        =|>|<|<>|>=|<=|=>|=<|==
+ONERROR                 On matching errorlevel (from 0 to 65535) condition 
+                        executes the remaining part of the line. Conditions 
+                        may be =|>|<|<>|>=|<=|=>|=<|==
                         One example to better illustrate its usage:
                         ONERROR =< 1 GOTO FAILURE
 
