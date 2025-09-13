@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  13 sep 2025: accept documentation of CORE pkgs in DOC/PKGNAME.AMB
   14 oct 2024: tolerate single-file documentation of CORE pkgs in DOC/PKGNAME.TXT
   20 may 2024: directory for alternative kernels changed to "KERNEL"
   10 mar 2024: support for "url" in LSM files
@@ -44,7 +45,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20241014";
+$PVER = "20250913";
 
 
 // computes the BSD sum of a file and returns it
@@ -404,6 +405,7 @@ foreach ($pkgfiles as $fname) {
       if (str_head_is($f, 'cpi/')) continue;
       if (str_head_is($f, "doc/{$pkgdir}/")) continue;
       if ($f === "doc/{$pkgnam}.txt") continue;
+      if ($f === "doc/{$pkgnam}.amb") continue;
       if ($f === 'doc/') continue;
       if (str_head_is($f, "nls/{$pkgdir}.")) continue;
       if ($f === 'nls/') continue;
