@@ -1,7 +1,7 @@
 <?php /*
 
   SvarDOS repo index builder
-  Copyright (C) Mateusz Viste 2012-2024
+  Copyright (C) Mateusz Viste 2012-2025
 
   buildidx computes an index json file for the SvarDOS repository.
   it must be executed pointing to a directory that stores packages (*.svp)
@@ -10,7 +10,7 @@
 
   requires php-zip
 
-  13 sep 2025: accept documentation of CORE pkgs in DOC/PKGNAME.AMB
+  13 sep 2025: accept documentation of CORE pkgs in DOC/PKGNAME.AMB and accept new "SHELLS" location
   14 oct 2024: tolerate single-file documentation of CORE pkgs in DOC/PKGNAME.TXT
   20 may 2024: directory for alternative kernels changed to "KERNEL"
   10 mar 2024: support for "url" in LSM files
@@ -339,7 +339,7 @@ foreach ($pkgfiles as $fname) {
 
   $lsm = read_file_from_zip($pkgfullpath, "appinfo/{$pkgnam}.lsm");
   if ($lsm == false) {
-    echo "ERROR: {$fname} does not contain an LSM file at the expected location\n";
+    echo "ERROR: {$fname} does not contain an LSM file at the expected location (appinfo/{$pkgnam}.lsm)\n";
     continue;
   }
   $lsmarray = parse_lsm($lsm);
@@ -433,6 +433,7 @@ foreach ($pkgfiles as $fname) {
     if (str_head_is($f, "drivers/{$pkgdir}/")) continue;
     if ($f === 'drivers/') continue;
     if (str_head_is($f, "kernel/{$pkgdir}/")) continue;
+    if (str_head_is($f, "shells/{$pkgdir}/")) continue;
     echo "WARNING: {$fname} contains a file in an illegal location: {$f}\n";
   }
 
