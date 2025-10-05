@@ -1,8 +1,28 @@
-version 2025 (xx xxx xxxx)
-- added the pktdrv packet driver Ethernet interface
-- added mdr_cout_scrollup()
-- mdr_cout_close() restores the cursor (if it has been hidden)
+version 2026 (xx xxx xxxx)
+- cout: preserves BP to avoid crashes on the original IBM PC BIOS
+- mouse: minor optimizations
+- vid12: vid12_rawscanlines_to_plane() becomes vid12_rawscanlines_to_planes()
+- vid12: added vid12_setorigin()
+
+version 2025 (29 Jul 2025)
+- cout: added mdr_cout_scrollup()
+- cout: mdr_cout_close() restores the cursor (if it has been hidden)
+- mda: added the mda driver (MDA dual screen access)
+- mouse: added mdr_mouse_rawmotion()
+- mouse: mdr_mouse_fetchrelease() accepts NULL arguments
+- pcx: removed the pcx_load() convenience function
+- pcx: pcx_loadrow() takes a memory pointer instead of a FILE handler
+- pcx: exposing the mdr_pcx_palentry struct so it can be accessed by programs
+- pcx: minor optimizations
+- pktdrv: added the pktdrv packet driver Ethernet interface
+- vid12: added vid12_vline() vid12_rawscanlines_to_plane() vid12_vramcpy_8px()
 - video_detect_ega() returns 0 when EGA is *NOT* found
+- vidx: added the vidx driver (VGA "MODE X", 320x240, 8bpp, 3 video pages)
+- xms: functions expose the 16bit handle instead of an exotic struct
+- xms: memory move routine fixed so it works in large model
+- xms: all functions prefixed with "mdr_" (eg. "mdr_xms_init()")
+- xms: dropped the DOS.H and STDLIB.H dependencies (smaller and faster code)
+- xms: xms_pull() and xms_push() return an unsigned char instead of an int
 
 version 2024 (29 Jul 2024)
 - added the OPL driver (Adlib-style OPL2 FM synth) along with IMF playback
@@ -42,4 +62,4 @@ version 2023 (29 Jul 2023)
 - vid12: optimized vid12_putpixel() - 17% faster
 
 version 2022 (09 Oct 2022)
-- initial public release
+- initial public release (unorganized lump of routines)

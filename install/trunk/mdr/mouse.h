@@ -1,10 +1,10 @@
 /*
  * Mouse routines
  *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2023 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -32,7 +32,7 @@
    * returns 0 if no mouse is present, and the number of buttons otherwise.
    * after initialization the mouse cursor is hidden, use mdr_mouse_show() to
    * make it visible. */
-  int mdr_mouse_init(void);
+  unsigned char mdr_mouse_init(void);
 
   /* shows the mouse pointer */
   void mdr_mouse_show(void);
@@ -43,8 +43,12 @@
   /* get x/y coordinates of the mouse, and returns a bitfield with state of buttons */
   int mdr_mouse_getstate(int *x, int *y);
 
+  /* fetches last horizontal and vertical motion since last call (in mickeys) */
+  void mdr_mouse_rawmotion(int *horz, int *vert);
+
   /* get x/y coordinates of the mouse when the last button release occured since last check.
-     returns the id of the button pressed (1 or 2), or 0 if no event occured. */
+   * returns the id of the button pressed (1 or 2), or 0 if no event occured.
+   * x,y coordinates are optional (can be NULL) */
   int mdr_mouse_fetchrelease(int *x, int *y);
 
   /* set graphic pointer shape. icon is 64-bytes long, two sets of 32. each set

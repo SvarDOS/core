@@ -1,10 +1,10 @@
 /*
  * XMS driver
  *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2022 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -28,24 +28,23 @@
 #ifndef MDR_XMS_H
 #define MDR_XMS_H
 
-struct xms_struct {
-  unsigned int handle;
-  long memsize; /* allocated memory size, in bytes */
-};
-
-/* checks if a XMS driver is installed, inits it and allocates a memory block of memsize K-bytes.
+/* checks if a XMS driver is installed, inits it and tries to allocate a
+ * memory block of memsize K-bytes.
  * if memsize is 0, then the maximum possible block will be allocated.
- * returns the amount of allocated memory (in K-bytes) on success, 0 otherwise. */
-unsigned int xms_init(struct xms_struct *xms, unsigned int memsize);
+ * returns a non-zero XMS handle on success (0 otherwise)
+ * NOTE the amount of actually allocated memory (in K-bytes) is updated in
+ *      memsize. Check this carefully as the routine may provide much less
+ *      memory than requested if XMS is depleted. */
+unsigned short mdr_xms_init(unsigned short *memsize);
 
-/* free XMS memory */
-void xms_close(struct xms_struct *xms);
+/* free XMS handle, returns 0 on success */
+unsigned char mdr_xms_close(unsigned short handle);
 
 /* copies a chunk of memory from conventional memory into the XMS block.
    returns 0 on sucess, non-zero otherwise. */
-int xms_push(struct xms_struct *xms, void far *src, unsigned int len, long xmsoffset);
+unsigned char mdr_xms_push(unsigned short handle, void far *src, unsigned long xmsoffset, unsigned short len);
 
 /* copies a chunk of memory from the XMS block into conventional memory */
-int xms_pull(struct xms_struct *xms, long xmsoffset, void far *dst, unsigned int len);
+unsigned char mdr_xms_pull(unsigned short handle, void far *dst, unsigned long xmsoffset, unsigned short len);
 
 #endif

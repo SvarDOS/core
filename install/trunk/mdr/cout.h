@@ -1,10 +1,10 @@
 /*
  * Console output
  *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2023 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -59,6 +59,12 @@ unsigned char mdr_cout_str(unsigned char y, unsigned char x, const char *s, unsi
 
 /* clears screen, filling it with a single color attribute */
 void mdr_cout_cls(unsigned char colattr);
+
+/* scrolls a rectangle of screen by nlines up, starting at upper left corner
+ * [row_high,col_high] and ending at lower right corner [row_low,col_low].
+ * blank area is filled with blanks and attribute colattr. if nlines is 0 then
+ * entire screen is scrolled. */
+void mdr_cout_scrollup(unsigned char colattr, unsigned char row_high, unsigned char col_high, unsigned char row_low, unsigned char col_low, unsigned char nlines);
 
 /* provides properties of the current video mode:
  * termwidth = terminal's width

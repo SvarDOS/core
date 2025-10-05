@@ -1,10 +1,10 @@
 /*
  * PCX-loading routines
  *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2022-2023 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -36,7 +36,7 @@ struct pcx_hdr {
   unsigned short max_x;
   unsigned short max_y;
   unsigned short bytes_per_scanline;
-  struct {
+  struct mdr_pcx_palentry {
     unsigned char r;
     unsigned char g;
     unsigned char b;
@@ -51,19 +51,12 @@ struct pcx_hdr {
  * returns 0 on success, non-zero otherwise. */
 int mdr_pcx_anal(struct pcx_hdr *h, FILE *fd, unsigned long offset, unsigned long len);
 
-/* this function should be called to load the next row of a PCX file into a
+/* this function should be called to load the next row of a PCX image into a
  * buffer pointed at by bufptr. you will typically want to call this function
- * h->max_y times. ptr must be at least (h->max_x + 1) bytes large for 8bpp.
+ * h->max_y times. ptr must be at least (h->bytes_per_scanline) bytes large.
  * the pcx_hdr struct must have been produced by pcx_anal().
- * returns 0 on success, non-zero otherwise. */
-int mdr_pcx_loadrow(void *bufptr, const struct pcx_hdr *h, FILE *fd);
-
-/* load an entire PCX file into a pixel buffer. the PCX data must have been
- * previously analyzed by pcx_anal() and the fd file pointer must not have been
- * modified since then. the destination buffer must be large enough to hold all
- * pixels, ie. (h->max_x + 1) * (h->max_y + 1) for 8 bpp.
- * returns 0 on success, non-zero otherwise. */
-int mdr_pcx_load(void *ptr, const struct pcx_hdr *h, FILE *fd);
+ * returns the amount of consumed bytes */
+unsigned short mdr_pcx_loadrow(void *bufptr, const struct pcx_hdr *h, const unsigned char *src);
 
 /* convert img to 8bpp if needed (ie unpack 2 and 4bpp data to 8bpp).
  * the conversion is performed in-place, make sure the img buffer is large

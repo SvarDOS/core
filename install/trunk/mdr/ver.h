@@ -1,10 +1,10 @@
 /*
  * MDR version
  *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2024 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -27,7 +27,7 @@
 
 #ifndef MDR_VER_H
 
-#define MDR_VER_MAJOR 2024
+#define MDR_VER_MAJOR 2026
 #define MDR_VER_MINOR 0
 
 #endif

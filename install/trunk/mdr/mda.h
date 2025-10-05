@@ -1,5 +1,6 @@
 /*
- * BIOS functions
+ * MDA output that can be used in parallel of some other video calls in a
+ * dual-screen setup.
  *
  * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
@@ -25,15 +26,29 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef MDR_BIOS_H
-#define MDR_BIOS_H
+/*
+ * MDA is always 80x25 monochrome
+ *
+ * This can be used in two ways:
+ * 1. use mdr_mda_write() to position strings on the screen yourself,
+ * or
+ * 2. mdr_mda_log() to write strings one under another with an automatic
+ * screen scroll once the bottom line is reached.
+ */
 
-/* waits for ticks time (1 tick is roughly 55ms, an hour has 65543 ticks)
- * works on IBM PC, XT, AT - ie. it's always safe */
-void mdr_bios_tickswait(unsigned short ticks);
+#ifndef MDR_MDA_H
+#define MDR_MDA_H
 
-/* returns the current BIOS tick counter (18.2 Hz, 1 tick is roughly 55ms, an
- * hour has 65543 ticks). works on IBM PC, XT, AT - ie. it's always safe */
-unsigned short mdr_bios_ticks(void);
+/* clears the MDA screen */
+void mdr_mda_cls(void);
+
+/* write a 0-terminated string on MDA's screen at [x,y] position
+ * NOTE: [0,0] is the top left corner */
+void mdr_mda_write(unsigned char x, unsigned char y, const char *s);
+
+/* write a "log" message to the MDA screen, line after line. scrolls screen
+ * automatically when bottom row is reached. */
+void mdr_mda_log(const char *s);
+
 
 #endif

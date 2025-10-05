@@ -1,6 +1,8 @@
 
+
                              Mateusz' DOS Routines
-                          http://mdrlib.sourceforge.io
+
+                             http://mateusz.fr/mdr
 
 
 Mateusz' DOS Routines (MDR) is a C library that contains a variety of routines
@@ -18,9 +20,11 @@ BIOS     BIOS-based functions
 COUT     console output (writing to text-mode display)
 DOS      functions interacting with DOS
 KEYB     basic functions to interact with the keyboard
+MDA      writes directly to the MDA screen (useful for dual-screen setups)
 MOUSE    mouse routines
 OPL      OPL2 (Adlib style) audio
 PCX      parsing, loading and uncompressing PCX images
+PKTDRV   packet driver interface (sending and receiving raw Ethernet frames)
 RS232    writing to and reading from an RS-232 ("COM") port
 SBDIGI   playing digitized sounds with a SoundBlaster-compatible card
 TIMER    high-resolution (1 kHz) timer, relies on PIT reprogramming
@@ -28,6 +32,7 @@ TRIGINT  sin and cos functions using integers only (8086-compatible)
 UNZIP    iteration over ZIP archives (no decompression code)
 VID12    driver for mode 12h VGA graphic (640x480, 16 colors)
 VIDEO    drivers for 320x200 video modes (256 colors on VGA, 16 colors on CGA)
+VIDX     driver for VGA "MODE X", ie. 320x240 with 256 colors and 3 pages
 WAVE     parsing and loading WAVE sound files
 XMS      detecting and using XMS memory to store data
 
@@ -67,7 +72,7 @@ wmake utility as follows:
   wmake clean
   wmake model=<MEMORY MODEL>
 
-valid memory model options are:
+valid memory models are:
 
   wmake model=s
   wmake model=c
