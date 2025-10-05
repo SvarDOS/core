@@ -4,6 +4,11 @@
 
 
 
+=== ver 2025.2 (xx.xx.2025) ==================================================
+
+ - CLS: preserves bp (work-around for a bug in the IBM PC BIOS)
+
+
 === ver 2025.1 (13.03.2025) ==================================================
 
  - COMMAND /? shows the program's version

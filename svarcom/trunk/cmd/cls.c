@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -41,6 +41,11 @@ static enum cmd_result cmd_cls(struct cmd_funcparam *p) {
   screenh = screen_getheight();
 
   _asm {
+    push bp /* int 10h,ah=6 trashes BP on an IBM PC */
+    push bx
+    push cx
+    push dx
+
     /* output an ANSI ESC code for "clear screen" in case the console is
      * some kind of terminal */
     mov ah, 0x09     /* write $-terminated string to stdout */
@@ -81,6 +86,11 @@ static enum cmd_result cmd_cls(struct cmd_funcparam *p) {
     xor dx, dx       /* location in DH,DL */
     int 0x10
     DONE:
+
+    pop dx
+    pop cx
+    pop bx
+    pop bp
   }
 
   return(CMD_OK);
