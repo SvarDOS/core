@@ -1,5 +1,6 @@
 version 2026 (xx xxx xxxx)
 - cout: preserves BP to avoid crashes on the original IBM PC BIOS
+- cout: fixed EGA detection (2025 regression)
 - mouse: minor optimizations
 - vid12: vid12_rawscanlines_to_plane() becomes vid12_rawscanlines_to_planes()
 - vid12: added vid12_setorigin()
@@ -16,7 +17,7 @@ version 2025 (29 Jul 2025)
 - pcx: minor optimizations
 - pktdrv: added the pktdrv packet driver Ethernet interface
 - vid12: added vid12_vline() vid12_rawscanlines_to_plane() vid12_vramcpy_8px()
-- video_detect_ega() returns 0 when EGA is *NOT* found
+- video_detectega() returns 0 when EGA is *NOT* found
 - vidx: added the vidx driver (VGA "MODE X", 320x240, 8bpp, 3 video pages)
 - xms: functions expose the 16bit handle instead of an exotic struct
 - xms: memory move routine fixed so it works in large model
