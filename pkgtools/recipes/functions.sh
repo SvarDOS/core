@@ -1,3 +1,6 @@
+FETCH_CMD="curl -L"
+ZIP_CMD="7zz a -r -mm=deflate -mx=9 -tzip"
+
 #----------------------------------------------------------------------------
 
 BUILDDIR=build/$CATEGORY/$NAME
@@ -7,8 +10,6 @@ SRCFILE=pkg/$NAME-$VERSION.zip
 PKGDIR=pkg
 
 #----------------------------------------------------------------------------
-
-FETCH_CMD="curl -L"
 
 ACTION="$1"
 
@@ -49,7 +50,7 @@ function generate_appinfo() {
 
 function generate_package() {
 	echo "build.sh: generating $NAME.svp"
-	(cd build; 7zz a -r -mm=deflate -mx=9 -tzip ../$PKGDIR/$NAME-$VERSION.svp appinfo $CATEGORY) || exit 1
+	(cd build; $ZIP_CMD ../$PKGDIR/$NAME-$VERSION.svp appinfo $CATEGORY) || exit 1
 	ln -s $NAME-$VERSION.svp $PKGDIR/$NAME.svp
 
 }
@@ -97,7 +98,7 @@ function build_source_package() {
 }
 
 function usage() {
-	echo "build.sh - build script for $NAME $VERSION"
+	echo "build.sh - SvarDOS package build script for $NAME $VERSION"
 	echo "usage: build.sh [clean]"
 }
 
