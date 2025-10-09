@@ -10,7 +10,7 @@
 <?php
   // look for BUILDIDX warnings
   $errs = trim(file_get_contents('../packages/_buildidx.log'));
-  if (!empty($errs)) echo '<p style="color: #fff; font-weight: bold; border: 1px #555 solid; padding: 0.2em 0.5em; background: #f66; border-radius: 0.5em;">Note to SvarDOS packagers: inconsistencies have been detected in the repository, <a href="?p=repo&amp;showlogs=1#logs">review them</a>.</p>';
+  if (!empty($errs)) echo '<p style="color: #fff; font-weight: bold; border: 1px #555 solid; padding: 0.2em 0.5em; background: #f66; border-radius: 0.5em;">Note to SvarDOS packagers: inconsistencies have been detected in the repository, <a href="#logs">review them</a>.</p>';
 
   // load the category list
   $cats = json_decode(file_get_contents('../packages/_cats.json'), true);
@@ -195,13 +195,9 @@ foreach ($db as $pkg => $meta) {
 }
 echo "</table>\n";
 
-if ($_GET['showlogs'] == 1) {
-  echo "<p style=\"font-size: 0.8em;\"><a name=\"logs\">DEBUG REPO BUILD LOGS</a>:<br>\n";
-  if (empty($errs)) {
-    echo "no buildidx errors to display\n";
-  } else {
-    echo nl2br(htmlentities($errs));
-  }
+if (!empty($errs)) {
+  echo '<p style="font-size: 0.8em; border-top: 1px #000 solid;"><a name="logs">DEBUG REPO BUILD LOGS</a>:<br>' . "\n";
+  echo nl2br(htmlentities($errs));
   echo "</p>\n";
 }
 
