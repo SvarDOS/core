@@ -10,6 +10,7 @@
 
   requires php-zip
 
+  09 oct 2025: added pkg2func[] resolutions + special rule for F-PROT and a few CORE-alternative packages
   13 sep 2025: accept documentation of CORE pkgs in DOC/PKGNAME.AMB and accept new "SHELLS" location
   14 oct 2024: tolerate single-file documentation of CORE pkgs in DOC/PKGNAME.TXT
   20 may 2024: directory for alternative kernels changed to "KERNEL"
@@ -45,7 +46,7 @@
   22 sep 2012: forked 1st version from FDUPDATE builder
 */
 
-$PVER = "20250913";
+$PVER = "20251009";
 
 
 // computes the BSD sum of a file and returns it
@@ -299,7 +300,12 @@ $pkgcount = 0;
 // load the list of CORE and MSDOS_COMPAT packages
 
 $core_packages_list = load_core_list($repodir . '/../packages-core/');
-$msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice comp cpidos debug defrag deltree diskcomp diskcopy display dosfsck edlin exe2bin fc fdapm fdisk fdmore find format freecom help himemx kernledr kernlfd keyb label localcfg mem mirror mode more move nlsfunc print replace share shareedr shsucdx sort svarcom sved swsubst tree undelete unformat xcopy');
+$msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice command comp cpidos debug defrag deltree diskcomp diskcopy display dosfsck edlin exe2bin fc fdapm fdisk fdmore find format freecom help himemx kernel kernledr kernlfd keyb label localcfg mem mirror mode more move nlsfunc print replace share shareedr shsucdx sort svarcom sved swsubst tree undelete unformat xcopy');
+
+// some packages have a name that does not match their "functionality"
+$pkg2func = array('choicesv' => 'choice',
+                  'fdmore' => 'more',
+                  'shareedr' => 'share');
 
 // do a list of all svp packages with their available versions and descriptions
 
@@ -360,10 +366,17 @@ foreach ($pkgfiles as $fname) {
   $listoffiles = read_list_of_files_in_zip($pkgfullpath);
   $pkgdir = $pkgnam;
 
-  // special rule for "parent and children" packages
+  // some packages should use directories different than their filename because
+  // their function name is standardised (eg. FDMORE = function name "MORE")
+  if (!empty($pkg2func[$pkgnam])) $pkgdir = $pkg2func[$pkgnam];
+
+  // special rules for "parent and children" packages
   if (str_head_is($pkgnam, 'djgpp_')) $pkgdir = 'djgpp'; // djgpp_* packages put their files in djgpp
   if ($pkgnam == 'fbc_help') $pkgdir = 'fbc'; // FreeBASIC help goes to the FreeBASIC dir
   if ($pkgnam == 'clamdb') $pkgdir = 'clamav'; // data patterns for clamav
+
+  // special rules for names with a dash (illegal in an SVP filename)
+  if ($pkgnam == 'fprot') $pkgdir = 'f-prot';
 
   // array used to detect duplicated entries after lower-case conversion
   $duparr = array();
