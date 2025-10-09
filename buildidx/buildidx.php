@@ -417,6 +417,7 @@ foreach ($pkgfiles as $fname) {
       if (str_head_is($f, 'bin/')) continue;
       if (str_head_is($f, 'cpi/')) continue;
       if (str_head_is($f, "doc/{$pkgdir}/")) continue;
+      if (str_head_is($f, "doc/{$pkgnam}/")) continue;
       if ($f === "doc/{$pkgnam}.txt") continue;
       if ($f === "doc/{$pkgnam}.amb") continue;
       if ($f === 'doc/') continue;
