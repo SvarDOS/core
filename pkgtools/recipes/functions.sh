@@ -38,13 +38,13 @@ function unpack_distfiles() {
 
 function generate_appinfo() {
 	echo "build.sh: generating $NAME.lsm"
-	echo "version: $VERSION" | unix2dos >$INFODIR/$NAME.lsm
-	echo "description: $DESCRIPTION" | unix2dos >>$INFODIR/$NAME.lsm
+	(echo "version: $VERSION" | unix2dos) >$INFODIR/$NAME.lsm
+	(echo "description: $DESCRIPTION" | unix2dos) >>$INFODIR/$NAME.lsm
 	if [ "$HWREQ" != "" ]; then
-		echo "hwreq: $HWREQ" | unix2dos >>$INFODIR/$NAME.lsm
+		(echo "hwreq: $HWREQ" | unix2dos) >>$INFODIR/$NAME.lsm
 	fi
 	if [ "$WARN" != "" ]; then
-		echo "hwreq: $HWREQ" | unix2dos >>$INFODIR/$NAME.lsm
+		(echo "hwreq: $HWREQ" | unix2dos) >>$INFODIR/$NAME.lsm
 	fi	
 }
 
