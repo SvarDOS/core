@@ -16,7 +16,6 @@ function adjust_builddir() {
 	mv $BUILDDIR/bin/* $BUILDDIR
 	mv $BUILDDIR/doc/* $BUILDDIR
 	rm -rf "$BUILDDIR/bin" "$BUILDDIR/doc" "$BUILDDIR/source"
-	true
 }
 
 run

@@ -1,6 +1,8 @@
 FETCH_CMD="curl -L"
 ZIP_CMD="7zz a -r -mm=deflate -mx=9 -tzip"
 
+EXTERNAL_CMDS="curl unix2dos 7zz"
+
 #----------------------------------------------------------------------------
 
 BUILDDIR=build/$CATEGORY/$NAME
@@ -12,6 +14,16 @@ PKGDIR=pkg
 #----------------------------------------------------------------------------
 
 ACTION="$1"
+
+function check_externals() {
+	for CMD in $EXTERNAL_CMDS; do
+	# check for tools
+		if ! command -v $CMD > /dev/null 2>&1; then
+			echo "error: executable $CMD not found"
+			exit 1
+		fi
+	done	
+}
 
 function clean() {
 	echo "build.sh: cleaning"
@@ -104,6 +116,7 @@ function usage() {
 
 function run() {
 	if [ -z "$ACTION" ]; then
+		check_externals
 		build_package
 		build_source_package
 	elif [ "$ACTION" = "clean" ]; then

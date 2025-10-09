@@ -15,7 +15,6 @@ source ../functions.sh
 # you can add, modify, delete files that will go into the .SVP package
 function adjust_builddir() {
 	rm -rf "$BUILDDIR/win31"
-	true
 }
 
 run
