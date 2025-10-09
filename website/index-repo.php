@@ -8,6 +8,10 @@
 <p>If you wish to receive notifications about new or updated packages, you may subscribe to the <a href="http://svn.svardos.org/rss.php?repname=SvarDOS%20Packages&amp;path=%2F&amp;isdir=1">SvarDOS Packages RSS feed</a>.</p>
 
 <?php
+  // look for BUILDIDX warnings
+  $errs = trim(file_get_contents('../packages/_buildidx.log'));
+  if (!empty($errs)) echo '<p style="color: #fff; font-weight: bold; border: 1px #555 solid; padding: 0.2em 0.5em; background: #f66; border-radius: 0.5em;">Note to SvarDOS packagers: inconsistencies have been detected in the repository, <a href="?p=repo&amp;showlogs=1#logs">review them</a>.</p>';
+
   // load the category list
   $cats = json_decode(file_get_contents('../packages/_cats.json'), true);
   sort($cats);
@@ -190,9 +194,6 @@ foreach ($db as $pkg => $meta) {
   }
 }
 echo "</table>\n";
-
-$errs = trim(file_get_contents('../packages/_buildidx.log'));
-if (!empty($errs)) echo '<p style="color: #f00; font-weigth: bold;">Note to SvarDOS packagers: inconsistencies have been detected in the repository, please <a href="?p=repo&amp;showlogs=1#logs">review them</a>.</p>';
 
 if ($_GET['showlogs'] == 1) {
   echo "<p style=\"font-size: 0.8em;\"><a name=\"logs\">DEBUG REPO BUILD LOGS</a>:<br>\n";
