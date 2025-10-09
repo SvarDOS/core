@@ -56,6 +56,11 @@ For "core" packages, we have this:
   DOC\PKGNAME\*      Documentation, if more than one file
   NLS\PKGNAME        Localization files in the legacy, multifile (CATS) format
 
+This structure is primarily intended for "core" packages, but it also applies
+to packages that serve as MS-DOS compatibility tools (commands found in MS-DOS
+but not included in SvarDOS) as well as packages that offer alternatives to
+core components, designed to replace default commands.
+
 Non-core packages use a slightly different directory organization. For
 example, if we were to consider a package FOO, we might end up with the
 following structure:
