@@ -300,7 +300,7 @@ $pkgcount = 0;
 // load the list of CORE and MSDOS_COMPAT packages
 
 $core_packages_list = load_core_list($repodir . '/../packages-core/');
-$msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice command comp cpidos debug defrag deltree diskcomp diskcopy display dosfsck edlin exe2bin fc fdapm fdisk fdmore find format freecom help himemx kernel kernledr kernlfd keyb label localcfg mem mirror mode more move nlsfunc print replace share shareedr shsucdx sort svarcom sved swsubst tree undelete unformat xcopy');
+$msdos_compat_list = explode(' ', 'append assign attrib callver chkdsk choice choicesv command comp cpidos debug defrag deltree diskcomp diskcopy display dosfsck edlin exe2bin fc fdapm fdisk fdmore find format freecom help himemx kernel kernledr kernlfd keyb label localcfg mem mirror mode more move nlsfunc print replace share shareedr shsucdx sort svarcom sved swsubst tree undelete unformat xcopy');
 
 // some packages have a name that does not match their "functionality"
 $pkg2func = array('choicesv' => 'choice',
