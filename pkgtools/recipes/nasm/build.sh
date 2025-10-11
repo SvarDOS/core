@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NAME=nasm
-VERSION=3.00
+VERSION=3.01
 CATEGORY=devel
 HWREQ=386
 DESCRIPTION="The Netwide Assembler (UPX-compressed, 386+)"
