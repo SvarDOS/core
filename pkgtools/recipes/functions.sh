@@ -10,6 +10,7 @@ INFODIR=build/appinfo
 DISTFILE=tmp/$NAME.zip
 SRCFILE=pkg/$NAME-$VERSION.zip
 PKGDIR=pkg
+REPODIR=../../../packages
 
 #----------------------------------------------------------------------------
 
@@ -84,8 +85,8 @@ function fix_distfiles() {
 }
 
 function fetch_sourcefiles() {
-	echo "build.sh: fetching sources"
 	if [ "$SRCURL" != "" ]; then
+		echo "build.sh: fetching sources"
 		$FETCH_CMD "$SRCURL" -o "$SRCFILE" || exit 1
 		ln -s $NAME-$VERSION.zip $PKGDIR/$NAME.zip
 	fi
@@ -109,18 +110,64 @@ function build_source_package() {
 	fetch_sourcefiles
 }
 
+
+function upgrade() {
+	OLDVERSION=$(ls "$REPODIR/$NAME-"*.svp | sed "s|$REPODIR\/$NAME-||; s|.svp\$||" | sort | tail -n 1)
+	if [ -z "$OLDVERSION" ]; then
+		echo "build.sh: cannot determine old version"
+		exit 1
+	fi
+	if [ ! -f "$PKGDIR/$NAME-$VERSION.svp" ]; then
+		echo "build.sh: you first have to build $PKGDIR/$NAME-$VERSION.svp"
+		exit 1
+	fi
+	echo "build.sh: upgrading $NAME $OLDVERSION -> $VERSION"
+	if [ "$OLDVERSION" != "$VERSION" ]; then
+		echo "build.sh: SVN copy version $OLDVERSION to $VERSION"
+		(cd $REPODIR; svn cp "$NAME-$OLDVERSION.svp" "$NAME-$VERSION.svp") || exit 1
+	fi
+	echo "build.sh: copying version $VERSION to SVN repo"
+	cp -a "$PKGDIR/$NAME-$VERSION.svp" "$REPODIR/$NAME-$VERSION.svp"
+
+	# handle source package
+	OLDSRCVER=$(ls "$REPODIR/$NAME-"*.zip | sed "s|$REPODIR\/$NAME-||; s|.zip\$||" | sort | tail -n 1)
+	if [ -f "$PKGDIR/$NAME-$VERSION.zip" ]; then
+		echo "build.sh: upgrading source package"
+
+		if [ "$OLDSRCVER" != "$VERSION" ]; then
+			echo "build.sh: SVN copy source of version $OLDSRCVER to $VERSION"
+			(cd $REPODIR; svn cp "$NAME-$OLDSRCVER.zip" "$NAME-$VERSION.zip") || exit 1
+		fi
+
+		echo "build.sh: copying source of version $VERSION to SVN repo"
+		cp -a "$PKGDIR/$NAME-$VERSION.zip" "$REPODIR/$NAME-$VERSION.zip"
+
+		if [ -z "$OLDSRCVER" ]; then
+			echo "build.sh: no previous source version, you must manually SVN add"
+		fi
+	fi
+	echo "build.sh: done!"
+}
+
 function usage() {
 	echo "build.sh - SvarDOS package build script for $NAME $VERSION"
-	echo "usage: build.sh [clean]"
+	echo ""
+	echo "usage: build.sh [build|clean|upgrade]"
+	echo ""
+	echo "\tbuild    build .SVP package"
+	echo "\tclean    deletes build artifacts"
+	echo "\tupgrade  copies generated package to the repo dir and updates SVN"
 }
 
 function run() {
-	if [ -z "$ACTION" ]; then
+	if [ "$ACTION" = "build" ]; then
 		check_externals
 		build_package
 		build_source_package
 	elif [ "$ACTION" = "clean" ]; then
 		clean
+	elif [ "$ACTION" = "upgrade" ]; then
+		upgrade
 	else
 		usage
 	fi
