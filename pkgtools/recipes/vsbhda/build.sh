@@ -1,12 +1,12 @@
 #!/bin/sh
 
 NAME=vsbhda
-VERSION=1.7
+VERSION=1.8
 CATEGORY=drivers
 DESCRIPTION="Sound Blaster emulation for HDA (and AC'97/SB Live!). (386+)"
 HWREQ=386
 
-DISTURL="https://github.com/Baron-von-Riedesel/VSBHDA/releases/download/v$VERSION/vsbhda17.zip"
+DISTURL="https://github.com/Baron-von-Riedesel/VSBHDA/releases/download/v$VERSION/vsbhda18.zip"
 SRCURL="https://github.com/Baron-von-Riedesel/VSBHDA/archive/refs/tags/v$VERSION.zip"
 
 source ../functions.sh
