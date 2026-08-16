@@ -1,14 +1,15 @@
 FETCH_CMD="curl -L"
-ZIP_CMD="7zz a -r -mm=deflate -mx=9 -tzip"
+ZIP_CMD="7z a -r -mm=deflate -mx=9 -tzip"
 
-EXTERNAL_CMDS="curl unix2dos 7zz"
+EXTERNAL_CMDS="curl unix2dos 7z"
 
 #----------------------------------------------------------------------------
 
+FILEVERSION=$(echo "$VERSION" | sed 's/release //;')
 BUILDDIR=build/$CATEGORY/$NAME
 INFODIR=build/appinfo
 DISTFILE=tmp/$NAME.zip
-SRCFILE=pkg/$NAME-$VERSION.zip
+SRCFILE=pkg/$NAME-$FILEVERSION.zip
 PKGDIR=pkg
 REPODIR=../../../packages
 
@@ -63,8 +64,8 @@ function generate_appinfo() {
 
 function generate_package() {
 	echo "build.sh: generating $NAME.svp"
-	(cd build; $ZIP_CMD ../$PKGDIR/$NAME-$VERSION.svp appinfo $CATEGORY) || exit 1
-	ln -s $NAME-$VERSION.svp $PKGDIR/$NAME.svp
+	(cd build; $ZIP_CMD ../$PKGDIR/$NAME-$FILEVERSION.svp appinfo $CATEGORY) || exit 1
+	ln -s $NAME-$FILEVERSION.svp $PKGDIR/$NAME.svp
 
 }
 
@@ -88,7 +89,7 @@ function fetch_sourcefiles() {
 	if [ "$SRCURL" != "" ]; then
 		echo "build.sh: fetching sources"
 		$FETCH_CMD "$SRCURL" -o "$SRCFILE" || exit 1
-		ln -s $NAME-$VERSION.zip $PKGDIR/$NAME.zip
+		ln -s $NAME-$FILEVERSION.zip $PKGDIR/$NAME.zip
 	fi
 }
 
@@ -117,30 +118,30 @@ function upgrade() {
 		echo "build.sh: cannot determine old version"
 		exit 1
 	fi
-	if [ ! -f "$PKGDIR/$NAME-$VERSION.svp" ]; then
-		echo "build.sh: you first have to build $PKGDIR/$NAME-$VERSION.svp"
+	if [ ! -f "$PKGDIR/$NAME-$FILEVERSION.svp" ]; then
+		echo "build.sh: you first have to build $PKGDIR/$NAME-$FILEVERSION.svp"
 		exit 1
 	fi
-	echo "build.sh: upgrading $NAME $OLDVERSION -> $VERSION"
-	if [ "$OLDVERSION" != "$VERSION" ]; then
-		echo "build.sh: SVN copy version $OLDVERSION to $VERSION"
-		(cd $REPODIR; svn cp "$NAME-$OLDVERSION.svp" "$NAME-$VERSION.svp") || exit 1
+	echo "build.sh: upgrading $NAME $OLDVERSION -> $FILEVERSION"
+	if [ "$OLDVERSION" != "$FILEVERSION" ]; then
+		echo "build.sh: SVN copy version $OLDVERSION to $FILEVERSION"
+		(cd $REPODIR; svn cp "$NAME-$OLDVERSION.svp" "$NAME-$FILEVERSION.svp") || exit 1
 	fi
 	echo "build.sh: copying version $VERSION to SVN repo"
-	cp -a "$PKGDIR/$NAME-$VERSION.svp" "$REPODIR/$NAME-$VERSION.svp"
+	cp -a "$PKGDIR/$NAME-$FILEVERSION.svp" "$REPODIR/$NAME-$FILEVERSION.svp"
 
 	# handle source package
 	OLDSRCVER=$(ls "$REPODIR/$NAME-"*.zip | sed "s|$REPODIR\/$NAME-||; s|.zip\$||" | sort | tail -n 1)
-	if [ -f "$PKGDIR/$NAME-$VERSION.zip" ]; then
+	if [ -f "$PKGDIR/$NAME-$FILEVERSION.zip" ]; then
 		echo "build.sh: upgrading source package"
 
-		if [ "$OLDSRCVER" != "$VERSION" ]; then
-			echo "build.sh: SVN copy source of version $OLDSRCVER to $VERSION"
-			(cd $REPODIR; svn cp "$NAME-$OLDSRCVER.zip" "$NAME-$VERSION.zip") || exit 1
+		if [ "$OLDSRCVER" != "$FILEVERSION" ]; then
+			echo "build.sh: SVN copy source of version $OLDSRCVER to $FILEVERSION"
+			(cd $REPODIR; svn cp "$NAME-$OLDSRCVER.zip" "$NAME-$FILEVERSION.zip") || exit 1
 		fi
 
 		echo "build.sh: copying source of version $VERSION to SVN repo"
-		cp -a "$PKGDIR/$NAME-$VERSION.zip" "$REPODIR/$NAME-$VERSION.zip"
+		cp -a "$PKGDIR/$NAME-$FILEVERSION.zip" "$REPODIR/$NAME-$FILEVERSION.zip"
 
 		if [ -z "$OLDSRCVER" ]; then
 			echo "build.sh: no previous source version, you must manually SVN add"

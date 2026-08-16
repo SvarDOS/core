@@ -1,13 +1,13 @@
 #!/bin/sh
 
 NAME=jemm
-VERSION=5.85
+VERSION=5.86
 CATEGORY=drivers
 DESCRIPTION='Jemm is an "Expanded Memory Manager". Includes Jemm386, JemmEx. (386+)'
 HWREQ=386
 
-DISTURL="https://github.com/Baron-von-Riedesel/Jemm/releases/download/v5.85/JemmB_v585.zip"
-SRCURL="https://github.com/Baron-von-Riedesel/Jemm/archive/refs/tags/v5.85.zip"
+DISTURL="https://github.com/Baron-von-Riedesel/Jemm/releases/download/v5.86/JemmB_v586.zip"
+SRCURL="https://github.com/Baron-von-Riedesel/Jemm/archive/refs/tags/v5.86.zip"
 
 source ../functions.sh
 
