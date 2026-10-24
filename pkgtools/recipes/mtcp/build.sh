@@ -1,12 +1,12 @@
 #!/bin/sh
 
 NAME=mtcp
-VERSION=2025-01-10
+VERSION=2026-10-10
 CATEGORY=progs
 DESCRIPTION="collection of TCP/IP tools for 16 bit DOS: DHCP, IRC, FTP, Telnet, Netcat, HTGet, Ping, SNTP"
 
-DISTURL="https://www.brutman.com/mTCP/download/mTCP_2025-01-10.zip"
-SRCURL="https://www.brutman.com/mTCP/download/mTCP-src_2025-01-10.zip"
+DISTURL="https://www.brutman.com/mTCP/download/mTCP_2026-10-10.zip"
+SRCURL="https://www.brutman.com/mTCP/download/mTCP-src_2026-10-10.zip"
 
 source ../functions.sh
 
