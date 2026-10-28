@@ -80,7 +80,8 @@ FILES[HIGH] or [HI]FILES=nn
 FASTOPEN=nnn
             Tracks the location of files on hard disk in memory for fast
             access. Valid values are in the range of 128 through 32768.
-            Each file tracked requires 2 bytes of memory.
+            Each file tracked requires 2 bytes of memory. Argument is optional 
+            and that it defaults to 512.
 
 GETKEY     Waits for a keystroke and then sets the error level to the value
            of the corresponding ASCII code of the key (0..255). For example,
@@ -256,4 +257,4 @@ VERSION=n.nn[,n.nn]     Sets the DOS version (Int 21h/AH=30h) and optionally
                         the true DOS version (Int 21h/AX=3306h) to be reported
                         to programs.
 %b______________________________________________________________________________
-%b                               Author: Ignacio Gully | Last edit: 2025-09-12
+%b                               Author: Ignacio Gully | Last edit: 2026-10-28
