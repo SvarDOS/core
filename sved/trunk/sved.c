@@ -910,10 +910,10 @@ static int parseargv(struct file *dbarr) {
 
     /* look at the arg now */
     if (*arg == '/') {
-      if (arg[1] == 't') { /* /t = do not expand tabs */
+      if ((arg[1] == 't') || (arg[1] == 'T')) { /* /t = do not expand tabs */
         glob_tablessmode = 1;
 
-      } else if (arg[1] == 'm') { /* /m = force mono mode */
+      } else if ((arg[1] == 'm') || (arg[1] == 'M')) { /* /m = force mono mode */
         glob_monomode = 1;
 
       } else {  /* help screen */

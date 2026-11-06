@@ -74,6 +74,7 @@ and wish to free a bit of disk space.
  - fixed data loss when joining lines runs out of memory
  - fixed a short disk write being reported as a successful save
  - fixed OPEN discarding current file when new filename cannot be opened
+ - uppercase /T and /M are recognized (and handled like /t and /m)
 
 2024.1 [27 Feb 2024]
  - fixed tab-less mode [/t] (got broken in 2024.0 inducing freezes)
