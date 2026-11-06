@@ -649,12 +649,6 @@ static void cursor_up(struct file *db) {
 
 static void cursor_eol(struct file *db) {
   /* adjust xoffset to make sure eol is visible on screen */
-  if (db->xoffset > db->cursor->len) {
-    db->xoffset = db->cursor->len - 1;
-    uidirty.from = 0;
-    uidirty.to = 0xff;
-  }
-
   if (db->xoffset + screenlastcol <= db->cursor->len) {
     db->xoffset = db->cursor->len - screenw + 2;
     uidirty.from = 0;
