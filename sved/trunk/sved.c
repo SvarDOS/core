@@ -1,6 +1,6 @@
 /* Sved, the SvarDOS editor
  *
- * Copyright (C) 2023-2024 Mateusz Viste
+ * Copyright (C) 2023-2026 Mateusz Viste
  *
  * Sved is released under the terms of the MIT license.
  *
@@ -32,8 +32,8 @@
 #include "svarlang\svarlang.h"
 
 
-#define PVER "2024.1"
-#define PDATE "2023-2024"
+#define PVER "2026.0"
+#define PDATE "2023-2026"
 
 /*****************************************************************************
  * global variables and definitions                                          *
@@ -248,6 +248,7 @@ static void line_free(struct line far *ptr) {
 
 static int curline_resize(struct file *db, unsigned short newsiz) {
   struct line far *newptr;
+  struct line far *oldptr;
 
   /* try resizing the block (much faster) */
   if (dos_resizeblock((sizeof(struct line) + newsiz + 15) / 16, FP_SEG(db->cursor)) == 0) return(0);
@@ -255,12 +256,14 @@ static int curline_resize(struct file *db, unsigned short newsiz) {
   /* create a new block and copy data over */
   newptr = line_calloc(newsiz);
   if (newptr == NULL) return(-1);
-  fmemmove(newptr, db->cursor, sizeof(struct line) + db->cursor->len);
+  oldptr = db->cursor;
+  fmemmove(newptr, oldptr, sizeof(struct line) + oldptr->len);
 
-  /* rewire the linked list */
+  /* rewire the linked list, then release the old block */
   db->cursor = newptr;
   if (newptr->next) newptr->next->prev = newptr;
   if (newptr->prev) newptr->prev->next = newptr;
+  line_free(oldptr);
 
   return(0);
 }

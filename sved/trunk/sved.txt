@@ -68,6 +68,9 @@ and wish to free a bit of disk space.
 
 ### CHANGELOG ################################################################
 
+2026.0 [xx Nov 2026]
+ - fixed a memory leak when a line outgrows its allocated block
+
 2024.1 [27 Feb 2024]
  - fixed tab-less mode [/t] (got broken in 2024.0 inducing freezes)
  - fixed a register trashing during file save (potential cause of crash)
@@ -106,7 +109,7 @@ and wish to free a bit of disk space.
 
 The SvarDOS editor (SVED) is released under the terms of the MIT license.
 
-Copyright (C) 2023-2024 Mateusz Viste
+Copyright (C) 2023-2026 Mateusz Viste
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
