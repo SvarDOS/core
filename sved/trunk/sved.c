@@ -754,9 +754,15 @@ static void bkspc(struct file *db) {
 static unsigned char loadfile(struct file *db, const char *fname) {
   char *buffptr;
   unsigned short len, llen;
-  unsigned short fd;
+  unsigned short fd = 0;
   unsigned char eolfound;
   unsigned char err = 0;
+
+  /* a failed open must not discard the buffer that is on screen */
+  if (fname != NULL) {
+    fd = dos_fopen(fname, 0x3D /* open for read */);
+    if (fd == 0) return(LOADFILE_FILENOTFOUND);
+  }
 
   /* free the entire linked list of lines */
   db_rewind(db);
@@ -775,18 +781,15 @@ static unsigned char loadfile(struct file *db, const char *fname) {
   }
 
   /* start by adding an empty line */
-  if (line_add(db, NULL, 0) != 0) return(2);
+  if (line_add(db, NULL, 0) != 0) {
+    if (fd != 0) dos_fclose(fd);
+    return(1); /* buffer already discarded, unlike a failed open */
+  }
 
   if (fname == NULL) goto SKIPLOADING;
 
   /* make the filename canonical (DOS 3+ only, on earlier versions it just copies the filename) */
   mdr_dos_truename(db->fname, fname);
-
-  /* fopen file */
-  fd = dos_fopen(fname, 0x3D /* open for read */);
-  if (fd == 0) err = LOADFILE_FILENOTFOUND;
-
-  if (err != 0) goto SKIPLOADING;
 
   db->lfonly = 1;
 
@@ -944,6 +947,7 @@ static int parseargv(struct file *dbarr) {
     if (err) {
       if (err == LOADFILE_FILENOTFOUND) { /* file not found */
         if ((count == 0) && (lastarg != 0)) { /* a 'file not found' is fine if only one file was given */
+          mdr_dos_truename(dbarr[count].fname, arg);
           err = 0;
         } else {
           err = 11;
@@ -1256,7 +1260,8 @@ void main(void) {
                 ui_msg(10, 0, 0, SCHEME_ERR);  /* ERROR */
               }
               mdr_bios_tickswait(44); /* 3s */
-              loadfile(db, NULL);
+              /* not-found left the previous text untouched; other errors already freed it */
+              if (err != LOADFILE_FILENOTFOUND) loadfile(db, NULL);
             }
           }
           uidirty.from = 0;
