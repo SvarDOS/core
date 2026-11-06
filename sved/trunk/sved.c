@@ -281,7 +281,7 @@ static int line_add(struct file *db, const char far *line, unsigned short slen) 
   if (db->cursor) {
     l->next = db->cursor->next;
     db->cursor->next = l;
-    l->next->prev = l;
+    if (l->next) l->next->prev = l;
   }
   db->cursor = l;
   if (slen > 0) {
@@ -730,7 +730,7 @@ static void del(struct file *db) {
     }
 
     db->cursor->next = db->cursor->next->next;
-    db->cursor->next->prev = db->cursor;
+    if (db->cursor->next) db->cursor->next->prev = db->cursor;
 
     line_free(nextline);
     uidirty.from = db->cursorposy;

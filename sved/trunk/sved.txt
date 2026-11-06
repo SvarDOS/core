@@ -70,6 +70,7 @@ and wish to free a bit of disk space.
 
 2026.0 [xx Nov 2026]
  - fixed a memory leak when a line outgrows its allocated block
+ - fixed null writes when a line is inserted or joined at the end of the file
 
 2024.1 [27 Feb 2024]
  - fixed tab-less mode [/t] (got broken in 2024.0 inducing freezes)
