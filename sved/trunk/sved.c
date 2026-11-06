@@ -385,11 +385,16 @@ static int savefile(struct file *db, const char *saveas) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      errflag |= dos_fwrite(fd, l->len, &bytes, l->payload);
+      if (dos_fwrite(fd, l->len, &bytes, l->payload) != 0) errflag = 1;
+      else if (bytes != l->len) errflag = 1;
     } else if (l->next == NULL) {
       break;
     }
-    errflag |= dos_fwrite(fd, eollen, &bytes, eolbuf);
+    if (errflag == 0) {
+      if (dos_fwrite(fd, eollen, &bytes, eolbuf) != 0) errflag = 1;
+      else if (bytes != eollen) errflag = 1;
+    }
+    if (errflag != 0) break;
     l = l->next;
   }
 

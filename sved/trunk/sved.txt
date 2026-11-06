@@ -72,6 +72,7 @@ and wish to free a bit of disk space.
  - fixed a memory leak when a line outgrows its allocated block
  - fixed null writes when a line is inserted or joined at the end of the file
  - fixed data loss when joining lines runs out of memory
+ - fixed a short disk write being reported as a successful save
 
 2024.1 [27 Feb 2024]
  - fixed tab-less mode [/t] (got broken in 2024.0 inducing freezes)
