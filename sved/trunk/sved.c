@@ -722,14 +722,13 @@ static void del(struct file *db) {
     db->modflag = 1;
   } else if (db->cursor->next != NULL) { /* cursor is at end of line: merge current line with next one (if there is a next one) */
     struct line far *nextline = db->cursor->next;
-    if (db->cursor->next->len > 0) {
-      if (curline_resize(db, db->cursor->len + db->cursor->next->len + 1) == 0) {
-        fmemmove(db->cursor->payload + db->cursor->len, db->cursor->next->payload, db->cursor->next->len + 1);
-        db->cursor->len += db->cursor->next->len;
-      }
+    if (nextline->len > 0) {
+      if (curline_resize(db, db->cursor->len + nextline->len + 1) != 0) return;
+      fmemmove(db->cursor->payload + db->cursor->len, nextline->payload, nextline->len + 1);
+      db->cursor->len += nextline->len;
     }
 
-    db->cursor->next = db->cursor->next->next;
+    db->cursor->next = nextline->next;
     if (db->cursor->next) db->cursor->next->prev = db->cursor;
 
     line_free(nextline);
