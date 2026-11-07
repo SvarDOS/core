@@ -1375,8 +1375,9 @@ void main(void) {
       /* now skip to next non-space or end of file */
       for (;;) {
         cursor_right(db);
+        /* index == len is past the stored line (EOL or an empty line) */
+        if (db->xoffset + db->cursorposx == db->cursor->len) break;
         if (db->cursor->payload[db->xoffset + db->cursorposx] != ' ') break;
-        if ((db->cursor->next == NULL) && (db->cursorposx + db->xoffset == db->cursor->len)) break;
       }
 
     } else if (k == 0x173) { /* CTRL+ArrLeft - jump to prev word */
@@ -1384,13 +1385,14 @@ void main(void) {
       /* if currently cursor is on a space, then fast-forward to nearest non-space or start of line */
       for (;;) {
         if ((db->xoffset == 0) && (db->cursorposx == 0)) break;
+        if (db->xoffset + db->cursorposx == db->cursor->len) break;
         if (db->cursor->payload[db->xoffset + db->cursorposx] != ' ') break;
         cursor_left(db);
       }
       /* now skip to next space or start of file */
       for (;;) {
         cursor_left(db);
-        if (db->cursor->payload[db->xoffset + db->cursorposx] == ' ') {
+        if ((db->xoffset + db->cursorposx < db->cursor->len) && (db->cursor->payload[db->xoffset + db->cursorposx] == ' ')) {
           cursor_right(db);
           break;
         }
