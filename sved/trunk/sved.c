@@ -980,6 +980,9 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
       databuf++;
       cursor_right(db);
     }
+  } else {
+    ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
+    mdr_bios_tickswait(18); /* 1s */
   }
 }
 
@@ -1341,7 +1344,8 @@ void main(void) {
         cursor_down(db);
         cursor_home(db);
       } else {
-        /* ERROR: OUT OF MEMORY */
+        ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
+        mdr_bios_tickswait(18); /* 1s */
       }
 
     } else if (k == 0x153) {  /* DEL */

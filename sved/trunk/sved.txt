@@ -76,6 +76,7 @@ and wish to free a bit of disk space.
  - fixed OPEN discarding current file when new filename cannot be opened
  - uppercase /T and /M are recognized (and handled like /t and /m)
  - fixed word jump reading one byte past the end of a line
+ - display an explicit error when ENTER or typing runs out of memory
 
 2024.1 [27 Feb 2024]
  - fixed tab-less mode [/t] (got broken in 2024.0 inducing freezes)
