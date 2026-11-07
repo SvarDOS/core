@@ -168,9 +168,11 @@ parm [bx] [es] \
 value [ax]
 
 
-unsigned short dos_fwrite(unsigned short handle, unsigned short count, unsigned short *bytes, const void far *buf);
-/* NOTE: last parameter (far pointer buf) is passed on the stack */
-#pragma aux dos_fwrite = \
+unsigned short dos_fwrite_internal(unsigned short handle, unsigned short count, unsigned short *bytes, const void far *buf);
+/* NOTE: last parameter (far pointer buf) is passed on the stack.
+ * returns 0 when DOS accepted the call; *bytes is the transferred count,
+ * which may be shorter than requested (disk full). */
+#pragma aux dos_fwrite_internal = \
 "push ds"   /* save DS into AX */ \
 "pop ax" \
 "pop dx" \
@@ -357,12 +359,20 @@ static void db_rewind(struct file *db) {
 }
 
 
+/* returns 0 only when all count bytes were written */
+static unsigned short dos_fwrite(unsigned short handle, unsigned short count, const void far *buf) {
+  unsigned short bytes;
+  if (dos_fwrite_internal(handle, count, &bytes, buf) != 0) return(1);
+  if (bytes != count) return(1);
+  return(0);
+}
+
+
 /* saves db file, resets db->modflag on success and overwrites the filename
  * field if saveas is not NULL */
 static int savefile(struct file *db, const char *saveas) {
   int fd = 0;
   const struct line far *l;
-  unsigned short bytes;
   unsigned char eollen = 2;
   const unsigned char *eolbuf = "\r\n";
   int errflag = 0;
@@ -385,15 +395,11 @@ static int savefile(struct file *db, const char *saveas) {
   while (l) {
     /* do not write the last empty line, it is only useful for edition */
     if (l->len != 0) {
-      if (dos_fwrite(fd, l->len, &bytes, l->payload) != 0) errflag = 1;
-      else if (bytes != l->len) errflag = 1;
+      if (dos_fwrite(fd, l->len, l->payload) != 0) errflag = 1;
     } else if (l->next == NULL) {
       break;
     }
-    if (errflag == 0) {
-      if (dos_fwrite(fd, eollen, &bytes, eolbuf) != 0) errflag = 1;
-      else if (bytes != eollen) errflag = 1;
-    }
+    if ((errflag == 0) && (dos_fwrite(fd, eollen, eolbuf) != 0)) errflag = 1;
     if (errflag != 0) break;
     l = l->next;
   }
