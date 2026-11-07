@@ -4,9 +4,10 @@
 
 
 
-=== ver 2025.2 (xx.xx.2025) ==================================================
+=== ver 2026.0 (xx.xx.2026) ==================================================
 
  - CLS: preserves bp (work-around for a bug in the IBM PC BIOS)
+ - fixed exec of 1st extern program after boot (corrupt cmd tail, bugz #178)
 
 
 === ver 2025.1 (13.03.2025) ==================================================

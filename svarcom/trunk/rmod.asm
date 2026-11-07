@@ -1,7 +1,7 @@
 ;
 ; rmod - resident module of the SvarCOM command interpreter (NASM code)
 ;
-; Copyright (C) 2021-2024 Mateusz Viste
+; Copyright (C) 2021-2026 Mateusz Viste
 ; MIT license
 ;
 ; this is installed in memory by the transient part of SvarCOM. it has only
@@ -32,7 +32,7 @@ INPUTBUF: times 132 db 0 ; 130 bytes for the input buffer + 2 for signature
 ; DOS int 21h functions that I use require at least 40 bytes of stack under
 ; DOS-C (FreeDOS) kernel, so here I reserve 64 bytes juste to be sure
 STACKBUF db "XXX  SVARCOM RMOD BY MATEUSZ VISTE  XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-STACKPTR dw 0
+STACKPTR dw 0   ; rmod_install calls INT 21h with SP=here so DOS fills PSP:2Eh
 
 ; offset of the COMSPEC variable in the environment block, 0 means "use
 ; boot drive". this value is patched by the transient part of COMMAND.COM

@@ -87,22 +87,6 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
   myptr[0x16] = rmodseg & 0xff; /* RMOD is his own parent */
   myptr[0x17] = rmodseg >> 8;
 
-  /* patch up RMOD's PSP: SS:SP pointer @ 0x2E-0x31  --  I abuse the PSP's
-   * command line tail as stack, but I do NOT set the stack at the end of the
-   * tail. E. C. Masloch kindly explained why this would be a bad idea:
-   *
-   * "This is wrong and will potentially overwrite part of your buffers that
-   * start past the PSP. This is because the dword [PSP:2Eh] is not used merely
-   * to set SS:SP but rather to find the stack frame created by the int 21h
-   * call. Therefore the int 21h call that terminates the child process will
-   * then pop a number of registers off starting from the address stored in the
-   * PSP." <https://github.com/SvarDOS/bugz/issues/38#issuecomment-1817445740>
-   */
-  myptr[0x2e] = 192; /* middle of the command line tail area so I have 64 bytes */
-  myptr[0x2f] = 0;   /* before and 64 bytes in front of me */
-  myptr[0x30] = rmodseg & 0xff;
-  myptr[0x31] = rmodseg >> 8;
-
   /* patch up RMOD's PSP: JFT size @ 0x32-0x33 */
   myptr[0x32] = 20; /* default JFT size (max that fits without an extra allocation) */
   myptr[0x33] = 0;
@@ -197,6 +181,63 @@ struct rmod_props far *rmod_install(unsigned short envsize, unsigned char *rmodc
     pop dx
     pop bx
     pop ax
+  }
+
+  /* DOS reloads SS:SP from the parent PSP when a process exits, and writes
+   * its register image there. That pointer is the one saved the last time
+   * the parent entered INT 21h. AH=26 copied mine into RMOD and RMOD has not
+   * entered INT 21h yet, so the first exit would write the image over the
+   * command tail of the program about to be exec'd (bugz #178). Every later
+   * program is fine, because RMOD's own INT 21h has since saved its real
+   * stack. Make that true before the first program as well: one ordinary
+   * call, issued on RMOD's stack with RMOD as the current PSP. Get Current
+   * Drive is that call: it returns the drive in AL and leaves BX, CX, DX,
+   * SI, DI, BP, DS and ES alone, as do AH=50h and AH=51h apart from AH=51h
+   * returning the PSP in BX. SI and DI carry the caller's SS:SP across the
+   * drive call. */
+  {
+    unsigned short oldpsp = 0; /* asm stores the current PSP here */
+    unsigned short rmodsp = RMOD_OFFSET_STACKPTR;
+
+    _asm {
+      push ax
+      push bx
+      push si
+      push di
+
+      mov ah, 0x51        /* remember who the current PSP is */
+      int 0x21
+      mov oldpsp, bx
+
+      mov ah, 0x50        /* the following call must be recorded in RMOD */
+      mov bx, rmodseg
+      int 0x21
+
+      mov si, ss
+      mov di, sp
+      mov ax, rmodseg
+      mov bx, rmodsp
+      cli
+      mov ss, ax          /* stack switch: the mov sp is the next instruction */
+      mov sp, bx
+
+      mov ah, 0x19        /* ordinary INT 21h: DOS stores SS:SP in the PSP */
+      int 0x21
+
+      cli
+      mov ss, si
+      mov sp, di
+      sti                 /* IF was cleared for the switch; AH=19h's IRET kept it that way */
+
+      mov ah, 0x50
+      mov bx, oldpsp
+      int 0x21
+
+      pop di
+      pop si
+      pop bx
+      pop ax
+    }
   }
 
   /* prepare result (rmod props) */

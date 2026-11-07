@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2026 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -74,6 +74,7 @@ struct rmod_props {
 #define RMOD_OFFSET_ENVSEG     0x2C   /* stored in rmod's PSP */
 #define RMOD_OFFSET_INPUTBUF   (0x100 + 0x08)
 #define RMOD_OFFSET_COMSPECPTR (0x100 + 0xCE)
+#define RMOD_OFFSET_STACKPTR   (RMOD_OFFSET_COMSPECPTR - 2)
 #define RMOD_OFFSET_BOOTDRIVE  (0x100 + 0xD0)
 #define RMOD_OFFSET_LEXITCODE  (0x100 + 0xDF)
 #define RMOD_OFFSET_EXECPARAM  (0x100 + 0xE0)
