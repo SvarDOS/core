@@ -521,6 +521,13 @@ static void ui_msg(unsigned short msgid1, unsigned short msgid2, unsigned short 
 }
 
 
+/* pop the ERROR string and leave it on screen for about a second */
+static void ui_generic_error(void) {
+  ui_msg(10, 0, 0, SCHEME_ERR);
+  mdr_bios_tickswait(18);
+}
+
+
 /* returns 0 if operation may proceed, non-zero to cancel */
 static unsigned char ui_confirm_if_unsaved(struct file *db) {
   int k;
@@ -987,8 +994,7 @@ static void insert_in_line(struct file *db, const char *databuf, unsigned short 
       cursor_right(db);
     }
   } else {
-    ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
-    mdr_bios_tickswait(18); /* 1s */
+    ui_generic_error();
   }
 }
 
@@ -1350,8 +1356,7 @@ void main(void) {
         cursor_down(db);
         cursor_home(db);
       } else {
-        ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
-        mdr_bios_tickswait(18); /* 1s */
+        ui_generic_error();
       }
 
     } else if (k == 0x153) {  /* DEL */
@@ -1416,8 +1421,7 @@ void main(void) {
       /* copy cursor line to clipboard */
       clipboard = line_calloc(db->cursor->len);
       if (clipboard == NULL) {
-        ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
-        mdr_bios_tickswait(18); /* 1s */
+        ui_generic_error();
       } else {
         mdr_cout_char_rep(db->cursorposy, 0, ' ', ((SCHEME_TEXT >> 4) | (SCHEME_TEXT << 4)) & 0xff, screenlastcol);
         uidirty.from = db->cursorposy;
@@ -1449,8 +1453,7 @@ void main(void) {
 
     } else if ((k == 0x016) && (clipboard != NULL)) { /* CTRL+V */
       if (line_add(db, clipboard->payload, clipboard->len) != 0) {
-        ui_msg(10, 0, 0, SCHEME_ERR); /* ERROR */
-        mdr_bios_tickswait(18); /* 1s */
+        ui_generic_error();
       } else {
         /* rewire the linked list so the new line is on top of the previous one */
         clipboard->prev = db->cursor->prev;
