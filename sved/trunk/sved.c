@@ -55,6 +55,7 @@ static unsigned char screenw, screenh, screenlastrow, screenlastcol;
 static unsigned char glob_monomode, glob_tablessmode;
 
 static char buff[512]; /* short lived buffer for whatever needed */
+static char visfname[128]; /* near copy of one filename (truename and the status line) */
 
 static struct {
     unsigned char from;
@@ -83,7 +84,7 @@ struct file {
   char modflag;  /* non-zero if file has been modified since last save */
   char modflagprev;
   char slotid; /* 0..9 */
-  char fname[128];
+  char far *fname; /* NULL when untitled, otherwise an exact-size DOS block */
 };
 
 
@@ -248,6 +249,74 @@ static void line_free(struct line far *ptr) {
 }
 
 
+/* drop the DOS block that stores a slot's filename */
+static void fname_free(struct file *db) {
+  if (db->fname == NULL) return;
+  dos_free(FP_SEG(db->fname));
+  db->fname = NULL;
+}
+
+
+/* copy db's filename into visfname (empty string when untitled) */
+static char *fname_near(const struct file *db) {
+  const char far *src;
+  char *dst = visfname;
+
+  if (db->fname == NULL) {
+    visfname[0] = 0;
+    return(visfname);
+  }
+  src = db->fname;
+  for (;;) {
+    *dst = *src;
+    if (*dst == 0) break;
+    dst++;
+    src++;
+  }
+  return(visfname);
+}
+
+
+/* DOS block holding a copy of s. s must not be empty. NULL if out of memory. */
+static char far *fname_alloc(const char *s) {
+  unsigned short n;
+  unsigned short seg;
+  char far *blk;
+  char far *dst;
+
+  n = strlen(s) + 1;
+  seg = dos_alloc((n + 15) / 16); /* rounded up to a paragraph */
+  if (seg == 0) return(NULL);
+  blk = MK_FP(seg, 0);
+  dst = blk;
+  for (;;) {
+    *dst = *s;
+    if (*dst == 0) break;
+    dst++;
+    s++;
+  }
+  return(blk);
+}
+
+
+/* replace db's filename with the canonical form of name.
+ * returns -1 when the new block cannot be allocated; the previous name stays. */
+static int fname_set(struct file *db, const char *name) {
+  char far *blk;
+
+  mdr_dos_truename(visfname, name);
+  if (visfname[0] == 0) {
+    fname_free(db);
+    return(0);
+  }
+  blk = fname_alloc(visfname);
+  if (blk == NULL) return(-1);
+  fname_free(db);
+  db->fname = blk;
+  return(0);
+}
+
+
 static int curline_resize(struct file *db, unsigned short newsiz) {
   struct line far *newptr;
   struct line far *oldptr;
@@ -376,12 +445,25 @@ static int savefile(struct file *db, const char *saveas) {
   unsigned char eollen = 2;
   const unsigned char *eolbuf = "\r\n";
   int errflag = 0;
+  char far *newname = NULL;
 
-  /* if filename not overloaded then use the fname in db */
-  if (saveas == NULL) saveas = db->fname;
+  if (saveas != NULL) {
+    /* remember the new name before the create call truncates the file */
+    mdr_dos_truename(visfname, saveas);
+    if (visfname[0] == 0) return(-1);
+    newname = fname_alloc(visfname);
+    if (newname == NULL) return(-1);
+    saveas = visfname;
+  } else {
+    saveas = fname_near(db);
+    if (saveas[0] == 0) return(-1);
+  }
 
   fd = dos_fopen(saveas, 0x3C /* create or truncate file */);
-  if (fd == 0) return(-1);
+  if (fd == 0) {
+    if (newname != NULL) dos_free(FP_SEG(newname));
+    return(-1);
+  }
 
   l = db->cursor;
   while (l->prev) l = l->prev;
@@ -409,8 +491,13 @@ static int savefile(struct file *db, const char *saveas) {
   /* did it all work? */
   if (errflag == 0) {
     db->modflag = 0;
-    if (saveas != db->fname) mdr_dos_truename(db->fname, saveas);
+    if (newname != NULL) {
+      fname_free(db);
+      db->fname = newname;
+      newname = NULL;
+    }
   }
+  if (newname != NULL) dos_free(FP_SEG(newname));
 
   return(errflag);
 }
@@ -468,11 +555,11 @@ static void ui_statusbar(const struct file *db) {
     const char *fn;
     unsigned short x;
     unsigned short maxfnlen = col - 6;
-    if (db->fname[0] == 0) {
+    fn = fname_near(db);
+    if (fn[0] == 0) {
       fn = svarlang_str(0, 1); /* "UNTITLED" */
     } else {
       /* display filename up to maxfnlen chars */
-      fn = db->fname;
       x = strlen(fn);
       if (x > maxfnlen) fn += x - maxfnlen;
     }
@@ -531,6 +618,7 @@ static void ui_generic_error(void) {
 /* returns 0 if operation may proceed, non-zero to cancel */
 static unsigned char ui_confirm_if_unsaved(struct file *db) {
   int k;
+  const char *fn;
 
   if (db->modflag == 0) return(0);
 
@@ -540,7 +628,8 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
    * ENTER        : agree to data loss
    * SPACE        : SAVE file before quit (only if valid filename present)
    * anything else: ABORT */
-  ui_msg(4, 5, (db->fname[0])?9:8, SCHEME_MSG);
+  fn = fname_near(db);
+  ui_msg(4, 5, (fn[0])?9:8, SCHEME_MSG);
 
   k = mdr_dos_getkey2();
   mdr_cout_cursor_show();
@@ -549,7 +638,7 @@ static unsigned char ui_confirm_if_unsaved(struct file *db) {
   if (k == '\r') return(0);
 
   /* SPACE = save file and continue */
-  if ((k == ' ') && (db->fname[0] != 0) && (savefile(db, NULL) == 0)) return(0);
+  if ((k == ' ') && (fn[0] != 0) && (savefile(db, NULL) == 0)) return(0);
 
   /* any other key = cancel operation */
   return(1);
@@ -786,6 +875,9 @@ static unsigned char loadfile(struct file *db, const char *fname) {
     line_free(victim);
   }
 
+  /* the struct wipe below would lose the pointer to the old name */
+  fname_free(db);
+
   /* zero out the struct (take care to preserve the id of the slot, though) */
   {
     unsigned char slotid = db->slotid;
@@ -801,8 +893,9 @@ static unsigned char loadfile(struct file *db, const char *fname) {
 
   if (fname == NULL) goto SKIPLOADING;
 
-  /* make the filename canonical (DOS 3+ only, on earlier versions it just copies the filename) */
-  mdr_dos_truename(db->fname, fname);
+  /* store the canonical name. if this runs out of memory the slot stays
+   * untitled and the file is still read: the previous buffer is already gone. */
+  fname_set(db, fname);
 
   db->lfonly = 1;
 
@@ -960,8 +1053,8 @@ static int parseargv(struct file *dbarr) {
     if (err) {
       if (err == LOADFILE_FILENOTFOUND) { /* file not found */
         if ((count == 0) && (lastarg != 0)) { /* a 'file not found' is fine if only one file was given */
-          mdr_dos_truename(dbarr[count].fname, arg);
-          err = 0;
+          if (fname_set(&(dbarr[count]), arg) != 0) err = 10;
+          else err = 0;
         } else {
           err = 11;
         }
@@ -1288,7 +1381,7 @@ void main(void) {
           saveflag = 1;
           /* FALLTHRU */
         case MENU_SAVE:
-          if ((saveflag != 0) || (db->fname[0] == 0)) { /* save as... */
+          if ((saveflag != 0) || (db->fname == NULL)) { /* save as... */
             ui_getstring(svarlang_str(0,6), fname, sizeof(fname));
             if (*fname == 0) break;
             saveflag = savefile(db, fname);
