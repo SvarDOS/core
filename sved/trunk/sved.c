@@ -54,8 +54,7 @@ static unsigned char SCHEME_TEXT   = 0x07,
 static unsigned char screenw, screenh, screenlastrow, screenlastcol;
 static unsigned char glob_monomode, glob_tablessmode;
 
-static char buff[512]; /* short lived buffer for whatever needed */
-static char visfname[128]; /* near copy of one filename (truename and the status line) */
+static char buff[512]; /* short lived buffer for whatever needed, filenames included */
 
 static struct {
     unsigned char from;
@@ -257,14 +256,14 @@ static void fname_free(struct file *db) {
 }
 
 
-/* copy db's filename into visfname (empty string when untitled) */
+/* copy db's filename into buff (empty string when untitled) */
 static char *fname_near(const struct file *db) {
   const char far *src;
-  char *dst = visfname;
+  char *dst = buff;
 
   if (db->fname == NULL) {
-    visfname[0] = 0;
-    return(visfname);
+    buff[0] = 0;
+    return(buff);
   }
   src = db->fname;
   for (;;) {
@@ -273,7 +272,7 @@ static char *fname_near(const struct file *db) {
     dst++;
     src++;
   }
-  return(visfname);
+  return(buff);
 }
 
 
@@ -304,12 +303,12 @@ static char far *fname_alloc(const char *s) {
 static int fname_set(struct file *db, const char *name) {
   char far *blk;
 
-  mdr_dos_truename(visfname, name);
-  if (visfname[0] == 0) {
+  mdr_dos_truename(buff, name);
+  if (buff[0] == 0) {
     fname_free(db);
     return(0);
   }
-  blk = fname_alloc(visfname);
+  blk = fname_alloc(buff);
   if (blk == NULL) return(-1);
   fname_free(db);
   db->fname = blk;
@@ -449,11 +448,11 @@ static int savefile(struct file *db, const char *saveas) {
 
   if (saveas != NULL) {
     /* remember the new name before the create call truncates the file */
-    mdr_dos_truename(visfname, saveas);
-    if (visfname[0] == 0) return(-1);
-    newname = fname_alloc(visfname);
+    mdr_dos_truename(buff, saveas);
+    if (buff[0] == 0) return(-1);
+    newname = fname_alloc(buff);
     if (newname == NULL) return(-1);
-    saveas = visfname;
+    saveas = buff;
   } else {
     saveas = fname_near(db);
     if (saveas[0] == 0) return(-1);
