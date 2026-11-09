@@ -255,8 +255,10 @@ static int svl_find(const struct svl_lang *l, unsigned short id) {
     if ( id == v ) return(1); /* found! */
 
     if (id > v) {
+      if (x == 65535) return(0); /* avoid left overflow */
       left = x + 1;
     } else {
+      if (x == 0) return(0); /* avoid right underflow */
       right = x - 1;
     }
   }

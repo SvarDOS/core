@@ -1,5 +1,6 @@
 2026xxxx
 - fixed svarlang_load() crashing when lang is NULL or empty (unset LANG)
+- fixed svl_find() crashing when the searched id is lower than the first entry
 
 20241010
 - improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
