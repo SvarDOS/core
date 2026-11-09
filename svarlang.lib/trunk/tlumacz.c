@@ -223,7 +223,8 @@ static int svl_add_str(struct svl_lang *l, unsigned short id, const char *s) {
   size_t len = strlen(s) + 1;
   size_t cursor;
 
-  if ((l->strings_cap < svl_strings_bytes(l) + len) || (l->dict_cap < (l->num_strings + 1) * sizeof(struct dict_entry))) {
+  /* dict_cap counts entries; strings_cap counts bytes */
+  if ((l->strings_cap < svl_strings_bytes(l) + len) || (l->dict_cap < l->num_strings + 1)) {
     return(0);
   }
 
