@@ -204,9 +204,14 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
     mov ah, 0x3e   /* DOS 2+ -- close a file handle */
     int 0x21
 
-    /* remove dst file on error (remember DS still points to databuff) */
+    /* remove dst file on error (remember DS still points to databuff).
+     * do not delete when appending: dst already existed and is the user's
+     * original file (COPY a+b, or the 2nd source of COPY *.txt out.txt) */
     cmp word ptr [errcode], 0
     jz DONE
+    xor al, al
+    cmp [appendflag], al
+    jne DONE
     mov ah, 0x41
     mov dx, dst
     xor cx, cx
