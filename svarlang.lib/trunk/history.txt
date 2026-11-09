@@ -2,6 +2,7 @@
 - fixed svarlang_load() crashing when lang is NULL or empty (unset LANG)
 - fixed svl_find() crashing when the searched id is lower than the first entry
 - fixed tlumacz dictionary limit (was 2500 strings instead of 10000)
+- fixed svarlang_autoload_pathlist() overflowing its 128-byte path buffer
 
 20241010
 - improved the MVCOMP compression algorithm (ca. 5% more efficient on text)

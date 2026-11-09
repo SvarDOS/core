@@ -27,10 +27,15 @@
 
 int svarlang_autoload_pathlist(const char *progname, const char *pathlist, const char *lang) {
   char buff[128];
-  unsigned short i, ii;
+  unsigned short i, ii, proglen, room;
 
-  /* read and validate LANG and pathlist */
-  if ((!lang) || (lang[0] == 0) || (!pathlist)) return(-1);
+  /* read and validate LANG, pathlist and progname */
+  if ((!lang) || (lang[0] == 0) || (!pathlist) || (!progname)) return(-1);
+
+  for (proglen = 0; progname[proglen] != 0; proglen++);
+  /* path + optional '\' + progname + ".LNG" + NUL must fit in buff */
+  if (proglen > sizeof(buff) - 6) return(-4);
+  room = sizeof(buff) - 6 - proglen;
 
   /* look into every path in NLSPATH */
   while (*pathlist != 0) {
@@ -40,15 +45,21 @@ int svarlang_autoload_pathlist(const char *progname, const char *pathlist, const
 
     if (*pathlist == 0) return(-3);
 
-    /* copy nlspath to buff and remember len */
-    for (i = 0; (pathlist[i] != 0) && (pathlist[i] != ';'); i++) buff[i] = pathlist[i];
+    /* copy one component; stop if it cannot fit beside progname + ".LNG" */
+    for (i = 0; (pathlist[i] != 0) && (pathlist[i] != ';') && (i < room); i++) buff[i] = pathlist[i];
     pathlist += i;
+
+    /* too long: skip the rest of this component and try the next one */
+    if ((*pathlist != 0) && (*pathlist != ';')) {
+      while ((*pathlist != 0) && (*pathlist != ';')) pathlist++;
+      continue;
+    }
 
     /* add a trailing backslash if there is none (non-empty paths empty) */
     if ((i > 0) && (buff[i - 1] != '\\')) buff[i++] = '\\';
 
     /* append progname + ".LNG" to the path */
-    for (ii = 0; progname[ii] != 0; ii++) buff[i++] = progname[ii];
+    for (ii = 0; ii < proglen; ii++) buff[i++] = progname[ii];
     buff[i++] = '.';
     buff[i++] = 'L';
     buff[i++] = 'N';
