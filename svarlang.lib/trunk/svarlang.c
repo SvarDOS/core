@@ -299,7 +299,16 @@ int svarlang_load(const char *fname, const char *lang) {
     }
 
     /* is it the lang I am looking for? */
-    if ((buff16[0] & 0x7FFF) == langid) break; /* compare without highest bit - it is a flag for compression */
+    /* compare without the highest bit - it is a flag for compression */
+    if ((buff16[0] & 0x7FFF) == langid) {
+      /* reject a block bigger than svarlang_mem before any write: the
+       * compressed load address would wrap and a raw load would run past it */
+      if (buff16[1] > svarlang_memsz) {
+        exitcode = -6;
+        goto FCLOSE_AND_EXIT;
+      }
+      break;
+    }
 
     /* skip to next lang (in two steps to avoid a potential uint16 overflow) */
     FSEEK(fd, svarlang_string_count * 4);
