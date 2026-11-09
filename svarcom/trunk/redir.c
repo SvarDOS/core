@@ -138,6 +138,8 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
       } else {
         sv_strcat_far(awaitingcmd, ">");
       }
+      /* operator alone is not enough: "dir | sort >out.txt" must keep out.txt */
+      sv_strcat_far(awaitingcmd, d->stdoutfile);
       d->stdoutfile = NULL;
     }
     /* redirect stdin of next command from a temp file (that is used as my output) */

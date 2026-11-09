@@ -9,6 +9,7 @@
  - CLS: preserves bp (work-around for a bug in the IBM PC BIOS)
  - fixed exec of 1st extern program after boot (corrupt cmd tail, bugz #178)
  - COPY: keep the destination when an append fails (was deleted)
+ - fixed piping combined with > or >> (output filename was lost)
 
 
 === ver 2025.1 (13.03.2025) ==================================================
