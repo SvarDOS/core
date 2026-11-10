@@ -4,6 +4,7 @@
 - fixed tlumacz dictionary limit (was 2500 strings instead of 10000)
 - fixed svarlang_autoload_pathlist() overflowing its 128-byte path buffer
 - fixed svarlang_load() writing past svarlang_mem when string block is too big
+- svarlang_load() does not replace the loaded lang if LNG file is truncated
 
 20241010
 - improved the MVCOMP compression algorithm (ca. 5% more efficient on text)

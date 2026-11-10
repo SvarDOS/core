@@ -1,7 +1,7 @@
 /* This file is part of the svarlang project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2026 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,13 +30,16 @@
 typedef FILE* FHANDLE;
 #define FOPEN(x) fopen(x, "rb")
 #define FCLOSE(x) fclose(x)
-#define FSEEK(f,b) fseek(f,b,SEEK_CUR)
 #define FREAD(f,t,b) fread(t, 1, b, f)
+#define FSEEK(f,o,n) (fseek((f), (long)(n), (o)) ? (unsigned long)-1 : (unsigned long)ftell(f))
 
 #else
 
 #include <i86.h>  /* FP_SEG, FP_OFF */
 typedef unsigned short FHANDLE;
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
 
 #endif
 
@@ -124,14 +127,21 @@ parm [bx] [es dx] [cx] \
 value [ax]
 
 
-static void FSEEK(unsigned short handle, unsigned short bytes);
+/* origin is SEEK_SET, SEEK_CUR or SEEK_END. returns the new position,
+ * or all-bits-one on error. */
+static unsigned long FSEEK(unsigned short handle, unsigned short origin, unsigned long off);
 
 #pragma aux FSEEK = \
-"mov ax, 0x4201"  /* move file pointer from cur pos + CX:DX */ \
-"xor cx, cx" \
+"mov ah, 0x42" /* AL = origin, CX:DX = signed offset */ \
 "int 0x21" \
-parm [bx] [dx] \
-modify [ax cx dx]
+"jnc DONE" \
+"xor ax, ax" \
+"dec ax"      /* AX = DX = 0xFFFF */ \
+"mov dx, ax" \
+"DONE:" \
+parm [bx] [ax] [cx dx] \
+value [dx ax] \
+modify [cx]
 
 #endif
 
@@ -311,8 +321,21 @@ int svarlang_load(const char *fname, const char *lang) {
     }
 
     /* skip to next lang (in two steps to avoid a potential uint16 overflow) */
-    FSEEK(fd, svarlang_string_count * 4);
-    FSEEK(fd, buff16[1]);
+    FSEEK(fd, SEEK_CUR, svarlang_string_count * 4);
+    FSEEK(fd, SEEK_CUR, buff16[1]);
+  }
+
+  /* the dictionary and the strings must both be in the file before either
+   * is written over the language that is already loaded */
+  {
+    unsigned long pos, end, have;
+    pos = FSEEK(fd, SEEK_CUR, 0); /* position at the dictionary */
+    end = FSEEK(fd, SEEK_END, 0); /* file size */
+    have = (unsigned long)svarlang_string_count * 4 + buff16[1];
+    if ((pos == (unsigned long)-1) || (end == (unsigned long)-1) || (end < pos) || ((end - pos) < have) || (FSEEK(fd, SEEK_SET, pos) != pos)) {
+      exitcode = -4;
+      goto FCLOSE_AND_EXIT;
+    }
   }
 
   /* load the index (dict) */
