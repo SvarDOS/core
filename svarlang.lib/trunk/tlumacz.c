@@ -72,10 +72,13 @@ static unsigned short readl(char *dst, size_t dstsz, FILE *fd) {
 
 
 /* parse a line in format "[?]1.50:somestring". fills id and returns a pointer to
- * the actual string part on success, or NULL on error */
-static const char *parseline(unsigned short *id, const char *s) {
-  int i;
+ * the actual string part on success, or NULL on error. sets *toobig when the
+ * id does not fit in one byte per part (a fatal error for the caller). */
+static const char *parseline(unsigned short *id, const char *s, int *toobig) {
+  int i, major, minor;
   int dotpos = 0, colpos = 0, gotdigits = 0;
+
+  *toobig = 0;
 
   /* strings prefixed by '?' are flagged as "dirty": ignore this flag here */
   if (*s == '?') s++;
@@ -96,10 +99,19 @@ static const char *parseline(unsigned short *id, const char *s) {
   }
   /* did I collect everything? */
   if ((dotpos == 0) || (colpos == 0)) return(NULL);
+  /* each part is one byte: at most 3 digits, and not above 255 */
+  if ((dotpos > 3) || (colpos - dotpos - 1 > 3)) {
+    *toobig = 1;
+    return(NULL);
+  }
 
-  *id = atoi(s);
-  *id <<= 8;
-  *id |= atoi(s + dotpos + 1);
+  major = atoi(s);
+  minor = atoi(s + dotpos + 1);
+  if ((major > 255) || (minor > 255)) {
+    *toobig = 1;
+    return(NULL);
+  }
+  *id = (unsigned short)(major << 8) | (unsigned short)minor;
 
   /* printf("parseline(): %04X = '%s'\r\n", *id, s + colpos + 1); */
 
@@ -276,7 +288,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
   static char linebuf[8192];
   const char *ptr;
   unsigned short id, maxid=0, maxid_line=0, linecount;
-  int i;
+  int i, toobig;
 
   fname[strlen(fname) - 6] = (char)tolower( l->id[0] );
   fname[strlen(fname) - 5] = (char)tolower( l->id[1] );
@@ -296,7 +308,15 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
     linelen = unesc_string(linebuf);
 
     /* read id and get ptr to actual string ("1.15:string") */
-    ptr = parseline(&id, linebuf);
+    ptr = parseline(&id, linebuf, &toobig);
+
+    /* an id that does not fit in one byte per part would alias another id */
+    if (toobig) {
+      fprintf(stderr, "ERROR: %s[#%u] string id exceeds 255.255\r\n", fname, linecount);
+      fprintf(stderr, "%s\r\n", linebuf);
+      fclose(fd);
+      return(0);
+    }
 
     /* handle malformed lines */
     if (ptr == NULL) {
