@@ -149,10 +149,13 @@ modify [cx]
 
 #ifdef MVUCOMP_ASM
 
-static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned short src, unsigned short complen);
+/* returns 0, or -1 if the output would run past dstmax bytes */
+static int mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned short src, unsigned short complen, unsigned short dstmax);
 
 #pragma aux mvucomp_asm = \
 "    push ds"\
+"    push bp"\
+"    mov bp, cx" /* bp = output bytes still allowed */ \
 \
      /* ds:si = compressed stream */     \
      /* es:di = output location */       \
@@ -178,6 +181,9 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
 "    /* literal continuation? */"\
 "    test dx, dx"\
 "    jz TRY_BACKREF"\
+"    cmp bp, 2" /* a raw word needs two output bytes */ \
+"    jb FAIL"\
+"    sub bp, 2"\
 "    stosw"\
 "    dec dx" /* a byte shorter than dec dl */ \
 "    jmp AGAIN"\
@@ -188,15 +194,18 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
 "    jz LITERAL_START" /* else it's a literal start */ \
      /* AH = LLLL OOOO   AL = OOOO OOOO */ \
      /* copy (ah>>4)+1 bytes from (ax & 0x0FFF)+1 */ \
-     /* save regs */ \
-"    push si"\
-     /* prep DS:SI = source ; ES:DI = destination ; CX = len */ \
+     /* prep CX = len, then refuse the copy if it does not fit */ \
 "    mov ch, ah" /* this is all about setting CX to the high nibble of AX */ \
 "    mov cl, 4"  /* using a code as compact as possible.                  */ \
 "    shr ch, cl"\
 "    mov cl, ch"\
 "    xor ch, ch"\
 "    inc cx"\
+"    cmp bp, cx"\
+"    jb FAIL"\
+"    sub bp, cx"\
+     /* save regs */ \
+"    push si"\
 "    and ax, 0x0fff"  /* clear the backref length bits */ \
 "    inc ax"\
 "    mov si, di"\
@@ -210,18 +219,29 @@ static void mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned shor
 \
 "    LITERAL_START:" /* write al to dst and set literal counter */ \
      /* 0000 UUUU  BBBB BBBB */ \
+"    cmp bp, 1"\
+"    jb FAIL"\
+"    dec bp"\
 "    stosb" /* mov [es:di], al + inc di */ \
 "    mov dl, ah" /* ah high nibble is guaranteed to be zero */ \
 "    jmp AGAIN"\
-""\
+\
+"    FAIL:"\
+"    mov ax, 0xffff"\
+"    jmp DONE"\
 "    KONIEC:"\
+"    xor ax, ax"\
+"    DONE:"\
+"    pop bp"\
 "    pop ds"\
 modify [ax bx cx dx di si] \
-parm [es] [di] [si] [bx]
+parm [es] [di] [si] [bx] [cx] \
+value [ax]
 
 #else
 
-void mvucomp(char *dst, const unsigned short *src, unsigned short complen) {
+/* returns 0, or -1 if the output would run past dstmax bytes */
+int mvucomp(char *dst, const unsigned short *src, unsigned short complen, unsigned short dstmax) {
   unsigned char rawwords = 0; /* number of uncompressible words */
   complen /= 2; /* I'm interested in number of words, not bytes */
 
@@ -246,20 +266,29 @@ void mvucomp(char *dst, const unsigned short *src, unsigned short complen) {
 
     /* raw word? */
     if (rawwords != 0) {
-      unsigned short *dst16 = (void *)dst;
+      unsigned short *dst16;
+      if (dstmax < 2) return(-1);
+      dstmax -= 2;
+      dst16 = (void *)dst;
       *dst16 = token;
       dst += 2;
       rawwords--;
 
     /* literal byte? */
     } else if ((token & 0xF000) == 0) {
+      if (dstmax == 0) return(-1);
+      dstmax--;
       *dst = token; /* no need for an explicit "& 0xff", dst is a char ptr so token is naturally truncated to lowest 8 bits */
       dst++;
       rawwords = token >> 8; /* number of RAW words that are about to follow */
 
     /* else it's a backreference */
     } else {
-      char *src = dst - (token & 0x0FFF) - 1;
+      char *src;
+      unsigned short len = (token >> 12) + 1; /* 1..16 bytes */
+      if (dstmax < len) return(-1);
+      dstmax -= len;
+      src = dst - (token & 0x0FFF) - 1;
       token >>= 12;
       for (;;) {
         *dst = *src;
@@ -270,6 +299,7 @@ void mvucomp(char *dst, const unsigned short *src, unsigned short complen) {
       }
     }
   }
+  return(0);
 }
 
 #endif
@@ -355,11 +385,18 @@ int svarlang_load(const char *fname, const char *lang) {
       goto FCLOSE_AND_EXIT;
     }
 
-    /* uncompress now */
+    /* uncompress now. stop instead of writing past svarlang_mem: the
+     * compressed size already fit, the expanded text may not */
 #ifndef MVUCOMP_ASM
-    mvucomp(svarlang_mem, mvcompptr, buff16[1]);
+    if (mvucomp(svarlang_mem, mvcompptr, buff16[1], svarlang_memsz) != 0) {
+      exitcode = -6;
+      goto FCLOSE_AND_EXIT;
+    }
 #else
-    mvucomp_asm(FP_SEG(svarlang_mem), FP_OFF(svarlang_mem), FP_OFF(svarlang_mem) + svarlang_memsz - buff16[1], buff16[1]);
+    if (mvucomp_asm(FP_SEG(svarlang_mem), FP_OFF(svarlang_mem), FP_OFF(svarlang_mem) + svarlang_memsz - buff16[1], buff16[1], svarlang_memsz) != 0) {
+      exitcode = -6;
+      goto FCLOSE_AND_EXIT;
+    }
 #endif
 
     goto FCLOSE_AND_EXIT;

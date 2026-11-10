@@ -9,6 +9,7 @@
 - fixed tlumacz wrapping the embedded buffer size for blocks above 62415 bytes
 - tlumacz: added /nomarg (buffer sized to the exact lang block)
 - tlumacz: fixed folding string ids above 255 (1.256 was stored as 1.0)
+- fixed mvucomp() writing past svarlang_mem when data expands too far
 
 20241010
 - improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
