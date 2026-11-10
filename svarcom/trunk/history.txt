@@ -14,6 +14,7 @@
  - FOR: expanded command no longer overflows the command-line buffer
  - DEL: abort when filespec cannot be resolved (was reusing a stale buffer)
  - internal commands respect < redirections (eg. "TIME < NEWTIME.TXT"
+ - pipe queue no longer overflows the resident module (unbounded awaitingcmd)
 
 
 === ver 2025.1 (13.03.2025) ==================================================

@@ -70,10 +70,29 @@ static unsigned short gentmpfile(char *s, unsigned short envseg) {
 }
 
 
+/* append s to dst if it fits in dst[bufsz] (bufsz includes the terminating NUL
+ * written by sv_strcat_far). len is the current length. returns 0 on success. */
+static int cat_if_fits(char far *dst, unsigned short *len, unsigned short bufsz, const char *s) {
+  unsigned short need = sv_strlen(s);
+  if ((*len >= bufsz) || (need >= bufsz - *len)) return(-1);
+  sv_strcat_far(dst, s);
+  *len += need;
+  return(0);
+}
+
+
+/* the pending pipe command does not fit. drop whatever was queued. */
+static unsigned short pipe_wont_fit(char far *awaitingcmd) {
+  *awaitingcmd = 0;
+  nls_outputnl(18, 8); /* "Line too long" */
+  return(REDIR_ERR_TOOLONG);
+}
+
+
 /* parse commandline and performs necessary redirections. cmdline is
  * modified so all redirections are cut out.
  * piped commands are moved to awaitingcmd for later execution
- * returns 0 on success, DOS err on failure */
+ * returns 0 on success, a DOS error on failure, or REDIR_ERR_TOOLONG */
 unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd, unsigned short envseg) {
   unsigned short i;
   unsigned short pipescount = 0;
@@ -126,29 +145,53 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
     }
   }
 
-  /* if pipes present, write them to awaitingcmd (and stdout redirection too) */
+  /* if pipes present, write them to awaitingcmd (and stdout redirection too).
+   * awaitingcmd is followed by the bat and forloop pointers, so a queue that
+   * does not fit must be rejected rather than truncated. */
   if (pipescount != 0) {
     static char tmpfile[130];
+    unsigned short len = 0;
+
     for (i = 0; i < pipescount; i++) {
-      if (i != 0) sv_strcat_far(awaitingcmd, "|");
-      sv_strcat_far(awaitingcmd, d->pipes[i]);
+      if (i != 0) {
+        if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, "|") != 0) return(pipe_wont_fit(awaitingcmd));
+      }
+      if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, d->pipes[i]) != 0) return(pipe_wont_fit(awaitingcmd));
     }
     /* append stdout redirection so I don't forget about it for the last command of the pipe queue */
     if (d->stdoutfile != NULL) {
       if (d->stdout_openflag == 0x11) {
-        sv_strcat_far(awaitingcmd, ">>");
+        if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, ">>") != 0) return(pipe_wont_fit(awaitingcmd));
       } else {
-        sv_strcat_far(awaitingcmd, ">");
+        if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, ">") != 0) return(pipe_wont_fit(awaitingcmd));
       }
       /* operator alone is not enough: "dir | sort >out.txt" must keep out.txt */
-      sv_strcat_far(awaitingcmd, d->stdoutfile);
+      if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, d->stdoutfile) != 0) return(pipe_wont_fit(awaitingcmd));
       d->stdoutfile = NULL;
     }
     /* redirect stdin of next command from a temp file (that is used as my output) */
-    sv_strcat_far(awaitingcmd, "<");
+    if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, "<") != 0) return(pipe_wont_fit(awaitingcmd));
     i = gentmpfile(tmpfile, envseg);
     if (i != 0) return(i);
-    sv_strcat_far(awaitingcmd, tmpfile);
+    if (cat_if_fits(awaitingcmd, &len, RMOD_AWAITINGCMD_SZ, tmpfile) != 0) {
+      /* the temp file will not be consumed */
+      _asm {
+        push ax
+        push bx
+        push cx
+        push dx
+        push si
+        mov ah, 0x41
+        mov dx, tmpfile
+        int 0x21
+        pop si
+        pop dx
+        pop cx
+        pop bx
+        pop ax
+      }
+      return(pipe_wont_fit(awaitingcmd));
+    }
     /* same file is used as my stdout */
     d->stdoutfile = tmpfile;
     d->stdout_openflag = 0x12;

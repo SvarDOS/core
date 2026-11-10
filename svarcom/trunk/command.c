@@ -1284,7 +1284,8 @@ int main(void) {
     /* handle redirections (if any) */
     i = redir_parsecmd(&redirprops, cmdline, rmod->awaitingcmd, *rmod_envseg);
     if (i != 0) {
-      nls_outputnl_doserr(i);
+      /* REDIR_ERR_TOOLONG was already reported as "Line too long" */
+      if (i != REDIR_ERR_TOOLONG) nls_outputnl_doserr(i);
       rmod->awaitingcmd[0] = 0;
       continue;
     }

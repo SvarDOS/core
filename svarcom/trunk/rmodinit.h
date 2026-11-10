@@ -57,13 +57,15 @@ struct forctx {
   unsigned char dta_inited;   /* 0=requires FindFirst 1=FindNext */
 };
 
+#define RMOD_AWAITINGCMD_SZ 130
+
 struct rmod_props {
   unsigned short rmodseg;     /* segment where rmod is loaded */
   unsigned long origint22;    /* original int 22 handler (far ptr) of the shell */
   unsigned short origparent;  /* original parent (PSP's segment) */
   unsigned char flags;        /* command line parameters */
   unsigned char version;      /* used to detect mismatch between rmod and SvarCOM */
-  char awaitingcmd[130];      /* command to exec next time (if any) */
+  char awaitingcmd[RMOD_AWAITINGCMD_SZ]; /* command to exec next time (if any) */
   struct batctx far *bat;     /* linked list of bat contexts, if BAT ongoing */
   struct forctx far *forloop; /* a single FOR loop structure, if FOR ongoing */
   unsigned short lng_segmem;  /* segment where a lang block copy is kept (/M), 0=none */

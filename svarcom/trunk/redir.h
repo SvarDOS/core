@@ -27,6 +27,10 @@
 
 #define REDIR_MAX_PIPES 15
 
+/* redir_parsecmd() result when the pending pipe command does not fit in
+ * awaitingcmd[]. the "Line too long" message has already been displayed. */
+#define REDIR_ERR_TOOLONG 0xffff
+
 struct redir_data {
   char *pipes[REDIR_MAX_PIPES + 1];
   char *stdinfile;
@@ -37,7 +41,7 @@ struct redir_data {
 /* parse commandline and performs necessary redirections. cmdline is
  * modified so all redirections are cut out.
  * piped commands are moved to awaitingcmd for later execution and a temporary file is created (either in current directory or in %TEMP%, if the latter is defined)
- * returns 0 on success, DOS err on failure */
+ * returns 0 on success, a DOS error on failure, or REDIR_ERR_TOOLONG */
 unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awaitingcmd, unsigned short envseg);
 
 /* apply stdin/stdout redirections defined in redir_data, returns 0 on success */
