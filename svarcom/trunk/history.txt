@@ -12,6 +12,7 @@
  - fixed piping combined with > or >> (output filename was lost)
  - external command tail capped at 126 bytes (was overflowing into rmod)
  - FOR: expanded command no longer overflows the command-line buffer
+ - DEL: abort when filespec cannot be resolved (was reusing a stale buffer)
 
 
 === ver 2025.1 (13.03.2025) ==================================================

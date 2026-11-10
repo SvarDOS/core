@@ -72,12 +72,23 @@ static enum cmd_result cmd_del(struct cmd_funcparam *p) {
     }
   }
 
-  /* convert path to canonical form */
-  file_truename(delspec, buff);
+  /* a switch-only invocation ("DEL /P") has no filespec */
+  if (delspec == NULL) {
+    nls_outputnl(0,7); /* "Required parameter missing" */
+    return(CMD_FAIL);
+  }
+
+  /* convert path to canonical form. on failure the buffer is untouched, so
+   * it must not be used: it may still hold the previous command's filespec. */
+  err = file_truename(delspec, buff);
+  if (err != 0) {
+    nls_outputnl_doserr(err);
+    return(CMD_FAIL);
+  }
 
   /* is delspec pointing at a directory? if so, add a \*.* */
   i = path_appendbkslash_if_dir(buff);
-  if (buff[i - 1] == '\\') sv_strcat(buff, "????????.???");
+  if ((i != 0) && (buff[i - 1] == '\\')) sv_strcat(buff, "????????.???");
 
   /* parse delspec in buff and remember where last backslash or slash is */
   for (i = 0; buff[i] != 0; i++) if (buff[i] == '\\') pathlimit = i + 1;
