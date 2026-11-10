@@ -29,6 +29,7 @@
 #include "redir.h"
 
 static unsigned short oldstdout = 0xffff;
+static unsigned short oldstdin = 0xffff;
 
 
 /* compute a filename to be used for pipes */
@@ -89,8 +90,9 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
    *    stdin redirection (<) is (obviously) applied to the first command only
    */
 
-  /* preset oldstdout to 0xffff in case no redirection is required */
+  /* preset to 0xffff in case no redirection is required */
   oldstdout = 0xffff;
+  oldstdin = 0xffff;
 
   /* clear out the redir_data struct */
   sv_bzero(d, sizeof(*d));
@@ -155,7 +157,7 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
 }
 
 
-/* apply stdout redirections defined in redir_data, returns 0 on success */
+/* apply stdin/stdout redirections defined in redir_data, returns 0 on success */
 int redir_apply(const struct redir_data *d) {
 
   if (d->stdoutfile != NULL) {
@@ -219,17 +221,68 @@ int redir_apply(const struct redir_data *d) {
     }
   }
 
+  /* stdin (<). external programs get this from rmod; internal commands
+   * (DATE, TIME) read the standard input themselves. */
+  if (d->stdinfile != NULL) {
+    unsigned short errcode = 0;
+    unsigned short handle = 0;
+    const char *myptr = d->stdinfile;
+
+    _asm {
+      push ax
+      push bx
+      push cx
+      push dx
+      push si
+      mov ax, 0x3d00     /* open for read */
+      mov dx, myptr      /* ASCIIZ filename */
+      int 0x21           /* AX=handle on success (CF clear), otherwise dos err */
+      mov handle, ax
+      jnc STDIN_OPENED
+      mov errcode, ax
+      jmp STDIN_DONE
+
+      /* save (duplicate) current stdin so I can revert it later */
+      STDIN_OPENED:
+      mov ah, 0x45       /* duplicate file handle */
+      xor bx, bx         /* handle to dup (0=stdin) */
+      int 0x21           /* ax = new file handle */
+      mov oldstdin, ax
+      /* redirect the stdin handle */
+      mov bx, handle     /* opened file */
+      xor cx, cx         /* handle to replace (0=stdin) */
+      mov ah, 0x46       /* redirect a handle */
+      int 0x21
+      /* close the original file handle (no longer needed) */
+      mov ah, 0x3e       /* close a file handle (handle in BX) */
+      int 0x21
+      STDIN_DONE:
+      pop si
+      pop dx
+      pop cx
+      pop bx
+      pop ax
+    }
+    if (errcode != 0) {
+      /* stdout may already point at another file: restore it first,
+       * otherwise the error message itself is redirected away */
+      redir_revert();
+      nls_outputnl_doserr(errcode);
+      return(-1);
+    }
+  }
+
   return(0);
 }
 
 
-/* restores previous stdout handle if is has been redirected */
+/* restores previous stdout/stdin handles if they have been redirected */
 void redir_revert(void) {
   _asm {
     /* if oldstdout is 0xffff then not redirected */
     mov bx, [oldstdout] /* dst handle */
     cmp bx, 0xffff
-    je DONE
+    je STDOUT_DONE
     /* redirect the stdout handle (handle already in BX) */
     mov cx, 1           /* src handle (1=stdout) */
     mov ah, 0x46        /* redirect a handle */
@@ -238,6 +291,20 @@ void redir_revert(void) {
     mov ah, 0x3e
     int 0x21
     mov [oldstdout], 0xffff
-    DONE:
+    STDOUT_DONE:
+
+    /* if oldstdin is 0xffff then not redirected */
+    mov bx, [oldstdin]
+    cmp bx, 0xffff
+    je STDIN_DONE
+    /* redirect the stdin handle (handle already in BX) */
+    xor cx, cx          /* src handle (0=stdin) */
+    mov ah, 0x46        /* redirect a handle */
+    int 0x21
+    /* close old handle (in bx already) */
+    mov ah, 0x3e
+    int 0x21
+    mov [oldstdin], 0xffff
+    STDIN_DONE:
   }
 }
