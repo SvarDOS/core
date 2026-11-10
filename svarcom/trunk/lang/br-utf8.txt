@@ -107,6 +107,7 @@
 18.5:parâmetros  Parâmetros ou opções para o comando especificado.
 18.6:Para usar o FOR em um programa de lote, use %%variável invés de %variável
 18.7:O FOR não pode ser aninhado (dentro de outro FOR)
+18.8:Linha muito longa
 
 # VERIFY
 19.0:Diz ao DOS se deve verificar se os arquivos foram corretamente gravados no\r\ndisco.

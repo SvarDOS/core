@@ -107,6 +107,7 @@
 18.5:parametreler Belirtilen komut için parametre veya seçenekler.
 18.6:FOR'u bir toplu iş dosyasında kullanmak için, %değişken yerine %%değişken kullanın.
 18.7:FOR iç içe geçirilemez yani yuvalanamaz
+18.8:Satır çok uzun
 
 # VERIFY
 19.0:DOS'a dosyaların diske doğru yazılıp yazılmadıklarını denetlemesini belirtir.

@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 15 Nov 2024
+# Last update: 10 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -15,7 +15,7 @@
 0.6:Invalid parameter
 0.7:Required parameter missing
 0.8:Invalid destination
-0.9:This command is not implemented
+0.9:Command not implemented
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
@@ -107,6 +107,7 @@
 18.5:parameters  Parameters or switches for the specified command.
 18.6:To use FOR in a batch program, use %%variable instead of %variable.
 18.7:FOR cannot be nested
+18.8:Line too long
 
 # VERIFY
 19.0:Tells DOS whether to verify that files are written correctly to disk.

@@ -932,8 +932,10 @@ static void batpercrepl(char *res, unsigned short ressz, const char *line, const
 
 
 /* process the ongoing forloop, returns 0 on success, non-zero otherwise (no
-   more things to process) */
-static int forloop_process(char *res, struct forctx far *forloop) {
+   more things to process, or the expanded command does not fit in res).
+   ressz is the number of bytes available, including the terminating NUL.
+   the guard byte lives at res[ressz] and must not be written. */
+static int forloop_process(char *res, unsigned short ressz, struct forctx far *forloop) {
   unsigned short i, t;
   struct DTA dta;
   char *fnameptr = dta.fname;
@@ -1015,24 +1017,36 @@ static int forloop_process(char *res, struct forctx far *forloop) {
 
   SKIP_DTA:
 
-  /* fill res with command, replacing varname by actual filename */
-  /* full filename is to be built with path of curpat and fname from dta */
+  /* fill res with command, replacing varname by actual filename.
+   * full filename is path of curpat + fname from dta. stop if the result
+   * would not fit: a truncated command must not be executed. */
   t = 0;
   i = 0;
   for (;;) {
     if ((forloop->cmd[forloop->exec + t] == '%') && (forloop->cmd[forloop->exec + t + 1] == forloop->varname)) {
+      unsigned short need = sv_strlen(pathprefix) + sv_strlen(fnameptr);
+      /* sv_strcpy() / sv_strcat() also write the terminating NUL */
+      if ((i >= ressz) || (need >= ressz - i)) goto TOOLONG;
       sv_strcpy(res + i, pathprefix);
       sv_strcat(res + i, fnameptr);
-      for (; res[i] != 0; i++);
+      i += need;
       t += 2;
     } else {
-      res[i] = forloop->cmd[forloop->exec + t];
+      char c = forloop->cmd[forloop->exec + t];
+      if ((i >= ressz) || ((c != 0) && (i + 1 >= ressz))) goto TOOLONG;
+      res[i] = c;
+      if (c == 0) break;
+      i++;
       t++;
-      if (res[i++] == 0) break;
     }
   }
 
   return(0);
+
+  TOOLONG:
+  if (ressz != 0) res[0] = 0;
+  nls_outputnl(18, 8); /* "Line too long" */
+  return(-1);
 }
 
 
@@ -1157,7 +1171,7 @@ int main(void) {
 
     /* am I inside a FOR loop? */
     if (rmod->forloop) {
-      if (forloop_process(cmdlinebuf, rmod->forloop) != 0) {
+      if (forloop_process(cmdlinebuf, CMDLINE_MAXLEN, rmod->forloop) != 0) {
         rmod_ffree(rmod->forloop);
         rmod->forloop = NULL;
         continue; /* needed so we quit if the FOR loop was ran through COMMAND/C */
