@@ -536,7 +536,9 @@ static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag, unsi
     if (mvcompbytesahead + stringslen > *buffrequired) {
       *buffrequired = mvcompbytesahead + stringslen;
     }
-    if (comp_bytes < strings_bytes) {
+    /* stringslen > 0 means mvcomp stopped early (output buffer full): the
+     * returned stream is shorter than the raw text but does not decode to it */
+    if ((stringslen == 0) && (comp_bytes < strings_bytes)) {
       printf("lang %c%c mvcomp-ressed (%u bytes -> %u bytes) mvcomp stream at most %u bytes ahead of raw data (%u bytes needed for in-place decomp)\n", l->id[0], l->id[1], strings_bytes, comp_bytes, mvcompbytesahead, strings_bytes + mvcompbytesahead);
       langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
       strings_bytes = comp_bytes;
