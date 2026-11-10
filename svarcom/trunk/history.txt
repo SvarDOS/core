@@ -10,6 +10,7 @@
  - fixed exec of 1st extern program after boot (corrupt cmd tail, bugz #178)
  - COPY: keep the destination when an append fails (was deleted)
  - fixed piping combined with > or >> (output filename was lost)
+ - external command tail capped at 126 bytes (was overflowing into rmod)
 
 
 === ver 2025.1 (13.03.2025) ==================================================

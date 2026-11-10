@@ -663,8 +663,10 @@ static void run_as_external(char *buff, const char *cmdline, unsigned short envs
     *farptr16 = redir->stdout_openflag;
   }
 
-  /* copy cmdtail to rmod's PSP and compute its len */
-  for (i = 0; cmdtail[i] != 0; i++) rmod_cmdtail[i] = cmdtail[i];
+  /* copy cmdtail to rmod's PSP and compute its len.
+   * the tail lives at 81h-FFh: 126 chars and a CR. a batch line may be 255
+   * bytes, and writing past FFh overwrites the resident module at 100h. */
+  for (i = 0; (i < 126) && (cmdtail[i] != 0); i++) rmod_cmdtail[i] = cmdtail[i];
   rmod_cmdtail[i] = '\r';
   rmod_cmdtail[-1] = i;
 
