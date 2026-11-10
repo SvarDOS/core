@@ -7,6 +7,7 @@
 - svarlang_load() does not replace the loaded lang if LNG file is truncated
 - tlumacz fix: does not store an unfinished stream when output buffer fills up
 - fixed tlumacz wrapping the embedded buffer size for blocks above 62415 bytes
+- tlumacz: added /nomarg (buffer sized to the exact lang block)
 
 20241010
 - improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
