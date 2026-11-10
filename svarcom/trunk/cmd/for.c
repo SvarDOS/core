@@ -100,8 +100,14 @@ static enum cmd_result cmd_for(struct cmd_funcparam *p) {
     return(CMD_OK);
   }
 
-  /* clear out struct and copy command line to it */
+  /* clear out struct and copy command line to it.
+   * cmd[] is copied verbatim into the resident context, so a longer line
+   * would run into the DTA and the offsets that follow it. */
   sv_bzero(f, sizeof(*f));
+  if (sv_strlen(p->cmdline) >= sizeof(f->cmd)) {
+    nls_outputnl(18, 8); /* "Line too long" */
+    return(CMD_FAIL);
+  }
   sv_strcpy(f->cmd, p->cmdline);
 
   /* locate the %varname (single char) */

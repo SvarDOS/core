@@ -12,6 +12,7 @@
  - fixed piping combined with > or >> (output filename was lost)
  - external command tail capped at 126 bytes (was overflowing into rmod)
  - FOR: expanded command no longer overflows the command-line buffer
+ - FOR: reject a command that does not fit in the resident context
  - DEL: abort when filespec cannot be resolved (was reusing a stale buffer)
  - internal commands respect < redirections (eg. "TIME < NEWTIME.TXT"
  - pipe queue no longer overflows the resident module (unbounded awaitingcmd)
