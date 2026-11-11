@@ -2,7 +2,7 @@
 
               SVARLANG.LIB - THE SVARDOS TRANSLATION C LIBRARY
 
-                   Copyright (C) 2021-2024 Mateusz Viste
+                   Copyright (C) 2021-2026 Mateusz Viste
 
 
 
@@ -122,7 +122,7 @@ NOTE 1: All numeric values are stored in x86 (little endian) order.
 
 NOTE 2: A language with compressed strings is flagged with bit 0x8000 set in
         lang_id. The strings are then compressed with the MVCOMP algorithm,
-        see https://mvcomp.sourceforge.io for more details about MVCOMP.
+        see http://mateusz.fr/mvcomp for more details about MVCOMP.
 
 
 ####################################################################### EOF ###

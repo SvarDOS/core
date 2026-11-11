@@ -1,4 +1,4 @@
-2026xxxx
+20261111
 - fixed svarlang_load() crashing when lang is NULL or empty (unset LANG)
 - fixed svl_find() crashing when the searched id is lower than the first entry
 - fixed tlumacz dictionary limit (was 2500 strings instead of 10000)
