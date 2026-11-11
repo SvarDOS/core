@@ -1,0 +1,57 @@
+20261111
+- fixed svarlang_load() crashing when lang is NULL or empty (unset LANG)
+- fixed svl_find() crashing when the searched id is lower than the first entry
+- fixed tlumacz dictionary limit (was 2500 strings instead of 10000)
+- fixed svarlang_autoload_pathlist() overflowing its 128-byte path buffer
+- fixed svarlang_load() writing past svarlang_mem when string block is too big
+- svarlang_load() does not replace the loaded lang if LNG file is truncated
+- tlumacz fix: does not store an unfinished stream when output buffer fills up
+- fixed tlumacz wrapping the embedded buffer size for blocks above 62415 bytes
+- tlumacz: added /nomarg (buffer sized to the exact lang block)
+- tlumacz: fixed folding string ids above 255 (1.256 was stored as 1.0)
+- fixed mvucomp() writing past svarlang_mem when data expands too far
+
+20241010
+- improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
+- added /nodef to TLUMACZ (skips deflang generation)
+- MVCOMP-packed data is loaded to RAM before unpacking (60x faster on an 8086)
+- assembly version of the MVCOMP depacker used by default (saves 27 bytes)
+
+20240929
+- LNG strings may be optionally MVCOMP-compressed (disabled with /nocomp)
+- reference language can be excluded from the LNG file (/excref)
+
+20240915
+- fixed svarlang_strid() when id=0 and string does not exist (Bernd Boeckmann)
+
+20240227
+- replaced inline _asm by pragma aux (more compact code, open watcom only)
+
+20230730
+- dropped svarlang_autoload() (replaced by more specialized functions below)
+- added svarlang_autoload_exepath() and svarlang_autoload_nlspath()
+- svarlang_load() simplified so it takes the target filename as an argument
+- file access relies on fopen() when svarlang is compiled with -DWITHSTDIO
+- new file format: sorted dictionary for faster lookup (by Bernd Boeckmann)
+  breaking change! See svarlang.txt for file format specification
+
+20230630
+- tlumacz.exe warns about empty strings (patch by Bernd Boeckmann)
+- tlumacz.exe does not abort when a malformed line is found
+
+20230629
+- deflang.c has each message on a different line so it is nicer to VCSes
+
+20230628
+- added support for \e sequences in translation strings
+- implemented svarlang_getver()
+
+20220314
+- added support for flagging strings as being "dirty", eg: ?1.1:Hello, World
+
+20220309
+- static lib buffer is sized to fit the largest lang block +5% of margin
+  (was: twice the size of the reference language)
+
+20220226
+- replaced fopen() and friends by direct DOS calls (smaller memory footprint)
