@@ -1,7 +1,10 @@
 #
 # make instructions to build svarlang and tlumacz.exe with OpenWatcom
-# Copyright (C) 2021-2024 Mateusz Viste
+# Copyright (C) 2021-2026 Mateusz Viste
 #
+# MVCOMP compressor, copied from mvcomp-20261111 so this tree builds alone.
+MVLIB = mvlib
+
 
 ALLBIN = svarlngs.lib svarlngc.lib svarlngm.lib svarlngl.lib tlumacz.exe
 all: $(ALLBIN)
@@ -56,10 +59,10 @@ release: $(ALLBIN) .symbolic
 	if exist svarlang.zip rm -f svarlang.zip
 	if exist svrl_src.zip rm -f svrl_src.zip
 	zip -9rkDX svarlang.zip *.lib *.h *.txt tlumacz.exe
-	zip -9rkDX svrl_src.zip *.c *.txt *.h makefile
+	zip -9rkDX svrl_src.zip *.c *.txt *.h makefile $(MVLIB)
 
-tlumacz.exe: tlumacz.c
-	wcl -q -0 -y -cc -wx -mc -lr -we -ox tlumacz.c
+tlumacz.exe: tlumacz.c $(MVLIB)\mvpack.c $(MVLIB)\mvcomp.h
+	wcl -q -0 -y -cc -wx -mc -lr -we -ox -i=$(MVLIB) tlumacz.c $(MVLIB)\mvpack.c
 	rm -f *.obj
 
 clean: .symbolic

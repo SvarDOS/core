@@ -27,7 +27,8 @@ tlumacz en fr pl (...)
 
 The first language provided in the command line is the reference language and
 is used both as the default (embedded in the application) language, as well as
-to substitute messages missing in other languages.
+to substitute messages missing in other languages. String blocks are compressed
+with the MVCOMP library shipped in mvcomp/ (mvpack). /nocomp stores them uncompressed.
 
 TLUMACZ computes two files:
 

@@ -315,9 +315,9 @@ int svarlang_load(const char *fname, const char *lang) {
     unsigned short string_count;
   } hdr;
 
-  /* getenv("LANG") is NULL when unset; an empty string is a 1-byte object
-   * and the word load below would read past it */
-  if ((lang == NULL) || (lang[0] == 0)) return(-1);
+  /* getenv("LANG") is a null pointer when unset; an empty string is a 1-byte
+   * object and the word load below would read past it */
+  if ((!lang) || (lang[0] == 0)) return(-1);
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */

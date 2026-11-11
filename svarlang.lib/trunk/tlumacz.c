@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2024 Mateusz Viste
+ * Copyright (C) 2021-2026 Mateusz Viste
  *
  * Dictionary-based lookups contributed by Bernd Boeckmann, 2023
  *
@@ -7,31 +7,10 @@
  *
  * computes:
  * OUT.LNG -> contains all language resources.
- * OUTC.LNG -> same as OUT.LNG but with compressed strings (slower to load).
  *
- * === COMPRESSION ===========================================================
- * The compression scheme is very simple. It is applied only to strings (ie.
- * not the dictionnary) and it is basically a stream of 16-bit words (tokens).
- *
- * Token format is LLLL OOOO OOOO OOOO, where:
- * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
- * LLLL is the number of bytes (-1) that have to be copied from the offset.
- *
- * However, if LLLL is zero then the token's format is different:
- * 0000 RRRR BBBB BBBB
- *
- * The above form occurs when uncompressible data is encountered:
- * BBBB BBBB is the literal value of a byte to be copied
- * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
- *
- * where each WORD value contains the following bits "LLLL OOOO OOOO OOOO":
- *
- * OOOO OOOO OOOO = a backreference offset ("look that many bytes back")
- * LLLL = the number of bytes to copy from the backreference
- *
- * To recognize a compressed lang block one has to look at the id of the block
- * (16-bit language id). If its highest bit is set (0x8000) then the lang block
- * is compressed.
+ * String bytes are MVCOMP-compressed unless /nocomp is given. The compressor
+ * is the bundled MVCOMP library in mvcomp/ (mvpack.c).
+ * A compressed language block has the high bit set in its 16-bit language id.
  */
 
 
@@ -41,6 +20,7 @@
 #include <ctype.h>
 
 #include "svarlang.h"
+#include "mvcomp.h"
 
 #define STRINGS_CAP 65000   /* string storage size in characters */
 #define DICT_CAP    10000   /* dictionary size in elements */
@@ -384,194 +364,62 @@ static int svl_write_header(unsigned short num_strings, FILE *fd) {
 
 
 
-/* write qlen literal bytes into dst, returns amount of "compressed" bytes */
-static unsigned short mvcomp_litqueue_dump(unsigned short **dst, const unsigned char *q, unsigned short qlen) {
-  unsigned short complen = 0;
-
-  AGAIN:
-
-  /* are we done? (also take care of guys calling me in for jokes) */
-  if (qlen == 0) return(complen);
-
-  qlen--; /* now it's between 0 and 30 */
-  /* write the length and first char */
-  **dst = (unsigned short)((qlen / 2) << 8) | q[0];
-  *dst += 1;
-  q++;
-  complen += 2;
-
-  /* anything left? */
-  if (qlen == 0) return(complen);
-
-  /* write the pending words */
-  if (qlen > 1) {
-    memcpy(*dst, q, (qlen/2)*2);
-    *dst += qlen / 2;
-    q += (qlen / 2) * 2;
-    complen += (qlen / 2) * 2;
-    qlen -= (qlen / 2) * 2;
-  }
-
-  /* one byte might still be left if it did not fit inside a word */
-  goto AGAIN;
-}
-
-
-/* compare up to n bytes of locations s1 and s2, returns the amount of same bytes (0..n) */
-static unsigned short comparemem(const unsigned char *s1, const unsigned char *s2, unsigned short n) {
-  unsigned short i;
-  for (i = 0; (i < n) && (s1[i] == s2[i]); i++);
-  return(i);
-}
-
-
-/* mvcomp applies the MV-COMPRESSION algorithm to data and returns the compressed size
- * updates len with the number of input bytes left unprocessed */
-static unsigned short mvcomp(void *dstbuf, size_t dstbufsz, const unsigned char *src, size_t *len, unsigned short *maxbytesahead) {
-  unsigned short complen = 0;
-  unsigned short *dst = dstbuf;
-  unsigned short bytesprocessed = 0;
-  unsigned char litqueue[32];
-  unsigned char litqueuelen = 0;
-
-  *maxbytesahead = 0;
-
-  /* read src byte by byte, len times, each time look for a match of 15,14,13..2 chars in the back buffer */
-  while (*len > 0) {
-    unsigned short matchlen;
-    unsigned short minmatch;
-    unsigned short offset;
-    matchlen = 16;
-    if (*len < matchlen) matchlen = (unsigned short)(*len);
-
-    /* monitor the amount of bytes that the compressed stream is "ahead" of
-     * uncompressed data, this is an information used later to size a proper
-     * buffer for in-place depacking */
-    if (complen + litqueuelen + 2 > bytesprocessed) {
-      unsigned short mvstreamlen = complen + litqueuelen + 2;
-      if (*maxbytesahead < (mvstreamlen - bytesprocessed)) *maxbytesahead = mvstreamlen - bytesprocessed;
-    }
-
-    /* abort if no space in output buffer, but do NOT break a literal queue */
-    if ((complen >= dstbufsz - 32) && (litqueuelen == 0)) return(complen);
-
-    /* look for a minimum match of 2 bytes, unless I have some pending literal bytes
-     * awaiting, in which case I am going through a new data pattern and it is more
-     * efficient to wait for a longer match before breaking the literal string */
-    if (litqueuelen & 1) {
-      minmatch = 3; /* breaking an uneven queue is less expensive */
-    } else if (litqueuelen > 0) {
-      goto NOMATCH; /* breaking an even-sized literal queue is never a good idea */
-    } else {
-      minmatch = 2;
-    }
-
-    if (matchlen >= minmatch) {
-      /* start at -1 and try to match something moving backward. note that
-       * matching a string longer than the offset is perfectly valid, this
-       * allows for encoding self-duplicating strings (see MVCOMP.TXT) */
-      unsigned short maxoffset = 4096;
-      unsigned short longestmatch = 0;
-      unsigned short longestmatchoffset = 0;
-      if (maxoffset > bytesprocessed) maxoffset = bytesprocessed;
-
-      for (offset = 1; offset <= maxoffset; offset++) {
-        unsigned short matchingbytes;
-        /* quick skip if first two bytes to not match (never interested in 1-byte matches) */
-        if (*((const unsigned short *)src) != *(const unsigned short *)(src - offset)) continue;
-        /* compute the exact number of bytes that match */
-        matchingbytes = comparemem(src, src - offset, matchlen);
-        if (matchingbytes == matchlen) {
-          //printf("Found match of %u bytes at offset -%u: '%c%c%c...'\n", matchlen, offset, src[0], src[1], src[2]);
-          goto FOUND;
-        }
-        if (matchingbytes > longestmatch) {
-          longestmatch = matchingbytes;
-          longestmatchoffset = offset ;
-        }
-      }
-      /* is the longest match interesting? */
-      if (longestmatch >= minmatch) {
-        matchlen = longestmatch;
-        offset = longestmatchoffset;
-        goto FOUND;
-      }
-    }
-
-    NOMATCH:
-
-    /* if here: no match found, write a literal byte to queue */
-    litqueue[litqueuelen++] = *src;
-    src++;
-    bytesprocessed++;
-    *len -= 1;
-
-    /* dump literal queue to dst if max length reached */
-    if (litqueuelen == 31) {
-      complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
-      litqueuelen = 0;
-    }
-    continue;
-
-    FOUND: /* found a match of matchlen bytes at -offset */
-
-    /* dump awaiting literal queue to dst first */
-    if (litqueuelen != 0) {
-      complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
-      litqueuelen = 0;
-    }
-
-    *dst = (unsigned short)((matchlen - 1) << 12) | (offset - 1);
-    dst++;
-    src += matchlen;
-    bytesprocessed += matchlen;
-    *len -= matchlen;
-    complen += 2;
-  }
-
-  /* dump awaiting literal queue to dst first */
-  if (litqueuelen != 0) {
-    complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
-    litqueuelen = 0;
-  }
-
-  return(complen);
-}
-
-
 /* write the language block (id, dict, strings) into the LNG file.
- * strings are compressed if compflag != 0 */
-static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag, unsigned short *buffrequired) {
+ * strings are compressed when compflag != 0, using mvcomp_pack(). */
+static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag) {
   unsigned short strings_bytes = svl_strings_bytes(l);
   unsigned short langid = *((unsigned short *)(&l->id));
-  const char *stringsptr = l->strings;
+  const unsigned char *stringsptr = (const unsigned char *)l->strings;
+  unsigned char *packed = NULL;
+  int ok;
 
-  /* if compressed then do the magic */
   if (compflag) {
-    static char compstrings[65000];
-    unsigned short comp_bytes;
-    size_t stringslen = strings_bytes;
-    unsigned short mvcompbytesahead;
-    comp_bytes = mvcomp(compstrings, sizeof(compstrings), (const unsigned char *)(l->strings), &stringslen, &mvcompbytesahead);
-    if (mvcompbytesahead + stringslen > *buffrequired) {
-      *buffrequired = mvcompbytesahead + stringslen;
+    /* MVCOMP_BOUND is enough for any result. A 16-bit segment cannot hold
+     * more than 65534 bytes, and a block that does not shrink is stored raw. */
+    unsigned long bound = MVCOMP_BOUND((unsigned long)strings_bytes);
+    unsigned long cap = bound;
+    unsigned long got;
+    struct mvcomp *probe;
+    if (cap > 65534ul) cap = 65534ul;
+    packed = malloc((size_t)cap);
+    if (packed == NULL) {
+      fprintf(stderr, "ERROR: OUT OF MEMORY\r\n");
+      return(0);
     }
-    /* stringslen > 0 means mvcomp stopped early (output buffer full): the
-     * returned stream is shorter than the raw text but does not decode to it */
-    if ((stringslen == 0) && (comp_bytes < strings_bytes)) {
-      printf("lang %c%c mvcomp-ressed (%u bytes -> %u bytes) mvcomp stream at most %u bytes ahead of raw data (%u bytes needed for in-place decomp)\n", l->id[0], l->id[1], strings_bytes, comp_bytes, mvcompbytesahead, strings_bytes + mvcompbytesahead);
+    got = mvcomp_pack(packed, cap, stringsptr, strings_bytes);
+    if (got == MVCOMP_ERR) {
+      /* the bound always fits the result. a short buffer means the packed
+       * form does not fit in one 16-bit segment. a failed index allocation
+       * is reported on its own. */
+      probe = mvcomp_open();
+      if (probe == NULL) {
+        fprintf(stderr, "ERROR: OUT OF MEMORY\r\n");
+        free(packed);
+        return(0);
+      }
+      mvcomp_close(probe);
+      if (cap >= bound) {
+        fprintf(stderr, "ERROR: mvcomp failed\r\n");
+        free(packed);
+        return(0);
+      }
+      printf("lang %c%c left UNCOMPRESSED (uncomp=%u bytes, mvcomp result exceeds 64K)\n", l->id[0], l->id[1], strings_bytes);
+    } else if (got < strings_bytes) {
+      printf("lang %c%c mvcomp-ressed (%u bytes -> %lu bytes)\n", l->id[0], l->id[1], strings_bytes, got);
       langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
-      strings_bytes = comp_bytes;
-      stringsptr = compstrings;
+      strings_bytes = (unsigned short)got;
+      stringsptr = packed;
     } else {
-      printf("lang %c%c left UNCOMPRESSED (uncomp=%u bytes ; mvcomp=%u bytes)\n", l->id[0], l->id[1], strings_bytes, comp_bytes);
+      printf("lang %c%c left UNCOMPRESSED (uncomp=%u bytes ; mvcomp=%lu bytes)\n", l->id[0], l->id[1], strings_bytes, got);
     }
   }
 
-  return((fwrite(&langid, 1, 2, fd) == 2) &&
-         (fwrite(&strings_bytes, 1, 2, fd) == 2) &&
-         (fwrite(l->dict, 1, svl_dict_bytes(l), fd) == svl_dict_bytes(l)) &&
-         (fwrite(stringsptr, 1, strings_bytes, fd) == strings_bytes));
+  ok = ((fwrite(&langid, 1, 2, fd) == 2) &&
+        (fwrite(&strings_bytes, 1, 2, fd) == 2) &&
+        (fwrite(l->dict, 1, svl_dict_bytes(l), fd) == svl_dict_bytes(l)) &&
+        (fwrite(stringsptr, 1, strings_bytes, fd) == strings_bytes));
+  free(packed);
+  return(ok);
 }
 
 
@@ -810,9 +658,7 @@ int main(int argc, char **argv) {
        the dictionary and string table for current language
        skip this for reference language if /excref given */
     if ((reflang != NULL) || (excref == 0)) {
-      /* also updates the biggest_langsz variable to accomodate enough space
-       * for in-place decompression of mvcomp-compressed lang blocks */
-      if (!svl_write_lang(lang, fd, mvcomp_enabled, &biggest_langsz)) {
+      if (!svl_write_lang(lang, fd, mvcomp_enabled)) {
         fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
         ecode = 1;
         goto exit_main;
