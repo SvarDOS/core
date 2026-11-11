@@ -16,7 +16,6 @@
 0.6:Ungültiger Parameter
 0.7:Erforderlicher Parameter fehlt
 0.8:Ungültiges Ziel
-0.9:Dieser Befehl ist nicht implementiert.
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions

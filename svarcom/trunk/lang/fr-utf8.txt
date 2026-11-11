@@ -15,7 +15,6 @@
 0.6:Paramètre invalide
 0.7:Paramètre requis manquant
 0.8:Destination invalide
-0.9:Commande indisponible
 
 # the message below MUST be a two-letter UPPER-CASE string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions

@@ -15,7 +15,6 @@
 0.6:Nieprawidłowy parametr
 0.7:Brak wymaganego parametru
 0.8:Nieprawidłowy cel
-0.9:To polecenie nie jest dostępne
 
 # the message below MUST be a two-letter upper-case string for "Yes/No" keys
 # that user can press to answer interactive "Yes/No" questions
