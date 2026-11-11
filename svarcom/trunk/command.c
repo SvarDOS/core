@@ -1056,6 +1056,202 @@ static int forloop_process(char *res, unsigned short ressz, struct forctx far *f
 }
 
 
+/* delete a file, returns 0 on success or a DOS error code */
+static unsigned short dos_unlink(const char near *f);
+#pragma aux dos_unlink = \
+"mov ah, 0x41" \
+"int 0x21" \
+"jc unlink_done" \
+"xor ax, ax" \
+"unlink_done:" \
+parm [dx] \
+value [ax]
+
+
+/* first token ends at one of these (the command-name buffer holds that token) */
+static int mux_isdelim(char c) {
+  switch (c) {
+    case ' ':
+    case '\t':
+    case '\r':
+    case '/':
+    case '=':
+    case ',':
+    case ';':
+    case '+':
+    case '<':
+    case '>':
+    case '|':
+    case '"':
+      return(1);
+  }
+  return(0);
+}
+
+
+/* INT 2Fh AX=AE00h/AE01h, the installable-command hook used by APPEND and
+ * similar TSRs. cmdline is the command with redirections already removed.
+ *
+ * returns 0  execute cmdline as usual (nobody claimed it, or a rewrite was
+ *            rejected and the previous line is kept)
+ *         1  a TSR consumed the command
+ *         2  dst holds a rewritten command; call again
+ *         3  aborted; a redirection error was already displayed
+ *
+ * A rewrite is the (trimmed) command name plus the command-line text with
+ * its first namelen bytes skipped. That is how MS-DOS APPEND /E replaces
+ * APPEND with SET APPEND=... */
+static int notify_pending_command(const char *cmdline, char *dst, unsigned short dstmax, const struct redir_data *redir) {
+  /* DOS 0Ah buffer: capacity, length, text, CR. Capacity is 255; the text
+   * copied in is capped at 254 so a rebuilt line still fits under the
+   * cmdlinebuf guard byte. */
+  unsigned char linebuf[2 + 255 + 1];
+  unsigned char namebuf[1 + 254 + 1];
+  unsigned short linelen;
+  unsigned short namelen;
+  unsigned short rawlen;
+  unsigned short trimmed;
+  unsigned short textlen;
+  unsigned short skip;
+  unsigned short taillen;
+  unsigned short i;
+  unsigned char muxal;
+  unsigned char near *lineptr;
+  unsigned char near *nameptr;
+
+  linelen = 0;
+  while ((cmdline[linelen] != 0) && (linelen < 254)) {
+    linebuf[2 + linelen] = cmdline[linelen];
+    linelen++;
+  }
+  linebuf[0] = 255;
+  linebuf[1] = (unsigned char)linelen;
+  linebuf[2 + linelen] = 0x0d;
+
+  /* command name: uppercased first token, space-padded to 11 if shorter */
+  namelen = 0;
+  while ((cmdline[namelen] != 0) && (namelen < 254) && (mux_isdelim(cmdline[namelen]) == 0)) {
+    namebuf[1 + namelen] = cmdline[namelen];
+    namelen++;
+  }
+  namebuf[1 + namelen] = 0;
+  nls_strtoup((char *)(namebuf + 1));
+  namebuf[0] = (unsigned char)namelen;
+  if (namelen < 11) {
+    for (i = namelen; i < 11; i++) namebuf[1 + i] = ' ';
+  }
+
+  /* AE00h: does any TSR want this command? CH=FFh, CL=line length.
+   * Registers are loaded here, not by a pragma-aux call: otherwise CX can
+   * be left holding whatever a previous call preserved. Watcom may also
+   * still be holding values in these registers, so they are saved across
+   * the block. BP is restored before muxal is stored: that store is
+   * BP-relative. */
+  lineptr = linebuf;
+  nameptr = namebuf;
+  muxal = 0; /* the asm below overwrites this; keeps the compiler quiet */
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+    push si
+    push di
+    push es
+
+    mov bx, lineptr
+    mov si, nameptr
+    mov cx, linelen
+    mov ch, 0xff
+    mov ax, 0xae00
+    mov dx, 0xffff
+    xor di, di
+    push ds
+    pop es
+    push bp
+    int 0x2f
+    cld
+    pop bp
+    mov muxal, al
+
+    pop es
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+  if (muxal == 0) return(0);
+
+  /* AE01h runs with redirections applied, same order as COMMAND.COM ioset.
+   * CH=0, CL=command-name length. */
+  if (redir_apply(redir) != 0) return(3);
+  lineptr = linebuf;
+  nameptr = namebuf;
+  _asm {
+    push ax
+    push bx
+    push cx
+    push dx
+    push si
+    push di
+    push es
+
+    mov bx, lineptr
+    mov si, nameptr
+    mov cx, namelen
+    mov ax, 0xae01
+    mov dx, 0xffff
+    xor di, di
+    push ds
+    pop es
+    push bp
+    int 0x2f
+    cld
+    pop bp
+
+    pop es
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+  }
+  redir_revert();
+
+  /* length byte 0: the TSR handled the command (APPEND does this) */
+  if (namebuf[0] == 0) return(1);
+
+  /* a length past the buffer we handed over is not a usable rewrite */
+  rawlen = namebuf[0];
+  if (rawlen > 254) return(0);
+  textlen = linebuf[1];
+  if (textlen > 255) return(0);
+
+  trimmed = rawlen;
+  while ((trimmed > 0) && (namebuf[trimmed] == ' ')) trimmed--;
+
+  /* do not copy a CR into the rebuilt command */
+  for (i = 0; i < textlen; i++) {
+    if (linebuf[2 + i] == 0x0d) {
+      textlen = i;
+      break;
+    }
+  }
+  skip = rawlen;
+  if (skip > textlen) skip = textlen;
+  taillen = textlen - skip;
+  if ((unsigned short)(trimmed + taillen) > dstmax) return(0);
+
+  for (i = 0; i < trimmed; i++) dst[i] = namebuf[1 + i];
+  for (i = 0; i < taillen; i++) dst[trimmed + i] = linebuf[2 + skip + i];
+  dst[trimmed + taillen] = 0;
+  return(2);
+}
+
+
 int main(void) {
   static struct config cfg;
   static unsigned short far *rmod_envseg;
@@ -1303,6 +1499,36 @@ int main(void) {
       continue;
     }
 
+    /* installable command (INT 2Fh AX=AE00h/AE01h). A TSR may consume the
+     * line or rewrite it. Do not parse redirections again: that would drop
+     * a pipe already queued in awaitingcmd. Three rewrites, then run as-is.
+     * The rewritten text goes to its own buffer so redirection filenames
+     * that still point into cmdlinebuf stay intact. */
+    {
+      static char mux_cmdline[CMDLINE_MAXLEN];
+      unsigned char muxtries;
+      int muxres = 0;
+
+      for (muxtries = 0; muxtries < 3; muxtries++) {
+        muxres = notify_pending_command(cmdline, mux_cmdline, CMDLINE_MAXLEN - 1, &redirprops);
+        if (muxres != 2) break;
+        cmdline = mux_cmdline;
+      }
+      if (muxres == 1) {
+        /* TSR consumed it. Drop the pipe temp file, as an internal command would. */
+        if (flags & DELETE_STDIN_FILE) {
+          unsigned short doserr = dos_unlink(redirprops.stdinfile);
+          if (doserr != 0) {
+            output(redirprops.stdinfile);
+            output(": ");
+            nls_outputnl_doserr(doserr);
+          }
+        }
+        goto RESET_FLAGS;
+      }
+      if (muxres == 3) goto RESET_FLAGS; /* redirection failed, already reported */
+    }
+
     /* try matching (and executing) an internal command */
     cmdres = cmd_process(rmod, *rmod_envseg, cmdline, BUFFER, sizeof(BUFFER), &redirprops, flags & DELETE_STDIN_FILE);
     if ((cmdres == CMD_OK) || (cmdres == CMD_FAIL)) {
@@ -1331,6 +1557,7 @@ int main(void) {
     }
 
     /* reset one-time only flags */
+    RESET_FLAGS:
     flags &= ~CALL_FLAG;
     flags &= ~FLAG_STEPBYSTEP;
     flags &= ~LOADHIGH_FLAG;
