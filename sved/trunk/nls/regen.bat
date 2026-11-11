@@ -14,7 +14,7 @@ utf8tocp maz pl_utf8.txt pl.txt
 utf8tocp 866 ru_utf8.txt ru.txt
 utf8tocp 857 tr_utf8.txt tr.txt
 
-..\svarlang\tlumacz en de fr pl ru tr
+..\svarlang\tlumacz /nomarg en de fr pl ru tr
 move /y out.lng ..\sved.lng
 move /y deflang.c ..
 
