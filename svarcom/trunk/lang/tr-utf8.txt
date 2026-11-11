@@ -23,7 +23,7 @@
 
 # SVARCOM HELP SCREEN
 1.0:SvarCOM komut yorumlayıcısını başlatır, ver
-1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] komut]
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/F] [/[C|K] komut]
 1.2:/D      AUTOEXEC.BAT işlenmesini atla (sadece /P ile bir anlamı vardır)
 1.3:/E:nnn  Ortamın boyutunu nnn bayt olarak ayarlar
 1.4:/P      Yeni komut yorumlayıcısını daimi kılar ve AUTOEXEC.BAT'i çalıştırır
@@ -31,6 +31,7 @@
 1.6:/K      Belirtilen komutu çalıştırır ve çalışmaya devam eder
 1.7:/Y      Toplu iş programını adım adım çalıştırır (sadece /P, /K veya /C ile)
 1.8:/M      NLS (millî dil desteği) mesajlarını bellekte muhafaza eder
+1.9:/F      Kritik hatalara sormadan Fail yanıtı verir
 
 # VARIOUS SVARCOM MESSAGES
 2.0:SVARCOM SÜRÜMÜ DEĞİŞTİ. SİSTEM DURDURULDU. BİLGİSAYARINIZI YENİDEN BAŞLATIN.

@@ -460,6 +460,7 @@ ret
 ;
 ; =============================================================================
 HANDLER_24H:    ; +464h
+; COMMAND /F overwrites this entry with "mov al,3 / iret"
 
 ; save registers so I can restore them later. AX does not require saving.
 ; Microsoft documentation says:

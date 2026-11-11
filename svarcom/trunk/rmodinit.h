@@ -34,6 +34,7 @@
 #define FLAG_SKIP_AUTOEXEC   16
 #define FLAG_STEPBYSTEP      32
 #define FLAG_MSG             64
+#define FLAG_AUTOFAIL       128 /* /F: critical errors fail without a prompt */
 
 
 /* batch context structure used to track what batch file is being executed,

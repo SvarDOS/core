@@ -294,6 +294,11 @@ static void parse_argv(struct config *cfg) {
         cfg->flags |= FLAG_MSG;
         break;
 
+      case 'f': /* /F = fail critical errors, do not ask */
+      case 'F':
+        cfg->flags |= FLAG_AUTOFAIL;
+        break;
+
       case '?':
         nls_output(1,0); /* "SvarCOM command interpreter, version" */
         output(" ");
@@ -308,6 +313,7 @@ static void parse_argv(struct config *cfg) {
         nls_outputnl(1,6); /* "/K      Executes the specified command and continues running" */
         nls_outputnl(1,7); /* "/Y      Executes the batch program step by step" */
         nls_outputnl(1,8); /* "/M      Keep the lang messages resident" */
+        nls_outputnl(1,9); /* "/F      Fail critical errors (no Abort, Retry, Fail prompt)" */
         crt_exit(1);
         break;
 
@@ -1108,6 +1114,13 @@ int main(void) {
 
   /* general (far) pointer to RMOD, useful to check some of its internal fields */
   rmod_farptr = MK_FP(rmod->rmodseg, 0);
+
+  /* COMMAND /F: overwrite the int 24h handler with "mov al,3 / iret" */
+  if (rmod->flags & FLAG_AUTOFAIL) {
+    rmod_farptr[RMOD_OFFSET_CRITHANDLER] = 0xB0;
+    rmod_farptr[RMOD_OFFSET_CRITHANDLER + 1] = 0x03;
+    rmod_farptr[RMOD_OFFSET_CRITHANDLER + 2] = 0xCF;
+  }
 
   rmod_envseg = MK_FP(rmod->rmodseg, RMOD_OFFSET_ENVSEG);
 

@@ -24,7 +24,7 @@
 
 # SVARCOM HELP SCREEN
 1.0:SvarCOM-Befehlsinterpreter, version
-1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] Befehl]
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/F] [/[C|K] Befehl]
 1.2:/D      Überspringt die Abarbeitung von AUTOEXEC.BAT (nur sinnvoll mit /P)
 1.3:/E:nnn  Legt die Umgebungsgröße auf nnn Byte fest
 1.4:/P      Macht den neuen Befehlsinterpreter permanent und startet AUTOEXEC.BAT
@@ -32,6 +32,7 @@
 1.6:/K      Führt den angegebenen Befehl aus und läuft dann weiter
 1.7:/Y      Führt das Stapelprogramm schrittweise aus (nur mit /P, /K oder /C)
 1.8:/M      Hält deutsche Übersetzung im Speicher
+1.9:/F      Kritische Fehler mit Fail beantworten (keine Rückfrage)
 
 # VARIOUS SVARCOM MESSAGES
 2.0:SVARCOM-VERSION VERÄNDERT. SYSTEM ANGEHALTEN. STARTEN SIE DEN COMPUTER NEU.

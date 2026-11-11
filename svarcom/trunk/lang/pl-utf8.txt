@@ -23,7 +23,7 @@
 
 # SVARCOM HELP SCREEN
 1.0:Interpreter poleceń SvarCOM, wersja
-1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] polecenie]
+1.1:COMMAND /E:nnn [/[C|K] [/P] [/D] [/F] polecenie]
 1.2:/D      Ignoruje AUTOEXEC.BAT (ma sens tylko przy /P)
 1.3:/E:nnn  Ustawia rozmiar środowiska na nnn bajtów
 1.4:/P      Ustala nowy interpreter poleceń i wykonuje AUTOEXEC.BAT
@@ -31,6 +31,7 @@
 1.6:/K      Wykonuje podane polecenie i działa dalej
 1.7:/Y      Wykonuje program wsadowy krok po kroku (tylko z /P, /K lub /C)
 1.8:/M      Przechowuje komunikaty NLS w pamięci
+1.9:/F      Błędy krytyczne kończy przez Fail (bez pytania)
 
 # VARIOUS SVARCOM MESSAGES
 2.0:WERSJA SVARCOM ULEGŁA ZMIANIE. SYSTEM ZATRZYMANY. ZRESTARTUJ KOMPUTER.

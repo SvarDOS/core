@@ -23,7 +23,7 @@
 
 # SVARCOM HELP SCREEN
 1.0:Interpretador de comandos SvarCOM, versão
-1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/[C|K] commando]
+1.1:COMMAND /E:nnn [/P] [/D] [/Y] [/F] [/[C|K] commando]
 1.2:/D      Pula o processamento do AUTOEXEC.BAT (faz sentido só com /P)
 1.3:/E:nnn  define o tamanho do ambiente para nnn bytes
 1.4:/P      Torna o novo interpretador permanente e roda o AUTOEXEC.BAT
@@ -31,6 +31,7 @@
 1.6:/K      Executa o comando especificado e continua rodando
 1.7:/Y      Executa o programa em lote passo a passo (só com /P, /K or /C)
 1.8:/M      Mantém mensagens NLS na memória
+1.9:/F      Responde Fail aos erros críticos (sem perguntar)
 
 # VARIOUS SVARCOM MESSAGES
 2.0:A VERSÃO DO SVARCOM MUDOU. SISTEMA INTERROMPIDO. POR FAVOR REINICIE SEU\r\nCOMPUTADOR.
