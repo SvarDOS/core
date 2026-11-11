@@ -3,7 +3,7 @@
 #
 # Language.....: French
 # Authors......: Berki Yenigün + fixes and adaptations by Mateusz Viste
-# Last update..: 10 Nov 2026
+# Last update..: 11 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -292,6 +292,12 @@
 40.0:Charge un programme dans la zone mémoire haute.
 40.1:[lecteur:][chemin]nomfichier [paramètres]
 40.2:paramètres : tout argument requis par le programme à charger.
+
+# CTTY
+41.0:Change le périphérique de terminal utilisé pour contrôler votre système.
+41.1:CTTY périphérique
+41.2:périphérique  Périphérique de terminal à utiliser, tel que COM1.
+41.3:Périphérique invalide
 
 # DOS ERRORS
 255.1:Numéro de fonction invalide

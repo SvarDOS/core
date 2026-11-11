@@ -3,7 +3,7 @@
 #
 # Language...: Portuguese Brazil
 # Authors....: Luzemário Dantas
-# Last update: 16 Nov 2024
+# Last update: 11 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -277,6 +277,12 @@
 40.0:Carrega um programa na área de memória alta.
 40.1:[drive:][caminho]arquivo [parâmetros]
 40.2:parâmetros: os argumentos necessários ao programa que você quer carregar.
+
+# CTTY
+41.0:Altera o dispositivo de terminal usado para controlar o sistema.
+41.1:CTTY dispositivo
+41.2:dispositivo  O dispositivo de terminal que você quer usar, como COM1.
+41.3:Dispositivo inválido
 
 # DOS ERRORS
 255.1:Número de função inválida

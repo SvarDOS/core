@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2026 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -182,7 +182,7 @@ unsigned short redir_parsecmd(struct redir_data *d, char *cmdline, char far *awa
         push dx
         push si
         mov ah, 0x41
-        mov dx, tmpfile
+        lea dx, tmpfile   /* static array: DX needs its address, not the first byte */
         int 0x21
         pop si
         pop dx
@@ -350,4 +350,49 @@ void redir_revert(void) {
     mov [oldstdin], 0xffff
     STDIN_DONE:
   }
+}
+
+
+/* point the handles saved by redir_apply() at devhandle, so redir_revert()
+ * restores that device instead of the previous console. devhandle is not
+ * closed. returns 0 on success. */
+unsigned short redir_point_saved(unsigned short devhandle) {
+  unsigned short errcode = 0;
+
+  _asm {
+    push ax
+    push bx
+    push cx
+
+    /* AH=46h: BX = existing handle, CX = handle to replace */
+    mov bx, [devhandle]
+    mov cx, [oldstdout]
+    cmp cx, 0xffff
+    je SAVED_STDOUT_DONE
+    cmp cx, bx
+    je SAVED_STDOUT_DONE
+    mov ah, 0x46
+    int 0x21
+    jnc SAVED_STDOUT_DONE
+    mov [errcode], ax
+    SAVED_STDOUT_DONE:
+
+    mov bx, [devhandle]
+    mov cx, [oldstdin]
+    cmp cx, 0xffff
+    je SAVED_STDIN_DONE
+    cmp cx, bx
+    je SAVED_STDIN_DONE
+    mov ah, 0x46
+    int 0x21
+    jnc SAVED_STDIN_DONE
+    mov [errcode], ax
+
+    SAVED_STDIN_DONE:
+    pop cx
+    pop bx
+    pop ax
+  }
+
+  return(errcode);
 }

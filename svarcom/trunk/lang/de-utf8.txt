@@ -3,7 +3,7 @@
 #
 # Language...........: German
 # Authors.  .........: Robert Riebisch (2022-2023), Bernd Boeckmann (2024)
-# Last update........: 16 Nov 2024
+# Last update........: 11 Nov 2026
 # In sync with EN rev: 2255;
 # 31.11 and 31.12 and 33.10 - 33.23 added by W. Spiegl
 
@@ -293,6 +293,12 @@
 40.0:Lädt ein Programm in den hohen Speicherbereich (Upper Memory Area).
 40.1:[Laufwerk:][Pfad]Dateiname [Parameter]
 40.2:Parameter: Alle Argumente, die vom zu ladenden Programm benötigt werden.
+
+# CTTY
+41.0:Ändert das Terminalgerät, mit dem das System gesteuert wird.
+41.1:CTTY Gerät
+41.2:Gerät  Das zu verwendende Terminalgerät, z. B. COM1.
+41.3:Ungültiges Gerät
 
 # DOS ERRORS
 255.1:Funktionsnummer ungültig

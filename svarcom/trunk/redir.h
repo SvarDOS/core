@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021 Mateusz Viste
+ * Copyright (C) 2021-2026 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -49,5 +49,10 @@ int redir_apply(const struct redir_data *d);
 
 /* restores previous stdout/stdin handlers if they have been redirected */
 void redir_revert(void);
+
+/* point the handles saved by redir_apply() at devhandle, so redir_revert()
+ * restores that device instead of the previous console. devhandle is not
+ * closed. returns 0 on success. */
+unsigned short redir_point_saved(unsigned short devhandle);
 
 #endif

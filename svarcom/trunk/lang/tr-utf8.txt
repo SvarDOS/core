@@ -3,7 +3,7 @@
 #
 # Language...: Turkish
 # Authors....: Berki Yenigün
-# Last update: 19 Jan 2024
+# Last update: 11 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -292,6 +292,12 @@
 40.0:Bir programı üst bellek alanına yükler.
 40.1:[sürücü:][yol]dosyaismi [parametreler]
 40.2:parametreler: yüklemek istediğiniz programın ihtiyaç duyduğu parametreler.
+
+# CTTY
+41.0:Sistemi kontrol etmek için kullanılan terminal aygıtını değiştirir.
+41.1:CTTY aygıt
+41.2:aygıt  Kullanmak istediğiniz terminal aygıtı, örneğin COM1.
+41.3:Geçersiz aygıt
 
 # DOS ERRORS
 255.1:Geçersiz işlev sayısı

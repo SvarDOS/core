@@ -17,6 +17,7 @@
  - internal commands respect < redirections (eg. "TIME < NEWTIME.TXT"
  - pipe queue no longer overflows the resident module (unbounded awaitingcmd)
  - COMMAND /F fails critical errors without asking (Abort, Retry, Fail)
+ - CTTY switches the console to another character device (bugz #101)
 
 
 === ver 2025.1 (13.03.2025) ==================================================
