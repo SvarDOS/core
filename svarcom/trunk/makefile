@@ -56,9 +56,9 @@ LSYS = dos com
 
 all: command.com
 
-command.com: startup.obj rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj
+command.com: startup.obj rmodcore.h command.obj cmd.obj deflang.obj env.obj redir.obj rmodinit.obj sayonara.obj helpers.obj sysparse.obj
 	# build the final executable
-	*wlink system $(LSYS) $(LFLAGS) op map op quiet file startup.obj,command.obj,cmd.obj,deflang.obj,env.obj,redir.obj,rmodinit.obj,sayonara.obj,helpers.obj,svarlang.lib\svarlngs.lib NAME command.com
+	*wlink system $(LSYS) $(LFLAGS) op map op quiet file startup.obj,command.obj,cmd.obj,deflang.obj,env.obj,redir.obj,rmodinit.obj,sayonara.obj,helpers.obj,sysparse.obj,svarlang.lib\svarlngs.lib NAME command.com
 
 startup.obj: wmincrt\startup.asm
 	wasm $(AFLAGS) wmincrt\startup.asm -DSTACKSIZE=2048 -DNOARGV -DNOSTACKALLOC
@@ -82,8 +82,11 @@ deflang.obj: lang\*.txt
 cmd.obj: cmd.c cmd\*.c
 	wcc $(CFLAGS) cmd.c
 
-command.obj: command.c rmodcore.h
+command.obj: command.c rmodcore.h sysparse.h
 	wcc $(CFLAGS) command.c
+
+sysparse.obj: sysparse.c sysparse.h
+	wcc $(CFLAGS) sysparse.c
 
 helpers.obj: helpers.c
 	wcc $(CFLAGS) helpers.c

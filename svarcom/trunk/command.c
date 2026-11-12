@@ -32,6 +32,7 @@
 #include "redir.h"
 #include "rmodinit.h"
 #include "sayonara.h"
+#include "sysparse.h"
 #include "version.h"
 #include "wmincrt/wmincrt.h"
 
@@ -1118,6 +1119,11 @@ static int notify_pending_command(const char *cmdline, char *dst, unsigned short
   unsigned char muxal;
   unsigned char near *lineptr;
   unsigned char near *nameptr;
+  unsigned short parseoff;
+  unsigned short ti;
+  unsigned short tlen;
+  static unsigned char pspsave[128];
+  static unsigned char taildst[126];
 
   linelen = 0;
   while ((cmdline[linelen] != 0) && (linelen < 254)) {
@@ -1185,10 +1191,26 @@ static int notify_pending_command(const char *cmdline, char *dst, unsigned short
   if (muxal == 0) return(0);
 
   /* AE01h runs with redirections applied, same order as COMMAND.COM ioset.
-   * CH=0, CL=command-name length. */
+   * CH=0, CL=command-name length.
+   * ES:DI is the far SYSPARSE entry MS-DOS APPEND calls. FreeDOS APPEND
+   * does not look at it. APPEND also parses the argument tail from DS:0080h
+   * (length) and DS:0081h (text, CR terminated), which in COMMAND.COM is the
+   * transient parameter area and here is the real PSP tail. Borrow it for
+   * the interrupt and put the previous bytes back afterwards. */
   if (redir_apply(redir) != 0) return(3);
   lineptr = linebuf;
   nameptr = namebuf;
+  parseoff = FP_OFF(mux_parse_entry);
+  /* /C keeps the command in the PSP tail, so copy it out before borrowing 80h */
+  tlen = 0;
+  while ((cmdline[namelen + tlen] != 0) && (tlen < 126)) {
+    taildst[tlen] = cmdline[namelen + tlen];
+    tlen++;
+  }
+  for (ti = 0; ti < 128; ti++) pspsave[ti] = *(unsigned char *)(0x80 + ti);
+  for (ti = 0; ti < tlen; ti++) *(unsigned char *)(0x81 + ti) = taildst[ti];
+  *(unsigned char *)(0x81 + tlen) = 0x0d;
+  *(unsigned char *)0x80 = (unsigned char)tlen;
   _asm {
     push ax
     push bx
@@ -1203,8 +1225,8 @@ static int notify_pending_command(const char *cmdline, char *dst, unsigned short
     mov cx, namelen
     mov ax, 0xae01
     mov dx, 0xffff
-    xor di, di
-    push ds
+    mov di, parseoff
+    push cs
     pop es
     push bp
     int 0x2f
@@ -1219,6 +1241,7 @@ static int notify_pending_command(const char *cmdline, char *dst, unsigned short
     pop bx
     pop ax
   }
+  for (ti = 0; ti < 128; ti++) *(unsigned char *)(0x80 + ti) = pspsave[ti];
   redir_revert();
 
   /* length byte 0: the TSR handled the command (APPEND does this) */
