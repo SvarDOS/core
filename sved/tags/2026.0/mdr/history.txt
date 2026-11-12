@@ -1,0 +1,123 @@
+version 2027 (xx xxx 2027)
+- mvcomp: mdr_mvcomp_depack() unpacks an MVCOMP stream
+- mvcomp: mdr_mvcomp_bufsize() is the safe size of an in-place buffer
+- bios: kbd_detect required before kbd_getscan, kbd_scanpending, and kbd_ralt
+- bios: kbd_detect reports the enhanced-keyboard flag (0040:0096 bit 4)
+- bios: kbd: getscan/scanpending return the scancode (INT 16h AH=10h/11h)
+- bios: scan2ch maps that scancode to a DE/EN/FR/PL/RU letter, ignoring KEYB
+- opl: mdr_opl_notelist_play() plays a clocked list of notes
+- opl: mdr_opl_voice_release() sets sustain and release on a sounding voice
+- opl: one octave of frequency numbers, C through B, as an enum
+- bios: tickswait returns once the elapsed tick count is reached
+- cout: mdr_coutraw_str() writes to stdout (handle 1), not stdin
+- dma: mdr_dma_alloc() returns a buffer that does not cross a 64K page
+- dos: getkey and getkey2 reload AH before the extended-key INT 21h
+- dos: getenv writes a NUL when the value does not fit in reslimit
+- dos: truename copies at most 127 characters into the 128-byte result
+- mda: cls and the log scroll fill blank cells with spaces instead of NULs
+- opl: imfeasy_play - a trailing chunk shorter than 4 bytes ends the song
+- opl: a voice above 8 is ignored, so the per-voice tables stay in range
+- opl: timer_tick() reloads preset so later ticks keep the timer_set interval
+- pcx: to8bpp skips the even-byte padding at the end of each scanline
+- pcx: anal accepts 16-color PCX (version 2 or 3, four planes)
+- pcx: decode() expands runs with rep stosb and leaves split tokens unconsumed
+- pktdrv: recv sets the busy flag in frame length without modifying CX
+- sbdigi: BLASTER parser accepts DMA channel 0 (BLASTER=A220 D0 I5)
+- sbdigi: playsample does not start DMA when the buffer crosses a 64K page
+- sbdigi: quit stops DMA and resets the DSP before restoring the IRQ handler
+- timer: a second init keeps the original IRQ 8 vector
+- unzip: bit 3 with zero sizes is read from the data descriptor
+- wave: odd-sized RIFF chunks skip the following pad byte
+- vid12: added vid12_putpix_prep(), vid12_putpix() and vid12_putpix_done()
+- vid12: public draw calls restore VGA registers before returning
+- vid12: draw calls stay inside the 640x819 addressable screen
+- vid12: putscanline() writes each plane with a single 640px string move
+- vid12: rawscanlines_to_planes() copies the batch with one rep movsw
+- vid12: hline() fills eight pixels per write through set/reset
+- vid12: vline() programs the bit mask only once
+- vid12: added vid12_putspan() for drawing eight pixels at once
+- vidx: draw calls stay inside the 320x819 virtual screen
+- vga: mdr_vga_setoverscan() sets the border to a DAC palette index
+- vga: mdr_vga_latchcopy() copies a rectangle through the VGA latches
+
+version 2026 (07 Sep 2026)
+- cout: preserves BP to avoid crashes on the original IBM PC BIOS
+- cout: fixed EGA detection (2025 regression)
+- dos: ctrlc_inhibit sets INT 23h with correct DS:DX (not DX only)
+- mda: cls resets logrow so the next log line starts at row 0
+- mouse: minor optimizations
+- mouse: mdr_mouse_rawmotion() accepts NULL arguments
+- opl: notebend keeps KEY-ON bit so pitch bend does not note-off
+- pcx: mdr_pcx_anal() no longer closes the pcx file descriptor on error
+- pktdrv: init publishes PKTDRV_PTR only after recv patch succeeds
+- pktdrv: mdr_pktdrv_send() returns failure when the driver sets CF
+- sbdigi: off-by-one fix while providing the DMA controller with sample ptr
+- sbdigi: install IRQ handler to ack DSP and send PIC EOI
+- timer: stop is a no-op if not inited; callmod reset on init
+- unzip: fixed data-descriptor skip after memset wiped nextidxoffset
+- unzip: guard empty filenames in dir detection (len == 0)
+- vid12: vid12_rawscanlines_to_plane() becomes vid12_rawscanlines_to_planes()
+- vid12: added vid12_setorigin()
+- wave: skips unrecognized fmt bytes instead of choking on them
+- xms: push/pull reject odd lengths (XMS move requires even count)
+- tests: per-module test programs (TESTS\T_*.C)
+
+version 2025 (29 Jul 2025)
+- cout: added mdr_cout_scrollup()
+- cout: mdr_cout_close() restores the cursor (if it has been hidden)
+- mda: added the mda driver (MDA dual screen access)
+- mouse: added mdr_mouse_rawmotion()
+- mouse: mdr_mouse_fetchrelease() accepts NULL arguments
+- pcx: removed the pcx_load() convenience function
+- pcx: pcx_loadrow() takes a memory pointer instead of a FILE handler
+- pcx: exposing the mdr_pcx_palentry struct so it can be accessed by programs
+- pcx: minor optimizations
+- pktdrv: added the pktdrv packet driver Ethernet interface
+- vid12: added vid12_vline() vid12_rawscanlines_to_plane() vid12_vramcpy_8px()
+- video_detectega() returns 0 when EGA is *NOT* found
+- vidx: added the vidx driver (VGA "MODE X", 320x240, 8bpp, 3 video pages)
+- xms: functions expose the 16bit handle instead of an exotic struct
+- xms: memory move routine fixed so it works in large model
+- xms: all functions prefixed with "mdr_" (eg. "mdr_xms_init()")
+- xms: dropped the DOS.H and STDLIB.H dependencies (smaller and faster code)
+- xms: xms_pull() and xms_push() return an unsigned char instead of an int
+
+version 2024 (29 Jul 2024)
+- added the OPL driver (Adlib-style OPL2 FM synth) along with IMF playback
+- new mdr_dos_selfexe()
+- new mdr_dos_truename()
+- new mdr_coutraw_str() and mdr_coutraw_crlf()
+- new mdr_dos_ctrlc_inhibit(), mdr_dos_ctrlc_enable(), mdr_dos_ctrlc_disable()
+- added mdr_bios_ticks()
+- renamed keyb_getkey() to mdr_dos_getkey()
+- renamed keyb_flush() to mdr_dos_flushkeyb()
+- renamed all timer_ functions to mdr_timer_
+- new mdr_dos_getkey2(), same as mdr_dos_getkey() but immune to CTRL+C
+- new mdr_dos_keypending()
+- removed keyb_getkey_ifany(): use mdr_dos_keypending + mdr_dos_getkey instead
+- renamed pcx_anal() and pcx_load() to mdr_pcx_anal() and mdr_pcx_load()
+- added pcx_loadrow(): loads PCX data row by row (useful on PCX files > 64K)
+- replaced pcx_convto8bpp() by mdr_pcx_to8bpp()
+- vid12_putscanline() optimizations: 22% faster
+- renamed all the mouse_ functions to mdr_mouse_
+- improved mdr_cout_cursor_hide() so it works well on VirtualBox
+- added mdr_mouse_setcursor()
+- added vid12_waitblank()
+
+version 2023 (29 Jul 2023)
+- all routines are built as a library now
+- advertising MDR version (MDR_VER_MAJOR and MDR_VER_MINOR in VER.H)
+- added the SBDIGI driver (SoundBlaster Digitized sound)
+- added the COUT module (text-mode console output)
+- added the DOS module (mdr_dos_* functions)
+- added the UNZIP module for iteration over ZIP archives
+- added the BIOS module (with the mdr_bios_tickswait() function)
+- vid12: fast VRAM copy (vid12_vramcpy_* functions)
+- vid12: vid12_clrline()
+- vid12: fixed color mapping in vid12_setpalette()
+- vid12: added functions vid12_hline() and vid12_linepat()
+- vid12: fixed reverting the previous video mode at vid12_close()
+- vid12: optimized vid12_putpixel() - 17% faster
+
+version 2022 (09 Oct 2022)
+- initial public release (unorganized lump of routines)
