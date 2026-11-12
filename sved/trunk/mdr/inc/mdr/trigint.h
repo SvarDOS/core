@@ -1,15 +1,16 @@
-/*
- * Routines for computation of basic transcendental functions sin and cos.
- * These routines use only integers, hence they do not require an FPU nor any
- * kind of FPU emulation. Works reasonably fast even on an 8086 CPU.
+/******************************************************************************
+ * Routines for computation of basic transcendental functions sin and cos.    *
+ * These routines use only integers, hence they do not require an FPU nor any *
+ * kind of FPU emulation. Works reasonably fast even on an 8086 CPU.          *
+ *                                                                            *
+ * The results are computed using polynomial approximations. Their precision  *
+ * is not expected to be ideal, but "good enough" for common usage.           *
+ ******************************************************************************
  *
- * The results are computed using polynomial approximations. Their precision
- * is not expected to be ideal, but "good enough" for common usage.
- *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2022 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to

@@ -1,10 +1,10 @@
 /*
  * Console output
  *
- * This file is part of the Mateusz' DOS Routines (MDR): http://mdr.osdn.io
+ * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2023 Mateusz Viste
+ * Copyright (C) 2014-2025 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -32,7 +32,7 @@
  * w = screen width
  * h = screen height
  * Any of these arguments may be passed as NULL
- * Returns a color flag (0=mono, non-zero=color) */
+ * Returns a color flag (0=mono, 1=color) */
 unsigned char mdr_cout_init(unsigned char *w, unsigned char *h);
 
 /* get current attribute value under cursor and returns it */
@@ -50,7 +50,7 @@ void mdr_cout_locate(unsigned char row, unsigned char column);
 /* print a single character on screen */
 void mdr_cout_char(unsigned char y, unsigned char x, char c, unsigned char attr);
 
-/* print a single character on screen, repeated count times */
+/* print a single character on screen, repeated count times (count=0 prints nothing) */
 void mdr_cout_char_rep(unsigned char y, unsigned char x, char c, unsigned char attr, unsigned char count);
 
 /* print a nul-terminated string on screen, up to maxlen characters
@@ -60,6 +60,17 @@ unsigned char mdr_cout_str(unsigned char y, unsigned char x, const char *s, unsi
 /* clears screen, filling it with a single color attribute */
 void mdr_cout_cls(unsigned char colattr);
 
+/* scrolls a rectangle of screen by nlines up, starting at upper left corner
+ * [row_high,col_high] and ending at lower right corner [row_low,col_low].
+ * blank area is filled with blanks and attribute colattr. if nlines is 0 then
+ * entire screen is scrolled. */
+void mdr_cout_scrollup(unsigned char colattr, unsigned char row_high, unsigned char col_high, unsigned char row_low, unsigned char col_low, unsigned char nlines);
+
+/* provides properties of the current video mode:
+ * termwidth = terminal's width
+ * termheight = terminal's height
+ * colorflag = mono/color flag (0=mono 1=color)
+ * NOTE: all arguments must be valid pointers (NULL not allowed) */
 void mdr_cout_getconprops(unsigned char *termwidth, unsigned char *termheight, unsigned char *colorflag);
 
 
