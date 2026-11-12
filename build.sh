@@ -3,7 +3,7 @@
 # SvarDOS build script
 # http://svardos.org
 #
-# Copyright (C) 2016-2025 Mateusz Viste
+# Copyright (C) 2016-2026 Mateusz Viste
 #
 # This script builds floppy and CD images. It should be executed each time that
 # a CORE package has been modified or the build script changed. This is usually
@@ -161,7 +161,6 @@ done
 # add some extra packages to CDROOT but not in the list of packages to install
 cp "$REPOROOT/pcntpk.svp" "$CDROOT/"
 cp "$REPOROOT/videcdd-2.14.svp" "$CDROOT/videcdd.svp"
-cp "$REPOROOT/provox-7.05.svp" "$CDROOT/provox.svp"
 
 #
 
@@ -204,22 +203,6 @@ ECHO  ********************
 ECHO  build: $CURDATE
 ECHO.
 
-REM Load PROVOX screen reader if present
-IF NOT EXIST PROVOX7.EXE GOTO INSTALL
-CLS
-ECHO This svardos build comes with the provox screen reader preinstalled
-ECHO.
-ECHO It outputs speech to a Braille n Speak device that has to be connected to
-ECHO the first serial port of your computer
-ECHO.
-ECHO The installation of the SvarDOS system is about to begin
-ECHO Press any key to continue
-ECHO.
-PROVOX7.EXE
-PV7.EXE INIT BNS > NUL
-PAUSE
-
-:INSTALL
 INSTALL
 EOF
 unix2dos "$FLOPROOT/autoexec.bat"
@@ -272,14 +255,6 @@ prep_flop 80 2 18 1440 "$PUBDIR" "1.44M" "$COREPKGS pcntpk"
 prep_flop 80 2 15 1200 "$PUBDIR" "1.2M" "$COREPKGS"
 prep_flop 80 2  9  720 "$PUBDIR" "720K" "$COREPKGS"
 prep_flop 40 2  9  360 "$PUBDIR" "360K" "$COREPKGS"
-
-# BNS-enabled (screen reader) 2.88M build
-unzip -CLj "$CDROOT/provox.svp" drivers/provox/provox7.exe -d "$FLOPROOT/"
-unzip -CLj "$CDROOT/provox.svp" drivers/provox/pv7.exe -d "$FLOPROOT/"
-prep_flop 80 2 36 2880 "$PUBDIR" "2.88M-BNS" "$COREPKGS pcntpk videcdd provox" "$CDROOT/bootbns.img"
-rm "$FLOPROOT/provox7.exe"
-rm "$FLOPROOT/pv7.exe"
-
 
 
 echo
@@ -359,18 +334,10 @@ echo
 echo "### Generating ISO CD images"
 echo
 
-# normal
 CDISO="$PUBDIR/svardos-$CURDATE-cd.iso"
 CDZIP="$PUBDIR/svardos-$CURDATE-cd.zip"
 $GENISOIMAGE -input-charset cp437 -b boot.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/boot.img"
 zip -mj9 "$CDZIP" "$CDISO"
-
-# BNS-enabled
-CDISO="$PUBDIR/svardos-$CURDATE-cd-bns.iso"
-CDZIP="$PUBDIR/svardos-$CURDATE-cd-bns.zip"
-$GENISOIMAGE -input-charset cp437 -b bootbns.img -iso-level 1 -f -V SVARDOS -o "$CDISO" "$CDROOT/bootbns.img"
-zip -mj9 "$CDZIP" "$CDISO"
-
 
 
 ###############################################################################
