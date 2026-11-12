@@ -48,16 +48,6 @@
       ?>
       </ul>
     </div>
-    <div>
-      <h3>BNS build (<?php echo $lastver; ?>)</h3>
-      <ul>
-      <?php
-        echo "<li><a href=\"download/{$lastver}/svardos-{$lastver}-cd-bns.zip\">CD-ROM ISO image</a></li>\n";
-      ?>
-      </ul>
-      <p>A "talking" version for blind persons. Uses the PROVOX screen reader and requires a Braille 'n Speak synthesizer connected to the COM1 port. If running as a VM, the BNS can be <a href="https://emubns.sourceforge.net/">emulated</a>.</p>
-    </div>
-
     <?php
       if ($latestbuild !== $lastver) {
         echo "    <div>\n";
