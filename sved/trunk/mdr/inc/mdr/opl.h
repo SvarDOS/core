@@ -117,6 +117,26 @@ enum mdr_opl_fgroup_t {
   MDR_OPL_FGROUP7 = 7 << 2
 };
 
+/* Frequency numbers for one octave, tuned for block 4 (MDR_OPL_FGROUP4).
+ * The block selects the octave: the same number one block lower is one
+ * octave down, and one block higher is one octave up. A note past the top
+ * of a block, such as G5 on block 4, is that pitch class on the next block.
+ * CS is C#, DS is D#, FS is F#, GS is G#, AS is A#. */
+enum mdr_opl_freq_t {
+  MDR_OPL_FREQ_C  = 345,
+  MDR_OPL_FREQ_CS = 365,
+  MDR_OPL_FREQ_D  = 387,
+  MDR_OPL_FREQ_DS = 410,
+  MDR_OPL_FREQ_E  = 434,
+  MDR_OPL_FREQ_F  = 460,
+  MDR_OPL_FREQ_FS = 488,
+  MDR_OPL_FREQ_G  = 517,
+  MDR_OPL_FREQ_GS = 547,
+  MDR_OPL_FREQ_A  = 580,
+  MDR_OPL_FREQ_AS = 615,
+  MDR_OPL_FREQ_B  = 651
+};
+
 /* Hardware detection and initialization. Must be called before any other
  * OPL function. Returns 0 on success, non-zero otherwise. */
 int mdr_opl_init(void);
@@ -129,7 +149,8 @@ void mdr_opl_clear(void);
 
 /* loads an instrument described by properties in a timbre_t struct into
  * the defined voice channel. The OPL2 chip supports up to 9 voice channels,
- * from 0 to 8. The timbre struct can be freed right after this call. */
+ * from 0 to 8. a higher voice is ignored. The timbre struct can be freed
+ * right after this call. */
 void mdr_opl_loadinstrument(unsigned char voice, const struct mdr_opl_timbre *timbre);
 
 /* generate a timbre structure based on a timbre template. this is a
@@ -143,18 +164,53 @@ int mdr_opl_timbre_gen(struct mdr_opl_timbre *timbre, const struct mdr_opl_timbr
  *
  *   freqid = frequency * 2^(20 - block) / 49716
  *
- * The note will be kept "pressed" until mdr_opl_noteoff() is called. */
+ * The note will be kept "pressed" until mdr_opl_noteoff() is called.
+ * voice is 0..8. a higher voice is ignored. */
 void mdr_opl_noteon(unsigned char voice, unsigned short freqid, enum mdr_opl_fgroup_t fgroup);
 
 /* changes the frequency of the note currently playing on voice channel, this
- * can be used for pitch bending. */
+ * can be used for pitch bending. voice is 0..8. a higher voice is ignored. */
 void mdr_opl_notebend(unsigned char voice, unsigned short freqid, enum mdr_opl_fgroup_t fgroup);
 
-/* releases a note on selected voice. */
+/* releases a note on selected voice. voice is 0..8. a higher voice is ignored. */
 void mdr_opl_noteoff(unsigned char voice);
 
-/* adjusts volume of a voice. volume goes from 63 (mute) to 0 (loudest) */
+/* adjusts volume of a voice. volume goes from 63 (mute) to 0 (loudest).
+ * voice is 0..8. a higher voice is ignored. */
 void mdr_opl_voicevolume(unsigned char voice, unsigned char volume);
+
+/* sets the sustain level and release rate of a voice that is already
+ * sounding. Each value is 0..15. Sustain 0 is loudest, 15 is quietest.
+ * Release 0 is slowest, 15 is fastest. voice is 0..8. a higher voice
+ * is ignored. */
+void mdr_opl_voice_release(unsigned char voice, unsigned char mod_sustain, unsigned char mod_release, unsigned char car_sustain, unsigned char car_release);
+
+/* One event of a phrase played by mdr_opl_notelist_play().
+ * tick: when this event happens. The unit is the same as the elapsed
+ *   argument of mdr_opl_notelist_play(). This library does not choose it.
+ * voice: OPL channel this event is played on, 0..8. A higher voice is
+ *   ignored. Each event names its own voice. There is no default channel.
+ * freq: frequency number, as for mdr_opl_noteon(). 0 releases that voice.
+ * block: an mdr_opl_fgroup_t value, the octave block of that note. */
+struct mdr_opl_notelist {
+  unsigned short tick;
+  unsigned char voice;
+  unsigned short freq;
+  unsigned char block;
+};
+
+/* Plays events from ev[pos] onward whose tick is at or before elapsed.
+ * ev: first event of the phrase.
+ * count: number of events in ev.
+ * pos: index of the next event to consider. Pass 0 on the first call,
+ *   then the value returned by the previous call.
+ * elapsed: time since the phrase started, in the same units as tick.
+ *   The caller chooses those units and advances elapsed itself. One BIOS
+ *   tick (about 55 ms) is a possible unit. This function does not read
+ *   a timer.
+ * Returns the index of the first event not yet played. A return value
+ * equal to count means the phrase is finished. */
+unsigned short mdr_opl_notelist_play(const struct mdr_opl_notelist *ev, unsigned short count, unsigned short pos, unsigned short elapsed);
 
 /* this is a LOW-LEVEL function that writes a data byte into the reg register
  * of the OPL chip. Use this only if you know exactly what you are doing. */
@@ -208,7 +264,7 @@ unsigned short mdr_opl_imf_init(void *imf, unsigned short clock);
  * it allows to load an imf song partially and provide only short chunks of
  * data for playback instead of having to buffer the entire song in memory.
  * For a simpler call that requires to buffer the entire IMF file in memory,
- * see mdr_opl_imf_playeasy().
+ * see mdr_opl_imfeasy_play().
  * This function must be called repeatedly at a high frequency for best
  * playback quality. */
 unsigned short mdr_opl_imf_play(void *imf, unsigned short imflen, unsigned short clock);

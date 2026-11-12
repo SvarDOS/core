@@ -70,7 +70,7 @@ int mdr_dos_keypending(void);
  * this is only valid for the duration of the program because DOS will restore
  * the original handler after the program exits.
  *
- * an alternative is mdr_dos_ctrlc_off(), but this does not inhibit the
+ * an alternative is mdr_dos_ctrlc_disable(), but this does not inhibit the
  * handler, it sets DOS to not react to CTRL+C in the first place, and this
  * setting stays active after the program quits so the program should remember
  * to restore the original setting before quitting. */
@@ -108,7 +108,8 @@ void mdr_dos_time2hms(unsigned char *h, unsigned char *m, unsigned char *s, unsi
 /* Determine the canonical name of the specified filename or path and writes
  * the result into result. The input path does not need to actually exist.
  * This function requires a 3.x+ DOS kernel.
- * name is simply copied to result on error. */
+ * result must be 128 bytes. a longer name is truncated to 127 characters
+ * before the DOS call. name is simply copied to result on error. */
 void mdr_dos_truename(char *result, const char *name);
 
 #endif

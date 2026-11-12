@@ -17,11 +17,13 @@ Version macros live in INC\MDR\VER.H (MDR_VER_MAJOR / MDR_VER_MINOR).
 
 List of modules:
 
-BIOS     BIOS helpers (notably tick counting / waiting)
+BIOS     BIOS helpers (tick counter, keyboard scancodes)
 COUT     text-mode console output
+DMA      conventional-memory buffers that stay inside one 64K DMA page
 DOS      DOS services (keyboard, environment, Ctrl+C, paths, …)
 MDA      direct writes to an MDA screen (dual-monitor debugging)
 MOUSE    mouse driver (INT 33h) helpers
+MVCOMP   MVCOMP decompression, including in-place
 OPL      OPL2 / AdLib FM synthesis and IMF playback
 PCX      PCX header analysis, RLE decode and bit-depth unpack
 PKTDRV   packet-driver Ethernet (raw frames)
@@ -30,6 +32,7 @@ SBDIGI   Sound Blaster digitized PCM playback (DMA)
 TIMER    high-resolution timer (~1.1 kHz) via PIT reprogramming
 TRIGINT  integer-only sin/cos (8086-friendly, no FPU)
 UNZIP    ZIP archive iteration and access to stored (uncompressed) members
+VGA      border color and latch copies, independent of the graphics mode
 VID12    VGA mode 12h (640x480, 16 colors)
 VIDEO    320x200 drivers (VGA 256 colors / CGA 16 colors)
 VIDX     VGA Mode X (320x240, 256 colors, 3 pages)
@@ -112,8 +115,8 @@ TIMER
 SBDIGI
   Samples must be unsigned 8-bit mono PCM at 8 kHz. Pass a BLASTER-style
   string such as "A220 I5 D1". Playback returns while DMA is still running.
-  MDR does not allocate the sample buffer: you must supply memory that does
-  not cross a 64K physical page (ISA DMA cannot cross that boundary).
+  MDR does not allocate the sample buffer inside sbdigi. Use mdr_dma_alloc()
+  (INC\MDR\DMA.H): ISA DMA cannot cross a 64K physical page.
 
 XMS
   mdr_xms_push() / mdr_xms_pull() require an even byte count (XMS move API).
@@ -125,6 +128,13 @@ UNZIP
   Walks the archive and exposes each member's offset and size so you can read
   stored (method 0) payloads directly from the file. Deflate and other
   compressed methods are not inflated by MDR.
+
+MVCOMP
+  mdr_mvcomp_depack() unpacks one stream. The caller passes the compressed
+  length; the format has no header. The plain bytes must fit in the
+  destination segment. mdr_mvcomp_bufsize() is the buffer size for unpacking
+  in place: the compressed bytes sit at the end, and the plain bytes are
+  written at the front.
 
 OPL / IMF
   IMF playback needs a regularly advancing 16-bit clock and frequent polling;

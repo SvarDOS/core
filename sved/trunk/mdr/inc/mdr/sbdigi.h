@@ -33,9 +33,7 @@ struct sbdigi_ctx;
 /* initializes the SoundBlaster DSP chip
  * blaster must point to a BLASTER environment string (like "A220 I5 D1")
  * returns a pointer to a context, NULL on error
- * NOTE: DSP's state after initialization may or may not be muted, depending
- *       on the exact hardware revision. use sbdigi_spkoff() to make sure it is
- *       unmuted */
+ * a successful init turns the speaker on (sbdigi_spkon) */
 struct sbdigi_ctx *sbdigi_init(const char *blaster);
 
 /* unmutes the SoundBlaster DSP */
@@ -51,7 +49,9 @@ void sbdigi_spkoff(struct sbdigi_ctx *ctx);
  * NOTES: this routine uses DMA to transfer memory. This has two implications:
  *  1. the routine will return almost immediately, while the sound is playing
  *  2. sample data must be contained in a buffer that does NOT cross a 64K page
- *     because DMA transfers are unable to cross 64K boundaries */
+ *     because DMA transfers are unable to cross 64K boundaries. mdr_dma_alloc()
+ *     returns such a buffer. if the sample crosses a page, the call returns
+ *     without starting the transfer */
 void sbdigi_playsample(struct sbdigi_ctx *ctx, void *buf, unsigned short len);
 
 /* shuts down the DSP and frees context memory */

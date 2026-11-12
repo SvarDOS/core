@@ -35,7 +35,8 @@ struct pcx_hdr {
   unsigned char bpp;
   unsigned short max_x;
   unsigned short max_y;
-  unsigned short bytes_per_scanline;
+  unsigned short bytes_per_scanline; /* one plane; a row is planes times this */
+  unsigned char planes;             /* 1, or 4 for a 16-color EGA image */
   struct mdr_pcx_palentry {
     unsigned char r;
     unsigned char g;
@@ -51,18 +52,32 @@ struct pcx_hdr {
  * returns 0 on success, non-zero otherwise. */
 int mdr_pcx_anal(struct pcx_hdr *h, FILE *fd, unsigned long offset, unsigned long len);
 
+/* Expand src into dst. rle == 1 selects PCX run encoding: a byte below 192
+ * is stored as itself, and a byte from 192 up is a count of 1..63 followed
+ * by the byte to repeat. Any other rle copies raw bytes. Stops when dstlen
+ * bytes have been written or src runs out. A count with no following byte is
+ * left unconsumed so the caller can append more input. A run that would pass
+ * the end of dst is clipped and its token is consumed. When written is not
+ * NULL it receives the number of bytes stored. Returns how many source bytes
+ * were consumed. */
+unsigned short mdr_pcx_decode(void far *dst, unsigned short dstlen,
+                              const void far *src, unsigned short srclen,
+                              unsigned char rle, unsigned short *written);
+
 /* this function should be called to load the next row of a PCX image into a
  * buffer pointed at by bufptr. you will typically want to call this function
- * h->max_y times. ptr must be at least (h->bytes_per_scanline) bytes large.
- * the pcx_hdr struct must have been produced by pcx_anal().
+ * h->max_y + 1 times. one call decodes every plane of that row, so ptr
+ * must be at least (h->planes * h->bytes_per_scanline) bytes large (a planes
+ * value of 0 is treated as 1). the pcx_hdr struct must have been produced
+ * by pcx_anal().
  * returns the amount of consumed bytes */
 unsigned short mdr_pcx_loadrow(void *bufptr, const struct pcx_hdr *h, const unsigned char *src);
 
-/* convert img to 8bpp if needed (ie unpack 2 and 4bpp data to 8bpp).
- * the conversion is performed in-place, make sure the img buffer is large
- * enough to accomodate the size of the data after conversion (ie. twice as
- * big on 4bpp source, 4x times as big on 2bpp source and 8x as big on 1bpp
- * source).
+/* convert img to 8bpp if needed (unpack 1, 2 or 4bpp, or merge four 1-bit
+ * planes into palette indexes). the conversion is performed in-place, make
+ * sure the img buffer is large enough to accomodate the size of the data
+ * after conversion (ie. twice as big on 4bpp or 4-plane source, 4x times as
+ * big on 2bpp source and 8x as big on 1bpp source).
  * if rowflag is set to a non-zero value, then the routine assumes img
  * contains only a single row of pixels */
 int mdr_pcx_to8bpp(void *img, const struct pcx_hdr *h, unsigned char rowflag);

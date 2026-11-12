@@ -4,7 +4,7 @@
  * This file is part of Mateusz' DOS Routines <http://mateusz.fr/mdr>
  * Published under the terms of the MIT License, as stated below.
  *
- * Copyright (C) 2014-2025 Mateusz Viste
+ * Copyright (C) 2014-2026 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -28,6 +28,10 @@
 #ifndef MDR_VID12_H
 #define MDR_VID12_H
 
+/* mdr/vga.h covers two jobs that are not specific to mode 12h:
+ * mdr_vga_latchcopy() copies a rectangle already on the screen, and
+ * mdr_vga_setoverscan() sets the border color. */
+
 /* init video mode 12h (640x480x16c)
  * remember to call vid12_close() at exit time */
 void vid12_init(void);
@@ -38,39 +42,67 @@ void vid12_waitvblank(void);
 /* wait until ANY blank: either VBLANK or HBLANK */
 void vid12_waitblank(void);
 
-/* clear screen using color
- * this function is fastest when color is 0 or 15 */
+/* clear the visible screen (rows 0..479) using color. rows 480..818 are
+ * left alone because some mouse drivers store data there. use vid12_clrline()
+ * to clear an off-screen row. this function is fastest when color is 0 or 15 */
 void vid12_cls(unsigned char color);
 
-/* clear a single scanline (0..479) with a solid color (0..15)
- * this function is fastest when color is 0 or 15 */
+/* clear a single scanline (0..818) with a solid color (0..15).
+ * a higher line is ignored. this function is fastest when color is 0 or 15 */
 void vid12_clrline(unsigned short line, unsigned char color);
 
-/* fill lines from linefirst to linelast with an 8 pixels pattern
- * linelast must be equal to or greater than linelast
- * pattern must be 8 bytes long */
+/* fill lines from linefirst to linelast with an 8 pixels pattern.
+ * lines are 0..818 and linelast must be >= linefirst. the range is clipped
+ * at line 818. pattern must be 8 bytes long */
 void vid12_linepat(unsigned short linefirst, unsigned short linelast, const unsigned char *pattern);
 
 /* deinit video mode 12h and resets to previous mode */
 void vid12_close(void);
 
-/* puts a pixel on screen */
+/* One pixel. Performs vid12_putpix_prep(), vid12_putpix() and
+ * vid12_putpix_done(). A loop of these repeats that setup on every pixel;
+ * a run of pixels should use the three calls below instead.
+ * x is 0..639 and y is 0..818. a coordinate outside that range is ignored. */
 void vid12_putpixel(unsigned short x, unsigned short y, unsigned char col);
 
-/* draws a horizonatal line from [x1,y] to [x2,y] */
+/* Fast pixels, write mode 2. Call vid12_putpix_prep() once, then vid12_putpix()
+ * any number of times, then vid12_putpix_done().
+ * Between prep and done, call only vid12_putpix() and vid12_putspan(). Any
+ * other vid12 draw, including vid12_putpixel(), reprograms the VGA and
+ * closes the bracket.
+ * Hide the mouse cursor for that stretch. vid12_putpix_done() restores the
+ * state a graphics mouse driver expects: map mask on all four planes, write
+ * mode 0, set/reset off, read-map select 0, bit mask 0xFF. The other public
+ * draw calls restore that same state before they return. */
+void vid12_putpix_prep(void);
+void vid12_putpix(unsigned short x, unsigned short y, unsigned char col);
+void vid12_putpix_done(void);
+
+/* Eight pixels in the state left by vid12_putpix_prep(). Bit 7 of mask is
+ * the pixel at x, bit 0 is seven pixels to the right. An unaligned run
+ * crosses two VGA bytes. Pixels past x = 639 are dropped. y is 0..818.
+ * A zero mask does nothing. */
+void vid12_putspan(unsigned short x, unsigned short y, unsigned char mask, unsigned char col);
+
+/* draws a horizonatal line from [x1,y] to [x2,y].
+ * y is 0..818 and x2 is clipped to 639. the call is ignored when x1 is past
+ * 639 or x2 is less than x1. */
 void vid12_hline(unsigned short y, unsigned short x1, unsigned short x2, unsigned char color);
 
-/* draws a vertical line from [x,y] down l pixels */
+/* draws a vertical line from [x,y] down l pixels.
+ * x is 0..639 and y is 0..818. the line is clipped at y = 818. */
 void vid12_vline(unsigned short x, unsigned short y, unsigned short l, unsigned char color);
 
 /* write an entire scanline (640 pixels) to screen. the pixels data must be
- * a serie of 640 bytes having values in the range [0..15] */
+ * a serie of 640 bytes having values in the range [0..15].
+ * scanline is 0..818. a higher line is ignored. */
 void vid12_putscanline(unsigned short scanline, const unsigned char *pixels);
 
-/* sends n raw scanlines to VGA plane(s).
- * a scanline is a mono bitmap of 80 bytes (640 bits)
- * planemask is a bitmask that tells which plane(s) the pixels have to go to,
- * eg. planemask=5 means "plane 0 and plane 2", planemask=15 is all planes. */
+/* sends n raw scanlines to VGA plane(s). rows are 0..818; a run that would
+ * pass row 818 is clipped. a scanline is a mono bitmap of 80 bytes (640 bits)
+ * and the n rows are contiguous. planemask is a bitmask that tells which
+ * plane(s) the pixels have to go to, eg. planemask=5 means "plane 0 and
+ * plane 2", planemask=15 is all planes. The bytes are stored as themselves. */
 void vid12_rawscanlines_to_planes(unsigned char planemask, unsigned short scanline_start, unsigned short n, const void *pixels);
 
 /* set index palette color to given R,G,B value. each R,G,B component must be
@@ -107,12 +139,18 @@ void vid12_setorigin(unsigned short offs);
  * Hence to avoid unexpected behavior or graphical glitches, it's best to    *
  * avoid using scanlines 480-507 if your program calls mouse services. This  *
  * precaution helps ensure compatibility across different mouse drivers.     *
+ *                                                                           *
+ * Public draw calls restore the VGA registers those drivers assume (all     *
+ * planes writable, write mode 0, full bit mask). Hide the cursor across     *
+ * vid12_putpix_prep() .. vid12_putpix_done(): the pointer is painted in     *
+ * there with whatever map mask the bracket set.                             *
  *****************************************************************************/
 
 /* prepares VGA for a VRAM-to-VRAM copy operation */
 void vid12_vramcpy_prep(void);
 
-/* fast (VRAM-to-VRAM) copy of a scanline (0..479) to another scanline.
+/* fast (VRAM-to-VRAM) copy of a scanline (0..818) to another scanline.
+ * a row past 818 is ignored.
  * vid12_vramcpy_prep() must be called before and vid12_vramcpy_done must be
  * called after one or more vid12_vramcpy_scanline() calls. */
 void vid12_vramcpy_scanline(unsigned short dst, unsigned short src);

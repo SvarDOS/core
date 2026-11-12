@@ -33,6 +33,10 @@
  * The entire virtual screen can be accessed directly at all times, but only a
  * 320x240 window is actually displayed. This window can be moved up/down with
  * vidx_setorigin() allowing for smooth vertical scrolling and page flipping.
+ *
+ * mdr/vga.h covers two jobs that are not specific to mode X:
+ * mdr_vga_latchcopy() copies a rectangle already on the screen, and
+ * mdr_vga_setoverscan() sets the border color.
  */
 
 #ifndef VIDX_H
@@ -41,25 +45,31 @@
 /* initializes VGA "mode X" (320x240 8bpp), make sure you have a VGA first! */
 void vidx_init(void);
 
-/* draw a single pixel of c color at [x,y] (x = 0..319 ; y = 0..818) */
+/* draw a single pixel of c color at [x,y] (x = 0..319 ; y = 0..818).
+ * a coordinate outside that range is ignored. */
 void vidx_putpixel(unsigned short x, unsigned short y, unsigned char c);
 
-/* fill an entire scanline (row of 320 pixels) with color c */
+/* fill an entire scanline (row of 320 pixels) with color c.
+ * y is 0..818. a higher row is ignored. */
 void vidx_fillscanline(unsigned short y, unsigned char c);
 
-/* draw a horizontal line starting at [x,y] and going l pixels left */
+/* draw a horizontal line starting at [x,y] and going l pixels right.
+ * y is 0..818 and x is 0..319. the line is clipped at x = 319. */
 void vidx_hline(unsigned short x, unsigned short y, unsigned short l, unsigned char c);
 
-/* draw a vertical line starting at [x,y] and going h pixels down */
+/* draw a vertical line starting at [x,y] and going h pixels down.
+ * x is 0..319 and y is 0..818. the line is clipped at y = 818. */
 void vidx_vline(unsigned short x, unsigned short y, unsigned short h, unsigned char c);
 
 /* draws a w x h sprite (bitmap of 8bpp pixels) with sprite's upper left corner
  * being at [x,y]. transparent pixels are skipped. if no transparency is
- * required then set transparency to -1. */
+ * required then set transparency to -1. the sprite is clipped to x = 0..319
+ * and y = 0..818. */
 void vidx_drawsprite(unsigned short x, unsigned short y, const unsigned char *sprite, unsigned short w, unsigned short h, int transparency);
 
 /* reads a rectangle from the VGA memory. such rectangle can then be
- * used as a sprite with vidx_drawsprite() */
+ * used as a sprite with vidx_drawsprite(). the rectangle must lie entirely
+ * inside x = 0..319 and y = 0..818, otherwise nothing is read. */
 void vidx_readrect(unsigned char *buff, unsigned short x, unsigned short y, unsigned short w, unsigned short h);
 
 /* sets the first row that is to be displayed at the top of the screen.

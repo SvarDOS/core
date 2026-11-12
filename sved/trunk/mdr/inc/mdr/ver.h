@@ -25,9 +25,9 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef MDR_VER_H
+#ifndef MDR_VER_MAJOR
 
-#define MDR_VER_MAJOR 2026
+#define MDR_VER_MAJOR 2027
 #define MDR_VER_MINOR 0
 
 #endif

@@ -28,6 +28,8 @@
 #ifndef MDR_WAVE_H
 #define MDR_WAVE_H
 
+#include <stdio.h> /* FILE */
+
 struct wave_t {
   unsigned short format;
   unsigned short channels;

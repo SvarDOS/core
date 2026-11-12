@@ -41,7 +41,7 @@ short trigint_cos(short rad1000);
 
 /* Computes the sine value for the given radian angle.
  * The radian argument must be provided multiplied by 1000.
- * Returns the cosine value multiplied by 1000. */
+ * Returns the sine value multiplied by 1000. */
 short trigint_sin(short rad1000);
 
 #endif
