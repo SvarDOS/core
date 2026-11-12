@@ -1,7 +1,7 @@
 /* This file is part of the SvarCOM project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2025 Mateusz Viste
+ * Copyright (C) 2021-2026 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -40,6 +40,11 @@
  * /V - Checks after the copy to assure that a file was copied correctly. If
  * the copy cannot be verified, the program will display an error message.
  * Using this option will result in a slower copying process.
+ *
+ * /Y  - Replace an existing destination file without asking.
+ * /-Y - Ask before replacing an existing destination file.
+ *       The default is to ask, except from a batch file. COPYCMD=/Y or
+ *       COPYCMD=/-Y presets this. A switch on the command line wins.
  *
  * special case: "COPY A+B+C+D" means "append B, C and D files to the A file"
  * if A does not exist, then "append C and D to B", etc.
@@ -231,22 +236,138 @@ static unsigned short cmd_copy_internal(const char *dst, char dstascii, const ch
 }
 
 
+/* one key, no echo. extended keys come back as 0 (scan code is discarded) */
+static unsigned char copy_getkey(void);
+#pragma aux copy_getkey = \
+"mov ax, 0x0c08" /* flush the keyboard buffer, then INT 21h AH=08 */ \
+"int 0x21" \
+"test al, al" \
+"jnz COPY_GOTKEY" \
+"mov ah, 0x08" \
+"int 0x21" \
+"xor al, al" \
+"COPY_GOTKEY:" \
+modify [ah] \
+value [al]
+
+
+/* COPYCMD may hold /Y or /-Y. The last one wins. /-Y is not a /Y. */
+static void copy_apply_copycmd(char *confirm, unsigned short env_seg) {
+  char far *v;
+  unsigned short k;
+
+  v = env_lookup_val(env_seg, "COPYCMD");
+  if (v == NULL) return;
+
+  for (k = 0; v[k] != 0; k++) {
+    char c1, c2;
+
+    if (v[k] != '/') continue;
+    c1 = v[k + 1];
+    if (c1 == 0) break;
+
+    if (c1 == '-') {
+      c2 = v[k + 2];
+      if ((c2 == 'Y') || (c2 == 'y')) {
+        c1 = v[k + 3];
+        if ((c1 == 0) || (c1 == ' ') || (c1 == '\t') || (c1 == '/')) *confirm = 1;
+      }
+    } else if ((c1 == 'Y') || (c1 == 'y')) {
+      c2 = v[k + 2];
+      if ((c2 == 0) || (c2 == ' ') || (c2 == '\t') || (c2 == '/')) *confirm = 0;
+    }
+  }
+}
+
+
+/* name shown by the overwrite prompt.
+ * file name only when the destination is in the current directory, so
+ * C:\HELLO.TXT is "HELLO.TXT" while another directory keeps its path. */
+static const char *copy_ovname(const char *dst) {
+  unsigned short i, slash, cwdlen;
+  char hasslash;
+  char cwd[128];
+
+  hasslash = 0;
+  slash = 0;
+  for (i = 0; dst[i] != 0; i++) {
+    if (dst[i] == '\\') {
+      slash = i;
+      hasslash = 1;
+    }
+  }
+  if (hasslash == 0) return(dst);
+  if (curpathfordrv(cwd, 0) != 0) return(dst);
+
+  cwdlen = sv_strlen(cwd);
+  if (cwdlen == 0) return(dst);
+
+  /* root comes back as "C:\"; any other directory has no trailing backslash */
+  if (cwd[cwdlen - 1] == '\\') {
+    if ((slash + 1 == cwdlen) && (imatchlim(dst, cwd, cwdlen) != 0)) return(dst + slash + 1);
+  } else if ((slash == cwdlen) && (imatchlim(dst, cwd, cwdlen) != 0)) {
+    return(dst + slash + 1);
+  }
+  return(dst);
+}
+
+
+/* returns 0 = Yes, 1 = No, 2 = All.
+ * one keystroke, no Enter. the key is echoed as typed. anything else,
+ * including Enter, is ignored. buff is scratch for the prompt text. */
+static unsigned short copy_ask_overwrite(const char *name, char *buff) {
+  const char *keys;
+  unsigned short i;
+  unsigned char key, keyu;
+  char shown[2];
+
+  sv_strcpy(buff, svarlang_str(38,13)); /* "Overwrite % (Yes/No/All)?" */
+  if (buff[0] == 0) sv_strcpy(buff, "Overwrite % (Yes/No/All)?");
+  sv_insert_str_in_str(buff, name);
+  output(buff);
+
+  keys = svarlang_str(38,14); /* "YNA" */
+  if ((keys[0] == 0) || (keys[1] == 0) || (keys[2] == 0)) keys = "YNA";
+
+  shown[1] = 0;
+  for (;;) {
+    key = copy_getkey();
+    if (key == 0) continue; /* extended key */
+    keyu = key;
+    if ((keyu >= 'a') && (keyu <= 'z')) keyu -= ('a' - 'A');
+
+    for (i = 0; i < 3; i++) {
+      if (keys[i] != keyu) continue;
+      shown[0] = key; /* echo the key the user pressed, not the upper-case form */
+      output(shown);
+      output("\r\n");
+      return(i);
+    }
+  }
+}
+
+
 static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   struct copy_setup *setup = (void *)(p->BUFFER);
   unsigned short i;
   unsigned short copiedcount_in = 0, copiedcount_out = 0; /* number of input/output copied files */
   struct DTA dta;
+  char confirm = 0; /* 1 = ask before replacing an existing file */
+  char y_set = 0;   /* command line had /Y or /-Y (overrides COPYCMD) */
 
   if (cmd_ishlp(p)) {
     nls_outputnl(38,0); /* "Copies one or more files to another location." */
     outputnl("");
-    nls_outputnl(38,1); /* "COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]" */
+    nls_outputnl(38,1); /* "COPY [/Y|/-Y] [/A|/B] source ..." */
     outputnl("");
     nls_outputnl(38,2); /* "source       Specifies the file or files to be copied" */
     nls_outputnl(38,3); /* "/A           Indicates an ASCII text file" */
     nls_outputnl(38,4); /* "/B           Indicates a binary file" */
     nls_outputnl(38,5); /* "destination  Specifies the directory and/or filename for the new file(s)" */
     nls_outputnl(38,6); /* "/V           Verifies that new files are written correctly" */
+    nls_outputnl(38,10); /* "/Y           Overwrite existing files without asking" */
+    nls_outputnl(38,11); /* "/-Y          Ask before overwriting an existing file" */
+    nls_outputnl(38,12); /* "Default is to ask, except in a batch file. ..." */
     outputnl("");
     nls_outputnl(38,7); /* "To append files, specify a single file for destination, but multiple (...)" */
     outputnl("");
@@ -274,6 +395,12 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
         }
       } else if (imatch(p->argv[i], "/v")) {
         setup->verifyflag = 1;
+      } else if (imatch(p->argv[i], "/y")) {
+        confirm = 0; /* /Y: replace without asking */
+        y_set = 1;
+      } else if (imatch(p->argv[i], "/-y")) {
+        confirm = 1; /* /-Y: always ask */
+        y_set = 1;
       } else {
         nls_outputnl(0,2); /* "Invalid switch" */
         return(CMD_FAIL);
@@ -337,6 +464,14 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
   if (setup->src_count == 0) {
     nls_outputnl(0,7); /* "Required parameter missing" */
     return(CMD_FAIL);
+  }
+
+  /* command-line /Y or /-Y wins. otherwise COPYCMD, otherwise ask at the
+   * prompt and stay quiet inside a batch file (MS-DOS 6.2). */
+  if (y_set == 0) {
+    confirm = 1;
+    if (p->rmod->bat != NULL) confirm = 0;
+    copy_apply_copycmd(&confirm, p->env_seg);
   }
 
   /* alloc as much memory as possible */
@@ -451,13 +586,30 @@ static enum cmd_result cmd_copy(struct cmd_funcparam *p) {
       /* if dst file exists already -> overwrite it or append?
           - if dst is a dir (dstlen-1 points at a \\) -> overwrite
           - otherwise: if copiedcount_in==0 overwrite, else append */
-      output(setup->cursrc);
       if ((setup->dst[setup->dstlen - 1] == '\\') || (copiedcount_in == 0)) {
         appendflag = 0;
+      } else {
+        appendflag = 1;
+      }
+
+      /* ask before replacing an existing file. appends and devices are not
+       * asked: a device has no directory entry, so getattr fails. */
+      if ((appendflag == 0) && (confirm != 0)) {
+        int attr;
+        attr = file_getattr(setup->dst);
+        if ((attr >= 0) && ((attr & DOS_ATTR_DIR) == 0)) {
+          unsigned short ans;
+          ans = copy_ask_overwrite(copy_ovname(setup->dst), setup->databuf);
+          if (ans == 1) continue; /* No: leave this file alone */
+          if (ans == 2) confirm = 0; /* All: keep replacing, do not ask again */
+        }
+      }
+
+      output(setup->cursrc);
+      if (appendflag == 0) {
         output(" > ");
         copiedcount_out++;
       } else {
-        appendflag = 1;
         output(" >> ");
       }
       outputnl(setup->dst);

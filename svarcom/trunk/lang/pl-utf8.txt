@@ -3,7 +3,7 @@
 #
 # Language...: Polish
 # Authors....: Mateusz Viste
-# Last update: 11 Nov 2026
+# Last update: 12 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -273,7 +273,7 @@
 
 # COPY
 38.0:Kopiuje jeden lub więcej plików do innej lokalizacji.
-38.1:COPY [/A|/B] źródło [/A|/B] [+źródło [/A|/B] [+...]] [cel [/A|/B]] [/V]
+38.1:COPY [/Y|/-Y] [/A|/B] źródło [/A|/B] [+źródło [/A|/B] [+...]]\r\n     [cel [/A|/B]] [/V]
 38.2:źródło     Określa plik lub pliki, które mają być skopiowane
 38.3:/A         Wskazuje plik tekstowy ASCII
 38.4:/B         Wskazuje plik binarny
@@ -282,6 +282,11 @@
 38.7:Aby połączać pliki, należy podać pojedynczy plik jako cel, ale wiele plików\r\nźródłowych (używając symboli wieloznacznych lub formatu plik1+plik2+plik3).
 38.8:UWAGA: /A i /B są ignorowane, podane tylko ze względu na kompatybilność.\r\nCOPY zakłada zawsze binaria.
 38.9:skopiowano % plik(ów)
+38.10:/Y         Nadpisuje istniejące pliki bez pytania
+38.11:/-Y        Pyta przed nadpisaniem istniejącego pliku
+38.12:Domyślnie pyta, poza plikami wsadowymi. COPYCMD=/Y lub /-Y to zmienia.
+38.13:Nadpisać % (Tak/Nie/Wszystkie)?
+38.14:TNW
 
 # TRUENAME
 39.0:Zwraca w pełni kwalifikowaną ścieżkę lub nazwę pliku.

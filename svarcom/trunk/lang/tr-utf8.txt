@@ -3,7 +3,7 @@
 #
 # Language...: Turkish
 # Authors....: Berki Yenigün
-# Last update: 11 Nov 2026
+# Last update: 12 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -272,7 +272,7 @@
 
 # COPY
 38.0:Bir veya daha fazla dosyayı başka bir konuma kopyalar.
-38.1:COPY [/A|/B] kaynak [/A|/B] [+kaynak [/A|/B] [+...]] [hedef [/A|/B]] [/V]
+38.1:COPY [/Y|/-Y] [/A|/B] kaynak [/A|/B] [+kaynak [/A|/B] [+...]]\r\n     [hedef [/A|/B]] [/V]
 38.2:kaynak       Kopyalanacak dosya veya dosyaları belirtir
 38.3:/A           ASCII metin dosyası belirtir
 38.4:/B           İkili dosya belirtir
@@ -281,6 +281,11 @@
 38.7:Dosya eklemek için hedef olarak tek bir dosya belirtin, fakat kaynak için\r\nçoklu (joker veya dosya1+doya2+dosya3 biçimini kullanın).
 38.8:NOT: /A ve /B no-op'tur (yok sayılır), sadece uyumluluk amaçlı bulunurlar.\r\nCOPY daima ikili var sayar.
 38.9:% dosya kopyalandı
+38.10:/Y           Var olan dosyaların üzerine sormadan yazar
+38.11:/-Y          Üzerine yazmadan önce sorar
+38.12:Öntanımlı sorar, toplu iş dosyası dışında. COPYCMD=/Y veya /-Y bunu değiştirir.
+38.13:Üzerine yaz % (Evet/Hayır/Tümü)?
+38.14:EHT
 
 # TRUENAME
 39.0:Tam nitelikli bir yol veya dosya adı döndürür.

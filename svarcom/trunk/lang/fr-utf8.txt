@@ -3,7 +3,7 @@
 #
 # Language.....: French
 # Authors......: Berki Yenigün + fixes and adaptations by Mateusz Viste
-# Last update..: 11 Nov 2026
+# Last update..: 12 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -273,7 +273,7 @@
 
 # COPY
 38.0:Copie un ou davantage de fichiers à un autre endroit.
-38.1:COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]
+38.1:COPY [/Y|/-Y] [/A|/B] source [/A|/B] [+source [/A|/B] [+...]]\r\n     [destination [/A|/B]] [/V]
 38.2:source       Spécifie le ou les fichiers à copier
 38.3:/A           Indique un fichier texte ASCII
 38.4:/B           Indique un fichier binaire
@@ -282,6 +282,11 @@
 38.7:Pour concaténer des fichiers, spécifiez un seul fichier de destination, mais de\r\nmultiples fichiers source (en utilisant soit des jokers, soit le format\r\nfichier1+fichier2+fichier3).
 38.8:NOTE: /A et /B sont des no-ops (ignorés), fournis pour la compatibilité.\r\nCOPY considère toujours les fichiers comme étant des binaires.
 38.9:% fichier(s) copié(s)
+38.10:/Y           Écrase les fichiers existants sans demander
+38.11:/-Y          Demande confirmation avant d'écraser un fichier
+38.12:Par défaut, COPY demande sauf en batch. COPYCMD=/Y ou /-Y change cela.
+38.13:Écraser % (Oui/Non/Tous)?
+38.14:ONT
 
 # TRUENAME
 39.0:Retourne un chemin ou un nom de fichier pleinement qualifié.

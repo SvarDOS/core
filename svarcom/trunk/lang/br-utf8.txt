@@ -3,7 +3,7 @@
 #
 # Language...: Portuguese Brazil
 # Authors....: Luzemário Dantas
-# Last update: 11 Nov 2026
+# Last update: 12 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -258,7 +258,7 @@
 
 # COPY
 38.0:Copia um ou mais arquivos para outro lugar.
-38.1:COPY [/A|/B] origem [/A|/B] [+origem [/A|/B] [+...]] [dest. [/A|/B]] [/V]
+38.1:COPY [/Y|/-Y] [/A|/B] origem [/A|/B] [+origem [/A|/B] [+...]]\r\n     [dest. [/A|/B]] [/V]
 38.2:origem       Especifica o arquivo ou arquivos para copiar
 38.3:/A           Indica um arquivo de texto ASCII
 38.4:/B           Indica um arquivo binário
@@ -267,6 +267,11 @@
 38.7:Para concatenar arquivos, especifique um único arquivo para o destino, mas\r\nmúltiplos arquivos de origem (usando curingas ou o formato\r\narquivo1+arquivo2+arquivo3).
 38.8:NOTE: /A e /B não são opções válidas (são ignoradas), providos somente\r\npor motivos de compatibilidade. COPY sempre assume que os arquivos são binários.
 38.9:% arquivos(s) copiado(s)
+38.10:/Y           Substitui arquivos existentes sem perguntar
+38.11:/-Y          Pergunta antes de substituir um arquivo existente
+38.12:O padrão é perguntar, exceto em arquivo de lote. COPYCMD=/Y ou /-Y muda isso.
+38.13:Substituir % (Sim/Não/Todos)?
+38.14:SNT
 
 # TRUENAME
 39.0:Returna um caminho ou nome de arquivo totalmente qualificado.

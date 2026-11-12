@@ -3,7 +3,7 @@
 #
 # Language...........: German
 # Authors.  .........: Robert Riebisch (2022-2023), Bernd Boeckmann (2024)
-# Last update........: 11 Nov 2026
+# Last update........: 12 Nov 2026
 # In sync with EN rev: 2255;
 # 31.11 and 31.12 and 33.10 - 33.23 added by W. Spiegl
 
@@ -274,7 +274,7 @@
 
 # COPY
 38.0:Kopiert eine oder mehrere Dateien an eine andere Stelle.
-38.1:COPY [/A|/B] Quelle [/A|/B] [+Quelle [/A|/B] [+...]] [Ziel [/A|/B]] [/V]
+38.1:COPY [/Y|/-Y] [/A|/B] Quelle [/A|/B] [+Quelle [/A|/B] [+...]]\r\n     [Ziel [/A|/B]] [/V]
 38.2:Quelle  Gibt die zu kopierende(n) Datei(en) an
 38.3:/A      Weist auf eine ASCII-Textdatei hin
 38.4:/B      Weist auf eine Binärdatei hin
@@ -283,6 +283,11 @@
 38.7:Um Dateien aneinanderzuhängen, geben Sie eine einzelne Datei als Ziel an, aber\r\nmehrere Dateien als Quelle (per Platzhalter oder Format Datei1+Datei2+Datei3).
 38.8:HINWEIS: /A und /B sind ohne Wirkung. Sie werden nur aus Gründen der\r\nKompatibilität angeboten. COPY nimmt immer binär an.
 38.9:% Datei(en) kopiert
+38.10:/Y      Vorhandene Dateien ohne Rückfrage überschreiben
+38.11:/-Y     Vor dem Überschreiben einer Datei fragen
+38.12:Vorgabe ist Rückfrage, außer in Stapeldateien. COPYCMD=/Y oder /-Y ändert dies.
+38.13:Überschreiben % (Ja/Nein/Alle)?
+38.14:JNA
 
 # TRUENAME
 39.0:Gibt einen vollständig qualifizierten Pfad oder Dateinamen zurück.

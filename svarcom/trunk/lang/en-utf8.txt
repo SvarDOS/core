@@ -3,7 +3,7 @@
 #
 # Language...: English
 # Authors....: Mateusz Viste, Robert Riebisch
-# Last update: 11 Nov 2026
+# Last update: 12 Nov 2026
 #
 
 # GENERIC MESSAGES USED BY MULTIPLE INTERNAL COMMANDS
@@ -273,7 +273,7 @@
 
 # COPY
 38.0:Copies one or more files to another location.
-38.1:COPY [/A|/B] source [/A|/B] [+source [/A|/B] [+...]] [destination [/A|/B]] [/V]
+38.1:COPY [/Y|/-Y] [/A|/B] source [/A|/B] [+source [/A|/B] [+...]]\r\n     [destination [/A|/B]] [/V]
 38.2:source       Specifies the file or files to be copied
 38.3:/A           Indicates an ASCII text file
 38.4:/B           Indicates a binary file
@@ -282,6 +282,13 @@
 38.7:To append files, specify a single file for destination, but multiple files\r\nfor source (using wildcards or file1+file2+file3 format).
 38.8:NOTE: /A and /B are no-ops (ignored), provided only for compatibility reasons.\r\nCOPY assumes binary always.
 38.9:% file(s) copied
+38.10:/Y           Overwrite existing files without asking
+38.11:/-Y          Ask before overwriting an existing file
+38.12:Default is to ask, except in a batch file. COPYCMD=/Y or /-Y changes this.
+# 38.13 is the overwrite prompt (% is the destination name).
+# 38.14 MUST be three UPPER-CASE letters: the Yes, No and All keys, in that order.
+38.13:Overwrite % (Yes/No/All)?
+38.14:YNA
 
 # TRUENAME
 39.0:Returns a fully qualified path or filename.
