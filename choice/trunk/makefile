@@ -28,7 +28,7 @@ TLUMACZ = ..$(SEP)svarlang$(SEP)tlumacz.exe
 
 TLFLAGS = /nomarg /excref
 
-LANGS = en de fr pl es it pt br nl sv dk ru tr hu si lv
+LANGS = en de fr pl es pt br nl ru tr
 
 all: choice.com .symbolic
 
@@ -62,17 +62,11 @@ deflang.c: nls$(SEP)en_utf8.txt .symbolic
 	utf8tocp 850 fr_utf8.txt fr.txt
 	utf8tocp maz pl_utf8.txt pl.txt
 	utf8tocp 850 es_utf8.txt es.txt
-	utf8tocp 850 it_utf8.txt it.txt
 	utf8tocp 850 pt_utf8.txt pt.txt
 	utf8tocp 850 br_utf8.txt br.txt
 	utf8tocp 850 nl_utf8.txt nl.txt
-	utf8tocp 850 sv_utf8.txt sv.txt
-	utf8tocp 850 dk_utf8.txt dk.txt
 	utf8tocp 866 ru_utf8.txt ru.txt
 	utf8tocp 857 tr_utf8.txt tr.txt
-	utf8tocp 852 hu_utf8.txt hu.txt
-	utf8tocp 852 si_utf8.txt si.txt
-	utf8tocp 775 lv_utf8.txt lv.txt
 	$(TLUMACZ) $(TLFLAGS) $(LANGS) > tlumacz.log
 	-$(RM) ..$(SEP)choice.lng
 	$(CP) out.lng ..$(SEP)choice.lng
