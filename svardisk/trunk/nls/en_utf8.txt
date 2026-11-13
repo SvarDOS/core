@@ -5,8 +5,8 @@
 # of a message do not.
 
 1.0:SvarDISK is the SvarDOS tool for disk repair, similar to\r\nCHKDSK or SCANDISK on other systems. It checks and repairs\r\nFAT12, FAT16 and FAT32.\r\nCopyright (C) 2026 Mateusz Viste\r\n\r\n
-1.1:SVARDISK [drive:] [/F]\r\nSVARDISK imagefile [/F]\r\n\r\n
-1.2:/F   write repairs. Without /F the disk is not changed.\r\n
+1.1:SVARDISK [drive:] [/F] [/S] [/R]\r\nSVARDISK imagefile [/F] [/S] [/R]\r\n\r\n
+1.2:/F   write repairs. Without /F the disk is not changed.\r\n/S   read clusters. With /F, mark a free one bad if it fails.\r\n/R   re-read bad clusters. With /F, free one that reads.\r\n
 
 2.0:Bad command line.\r\n
 2.1:Name a drive or an image file.\r\n
@@ -30,6 +30,7 @@
 3.8:Reading the allocation table.\r\n
 3.9:Reading directories.\r\n
 3.10:Looking for lost chains.\r\n
+3.11:Reading the surface.\r\n
 
 4.0:No problems found.\r\n
 4.1:Problems found:
@@ -55,5 +56,8 @@
 4.21:points at a bad cluster.
 4.22:has a broken cluster chain.
 4.23:The root directory has a broken cluster chain.
+4.24:Unreadable free cluster
+4.25:Unreadable cluster in use
+4.26:Bad cluster can be read
 
 5.0:Free clusters:

@@ -2,8 +2,8 @@
 
 
 SVARDISK checks the bookkeeping of a FAT12, FAT16 or FAT32 disk. It can
-also repair the mistakes it understands. It does not scan the surface of
-the disk for bad sectors, and it does not bring back deleted files.
+also repair the mistakes it understands. With /S it reads the data
+clusters as well. It does not bring back deleted files.
 
 The program is 8086 code. It never loads the whole allocation table into
 memory, so the same program can run on an old PC and can still check a
@@ -20,6 +20,9 @@ Watcom C library.
   SVARDISK
   SVARDISK D:
   SVARDISK D: /F
+  SVARDISK D: /S
+  SVARDISK D: /S /F
+  SVARDISK D: /R
   SVARDISK disk.img
   SVARDISK disk.img /F
   SVARDISK /?
@@ -29,10 +32,14 @@ D or as D:. An image file is a raw copy of one FAT volume, with no
 partition table in front of it.
 
   /F    write the repairs. Without /F the disk is not changed.
+  /S    read each cluster that is not marked bad. With /F, a free
+        cluster that cannot be read is marked bad.
+  /R    read clusters marked bad. With /F, one that reads is marked free.
   /?    print a short help screen and return to DOS.
 
 The letter of a switch does not matter: /f and /F are the same. Anything
-other than /F and /? is an error. /FF is an error too.
+other than /F, /S, /R and /? is an error. /FF is an error too. /SR is an
+error too: each switch is its own argument.
 
 
 ### WHAT THE DISK KEEPS ######################################################
@@ -185,6 +192,8 @@ With /F, each problem above is repaired in the way the report describes:
   - a broken long filename is deleted
   - a lost chain becomes FILE####.CHK in the root
   - the FAT32 free-space record is rewritten with the real count
+  - with /S, a free cluster that cannot be read is marked bad
+  - with /R, a bad cluster that can be read is marked free
 
 An unknown free-space count is filled in as well. That fill-in is not
 counted as a problem.
@@ -198,14 +207,51 @@ After /F on a real drive, restart the computer before using that drive.
 DOS may still be holding the old table. An image file does not need a
 restart.
 
-If a sector cannot be read, SVARDISK stops and does not write anything
-further. If a sector cannot be written, it stops and says so. Repairs
-that were already written stay written.
+If a sector the check needs cannot be read, SVARDISK stops and does not
+write anything further. A data cluster that /S or /R cannot read is
+reported instead, as described below. If a sector cannot be written, the
+program stops and says so. Repairs that were already written stay written.
+
+
+### SURFACE ###################################################################
+
+/S and /R run after the check above, and before the repaired table is
+copied. /S reads every data cluster that is not already marked bad. /R
+reads the clusters that are marked bad. The two can be used together.
+Without /F the disk is not changed.
+
+The read is the ordinary sector read. SVARDISK does not write a pattern
+and does not read a sector twice. A cluster of more than one sector fails
+as soon as one of its sectors cannot be read. A bad cluster is freed only
+when every sector of it has been read. The mark in the table covers the
+whole cluster. One sector cannot be marked on its own.
+
+A free cluster that cannot be read is reported. With /F that cluster is
+marked bad. It was not in a chain, so nothing else is rewritten.
+
+A cluster that belongs to a file, a directory, or a lost chain is only
+reported. It is not marked bad, with or without /F. The bad mark would
+replace the link to the rest of the chain.
+
+A cluster that is already marked bad is left unread by /S. With /R, if
+every sector can be read, that is reported. With /F the entry is set back
+to free. The link that used to be there is already gone, so the cluster
+is not put back into a file.
+
+The boot sector, the allocation table, and the fixed root of a FAT12 or
+FAT16 disk are not part of this pass. If one of those cannot be read, the
+check stops as it always has.
+
+If /F is given and every problem is a cluster that is in use, the table
+is not written and the exit code is 2. A large disk takes as long as
+reading every cluster through DOS.
 
 
 ### WHAT IT WILL NOT DO ######################################################
 
-  - scan the surface, or mark new bad sectors
+  - write a test pattern, or mark one sector of a cluster
+  - mark a cluster that a file, a directory, or a lost chain is using
+  - put a cluster freed by /R back into the file that used to own it
   - undelete a file, or rebuild a file from a deleted directory entry
   - defragment
   - copy the shared part of a cross-link into free space
@@ -226,6 +272,10 @@ that were already written stay written.
 
 Filling in an unknown FAT32 free-space count is not a problem, so /F
 still returns 0 when that was the only thing written.
+
+A cluster that is in use and cannot be read is a problem, and /F does
+not repair it. If that is the only problem, /F writes nothing and the
+exit code is 2.
 
 
 ### LANGUAGE #################################################################

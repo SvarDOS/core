@@ -13,6 +13,7 @@ file bitmap.obj
 file bpb.obj
 file fat.obj
 file walk.obj
+file surface.obj
 file deflang.obj
 file svarlang.obj
 file auto_exe.obj

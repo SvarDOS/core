@@ -39,7 +39,7 @@ host: svardisk .symbolic
 test: svardisk .symbolic
 	python3 tests$(SEP)test_svardisk.py
 
-svardisk: deflang.c svardisk.c out.c diskio.c bitmap.c bpb.c fat.c walk.c svardisk.h
+svardisk: deflang.c svardisk.c out.c diskio.c bitmap.c bpb.c fat.c walk.c surface.c svardisk.h
 	gcc $(HOSTCFLAGS) -c svardisk.c -o svardisk.o
 	gcc $(HOSTCFLAGS) -c out.c -o out.o
 	gcc $(HOSTCFLAGS) -c diskio.c -o diskio.o
@@ -47,13 +47,14 @@ svardisk: deflang.c svardisk.c out.c diskio.c bitmap.c bpb.c fat.c walk.c svardi
 	gcc $(HOSTCFLAGS) -c bpb.c -o bpb.o
 	gcc $(HOSTCFLAGS) -c fat.c -o fat.o
 	gcc $(HOSTCFLAGS) -c walk.c -o walk.o
+	gcc $(HOSTCFLAGS) -c surface.c -o surface.o
 	gcc -O2 -c deflang.c -o deflang.o
 	gcc -O2 -DWITHSTDIO -Isvarlang -c svarlang$(SEP)svarlang.c -o svarlang_h.o
 	gcc -O2 -Isvarlang -c svarlang$(SEP)auto_exe.c -o auto_exe_h.o
-	gcc -o svardisk svardisk.o out.o diskio.o bitmap.o bpb.o fat.o walk.o deflang.o svarlang_h.o auto_exe_h.o
+	gcc -o svardisk svardisk.o out.o diskio.o bitmap.o bpb.o fat.o walk.o surface.o deflang.o svarlang_h.o auto_exe_h.o
 !endif
 
-svardisk.exe: startup.obj u4m.obj u4d.obj svardisk.obj out.obj diskio.obj bitmap.obj bpb.obj fat.obj walk.obj deflang.obj svarlang.obj auto_exe.obj svardisk.lnk
+svardisk.exe: startup.obj u4m.obj u4d.obj svardisk.obj out.obj diskio.obj bitmap.obj bpb.obj fat.obj walk.obj surface.obj deflang.obj svarlang.obj auto_exe.obj svardisk.lnk
 	wlink @svardisk.lnk
 	upx -9 --8086 svardisk.exe
 
@@ -86,6 +87,9 @@ fat.obj: fat.c svardisk.h
 
 walk.obj: walk.c svardisk.h
 	$(CC) $(CFLAGS) -fo=walk.obj walk.c
+
+surface.obj: surface.c svardisk.h
+	$(CC) $(CFLAGS) -fo=surface.obj surface.c
 
 deflang.obj: deflang.c
 	$(CC) $(CFLAGS) -fo=deflang.obj deflang.c

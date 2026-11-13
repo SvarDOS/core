@@ -23,6 +23,13 @@ static void mark_io(int writing) {
   if (vol.io_error == 0) vol.io_error = writing ? 2 : 1;
 }
 
+/* fatal is 0 for a surface probe: the caller hears about the miss,
+ * and the check is allowed to go on. */
+static int fail_io(int writing, int fatal) {
+  if (fatal) mark_io(writing);
+  return(-1);
+}
+
 #ifdef SV_HOST
 
 int io_open_drive(u8 drive1) {
@@ -49,33 +56,18 @@ void io_close(void) {
   writable = 0;
 }
 
-static int io_one(u32 sector, void *buf, int writing) {
+static int io_one(u32 sector, void *buf, int writing, int fatal) {
   u32 off;
-  if (!opened || img == 0) {
-    mark_io(writing);
-    return(-1);
-  }
-  if (writing && !writable) {
-    mark_io(1);
-    return(-1);
-  }
-  if (sector > 0x7ffffful) {
-    mark_io(writing);
-    return(-1);
-  }
+  if (!opened || img == 0) return(fail_io(writing, fatal));
+  if (writing && !writable) return(fail_io(1, fatal));
+  if (sector > 0x7ffffful) return(fail_io(writing, fatal));
   off = sector << 9;
-  if (fseek(img, (long)off, SEEK_SET) != 0) {
-    mark_io(writing);
-    return(-1);
-  }
+  if (fseek(img, (long)off, SEEK_SET) != 0) return(fail_io(writing, fatal));
   if (writing) {
-    if (fwrite(buf, 1, 512, img) != 512) {
-      mark_io(1);
-      return(-1);
-    }
+    if (fwrite(buf, 1, 512, img) != 512) return(fail_io(1, fatal));
   } else if (fread(buf, 1, 512, img) != 512) {
-    mark_io(0);
-    return(-1);
+    if (!fatal) clearerr(img);
+    return(fail_io(0, fatal));
   }
   return(0);
 }
@@ -199,34 +191,19 @@ static void put_u32(u8 *p, u32 v) {
   p[3] = (u8)(v >> 24);
 }
 
-static int io_one(u32 sector, void *buf, int writing) {
+static int io_one(u32 sector, void *buf, int writing, int fatal) {
   u32 off;
   u16 rc;
-  if (!opened) {
-    mark_io(writing);
-    return(-1);
-  }
-  if (writing && !writable) {
-    mark_io(1);
-    return(-1);
-  }
+  if (!opened) return(fail_io(writing, fatal));
+  if (writing && !writable) return(fail_io(1, fatal));
   if (vol.is_image) {
-    if (sector > 0x7ffffful) {
-      mark_io(writing);
-      return(-1);
-    }
+    if (sector > 0x7ffffful) return(fail_io(writing, fatal));
     off = sector << 9;
     rc = dos_seek(img_handle, (u16)(off >> 16), (u16)off);
-    if (rc != 0) {
-      mark_io(writing);
-      return(-1);
-    }
+    if (rc != 0) return(fail_io(writing, fatal));
     if (writing) rc = img_write(img_handle, buf, 512);
     else rc = img_read(img_handle, buf, 512);
-    if (rc != 512) {
-      mark_io(writing);
-      return(-1);
-    }
+    if (rc != 512) return(fail_io(writing, fatal));
     return(0);
   }
   put_u32(pkt, sector);
@@ -237,10 +214,8 @@ static int io_one(u32 sector, void *buf, int writing) {
   rc = get_ds();
   pkt[8] = (u8)rc;
   pkt[9] = (u8)(rc >> 8);
-  if (dos_abs(vol.drive1, (u16)(writing ? 1 : 0), pkt) != 0) {
-    mark_io(writing);
-    return(-1);
-  }
+  if (dos_abs(vol.drive1, (u16)(writing ? 1 : 0), pkt) != 0)
+    return(fail_io(writing, fatal));
   return(0);
 }
 
@@ -250,12 +225,16 @@ void io_reset(void) {
 
 #endif
 
+int io_probe(u32 sector, void *buf) {
+  return(io_one(sector, buf, 0, 0));
+}
+
 int io_read(u32 sector, u16 count, void *buf) {
   u16 i;
   u8 *p;
   p = (u8 *)buf;
   for (i = 0; i < count; i++) {
-    if (io_one(sector + i, p, 0) != 0) return(-1);
+    if (io_one(sector + i, p, 0, 1) != 0) return(-1);
     p += 512;
   }
   return(0);
@@ -266,7 +245,7 @@ int io_write(u32 sector, u16 count, const void *buf) {
   u8 *p;
   p = (u8 *)buf;
   for (i = 0; i < count; i++) {
-    if (io_one(sector + i, p, 1) != 0) return(-1);
+    if (io_one(sector + i, p, 1, 1) != 0) return(-1);
     p += 512;
   }
   return(0);

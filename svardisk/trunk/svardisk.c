@@ -34,6 +34,8 @@
 
 static int help_only;
 static int saw_fix;
+static int saw_surface;
+static int saw_retest;
 static const char *target;
 
 static void show_help(void) {
@@ -147,6 +149,8 @@ static int parse(int argc, char **argv) {
   int i;
   help_only = 0;
   saw_fix = 0;
+  saw_surface = 0;
+  saw_retest = 0;
   target = 0;
   for (i = 1; i < argc; i++) {
     char *a;
@@ -172,6 +176,14 @@ static int parse(int argc, char **argv) {
         saw_fix = 1;
         continue;
       }
+      if (sw == 'S') {
+        saw_surface = 1;
+        continue;
+      }
+      if (sw == 'R') {
+        saw_retest = 1;
+        continue;
+      }
       return(-1);
     }
     if (target != 0) return(-1);
@@ -185,6 +197,8 @@ static int open_target(void) {
   u8 drive1;
 
   vol.fix = saw_fix;
+  vol.surface = saw_surface;
+  vol.retest = saw_retest;
   if (target == 0) {
 #ifdef SV_HOST
     out_msg(2, 1);
@@ -299,6 +313,11 @@ static int run_check(void) {
     say_io();
     return(3);
   }
+  if (surface_scan() != 0 || vol.io_error) {
+    fat_flush();
+    say_io();
+    return(3);
+  }
 
   if (vol.fix) {
     if (fat_finish() != 0 || bpb_finish() != 0 || vol.io_error) {
@@ -316,7 +335,9 @@ static int run_check(void) {
     out_msg(4, 0);
     return(0);
   }
-  if (vol.fix) {
+  /* An in-use cluster is reported and left alone. If that was the only
+   * problem and the table was not written, /F did not repair anything. */
+  if (vol.fix && (vol.problems != vol.unfixed || vol.fat_dirty)) {
     out_msg(4, 2);
     out_chr(' ');
     out_u32(vol.problems);

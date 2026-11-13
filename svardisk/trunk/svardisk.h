@@ -40,6 +40,8 @@ typedef unsigned long u32;
 typedef struct {
   int is_image;
   int fix;
+  int surface;        /* /S read clusters that are not marked bad */
+  int retest;         /* /R read clusters that are marked bad */
   int io_error;       /* 0 none, 1 read, 2 write */
   int fat_dirty;
   int mirror_diff;
@@ -58,6 +60,7 @@ typedef struct {
   u16 fsinfo;
   u16 backup_boot;
   u16 problems;
+  u16 unfixed;        /* unreadable clusters left in use */
   u16 cluster_bytes;
   u32 total_sectors;
   u32 fat_sectors;
@@ -96,6 +99,7 @@ int note_shown(void);
 int io_open_drive(u8 drive1);
 int io_open_image(const char *path, int writable);
 void io_close(void);
+int io_probe(u32 sector, void *buf);
 int io_read(u32 sector, u16 count, void *buf);
 int io_write(u32 sector, u16 count, const void *buf);
 void io_reset(void);
@@ -125,5 +129,6 @@ int fat_finish(void);
 
 int walk_all(void);
 int lost_and_loops(void);
+int surface_scan(void);
 
 #endif

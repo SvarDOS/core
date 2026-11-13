@@ -360,8 +360,10 @@ def test_cli():
     once(out, err, "SvarDISK is the SvarDOS tool for disk repair")
     once(out, err, "CHKDSK or SCANDISK on other systems.")
     once(out, err, "Copyright (C) 2026 Mateusz Viste")
-    once(out, err, "SVARDISK [drive:] [/F]")
+    once(out, err, "SVARDISK [drive:] [/F] [/S] [/R]")
     once(out, err, "/F   write repairs.")
+    once(out, err, "/S   read clusters.")
+    once(out, err, "/R   re-read bad clusters.")
 
     code, out, err = run([])
     expect_code(code, out, err, 3)
@@ -372,6 +374,10 @@ def test_cli():
     once(out, err, "Bad command line.")
 
     code, out, err = run(["/FF"])
+    expect_code(code, out, err, 3)
+    once(out, err, "Bad command line.")
+
+    code, out, err = run(["/SR"])
     expect_code(code, out, err, 3)
     once(out, err, "Bad command line.")
 
@@ -618,6 +624,260 @@ def test_fat32(tmp):
     print("PASS fat32", flush=True)
 
 
+def mirror_fat(img, info):
+    fatsz = info.get("fatsz", 1)
+    n = fatsz * 512
+    img[info["other"]:info["other"] + n] = img[info["base"]:info["base"] + n]
+
+
+def build_spc2():
+    reserved, nfats, fatsz, root_ent, spc, total = 1, 2, 1, 32, 2, 25
+    clusters, data_start, root_sector, root_sectors = layout(
+        reserved, nfats, fatsz, root_ent, spc, total)
+    if clusters != 10 or data_start != 5 or root_sectors != 2:
+        raise SystemExit("spc2 geometry %s" % (
+            (clusters, data_start, root_sector, root_sectors),))
+    img = bytearray(total * 512)
+    write_boot(
+        img, reserved, nfats, fatsz, root_ent, spc, total, False, b"FAT12   ")
+    base = reserved * 512
+    set_fat12(img, base, 0, 0xFF8)
+    set_fat12(img, base, 1, 0xFFF)
+    info = {"base": base, "other": base + fatsz * 512, "fatsz": fatsz}
+    mirror_fat(img, info)
+    return img, info
+
+
+def test_surface(tmp):
+    img, info = build_fat12(False)
+    path = os.path.join(tmp, "surf12.img")
+    write_file(path, img)
+    before = bytes(img)
+    code, out, err = run([path, "/s"])
+    expect_code(code, out, err, 0)
+    once(out, err, "Reading the surface.")
+    once(out, err, "No problems found.")
+    if read_file(path) != before:
+        fail("clean /S changed the image")
+    code, out, err = run([path, "/S", "/F"])
+    expect_code(code, out, err, 0)
+    once(out, err, "No problems found.")
+    absent(out, err, "Repairs written.")
+    if read_file(path) != before:
+        fail("clean /S /F changed the image")
+
+    short_path = os.path.join(tmp, "surf12-free.img")
+    write_file(short_path, before[:-512])
+    code, out, err = run([short_path, "/S"])
+    expect_code(code, out, err, 2)
+    once(out, err, "Unreadable free cluster 101")
+    once(out, err, "Problems found: 1")
+    absent(out, err, "Repairs written.")
+    absent(out, err, "Unreadable cluster in use")
+    if read_file(short_path) != before[:-512]:
+        fail("read-only surface scan changed a free cluster")
+    code, out, err = run([short_path, "/s", "/f"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Unreadable free cluster 101")
+    once(out, err, "Repairs written. Problems fixed: 1")
+    once(out, err, "Free clusters: 99")
+    marked = read_file(short_path)
+    if get_fat12(marked, info["base"], 101) != 0xFF7:
+        fail("free cluster was not marked bad", out, err)
+    if get_fat12(marked, info["other"], 101) != 0xFF7:
+        fail("second FAT was not marked bad", out, err)
+    if get_fat12(marked, info["base"], 100) != 0:
+        fail("a neighbor cluster was marked", out, err)
+    code, out, err = run([short_path])
+    expect_code(code, out, err, 0)
+    once(out, err, "No problems found.")
+    absent(out, err, "Unreadable")
+    absent(out, err, "bad cluster")
+    if read_file(short_path) != marked:
+        fail("recheck changed a marked cluster")
+
+    used = bytearray(before)
+    set_fat12(used, info["base"], 100, 101)
+    set_fat12(used, info["base"], 101, 0xFFF)
+    mirror_fat(used, info)
+    used[3 * 512:3 * 512 + 32] = entry("A.TXT", 0x20, 100, 1024)
+    used_path = os.path.join(tmp, "surf12-used.img")
+    used_short = bytes(used)[:-512]
+    write_file(used_path, used_short)
+    code, out, err = run([used_path, "/S", "/F"])
+    expect_code(code, out, err, 2)
+    once(out, err, "Unreadable cluster in use 101")
+    once(out, err, "Problems found: 1")
+    absent(out, err, "Repairs written.")
+    absent(out, err, "Unreadable free cluster")
+    if read_file(used_path) != used_short:
+        fail("in-use cluster was changed")
+    kept = read_file(used_path)
+    if get_fat12(kept, info["base"], 100) != 101 or get_fat12(kept, info["base"], 101) != 0xFFF:
+        fail("chain was rewritten", out, err)
+    hits = find_name(kept, "A.TXT")
+    if len(hits) != 1 or ent_cluster(kept, hits[0]) != 100 or ent_size(kept, hits[0]) != 1024:
+        fail("directory entry was rewritten", out, err)
+
+    wide, wide_info = build_spc2()
+    wide_path = os.path.join(tmp, "surf12-spc2.img")
+    write_file(wide_path, bytes(wide)[:-512])
+    code, out, err = run([wide_path, "/S", "/F"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Unreadable free cluster 11")
+    once(out, err, "Free clusters: 9")
+    wide_marked = read_file(wide_path)
+    if get_fat12(wide_marked, wide_info["base"], 11) != 0xFF7:
+        fail("two-sector cluster was not marked", out, err)
+    if get_fat12(wide_marked, wide_info["other"], 11) != 0xFF7:
+        fail("second FAT missed the two-sector cluster", out, err)
+    if get_fat12(wide_marked, wide_info["base"], 10) != 0:
+        fail("earlier cluster of a two-sector disk was marked", out, err)
+
+    bad = bytearray(before)
+    set_fat12(bad, info["base"], 5, 0xFF7)
+    mirror_fat(bad, info)
+    bad_path = os.path.join(tmp, "surf12-bad.img")
+    write_file(bad_path, bad)
+    bad_before = bytes(bad)
+    code, out, err = run([bad_path, "/S"])
+    expect_code(code, out, err, 0)
+    once(out, err, "No problems found.")
+    absent(out, err, "Bad cluster can be read")
+    absent(out, err, "Unreadable")
+    if read_file(bad_path) != bad_before:
+        fail("/S reread a cluster marked bad")
+    code, out, err = run([bad_path, "/R"])
+    expect_code(code, out, err, 2)
+    once(out, err, "Bad cluster can be read 5")
+    once(out, err, "Problems found: 1")
+    absent(out, err, "Unreadable")
+    if read_file(bad_path) != bad_before:
+        fail("read-only /R changed a bad cluster")
+    code, out, err = run([bad_path, "/R", "/F"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Repairs written. Problems fixed: 1")
+    once(out, err, "Free clusters: 100")
+    freed = read_file(bad_path)
+    if get_fat12(freed, info["base"], 5) != 0 or get_fat12(freed, info["other"], 5) != 0:
+        fail("readable bad cluster was not freed", out, err)
+
+    stuck = bytearray(before)
+    set_fat12(stuck, info["base"], 101, 0xFF7)
+    mirror_fat(stuck, info)
+    stuck_path = os.path.join(tmp, "surf12-stuck.img")
+    stuck_short = bytes(stuck)[:-512]
+    write_file(stuck_path, stuck_short)
+    code, out, err = run([stuck_path, "/R"])
+    expect_code(code, out, err, 0)
+    once(out, err, "No problems found.")
+    absent(out, err, "Bad cluster can be read")
+    absent(out, err, "Unreadable")
+    if read_file(stuck_path) != stuck_short:
+        fail("/R cleared a cluster that still cannot be read")
+    if get_fat12(read_file(stuck_path), info["base"], 101) != 0xFF7:
+        fail("unreadable bad mark was removed")
+
+    both = bytearray(before)
+    set_fat12(both, info["base"], 5, 0xFF7)
+    mirror_fat(both, info)
+    both_path = os.path.join(tmp, "surf12-both.img")
+    write_file(both_path, bytes(both)[:-512])
+    code, out, err = run([both_path, "/S", "/R", "/F"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Bad cluster can be read 5")
+    once(out, err, "Unreadable free cluster 101")
+    once(out, err, "Problems fixed: 2")
+    once(out, err, "Free clusters: 99")
+    both_fixed = read_file(both_path)
+    if get_fat12(both_fixed, info["base"], 5) != 0:
+        fail("combined pass left the readable bad cluster", out, err)
+    if get_fat12(both_fixed, info["other"], 5) != 0:
+        fail("second FAT kept the readable bad cluster", out, err)
+    if get_fat12(both_fixed, info["base"], 101) != 0xFF7:
+        fail("combined pass did not mark the free cluster", out, err)
+    if get_fat12(both_fixed, info["other"], 101) != 0xFF7:
+        fail("second FAT missed the new bad cluster", out, err)
+    print("PASS surface12", flush=True)
+
+
+def test_surface16(tmp):
+    img, info = build_fat16()
+    set_fat16(img, info["base"], 1, 0xFFFF)
+    mirror_fat(img, info)
+    path = os.path.join(tmp, "surf16.img")
+    raw = bytes(img)
+    write_file(path, raw[:-512])
+    code, out, err = run([path, "/S"])
+    expect_code(code, out, err, 2)
+    once(out, err, "Unreadable free cluster 5001")
+    once(out, err, "Problems found: 1")
+    if read_file(path) != raw[:-512]:
+        fail("read-only FAT16 surface scan wrote the disk")
+    code, out, err = run([path, "/S", "/F"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Problems fixed: 1")
+    once(out, err, "Free clusters: 4999")
+    marked = read_file(path)
+    if get_fat16(marked, info["base"], 5001) != 0xFFF7:
+        fail("FAT16 mark is %04X" % get_fat16(marked, info["base"], 5001), out, err)
+    if get_fat16(marked, info["other"], 5001) != 0xFFF7:
+        fail("second FAT16 was not marked", out, err)
+    if get_fat16(marked, info["base"], 5000) != 0:
+        fail("FAT16 neighbor was marked", out, err)
+    code, out, err = run([path])
+    expect_code(code, out, err, 0)
+    once(out, err, "No problems found.")
+    print("PASS surface16", flush=True)
+
+
+def test_surface32(tmp):
+    img, info = build_fat32(65524)
+    path = os.path.join(tmp, "surf32.img")
+    raw = bytes(img)
+    print("surface32 scan", flush=True)
+    write_file(path, raw[:-512])
+    code, out, err = run([path, "/S", "/F"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Unreadable free cluster 65526")
+    once(out, err, "Problems fixed: 1")
+    once(out, err, "Free clusters: 65523")
+    marked = read_file(path)
+    if get_fat32(marked, info["base"], 65526) != 0x0FFFFFF7:
+        fail("FAT32 mark is %08X" % get_fat32(marked, info["base"], 65526), out, err)
+    if get_fat32(marked, info["other"], 65526) != 0x0FFFFFF7:
+        fail("second FAT32 was not marked", out, err)
+    if int.from_bytes(marked[512 + 488:512 + 492], "little") != 65523:
+        fail("FAT32 free count was not updated", out, err)
+    code, out, err = run([path])
+    expect_code(code, out, err, 0)
+    once(out, err, "No problems found.")
+
+    re = bytearray(img)
+    set_fat32(re, info["base"], 10, 0x0FFFFFF7)
+    mirror_fat(re, info)
+    put32(re, 512 + 488, 65523)
+    re_path = os.path.join(tmp, "surf32-re.img")
+    write_file(re_path, re)
+    re_before = bytes(re)
+    code, out, err = run([re_path, "/R"])
+    expect_code(code, out, err, 2)
+    once(out, err, "Bad cluster can be read 10")
+    once(out, err, "Problems found: 1")
+    absent(out, err, "Unreadable")
+    if read_file(re_path) != re_before:
+        fail("read-only /R changed FAT32")
+    code, out, err = run([re_path, "/R", "/F"])
+    expect_code(code, out, err, 1)
+    once(out, err, "Free clusters: 65524")
+    freed = read_file(re_path)
+    if get_fat32(freed, info["base"], 10) != 0 or get_fat32(freed, info["other"], 10) != 0:
+        fail("FAT32 bad cluster was not freed", out, err)
+    if int.from_bytes(freed[512 + 488:512 + 492], "little") != 65524:
+        fail("FAT32 free count was not restored", out, err)
+    print("PASS surface32", flush=True)
+
+
 def main():
     if not os.path.isfile(BIN):
         fail("missing " + BIN)
@@ -628,6 +888,9 @@ def main():
         test_broken12(tmp)
         test_fat16(tmp)
         test_fat32(tmp)
+        test_surface(tmp)
+        test_surface16(tmp)
+        test_surface32(tmp)
     print("PASS all", flush=True)
 
 
