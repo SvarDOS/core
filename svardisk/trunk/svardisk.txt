@@ -1,0 +1,292 @@
+                                 SVARDOS SVARDISK
+
+
+SVARDISK checks the bookkeeping of a FAT12, FAT16 or FAT32 disk. It can
+also repair the mistakes it understands. It does not scan the surface of
+the disk for bad sectors, and it does not bring back deleted files.
+
+The program is 8086 code. It never loads the whole allocation table into
+memory, so the same program can run on an old PC and can still check a
+large FAT32 disk on a newer PC, as long as the short notes it keeps about
+each cluster fit in ordinary DOS memory.
+
+Messages are stored with SvarLANG. English is part of the program. The
+DOS program is started by WMINCRT, which means it does not need the
+Watcom C library.
+
+
+### USAGE ####################################################################
+
+  SVARDISK
+  SVARDISK D:
+  SVARDISK D: /F
+  SVARDISK disk.img
+  SVARDISK disk.img /F
+  SVARDISK /?
+
+With no arguments the current drive is checked. A drive can be written as
+D or as D:. An image file is a raw copy of one FAT volume, with no
+partition table in front of it.
+
+  /F    write the repairs. Without /F the disk is not changed.
+  /?    print a short help screen and return to DOS.
+
+The letter of a switch does not matter: /f and /F are the same. Anything
+other than /F and /? is an error. /FF is an error too.
+
+
+### WHAT THE DISK KEEPS ######################################################
+
+A FAT disk stores a file as a chain of clusters. A cluster is a run of
+sectors. SVARDISK accepts clusters of 1, 2, 4, 8, 16, 32 or 64 sectors,
+which is 512 bytes up to 32 kilobytes. Every sector it understands is
+512 bytes long.
+
+The file allocation table says, for each cluster, what comes next. The
+last cluster of a chain is marked "end". A cluster that belongs to nobody
+is marked "free". A cluster the formatter has given up on is marked "bad".
+
+Most disks keep two copies of that table. They are meant to be identical.
+SVARDISK calls them the two copies of the allocation table.
+
+The first sector, the boot sector, says how the disk is laid out: how many
+clusters there are, how big they are, and where the table starts. The type
+is decided from the number of clusters, which is the rule the FAT format
+uses:
+
+  fewer than 4085 clusters     FAT12
+  fewer than 65525 clusters    FAT16
+  65525 clusters or more       FAT32
+
+The boot sector also carries an 8-character name: "FAT12   ", "FAT16   "
+or "FAT32   ". The older name "FAT     " is accepted for FAT12 and FAT16.
+
+Directories are files of a special kind. Each one holds the names of the
+files inside it, and the cluster where each file starts. A directory other
+than the root should begin with the names "." and "..". "." is the
+directory itself. ".." is the directory that contains it.
+
+
+### HOW A CHECK WORKS ########################################################
+
+SVARDISK reads the boot sector first. If that sector is not a FAT boot
+sector it understands, it stops and writes nothing.
+
+It then keeps two yes-or-no notes for every cluster, in ordinary memory.
+On DOS that memory is a block allocated from DOS. The two notes are:
+
+  - some other cluster's table entry points here
+  - a file or a directory has already claimed this cluster
+
+Two notes are two bits, so four clusters fit in one byte. The notes for a
+normal FAT16 disk take about 16 kilobytes. FAT12 takes less. A FAT32 disk
+takes about 16 kilobytes for every 65536 clusters. If the notes do not
+fit, SVARDISK stops before it changes the disk.
+
+The allocation table itself stays on the disk. SVARDISK reads a few
+sectors of it at a time and forgets them again. That is what lets an 8086
+do the job: the table can be larger than the PC's memory, but the notes
+cannot, and the notes are the only thing that has to stay.
+
+For a drive letter the sectors go through DOS function 7305h. The program
+does not talk to the disk controller itself. DOS already knows how to
+reach a large disk, which is why the same 8086 program can check one.
+For an image file the sectors are ordinary reads and writes of that file.
+
+The check then does four things.
+
+1. It compares the two copies of the allocation table, sector by sector.
+
+2. It reads every entry in the first copy. A free cluster is counted. A
+   bad mark is left as it is and counted. An entry that is not a cluster
+   number, not an end mark and not a bad mark is reported. The first entry
+   is the media byte and should start with the same value the boot sector
+   gives (F8 on a hard disk). On FAT16 and FAT32 the second entry also
+   holds a flag that says the disk was unmounted cleanly. FAT12 has no
+   such flag.
+
+3. It reads every directory, and directories inside those, and follows
+   each chain. The first name to claim a cluster keeps it. The notes
+   above are how it remembers that.
+
+4. It looks for clusters that are in use but were never claimed.
+
+A cross-link is a cluster that a second file asks for after a first file
+has already claimed it. The first file keeps the data. The later file is
+cut at that cluster. If the shared cluster is where the later file
+starts, that file is left empty. SVARDISK does not try to guess which
+bytes belonged to which name, and it does not copy the shared clusters
+somewhere else.
+
+A loop is a chain that comes back to a cluster it has already used. The
+chain is cut so that it ends instead of going around.
+
+A lost chain is a run of used clusters that no directory points at. With
+/F it is saved in the root directory as FILE0000.CHK, then FILE0001.CHK,
+and so on up to FILE9999.CHK. The size written on that file is the full
+size of those clusters. You can open the file, rename it, or delete it.
+A loop that no directory points at is saved the same way, and the message
+says that it was a loop.
+
+If the root directory has no free slot, and it cannot grow, the chain is
+left where it is and SVARDISK says so. The same message is used when every
+FILE####.CHK name is already taken. A FAT12 or FAT16 root has a fixed
+size. A FAT32 root is itself a chain and can be extended by one cluster
+when a lost file needs a name.
+
+Long filenames are extra directory entries that sit in front of the short
+8.3 name. If those entries are broken, or do not belong to the short name
+under them, they are removed. The short name stays.
+
+If a file's size is larger than the clusters its chain really has, that
+is reported. Clusters that hang off the end of a file, past the size the
+directory claims, are left in place. A file of size zero that still owns
+a cluster is left as it is.
+
+If "." or ".." is present but names the wrong cluster, that is reported.
+If "." or ".." is missing, that is reported too, and the entry that is
+there is still treated as a normal file or directory. SVARDISK does not
+invent a new "." or ".." line.
+
+A directory is not supposed to have a file size. A size other than zero
+is reported.
+
+Directories are followed up to 40 levels. Deeper than that, SVARDISK says
+so and does not go in. It also does not save lost chains in that case:
+the clusters it skipped may still belong to the directories it did not
+read, and turning them into FILE####.CHK files would give them a second
+name. Repairs that were already decided are still written.
+
+FAT32 keeps a small free-space record, separate from the allocation
+table. If the number there is wrong, SVARDISK says so. The value where
+every bit is set means "unknown". That is not reported as a problem.
+
+
+### WHAT /F CHANGES ##########################################################
+
+Without /F, SVARDISK only reports. The disk is not written.
+
+With /F, each problem above is repaired in the way the report describes:
+
+  - an invalid table entry becomes an end-of-chain mark
+  - the media byte is rewritten from the boot sector
+  - the FAT16 or FAT32 clean flag is set
+  - the second copy of the table is replaced by the repaired first copy
+  - the 8-character filesystem name is rewritten when it is wrong
+  - a cross-linked file is cut, and the earlier file keeps the clusters
+  - a loop is cut so the chain ends
+  - a chain that runs into a free cluster is cut at the last good one
+  - a chain that runs into a bad cluster is cut in front of that mark
+  - a file whose first cluster is free, or is a bad mark, is disconnected
+  - the bad mark itself is left in the table
+  - a file that claims to be larger than its chain is shortened
+  - a directory size other than zero is set to zero
+  - a wrong "." or ".." cluster number is corrected
+  - a broken long filename is deleted
+  - a lost chain becomes FILE####.CHK in the root
+  - the FAT32 free-space record is rewritten with the real count
+
+An unknown free-space count is filled in as well. That fill-in is not
+counted as a problem.
+
+SVARDISK will not repair the drive it was started from. If the program
+is C:\SVARDISK.EXE, then SVARDISK C: /F is refused. Checking that drive
+without /F is allowed. Copy the program to another drive, or give it an
+image file. An image file may be repaired.
+
+After /F on a real drive, restart the computer before using that drive.
+DOS may still be holding the old table. An image file does not need a
+restart.
+
+If a sector cannot be read, SVARDISK stops and does not write anything
+further. If a sector cannot be written, it stops and says so. Repairs
+that were already written stay written.
+
+
+### WHAT IT WILL NOT DO ######################################################
+
+  - scan the surface, or mark new bad sectors
+  - undelete a file, or rebuild a file from a deleted directory entry
+  - defragment
+  - copy the shared part of a cross-link into free space
+  - repair a boot sector that is not already a FAT boot sector
+  - accept a sector size other than 512 bytes
+  - accept more than two copies of the allocation table
+  - accept a cluster size that is not one of the sizes listed above
+  - notice two files that share the same name
+  - insert a missing "." or ".." entry
+
+
+### EXIT CODE ################################################################
+
+  0   no problems were found, or you asked for /?
+  1   repairs were written
+  2   problems were found and the disk was not changed
+  3   the disk could not be checked, or the command line is wrong
+
+Filling in an unknown FAT32 free-space count is not a problem, so /F
+still returns 0 when that was the only thing written.
+
+
+### LANGUAGE #################################################################
+
+  SET LANG=PL
+
+looks for SVARDISK.LNG next to SVARDISK.EXE. Unknown or missing lines
+stay in English, which is stored in the program. This release ships the
+English catalog. A translation is a SvarLANG file. The source of the
+English text is nls/en_utf8.txt.
+
+
+### BUILD ####################################################################
+
+Open Watcom 1.9, from this directory:
+
+  wmake            builds svardisk.exe
+  wmake host       builds a Linux program that checks image files
+  wmake test       builds that program and runs the image tests
+  wmake release    builds svardisk.svp, svardisk.zip and svardisk_src.zip
+
+The DOS program is a small-model EXE. WMINCRT provides the startup code
+and the 32-bit multiply the compiler calls. The matching 32-bit divide
+is u4d.asm, because WMINCRT does not include one. SvarLANG holds the
+messages. The directories svarlang and wmincrt are links to those
+SvarDOS trees. Linking reads svardisk.lnk, because the list of object
+files is longer than a DOS command line.
+
+On Linux, gcc is used once to compile tlumacz, the tool that turns the
+message file into deflang.c and svardisk.lng, and gcc also builds the
+host program used by "wmake test". utf8tocp must be on PATH. A DOS build
+uses svarlang\tlumacz.exe.
+
+wmake packs svardisk.exe with UPX -9 --8086. wmake release builds
+three archives. svardisk.svp is the SvarDOS package. It contains that
+packed program, and the package says version 2026.0 and hwreq 8086.
+svardisk.zip is the same packed program, the message file and this
+manual. svardisk_src.zip is the source.
+
+The host program is for tests. It reads and writes image files only. It
+will not open a drive letter.
+
+
+### LICENSE (MIT) ############################################################
+
+Copyright (C) 2026 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
