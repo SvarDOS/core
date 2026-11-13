@@ -326,7 +326,7 @@ static void show_help(void) {
   const char *d;
   unsigned i;
 
-  out_line("SvarDOS CHOICE");
+  out_line("SvarDOS CHOICE ver 20261113");
   crlf();
   out_line(svarlang_str(1, 0));
   crlf();

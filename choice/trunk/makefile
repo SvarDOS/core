@@ -12,7 +12,7 @@
 CC = wcc
 CFLAGS = -q -0 -bt=dos -ms -zl -os -s -wx -we -i=wmincrt -i=svarlang
 
-PVER = 2026.0
+PVER = 20261113
 
 !ifdef __UNIX__
 SEP = /
