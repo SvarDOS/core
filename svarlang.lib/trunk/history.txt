@@ -1,3 +1,6 @@
+20261113
+- tlumacz returns freed language blocks to DOS before the next MVCOMP index
+
 20261111
 - fixed svarlang_load() crashing when lang is NULL or empty (unset LANG)
 - fixed svl_find() crashing when the searched id is lower than the first entry

@@ -22,6 +22,15 @@
 #include "svarlang.h"
 #include "mvcomp.h"
 
+/* free() leaves an empty far-heap segment owned by the C runtime. halloc()
+ * asks DOS and does not see that memory. _heapshrink() gives it back. */
+#if defined(__WATCOMC__) && !defined(__386__)
+#include <malloc.h>
+static void heap_return(void) { _heapshrink(); }
+#else
+static void heap_return(void) {}
+#endif
+
 #define STRINGS_CAP 65000   /* string storage size in characters */
 #define DICT_CAP    10000   /* dictionary size in elements */
 
@@ -644,6 +653,7 @@ int main(int argc, char **argv) {
       if (sz > biggest_langsz) biggest_langsz = sz;
     }
     svl_compact_lang(lang);
+    heap_return();
 
     /* write header if first (reference) language */
     if (!reflang) {
@@ -672,6 +682,7 @@ int main(int argc, char **argv) {
       reflang = lang;
     } else {
       svl_lang_free(lang);
+      heap_return();
       lang = NULL;
     }
   }
