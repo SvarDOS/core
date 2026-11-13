@@ -549,9 +549,15 @@ int atous(unsigned short *r, const char *s) {
  * returns the (possibly updated) length of path */
 unsigned short path_appendbkslash_if_dir(char *path) {
   unsigned short len;
+  unsigned short i;
   int attr;
   for (len = 0; path[len] != 0; len++);
   if (len == 0) return(0);
+  /* a wildcard is a filespec, never a directory. DOSBox's get-attribute
+   * call succeeds on "?" and "*" and would otherwise append a slash. */
+  for (i = 0; i < len; i++) {
+    if ((path[i] == '*') || (path[i] == '?')) return(len);
+  }
   if (path[len - 1] == '\\') return(len);
   /* */
   attr = file_getattr(path);
