@@ -1,0 +1,84 @@
+
+                                 SVARDOS CHOICE
+
+CHOICE waits until the user presses one of a set of keys, then returns the
+position of that key in ERRORLEVEL. It is the SvarDOS replacement for the
+MS-DOS 6.2 CHOICE command: same switches, same prompt, same errorlevels.
+Messages follow the LANG variable through SvarLANG.
+
+
+### USAGE ####################################################################
+
+  CHOICE [/C[:]keys] [/N] [/S] [/T[:]c,nn] [text]
+
+  /C[:]keys   Keys that are accepted. Default is YN (or the equivalent
+              letters of the loaded language, for example TN when LANG=PL).
+  /N          Do not display the key list and the question mark.
+  /S          Case sensitive. Without /S, keys are shown in uppercase and
+              either case is accepted.
+  /T[:]c,nn   After nn seconds (0 to 99) behave as if c had been pressed.
+              nn = 0 selects c immediately. c must be one of the keys.
+  text        Prompt printed before the key list. Quote it if it contains
+              a slash. Only one prompt is allowed.
+
+  CHOICE /?   prints the help screen. The first line is SvarDOS CHOICE.
+
+The key list is glued to the prompt:  CHOICE Go on   shows   Go on[Y,N]?
+A space before the bracket is a space that belongs to the prompt text.
+
+
+### ERRORLEVEL ###############################################################
+
+  1       first key
+  2       second key
+  ...
+  255     bad command line, or /?
+  0       Ctrl+C or Ctrl+Break (DOS aborts the program)
+
+A key that is not in the list beeps and is otherwise ignored. After the first
+keypress the /T countdown stops, even when that key was not a valid choice.
+The accepted key is echoed, followed by a new line.
+
+
+### LANGUAGE #################################################################
+
+  SET LANG=PL
+
+looks for CHOICE.LNG next to CHOICE.COM. Unknown or missing translations stay
+in English, which is stored in the program. The two letters in message 3.0 of
+the translation are the default keys used when /C is omitted.
+
+
+### BUILD ####################################################################
+
+Open Watcom 1.9, from this directory:
+
+  wmake
+  wmake release
+
+svarlang and wmincrt are links to those SvarDOS trees. A DOS build uses
+svarlang\tlumacz.exe. A Linux build compiles a host tlumacz with gcc and
+needs utf8tocp on PATH. Both compress the LNG. The program is 8086 code.
+
+
+### LICENSE (MIT) ############################################################
+
+Copyright (C) 2026 Mateusz Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.

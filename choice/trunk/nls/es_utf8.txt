@@ -1,0 +1,18 @@
+# CHOICE messages. Spanish (CP850).
+
+1.0:Espera a que el usuario elija una de las opciones.
+1.1:CHOICE [/C[:]teclas] [/N] [/S] [/T[:]c,nn] [texto]
+1.2:/C[:]teclas   Teclas permitidas. Por defecto:
+1.3:/N            No mostrar las teclas ni el ?.
+1.4:/S            Distinguir mayúsculas.
+1.5:/T[:]c,nn     Elegir la tecla c tras nn segundos.
+1.6:texto         Texto que se muestra.
+1.7:ERRORLEVEL es la posición de la tecla pulsada.
+2.0:Parámetro no válido. Forma esperada:
+2.1:sintaxis /C no válida. Forma esperada: /C[:]teclas
+2.2:sintaxis de espera incorrecta. Forma esperada: Tc,nn o T:c,nn
+2.3:la tecla de espera no está entre las opciones.
+2.4:solo se permite un texto. Forma esperada:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:sn

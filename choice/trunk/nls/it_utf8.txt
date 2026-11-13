@@ -1,0 +1,18 @@
+# CHOICE messages. Italian (CP850).
+
+1.0:Attende che si scelga una delle risposte.
+1.1:CHOICE [/C[:]tasti] [/N] [/S] [/T[:]c,nn] [testo]
+1.2:/C[:]tasti    Tasti ammessi. Predefinito:
+1.3:/N            Non mostrare i tasti né il ?.
+1.4:/S            Distingue maiuscole e minuscole.
+1.5:/T[:]c,nn     Sceglie il tasto c dopo nn secondi.
+1.6:testo         Testo da mostrare.
+1.7:ERRORLEVEL è la posizione del tasto premuto.
+2.0:Parametro non valido. Forma attesa:
+2.1:sintassi /C non valida. Forma attesa: /C[:]tasti
+2.2:sintassi di timeout errata. Forma attesa: Tc,nn o T:c,nn
+2.3:il tasto di timeout non è tra le scelte.
+2.4:è ammesso un solo testo. Forma attesa:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:sn

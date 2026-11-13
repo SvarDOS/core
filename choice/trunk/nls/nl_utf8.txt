@@ -1,0 +1,18 @@
+# CHOICE messages. Dutch (CP850).
+
+1.0:Wacht tot de gebruiker een van de keuzes maakt.
+1.1:CHOICE [/C[:]toetsen] [/N] [/S] [/T[:]c,nn] [tekst]
+1.2:/C[:]toetsen  Toegestane toetsen. Standaard:
+1.3:/N            Toetsen en ? niet tonen.
+1.4:/S            Hoofdletters en kleine letters onderscheiden.
+1.5:/T[:]c,nn     Na nn seconden toets c kiezen.
+1.6:tekst         Weer te geven tekst.
+1.7:ERRORLEVEL is de positie van de ingedrukte toets.
+2.0:Ongeldige schakelaar. Verwachte vorm:
+2.1:ongeldige /C-syntax. Verwachte vorm: /C[:]toetsen
+2.2:ongeldige wachttijd-syntax. Verwachte vorm: Tc,nn of T:c,nn
+2.3:de wachttijd-toets staat niet in de lijst.
+2.4:slechts één tekst is toegestaan. Verwachte vorm:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:jn

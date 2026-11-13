@@ -1,0 +1,18 @@
+# CHOICE messages. Turkish (CP857).
+
+1.0:Kullanıcının seçeneklerden birini seçmesini bekler.
+1.1:CHOICE [/C[:]tuşlar] [/N] [/S] [/T[:]c,nn] [metin]
+1.2:/C[:]tuşlar   İzin verilen tuşlar. Varsayılan:
+1.3:/N            Tuşları ve ? işaretini gösterme.
+1.4:/S            Büyük/küçük harfe duyarlı.
+1.5:/T[:]c,nn     nn saniye sonra c tuşunu seç.
+1.6:metin         Gösterilecek metin.
+1.7:ERRORLEVEL basılan tuşun sırasıdır.
+2.0:Geçersiz anahtar. Beklenen biçim:
+2.1:geçersiz /C sözdizimi. Beklenen biçim: /C[:]tuşlar
+2.2:geçersiz zaman aşımı sözdizimi. Beklenen biçim: Tc,nn veya T:c,nn
+2.3:zaman aşımı tuşu listede yok.
+2.4:yalnızca bir metne izin verilir. Beklenen biçim:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:eh
