@@ -44,19 +44,18 @@
  * /B Uses bare format (no heading information or summary)
  * /L Uses lowercases
  *
- * about /S - recursive DIR on specified (or current) path and subdirectories:
- * prerequisite: some sort of mechanism that works as a stack pile of DTAs
+ * about /S - recursive DIR on specified (or current) path and subdirectories.
+ * the walk is depth-first. At each level the next sibling is the subdirectory
+ * with the smallest name strictly after the one last entered there (MS-DOS 6).
+ * /O sorts the listing of a directory; it does not change this walk.
+ * a stack of DTAs remembers the directory entered at each level.
  *
  * /S logic:
- * 1. do a FindFirst on current directory
- * 2. do FindNext calls in a loop, if a DIR entry is encountered, remember its
- *    name and put a copy of the current DTA on stack, then continue the
- *    listing without further interruption
- * 3. if a new DIR was discovered, do a FindFirst on it and jmp to 2.
- *    if no DIR found, then go to 4.
- * 4. look on the stack for a DTA.
- *    if any found, pop it and jmp to 2.
- *    otherwise job is done, exit.
+ * 1. list the current directory
+ * 2. scan *.* for the next subdirectory name (see above) and enter it
+ * 3. push that directory's DTA and repeat from 1
+ * 4. if no further subdirectory exists, pop the stack and step the path back.
+ *    if the stack is empty, the walk is done; otherwise repeat from 2.
  */
 
 /* NOTE: /A attributes are matched in an exclusive way, ie. only files with
@@ -468,6 +467,63 @@ static int sortcmp(const struct TINYDTA far *dta1, const struct TINYDTA far *dta
   }
 
   return(0);
+}
+
+
+/* compare two ASCIIZ filenames using the NLS collating table (same weights
+ * as /ON). equal weights are broken by the raw byte so the order is total
+ * and every distinct name is visited once. returns <0, 0 or >0. */
+static int dir_namecmp(const char *s1, const char *s2) {
+  for (;;) {
+    unsigned char c1 = glob_sortcmp_dat.sortownia[(unsigned char)(*s1)];
+    unsigned char c2 = glob_sortcmp_dat.sortownia[(unsigned char)(*s2)];
+    if (c1 != c2) {
+      if (c1 < c2) return(-1);
+      return(1);
+    }
+    if (*s1 != *s2) {
+      if ((unsigned char)(*s1) < (unsigned char)(*s2)) return(-1);
+      return(1);
+    }
+    if (*s1 == 0) return(0);
+    s1++;
+    s2++;
+  }
+}
+
+
+/* pick the subdirectory of path to enter next. path ends with a filespec.
+ * after is the last sibling entered at this level, or NULL to start.
+ * copies the chosen DTA to out and returns 1, or 0 if there is no next one.
+ * hidden and system directories are not returned (DOS_ATTR_DIR search). */
+static int dir_pick_subdir(char *path, const char *after, struct DTA *out) {
+  char *s;
+  char backup[4];
+  struct DTA scan;
+  int found = 0;
+
+  /* same 4-byte filespec swap as the old /S scan: "*.*" is 4 bytes with NUL,
+   * restoring those 4 bytes rebuilds the original tail */
+  for (s = path; *s != 0; s++);
+  for (; s[-1] != '\\'; s--);
+  memcpy_ltr(backup, s, 4);
+  memcpy_ltr(s, "*.*", 4);
+
+  if (findfirst(&scan, path, DOS_ATTR_DIR) == 0) {
+    do {
+      /* "." and ".." (MS-DOS skips any name that starts with a dot) */
+      if (scan.fname[0] == '.') continue;
+      if ((scan.attr & DOS_ATTR_DIR) == 0) continue;
+      if ((after != NULL) && (dir_namecmp(scan.fname, after) <= 0)) continue;
+      if ((found == 0) || (dir_namecmp(scan.fname, out->fname) < 0)) {
+        memcpy_ltr(out, &scan, sizeof(struct DTA));
+        found = 1;
+      }
+    } while (findnext(&scan) == 0);
+  }
+
+  memcpy_ltr(s, backup, 4);
+  return(found);
 }
 
 
@@ -1021,46 +1077,25 @@ static enum cmd_result cmd_dir(struct cmd_funcparam *p) {
   summary_recurs_fcount += summary_fcount;
   summary_recurs_totsz += summary_totsz;
 
-  /* /S processing */
+  /* /S processing: descend in ascending name order (rescan per sibling,
+   * same cost model as MS-DOS FindNextChild; /O does not apply here) */
   CHECK_RECURS:
-  /* if /S then look for a subdir */
   if (req.flags & DIR_FLAG_RECUR) {
-    /* do the findfirst on *.* instead of reusing the user filter */
-    char *s;
-    char backup[4];
-    //printf("orig path='%s' new=", buf->path);
-    for (s = buf->path; *s != 0; s++);
-    for (; s[-1] != '\\'; s--);
-    memcpy_ltr(backup, s, 4);
-    memcpy_ltr(s, "*.*", 4);
-    //printf("'%s'\n", buf->path);
-    if (findfirst(&dta, buf->path, DOS_ATTR_DIR) == 0) {
-      memcpy_ltr(s, backup, 4);
-      for (;;) {
-        if ((dta.fname[0] != '.') && (dta.attr & DOS_ATTR_DIR)) break;
-        if (findnext(&dta) != 0) goto NOSUBDIR;
-      }
-      //printf("GOT DIR (/S): '%s'\n", dta->fname);
-      /* add dir to path and redo scan */
+    if (dir_pick_subdir(buf->path, NULL, &dta) != 0) {
       memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), &dta, sizeof(struct DTA));
       buf->dtastacklen++;
       path_add(buf->path, dta.fname);
       goto NEXT_ITER;
     }
-    memcpy_ltr(s, backup, 4);
   }
-  NOSUBDIR:
 
   while (buf->dtastacklen > 0) {
-    /* rewind path one directory back, pop the next dta and do a FindNext */
+    /* rewind to the parent and take the next sibling after the one just done */
     path_back(buf->path);
     buf->dtastacklen--;
-    TRYNEXTENTRY:
-    if (findnext(&(buf->dtastack[buf->dtastacklen])) != 0) continue;
-    if ((buf->dtastack[buf->dtastacklen].attr & DOS_ATTR_DIR) == 0) goto TRYNEXTENTRY;
-    if (buf->dtastack[buf->dtastacklen].fname[0] == '.') goto TRYNEXTENTRY;
-    /* something found -> add dir to path and redo scan */
-    path_add(buf->path, buf->dtastack[buf->dtastacklen].fname);
+    if (dir_pick_subdir(buf->path, buf->dtastack[buf->dtastacklen].fname, &dta) == 0) continue;
+    memcpy_ltr(&(buf->dtastack[buf->dtastacklen]), &dta, sizeof(struct DTA));
+    path_add(buf->path, dta.fname);
     buf->dtastacklen++;
     goto NEXT_ITER;
   }
