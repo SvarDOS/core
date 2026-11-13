@@ -1,0 +1,18 @@
+# CHOICE messages. Polish (Mazovia).
+
+1.0:Czeka, aż użytkownik wybierze jedną z odpowiedzi.
+1.1:CHOICE [/C[:]klawisze] [/N] [/S] [/T[:]c,nn] [tekst]
+1.2:/C[:]klawisze  Dozwolone klawisze. Domyślnie:
+1.3:/N             Nie pokazuj klawiszy ani znaku ?.
+1.4:/S             Rozróżniaj wielkość liter.
+1.5:/T[:]c,nn      Po nn sekundach wybierz klawisz c.
+1.6:tekst          Wyświetlany napis.
+1.7:ERRORLEVEL to pozycja naciśniętego klawisza.
+2.0:Nieznany przełącznik. Oczekiwana postać:
+2.1:błędna składnia /C. Oczekiwana postać: /C[:]klawisze
+2.2:błędna składnia czasu. Oczekiwana postać: Tc,nn lub T:c,nn
+2.3:klawisz czasu nie jest wśród dozwolonych.
+2.4:dozwolony jest tylko jeden napis. Oczekiwana postać:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:tn

@@ -1,0 +1,18 @@
+# CHOICE messages. German (CP850).
+
+1.0:Wartet, bis eine der Vorgaben gewählt wird.
+1.1:CHOICE [/C[:]tasten] [/N] [/S] [/T[:]c,nn] [text]
+1.2:/C[:]tasten   Zulässige Tasten. Vorgabe:
+1.3:/N            Vorgaben und ? nicht anzeigen.
+1.4:/S            Groß- und Kleinschreibung beachten.
+1.5:/T[:]c,nn     Nach nn Sekunden Taste c wählen.
+1.6:text          Angezeigter Text.
+1.7:ERRORLEVEL ist die Position der gedrückten Taste.
+2.0:Ungültiger Schalter. Erwartete Form:
+2.1:Ungültige Angabe /C. Erwartete Form: /C[:]tasten
+2.2:Falsche Wartezeit-Syntax. Erwartete Form: Tc,nn oder T:c,nn
+2.3:Taste der Wartezeit ist nicht in der Liste.
+2.4:Nur ein Text ist erlaubt. Erwartete Form:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:jn

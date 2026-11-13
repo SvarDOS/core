@@ -1,0 +1,9 @@
+system dos com
+option quiet
+option eliminate
+option map
+name choice.com
+file startup.obj
+file choice.obj
+file deflang.obj
+library svarlang/svarlngs.lib

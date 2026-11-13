@@ -1,0 +1,18 @@
+# CHOICE messages. English text.
+
+1.0:Waits for the user to choose one of a set of choices.
+1.1:CHOICE [/C[:]choices] [/N] [/S] [/T[:]c,nn] [text]
+1.2:/C[:]choices Specifies allowable keys. Default is
+1.3:/N           Do not display choices and ? at end of prompt string.
+1.4:/S           Treat choice keys as case sensitive.
+1.5:/T[:]c,nn    Default choice to c after nn seconds
+1.6:text         Prompt string to display
+1.7:ERRORLEVEL is set to offset of key user presses in choices.
+2.0:Invalid switch on command line. Expected form:
+2.1:invalid choice switch syntax. Expected form: /C[:]choices
+2.2:Incorrect timeout syntax.  Expected form Tc,nn or T:c,nn
+2.3:Timeout default not in specified (or default) choices.
+2.4:only one prompt string allowed. Expected Form:
+
+# default keys (uppercased on screen unless /S is given)
+3.0:yn
