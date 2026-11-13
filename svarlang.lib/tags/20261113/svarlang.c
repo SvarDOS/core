@@ -1,0 +1,414 @@
+/* This file is part of the svarlang project and is published under the terms
+ * of the MIT license.
+ *
+ * Copyright (C) 2021-2026 Mateusz Viste
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+/* if WITHSTDIO is enabled, then remap file operations to use the standard
+ * stdio amenities */
+#ifdef WITHSTDIO
+
+#include <stdio.h>   /* FILE, fopen(), fseek(), etc */
+typedef FILE* FHANDLE;
+#define FOPEN(x) fopen(x, "rb")
+#define FCLOSE(x) fclose(x)
+#define FREAD(f,t,b) fread(t, 1, b, f)
+#define FSEEK(f,o,n) (fseek((f), (long)(n), (o)) ? (unsigned long)-1 : (unsigned long)ftell(f))
+
+#else
+
+#include <i86.h>  /* FP_SEG, FP_OFF */
+typedef unsigned short FHANDLE;
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+
+#endif
+
+
+#include "svarlang.h"
+
+
+/* supplied through DEFLANG.C */
+extern char svarlang_mem[];
+extern unsigned short svarlang_dict[];
+extern const unsigned short svarlang_memsz;
+extern const unsigned short svarlang_string_count;
+
+
+const char *svarlang_strid(unsigned short id) {
+  unsigned short left = 0, right = svarlang_string_count - 1, x;
+  unsigned short v;
+
+  if (svarlang_string_count == 0) return("");
+
+  while (left <= right) {
+    x = left + ((right - left ) >> 2);
+    v = svarlang_dict[x * 2];
+
+    if (id == v) return(svarlang_mem + svarlang_dict[x * 2 + 1]);
+
+    if (id > v) {
+      if (x == 65535) goto not_found;
+      left = x + 1;
+    } else {
+      if (x == 0) goto not_found;
+      right = x - 1;
+    }
+  }
+
+not_found:
+  return("");
+}
+
+
+/* routines below are simplified (dos-based) versions of the libc FILE-related
+ * functions. Using them avoids a dependency on FILE, hence makes the binary
+ * smaller if the application does not need to pull fopen() and friends
+ * I use pragma aux directives for more compact size. open-watcom only. */
+#ifndef WITHSTDIO
+
+static unsigned short FOPEN(const char far *s);
+
+#pragma aux FOPEN = \
+"push ds" \
+"push es" \
+"pop ds" \
+"mov ax, 0x3D00" /* open file, read-only (fname at DS:DX) */ \
+"int 0x21" \
+"jnc DONE" \
+"xor ax, ax"     /* return 0 on error */ \
+"DONE:" \
+"pop ds" \
+parm [es dx] \
+value [ax];
+
+
+static void FCLOSE(unsigned short handle);
+
+#pragma aux FCLOSE = \
+"mov ah, 0x3E" \
+"int 0x21" \
+modify [ax]  /* AX might contain an error code on failure */ \
+parm [bx]
+
+
+static unsigned short FREAD(unsigned short handle, void far *buff, unsigned short bytes);
+
+#pragma aux FREAD = \
+"push ds" \
+"push es" \
+"pop ds" \
+"mov ah, 0x3F"    /* read cx bytes from file handle bx to DS:DX */ \
+"int 0x21" \
+"jnc ERR" \
+"xor ax, ax"      /* return 0 on error */ \
+"ERR:" \
+"pop ds" \
+parm [bx] [es dx] [cx] \
+value [ax]
+
+
+/* origin is SEEK_SET, SEEK_CUR or SEEK_END. returns the new position,
+ * or all-bits-one on error. */
+static unsigned long FSEEK(unsigned short handle, unsigned short origin, unsigned long off);
+
+#pragma aux FSEEK = \
+"mov ah, 0x42" /* AL = origin, CX:DX = signed offset */ \
+"int 0x21" \
+"jnc DONE" \
+"xor ax, ax" \
+"dec ax"      /* AX = DX = 0xFFFF */ \
+"mov dx, ax" \
+"DONE:" \
+parm [bx] [ax] [cx dx] \
+value [dx ax] \
+modify [cx]
+
+#endif
+
+
+
+#ifdef MVUCOMP_ASM
+
+/* returns 0, or -1 if the output would run past dstmax bytes */
+static int mvucomp_asm(unsigned short bufseg, unsigned short dst, unsigned short src, unsigned short complen, unsigned short dstmax);
+
+#pragma aux mvucomp_asm = \
+"    push ds"\
+"    push bp"\
+"    mov bp, cx" /* bp = output bytes still allowed */ \
+\
+     /* ds:si = compressed stream */     \
+     /* es:di = output location */       \
+     /* bx = len of compressed stream */ \
+"    shr bx, 1" /* convert byte length to number of words */ \
+"    cld" /* make sure stosw and friends move forward */ \
+     /* set ds = es = bufseg */          \
+"    push es"\
+"    pop ds"\
+\
+"    xor dx, dx" /* literal continuation counter */ \
+\
+"    AGAIN:"\
+\
+     /* do I have any input? */ \
+"    test bx, bx"\
+"    jz KONIEC"\
+"    dec bx"\
+\
+     /* load token */ \
+"    lodsw"  /* mov ax, [ds:si] + inc si + inc si */ \
+\
+"    /* literal continuation? */"\
+"    test dx, dx"\
+"    jz TRY_BACKREF"\
+"    cmp bp, 2" /* a raw word needs two output bytes */ \
+"    jb FAIL"\
+"    sub bp, 2"\
+"    stosw"\
+"    dec dx" /* a byte shorter than dec dl */ \
+"    jmp AGAIN"\
+\
+/* back ref? */ \
+"    TRY_BACKREF:"\
+"    test ax, 0xf000"\
+"    jz LITERAL_START" /* else it's a literal start */ \
+     /* AH = LLLL OOOO   AL = OOOO OOOO */ \
+     /* copy (ah>>4)+1 bytes from (ax & 0x0FFF)+1 */ \
+     /* prep CX = len, then refuse the copy if it does not fit */ \
+"    mov ch, ah" /* this is all about setting CX to the high nibble of AX */ \
+"    mov cl, 4"  /* using a code as compact as possible.                  */ \
+"    shr ch, cl"\
+"    mov cl, ch"\
+"    xor ch, ch"\
+"    inc cx"\
+"    cmp bp, cx"\
+"    jb FAIL"\
+"    sub bp, cx"\
+     /* save regs */ \
+"    push si"\
+"    and ax, 0x0fff"  /* clear the backref length bits */ \
+"    inc ax"\
+"    mov si, di"\
+"    sub si, ax"\
+"    /* do the copy */"\
+"    rep movsb" /* copy cx bytes from ds:si to es:di + inc si + inc di */ \
+\
+"    /* restore regs */"\
+"    pop si"\
+"    jmp AGAIN"\
+\
+"    LITERAL_START:" /* write al to dst and set literal counter */ \
+     /* 0000 UUUU  BBBB BBBB */ \
+"    cmp bp, 1"\
+"    jb FAIL"\
+"    dec bp"\
+"    stosb" /* mov [es:di], al + inc di */ \
+"    mov dl, ah" /* ah high nibble is guaranteed to be zero */ \
+"    jmp AGAIN"\
+\
+"    FAIL:"\
+"    mov ax, 0xffff"\
+"    jmp DONE"\
+"    KONIEC:"\
+"    xor ax, ax"\
+"    DONE:"\
+"    pop bp"\
+"    pop ds"\
+modify [ax bx cx dx di si] \
+parm [es] [di] [si] [bx] [cx] \
+value [ax]
+
+#else
+
+/* returns 0, or -1 if the output would run past dstmax bytes */
+int mvucomp(char *dst, const unsigned short *src, unsigned short complen, unsigned short dstmax) {
+  unsigned char rawwords = 0; /* number of uncompressible words */
+  complen /= 2; /* I'm interested in number of words, not bytes */
+
+  while (complen != 0) {
+    unsigned short token;
+    /* get next mvcomp token */
+    token = *src;
+    src++;
+    complen--;
+
+    /* token format is LLLL OOOO OOOO OOOO, where:
+     * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
+     * LLLL is the number of bytes (-1) that have to be copied from the offset.
+     *
+     * However, if LLLL is zero then the token's format is different:
+     * 0000 RRRR BBBB BBBB
+     *
+     * The above form occurs when uncompressible data is encountered:
+     * BBBB BBBB is the literal value of a byte to be copied
+     * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
+     */
+
+    /* raw word? */
+    if (rawwords != 0) {
+      unsigned short *dst16;
+      if (dstmax < 2) return(-1);
+      dstmax -= 2;
+      dst16 = (void *)dst;
+      *dst16 = token;
+      dst += 2;
+      rawwords--;
+
+    /* literal byte? */
+    } else if ((token & 0xF000) == 0) {
+      if (dstmax == 0) return(-1);
+      dstmax--;
+      *dst = token; /* no need for an explicit "& 0xff", dst is a char ptr so token is naturally truncated to lowest 8 bits */
+      dst++;
+      rawwords = token >> 8; /* number of RAW words that are about to follow */
+
+    /* else it's a backreference */
+    } else {
+      char *src;
+      unsigned short len = (token >> 12) + 1; /* 1..16 bytes */
+      if (dstmax < len) return(-1);
+      dstmax -= len;
+      src = dst - (token & 0x0FFF) - 1;
+      token >>= 12;
+      for (;;) {
+        *dst = *src;
+        dst++;
+        src++;
+        if (token == 0) break;
+        token--;
+      }
+    }
+  }
+  return(0);
+}
+
+#endif
+
+
+int svarlang_load(const char *fname, const char *lang) {
+  unsigned short langid;
+  unsigned short buff16[2];
+  FHANDLE fd;
+  signed char exitcode = 0;
+  struct {
+    unsigned long sig;
+    unsigned short string_count;
+  } hdr;
+
+  /* getenv("LANG") is a null pointer when unset; an empty string is a 1-byte
+   * object and the word load below would read past it */
+  if ((!lang) || (lang[0] == 0)) return(-1);
+
+  langid = *((unsigned short *)lang);
+  langid &= 0xDFDF; /* make sure lang is upcase */
+
+  fd = FOPEN(fname);
+  if (!fd) return(-1);
+
+  /* read hdr, sig should be "SvL\x1a" (0x1a4c7653) */
+  if ((FREAD(fd, &hdr, 6) != 6) || (hdr.sig != 0x1a4c7653L) || (hdr.string_count != svarlang_string_count)) {
+    exitcode = -2;
+    goto FCLOSE_AND_EXIT;
+  }
+
+  for (;;) {
+    /* read next lang id and string table size in file */
+    if (FREAD(fd, buff16, 4) != 4) {
+      exitcode = -3;
+      goto FCLOSE_AND_EXIT;
+    }
+
+    /* is it the lang I am looking for? */
+    /* compare without the highest bit - it is a flag for compression */
+    if ((buff16[0] & 0x7FFF) == langid) {
+      /* reject a block bigger than svarlang_mem before any write: the
+       * compressed load address would wrap and a raw load would run past it */
+      if (buff16[1] > svarlang_memsz) {
+        exitcode = -6;
+        goto FCLOSE_AND_EXIT;
+      }
+      break;
+    }
+
+    /* skip to next lang (in two steps to avoid a potential uint16 overflow) */
+    FSEEK(fd, SEEK_CUR, svarlang_string_count * 4);
+    FSEEK(fd, SEEK_CUR, buff16[1]);
+  }
+
+  /* the dictionary and the strings must both be in the file before either
+   * is written over the language that is already loaded */
+  {
+    unsigned long pos, end, have;
+    pos = FSEEK(fd, SEEK_CUR, 0); /* position at the dictionary */
+    end = FSEEK(fd, SEEK_END, 0); /* file size */
+    have = (unsigned long)svarlang_string_count * 4 + buff16[1];
+    if ((pos == (unsigned long)-1) || (end == (unsigned long)-1) || (end < pos) || ((end - pos) < have) || (FSEEK(fd, SEEK_SET, pos) != pos)) {
+      exitcode = -4;
+      goto FCLOSE_AND_EXIT;
+    }
+  }
+
+  /* load the index (dict) */
+  if (FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) {
+    exitcode = -4;
+    goto FCLOSE_AND_EXIT;
+  }
+
+  /* is the lang block compressed? then uncompress it */
+  if (buff16[0] & 0x8000) {
+    unsigned short *mvcompptr;
+
+    /* start by loading the entire block at the end of the svarlang mem */
+    mvcompptr = (void *)(svarlang_mem + svarlang_memsz - buff16[1]);
+    if (FREAD(fd, mvcompptr, buff16[1]) != buff16[1]) {
+      exitcode = -5;
+      goto FCLOSE_AND_EXIT;
+    }
+
+    /* uncompress now. stop instead of writing past svarlang_mem: the
+     * compressed size already fit, the expanded text may not */
+#ifndef MVUCOMP_ASM
+    if (mvucomp(svarlang_mem, mvcompptr, buff16[1], svarlang_memsz) != 0) {
+      exitcode = -6;
+      goto FCLOSE_AND_EXIT;
+    }
+#else
+    if (mvucomp_asm(FP_SEG(svarlang_mem), FP_OFF(svarlang_mem), FP_OFF(svarlang_mem) + svarlang_memsz - buff16[1], buff16[1], svarlang_memsz) != 0) {
+      exitcode = -6;
+      goto FCLOSE_AND_EXIT;
+    }
+#endif
+
+    goto FCLOSE_AND_EXIT;
+  }
+
+  /* lang block not compressed - load as is */
+  if (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1]) {
+    exitcode = -7;
+  }
+
+  FCLOSE_AND_EXIT:
+
+  FCLOSE(fd);
+  return(exitcode);
+}
